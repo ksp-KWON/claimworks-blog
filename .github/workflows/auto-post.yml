@@ -2,58 +2,42 @@ name: Auto Generate Daily Blog Post
 
 on:
   schedule:
-    - cron: '47 21 * * *'  # 매일 한국시간 오전 6시 47분 (UTC 21:47 전날) - 혼잡시간대 회피
-  workflow_dispatch:       # 수동 실행 버튼
-  repository_dispatch:     # 외부 크론 서비스(cron-job.org)에서 강제 호출 가능
+    - cron: '47 21 * * *'  # 매일 한국시간 오전 6시 47분
+  workflow_dispatch:       # 수동 실행 (테스트용)
+  repository_dispatch:
     types: [run-auto-post]
 
 jobs:
-  auto-generate:
+  generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20    # 지수 백오프 재시도 시간 여유 확보 (15→20분)
+    timeout-minutes: 15          # 최대 15분 (429 재시도 포함 여유 있게)
     permissions:
-      contents: write      # 자동 작성된 글을 저장소에 커밋/푸시할 권한
+      contents: write
 
     steps:
-      - name: Checkout
+      - name: 저장소 체크아웃
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1          # 기존 포스트 파일 전체를 읽어야 하므로 전체 히스토리 불필요
 
-      - name: Setup Node.js
+      - name: Node.js 설정
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
 
-      - name: Install dependencies
+      - name: 의존성 설치
         run: npm ci
 
-      - name: Generate blog post
+      - name: 자동글쓰기 실행
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/generate-blog-post.js
 
-      - name: Prebuild
-        run: node scripts/prebuild.js
-
-      - name: Build
-        run: npm run build
-        env:
-          NODE_ENV: production
-
-      - name: Commit new post
+      - name: 변경사항 커밋 & 푸시
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: auto-post [$(date +'%Y-%m-%d')]"
-            git push
-          else
-            echo "새 글 없음 (중복 슬러그 방지)"
-          fi
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy out --project-name=claimworks-blog --branch=main
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/content/posts/
+          # 새 파일이 없으면 커밋하지 않음 (오류 방지)
+          git diff --cached --quiet || git commit -m "auto: 자동글쓰기 $(TZ=Asia/Seoul date '+%Y-%m-%d')"
+          git push origin main

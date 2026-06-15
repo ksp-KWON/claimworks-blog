@@ -157,7 +157,7 @@ export default function AdminPage() {
     setStatusMessage('🤖 GitHub에 데일리 자동 발행(Auto Post) 트리거를 요청하고 있습니다...');
     
     try {
-      const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/dispatches`, {
+      const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/auto-post.yml/dispatches`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${githubToken}`,
@@ -165,7 +165,7 @@ export default function AdminPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          event_type: 'run-auto-post'
+          ref: 'main'
         })
       });
       

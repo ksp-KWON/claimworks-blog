@@ -34,7 +34,7 @@ export default function AdminPage() {
   });
   
   // App State
-  const [mode, setMode] = useState<'manual' | 'semi-auto' | 'edit'>('manual');
+  const [mode, setMode] = useState<'manual' | 'semi-auto' | 'auto' | 'edit'>('manual');
   const [inputText, setInputText] = useState('');
   const [generatedMarkdown, setGeneratedMarkdown] = useState('');
   const [slug, setSlug] = useState('');
@@ -149,6 +149,38 @@ export default function AdminPage() {
   };
 
   // Removed redundant useEffect to avoid synchronous setState calls
+
+  const triggerAutoPost = async () => {
+    if (!githubToken) return alert('GitHub 토큰이 필요합니다.');
+    
+    setIsLoading(true);
+    setStatusMessage('🤖 GitHub에 데일리 자동 발행(Auto Post) 트리거를 요청하고 있습니다...');
+    
+    try {
+      const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/dispatches`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${githubToken}`,
+          'Accept': 'application/vnd.github+json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_type: 'run-auto-post'
+        })
+      });
+      
+      if (res.status === 204) {
+        setStatusMessage('✅ 자동 발행 기동 명령이 성공적으로 전송되었습니다! 아래 [실시간 배포 로그 확인]을 눌러 빌드 상태를 모니터링하세요.');
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP 에러 상태 코드: ${res.status}`);
+      }
+    } catch (error) {
+      const err = error as Error;
+      setStatusMessage(`기동 실패: ${err.message}`);
+    }
+    setIsLoading(false);
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -590,12 +622,13 @@ ${inputText}
               {[
                 { id: 'manual', label: '수동 (대본 포장)' },
                 { id: 'semi-auto', label: '반자동 (링크/개요)' },
+                { id: 'auto', label: '자동 (데일리 발행)' },
                 { id: 'edit', label: '기존 글 수정' }
               ].map((m) => (
                 <button
                   key={m.id}
                   onClick={() => {
-                    setMode(m.id as 'manual' | 'semi-auto' | 'edit');
+                    setMode(m.id as 'manual' | 'semi-auto' | 'auto' | 'edit');
                     if (m.id === 'edit') {
                       fetchPostList();
                       setShowPostList(true); // 수정 탭으로 갈 때는 목록을 펼칩니다
@@ -684,6 +717,44 @@ ${inputText}
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                   AI 자율 작성 가동
                 </button>
+              </motion.div>
+            )}
+
+            {mode === 'auto' && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col justify-center items-center p-6 text-center space-y-6">
+                <div className="w-20 h-20 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                  <svg className="w-10 h-10 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div className="max-w-md">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">원격 데일리 자동 발행</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    구글 트렌드 및 최신 이슈를 기반으로 <b>AI가 스스로 글을 분석하고 자동 발행</b>하는 파이프라인(GitHub Actions)을 즉시 기동시킵니다.<br />
+                    실행 후 배포가 완료되기까지 약 2~3분이 소요됩니다.
+                  </p>
+                </div>
+                <div className="w-full max-w-sm space-y-3 pt-4">
+                  <button 
+                    onClick={triggerAutoPost}
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-xl shadow shadow-blue-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2 text-sm"
+                  >
+                    🚀 즉시 자동 발행 기동 (Run Workflow)
+                  </button>
+                  
+                  <a 
+                    href={`https://github.com/${REPO_OWNER}/${REPO_NAME}/actions`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-white dark:bg-[#303134] text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-[#3f3f42] font-bold py-3.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-xs"
+                  >
+                    📊 실시간 배포 로그 확인하기 (GitHub Actions)
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
               </motion.div>
             )}
 

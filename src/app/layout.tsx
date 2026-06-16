@@ -122,6 +122,9 @@ export default function RootLayout({
             {/* 우측 메뉴 영역 */}
             <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               
+              {/* 검색아이콘 (홈아이콘 왼쪽으로 이동) */}
+              <SearchBar />
+              
               {/* 데스크탑에서만 보이는 네비게이션 (모바일에서는 하단바로 이동) */}
               <nav className="hidden md:flex items-center space-x-1 sm:space-x-2">
                 <Link href="/" className="p-2 sm:p-2.5 rounded-full text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#e8eaed] dark:hover:bg-[#3c4043] hover:text-[var(--google-blue)] transition-colors flex items-center justify-center group" aria-label="홈" title="홈">
@@ -157,23 +160,23 @@ export default function RootLayout({
                 </Link>
               </nav>
 
-              <SearchBar />
-
               <div className="flex items-center gap-0.5 sm:gap-1 pl-1 sm:pl-2 ml-1 sm:ml-2 border-l border-[var(--google-border)]">
-                {/* 플랫폼 소개 아이콘 (상단바로 이동) */}
-                <Link href="/about" className="p-1.5 sm:p-2 text-[#5f6368] dark:text-[#9aa0a6] hover:text-[var(--google-blue)] hover:bg-[#e8eaed] dark:hover:bg-[#3c4043] rounded-full transition-colors flex items-center justify-center" aria-label="플랫폼 소개">
+                {/* 테마 변경 아이콘 */}
+                <ThemeToggle />
+                
+                {/* 햄버거 메뉴 서랍 (카테고리) - 우측 사이드바가 숨겨지는 lg 미만에서만 노출 */}
+                <div className="lg:hidden flex items-center">
+                  <MobileSidebarDrawer />
+                </div>
+
+                {/* 플랫폼 소개 아이콘 (맨 우측으로 이동) */}
+                <Link href="/about" className="p-1.5 sm:p-2 text-[#5f6368] dark:text-[#9aa0a6] hover:text-[var(--google-blue)] hover:bg-[#e8eaed] dark:hover:bg-[#3c4043] rounded-full transition-colors flex items-center justify-center" aria-label="플랫폼 소개" title="플랫폼 소개">
                   <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="16" x2="12" y2="12"></line>
                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                   </svg>
                 </Link>
-                
-                {/* 테마 변경 아이콘 (카카오 좌측으로 위치 이동) */}
-                <ThemeToggle />
-                
-                {/* 햄버거 메뉴 서랍 (카테고리) - 맨 우측 배치 */}
-                <MobileSidebarDrawer />
               </div>
             </div>
           </div>

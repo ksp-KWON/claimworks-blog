@@ -87,7 +87,7 @@ function extractFAQ(content: string): { q: string; a: string }[] {
 
       if (/^#+\s*/.test(trimmed)) {
         if (currentQ) faqs.push({ q: currentQ, a: currentA.trim() });
-        currentQ = trimmed.replace(/^(?:#+\s*)+/, '').trim();
+        currentQ = trimmed.replace(/^(?:#+\s*)+/, '').replace(/^Q\d+\s*[:.-]?\s*/i, '').trim();
         currentA = '';
       } else if (currentQ) {
         if (trimmed === '---') continue;

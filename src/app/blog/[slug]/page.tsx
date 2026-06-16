@@ -86,9 +86,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     }
     if (inFAQSection) {
       if (/^##\s+/.test(trimmed)) break; // 다음 H2 대제목을 만나면 종료
-      if (/^###\s+/.test(trimmed)) {
+      if (/^#+\s*/.test(trimmed)) {
         if (currentQ) faqs.push({ q: currentQ, a: currentA.trim() });
-        currentQ = trimmed.replace(/^###\s*/, '').replace(/^[Q\d.\s#]+/i, '').trim();
+        currentQ = trimmed.replace(/^(?:#+\s*)+/, '').replace(/^Q\d+\s*[:.-]?\s*/i, '').trim();
         currentA = '';
       } else if (currentQ) {
         if (trimmed === '---') continue;

@@ -79,9 +79,8 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
                   ? 'text-[#34A853] dark:text-[#81c995] font-bold line-through opacity-80'
                   : 'text-gray-800 dark:text-[#e8eaed] font-medium'
               }`}
-            >
-              {item}
-            </span>
+              dangerouslySetInnerHTML={{ __html: item }}
+            />
           </button>
         ))}
       </div>

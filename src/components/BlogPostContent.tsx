@@ -172,11 +172,11 @@ function preprocessBody(content: string): string {
       if (/^#{1,6}\s/.test(trimmed)) {
         flushChecklist();
         skipType = 'NONE';
-      } else if (/^[-*]\s+/.test(trimmed) || /^[☑️✅[\]]/.test(trimmed)) {
+      } else if (/^[-*]\s+/.test(trimmed) || /^[\u2611\u2705\uFE0F[\]]/.test(trimmed)) {
         const text = trimmed
           .replace(/^[-*]\s*/, '')
           .replace(/^\[[ x]\]\s*/i, '')
-          .replace(/^[☑️✅]\s*/u, '')
+          .replace(/^[\u2611\u2705\uFE0F]+\s*/gu, '')
           .trim();
         if (text) clBuffer.push(text);
         continue;

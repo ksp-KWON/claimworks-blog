@@ -7,7 +7,6 @@ import { SpecialtyDiseaseCategories, RegionalCategories } from '@/components/Sid
 
 export default function SidebarContent() {
   const [showAllTags, setShowAllTags] = useState(false);
-  const [isMajorCategoryOpen, setIsMajorCategoryOpen] = useState(false);
 
   // 인기 태그 계산 (빈도수 기준 내림차순 정렬)
   const sortedTags = useMemo(() => {
@@ -76,7 +75,7 @@ export default function SidebarContent() {
         </Link>
       </div>
 
-      {/* 주요 보상 카테고리 (세로 리스트 형태 원복) */}
+      {/* 주요 보상 카테고리 (가로 스크롤 스마트무빙 적용) */}
       <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(251,188,4,0.2)] hover:border-[var(--google-yellow)] transition-all duration-300 group relative overflow-hidden">
         <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-yellow)] pl-2.5">
           <span className="text-[var(--google-yellow)] text-lg leading-none">📂</span>
@@ -86,19 +85,7 @@ export default function SidebarContent() {
           보상스쿨의 다양한 보상 정보와 분쟁 해결 가이드를 주제별로 모아두었습니다.
         </p>
         
-        <button 
-          onClick={() => setIsMajorCategoryOpen(!isMajorCategoryOpen)}
-          className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors group p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10"
-        >
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
-            카테고리 펼치기
-          </div>
-          <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isMajorCategoryOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
-        
-        <div className={`overflow-hidden transition-all duration-300 ${isMajorCategoryOpen ? 'max-h-[500px] mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
-          <ul className="space-y-1 text-sm font-medium text-[#202124] dark:text-[#e8eaed]">
+        <div className="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-2 px-2 sm:mx-0 sm:px-0">
           {[
             { name: '교통사고', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
             { name: '배상책임', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20' },
@@ -108,20 +95,17 @@ export default function SidebarContent() {
             { name: '후유장해 보상', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
             { name: '보상정보', color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20' }
           ].map(cat => (
-            <li key={cat.name}>
-              <Link
-                href={`/blog?category=${encodeURIComponent(cat.name)}`}
-                className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[var(--google-surface-variant)] dark:hover:bg-white/5 transition-colors group"
-              >
-                <span className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${cat.bg} ${cat.color}`}></span>
-                  <span className="group-hover:text-[var(--google-blue)] transition-colors">{cat.name}</span>
-                </span>
-                <svg className="w-4 h-4 text-[#5f6368] opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-              </Link>
-            </li>
+            <Link
+              key={cat.name}
+              href={`/blog?category=${encodeURIComponent(cat.name)}`}
+              className="shrink-0 w-[140px] snap-start flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50 dark:bg-[#303134] border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:bg-[#e8f0fe] dark:hover:bg-[#174ea6]/20 transition-colors group"
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${cat.bg} ${cat.color} group-hover:scale-110 transition-transform`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+              </div>
+              <span className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">{cat.name}</span>
+            </Link>
           ))}
-          </ul>
         </div>
       </div>
 

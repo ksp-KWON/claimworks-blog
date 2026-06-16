@@ -62,27 +62,30 @@ export default function ThemeToggle() {
     >
       {/* 라이트 모드 (해 아이콘) */}
       {theme === "light" && (
-        <svg className="w-5 h-5 transition-transform duration-300 rotate-0 scale-100" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
+        <svg className="w-5 h-5 transition-transform duration-300 rotate-0 scale-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="5" />
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
         </svg>
       )}
 
       {/* 다크 모드 (달 아이콘) */}
       {theme === "dark" && (
-        <svg className="w-5 h-5 transition-transform duration-300 rotate-0 scale-100" fill="currentColor" viewBox="0 0 24 24">
-          <path fillRule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clipRule="evenodd" />
+        <svg className="w-5 h-5 transition-transform duration-300 rotate-0 scale-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
         </svg>
       )}
 
       {/* 시스템 기본값 (모니터 아이콘) */}
       {theme === "system" && (
         <div className="relative flex items-center justify-center">
-          <svg className="w-5 h-5 transition-transform duration-300 rotate-0 scale-100" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M2.25 4.5A2.25 2.25 0 014.5 2.25h15A2.25 2.25 0 0121.75 4.5v10.5A2.25 2.25 0 0119.5 17.25h-4.362l1.378 1.637a.75.75 0 01-.575 1.238H8.06a.75.75 0 01-.575-1.238l1.378-1.637H4.5a2.25 2.25 0 01-2.25-2.25V4.5zM4.5 3.75a.75.75 0 00-.75.75v10.5c0 .414.336.75.75.75h15a.75.75 0 00.75-.75V4.5a.75.75 0 00-.75-.75h-15z" />
+          <svg className="w-5 h-5 transition-transform duration-300 rotate-0 scale-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
           </svg>
-          <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+          <span className="absolute -top-1 -right-1 flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--google-blue)]"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
           </span>
         </div>
       )}

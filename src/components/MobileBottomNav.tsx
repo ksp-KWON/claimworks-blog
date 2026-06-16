@@ -65,11 +65,14 @@ export default function MobileBottomNav() {
       isActive: openModal === 'calculator'
     },
     {
-      id: 'category',
-      label: '카테고리',
-      onClick: () => setOpenModal(openModal === 'category' ? 'none' : 'category'),
+      id: 'blog',
+      label: '블로그',
+      onClick: () => {
+        closeModals();
+        window.location.href = '/blog';
+      },
       icon: (
-        <svg className="w-5 h-5 sm:w-6 sm:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'category' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-5 h-5 sm:w-6 sm:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={pathname === '/blog' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
           <path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"></path>
           <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
           <path d="M3 15h6"></path>
@@ -78,7 +81,7 @@ export default function MobileBottomNav() {
           <path d="M10 19h8"></path>
         </svg>
       ),
-      isActive: openModal === 'category'
+      isActive: pathname === '/blog' && openModal === 'none'
     },
     {
       id: 'consult',
@@ -113,59 +116,29 @@ export default function MobileBottomNav() {
           <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
           <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">보상 계산기 모음</h3>
           
-          <Link href="/calculator/auto" onClick={closeModals} className="flex flex-col p-4 rounded-2xl bg-[#f8f9fa] dark:bg-[#303134] hover:bg-[#e8f0fe] transition-colors border border-gray-100 dark:border-white/5 group">
-            <span className="text-[var(--google-blue)] text-2xl mb-2">🚗</span>
-            <span className="font-bold text-[#202124] dark:text-[#e8eaed] text-base group-hover:text-[var(--google-blue)]">자동차보험 합의금 계산기</span>
-            <span className="text-xs text-[#5f6368] mt-1">부상, 장해, 사망 등 예상 합의금 산출</span>
+          <Link href="/calculator/auto" onClick={closeModals} className="group flex flex-col bg-white dark:bg-[#202124] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#e8f0fe] to-transparent dark:from-[#8ab4f8]/10 dark:to-transparent rounded-bl-full -z-10" />
+            <div className="w-14 h-14 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-inner">🚗</div>
+            <h2 className="text-xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[var(--google-blue)] transition-colors">자동차보험 합의금</h2>
+            <p className="text-[#5f6368] dark:text-[#9aa0a6] text-xs leading-relaxed mb-4">교통사고 피해자 전용. 부상, 후유장해, 사망에 따른 약관 지급기준 및 호프만계수를 적용하여 산출합니다.</p>
+            <div className="flex items-center text-[var(--google-blue)] font-bold text-xs bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 px-4 py-2 rounded-xl w-fit group-hover:bg-[var(--google-blue)] group-hover:text-white transition-colors">계산 시작하기 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
           </Link>
 
-          <Link href="/calculator/medical" onClick={closeModals} className="flex flex-col p-4 rounded-2xl bg-[#f8f9fa] dark:bg-[#303134] hover:bg-[#e6f4ea] transition-colors border border-gray-100 dark:border-white/5 group">
-            <span className="text-[var(--google-green)] text-2xl mb-2">🏥</span>
-            <span className="font-bold text-[#202124] dark:text-[#e8eaed] text-base group-hover:text-[var(--google-green)]">실손의료비 계산기</span>
-            <span className="text-xs text-[#5f6368] mt-1">급여/비급여 본인부담금 공제 예상 산출</span>
+          <Link href="/calculator/medical" onClick={closeModals} className="group flex flex-col bg-white dark:bg-[#202124] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-[0_8px_30px_rgba(52,168,83,0.15)] transition-all duration-300 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#e6f4ea] to-transparent dark:from-[#1e8e3e]/10 dark:to-transparent rounded-bl-full -z-10" />
+            <div className="w-14 h-14 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-inner">🏥</div>
+            <h2 className="text-xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[var(--google-green)] transition-colors">실손의료비 보상</h2>
+            <p className="text-[#5f6368] dark:text-[#9aa0a6] text-xs leading-relaxed mb-4">가입 시기별 약관을 반영하여, 급여 및 비급여 병원비에서 본인부담금을 공제한 예상 실손 보험금을 정확하게 산출합니다.</p>
+            <div className="flex items-center text-[var(--google-green)] font-bold text-xs bg-[#e6f4ea] dark:bg-[#1e8e3e]/10 px-4 py-2 rounded-xl w-fit group-hover:bg-[var(--google-green)] group-hover:text-white transition-colors">계산 시작하기 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
           </Link>
 
-          <Link href="/calculator/liability" onClick={closeModals} className="flex flex-col p-4 rounded-2xl bg-[#f8f9fa] dark:bg-[#303134] hover:bg-[#fce8e6] transition-colors border border-gray-100 dark:border-white/5 group">
-            <span className="text-[var(--google-red)] text-2xl mb-2">⚖️</span>
-            <span className="font-bold text-[#202124] dark:text-[#e8eaed] text-base group-hover:text-[var(--google-red)]">배상책임 소송가액 계산기</span>
-            <span className="text-xs text-[#5f6368] mt-1">호프만계수 적용 법원 판례 기준 예상 손해액</span>
+          <Link href="/calculator/liability" onClick={closeModals} className="group flex flex-col bg-white dark:bg-[#202124] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-[0_8px_30px_rgba(234,67,53,0.15)] transition-all duration-300 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#fce8e6] to-transparent dark:from-[#d93025]/10 dark:to-transparent rounded-bl-full -z-10" />
+            <div className="w-14 h-14 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-inner">⚖️</div>
+            <h2 className="text-xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[var(--google-red)] transition-colors">배상책임 소송가액</h2>
+            <p className="text-[#5f6368] dark:text-[#9aa0a6] text-xs leading-relaxed mb-4">호프만계수를 적용하여 법원 판례 기준에 따른 예상 손해배상액을 산출합니다. 과실상계 및 기왕증 감액이 반영됩니다.</p>
+            <div className="flex items-center text-[var(--google-red)] font-bold text-xs bg-[#fce8e6] dark:bg-[#d93025]/10 px-4 py-2 rounded-xl w-fit group-hover:bg-[var(--google-red)] group-hover:text-white transition-colors">계산 시작하기 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
           </Link>
-        </div>
-      </div>
-
-      {/* 2. 카테고리 팝업 */}
-      <div 
-        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'category' ? 'translate-y-0' : 'translate-y-full'}`}
-        style={{ touchAction: openModal === 'category' ? 'auto' : 'none' }}
-      >
-        <div className="p-5 pb-8 max-h-[70vh] overflow-y-auto overscroll-contain">
-          <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
-          <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">주요 보상 카테고리</h3>
-          <ul className="space-y-2">
-            {[
-              { name: '교통사고', emoji: '🚗', color: 'text-red-500' },
-              { name: '배상책임', emoji: '⚖️', color: 'text-green-500' },
-              { name: '보상가이드', emoji: '📚', color: 'text-yellow-600' },
-              { name: '실손의료비', emoji: '🏥', color: 'text-blue-500' },
-              { name: '보험상식', emoji: '💡', color: 'text-orange-500' },
-              { name: '후유장해 보상', emoji: '🩼', color: 'text-purple-500' },
-              { name: '보상정보', emoji: '📰', color: 'text-teal-500' }
-            ].map(cat => (
-              <li key={cat.name}>
-                <Link
-                  href={`/blog?category=${encodeURIComponent(cat.name)}`}
-                  onClick={closeModals}
-                  className="flex items-center justify-between px-4 py-3.5 rounded-2xl bg-[#f8f9fa] dark:bg-[#303134] hover:bg-gray-100 dark:hover:bg-[#3c4043] transition-colors border border-gray-100 dark:border-white/5"
-                >
-                  <span className="flex items-center gap-3 font-bold text-[#202124] dark:text-[#e8eaed]">
-                    <span className="text-xl">{cat.emoji}</span>
-                    {cat.name}
-                  </span>
-                  <svg className="w-5 h-5 text-[#5f6368]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
 

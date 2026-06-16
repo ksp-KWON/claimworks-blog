@@ -40,15 +40,15 @@ export default function CalculatorIndexPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
           {/* 배상책임 링크 */}
-          <Link href="/calculator/liability" className="group flex flex-col items-center justify-center p-6 sm:p-8 bg-white dark:bg-[#202124] border-2 border-[var(--google-border)] rounded-3xl hover:border-[#7C4DFF] hover:shadow-lg transition-all duration-300">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#f3e8ff] dark:bg-[#7C4DFF]/20 rounded-full flex items-center justify-center text-3xl sm:text-4xl mb-4 sm:mb-6 shadow-sm group-hover:scale-110 transition-transform">
+          <Link href="/calculator/liability" className="group flex flex-col items-center justify-center p-6 sm:p-8 bg-white dark:bg-[#202124] border-2 border-[var(--google-border)] rounded-3xl hover:border-[#EF6C00] hover:shadow-lg transition-all duration-300">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#FFF3E0] dark:bg-[#EF6C00]/20 rounded-full flex items-center justify-center text-3xl sm:text-4xl mb-4 sm:mb-6 shadow-sm group-hover:scale-110 transition-transform">
               ⚖️
             </div>
-            <h2 className="text-2xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[#7C4DFF] transition-colors">배상책임 소송가액</h2>
+            <h2 className="text-2xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[#EF6C00] transition-colors">배상책임 소송가액</h2>
             <p className="text-center text-[#5f6368] dark:text-[#9aa0a6] text-sm leading-relaxed">
               법원 판례 기준에 따른<br/>위자료, 일실수입 등<br/>예상 소송가액 산출
             </p>
-            <div className="mt-6 flex items-center gap-2 text-[#7C4DFF] font-bold text-sm bg-[#f3e8ff] dark:bg-[#7C4DFF]/10 px-4 py-2 rounded-full">
+            <div className="mt-6 flex items-center gap-2 text-[#EF6C00] font-bold text-sm bg-[#FFF3E0] dark:bg-[#EF6C00]/10 px-4 py-2 rounded-full">
               계산하러 가기 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </div>
           </Link>

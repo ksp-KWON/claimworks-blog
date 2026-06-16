@@ -104,7 +104,7 @@ export default function RootLayout({
         <FloatingKakaoButton />
         
         {/* 1. 애플 iOS Glassmorphism 스타일 App Bar (쿨그레이 반투명) */}
-        <header className="sticky top-0 z-50 w-full h-[54px] border-b border-[var(--google-border)] bg-[#f8f9fa]/85 dark:bg-[#202124]/85 backdrop-blur-md text-[#202124] dark:text-[#e8eaed] shadow-sm transition-colors">
+        <header className="sticky top-0 z-50 w-full h-[54px] border-b border-[var(--google-border)] bg-[#f8f9fa]/80 dark:bg-[#202124]/80 backdrop-blur-md text-[#202124] dark:text-[#e8eaed] shadow-sm transition-colors">
           <div className="mx-auto flex h-full w-[92vw] xl:w-[85vw] max-w-7xl items-center justify-between px-2 sm:px-5">
 
             {/* 로고/제목 영역 (드롭다운) */}

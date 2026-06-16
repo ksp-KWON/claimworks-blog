@@ -35,7 +35,7 @@ const SCROLL_OFFSET = 140;
 
 // ─── 본문에서 식별할 섹션 패턴 ───
 const KEY_POINT_PATTERNS = /(?:핵심\s*요약|key\s*point)/i;
-const CHECKLIST_PATTERNS = /(?:자가진단|체크리스트)/i;
+const CHECKLIST_PATTERNS = /(?:자가진단|체크리스트|1분\s*체크|체크)/i;
 const GLOSSARY_PATTERNS = /(?:용어\s*사전|보상\s*용어)/i;
 const FAQ_PATTERNS = /(?:faq|자주\s*묻는)/i;
 const CTA_PATTERNS = /(?:카카오톡|call\s*to\s*action|상담\s*신청)/i;
@@ -146,11 +146,23 @@ function preprocessBody(content: string): string {
     const trimmed = line.trim();
 
     if (/^##\s+/.test(trimmed)) {
-      if (KEY_POINT_PATTERNS.test(trimmed)) { skipType = 'KEY_POINTS'; continue; }
-      if (CHECKLIST_PATTERNS.test(trimmed)) { skipType = 'CHECKLIST'; clBuffer = []; continue; }
-      if (GLOSSARY_PATTERNS.test(trimmed)) { skipType = 'GLOSSARY'; continue; }
-      if (FAQ_PATTERNS.test(trimmed)) { skipType = 'FAQ'; continue; }
-      if (CTA_PATTERNS.test(trimmed)) { skipType = 'CTA'; continue; }
+      const prevSkipType = skipType;
+      let newSkipType: 'NONE' | 'KEY_POINTS' | 'CHECKLIST' | 'GLOSSARY' | 'FAQ' | 'CTA' = skipType;
+      let matched = false;
+
+      if (KEY_POINT_PATTERNS.test(trimmed)) { newSkipType = 'KEY_POINTS'; matched = true; }
+      else if (CHECKLIST_PATTERNS.test(trimmed)) { newSkipType = 'CHECKLIST'; clBuffer = []; matched = true; }
+      else if (GLOSSARY_PATTERNS.test(trimmed)) { newSkipType = 'GLOSSARY'; matched = true; }
+      else if (FAQ_PATTERNS.test(trimmed)) { newSkipType = 'FAQ'; matched = true; }
+      else if (CTA_PATTERNS.test(trimmed)) { newSkipType = 'CTA'; matched = true; }
+
+      if (matched) {
+        if (prevSkipType === 'CHECKLIST') {
+          flushChecklist();
+        }
+        skipType = newSkipType;
+        continue;
+      }
     }
 
     if (skipType === 'KEY_POINTS') {

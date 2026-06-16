@@ -3,7 +3,7 @@
   <!-- 메인 홈 -->
   <url>
     <loc>https://claim-works.com/</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-06-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -50,6 +50,12 @@
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://claim-works.com/blog/delivery-motorcycle-accident-industrial-denial-lost-wages</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://claim-works.com/blog/guide-diabetic-retinopathy-claim</loc>
     <lastmod>2026-06-15</lastmod>
     <changefreq>monthly</changefreq>
@@ -57,12 +63,6 @@
   </url>
   <url>
     <loc>https://claim-works.com/blog/guide-spine-procedure-disclosure</loc>
-    <lastmod>2026-06-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://claim-works.com/blog/private-insurance-permanent-disability-claim</loc>
     <lastmod>2026-06-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

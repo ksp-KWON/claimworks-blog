@@ -226,9 +226,12 @@ export default function BlogPageClient() {
     const mappedSido = finalSido ? (SIDO_MAP[finalSido] || finalSido) : '';
 
     if (!mappedSido) {
-      setHiraData(null);
-      setLoading(false);
-      return () => clearTimeout(timer);
+      clearTimeout(timer);
+      setTimeout(() => {
+        setHiraData(null);
+        setLoading(false);
+      }, 0);
+      return;
     }
 
     // 3. 해당 시도-구군에 대응하는 쪼개진 가벼운 JSON 파일만 가져옴

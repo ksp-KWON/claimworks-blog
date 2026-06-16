@@ -69,17 +69,6 @@ export default function MobileBottomNav() {
           <path d="M10 19h8"></path>
         </svg>
       )
-    },
-    {
-      label: '플랫폼 소개',
-      href: '/about',
-      icon: (
-        <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={pathname === '/about' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
-      )
     }
   ];
 
@@ -87,7 +76,7 @@ export default function MobileBottomNav() {
     <div 
       className={`lg:hidden fixed bottom-0 left-0 z-[100] w-full h-[60px] bg-white/90 dark:bg-[#1a1b1e]/90 backdrop-blur-md border-t border-gray-200/50 dark:border-white/10 pb-[env(safe-area-inset-bottom,0px)] transition-transform duration-300 transform ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}
     >
-      <div className="grid h-full w-full grid-cols-4 px-2">
+      <div className="grid h-full w-full grid-cols-3 px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href === '/calculator' && pathname?.startsWith('/calculator'));
           

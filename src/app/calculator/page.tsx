@@ -25,61 +25,57 @@ export default function CalculatorIndexPage() {
         </nav>
       </div>
 
-      <article className="w-full bg-white dark:bg-[#202124] rounded-none sm:rounded-3xl px-3 py-6 sm:p-10 lg:p-12 border-y sm:border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] relative">
-        <header className="mb-10 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#f8f9fa] dark:bg-[#303134] border border-[var(--google-border)] text-gray-700 dark:text-gray-300 mb-6 shadow-sm">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight mb-4">
-            어떤 보상금을 계산하시겠습니까?
-          </h1>
-          <p className="text-[#5f6368] dark:text-[#9aa0a6] max-w-2xl mx-auto leading-relaxed">
-            더욱 정확하고 전문적인 계산을 위해 자동차보험, 실손의료비, 배상책임 소송가액 계산기가 <strong>독립된 시스템으로 완벽히 분리</strong>되었습니다. 원하시는 계산기를 선택해 주세요.
-          </p>
+      <article className="w-full max-w-xl mx-auto px-4 py-8">
+        <header className="mb-8 text-center">
+          <h1 className="text-2xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2">보상금 계산기</h1>
+          <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6]">원하시는 계산기를 선택해 주세요.</p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
-          {/* 배상책임 링크 */}
-          <Link href="/calculator/liability" className="group flex flex-col items-center justify-center p-6 sm:p-8 bg-white dark:bg-[#202124] border-2 border-[var(--google-border)] rounded-3xl hover:border-[#EF6C00] hover:shadow-lg transition-all duration-300">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#FFF3E0] dark:bg-[#EF6C00]/20 rounded-full flex items-center justify-center text-3xl sm:text-4xl mb-4 sm:mb-6 shadow-sm group-hover:scale-110 transition-transform">
-              ⚖️
-            </div>
-            <h2 className="text-2xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[#EF6C00] transition-colors">배상책임 소송가액</h2>
-            <p className="text-center text-[#5f6368] dark:text-[#9aa0a6] text-sm leading-relaxed">
-              법원 판례 기준에 따른<br/>위자료, 일실수입 등<br/>예상 소송가액 산출
+        <div className="space-y-4">
+          {/* 🚗 자동차보험 합의금 계산기 */}
+          <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 group relative overflow-hidden">
+            <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">
+              <span className="text-[var(--google-blue)] text-lg leading-none">🚗</span>
+              자동차보험 합의금 계산기
+            </h3>
+            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
+              약관 지급기준 및 호프만계수를 적용한 정확한 예상 합의금을 확인하세요.
             </p>
-            <div className="mt-6 flex items-center gap-2 text-[#EF6C00] font-bold text-sm bg-[#FFF3E0] dark:bg-[#EF6C00]/10 px-4 py-2 rounded-full">
-              계산하러 가기 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </div>
-          </Link>
+            <Link href="/calculator/auto" className="flex items-center justify-center gap-2 w-full bg-[var(--google-blue)] text-white font-bold text-sm py-2.5 rounded-xl hover:bg-[#174ea6] transition-colors shadow-sm">
+              자동차보험 계산하기
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </Link>
+          </div>
 
-          {/* 자동차보험 링크 */}
-          <Link href="/calculator/auto" className="group flex flex-col items-center justify-center p-6 sm:p-8 bg-white dark:bg-[#202124] border-2 border-[var(--google-border)] rounded-3xl hover:border-[var(--google-blue)] hover:shadow-lg transition-all duration-300">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-full flex items-center justify-center text-3xl sm:text-4xl mb-4 sm:mb-6 shadow-sm group-hover:scale-110 transition-transform">
-              🚗
-            </div>
-            <h2 className="text-2xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[var(--google-blue)] transition-colors">자동차보험 합의금</h2>
-            <p className="text-center text-[#5f6368] dark:text-[#9aa0a6] text-sm leading-relaxed">
-              교통사고 피해자 전용.<br/>부상, 후유장해, 사망에 따른<br/>대인배상 약관 기준 합의금 산출
+          {/* 🏥 실손의료비 보상 계산기 */}
+          <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(52,168,83,0.2)] hover:border-[var(--google-green)] transition-all duration-300 group relative overflow-hidden">
+            <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-green)] pl-2.5">
+              <span className="text-[var(--google-green)] text-lg leading-none">🏥</span>
+              실손의료비 계산기
+            </h3>
+            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
+              급여/비급여 병원비, 본인부담금을 공제한 예상 실손 보상금을 산출해 보세요.
             </p>
-            <div className="mt-6 flex items-center gap-2 text-[var(--google-blue)] font-bold text-sm bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 px-4 py-2 rounded-full">
-              계산하러 가기 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </div>
-          </Link>
+            <Link href="/calculator/medical" className="flex items-center justify-center gap-2 w-full bg-[var(--google-green)] text-white font-bold text-sm py-2.5 rounded-xl hover:bg-[#0d652d] transition-colors shadow-sm">
+              실손의료비 계산하기
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </Link>
+          </div>
 
-          {/* 실손의료비 링크 */}
-          <Link href="/calculator/medical" className="group flex flex-col items-center justify-center p-6 sm:p-8 bg-white dark:bg-[#202124] border-2 border-[var(--google-border)] rounded-3xl hover:border-[var(--google-green)] hover:shadow-lg transition-all duration-300">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center text-3xl sm:text-4xl mb-4 sm:mb-6 shadow-sm group-hover:scale-110 transition-transform">
-              🏥
-            </div>
-            <h2 className="text-2xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[var(--google-green)] transition-colors">실손의료비 보상</h2>
-            <p className="text-center text-[#5f6368] dark:text-[#9aa0a6] text-sm leading-relaxed">
-              병원비, 약제비 영수증 기준.<br/>급여/비급여 본인부담금을 공제한<br/>예상 보험금 산출
+          {/* ⚖️ 배상책임 소송가액 계산기 */}
+          <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(234,67,53,0.2)] hover:border-[var(--google-red)] transition-all duration-300 group relative overflow-hidden">
+            <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-red)] pl-2.5">
+              <span className="text-[var(--google-red)] text-lg leading-none">⚖️</span>
+              배상책임 소송가액 계산기
+            </h3>
+            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
+              호프만계수를 적용하여 법원 판례 기준에 따른 예상 손해배상액을 산출합니다.
             </p>
-            <div className="mt-6 flex items-center gap-2 text-[var(--google-green)] font-bold text-sm bg-[#e6f4ea] dark:bg-[#1e8e3e]/10 px-4 py-2 rounded-full">
-              계산하러 가기 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </div>
-          </Link>
+            <Link href="/calculator/liability" className="flex items-center justify-center gap-2 w-full bg-[var(--google-red)] text-white font-bold text-sm py-2.5 rounded-xl hover:bg-[#d93025] transition-colors shadow-sm">
+              소송가액 계산하기
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </Link>
+          </div>
         </div>
       </article>
     </>

@@ -135,6 +135,15 @@ export default function RootLayout({
               </nav>
 
               <div className="flex items-center gap-0.5 sm:gap-1 ml-0.5">
+                {/* 플랫폼 소개 아이콘 (상단바로 이동) */}
+                <Link href="/about" className="p-1.5 sm:p-2 text-[#5f6368] dark:text-[#9aa0a6] hover:text-[var(--google-blue)] hover:bg-[var(--google-surface-variant)] dark:hover:bg-white/10 rounded-full transition-colors flex items-center justify-center" aria-label="플랫폼 소개">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                </Link>
+                
                 {/* 테마 변경 아이콘 (카카오 좌측으로 위치 이동) */}
                 <ThemeToggle />
                 

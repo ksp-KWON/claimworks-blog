@@ -62,29 +62,37 @@ export default function SidebarContent() {
       </div>
 
       {/* ⚖️ 배상책임 소송가액 계산기 */}
-      <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(239,108,0,0.2)] hover:border-[#EF6C00] transition-all duration-300 group relative overflow-hidden">
-        <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[#EF6C00] pl-2.5">
-          <span className="text-[#EF6C00] text-lg leading-none">⚖️</span>
+      <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(234,67,53,0.2)] hover:border-[var(--google-red)] transition-all duration-300 group relative overflow-hidden">
+        <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-red)] pl-2.5">
+          <span className="text-[var(--google-red)] text-lg leading-none">⚖️</span>
           배상책임 소송가액 계산기
         </h3>
         <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
           호프만계수를 적용하여 법원 판례 기준에 따른 예상 손해배상액을 산출합니다.
         </p>
-        <Link href="/calculator/liability" className="flex items-center justify-center gap-2 w-full bg-[#EF6C00] text-white font-bold text-sm py-2.5 rounded-xl hover:bg-[#E65100] transition-colors shadow-sm">
+        <Link href="/calculator/liability" className="flex items-center justify-center gap-2 w-full bg-[var(--google-red)] text-white font-bold text-sm py-2.5 rounded-xl hover:bg-[#d93025] transition-colors shadow-sm">
           소송가액 계산하기
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </Link>
       </div>
 
       {/* 주요 보상 카테고리 (세로 리스트 형태 원복) */}
-      <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+      <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(251,188,4,0.2)] hover:border-[var(--google-yellow)] transition-all duration-300 group relative overflow-hidden">
+        <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-yellow)] pl-2.5">
+          <span className="text-[var(--google-yellow)] text-lg leading-none">📂</span>
+          주요 보상 카테고리
+        </h3>
+        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
+          보상스쿨의 다양한 보상 정보와 분쟁 해결 가이드를 주제별로 모아두었습니다.
+        </p>
+        
         <button 
           onClick={() => setIsMajorCategoryOpen(!isMajorCategoryOpen)}
-          className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between border-l-4 border-yellow-500 pl-2.5 transition-colors group"
+          className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors group p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10"
         >
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
-            주요 보상 카테고리
+            카테고리 펼치기
           </div>
           <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isMajorCategoryOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>

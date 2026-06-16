@@ -116,16 +116,24 @@ export function RegionalCategories() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+    <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(52,168,83,0.2)] hover:border-[var(--google-green)] transition-all duration-300 group relative overflow-hidden">
+      <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-green)] pl-2.5">
+        <span className="text-[var(--google-green)] text-lg leading-none">🗺️</span>
+        지역별 의료기관
+      </h3>
+      <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
+        전국 17개 시/도, 226개 시/군/구별 보상 전문 의료기관 및 협력 병원 정보를 제공합니다.
+      </p>
+
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between border-l-4 border-[var(--google-green)] pl-2.5 transition-colors group"
+        className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors group p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10"
       >
-        <span className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-[var(--google-green)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-          지역별 의료기관
-        </span>
-        <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          지역 둘러보기
+        </div>
+        <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
       </button>
       
       {isOpen && (
@@ -245,16 +253,24 @@ export function SpecialtyDiseaseCategories() {
   ];
 
   return (
-    <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+    <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 group relative overflow-hidden">
+      <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">
+        <span className="text-[var(--google-blue)] text-lg leading-none">🩺</span>
+        진료과목별 분쟁 가이드
+      </h3>
+      <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
+        진료과목 및 질병에 따른 주요 의료분쟁 사례와 보상 청구 팁을 확인하세요.
+      </p>
+
       <button 
         onClick={() => setIsMainOpen(!isMainOpen)}
-        className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between border-l-4 border-[var(--google-blue)] pl-2.5 transition-colors group"
+        className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors group p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10"
       >
-        <span className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
-          진료과목별 분쟁 가이드
-        </span>
-        <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isMainOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          가이드 펼치기
+        </div>
+        <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isMainOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
       </button>
 
       {isMainOpen && (

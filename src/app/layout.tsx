@@ -9,6 +9,7 @@ import FloatingKakaoButton from "@/components/FloatingKakaoButton";
 import ScrollProgressBar from "@/components/ScrollProgressBar";
 import SearchBar from "@/components/SearchBar";
 import SmartStickyLayout from "@/components/SmartStickyLayout";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -82,7 +83,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-300">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-300 pb-[calc(env(safe-area-inset-bottom,20px)+65px)] lg:pb-0">
         {/* 카카오 SDK */}
         <Script 
           src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" 
@@ -100,8 +101,8 @@ export default function RootLayout({
         <ScrollProgressBar />
         <FloatingKakaoButton />
         
-        {/* 1. 안드로이드 머티리얼 스타일 App Bar */}
-        <header className="sticky top-0 z-50 w-full h-[64px] border-b border-[var(--google-border)] bg-white dark:bg-[#202124] text-[#202124] dark:text-[#e8eaed] shadow-sm transition-colors">
+        {/* 1. 안드로이드 머티리얼 스타일 App Bar -> 애플 iOS Glassmorphism 스타일 */}
+        <header className="sticky top-0 z-50 w-full h-[64px] border-b border-[var(--google-border)] bg-white/80 dark:bg-[#202124]/80 backdrop-blur-md text-[#202124] dark:text-[#e8eaed] shadow-sm transition-colors">
           <div className="mx-auto flex h-full w-[92vw] xl:w-[85vw] max-w-7xl items-center justify-between px-2 sm:px-5">
 
             {/* 로고/제목 영역 */}
@@ -164,6 +165,8 @@ export default function RootLayout({
           </div>
         </footer>
 
+        {/* 5. 모바일 전용 하단 고정 탭바 (lg 미만에서 노출) */}
+        <MobileBottomNav />
       </body>
     </html>
   );

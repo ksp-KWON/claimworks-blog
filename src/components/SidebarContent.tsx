@@ -136,26 +136,28 @@ export default function SidebarContent() {
           </button>
           
           <div className={`overflow-hidden transition-all duration-300 ${isMajorCategoryOpen ? 'max-h-[500px] mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
-            <ul className="space-y-1 text-sm font-medium text-[#202124] dark:text-[#e8eaed]">
+            <ul className="flex overflow-x-auto pb-4 gap-3 lg:block lg:space-y-1 lg:overflow-visible lg:pb-0 text-sm font-medium text-[#202124] dark:text-[#e8eaed] snap-x scrollbar-hide">
             {[
-              { name: '교통사고', color: 'text-red-500' },
-              { name: '배상책임', color: 'text-green-500' },
-              { name: '보상가이드', color: 'text-yellow-600' },
-              { name: '실손의료비', color: 'text-blue-500' },
-              { name: '보험상식', color: 'text-orange-500' },
-              { name: '후유장해 보상', color: 'text-purple-500' },
-              { name: '보상정보', color: 'text-teal-500' }
+              { name: '교통사고', color: 'text-red-500', emoji: '🚗' },
+              { name: '배상책임', color: 'text-green-500', emoji: '⚖️' },
+              { name: '보상가이드', color: 'text-yellow-600', emoji: '📚' },
+              { name: '실손의료비', color: 'text-blue-500', emoji: '🏥' },
+              { name: '보험상식', color: 'text-orange-500', emoji: '💡' },
+              { name: '후유장해 보상', color: 'text-purple-500', emoji: '🩼' },
+              { name: '보상정보', color: 'text-teal-500', emoji: '📰' }
             ].map(cat => (
-              <li key={cat.name}>
+              <li key={cat.name} className="shrink-0 snap-center lg:w-full">
                 <Link
                   href={`/blog?category=${encodeURIComponent(cat.name)}`}
-                  className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors text-[#202124] dark:text-[#e8eaed]"
+                  className="flex flex-col lg:flex-row items-center lg:justify-between px-3 lg:px-3 py-3 lg:py-2.5 rounded-2xl lg:rounded-lg bg-[#f8f9fa] dark:bg-[#303134] lg:bg-transparent lg:dark:bg-transparent hover:bg-gray-100 lg:hover:bg-[var(--google-surface-variant)] transition-colors text-[#202124] dark:text-[#e8eaed] gap-2 lg:gap-0 min-w-[76px] lg:min-w-0 border border-gray-100 dark:border-white/5 lg:border-transparent"
                 >
-                  <span className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full bg-current ${cat.color}`}></span>
-                    {cat.name}
+                  <span className="flex flex-col lg:flex-row items-center gap-1.5 lg:gap-2">
+                    <span className={`w-12 h-12 lg:w-2 lg:h-2 rounded-full lg:bg-current flex items-center justify-center bg-white dark:bg-[#202124] shadow-sm lg:shadow-none ${cat.color}`}>
+                      <span className="lg:hidden text-2xl">{cat.emoji}</span>
+                    </span>
+                    <span className="text-[11px] lg:text-sm whitespace-nowrap font-bold lg:font-medium">{cat.name}</span>
                   </span>
-                  <svg className="w-4 h-4 text-[#5f6368]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  <svg className="hidden lg:block w-4 h-4 text-[#5f6368]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </Link>
               </li>
             ))}

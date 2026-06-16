@@ -34,11 +34,25 @@ export default function CalculatorIndexPage() {
             어떤 보상금을 계산하시겠습니까?
           </h1>
           <p className="text-[#5f6368] dark:text-[#9aa0a6] max-w-2xl mx-auto leading-relaxed">
-            더욱 정확하고 전문적인 계산을 위해 자동차보험과 실손의료비 계산기가 <strong>독립된 시스템으로 완벽히 분리</strong>되었습니다. 원하시는 계산기를 선택해 주세요.
+            더욱 정확하고 전문적인 계산을 위해 자동차보험, 실손의료비, 배상책임 소송가액 계산기가 <strong>독립된 시스템으로 완벽히 분리</strong>되었습니다. 원하시는 계산기를 선택해 주세요.
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
+          {/* 배상책임 링크 */}
+          <Link href="/calculator/liability" className="group flex flex-col items-center justify-center p-6 sm:p-8 bg-white dark:bg-[#202124] border-2 border-[var(--google-border)] rounded-3xl hover:border-[#7C4DFF] hover:shadow-lg transition-all duration-300">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#f3e8ff] dark:bg-[#7C4DFF]/20 rounded-full flex items-center justify-center text-3xl sm:text-4xl mb-4 sm:mb-6 shadow-sm group-hover:scale-110 transition-transform">
+              ⚖️
+            </div>
+            <h2 className="text-2xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[#7C4DFF] transition-colors">배상책임 소송가액</h2>
+            <p className="text-center text-[#5f6368] dark:text-[#9aa0a6] text-sm leading-relaxed">
+              법원 판례 기준에 따른<br/>위자료, 일실수입 등<br/>예상 소송가액 산출
+            </p>
+            <div className="mt-6 flex items-center gap-2 text-[#7C4DFF] font-bold text-sm bg-[#f3e8ff] dark:bg-[#7C4DFF]/10 px-4 py-2 rounded-full">
+              계산하러 가기 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </div>
+          </Link>
+
           {/* 자동차보험 링크 */}
           <Link href="/calculator/auto" className="group flex flex-col items-center justify-center p-6 sm:p-8 bg-white dark:bg-[#202124] border-2 border-[var(--google-border)] rounded-3xl hover:border-[var(--google-blue)] hover:shadow-lg transition-all duration-300">
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-full flex items-center justify-center text-3xl sm:text-4xl mb-4 sm:mb-6 shadow-sm group-hover:scale-110 transition-transform">

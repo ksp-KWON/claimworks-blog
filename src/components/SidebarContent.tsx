@@ -67,6 +67,21 @@ export default function SidebarContent() {
         </Link>
       </div>
 
+      {/* ⚖️ 배상책임 소송가액 계산기 (항상 표시) */}
+      <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(124,77,255,0.2)] hover:border-[#7C4DFF] hover:-translate-y-1 transition-all duration-300 group mb-6 relative overflow-hidden">
+        <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[#7C4DFF] pl-2.5">
+          <span className="text-[#7C4DFF] text-lg leading-none">⚖️</span>
+          배상책임 소송가액 계산기
+        </h3>
+        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
+          호프만계수를 적용하여 법원 판례 기준에 따른 예상 손해배상액을 산출합니다.
+        </p>
+        <Link href="/calculator/liability" className="flex items-center justify-center gap-2 w-full bg-[#7C4DFF] text-white font-bold text-sm py-2.5 rounded-xl hover:bg-[#651FFF] transition-colors shadow-sm">
+          소송가액 계산하기
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </Link>
+      </div>
+
       {/* ── 모바일 전용 카테고리/인기키워드 안내 카드 (lg 이상에서는 숨김) ── */}
       <div className="lg:hidden bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] hover:-translate-y-1 transition-all duration-300 group mb-6 relative overflow-hidden">
         <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">

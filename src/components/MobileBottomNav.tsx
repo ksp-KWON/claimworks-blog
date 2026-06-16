@@ -28,7 +28,7 @@ export default function MobileBottomNav() {
 
   return (
     <div 
-      className={`lg:hidden fixed bottom-0 left-0 z-[100] w-full h-[54px] bg-[#f8f9fa]/80 dark:bg-[#202124]/80 backdrop-blur-md border-t border-gray-200/50 dark:border-white/10 pb-[env(safe-area-inset-bottom,0px)] transition-transform duration-300 transform ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}
+      className={`lg:hidden fixed bottom-0 left-0 z-[100] w-full h-[48px] bg-[#f8f9fa]/80 dark:bg-[#202124]/80 backdrop-blur-md border-t border-gray-200/50 dark:border-white/10 pb-[env(safe-area-inset-bottom,0px)] transition-transform duration-300 transform ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}
     >
       <div className="grid h-full w-full grid-cols-4 px-2">
         {/* 홈 버튼 하나만 살려두고 나머지는 추후 컨텐츠를 위해 비워둠 */}

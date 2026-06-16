@@ -10,7 +10,6 @@ import FloatingKakaoButton from "@/components/FloatingKakaoButton";
 import SearchBar from "@/components/SearchBar";
 import SmartStickyLayout from "@/components/SmartStickyLayout";
 import MobileBottomNav from "@/components/MobileBottomNav";
-import LogoDropdown from "@/components/LogoDropdown";
 import MobileSidebarDrawer from "@/components/MobileSidebarDrawer";
 
 const geistSans = Geist({
@@ -85,7 +84,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-300 pb-[calc(env(safe-area-inset-bottom,20px)+54px)] lg:pb-0">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-300 pb-[calc(env(safe-area-inset-bottom,20px)+48px)] lg:pb-0">
         {/* 카카오 SDK */}
         <Script 
           src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" 
@@ -104,30 +103,54 @@ export default function RootLayout({
         <FloatingKakaoButton />
         
         {/* 1. 애플 iOS Glassmorphism 스타일 App Bar (쿨그레이 반투명) */}
-        <header className="sticky top-0 z-50 w-full h-[54px] border-b border-[var(--google-border)] bg-[#f8f9fa]/80 dark:bg-[#202124]/80 backdrop-blur-md text-[#202124] dark:text-[#e8eaed] shadow-sm transition-colors">
+        <header className="sticky top-0 z-50 w-full h-[48px] border-b border-[var(--google-border)] bg-[#f8f9fa]/80 dark:bg-[#202124]/80 backdrop-blur-md text-[#202124] dark:text-[#e8eaed] shadow-sm transition-colors">
           <div className="mx-auto flex h-full w-[92vw] xl:w-[85vw] max-w-7xl items-center justify-between px-2 sm:px-5">
 
-            {/* 로고/제목 영역 (드롭다운) */}
+            {/* 로고/제목 영역 */}
             <div className="flex items-center min-w-0 flex-1 mr-2">
-              <LogoDropdown />
+              <div className="font-sans font-bold text-base sm:text-lg lg:text-xl text-[#202124] dark:text-white min-w-0 tracking-tight">
+                <Link href="/" className="hover:text-[var(--google-blue)] transition-colors flex items-center gap-2 whitespace-nowrap overflow-hidden">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--google-blue)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                  <span className="hidden sm:inline truncate">보상스쿨 헬스케어 &amp; 손해사정 보상가이드</span>
+                  <span className="sm:hidden">보상스쿨</span>
+                </Link>
+              </div>
             </div>
 
-            {/* 우측 검색 영역 및 액션 메뉴 */}
+            {/* 우측 메뉴 영역 */}
             <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               <SearchBar />
               
-              {/* 상담신청 아이콘 (상단바) */}
-              <a 
-                href="https://open.kakao.com/o/sWeszp7" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="p-1.5 text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#FEE500] transition-colors rounded-full hover:bg-[var(--google-surface-variant)]"
-                aria-label="카카오톡 상담신청"
-              >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 3C6.477 3 2 6.541 2 10.908c0 2.502 1.432 4.745 3.659 6.13-.314 1.157-1.14 4.183-1.182 4.341-.053.197.075.18.156.126.104-.07 3.324-2.222 4.606-3.084.887.24 1.821.366 2.761.366 5.523 0 10-3.541 10-7.908C22 6.541 17.523 3 12 3z"/>
-                </svg>
-              </a>
+              <nav className="flex items-center gap-1 text-sm font-medium text-[#5f6368] dark:text-[#9aa0a6]">
+                <Link href="/" className="flex items-center justify-center p-1.5 sm:px-3 sm:py-2 rounded-full hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors" aria-label="홈">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                  <span className="hidden md:inline ml-1.5">홈</span>
+                </Link>
+                <Link href="/blog" className="flex items-center justify-center p-1.5 sm:px-3 sm:py-2 rounded-full hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors" aria-label="블로그">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M3 15h6"></path><path d="M3 19h6"></path><path d="M10 15h8"></path><path d="M10 19h8"></path></svg>
+                  <span className="hidden md:inline ml-1.5">블로그</span>
+                </Link>
+                <Link href="/about" className="flex items-center justify-center p-1.5 sm:px-3 sm:py-2 rounded-full hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors" aria-label="소개">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span className="hidden md:inline ml-1.5">소개</span>
+                </Link>
+                
+                {/* 상담신청 아이콘 (상단바) */}
+                <a 
+                  href="https://open.kakao.com/o/sWeszp7" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center p-1.5 sm:px-3 sm:py-2 rounded-full hover:bg-[var(--google-surface-variant)] hover:text-[#FEE500] transition-colors"
+                  aria-label="카카오톡 상담신청"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3C6.477 3 2 6.541 2 10.908c0 2.502 1.432 4.745 3.659 6.13-.314 1.157-1.14 4.183-1.182 4.341-.053.197.075.18.156.126.104-.07 3.324-2.222 4.606-3.084.887.24 1.821.366 2.761.366 5.523 0 10-3.541 10-7.908C22 6.541 17.523 3 12 3z"/>
+                  </svg>
+                  <span className="hidden md:inline ml-1.5">상담신청</span>
+                </a>
+              </nav>
 
               {/* 햄버거 메뉴 서랍 (카테고리) */}
               <MobileSidebarDrawer />

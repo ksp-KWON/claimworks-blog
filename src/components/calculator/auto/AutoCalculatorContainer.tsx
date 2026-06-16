@@ -1,13 +1,11 @@
 'use client';
 
-import ExpertModeForm from './ExpertModeForm';
+import AutoCalculator from '../AutoCalculator';
 
 export default function AutoCalculatorContainer() {
   return (
     <div className="w-full">
-      <div className="relative animate-in slide-in-from-bottom-8 fade-in duration-500">
-        <ExpertModeForm />
-      </div>
+      <AutoCalculator />
     </div>
   );
 }

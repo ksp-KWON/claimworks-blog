@@ -45,17 +45,16 @@ export default function ThemeToggle() {
     }
   };
 
-  // 서버 사이드 렌더링 시 발생하는 수분 불일치(Hydration Mismatch)를 방지합니다.
   if (!mounted) {
     return (
-      <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-zinc-800 animate-pulse" />
+      <div className="w-[36px] h-[36px] rounded-full hover:bg-[var(--google-surface-variant)] dark:hover:bg-white/10 transition-colors animate-pulse" />
     );
   }
 
   return (
     <button
       onClick={cycleTheme}
-      className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all duration-300 active:scale-95 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-300 border border-slate-200/40 dark:border-zinc-700/50 cursor-pointer"
+      className="flex items-center justify-center p-2 rounded-full hover:bg-[var(--google-surface-variant)] dark:hover:bg-white/10 transition-colors group text-[#5f6368] dark:text-[#9aa0a6] cursor-pointer"
       title={`테마 변경 (현재: ${
         theme === "light" ? "라이트 모드" : theme === "dark" ? "다크 모드" : "시스템 기본값"
       })`}

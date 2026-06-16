@@ -163,17 +163,17 @@ export default function MobileBottomNav() {
           <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
           <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">상담 신청하기</h3>
           
-          <Link href="/consult/auto" onClick={closeModals} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 relative overflow-hidden gap-4">
+          <a href="#" onClick={(e) => { e.preventDefault(); alert('예약상담 신청 폼이 준비중입니다.'); closeModals(); }} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 relative overflow-hidden gap-4">
             <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#e8f0fe] to-transparent dark:from-[#8ab4f8]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
-            <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">📞</div>
+            <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">📝</div>
             <div className="flex flex-col flex-1 min-w-0">
-              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors truncate">교통사고/배상책임 무료상담</h2>
-              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">전문 손해사정사가 직접 상담해 드립니다.</p>
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors truncate">예약상담 신청서 작성</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">사고 내용을 꼼꼼히 검토 후 연락드립니다.</p>
             </div>
             <div className="text-[var(--google-blue)] shrink-0">
               <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
             </div>
-          </Link>
+          </a>
 
           <a href="https://open.kakao.com/o/sWeszp7" target="_blank" rel="noopener noreferrer" onClick={closeModals} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(254,229,0,0.2)] transition-all duration-300 relative overflow-hidden gap-4">
             <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#FEE500]/20 to-transparent dark:from-[#FEE500]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />

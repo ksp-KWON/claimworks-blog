@@ -477,14 +477,25 @@ export default function MedicalCalculator() {
             <p>위 결과는 <strong>단순 계산 추정치</strong>입니다. 실제 보상 시에는 비례보상, 면책상병 여부, 연간 보상한도 초과 등에 따라 지급액이 달라질 수 있습니다.</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 mt-2">
-            <button onClick={shareResult} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#FEE500] hover:bg-[#F4DC00] text-black rounded-xl font-extrabold text-[13px] transition-all shadow-sm">결과 공유하기</button>
-            <button onClick={exportPDF} className="flex items-center justify-center gap-1.5 py-3.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 dark:bg-[#202124] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-[#303134] rounded-xl font-extrabold text-[13px] transition-all shadow-sm">PDF 다운로드</button>
+          <div className="flex flex-col gap-2 mt-2">
+            <a href="https://open.kakao.com/o/sWeszp7" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full gap-2 py-4 bg-[#FEE500] hover:bg-[#F4DC00] text-[#000000] rounded-2xl font-bold text-[14px] sm:text-[15px] transition-all shadow-sm hover:shadow-md">
+              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3C6.477 3 2 6.541 2 10.908c0 2.502 1.432 4.745 3.659 6.13-.314 1.157-1.14 4.183-1.182 4.341-.053.197.075.18.156.126.104-.07 3.324-2.222 4.606-3.084.887.24 1.821.366 2.761.366 5.523 0 10-3.541 10-7.908C22 6.541 17.523 3 12 3z"/>
+              </svg>
+              보상스쿨 1:1 무료 상담 신청하기
+            </a>
+            
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={shareResult} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#1a73e8] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#8ab4f8] dark:hover:bg-[#3c4043] rounded-xl font-bold text-[13px] transition-all shadow-sm group">
+                <svg className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                결과 공유하기
+              </button>
+              <button onClick={exportPDF} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#202124] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#e8eaed] dark:hover:bg-[#3c4043] rounded-xl font-bold text-[13px] transition-all shadow-sm group">
+                <svg className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                PDF 다운로드
+              </button>
+            </div>
           </div>
-          
-          <a href="https://open.kakao.com/o/sWeszp7" target="_blank" rel="noopener noreferrer" className="block text-center w-full py-4 bg-gray-900 hover:bg-black text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 rounded-2xl font-extrabold text-[14px] transition-all shadow-md">
-            보상스쿨 1:1 무료 상담 신청하기
-          </a>
 
         </div>
       </div>

@@ -33,8 +33,8 @@ export default function LogoDropdown() {
         <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--google-blue)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
         </svg>
-        <span className="font-sans font-bold text-[15px] sm:text-lg lg:text-xl text-[#202124] dark:text-white truncate max-w-[130px] sm:max-w-none">
-          보상스쿨 헬스케어 & 손해사정 보상가이드
+        <span className="font-sans font-bold text-lg sm:text-xl lg:text-2xl text-[#202124] dark:text-white truncate">
+          보상스쿨
         </span>
         <svg className={`w-3.5 h-3.5 text-[#5f6368] dark:text-[#9aa0a6] shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
       </button>

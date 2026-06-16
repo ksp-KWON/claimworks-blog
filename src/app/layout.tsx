@@ -11,6 +11,7 @@ import SearchBar from "@/components/SearchBar";
 import SmartStickyLayout from "@/components/SmartStickyLayout";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import LogoDropdown from "@/components/LogoDropdown";
+import MobileSidebarDrawer from "@/components/MobileSidebarDrawer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -102,8 +103,8 @@ export default function RootLayout({
         <ScrollProgressBar />
         <FloatingKakaoButton />
         
-        {/* 1. 애플 iOS Glassmorphism 스타일 App Bar */}
-        <header className="sticky top-0 z-50 w-full h-[54px] border-b border-[var(--google-border)] bg-white/80 dark:bg-[#202124]/80 backdrop-blur-md text-[#202124] dark:text-[#e8eaed] shadow-sm transition-colors">
+        {/* 1. 애플 iOS Glassmorphism 스타일 App Bar (쿨그레이 반투명) */}
+        <header className="sticky top-0 z-50 w-full h-[54px] border-b border-[var(--google-border)] bg-[#f8f9fa]/85 dark:bg-[#202124]/85 backdrop-blur-md text-[#202124] dark:text-[#e8eaed] shadow-sm transition-colors">
           <div className="mx-auto flex h-full w-[92vw] xl:w-[85vw] max-w-7xl items-center justify-between px-2 sm:px-5">
 
             {/* 로고/제목 영역 (드롭다운) */}
@@ -111,9 +112,26 @@ export default function RootLayout({
               <LogoDropdown />
             </div>
 
-            {/* 우측 검색 영역 (메뉴 삭제 및 검색창 확장) */}
-            <div className="flex items-center gap-2 shrink-0">
+            {/* 우측 검색 영역 및 액션 메뉴 */}
+            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               <SearchBar />
+              
+              {/* 상담신청 아이콘 (상단바) */}
+              <a 
+                href="https://open.kakao.com/o/sWeszp7" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-1.5 text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#FEE500] transition-colors rounded-full hover:bg-[var(--google-surface-variant)]"
+                aria-label="카카오톡 상담신청"
+              >
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 3C6.477 3 2 6.541 2 10.908c0 2.502 1.432 4.745 3.659 6.13-.314 1.157-1.14 4.183-1.182 4.341-.053.197.075.18.156.126.104-.07 3.324-2.222 4.606-3.084.887.24 1.821.366 2.761.366 5.523 0 10-3.541 10-7.908C22 6.541 17.523 3 12 3z"/>
+                </svg>
+              </a>
+
+              {/* 햄버거 메뉴 서랍 (카테고리) */}
+              <MobileSidebarDrawer />
+
               <ThemeToggle />
             </div>
           </div>

@@ -116,28 +116,40 @@ export default function MobileBottomNav() {
           <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
           <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">보상 계산기 모음</h3>
           
-          <Link href="/calculator/auto" onClick={closeModals} className="group flex flex-col bg-white dark:bg-[#202124] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#e8f0fe] to-transparent dark:from-[#8ab4f8]/10 dark:to-transparent rounded-bl-full -z-10" />
-            <div className="w-14 h-14 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-inner">🚗</div>
-            <h2 className="text-xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[var(--google-blue)] transition-colors">자동차보험 합의금</h2>
-            <p className="text-[#5f6368] dark:text-[#9aa0a6] text-xs leading-relaxed mb-4">교통사고 피해자 전용. 부상, 후유장해, 사망에 따른 약관 지급기준 및 호프만계수를 적용하여 산출합니다.</p>
-            <div className="flex items-center text-[var(--google-blue)] font-bold text-xs bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 px-4 py-2 rounded-xl w-fit group-hover:bg-[var(--google-blue)] group-hover:text-white transition-colors">계산 시작하기 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
+          <Link href="/calculator/auto" onClick={closeModals} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 relative overflow-hidden gap-4">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#e8f0fe] to-transparent dark:from-[#8ab4f8]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
+            <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">🚗</div>
+            <div className="flex flex-col flex-1 min-w-0">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors truncate">자동차보험 합의금</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">부상, 장해, 사망 등 약관 지급기준 적용</p>
+            </div>
+            <div className="text-[var(--google-blue)] shrink-0">
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+            </div>
           </Link>
 
-          <Link href="/calculator/medical" onClick={closeModals} className="group flex flex-col bg-white dark:bg-[#202124] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-[0_8px_30px_rgba(52,168,83,0.15)] transition-all duration-300 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#e6f4ea] to-transparent dark:from-[#1e8e3e]/10 dark:to-transparent rounded-bl-full -z-10" />
-            <div className="w-14 h-14 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-inner">🏥</div>
-            <h2 className="text-xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[var(--google-green)] transition-colors">실손의료비 보상</h2>
-            <p className="text-[#5f6368] dark:text-[#9aa0a6] text-xs leading-relaxed mb-4">가입 시기별 약관을 반영하여, 급여 및 비급여 병원비에서 본인부담금을 공제한 예상 실손 보험금을 정확하게 산출합니다.</p>
-            <div className="flex items-center text-[var(--google-green)] font-bold text-xs bg-[#e6f4ea] dark:bg-[#1e8e3e]/10 px-4 py-2 rounded-xl w-fit group-hover:bg-[var(--google-green)] group-hover:text-white transition-colors">계산 시작하기 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
+          <Link href="/calculator/medical" onClick={closeModals} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(52,168,83,0.15)] transition-all duration-300 relative overflow-hidden gap-4">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#e6f4ea] to-transparent dark:from-[#1e8e3e]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
+            <div className="w-12 h-12 shrink-0 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">🏥</div>
+            <div className="flex flex-col flex-1 min-w-0">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-green)] transition-colors truncate">실손의료비 보상</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">가입시기별 급여/비급여 본인부담금 공제</p>
+            </div>
+            <div className="text-[var(--google-green)] shrink-0">
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+            </div>
           </Link>
 
-          <Link href="/calculator/liability" onClick={closeModals} className="group flex flex-col bg-white dark:bg-[#202124] rounded-3xl p-6 border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-[0_8px_30px_rgba(234,67,53,0.15)] transition-all duration-300 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#fce8e6] to-transparent dark:from-[#d93025]/10 dark:to-transparent rounded-bl-full -z-10" />
-            <div className="w-14 h-14 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-inner">⚖️</div>
-            <h2 className="text-xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[var(--google-red)] transition-colors">배상책임 소송가액</h2>
-            <p className="text-[#5f6368] dark:text-[#9aa0a6] text-xs leading-relaxed mb-4">호프만계수를 적용하여 법원 판례 기준에 따른 예상 손해배상액을 산출합니다. 과실상계 및 기왕증 감액이 반영됩니다.</p>
-            <div className="flex items-center text-[var(--google-red)] font-bold text-xs bg-[#fce8e6] dark:bg-[#d93025]/10 px-4 py-2 rounded-xl w-fit group-hover:bg-[var(--google-red)] group-hover:text-white transition-colors">계산 시작하기 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></div>
+          <Link href="/calculator/liability" onClick={closeModals} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(234,67,53,0.15)] transition-all duration-300 relative overflow-hidden gap-4">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#fce8e6] to-transparent dark:from-[#d93025]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
+            <div className="w-12 h-12 shrink-0 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">⚖️</div>
+            <div className="flex flex-col flex-1 min-w-0">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-red)] transition-colors truncate">배상책임 소송가액</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">호프만계수 적용 법원 판례 기준 손해액</p>
+            </div>
+            <div className="text-[var(--google-red)] shrink-0">
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+            </div>
           </Link>
         </div>
       </div>
@@ -151,31 +163,27 @@ export default function MobileBottomNav() {
           <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
           <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">상담 신청하기</h3>
           
-          <a href="https://open.kakao.com/o/sWeszp7" target="_blank" rel="noopener noreferrer" onClick={closeModals} className="flex items-center gap-4 p-4 rounded-2xl bg-[#FEE500] hover:bg-[#F4DC00] transition-colors shadow-sm">
-            <div className="w-12 h-12 bg-black/10 rounded-full flex items-center justify-center shrink-0">
-              <svg className="w-7 h-7 text-black" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 3C6.477 3 2 6.541 2 10.908c0 2.502 1.432 4.745 3.659 6.13-.314 1.157-1.14 4.183-1.182 4.341-.053.197.075.18.156.126.104-.07 3.324-2.222 4.606-3.084.887.24 1.821.366 2.761.366 5.523 0 10-3.541 10-7.908C22 6.541 17.523 3 12 3z"/>
-              </svg>
+          <Link href="/consult/auto" onClick={closeModals} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 relative overflow-hidden gap-4">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#e8f0fe] to-transparent dark:from-[#8ab4f8]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
+            <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">📞</div>
+            <div className="flex flex-col flex-1 min-w-0">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors truncate">교통사고/배상책임 무료상담</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">전문 손해사정사가 직접 상담해 드립니다.</p>
             </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-black text-base">실시간 채팅상담 (카카오톡)</span>
-              <span className="text-black/60 text-xs font-medium">가장 빠르고 간편하게 상담받기</span>
+            <div className="text-[var(--google-blue)] shrink-0">
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
             </div>
-          </a>
+          </Link>
 
-          <a href="#" onClick={(e) => { e.preventDefault(); alert('예약상담 신청 폼이 준비중입니다.'); closeModals(); }} className="flex items-center gap-4 p-4 rounded-2xl bg-[var(--google-blue)] hover:bg-[#174ea6] transition-colors shadow-sm">
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
+          <a href="https://open.kakao.com/o/sWeszp7" target="_blank" rel="noopener noreferrer" onClick={closeModals} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(254,229,0,0.2)] transition-all duration-300 relative overflow-hidden gap-4">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#FEE500]/20 to-transparent dark:from-[#FEE500]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
+            <div className="w-12 h-12 shrink-0 bg-[#FEE500] dark:bg-[#FEE500]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">💬</div>
+            <div className="flex flex-col flex-1 min-w-0">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-yellow-600 dark:group-hover:text-[#FEE500] transition-colors truncate">카카오톡 실시간 상담</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">빠르고 간편하게 카카오톡으로 물어보세요.</p>
             </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-white text-base">예약상담 신청서 바로가기</span>
-              <span className="text-white/70 text-xs font-medium">자세한 내용을 미리 작성하여 상담 예약</span>
+            <div className="text-[#FEE500] dark:text-[#FEE500] shrink-0">
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
             </div>
           </a>
         </div>

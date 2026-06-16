@@ -114,7 +114,7 @@ export default function RootLayout({
                     <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                   </svg>
                   <span className="hidden sm:inline truncate">보상스쿨 헬스케어 &amp; 손해사정 보상가이드</span>
-                  <span className="sm:hidden text-[14px] truncate">보상스쿨 손해사정 보상가이드</span>
+                  <span className="sm:hidden text-[15px] truncate">보상스쿨's 보상가이드</span>
                 </Link>
               </div>
             </div>

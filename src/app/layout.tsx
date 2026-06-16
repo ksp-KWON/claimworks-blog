@@ -84,7 +84,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-300 pb-[calc(env(safe-area-inset-bottom,20px)+60px)] lg:pb-0 overflow-x-hidden">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-300 pb-[calc(env(safe-area-inset-bottom,20px)+60px)] lg:pb-0 overflow-x-clip">
         {/* 카카오 SDK */}
         <Script 
           src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" 

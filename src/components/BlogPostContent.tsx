@@ -117,8 +117,8 @@ function extractGlossary(content: string): { term: string; definition: string }[
 
       if (/^[-*]\s+/.test(trimmed)) {
         const text = trimmed.replace(/^[-*]\s*/, '').trim();
-        // "**용어**: 설명" 또는 "**용어** : 설명" 패턴 매칭
-        const match = text.match(/^\*\*([^*]+?)\*\*\s*:\s*(.*)/);
+        // "**용어**: 설명", "**용어** : 설명", "**용어 :** 설명" 등 다양한 패턴 매칭
+        const match = text.replace(/\*\*/g, '').match(/^([^:]+):\s*(.*)/);
         if (match) {
           glossary.push({ term: match[1].trim(), definition: match[2].trim() });
         }

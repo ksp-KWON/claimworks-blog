@@ -154,7 +154,7 @@ export default function RootLayout({
                 </a>
               </nav>
 
-              <div className="flex items-center gap-0.5 sm:gap-1 ml-0.5 border-l border-gray-300 dark:border-gray-600 pl-1 sm:pl-2">
+              <div className="flex items-center gap-0.5 sm:gap-1 ml-0.5">
                 <ThemeToggle />
                 
                 {/* 햄버거 메뉴 서랍 (카테고리) - 맨 우측 배치 */}

@@ -5,7 +5,6 @@ import "./globals.css";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import SidebarContent from "@/components/SidebarContent";
-import FloatingKakaoButton from "@/components/FloatingKakaoButton";
 import ScrollProgressBar from "@/components/ScrollProgressBar";
 import SearchBar from "@/components/SearchBar";
 import SmartStickyLayout from "@/components/SmartStickyLayout";
@@ -99,7 +98,6 @@ export default function RootLayout({
           `}
         </Script>
         <ScrollProgressBar />
-        <FloatingKakaoButton />
         
         {/* 1. 안드로이드 머티리얼 스타일 App Bar -> 애플 iOS Glassmorphism 스타일 */}
         <header className="sticky top-0 z-50 w-full h-[64px] border-b border-[var(--google-border)] bg-white/80 dark:bg-[#202124]/80 backdrop-blur-md text-[#202124] dark:text-[#e8eaed] shadow-sm transition-colors">

@@ -22,7 +22,7 @@ export default function SearchBar() {
       {/* Search Bar (Open by default on all screens) */}
       <form 
         onSubmit={handleSearch} 
-        className="flex items-center bg-[#f1f3f4]/80 dark:bg-[#3c4043]/80 rounded-full px-3 py-1.5 w-[130px] sm:w-[180px] md:w-[240px] lg:w-[320px] focus-within:bg-white dark:focus-within:bg-[#303134] focus-within:shadow-md focus-within:w-[150px] sm:focus-within:w-[200px] md:focus-within:w-[260px] lg:focus-within:w-[340px] transition-all duration-300 border border-gray-200/50 dark:border-transparent mr-1 md:mr-2"
+        className="flex items-center bg-[#f1f3f4]/80 dark:bg-[#3c4043]/80 rounded-full px-3 py-1.5 w-[160px] sm:w-[220px] md:w-[280px] lg:w-[360px] focus-within:bg-white dark:focus-within:bg-[#303134] focus-within:shadow-md focus-within:w-[180px] sm:focus-within:w-[240px] md:focus-within:w-[300px] lg:focus-within:w-[400px] transition-all duration-300 border border-gray-200/50 dark:border-transparent mr-1 md:mr-2"
       >
         <button type="submit" className="text-[#5f6368] dark:text-[#9aa0a6] hover:text-[var(--google-blue)] transition-colors pr-1.5">
           <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>

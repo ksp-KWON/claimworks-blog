@@ -230,11 +230,14 @@ export default function MedicalCalculatorResult({ data }: { data: MedicalInsuran
         </div>
 
         {result.formulas && result.formulas.length > 0 && (
-          <div className="bg-blue-50/50 dark:bg-blue-950/20 p-4 rounded-xl space-y-1.5 mt-4 border border-blue-100/50 dark:border-blue-900/20">
-            <h4 className="font-bold text-blue-800 dark:text-blue-300 text-xs">적용된 산출 계산식</h4>
-            <ul className="list-disc list-inside text-blue-700 dark:text-blue-400 space-y-1 text-[11px] leading-relaxed">
+          <div className="mt-5 bg-[#f8f9fa] dark:bg-[#2d2d2d] rounded-2xl p-4 border border-gray-100 dark:border-white/5">
+            <h4 className="text-[12px] font-extrabold text-[#34A853] mb-2 flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg>
+              적용된 산출 계산식
+            </h4>
+            <ul className="list-disc list-inside text-[11px] text-gray-500 dark:text-gray-400 space-y-1.5 leading-relaxed break-keep">
               {result.formulas.map((formula, idx) => (
-                <li key={idx} className="break-all">{formula}</li>
+                <li key={idx}>{formula}</li>
               ))}
             </ul>
           </div>

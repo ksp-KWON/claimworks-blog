@@ -19,11 +19,11 @@ export default function ExpertMedicalForm() {
 
   return (
     <div className="w-full max-w-6xl mx-auto">
-      {/* 2단 그리드 레이아웃: 데스크톱에서는 7:5 구조로 좌우 배치, 모바일에서는 상하 배치 */}
+      {/* 2단 그리드 레이아웃: 데스크톱에서는 5:7 구조로 좌우 배치, 모바일에서는 상하 배치 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* 좌측: 입력 폼 영역 (7열) */}
-        <div className="lg:col-span-7 space-y-6">
+        {/* 좌측: 입력 폼 영역 (5열) */}
+        <div className="lg:col-span-5 space-y-6">
           
           {/* 가입 정보 입력 */}
           <section className="bg-white dark:bg-[#202124] p-6 rounded-2xl border border-gray-200/80 dark:border-white/5 shadow-sm">
@@ -38,7 +38,7 @@ export default function ExpertMedicalForm() {
                 <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2.5">
                   실손보험 가입 시기 (세대 구분)
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-2 gap-2">
                   {[
                     { val: 1, label: '1세대', desc: '09년 8월 이전' },
                     { val: 2, label: '2세대', desc: '09.8 ~ 17.3' },
@@ -59,7 +59,7 @@ export default function ExpertMedicalForm() {
               </div>
 
               {/* 진료 형태 선택: 드롭다운 대신 2단 탭으로 변경 */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                 <div>
                   <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">진료 형태</label>
                   <div className="flex bg-gray-100 dark:bg-[#303134] p-1 rounded-xl">
@@ -105,7 +105,7 @@ export default function ExpertMedicalForm() {
               {/* 병원 규모 선택 */}
               {data.treatmentType === 'outpatient' && data.generation > 1 && (
                 <div className="mt-2">
-                  <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">병원 규모 (최소 공제금액 기준용)</label>
+                  <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">병원 규모 (최소 공제기준)</label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
                       { type: 'clinic', label: '의원', desc: '1만 원 공제' },
@@ -119,7 +119,7 @@ export default function ExpertMedicalForm() {
                         className={`p-2.5 rounded-xl border text-center transition-all ${data.clinicType === clinic.type ? 'border-green-600 bg-green-50/50 dark:bg-green-950/20 text-green-700 dark:text-green-400 font-bold shadow-sm' : 'border-gray-200 bg-white dark:bg-[#303134] dark:border-transparent text-gray-600 dark:text-gray-300 hover:border-green-300'}`}
                       >
                         <div className="text-xs sm:text-sm">{clinic.label}</div>
-                        <div className="text-[10px] opacity-75 mt-0.5">{clinic.desc}</div>
+                        <div className="text-[10px] opacity-75 mt-0.5 break-keep">{clinic.desc}</div>
                       </button>
                     ))}
                   </div>
@@ -134,7 +134,7 @@ export default function ExpertMedicalForm() {
               <span className="w-1 h-4 bg-green-600 rounded-full inline-block" />
               기본 병원비 영수증 정보
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">급여 (본인부담금 총액)</label>
                 <div className="relative">
@@ -173,8 +173,8 @@ export default function ExpertMedicalForm() {
                 <span className="w-1 h-4 bg-red-600 rounded-full inline-block" />
                 3대 비급여 특약 병원비
               </h3>
-              <p className="text-[11px] text-red-500 dark:text-red-400 mb-4 font-semibold">※ 위의 기본 비급여 영수증 정보와 중복으로 금액을 입력하지 마세요.</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <p className="text-[11px] text-red-500 dark:text-red-400 mb-4 font-semibold">※ 위의 기본 비급여 금액과 중복입력하지 마세요.</p>
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">도수치료/체외충격파</label>
                   <div className="relative">
@@ -202,8 +202,8 @@ export default function ExpertMedicalForm() {
 
         </div>
 
-        {/* 우측: 결과 영역 (5열) - 데스크톱에서 스티키(Sticky)하게 고정 */}
-        <div className="lg:col-span-5 lg:sticky lg:top-6 lg:self-start">
+        {/* 우측: 결과 영역 (7열) - 데스크톱에서 스티키(Sticky)하게 고정 */}
+        <div className="lg:col-span-7 lg:sticky lg:top-6 lg:self-start">
           <MedicalCalculatorResult data={data} />
         </div>
 

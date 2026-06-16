@@ -148,6 +148,32 @@ export default function LiabilityCalculator() {
   // 총계
   const totalAmount = alimony + lostIncome + hospitalLoss + totalActiveLoss;
 
+  // 산출 계산식 생성
+  const formulas: string[] = [];
+  if (alimony > 0) {
+    formulas.push(`위자료: 기준액(${fmt(Math.floor(data.alimonyBase))}원) × 장해율(${effectiveDisabilityRate}%) × [1 - (과실비율 ${data.faultRatio}% × 0.6)] = ${fmt(Math.floor(alimony))}원`);
+  }
+  if (lostIncome > 0) {
+    if (data.hasDeath) {
+      formulas.push(`사망 일실수입: (소득 × 2/3) × H계수(${H_disability.toFixed(4)}) × (1 - 과실비율 ${data.faultRatio}%) = ${fmt(Math.floor(lostIncome))}원`);
+    } else {
+      formulas.push(`장해 일실수입: 소득 × 장해율(${data.disabilityRate}%) × H계수(${H_disability.toFixed(4)}) × (1 - 과실비율 ${data.faultRatio}%) = ${fmt(Math.floor(lostIncome))}원`);
+    }
+  }
+  if (hospitalLoss > 0) {
+    formulas.push(`휴업손해: (소득 ÷ 30일) × 입원일수(${data.hospitalDays}일) × (1 - 과실비율 ${data.faultRatio}%) = ${fmt(Math.floor(hospitalLoss))}원`);
+  }
+  if (careCost > 0) {
+    const careMonths = data.careYears === 0 ? maxMonths : Math.min(maxMonths, data.careYears * 12);
+    formulas.push(`개호비: 일용단가(${fmt(156425)}원) × 30일 × 필요인원(${data.carePersons}명) × H계수(${getHoffmanForMonths(careMonths).toFixed(4)}) × (1 - 과실비율 ${data.faultRatio}%) = ${fmt(Math.floor(careCost))}원`);
+  }
+  if (finalFuneralCost > 0) {
+    formulas.push(`장례비: 장례비용(${fmt(data.funeralCost)}원) × (1 - 과실비율 ${data.faultRatio}%) = ${fmt(Math.floor(finalFuneralCost))}원`);
+  }
+  if (treatment > 0) {
+    formulas.push(`치료비 등: 추가비용 합계 × (1 - 과실비율 ${data.faultRatio}%) = ${fmt(Math.floor(treatment))}원`);
+  }
+
   // ── 공유 및 PDF 다운로드 기능 ──
   const exportPDF = async () => {
     if (!resultRef.current) return;
@@ -502,6 +528,19 @@ export default function LiabilityCalculator() {
                 </div>
               )}
             </div>
+
+            {/* 산출 계산식 */}
+            {formulas.length > 0 && (
+              <div className="mb-6 bg-white/60 dark:bg-black/10 rounded-2xl p-4 border border-[#FFE0B2] dark:border-white/5">
+                <h4 className="text-[12px] font-extrabold text-[#EF6C00] mb-2 flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg>
+                  적용된 산출 계산식
+                </h4>
+                <ul className="list-disc list-inside text-[11px] text-gray-600 dark:text-gray-400 space-y-1.5 leading-relaxed break-keep">
+                  {formulas.map((f, i) => <li key={i}>{f}</li>)}
+                </ul>
+              </div>
+            )}
 
             {/* 최종 합의금 카드: 오렌지색 그라데이션 적용 */}
             <div className="bg-gradient-to-br from-[#EF6C00] to-[#E65100] dark:from-[#E65100] dark:to-[#EF6C00] rounded-2xl p-6 text-white text-center shadow-md relative overflow-hidden transition-all duration-300 hover:shadow-lg">

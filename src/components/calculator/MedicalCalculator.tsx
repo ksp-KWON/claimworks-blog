@@ -251,6 +251,19 @@ export default function MedicalCalculator() {
               </div>
             </div>
 
+            {/* 산출 계산식 */}
+            <div className="mt-5 bg-[#f8f9fa] dark:bg-[#2d2d2d] rounded-2xl p-4 border border-gray-100 dark:border-white/5">
+              <h4 className="text-[12px] font-extrabold text-[#34A853] mb-2 flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg>
+                적용된 산출 계산식
+              </h4>
+              <ul className="list-disc list-inside text-[11px] text-gray-500 dark:text-gray-400 space-y-1.5 leading-relaxed break-keep">
+                <li>총 진료비({medicalBill.toLocaleString()}원) - 최소 공제액({Math.round(deductible).toLocaleString()}원) = 예상 지급액</li>
+                <li>적용 공제금액: 최소 공제금액과 비율 공제({100 - coveragePct}%) 중 큰 금액 차감</li>
+                <li>세대별 기준: {selectedGen.note}</li>
+              </ul>
+            </div>
+
             {/* 보장율 프로그레스 바 */}
             <div className="mt-8 pt-6 border-t border-dashed border-gray-200 dark:border-white/10">
               <div className="flex justify-between text-[12px] font-extrabold text-gray-500 dark:text-gray-400 mb-2">

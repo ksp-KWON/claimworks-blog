@@ -83,7 +83,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-300 pb-[calc(env(safe-area-inset-bottom,20px)+48px)] lg:pb-0 overflow-x-hidden">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-300 pb-[calc(env(safe-area-inset-bottom,20px)+56px)] lg:pb-0 overflow-x-hidden">
         {/* 카카오 SDK */}
         <Script 
           src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" 
@@ -101,7 +101,7 @@ export default function RootLayout({
         <ScrollProgressBar />
         
         {/* 1. 애플 iOS Glassmorphism 스타일 App Bar (조금 더 진한 쿨그레이 반투명) */}
-        <header className="sticky top-0 z-50 w-full h-[48px] border-b border-[var(--google-border)] bg-[#e8eaed]/90 dark:bg-[#303134]/90 backdrop-blur-md text-[#202124] dark:text-[#e8eaed] shadow-sm transition-colors">
+        <header className="sticky top-0 z-50 w-full h-[56px] border-b border-[var(--google-border)] bg-[#e8eaed]/90 dark:bg-[#303134]/90 backdrop-blur-md text-[#202124] dark:text-[#e8eaed] shadow-sm transition-colors">
           <div className="mx-auto flex h-full w-[92vw] xl:w-[85vw] max-w-7xl items-center justify-between px-2 sm:px-5">
 
             {/* 로고/제목 영역 */}

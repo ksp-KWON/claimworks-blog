@@ -12,6 +12,21 @@ export default function MobileBottomNav() {
 
   const closeModals = () => setOpenModal('none');
 
+  // 모달 활성화 시 배경 스크롤 방지
+  useEffect(() => {
+    if (openModal !== 'none') {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none'; // iOS Safari 대응 (배경 터치 무시)
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, [openModal]);
+
   const navItems = [
     {
       id: 'home',
@@ -85,12 +100,16 @@ export default function MobileBottomNav() {
         <div 
           className="lg:hidden fixed inset-0 bg-black/40 z-[90] animate-in fade-in duration-200"
           onClick={closeModals}
+          onTouchMove={(e) => e.preventDefault()}
         ></div>
       )}
 
       {/* 1. 계산기 팝업 */}
-      <div className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'calculator' ? 'translate-y-0' : 'translate-y-full'}`}>
-        <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto">
+      <div 
+        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'calculator' ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ touchAction: openModal === 'calculator' ? 'auto' : 'none' }}
+      >
+        <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto overscroll-contain">
           <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
           <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">보상 계산기 모음</h3>
           
@@ -115,8 +134,11 @@ export default function MobileBottomNav() {
       </div>
 
       {/* 2. 카테고리 팝업 */}
-      <div className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'category' ? 'translate-y-0' : 'translate-y-full'}`}>
-        <div className="p-5 pb-8 max-h-[70vh] overflow-y-auto">
+      <div 
+        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'category' ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ touchAction: openModal === 'category' ? 'auto' : 'none' }}
+      >
+        <div className="p-5 pb-8 max-h-[70vh] overflow-y-auto overscroll-contain">
           <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
           <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">주요 보상 카테고리</h3>
           <ul className="space-y-2">
@@ -148,8 +170,11 @@ export default function MobileBottomNav() {
       </div>
 
       {/* 3. 상담신청 팝업 */}
-      <div className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'consult' ? 'translate-y-0' : 'translate-y-full'}`}>
-        <div className="p-5 pb-8 space-y-4">
+      <div 
+        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'consult' ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ touchAction: openModal === 'consult' ? 'auto' : 'none' }}
+      >
+        <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto overscroll-contain">
           <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
           <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">상담 신청하기</h3>
           

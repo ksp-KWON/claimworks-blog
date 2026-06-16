@@ -23,11 +23,14 @@ export default function MobileSidebarDrawer() {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none'; // iOS Safari 대응
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
     };
   }, [isOpen]);
 
@@ -54,6 +57,7 @@ export default function MobileSidebarDrawer() {
             <div 
               className="lg:hidden fixed inset-0 bg-black/50 z-[100] animate-in fade-in duration-200"
               onClick={() => setIsOpen(false)}
+              onTouchMove={(e) => e.preventDefault()}
             ></div>
           )}
 
@@ -75,7 +79,7 @@ export default function MobileSidebarDrawer() {
             </div>
             
             {/* SidebarContent를 감싸서 서랍 내부에 렌더링 */}
-            <div className="overflow-y-auto flex-1 p-4">
+            <div className="overflow-y-auto flex-1 p-4 overscroll-contain">
               <SidebarContent />
             </div>
           </div>

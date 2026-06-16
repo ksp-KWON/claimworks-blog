@@ -121,6 +121,37 @@ export default function SidebarContent() {
         className={`space-y-6 ${isOpen ? 'block' : 'hidden'} lg:block lg:mt-6 mt-6`}
       >
 
+        {/* 주요 보상 카테고리 */}
+        <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+          <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-4 flex items-center gap-2 border-l-4 border-yellow-500 pl-2.5">
+            <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
+            주요 보상 카테고리
+          </h3>
+          <ul className="space-y-1 text-sm font-medium text-[#202124] dark:text-[#e8eaed]">
+            {[
+              { name: '교통사고', color: 'text-red-500' },
+              { name: '배상책임', color: 'text-green-500' },
+              { name: '보상가이드', color: 'text-yellow-600' },
+              { name: '실손의료비', color: 'text-blue-500' },
+              { name: '보험상식', color: 'text-orange-500' },
+              { name: '후유장해 보상', color: 'text-purple-500' },
+              { name: '보상정보', color: 'text-teal-500' }
+            ].map(cat => (
+              <li key={cat.name}>
+                <Link
+                  href={`/blog?category=${encodeURIComponent(cat.name)}`}
+                  className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors text-[#202124] dark:text-[#e8eaed]"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full bg-current ${cat.color}`}></span>
+                    {cat.name}
+                  </span>
+                  <svg className="w-4 h-4 text-[#5f6368]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
 
         {/* 진료과목별 분쟁 가이드 */}
         <SpecialtyDiseaseCategories />

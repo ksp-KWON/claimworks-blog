@@ -113,32 +113,43 @@ export const REGIONS_DATA = [
 
 // 1. 대한민국 전체 행정구역 카테고리 (대분류 17개 시/도, 중분류 226개 시/군/구 전수조사 반영)
 export function RegionalCategories() {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-      <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-4 flex items-center gap-2 border-l-4 border-[var(--google-green)] pl-2.5">
-        <svg className="w-4 h-4 text-[var(--google-green)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-        지역별 의료기관
-      </h3>
-      <ul className="space-y-1 text-sm font-medium text-[#202124] dark:text-[#e8eaed]">
-        {REGIONS_DATA.map((region) => (
-          <li key={region.name}>
-            <Link
-              href={`/blog?sido=${encodeURIComponent(region.name)}`}
-              className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors text-[#202124] dark:text-[#e8eaed]"
-            >
-              <span className="flex items-center gap-2">{region.name}</span>
-              <svg className="w-4 h-4 text-[#5f6368]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between border-l-4 border-[var(--google-green)] pl-2.5 transition-colors group"
+      >
+        <span className="flex items-center gap-2">
+          <svg className="w-4 h-4 text-[var(--google-green)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          지역별 의료기관
+        </span>
+        <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      
+      {isOpen && (
+        <ul className="space-y-1 text-sm font-medium text-[#202124] dark:text-[#e8eaed] mt-4 animate-in slide-in-from-top-2 fade-in duration-200">
+          {REGIONS_DATA.map((region) => (
+            <li key={region.name}>
+              <Link
+                href={`/blog?sido=${encodeURIComponent(region.name)}`}
+                className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors text-[#202124] dark:text-[#e8eaed]"
+              >
+                <span className="flex items-center gap-2">{region.name}</span>
+                <svg className="w-4 h-4 text-[#5f6368]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
 
 // 2. 대학병원 진료과목 기준 보상 가이드 카테고리 (진료과목 대분류, 보상/분쟁 대표병명 중분류)
 export function SpecialtyDiseaseCategories() {
+  const [isMainOpen, setIsMainOpen] = useState(false);
   const [openSpecialties, setOpenSpecialties] = useState<{ [key: string]: boolean }>({});
 
   const toggleSpecialty = (specialty: string) => {
@@ -235,37 +246,46 @@ export function SpecialtyDiseaseCategories() {
 
   return (
     <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-      <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-4 flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">
-        <svg className="w-4 h-4 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
-        진료과목별 분쟁 가이드
-      </h3>
-      <ul className="space-y-1 text-sm font-medium text-[#202124] dark:text-[#e8eaed]">
-        {specialties.map((specialty) => {
-          const isOpen = !!openSpecialties[specialty.name];
-          return (
-            <li key={specialty.name} className="">
-              <button
-                onClick={() => toggleSpecialty(specialty.name)}
-                className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors"
-              >
-                <span>{specialty.name}</span>
-                <svg className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180 text-[var(--google-blue)]' : 'text-[#5f6368]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
-              {isOpen && (
-                <ul className="pl-6 space-y-0.5 text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1 mb-2">
-                  {specialty.diseases.map((disease) => (
-                    <li key={disease}>
-                      <Link href={`/blog?category=${disease}`} className="block px-3 py-2 rounded-lg hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors">
-                        {disease}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      <button 
+        onClick={() => setIsMainOpen(!isMainOpen)}
+        className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between border-l-4 border-[var(--google-blue)] pl-2.5 transition-colors group"
+      >
+        <span className="flex items-center gap-2">
+          <svg className="w-4 h-4 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
+          진료과목별 분쟁 가이드
+        </span>
+        <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isMainOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+
+      {isMainOpen && (
+        <ul className="space-y-1 text-sm font-medium text-[#202124] dark:text-[#e8eaed] mt-4 animate-in slide-in-from-top-2 fade-in duration-200">
+          {specialties.map((specialty) => {
+            const isOpen = !!openSpecialties[specialty.name];
+            return (
+              <li key={specialty.name} className="">
+                <button
+                  onClick={() => toggleSpecialty(specialty.name)}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors"
+                >
+                  <span>{specialty.name}</span>
+                  <svg className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180 text-[var(--google-blue)]' : 'text-[#5f6368]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                {isOpen && (
+                  <ul className="pl-6 space-y-0.5 text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1 mb-2">
+                    {specialty.diseases.map((disease) => (
+                      <li key={disease}>
+                        <Link href={`/blog?category=${disease}`} className="block px-3 py-2 rounded-lg hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors">
+                          {disease}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

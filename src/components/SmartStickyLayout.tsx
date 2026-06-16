@@ -37,8 +37,8 @@ export default function SmartStickyLayout({ mainContent, sidebarContent }: Props
         {mainContent}
       </main>
 
-      {/* 사이드바 영역 */}
-      <aside className="w-full lg:w-[27%] relative transition-all duration-300 lg:px-0">
+      {/* 사이드바 영역 (모바일에서는 서랍으로 대체되므로 숨김) */}
+      <aside className="hidden lg:block w-full lg:w-[27%] relative transition-all duration-300 lg:px-0">
         <div className="lg:sticky lg:top-[80px] w-full">
           {sidebarContent}
         </div>

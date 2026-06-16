@@ -14,6 +14,7 @@ import { SpecialtyDiseaseCategories, RegionalCategories } from '@/components/Sid
 export default function SidebarContent() {
   const [isOpen, setIsOpen] = useState(false);
   const [showAllTags, setShowAllTags] = useState(false);
+  const [isMajorCategoryOpen, setIsMajorCategoryOpen] = useState(false);
 
   // 인기 태그 계산 (빈도수 기준 내림차순 정렬)
   const sortedTags = useMemo(() => {
@@ -123,11 +124,19 @@ export default function SidebarContent() {
 
         {/* 주요 보상 카테고리 */}
         <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-          <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-4 flex items-center gap-2 border-l-4 border-yellow-500 pl-2.5">
-            <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
-            주요 보상 카테고리
-          </h3>
-          <ul className="space-y-1 text-sm font-medium text-[#202124] dark:text-[#e8eaed]">
+          <button 
+            onClick={() => setIsMajorCategoryOpen(!isMajorCategoryOpen)}
+            className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between border-l-4 border-yellow-500 pl-2.5 transition-colors group"
+          >
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
+              주요 보상 카테고리
+            </div>
+            <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isMajorCategoryOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          
+          <div className={`overflow-hidden transition-all duration-300 ${isMajorCategoryOpen ? 'max-h-[500px] mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <ul className="space-y-1 text-sm font-medium text-[#202124] dark:text-[#e8eaed]">
             {[
               { name: '교통사고', color: 'text-red-500' },
               { name: '배상책임', color: 'text-green-500' },
@@ -150,7 +159,8 @@ export default function SidebarContent() {
                 </Link>
               </li>
             ))}
-          </ul>
+            </ul>
+          </div>
         </div>
 
         {/* 진료과목별 분쟁 가이드 */}

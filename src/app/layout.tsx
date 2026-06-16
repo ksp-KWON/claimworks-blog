@@ -24,7 +24,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://claim-works.com"),
-  title: "보상스쿨 헬스케어 & 손해사정 보상가이드",
+  title: "보상스쿨's 보상가이드",
   description: "건강보험심사평가원의 공개 정보를 기반으로 보상스쿨 손해사정사가 분석한 보상 노하우를 제공합니다.",
 };
 
@@ -113,7 +113,7 @@ export default function RootLayout({
                   <svg className="w-5 h-5 text-[var(--google-blue)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                   </svg>
-                  <span className="hidden sm:inline truncate">보상스쿨 헬스케어 &amp; 손해사정 보상가이드</span>
+                  <span className="hidden sm:inline truncate">보상스쿨's 보상가이드</span>
                   <span className="sm:hidden text-[15px] truncate">보상스쿨's 보상가이드</span>
                 </Link>
               </div>

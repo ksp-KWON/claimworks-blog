@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { toPng } from 'html-to-image';
+import { jsPDF } from 'jspdf';
 
 // ── 데이터 타입 및 초기값 ──
 export interface LiabilityData {
@@ -33,7 +35,7 @@ export interface LiabilityData {
 const initialData: LiabilityData = {
   ageAtAccident: 40,
   faultRatio: 20,
-  income: 3284525, 
+  income: 3441360, 
   
   hasInjury: true,
   hasDisability: false,
@@ -74,6 +76,7 @@ const STEPS = [
 export default function LiabilityCalculator() {
   const [data, setData] = useState<LiabilityData>(initialData);
   const [activeStep, setActiveStep] = useState(0);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   const handleChange = (field: keyof LiabilityData, value: number | boolean) => {
     let finalValue = value;
@@ -87,10 +90,6 @@ export default function LiabilityCalculator() {
     setData(prev => ({ ...prev, [field]: finalValue }));
   };
 
-  const addValue = (field: keyof LiabilityData, addAmount: number) => {
-    setData(prev => ({ ...prev, [field]: Number(prev[field]) + addAmount }));
-  };
-
   const fmt = (val: number | string) => {
     if (!val) return '';
     return Number(val.toString().replace(/,/g, '')).toLocaleString();
@@ -98,7 +97,6 @@ export default function LiabilityCalculator() {
   const parse = (val: string) => Math.max(0, Number(val.replace(/[^0-9]/g, '')) || 0);
 
   // ── 계산 로직 ──
-  // 가동연한 65세까지 남은 개월 수
   const maxMonths = Math.max(0, (65 - data.ageAtAccident) * 12);
   
   // 1. 위자료
@@ -108,36 +106,34 @@ export default function LiabilityCalculator() {
 
   const alimony = Math.max(0, data.alimonyBase * (effectiveDisabilityRate / 100) * (1 - (data.faultRatio / 100) * 0.6));
 
-  // 2. 일실수입 (사망 or 장해)
+  // 2. 일실수입
   let lostIncome = 0;
   let H_disability = 0;
   let isDeathDeduction = false;
 
   if (data.hasDeath) {
-    // 사망 일실수입: (소득 - 1/3 생계비) * 가동연한 H계수
     H_disability = getHoffmanForMonths(maxMonths);
     lostIncome = data.income * (2 / 3) * H_disability * (1 - (data.faultRatio / 100));
     isDeathDeduction = true;
   } else if (data.hasDisability) {
-    // 장해 일실수입: 소득 * 장해율 * 장해기간 H계수
     const targetMonths = data.disabilityYears === 0 ? maxMonths : Math.min(maxMonths, data.disabilityYears * 12);
     H_disability = getHoffmanForMonths(targetMonths);
     lostIncome = data.income * (data.disabilityRate / 100) * H_disability * (1 - (data.faultRatio / 100));
   }
 
-  // 3. 휴업손해 (부상)
+  // 3. 휴업손해
   let hospitalLoss = 0;
   if (data.hasInjury && !data.hasDeath) {
     hospitalLoss = data.income * (data.hospitalDays / 30) * (1 - (data.faultRatio / 100));
   }
 
-  // 4. 적극적 손해 (치료비, 개호비, 장례비, 보조구)
+  // 4. 적극적 손해
   let careCost = 0;
   if (data.hasCare) {
     const careMonths = data.careYears === 0 ? maxMonths : Math.min(maxMonths, data.careYears * 12);
     const H_care = getHoffmanForMonths(careMonths);
-    // 보통인부 일당 약 16만 원 적용 (여기서는 시중노임단가 일할 149,296원으로 계산)
-    const dailyWage = 149296; 
+    // 보통인부 시중노임단가 공사부문 3,441,360원 기준 일할 (÷22일 = 156,425원)
+    const dailyWage = 156425; 
     careCost = dailyWage * 30 * data.carePersons * H_care * (1 - (data.faultRatio / 100));
   }
 
@@ -152,10 +148,72 @@ export default function LiabilityCalculator() {
   // 총계
   const totalAmount = alimony + lostIncome + hospitalLoss + totalActiveLoss;
 
+  // ── 공유 및 PDF 다운로드 기능 ──
+  const exportPDF = async () => {
+    if (!resultRef.current) return;
+    try {
+      const originalBg = resultRef.current.style.backgroundColor;
+      resultRef.current.style.backgroundColor = '#ffffff';
+      
+      const imgData = await toPng(resultRef.current, { backgroundColor: '#ffffff', pixelRatio: 2 });
+      resultRef.current.style.backgroundColor = originalBg;
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (resultRef.current.offsetHeight * pdfWidth) / resultRef.current.offsetWidth;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save('보상스쿨_배상책임_소송가액명세서.pdf');
+    } catch (e: unknown) {
+      console.error(e);
+      const errorMsg = e instanceof Error ? e.message : String(e);
+      alert(`PDF 생성 중 오류가 발생했습니다: ${errorMsg}`);
+    }
+  };
+
+  const shareResult = () => {
+    const text = `보상스쿨 배상책임 소송가액 계산결과\n▶ 예상 총 손해배상액: ${Math.floor(totalAmount).toLocaleString()}원\n\n자세한 내역은 보상스쿨에서 확인해보세요!`;
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: '보상스쿨 배상책임 소송가액 결과',
+          description: `예상 손해배상액: ${Math.floor(totalAmount).toLocaleString()}원\n자세한 산출 명세서를 확인해 보세요!`,
+          imageUrl: 'https://claim-works.com/og-image.png',
+          link: {
+            mobileWebUrl: window.location.href,
+            webUrl: window.location.href,
+          },
+        },
+        buttons: [
+          {
+            title: '계산 결과 보기',
+            link: {
+              mobileWebUrl: window.location.href,
+              webUrl: window.location.href,
+            },
+          },
+        ],
+      });
+    } else if (navigator.share) {
+      navigator.share({
+        title: '보상스쿨 소송가액 산출 명세서',
+        text: text,
+        url: window.location.href,
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(text + '\n' + window.location.href);
+      alert('결과가 클립보드에 복사되었습니다. 카카오톡이나 메시지 앱에 붙여넣기 해보세요.');
+    }
+  };
+
   // ── 렌더링 ──
   const renderStep = () => {
     switch (activeStep) {
-      case 0: // 기본 정보
+      case 0:
         return (
           <div className="space-y-5 h-full animate-in fade-in duration-300">
             <div>
@@ -177,8 +235,8 @@ export default function LiabilityCalculator() {
                 <input type="text" inputMode="numeric" value={data.income ? fmt(data.income) : ''} onChange={e => handleChange('income', parse(e.target.value))} className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border border-gray-200 dark:border-white/10 rounded-xl py-3 pl-4 pr-12 text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] focus:ring-2 focus:ring-[#EF6C00] focus:outline-none transition-all" />
                 <span className="absolute right-4 top-3.5 text-[13px] text-gray-400 font-semibold">원</span>
               </div>
-              <button onClick={() => handleChange('income', 3284525)} className="w-full py-2 bg-[#FFF3E0] dark:bg-[#EF6C00]/15 text-[#E65100] dark:text-[#FFCC80] text-[12px] font-bold rounded-xl border border-[#FFB74D] hover:bg-[#FFE0B2] dark:hover:bg-[#EF6C00]/25 transition-all">
-                📊 시중노임단가 자동 적용 (3,284,525원)
+              <button onClick={() => handleChange('income', 3441360)} className="w-full py-2 bg-[#FFF3E0] dark:bg-[#EF6C00]/15 text-[#E65100] dark:text-[#FFCC80] text-[12px] font-bold rounded-xl border border-[#FFB74D] hover:bg-[#FFE0B2] dark:hover:bg-[#EF6C00]/25 transition-all">
+                📊 보통인부 시중노임단가(공사부문) 자동 적용 (3,441,360원)
               </button>
             </div>
 
@@ -197,7 +255,7 @@ export default function LiabilityCalculator() {
           </div>
         );
 
-      case 1: // 피해 유형
+      case 1:
         return (
           <div className="space-y-4 h-full animate-in fade-in duration-300">
             <label className="block text-[11px] font-bold text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider mb-3">피해 유형 (복수 선택 가능)</label>
@@ -228,7 +286,7 @@ export default function LiabilityCalculator() {
           </div>
         );
 
-      case 2: // 상세 입력
+      case 2:
         return (
           <div className="space-y-6 h-full overflow-y-auto pr-1 animate-in fade-in duration-300" style={{ maxHeight: '420px' }}>
             {data.hasInjury && !data.hasDeath && (
@@ -315,7 +373,7 @@ export default function LiabilityCalculator() {
           </div>
         );
 
-      case 3: // 추가 비용
+      case 3:
         return (
           <div className="space-y-4 h-full animate-in fade-in duration-300 overflow-y-auto" style={{ maxHeight: '420px' }}>
             {[
@@ -351,12 +409,10 @@ export default function LiabilityCalculator() {
 
   return (
     <div className="w-full">
-      {/* ── 2단 그리드 (좌: 입력, 우: 결과) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* 좌측: 탭 기반 스텝 입력 */}
         <div className="lg:col-span-6 flex flex-col">
-          {/* 탭 네비 */}
           <div className="flex gap-1.5 mb-4 bg-[#f8f9fa] dark:bg-[#2d2d2d] p-1.5 rounded-2xl border border-gray-200 dark:border-white/8">
             {STEPS.map((step, idx) => (
               <button
@@ -374,12 +430,10 @@ export default function LiabilityCalculator() {
             ))}
           </div>
 
-          {/* 탭 콘텐츠 */}
           <div className="flex-1 bg-white dark:bg-[#202124] rounded-2xl border border-gray-200 dark:border-white/10 p-5 shadow-sm min-h-[400px]">
             {renderStep()}
           </div>
 
-          {/* 이전/다음 네비 버튼 */}
           <div className="flex gap-2 mt-3">
             <button
               onClick={() => setActiveStep(s => Math.max(s - 1, 0))}
@@ -398,72 +452,104 @@ export default function LiabilityCalculator() {
           </div>
         </div>
 
-        {/* 우측: 결과 패널 */}
-        <div className="lg:col-span-6 relative">
-          <div className="sticky top-[100px] bg-gradient-to-br from-[#EF6C00] to-[#E65100] rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-[#EF6C00]/20 flex flex-col h-full min-h-[450px] overflow-hidden">
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/15 rounded-full blur-3xl pointer-events-none"></div>
-            
-            <h2 className="text-sm font-bold text-white/90 mb-6 flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
-              법원 소송가액 예상 산출
-            </h2>
+        {/* 우측: 결과 명세서 및 버튼 */}
+        <div className="lg:col-span-6">
+          <div ref={resultRef} className="bg-[#FFF8F0] dark:bg-[#2d2d2d] rounded-3xl p-6 sm:p-8 border border-[#FFE0B2] dark:border-[#EF6C00]/20 shadow-sm sticky top-[100px]">
+            <h3 className="text-lg font-extrabold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+              <span className="w-1.5 h-5 bg-[#EF6C00] rounded-full inline-block shrink-0" />
+              법원 소송가액 산출 명세서
+            </h3>
 
-            <div className="flex-1 space-y-3 mb-6">
-              <div className="bg-white/10 rounded-2xl p-3 backdrop-blur-md border border-white/5">
-                <div className="flex justify-between items-center mb-0.5">
-                  <span className="text-[12px] text-white/80 font-medium">정신적 손해 (위자료)</span>
-                  <span className="font-bold text-[14px]">{fmt(Math.floor(alimony))}원</span>
+            <div className="space-y-4 text-xs sm:text-sm mb-6">
+              {alimony > 0 && (
+                <div className="flex justify-between items-center pb-2 border-b border-dashed border-[#FFE0B2] dark:border-gray-700">
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">정신적 손해 (위자료)</span>
+                  <div className="text-right">
+                    <span className="font-bold text-gray-900 dark:text-white">{fmt(Math.floor(alimony))} 원</span>
+                    <p className="text-[10px] text-gray-400 mt-1">{data.hasDeath ? '사망 장해율 100%' : `장해율 ${data.disabilityRate}%`} (기준 1억)</p>
+                  </div>
                 </div>
-                <p className="text-[10px] text-white/50">{data.hasDeath ? '사망 장해율 100%' : `장해율 ${data.disabilityRate}%`} 적용 (기준 1억)</p>
-              </div>
+              )}
 
               {(data.hasInjury && !data.hasDeath) && (
-                <div className="bg-white/10 rounded-2xl p-3 backdrop-blur-md border border-white/5">
-                  <div className="flex justify-between items-center mb-0.5">
-                    <span className="text-[12px] text-white/80 font-medium">휴업손해 (입원기간)</span>
-                    <span className="font-bold text-[14px]">{fmt(Math.floor(hospitalLoss))}원</span>
-                  </div>
-                  <p className="text-[10px] text-white/50">입원 {data.hospitalDays}일</p>
+                <div className="flex justify-between items-center pb-2 border-b border-dashed border-[#FFE0B2] dark:border-gray-700">
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">휴업손해 (입원 {data.hospitalDays}일)</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{fmt(Math.floor(hospitalLoss))} 원</span>
                 </div>
               )}
 
               {(data.hasDisability || data.hasDeath) && (
-                <div className="bg-white/10 rounded-2xl p-3 backdrop-blur-md border border-white/5">
-                  <div className="flex justify-between items-center mb-0.5">
-                    <span className="text-[12px] text-white/80 font-medium">일실수입 ({data.hasDeath ? '사망' : '후유장해'})</span>
-                    <span className="font-bold text-[14px]">{fmt(Math.floor(lostIncome))}원</span>
+                <div className="flex justify-between items-center pb-2 border-b border-dashed border-[#FFE0B2] dark:border-gray-700">
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">일실수입 ({data.hasDeath ? '사망' : `후유장해 ${data.disabilityRate}%`})</span>
+                  <div className="text-right">
+                    <span className="font-bold text-gray-900 dark:text-white">{fmt(Math.floor(lostIncome))} 원</span>
+                    <p className="text-[10px] text-gray-400 mt-1">호프만계수 {H_disability.toFixed(2)} 적용</p>
                   </div>
-                  <p className="text-[10px] text-white/50">
-                    {isDeathDeduction && '생계비 1/3 공제, '}호프만계수 {H_disability.toFixed(2)} 적용
-                  </p>
                 </div>
               )}
 
-              <div className="bg-white/10 rounded-2xl p-3 backdrop-blur-md border border-white/5">
-                <div className="flex justify-between items-center mb-0.5">
-                  <span className="text-[12px] text-white/80 font-medium">적극적 손해</span>
-                  <span className="font-bold text-[14px]">{fmt(Math.floor(totalActiveLoss))}원</span>
+              {totalActiveLoss > 0 && (
+                <div className="flex justify-between items-center pb-2 border-b border-dashed border-[#FFE0B2] dark:border-gray-700">
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">적극적 손해 (치료비, 개호비 등)</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{fmt(Math.floor(totalActiveLoss))} 원</span>
                 </div>
-                <p className="text-[10px] text-white/50 flex flex-wrap gap-1 mt-1">
-                  {treatment > 0 && <span>치료비 {fmt(Math.floor(treatment))}원</span>}
-                  {careCost > 0 && <span>간병비 {fmt(Math.floor(careCost))}원</span>}
-                  {finalFuneralCost > 0 && <span>장례비 {fmt(Math.floor(finalFuneralCost))}원</span>}
-                </p>
+              )}
+              
+              {data.faultRatio > 0 && (
+                <div className="flex justify-between items-center pt-2 text-[#E65100] font-bold">
+                  <span>전체 과실 상계 ({data.faultRatio}%)</span>
+                  <span>적용 완료</span>
+                </div>
+              )}
+            </div>
+
+            {/* 최종 합의금 카드: 오렌지색 그라데이션 적용 */}
+            <div className="bg-gradient-to-br from-[#EF6C00] to-[#E65100] dark:from-[#E65100] dark:to-[#EF6C00] rounded-2xl p-6 text-white text-center shadow-md relative overflow-hidden transition-all duration-300 hover:shadow-lg">
+              <div className="absolute top-0 right-0 opacity-10 transform translate-x-8 -translate-y-8">
+                <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              </div>
+              <div className="relative z-10">
+                <h4 className="text-white/80 font-bold text-xs uppercase tracking-wider mb-1">예상 총 손해배상액</h4>
+                <div className="text-3xl sm:text-4xl font-black tracking-tight flex items-center justify-center gap-1">
+                  {totalAmount === 0 ? '0' : fmt(Math.floor(totalAmount))}
+                  <span className="text-lg font-bold text-white/90">원</span>
+                </div>
               </div>
             </div>
 
-            <div className="mt-auto bg-white text-[#E65100] rounded-2xl p-5 shadow-lg relative z-10">
-              <p className="text-[11px] font-bold text-gray-500 mb-1">예상 총 손해배상액</p>
-              <div className="flex items-end justify-between">
-                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-                  {totalAmount === 0 ? '0' : fmt(Math.floor(totalAmount))}
-                </span>
-                <span className="text-lg font-bold mb-1">원</span>
-              </div>
-              <div className="mt-3 pt-3 border-t border-gray-100 flex gap-2">
-                <span className="text-[10px] text-gray-500 bg-[#FFF3E0] px-2 py-1 rounded-md border border-[#FFCC80]/50">과실비율 {data.faultRatio}% 반영</span>
-              </div>
+            <div className="mt-5 text-[11px] leading-relaxed text-gray-600 dark:text-gray-400 bg-white/60 dark:bg-black/10 p-3.5 rounded-xl border border-[#FFE0B2] dark:border-transparent">
+              <span className="font-bold text-[#E65100] inline-block mr-1">⚠️ 참고:</span> 위 결과는 법원 판례 기준(호프만계수)을 단순 적용한 수치입니다. 실제 소송 시 피해자의 구체적 직업, 과실 비율, 개호비 등 수많은 변수에 따라 수백~수천만 원 차이가 발생할 수 있으므로 보상 전문가와의 상담을 적극 권장합니다.
             </div>
+
+            {/* 버튼들 */}
+            <div className="mt-5 space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <button 
+                  onClick={shareResult}
+                  className="flex items-center justify-center gap-1.5 py-3 bg-[#FEE500] hover:bg-[#F4DC00] active:scale-[0.98] text-black rounded-xl font-extrabold text-xs sm:text-sm transition-all shadow-sm"
+                >
+                  <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3C6.477 3 2 6.541 2 10.908c0 2.502 1.432 4.745 3.659 6.13-.314 1.157-1.14 4.183-1.182 4.341-.053.197.075.18.156.126.104-.07 3.324-2.222 4.606-3.084.887.24 1.821.366 2.761.366 5.523 0 10-3.541 10-7.908C22 6.541 17.523 3 12 3z"/></svg>
+                  결과 공유하기
+                </button>
+                <button 
+                  onClick={exportPDF}
+                  className="flex items-center justify-center gap-1.5 py-3 bg-white hover:bg-gray-50 active:scale-[0.98] border border-gray-200 text-gray-700 rounded-xl font-extrabold text-xs sm:text-sm transition-all shadow-sm dark:bg-[#202124] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-[#303134]"
+                >
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                  PDF 다운로드
+                </button>
+              </div>
+              
+              <a 
+                href="https://open.kakao.com/o/sWeszp7" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="block text-center w-full py-3.5 bg-gray-900 hover:bg-gray-800 active:scale-[0.99] text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-50 rounded-xl font-extrabold text-sm transition-all shadow-md"
+              >
+                보상스쿨 1:1 무료 상담 신청하기
+              </a>
+            </div>
+
           </div>
         </div>
 

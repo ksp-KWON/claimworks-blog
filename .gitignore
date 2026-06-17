@@ -44,3 +44,6 @@ next-env.d.ts
 # misc txt and build cache
 *.txt
 .wrangler/
+
+# generated redirects for Cloudflare
+/public/_redirects

@@ -129,9 +129,6 @@ export default function PrecedentSearchPage() {
   // 로컬 블로그 포스트 리스트 데이터 (실무 칼럼 매핑용)
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
 
-  // 수집된 정적 판례 데이터베이스 (CORS 및 IP 차단을 원천 방지하기 위한 100% 로컬 검색 엔진)
-  const [precedentsDb, setPrecedentsDb] = useState<Precedent[]>([]);
-
   // 자가진단 선택 체크 상태 추적용
   const [checklistState, setChecklistState] = useState<Record<string, boolean[]>>({});
 
@@ -148,12 +145,6 @@ export default function PrecedentSearchPage() {
       .then(res => res.json())
       .then(data => setBlogPosts(data))
       .catch(err => console.warn('블로그 포스트 연동 로드 실패:', err));
-
-    // 수집 완료된 정적 판례 데이터베이스 불러오기
-    fetch('/data/precedents-db.json')
-      .then(res => res.json())
-      .then(data => setPrecedentsDb(data))
-      .catch(err => console.warn('정적 판례 데이터베이스 로드 실패:', err));
   }, []);
 
   const saveSearch = (q: string) => {
@@ -178,56 +169,96 @@ export default function PrecedentSearchPage() {
     setOpenDetailId(null);
     saveSearch(trimmedQuery);
 
-    try {
-      // 1. 이미 로드된 정적 DB 확보 (혹시 모를 미로드 대비 지연 로드 지원)
-      let db = precedentsDb;
-      if (db.length === 0) {
-        const res = await fetch('/data/precedents-db.json');
-        if (res.ok) {
-          db = await res.json();
-          setPrecedentsDb(db);
-        }
-      }
+    // 1. 세션 캐시 조회 (0ms 즉시 반환으로 사용자 경험 극대화)
+    const cached = getCachedSearch(trimmedQuery);
+    if (cached) {
+      setResults(cached);
+      setLoading(false);
+      return;
+    }
 
-      if (db.length === 0) {
-        setError('판례 데이터베이스를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    try {
+      // 2. 법제처 API 목록 조회 (프록시 경로 호출)
+      const listRes = await fetch(`/api/precedent?query=${encodeURIComponent(trimmedQuery)}`);
+      if (!listRes.ok) {
+        throw new Error(`목록 조회에 실패했습니다. (HTTP ${listRes.status})`);
+      }
+      
+      const listXml = await listRes.text();
+      if (listXml.includes('사용자 정보 검증에 실패하였습니다')) {
+        setError('법제처 API 인증 실패: 등록된 IP와 현재 요청 IP가 일치하지 않거나 서버 동기화 지연 중입니다.');
         setLoading(false);
         return;
       }
 
-      // 2. 다중 키워드 매칭 및 가중치 기반 클라이언트 검색 구현 (의미/키워드 통합)
-      // 검색어를 공백 단위로 쪼개어 개별 키워드 복합 매칭을 지원합니다.
-      const keywords = trimmedQuery.toLowerCase().split(/\s+/).filter(Boolean);
+      // 브라우저의 Native DOMParser 사용 (서버 렌더링 시점에는 실행되지 않는 이벤트 핸들러 내부이므로 안전)
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(listXml, "text/xml");
       
-      const scoredResults = db.map(prec => {
-        let score = 0;
-        const titleLower = prec.title.toLowerCase();
-        const caseNoLower = prec.caseNo.toLowerCase();
-        const summaryLower = prec.judgmentSummary.toLowerCase();
-        const contentLower = prec.caseContent.toLowerCase();
-
-        keywords.forEach(kw => {
-          // 중요 정보 노출 영역별 차등 가중치 적용
-          if (titleLower.includes(kw)) score += 15;        // 제목 일치 가중치
-          if (caseNoLower.includes(kw)) score += 10;       // 사건번호 일치 가중치
-          if (summaryLower.includes(kw)) score += 3;       // 판결요지 일치 가중치
-          if (contentLower.includes(kw)) score += 1;       // 판결본문 일치 가중치
-        });
-
-        return { prec, score };
-      }).filter(item => item.score > 0);
-
-      // 점수가 높은 순으로 내림차순 정렬 후 상위 5건만 결과로 제공
-      scoredResults.sort((a, b) => b.score - a.score);
-      const topResults = scoredResults.slice(0, 5).map(item => item.prec);
-
-      setResults(topResults);
-      if (topResults.length === 0) {
-        setError('입력하신 조건과 일치하는 판례 데이터를 찾을 수 없습니다.');
+      // XML 파싱 에러 검출
+      const parserError = xmlDoc.getElementsByTagName('parsererror')[0];
+      if (parserError) {
+        throw new Error('법제처 응답 XML 파싱 중 오류가 발생했습니다.');
       }
-    } catch (err) {
+
+      const ids = Array.from(xmlDoc.getElementsByTagName('판례일련번호')).map(el => el.textContent?.trim() || '');
+      const titles = Array.from(xmlDoc.getElementsByTagName('사건명')).map(el => el.textContent?.trim() || '');
+      const caseNos = Array.from(xmlDoc.getElementsByTagName('사건번호')).map(el => el.textContent?.trim() || '');
+
+      if (ids.length === 0) {
+        setError('입력하신 조건과 일치하는 판례 데이터를 찾을 수 없습니다.');
+        setLoading(false);
+        return;
+      }
+
+      // 검색 속도 및 API 호출 부하 절약을 위해 상위 5건만 상세 조회 수행
+      const targetIds = ids.slice(0, 5);
+      const precedentDetails = await Promise.all(
+        targetIds.map(async (id, index) => {
+          try {
+            const detailRes = await fetch(`/api/precedent-detail?ID=${id}`);
+            if (!detailRes.ok) return null;
+
+            const detailXml = await detailRes.text();
+            const detailDoc = parser.parseFromString(detailXml, "text/xml");
+            
+            // XML 파싱 에러 검출
+            if (detailDoc.getElementsByTagName('parsererror')[0]) return null;
+
+            const getValue = (tagName: string) => {
+              const el = detailDoc.getElementsByTagName(tagName)[0];
+              return el?.textContent?.trim() || '';
+            };
+
+            return {
+              id,
+              title: titles[index] || getValue('사건명'),
+              caseNo: caseNos[index] || getValue('사건번호'),
+              judgmentDate: getValue('선고일자'),
+              courtName: getValue('법원명'),
+              judgmentSummary: cleanLawText(getValue('판결요지')),
+              caseContent: cleanLawText(getValue('판례내용')),
+              caseType: getValue('사건종류명'),
+              officialUrl: `https://www.law.go.kr/LSW/precInfoP.do?precSeq=${id}`
+            };
+          } catch {
+            return null;
+          }
+        })
+      );
+
+      const parsedData = precedentDetails.filter((item): item is Precedent => item !== null);
+      setResults(parsedData);
+      
+      if (parsedData.length === 0) {
+        setError('입력하신 조건과 일치하는 판례 상세 정보를 불러오지 못했습니다.');
+      } else {
+        // 세션 캐시에 검색 결과 저장
+        setCachedSearch(trimmedQuery, parsedData);
+      }
+    } catch (err: any) {
       console.error(err);
-      setError('검색 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      setError('법제처 API 조회 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setLoading(false);
     }

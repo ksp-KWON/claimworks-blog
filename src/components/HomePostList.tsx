@@ -66,6 +66,14 @@ export function getCategoryColor(category: string) {
       arrowColor: 'text-purple-500'
     };
   }
+  if (c.includes('판례') || c.includes('법률')) {
+    return {
+      badge: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400',
+      border: 'hover:border-indigo-400',
+      hoverText: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400',
+      arrowColor: 'text-indigo-500'
+    };
+  }
   
   // 기본 (보상정보 및 기타)
   return {
@@ -78,6 +86,7 @@ export function getCategoryColor(category: string) {
 
 export const CATEGORIES = [
   '전체',
+  '판례·법률 해석',
   '교통사고',
   '배상책임',
   '보상가이드',
@@ -112,6 +121,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
             else if (category.includes('보상가이드')) colorClasses = 'bg-yellow-500 text-white border-yellow-500';
             else if (category.includes('보험상식')) colorClasses = 'bg-orange-500 text-white border-orange-500';
             else if (category.includes('후유장해')) colorClasses = 'bg-purple-500 text-white border-purple-500';
+            else if (category.includes('판례') || category.includes('법률')) colorClasses = 'bg-indigo-500 text-white border-indigo-500';
             else colorClasses = 'bg-teal-500 text-white border-teal-500';
           }
 

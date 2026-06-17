@@ -168,7 +168,7 @@ const TOPIC_SCHEMA = {
   properties: {
     slug: { type: 'STRING', description: '하이픈 구분 영문 소문자 URL 슬러그 (예: spinal-fracture-precedent)' },
     title: { type: 'STRING', description: '법률적 신뢰도와 호기심을 유발하는 SEO 최적화 블로그 제목' },
-    category: { type: 'STRING', description: '교통사고|배상책임|후유장해|실손의료비|보험상식 중 택1' },
+    category: { type: 'STRING', description: '무조건 "판례·법률 해석" 지정' },
     specialtyCategory: { type: 'STRING', description: '전문 진료과목 (예: 정형외과, 신경외과 등)' },
     tags: { type: 'ARRAY', items: { type: 'STRING' }, description: '태그 5개 (예: ["대법원판례", "압박골절", "보험금분쟁"])' },
     keywords: { type: 'STRING', description: '타겟 키워드 목록 (쉼표 구분)' },
@@ -317,8 +317,13 @@ async function main() {
     throw new Error('.env.local 파일에 LAW_API_KEY가 등록되지 않았습니다.');
   }
 
-  // 대표 손해사정 키워드 목록 중 하나 선정
-  const keywords = ['압박골절', '교통사고', '보험금', '후유장해', '도수치료', '배상책임'];
+  // 대표 손해사정 키워드 목록 (명함 서비스 범위 확대 반영)
+  const keywords = [
+    '사망보험금', '자살보험금', '암진단비', '뇌출혈', '급성심근경색', 
+    '실손의료비', '소비자선임권', '교통사고 과실비율', '교통사고 위자료', '휴업손해', 
+    '장해진단', '영업배상책임', '의료사고', '근재보험', '산재보험', 
+    '장해평가', '면책보험금', '보험금 지급거절'
+  ];
   const targetKeyword = keywords[Math.floor(Math.random() * keywords.length)];
 
   // 1. 판례 목록 수집
@@ -385,7 +390,7 @@ slug: "${uniqueSlug}"
 date: "${kstDate}"
 updatedAt: "${kstDate}"
 summary: "${summary}"
-category: "${yamlSafe(topic.category)}"
+category: "판례·법률 해석"
 regionCategory: ""
 specialtyCategory: "${yamlSafe(topic.specialtyCategory)}"
 tags: [${tagsStr}]

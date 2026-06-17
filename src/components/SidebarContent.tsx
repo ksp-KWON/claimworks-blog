@@ -87,6 +87,7 @@ export default function SidebarContent() {
         
         <div className="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-2 px-2 sm:mx-0 sm:px-0">
           {[
+            { name: '판례·법률 해석', color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
             { name: '교통사고', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
             { name: '배상책임', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20' },
             { name: '보상가이드', color: 'text-yellow-600', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },

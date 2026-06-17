@@ -1,23 +1,29 @@
-// Cloudflare Pages Function: /api/precedent 프록시 테스트
+// Cloudflare Pages Function: /api/precedent 프록시
 export async function onRequest(context: any) {
   try {
-    const testUrl = `https://www.law.go.kr`;
-    
-    const response = await fetch(testUrl, {
+    const { request, env } = context;
+    const url = new URL(request.url);
+    const query = url.searchParams.get('query') || '';
+
+    // Cloudflare Pages 환경 변수에서 엔드포인트와 보안 토큰을 로드합니다.
+    const proxyEndpoint = env.LAW_PROXY_ENDPOINT || 'http://localhost:8080';
+    const proxyToken = env.LAW_PROXY_TOKEN || 'secure_secret_token_12345';
+
+    const targetUrl = `${proxyEndpoint}/api/precedent?query=${encodeURIComponent(query)}`;
+
+    const response = await fetch(targetUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'X-Proxy-Token': proxyToken
       }
     });
 
-    const html = await response.text();
-    return new Response(JSON.stringify({
+    const bodyText = await response.text();
+
+    return new Response(bodyText, {
       status: response.status,
-      ok: response.ok,
-      preview: html.substring(0, 500)
-    }), {
-      status: 200,
       headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
+        'Content-Type': 'application/xml;charset=UTF-8',
         'Access-Control-Allow-Origin': '*'
       }
     });

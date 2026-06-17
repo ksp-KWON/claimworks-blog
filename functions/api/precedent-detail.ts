@@ -4,19 +4,23 @@ export async function onRequest(context: any) {
     const { request, env } = context;
     const url = new URL(request.url);
     const id = url.searchParams.get('ID') || '';
-    const lawApiKey = env.LAW_API_KEY || 'ksp78';
 
-    const detailUrl = `https://www.law.go.kr/DRF/lawService.do?target=prec&type=XML&OC=${lawApiKey}&ID=${id}`;
+    // Cloudflare Pages 환경 변수에서 엔드포인트와 보안 토큰을 로드합니다.
+    const proxyEndpoint = env.LAW_PROXY_ENDPOINT || 'http://localhost:8080';
+    const proxyToken = env.LAW_PROXY_TOKEN || 'secure_secret_token_12345';
+
+    const targetUrl = `${proxyEndpoint}/api/precedent-detail?ID=${id}`;
     
-    const response = await fetch(detailUrl, {
+    const response = await fetch(targetUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
+        'X-Proxy-Token': proxyToken
       }
     });
 
-    return new Response(response.body, {
+    const bodyText = await response.text();
+
+    return new Response(bodyText, {
       status: response.status,
       headers: {
         'Content-Type': 'application/xml;charset=UTF-8',

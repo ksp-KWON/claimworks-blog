@@ -4,8 +4,18 @@ on:
   # 매일 오전 7시 (KST) = UTC 22:00 전날
   schedule:
     - cron: '0 22 * * *'
-  # 수동 실행 (테스트용)
+  # 수동 실행 (테스트용 및 어드민 연동)
   workflow_dispatch:
+    inputs:
+      post_type:
+        description: '발행할 글 종류 선택 (all: 전체, precedent: 법률칼럼, trend: 트렌드)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - precedent
+          - trend
 
 jobs:
   generate:
@@ -30,13 +40,27 @@ jobs:
       - name: 의존성 설치
         run: npm ci
 
-      - name: 자동글쓰기 실행 (인사이트 + 판례 분석 총 2개 생성)
+      - name: 자동글쓰기 실행 (선택적)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           LAW_API_KEY: ${{ secrets.LAW_API_KEY }}
         run: |
-          node scripts/generate-blog-post.js
-          node scripts/generate-precedent-post.js
+          POST_TYPE="${{ github.event.inputs.post_type }}"
+          if [ -z "$POST_TYPE" ]; then
+            POST_TYPE="all"
+          fi
+          
+          echo "📊 선택된 발행 유형: $POST_TYPE"
+          
+          if [ "$POST_TYPE" = "all" ] || [ "$POST_TYPE" = "trend" ]; then
+            echo "🔥 트렌드 글쓰기 기동 (scripts/generate-blog-post.js)"
+            node scripts/generate-blog-post.js
+          fi
+          
+          if [ "$POST_TYPE" = "all" ] || [ "$POST_TYPE" = "precedent" ]; then
+            echo "⚖️ 법률칼럼 글쓰기 기동 (scripts/generate-precedent-post.js)"
+            node scripts/generate-precedent-post.js
+          fi
 
       - name: prebuild 실행 (posts-data.json 갱신)
         run: node scripts/prebuild.js

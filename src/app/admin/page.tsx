@@ -35,6 +35,7 @@ export default function AdminPage() {
   
   // App State
   const [mode, setMode] = useState<'manual' | 'semi-auto' | 'auto' | 'edit'>('manual');
+  const [selectedPostType, setSelectedPostType] = useState<'all' | 'precedent' | 'trend'>('all');
   const [inputText, setInputText] = useState('');
   const [generatedMarkdown, setGeneratedMarkdown] = useState('');
   const [slug, setSlug] = useState('');
@@ -148,8 +149,6 @@ export default function AdminPage() {
     setIsLoading(false);
   };
 
-  // Removed redundant useEffect to avoid synchronous setState calls
-
   const triggerAutoPost = async () => {
     if (!githubToken) return alert('GitHub 토큰이 필요합니다.');
     
@@ -165,7 +164,10 @@ export default function AdminPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ref: 'main'
+          ref: 'main',
+          inputs: {
+            post_type: selectedPostType
+          }
         })
       });
       
@@ -735,6 +737,32 @@ ${inputText}
                   </p>
                 </div>
                 <div className="w-full max-w-sm space-y-3 pt-4">
+                  {/* 포스팅 종류 선택 단추 (딸깍기능) */}
+                  <div className="bg-gray-50 dark:bg-black/10 p-3.5 rounded-xl border border-gray-200 dark:border-white/5 text-left space-y-2">
+                    <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 block">📝 발행할 포스팅 종류 선택</span>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { id: 'all', label: '🔥 전체', desc: '둘 다 발행' },
+                        { id: 'precedent', label: '⚖️ 법률칼럼', desc: '판례분석만' },
+                        { id: 'trend', label: '📈 트렌드', desc: '가이드만' }
+                      ].map(type => (
+                        <button
+                          key={type.id}
+                          onClick={() => setSelectedPostType(type.id as 'all' | 'precedent' | 'trend')}
+                          type="button"
+                          className={`flex flex-col items-center justify-center py-2 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
+                            selectedPostType === type.id
+                              ? 'bg-blue-600 border-blue-650 text-white shadow-sm font-extrabold'
+                              : 'bg-white dark:bg-[#303134] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-[#3f3f42]'
+                          }`}
+                        >
+                          <span>{type.label}</span>
+                          <span className="text-[9px] opacity-70 mt-0.5 font-normal">{type.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <button 
                     onClick={triggerAutoPost}
                     disabled={isLoading}

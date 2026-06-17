@@ -459,8 +459,8 @@ export default function PrecedentSearchPage() {
           {error.includes('인증 실패') && (
             <div className="text-xs text-gray-500 dark:text-gray-400 max-w-lg mx-auto leading-relaxed space-y-1.5 bg-gray-50 dark:bg-white/2 p-3.5 rounded-xl border border-gray-150 dark:border-white/5">
               <div className="font-bold text-[var(--google-blue)] dark:text-[#8ab4f8]">💡 법제처 API IP 인증에 실패한 경우의 해결 방법:</div>
-              <p>법제처 API는 승인된 서버 IP에서만 조회가 가능합니다. 현재 대표님 컴퓨터(로컬 환경)의 임시 공인 IP 주소가 법제처 API 신청서에 적어둔 IP와 일치하지 않거나, 배포서버의 유동 IP가 차단되어 그렇습니다.</p>
-              <p className="font-bold text-[10px] text-gray-400">네이버에 &quot;내 IP&quot;를 검색하여 나온 주소를 법제처 오픈API 관리자 화면 마이페이지에 등록해 주시면 정상 가동됩니다.</p>
+              <p>법제처 API는 국가에서 지정한 고정 IP 서버에서만 조회가 가능합니다. 현재 구글 클라우드(GCP) 중계 서버의 <b>고정 외부 IP</b>가 법제처 오픈 API 센터 마이페이지에 올바르게 등록되지 않았거나, 중계 서버 프로그램이 꺼져 있을 때 발생합니다.</p>
+              <p className="font-bold text-[10px] text-gray-400">구글 클라우드 콘솔에서 발급받은 고정 IP 주소를 법제처 오픈 API 센터(open.law.go.kr) 마이페이지의 IP 주소 변경 메뉴에 등록해 주시면 정상 가동됩니다.</p>
             </div>
           )}
         </div>

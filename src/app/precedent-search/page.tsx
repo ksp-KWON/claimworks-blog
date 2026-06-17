@@ -15,22 +15,7 @@ interface Precedent {
   officialUrl: string;
 }
 
-// XML 태그 추출 헬퍼 (클라이언트 단에서 가볍고 안전하게 파싱하기 위한 정규식 함수)
-function getXmlTagContent(xml: string, tag: string): string {
-  const regex = new RegExp(`<${tag}>(?:<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>|([^<]*?))</${tag}>`);
-  const match = xml.match(regex);
-  return match ? (match[1] || match[2] || '').trim() : '';
-}
 
-function getXmlTags(xml: string, tag: string): string[] {
-  const regex = new RegExp(`<${tag}>(?:<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>|([^<]*?))</${tag}>`, 'g');
-  const results: string[] = [];
-  let match;
-  while ((match = regex.exec(xml)) !== null) {
-    results.push((match[1] || match[2] || '').trim());
-  }
-  return results;
-}
 
 // 🧭 상황별 검색 마법사 템플릿
 const SITUATION_TEMPLATES = [
@@ -165,9 +150,13 @@ export default function PrecedentSearchPage() {
         return;
       }
 
-      const ids = getXmlTags(listXml, '판례일련번호');
-      const titles = getXmlTags(listXml, '사건명');
-      const caseNos = getXmlTags(listXml, '사건번호');
+      // 브라우저의 Native DOMParser 사용 (서버 렌더링 시점에는 실행되지 않는 이벤트 핸들러 내부이므로 안전)
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(listXml, "text/xml");
+
+      const ids = Array.from(xmlDoc.getElementsByTagName('판례일련번호')).map(el => el.textContent?.trim() || '');
+      const titles = Array.from(xmlDoc.getElementsByTagName('사건명')).map(el => el.textContent?.trim() || '');
+      const caseNos = Array.from(xmlDoc.getElementsByTagName('사건번호')).map(el => el.textContent?.trim() || '');
 
       if (ids.length === 0) {
         setError('입력하신 조건과 일치하는 판례 데이터를 찾을 수 없습니다.');
@@ -184,16 +173,22 @@ export default function PrecedentSearchPage() {
             if (!detailRes.ok) return null;
 
             const detailXml = await detailRes.text();
+            const detailDoc = parser.parseFromString(detailXml, "text/xml");
             
+            const getValue = (tagName: string) => {
+              const el = detailDoc.getElementsByTagName(tagName)[0];
+              return el?.textContent?.trim() || '';
+            };
+
             return {
               id,
-              title: titles[index] || getXmlTagContent(detailXml, '사건명'),
-              caseNo: caseNos[index] || getXmlTagContent(detailXml, '사건번호'),
-              judgmentDate: getXmlTagContent(detailXml, '선고일자'),
-              courtName: getXmlTagContent(detailXml, '법원명'),
-              judgmentSummary: getXmlTagContent(detailXml, '판결요지'),
-              caseContent: getXmlTagContent(detailXml, '판례내용'),
-              caseType: getXmlTagContent(detailXml, '사건종류명'),
+              title: titles[index] || getValue('사건명'),
+              caseNo: caseNos[index] || getValue('사건번호'),
+              judgmentDate: getValue('선고일자'),
+              courtName: getValue('법원명'),
+              judgmentSummary: getValue('판결요지'),
+              caseContent: getValue('판례내용'),
+              caseType: getValue('사건종류명'),
               officialUrl: `https://www.law.go.kr/LSW/precInfoP.do?precSeq=${id}`
             };
           } catch {

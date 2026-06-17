@@ -391,6 +391,7 @@ date: "${kstDate}"
 updatedAt: "${kstDate}"
 summary: "${summary}"
 category: "판례·법률 해석"
+caseNumber: "${yamlSafe(detail.caseNo)}"
 regionCategory: ""
 specialtyCategory: "${yamlSafe(topic.specialtyCategory)}"
 tags: [${tagsStr}]

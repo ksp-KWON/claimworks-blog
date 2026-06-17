@@ -47,6 +47,7 @@ function run() {
         updatedAt: data.updatedAt ? formatDate(data.updatedAt) : undefined,
         summary: data.summary || '',
         category: data.category || '',
+        caseNumber: data.caseNumber || '',
         regionCategory: data.regionCategory || '',
         specialtyCategory: data.specialtyCategory || '',
         tags: Array.isArray(data.tags) ? data.tags : [],

@@ -32,6 +32,36 @@ export default function SidebarContent() {
 
   return (
     <div className="space-y-6">
+      {/* ⚖️ AI 판례검색센터 바로가기 배너 */}
+      <Link href="/precedent-search" className="block group">
+        <div className="bg-gradient-to-br from-[var(--google-blue)] via-[#1a5ab9] to-indigo-600 text-white p-5 rounded-2xl shadow-[0_8px_35px_rgba(26,115,232,0.15)] dark:shadow-[0_8px_35px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_45px_rgba(26,115,232,0.3)] hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden border border-white/10 dark:border-white/5">
+          {/* 장식용 배경 이모지 */}
+          <div className="absolute right-[-10px] bottom-[-20px] opacity-15 text-[80px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+            ⚖️
+          </div>
+          <div className="relative z-10 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full backdrop-blur-sm animate-pulse">
+                NEW
+              </span>
+              <span className="text-[10px] font-extrabold text-blue-100 tracking-wider">AI 판례 검색 서비스</span>
+            </div>
+            <div>
+              <h3 className="text-[15px] font-extrabold tracking-tight leading-tight flex items-center gap-1">
+                보상스쿨 AI 판례검색센터 🔍
+              </h3>
+              <p className="text-[11px] text-blue-100/90 leading-relaxed font-medium mt-1">
+                일상어로 나의 보상 사연을 입력해 보세요. 법제처 데이터베이스와 연동하여 유리한 손해사정 판례를 실시간으로 찾아드립니다.
+              </p>
+            </div>
+            <div className="pt-1 flex items-center gap-1 text-[11px] font-bold text-white group-hover:underline">
+              판례 검색하러 가기
+              <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </Link>
+
       {/* 🧮 보상금·합의금 계산기 (통합 아코디언) */}
       <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 group relative overflow-hidden">
         <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">

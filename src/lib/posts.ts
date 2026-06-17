@@ -7,6 +7,7 @@ export interface PostData {
   updatedAt?: string;         // 최종 수정일 (없으면 date와 동일하게 처리)
   summary: string;
   category: string;          // 기본 카테고리 (병원보상가이드 등)
+  caseNumber?: string;       // 판례 번호 (신뢰도 향상용)
   regionCategory: string;    // 지역 카테고리 (서울강남구, 부산해운대구 등)
   specialtyCategory: string; // 진료과목 카테고리 (정형외과, 신경외과 등)
   tags: string[];
@@ -46,6 +47,7 @@ export function getSortedPostsData(includeUnpublished = false): Omit<PostData, '
         updatedAt: post.updatedAt ? formatDate(post.updatedAt) : undefined,
         summary: post.summary || '',
         category: post.category || '',
+        caseNumber: post.caseNumber || '',
         regionCategory: post.regionCategory || '',
         specialtyCategory: post.specialtyCategory || '',
         tags: Array.isArray(post.tags) ? post.tags : [],
@@ -87,6 +89,7 @@ export function getPostData(slug: string, includeUnpublished = false): PostData 
       updatedAt: post.updatedAt ? formatDate(post.updatedAt) : undefined,
       summary: post.summary || '',
       category: post.category || '',
+      caseNumber: post.caseNumber || '',
       regionCategory: post.regionCategory || '',
       specialtyCategory: post.specialtyCategory || '',
       tags: Array.isArray(post.tags) ? post.tags : [],

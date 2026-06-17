@@ -10,6 +10,12 @@
  * - FAQ 아코디언
  * - CTA 배너 (헤더 배너 스타일 + 그림자)
  * - 저자 바이오 카드 (E-E-A-T 신호)
+ *
+ * [FIX v6.1] extractFAQ — Q1Q1 이중표기 버그 수정
+ *   AI가 ### **Q1** : 질문 처럼 볼드(**)·이탤릭(*)·이모지를
+ *   Q번호 앞뒤에 섞어 출력할 때 기존 정규식이 제거에 실패해
+ *   화면에 "Q1Q1 : 질문" 형태로 이중 표기되던 문제를 해결.
+ *   수정 위치: extractFAQ 함수 내 currentQ 정규식 1줄.
  */
 
 import ReactMarkdown from 'react-markdown';
@@ -87,7 +93,12 @@ function extractFAQ(content: string): { q: string; a: string }[] {
 
       if (/^#+\s*/.test(trimmed)) {
         if (currentQ) faqs.push({ q: currentQ, a: currentA.trim() });
-        currentQ = trimmed.replace(/^(?:#+\s*)+/, '').replace(/^Q\d+\s*[:.-]?\s*/i, '').trim();
+        // [FIX] Q번호 앞에 **·*·이모지·공백이 어떤 조합으로 와도 제거
+        //       Q번호 뒤에 남는 **·* 마커도 함께 제거
+        currentQ = trimmed
+          .replace(/^(?:#+\s*)+/, '')
+          .replace(/^[*_💬✅☑️🛡️⭐\s]*Q\d+[*_]*\s*[:.-]?\s*/i, '')
+          .trim();
         currentA = '';
       } else if (currentQ) {
         if (trimmed === '---') continue;
@@ -340,9 +351,7 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
     calculator: ({ ...props }: any) => {
       const isAuto = props.type === 'auto';
       const isMedical = props.type === 'medical';
-      
       if (!isAuto && !isMedical) return null;
-
       return (
         <div className="my-12 relative w-full mx-auto">
           <div className="bg-white dark:bg-[#202124] rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.07)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.45)] border border-gray-100 dark:border-white/8 overflow-visible">
@@ -360,7 +369,6 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
                 <span className="ml-2 text-[11px] font-bold text-gray-400 dark:text-gray-500">보상스쿨 안심 계산기</span>
               </div>
             </div>
-
             <div className="p-5 sm:p-8">
               {isAuto ? <AutoCalculatorContainer /> : <MedicalCalculator />}
             </div>

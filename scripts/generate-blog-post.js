@@ -256,7 +256,7 @@ function buildPrompt(topic, existingPosts) {
     ? '<calculator type="medical" />'
     : '<calculator type="auto" />';
 
-  return \`# Role
+  return `# Role
 당신은 '보상스쿨' 블로그의 수석 콘텐츠 기획자이자 손해사정 전문 테크니컬 라이터입니다.
 보상스쿨 손해사정사는 다음 3개 영역의 전문가입니다:
   - 사고 조사 전문가 : 교통사고·산재·일상생활 안전사고·질병사고의 손해 발생 사실 확인
@@ -264,7 +264,7 @@ function buildPrompt(topic, existingPosts) {
   - 의학 전문가 : 손해액 및 보험금 사정
 
 # Objective
-타겟 키워드 [\${topic.keywords}]를 기반으로, 구글 E-E-A-T 및 YMYL 기준을 완벽히 만족하는
+타겟 키워드 [${topic.keywords}]를 기반으로, 구글 E-E-A-T 및 YMYL 기준을 완벽히 만족하는
 최소 5,000자 이상(5,000자~10,000자 적극 권장)의 초고품질 전문 칼럼을 작성합니다.
 
 # 핵심 글쓰기 목표
@@ -328,7 +328,7 @@ SEO_META:[구글 검색 결과에 노출될 150자 이내의 매력적인 클릭
 이 태그는 반드시 독립된 줄에 단독으로 위치해야 합니다.
 절대로 H2 제목(## ...) 텍스트와 같은 줄에 넣지 마십시오.
 
-\${calcTag}
+${calcTag}
 
 ─────────────────────────────────────────────────
 [BLOCK-7: 본론 3 — 3단계 결과 비교 : 손해사정사 개입 전후]
@@ -353,7 +353,7 @@ SEO_META:[구글 검색 결과에 노출될 150자 이내의 매력적인 클릭
 반드시 '[링크 텍스트](/blog/슬러그)' 마크다운 형태로 작성. 단순 텍스트 경로 금지.
 
 기존 글 슬러그 목록:
-\${postsCtx}
+${postsCtx}
 
 ─────────────────────────────────────────────────
 [BLOCK-9: 자가진단 체크리스트]
@@ -427,12 +427,12 @@ SEO_META:[구글 검색 결과에 노출될 150자 이내의 매력적인 클릭
 ## AIO 최적화
 - 각 H2 섹션의 첫 문장은 해당 섹션 핵심을 1문장으로 요약.
 
-위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.\`;
+위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.`;
 }
 
 // ── 메인 실행 ───────────────────────────────────────────────────────────────
 async function main() {
-  console.log(\`=== 자동글쓰기 시작 (\${new Date().toISOString()}) ===\`);
+  console.log(`=== 자동글쓰기 시작 (${new Date().toISOString()}) ===`);
   if (!fs.existsSync(POSTS_DIR)) fs.mkdirSync(POSTS_DIR, { recursive: true });
 
   const existingPosts = getExistingPosts();
@@ -440,13 +440,13 @@ async function main() {
   // Step 1 : 트렌드 수집
   const trends   = await fetchGoogleTrends();
   const trendCtx = trends.length > 0
-    ? \`오늘 구글 트렌드 : \${trends.join(', ')}\\n(손해사정/보험/의료 관련이면 타겟팅, 아니면 독자 키워드 선정)\`
+    ? `오늘 구글 트렌드 : ${trends.join(', ')}\n(손해사정/보험/의료 관련이면 타겟팅, 아니면 독자 키워드 선정)`
     : '(트렌드 수집 실패 - 독자 키워드로 선정)';
 
   // Step 2 : 토픽 선정 (calculatorType 포함)
   const topic = await callGemini(buildTopicPrompt(existingPosts, trendCtx), TOPIC_SCHEMA);
-  console.log(\`[1] 토픽 확정 : \${topic.title} (\${topic.slug})\`);
-  console.log(\`    계산기 타입 : \${topic.calculatorType}\`);
+  console.log(`[1] 토픽 확정 : ${topic.title} (${topic.slug})`);
+  console.log(`    계산기 타입 : ${topic.calculatorType}`);
 
   console.log('  [대기] 30초 쿨다운...');
   await sleep(30000);
@@ -455,7 +455,7 @@ async function main() {
   const rawOutput = await callGemini(buildPrompt(topic, existingPosts));
 
   // SEO_META 파싱
-  const lines = rawOutput.split('\\n');
+  const lines = rawOutput.split('\n');
   let summary = '';
   let contentStart = 0;
 
@@ -465,44 +465,44 @@ async function main() {
     while (contentStart < lines.length && lines[contentStart].trim() === '') contentStart++;
   }
 
-  const content = lines.slice(contentStart).join('\\n').trim();
+  const content = lines.slice(contentStart).join('\n').trim();
 
   if (!summary) {
-    summary = content.replace(/[#*\`>[\\]!]/g, '').replace(/\\s+/g, ' ').trim().slice(0, 140);
+    summary = content.replace(/[#*`>[\]!]/g, '').replace(/\s+/g, ' ').trim().slice(0, 140);
     console.warn('  [경고] SEO_META 파싱 실패 - 본문 앞부분으로 대체.');
   }
   if (summary.length > 158) summary = summary.slice(0, 155) + '...';
 
-  console.log(\`[2] 본문 생성 완료 (\${content.length}자) | SEO : \${summary.slice(0, 30)}...\`);
+  console.log(`[2] 본문 생성 완료 (${content.length}자) | SEO : ${summary.slice(0, 30)}...`);
 
   // Step 4 : 저장
   const slug    = resolveUniqueSlug(topic.slug);
   const kstDate = new Date(Date.now() + 9 * 3600 * 1000).toISOString().split('T')[0];
-  const tagsStr = topic.tags.map(t => \`"\${yamlSafe(t)}"\`).join(', ');
+  const tagsStr = topic.tags.map(t => `"${yamlSafe(t)}"`).join(', ');
 
-  const md = \`---
-title: "\${yamlSafe(topic.title)}"
-slug: "\${slug}"
-date: "\${kstDate}"
-updatedAt: "\${kstDate}"
-summary: "\${summary}"
-category: "\${yamlSafe(topic.category)}"
+  const md = `---
+title: "${yamlSafe(topic.title)}"
+slug: "${slug}"
+date: "${kstDate}"
+updatedAt: "${kstDate}"
+summary: "${summary}"
+category: "${yamlSafe(topic.category)}"
 regionCategory: ""
-specialtyCategory: "\${yamlSafe(topic.specialtyCategory)}"
-tags: [\${tagsStr}]
+specialtyCategory: "${yamlSafe(topic.specialtyCategory)}"
+tags: [${tagsStr}]
 published: true
 ---
 
-\${content}
-\`;
+${content}
+`;
 
-  const filePath = path.join(POSTS_DIR, \`\${slug}.md\`);
+  const filePath = path.join(POSTS_DIR, `${slug}.md`);
   fs.writeFileSync(filePath, md, 'utf8');
-  console.log(\`[3] 저장 완료 : \${filePath}\`);
+  console.log(`[3] 저장 완료 : ${filePath}`);
   console.log('=== 자동글쓰기 종료 ===');
 }
 
 main().catch(err => {
-  console.error(\`치명적 오류 : \${err.message}\`);
+  console.error(`치명적 오류 : ${err.message}`);
   process.exit(1);
 });

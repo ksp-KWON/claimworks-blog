@@ -7,6 +7,8 @@ import { SpecialtyDiseaseCategories, RegionalCategories } from '@/components/Sid
 
 export default function SidebarContent() {
   const [showAllTags, setShowAllTags] = useState(false);
+  const [isCalcOpen, setIsCalcOpen] = useState(false);
+  const [isColOpen, setIsColOpen] = useState(false);
 
   // 인기 태그 계산 (빈도수 기준 내림차순 정렬)
   const sortedTags = useMemo(() => {
@@ -30,84 +32,114 @@ export default function SidebarContent() {
 
   return (
     <div className="space-y-6">
-      {/* 🚗 자동차보험 합의금 계산기 */}
+      {/* 🧮 보상금·합의금 계산기 (통합 아코디언) */}
       <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 group relative overflow-hidden">
         <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">
-          <span className="text-[var(--google-blue)] text-lg leading-none">🚗</span>
-          자동차보험 합의금 계산기
+          <span className="text-[var(--google-blue)] text-lg leading-none">🧮</span>
+          보상금·합의금 계산기
         </h3>
         <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
-          약관 지급기준 및 호프만계수를 적용한 정확한 예상 합의금을 확인하세요.
+          약관 지급기준 및 법원 판례 기준을 적용한 예상 합의금과 소송가액을 확인하세요.
         </p>
-        <Link href="/calculator/auto" className="flex items-center justify-center gap-2 w-full bg-[var(--google-blue)] text-white font-bold text-sm py-2.5 rounded-xl hover:bg-[#174ea6] transition-colors shadow-sm">
-          자동차보험 계산하기
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </Link>
+        
+        <button 
+          onClick={() => setIsCalcOpen(!isCalcOpen)}
+          className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors group p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
+            계산기 선택하기
+          </div>
+          <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isCalcOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        
+        {isCalcOpen && (
+          <div className="mt-4 space-y-3 animate-in slide-in-from-top-2 fade-in duration-200">
+            {/* 🚗 자동차보험 */}
+            <Link href="/calculator/auto" className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:bg-[#e8f0fe]/50 dark:hover:bg-[#174ea6]/10 transition-all group/item">
+              <div className="flex items-center gap-2.5">
+                <span className="text-lg">🚗</span>
+                <div className="text-left">
+                  <div className="text-xs font-bold text-[#202124] dark:text-[#e8eaed] group-hover/item:text-[var(--google-blue)]">자동차보험 합의금 계산기</div>
+                  <div className="text-[10px] text-[#5f6368] dark:text-[#9aa0a6] leading-tight mt-0.5">호프만계수 및 약관 지급기준 적용</div>
+                </div>
+              </div>
+              <svg className="w-4 h-4 text-[#5f6368] group-hover/item:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </Link>
+            
+            {/* 🏥 실손의료비 */}
+            <Link href="/calculator/medical" className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-white/5 hover:border-[var(--google-green)] hover:bg-[#e6f4ea]/50 dark:hover:bg-[#0d652d]/10 transition-all group/item">
+              <div className="flex items-center gap-2.5">
+                <span className="text-lg">🏥</span>
+                <div className="text-left">
+                  <div className="text-xs font-bold text-[#202124] dark:text-[#e8eaed] group-hover/item:text-[var(--google-green)]">실손의료비 계산기</div>
+                  <div className="text-[10px] text-[#5f6368] dark:text-[#9aa0a6] leading-tight mt-0.5">본인부담금 공제 후 예상 보상금</div>
+                </div>
+              </div>
+              <svg className="w-4 h-4 text-[#5f6368] group-hover/item:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </Link>
+            
+            {/* ⚖️ 배상책임 */}
+            <Link href="/calculator/liability" className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-white/5 hover:border-[var(--google-red)] hover:bg-[#fce8e6]/50 dark:hover:bg-[#d93025]/10 transition-all group/item">
+              <div className="flex items-center gap-2.5">
+                <span className="text-lg">⚖️</span>
+                <div className="text-left">
+                  <div className="text-xs font-bold text-[#202124] dark:text-[#e8eaed] group-hover/item:text-[var(--google-red)]">배상책임 소송가액 계산기</div>
+                  <div className="text-[10px] text-[#5f6368] dark:text-[#9aa0a6] leading-tight mt-0.5">법원 판례 기준 예상 손해배상액 산출</div>
+                </div>
+              </div>
+              <svg className="w-4 h-4 text-[#5f6368] group-hover/item:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </Link>
+          </div>
+        )}
       </div>
 
-      {/* 🏥 실손의료비 보상 계산기 */}
-      <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(52,168,83,0.2)] hover:border-[var(--google-green)] transition-all duration-300 group relative overflow-hidden">
-        <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-green)] pl-2.5">
-          <span className="text-[var(--google-green)] text-lg leading-none">🏥</span>
-          실손의료비 계산기
-        </h3>
-        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
-          급여/비급여 병원비, 본인부담금을 공제한 예상 실손 보상금을 산출해 보세요.
-        </p>
-        <Link href="/calculator/medical" className="flex items-center justify-center gap-2 w-full bg-[var(--google-green)] text-white font-bold text-sm py-2.5 rounded-xl hover:bg-[#0d652d] transition-colors shadow-sm">
-          실손의료비 계산하기
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </Link>
-      </div>
-
-      {/* ⚖️ 배상책임 소송가액 계산기 */}
-      <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(234,67,53,0.2)] hover:border-[var(--google-red)] transition-all duration-300 group relative overflow-hidden">
-        <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-red)] pl-2.5">
-          <span className="text-[var(--google-red)] text-lg leading-none">⚖️</span>
-          배상책임 소송가액 계산기
-        </h3>
-        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
-          호프만계수를 적용하여 법원 판례 기준에 따른 예상 손해배상액을 산출합니다.
-        </p>
-        <Link href="/calculator/liability" className="flex items-center justify-center gap-2 w-full bg-[var(--google-red)] text-white font-bold text-sm py-2.5 rounded-xl hover:bg-[#d93025] transition-colors shadow-sm">
-          소송가액 계산하기
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </Link>
-      </div>
-
-      {/* 주요 보상 카테고리 (가로 스크롤 스마트무빙 적용) */}
+      {/* 📂 분야별 보상 칼럼 (통합 아코디언 & 2열 그리드) */}
       <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(251,188,4,0.2)] hover:border-[var(--google-yellow)] transition-all duration-300 group relative overflow-hidden">
         <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-yellow)] pl-2.5">
           <span className="text-[var(--google-yellow)] text-lg leading-none">📂</span>
-          주요 보상 카테고리
+          분야별 보상 칼럼
         </h3>
         <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">
-          보상스쿨의 다양한 보상 정보와 분쟁 해결 가이드를 주제별로 모아두었습니다.
+          보상스쿨 손해사정사의 핵심 전문 칼럼들을 주제별로 분류하여 제공합니다.
         </p>
         
-        <div className="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-2 px-2 sm:mx-0 sm:px-0">
-          {[
-            { name: '판례·법률 해석', color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
-            { name: '교통사고', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
-            { name: '배상책임', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20' },
-            { name: '보상가이드', color: 'text-yellow-600', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
-            { name: '실손의료비', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-            { name: '보험상식', color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20' },
-            { name: '후유장해 보상', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
-            { name: '보상정보', color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20' }
-          ].map(cat => (
-            <Link
-              key={cat.name}
-              href={`/blog?category=${encodeURIComponent(cat.name)}`}
-              className="shrink-0 w-[140px] snap-start flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50 dark:bg-[#303134] border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:bg-[#e8f0fe] dark:hover:bg-[#174ea6]/20 transition-colors group"
-            >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${cat.bg} ${cat.color} group-hover:scale-110 transition-transform`}>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-              </div>
-              <span className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">{cat.name}</span>
-            </Link>
-          ))}
-        </div>
+        <button 
+          onClick={() => setIsColOpen(!isColOpen)}
+          className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors group p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-[var(--google-yellow)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
+            칼럼 카테고리 보기
+          </div>
+          <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isColOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        
+        {isColOpen && (
+          <div className="grid grid-cols-2 gap-2 mt-4 animate-in slide-in-from-top-2 fade-in duration-200">
+            {[
+              { name: '판례·법률 해석', color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
+              { name: '사망·자살 보험금', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-900/20' },
+              { name: '질병진단·실손', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
+              { name: '교통사고 보상', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
+              { name: '배상책임·의료', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20' },
+              { name: '근재·산재 사고', color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20' },
+              { name: '장해평가·면책', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
+              { name: '보상가이드', color: 'text-yellow-600', bg: 'bg-yellow-50 dark:bg-yellow-900/20' }
+            ].map(cat => (
+              <Link
+                key={cat.name}
+                href={`/blog?category=${encodeURIComponent(cat.name)}`}
+                className="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50 dark:bg-[#303134] border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:bg-[#e8f0fe] dark:hover:bg-[#174ea6]/20 transition-all group/item"
+              >
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center mb-1.5 ${cat.bg} ${cat.color} group-hover/item:scale-105 transition-transform`}>
+                  <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                </div>
+                <span className="text-[11px] font-bold text-[#202124] dark:text-[#e8eaed] text-center group-hover/item:text-[var(--google-blue)] transition-colors break-keep leading-tight">{cat.name}</span>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 진료과목별 분쟁 가이드 */}

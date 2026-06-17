@@ -1,13 +1,20 @@
 ---
-title: "교통사고 어깨 회전근개 파열, 보험사 기왕증 주장 시 손해사정으로 보험금 증액하는 법"
-slug: "rotator-cuff-tear-traffic-accident-pre-existing-condition-dispute"
-date: "2026-06-17"
-updatedAt: "2026-06-17"
-summary: "[교통사고 어깨 회전근개 파열, 기왕증 때문에 보상 삭감되셨나요? 손해사정사가 알려주는 어깨파열 보험금 증액 전략, 후유장해 보상 기준, 합의금 제대로 받는 법을 지금 확인하세요.]"
-category: "교통사고"
-regionCategory: ""
-specialtyCategory: "정형외과"
-tags: ["회전근개파열", "교통사고합의", "기왕증공제", "후유장해", "손해사정사"]
+title: '교통사고 어깨 회전근개 파열, 보험사 기왕증 주장 시 손해사정으로 보험금 증액하는 법'
+slug: rotator-cuff-tear-traffic-accident-pre-existing-condition-dispute
+date: '2026-06-17'
+updatedAt: '2026-06-17'
+summary: >-
+  [교통사고 어깨 회전근개 파열, 기왕증 때문에 보상 삭감되셨나요? 손해사정사가 알려주는 어깨파열 보험금 증액 전략, 후유장해 보상 기준,
+  합의금 제대로 받는 법을 지금 확인하세요.]
+category: '교통사고 보상, 장해평가·면책'
+regionCategory: ''
+specialtyCategory: 정형외과
+tags:
+  - 회전근개파열
+  - 교통사고합의
+  - 기왕증공제
+  - 후유장해
+  - 손해사정사
 published: true
 ---
 

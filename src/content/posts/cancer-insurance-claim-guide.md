@@ -5,7 +5,7 @@ summary: >-
   암보험금 청구, 어렵다고 포기 마세요! 보험사 심사 전략, 의료자문 거부, C/D 코드 확인 등 실무 노하우와 전문가 조언으로 당신의 권리를
   지키세요.
 category: '질병진단·실손, 보상가이드'
-specialtyCategory: 종양내과
+specialtyCategory: '내과, 외과, 산부인과'
 tags:
   - 암보험금
   - 암보험청구

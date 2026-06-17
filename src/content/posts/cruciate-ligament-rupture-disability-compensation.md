@@ -5,7 +5,7 @@ summary: >-
   십자인대 파열 후유장해 보험금 청구 시 핵심인 동요 측정 기준과 개인보험 및 맥브라이드 장해평가 노하우를 손해사정 실무 관점에서 상세히
   분석해 드립니다.
 category: 장해평가·면책
-specialtyCategory: 정형외과
+specialtyCategory: '정형외과, 재활의학과'
 tags:
   - 십자인대파열
   - 후유장해

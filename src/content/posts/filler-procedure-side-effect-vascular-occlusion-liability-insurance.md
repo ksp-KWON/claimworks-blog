@@ -8,7 +8,7 @@ summary: >-
   달라지는 결과를 보상스쿨이 알려드립니다.
 category: 배상책임·의료
 regionCategory: ''
-specialtyCategory: 성형외과
+specialtyCategory: 피부과 / 성형외과
 tags:
   - 필러부작용
   - 혈관폐색

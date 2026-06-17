@@ -7,6 +7,7 @@ tags:
   - 보상스쿨
   - 공지사항
 published: true
+specialtyCategory: ''
 ---
 
 ## 💡 Key Points

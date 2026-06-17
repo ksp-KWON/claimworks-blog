@@ -8,7 +8,7 @@ summary: >-
   합의금 제대로 받는 법을 지금 확인하세요.]
 category: '교통사고 보상, 장해평가·면책'
 regionCategory: ''
-specialtyCategory: 정형외과
+specialtyCategory: '정형외과, 재활의학과'
 tags:
   - 회전근개파열
   - 교통사고합의

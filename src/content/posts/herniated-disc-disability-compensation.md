@@ -3,7 +3,7 @@ title: '허리디스크 추간판탈출증 후유장해 보험금, 기왕증 삭
 date: '2026-06-10'
 summary: '허리디스크 추간판탈출증 후유장해 보험금, 기왕증 삭감 없이 제대로 받는 법'
 category: 장해평가·면책
-specialtyCategory: 정형외과
+specialtyCategory: '정형외과, 신경외과, 재활의학과'
 tags:
   - 허리디스크보험금
   - 추간판탈출증후유장해

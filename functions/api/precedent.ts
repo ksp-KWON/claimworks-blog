@@ -1,25 +1,23 @@
-// Cloudflare Pages Function: /api/precedent 프록시
+// Cloudflare Pages Function: /api/precedent 프록시 테스트
 export async function onRequest(context: any) {
   try {
-    const { request, env } = context;
-    const url = new URL(request.url);
-    const query = url.searchParams.get('query') || '';
-    const lawApiKey = env.LAW_API_KEY || 'ksp78';
-
-    const listUrl = `https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=${lawApiKey}&search=2&query=${encodeURIComponent(query)}`;
+    const testUrl = `https://www.law.go.kr`;
     
-    const response = await fetch(listUrl, {
+    const response = await fetch(testUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
       }
     });
 
-    return new Response(response.body, {
+    const html = await response.text();
+    return new Response(JSON.stringify({
       status: response.status,
+      ok: response.ok,
+      preview: html.substring(0, 500)
+    }), {
+      status: 200,
       headers: {
-        'Content-Type': 'application/xml;charset=UTF-8',
+        'Content-Type': 'application/json;charset=UTF-8',
         'Access-Control-Allow-Origin': '*'
       }
     });

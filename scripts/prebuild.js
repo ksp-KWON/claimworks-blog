@@ -175,24 +175,6 @@ function run() {
 
   // HIRA 병원 정보 분할 생성 추가
   splitHiraData();
-
-  // Cloudflare Pages Edge Redirects 파일 동적 생성 추가
-  generateCloudflareRedirects();
-}
-
-function generateCloudflareRedirects() {
-  console.log('Generating Cloudflare redirects file...');
-  const lawApiKey = process.env.LAW_API_KEY || 'ksp78';
-  const redirectsPath = path.join(process.cwd(), 'public/_redirects');
-  
-  // Cloudflare Pages 200 Proxy rules
-  const redirectsContent = `# Cloudflare Pages Edge Redirects / Proxy rules
-/api/precedent https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=${lawApiKey}&search=2 200
-/api/precedent-detail https://www.law.go.kr/DRF/lawService.do?target=prec&type=XML&OC=${lawApiKey} 200
-`;
-
-  fs.writeFileSync(redirectsPath, redirectsContent, 'utf8');
-  console.log(`Successfully generated redirects file to ${redirectsPath}`);
 }
 
 function splitHiraData() {

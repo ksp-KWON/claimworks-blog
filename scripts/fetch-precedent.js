@@ -56,8 +56,8 @@ async function searchPrecedents(query) {
   console.log(xml.slice(0, 800));
   console.log('---------------');
   
-  // 판례정보일련번호 태그들 추출
-  const ids = getXmlTags(xml, '판례정보일련번호');
+  // 판례일련번호 태그들 추출
+  const ids = getXmlTags(xml, '판례일련번호');
   const titles = getXmlTags(xml, '사건명');
   const caseNos = getXmlTags(xml, '사건번호');
 

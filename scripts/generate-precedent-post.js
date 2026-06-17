@@ -58,7 +58,7 @@ async function searchPrecedents(query) {
     throw new Error('법제처 API 인증 실패: 등록된 IP와 현재 요청 IP가 일치하지 않거나 서버 동기화 지연 중입니다.');
   }
 
-  const ids = getXmlTags(xml, '판례정보일련번호');
+  const ids = getXmlTags(xml, '판례일련번호');
   const titles = getXmlTags(xml, '사건명');
   const caseNos = getXmlTags(xml, '사건번호');
 

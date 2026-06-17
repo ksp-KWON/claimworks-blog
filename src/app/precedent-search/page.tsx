@@ -15,6 +15,38 @@ interface Precedent {
   officialUrl: string;
 }
 
+// 텍스트 클리닝 헬퍼: 법제처 판결요지 및 판례본문의 HTML 태그와 엔티티를 정제하여 줄바꿈을 깔끔하게 유지합니다.
+function cleanLawText(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/<br\s*\/?>/gi, '\n')              // <br> 태그를 줄바꿈 문자로 변환
+    .replace(/<[^>]*>/g, '')                    // 기타 모든 HTML 태그 제거
+    .replace(/&nbsp;/g, ' ')                    // 공백 문자 복원
+    .replace(/&lt;/g, '<')                      // 기본 엔티티 디코딩
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/\n{3,}/g, '\n\n')                 // 3회 이상 연속된 줄바꿈을 2회로 축소
+    .trim();
+}
+
+// 세션 스토리지 기반 검색 캐싱: 불필요한 법제처 API 중복 호출을 방지하고 0ms 로딩 속도를 달성합니다.
+const getCachedSearch = (query: string): Precedent[] | null => {
+  try {
+    const key = `prec_cache_${query.trim()}`;
+    const cached = sessionStorage.getItem(key);
+    return cached ? JSON.parse(cached) : null;
+  } catch {
+    return null;
+  }
+};
+
+const setCachedSearch = (query: string, data: Precedent[]) => {
+  try {
+    const key = `prec_cache_${query.trim()}`;
+    sessionStorage.setItem(key, JSON.stringify(data));
+  } catch {}
+};
+
 
 
 // 🧭 상황별 검색 마법사 템플릿
@@ -129,16 +161,25 @@ export default function PrecedentSearchPage() {
 
   const handleSearch = async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
-    setQuery(searchQuery);
+    const trimmedQuery = searchQuery.trim();
+    setQuery(trimmedQuery);
     setLoading(true);
     setError('');
     setResults([]);
     setOpenDetailId(null);
-    saveSearch(searchQuery.trim());
+    saveSearch(trimmedQuery);
+
+    // 1. 세션 캐시 조회 (0ms 즉시 반환으로 사용자 경험 극대화)
+    const cached = getCachedSearch(trimmedQuery);
+    if (cached) {
+      setResults(cached);
+      setLoading(false);
+      return;
+    }
 
     try {
-      // 1. 법제처 API 목록 조회 (프록시 경로 호출)
-      const listRes = await fetch(`/api/precedent?query=${encodeURIComponent(searchQuery)}`);
+      // 2. 법제처 API 목록 조회 (프록시 경로 호출)
+      const listRes = await fetch(`/api/precedent?query=${encodeURIComponent(trimmedQuery)}`);
       if (!listRes.ok) {
         throw new Error(`목록 조회에 실패했습니다. (HTTP ${listRes.status})`);
       }
@@ -153,6 +194,12 @@ export default function PrecedentSearchPage() {
       // 브라우저의 Native DOMParser 사용 (서버 렌더링 시점에는 실행되지 않는 이벤트 핸들러 내부이므로 안전)
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(listXml, "text/xml");
+      
+      // XML 파싱 에러 검출
+      const parserError = xmlDoc.getElementsByTagName('parsererror')[0];
+      if (parserError) {
+        throw new Error('법제처 응답 XML 파싱 중 오류가 발생했습니다.');
+      }
 
       const ids = Array.from(xmlDoc.getElementsByTagName('판례일련번호')).map(el => el.textContent?.trim() || '');
       const titles = Array.from(xmlDoc.getElementsByTagName('사건명')).map(el => el.textContent?.trim() || '');
@@ -175,6 +222,9 @@ export default function PrecedentSearchPage() {
             const detailXml = await detailRes.text();
             const detailDoc = parser.parseFromString(detailXml, "text/xml");
             
+            // XML 파싱 에러 검출
+            if (detailDoc.getElementsByTagName('parsererror')[0]) return null;
+
             const getValue = (tagName: string) => {
               const el = detailDoc.getElementsByTagName(tagName)[0];
               return el?.textContent?.trim() || '';
@@ -186,8 +236,8 @@ export default function PrecedentSearchPage() {
               caseNo: caseNos[index] || getValue('사건번호'),
               judgmentDate: getValue('선고일자'),
               courtName: getValue('법원명'),
-              judgmentSummary: getValue('판결요지'),
-              caseContent: getValue('판례내용'),
+              judgmentSummary: cleanLawText(getValue('판결요지')),
+              caseContent: cleanLawText(getValue('판례내용')),
               caseType: getValue('사건종류명'),
               officialUrl: `https://www.law.go.kr/LSW/precInfoP.do?precSeq=${id}`
             };
@@ -202,6 +252,9 @@ export default function PrecedentSearchPage() {
       
       if (parsedData.length === 0) {
         setError('입력하신 조건과 일치하는 판례 상세 정보를 불러오지 못했습니다.');
+      } else {
+        // 세션 캐시에 검색 결과 저장
+        setCachedSearch(trimmedQuery, parsedData);
       }
     } catch (err: any) {
       console.error(err);

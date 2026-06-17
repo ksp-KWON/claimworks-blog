@@ -132,6 +132,11 @@ export default function PrecedentSearchPage() {
   // 자가진단 선택 체크 상태 추적용
   const [checklistState, setChecklistState] = useState<Record<string, boolean[]>>({});
 
+  // AI 요약 관련 상태값 추적
+  const [aiSummaries, setAiSummaries] = useState<Record<string, string>>({});
+  const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({});
+  const [aiError, setAiError] = useState<Record<string, string>>({});
+
   // 로컬스토리지 로드 및 블로그 포스트 정적 DB 로드
   useEffect(() => {
     const saved = localStorage.getItem('recent_prec_searches');
@@ -273,6 +278,42 @@ export default function PrecedentSearchPage() {
     }
     setBasket(next);
     localStorage.setItem('prec_basket', JSON.stringify(next));
+  };
+
+  // 실시간 AI 판례 요약 API 호출 함수
+  const handleRequestAiSummary = async (prec: Precedent) => {
+    if (aiSummaries[prec.id]) return; // 이미 캐싱된 경우 API 재요청 차단
+
+    setAiLoading(prev => ({ ...prev, [prec.id]: true }));
+    setAiError(prev => ({ ...prev, [prec.id]: '' }));
+
+    try {
+      const res = await fetch('/api/precedent-summarize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: prec.title,
+          caseNo: prec.caseNo,
+          judgmentSummary: prec.judgmentSummary,
+          caseContent: prec.caseContent
+        })
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || `요약에 실패했습니다. (HTTP ${res.status})`);
+      }
+
+      const data = await res.json();
+      setAiSummaries(prev => ({ ...prev, [prec.id]: data.summary }));
+    } catch (err: any) {
+      console.error(err);
+      setAiError(prev => ({ ...prev, [prec.id]: err.message || '요약 과정 중 오류가 발생했습니다.' }));
+    } finally {
+      setAiLoading(prev => ({ ...prev, [prec.id]: false }));
+    }
   };
 
   // 1분 자가진단 체크박스 토글
@@ -507,17 +548,35 @@ export default function PrecedentSearchPage() {
                         )}
                       </div>
                       
-                      {/* 담기 버튼 */}
-                      <button
-                        onClick={() => toggleBasket(prec)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-extrabold cursor-pointer transition-all ${
-                          isAdded 
-                            ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-sm' 
-                            : 'bg-[#e8f0fe] hover:bg-[#d2e3fc] text-[var(--google-blue)] dark:bg-[#174ea6]/20 dark:hover:bg-[#174ea6]/30 dark:text-[#8ab4f8]'
-                        }`}
-                      >
-                        {isAdded ? '❌ 바구니에서 제외' : '📥 상담 바구니 담기'}
-                      </button>
+                      {/* 담기 및 AI 해설 버튼 */}
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => handleRequestAiSummary(prec)}
+                          disabled={aiLoading[prec.id]}
+                          className="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-[var(--google-blue)] to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-extrabold text-[10px] sm:text-xs shadow-sm cursor-pointer transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1"
+                        >
+                          {aiLoading[prec.id] ? (
+                            <>
+                              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
+                              <span>분석 중...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>✨ AI 쉬운 해설</span>
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => toggleBasket(prec)}
+                          className={`px-2.5 py-1.5 rounded-lg text-[10px] sm:text-xs font-extrabold cursor-pointer transition-all ${
+                            isAdded 
+                              ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-sm' 
+                              : 'bg-[#e8f0fe] hover:bg-[#d2e3fc] text-[var(--google-blue)] dark:bg-[#174ea6]/20 dark:hover:bg-[#174ea6]/30 dark:text-[#8ab4f8]'
+                          }`}
+                        >
+                          {isAdded ? '❌ 바구니에서 제외' : '📥 담기'}
+                        </button>
+                      </div>
                     </div>
 
                     {/* 제목 및 판례 사건번호 (매우 중요) */}
@@ -530,6 +589,66 @@ export default function PrecedentSearchPage() {
                         <span className="text-xs">⚖️ 공식 판례번호:</span> {prec.caseNo}
                       </div>
                     </div>
+
+                    {/* ✨ AI 법률 해결사 해설 영역 */}
+                    {aiLoading[prec.id] && !aiSummaries[prec.id] && (
+                      <div className="bg-gray-50 dark:bg-white/2 p-4 rounded-xl border border-gray-150 dark:border-white/5 space-y-3.5 shadow-inner animate-pulse">
+                        <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-white/10">
+                          <div className="w-3.5 h-3.5 bg-gray-300 dark:bg-gray-700 rounded-full" />
+                          <div className="w-40 h-3 bg-gray-300 dark:bg-gray-700 rounded" />
+                        </div>
+                        <div className="space-y-2">
+                          <div className="w-full h-3 bg-gray-250 dark:bg-gray-800 rounded" />
+                          <div className="w-5/6 h-3 bg-gray-250 dark:bg-gray-800 rounded" />
+                          <div className="w-4/5 h-3 bg-gray-250 dark:bg-gray-800 rounded" />
+                        </div>
+                      </div>
+                    )}
+
+                    {aiError[prec.id] && (
+                      <div className="bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 p-3.5 rounded-xl text-xs font-semibold">
+                        ⚠️ AI 요약 오류: {aiError[prec.id]}
+                      </div>
+                    )}
+
+                    {aiSummaries[prec.id] && (
+                      <div className="relative overflow-hidden bg-gradient-to-br from-[#e8f0fe]/40 to-[#174ea6]/5 dark:from-[#174ea6]/10 dark:to-transparent p-5 rounded-2xl border border-[var(--google-blue)]/20 dark:border-[#8ab4f8]/20 space-y-3.5 shadow-sm animate-in fade-in slide-in-from-top-3 duration-300">
+                        {/* AI Top Bar */}
+                        <div className="flex items-between justify-between pb-2 border-b border-[var(--google-blue)]/10 dark:border-[#8ab4f8]/10 flex-row w-full flex-wrap gap-2">
+                          <span className="flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8]">
+                            <span className="text-base animate-pulse">✨</span>
+                            AI 법률 해결사의 초보자 맞춤 요약 해설
+                          </span>
+                          <span className="text-[9px] font-bold text-gray-500 dark:text-gray-400 bg-blue-100/50 dark:bg-blue-900/20 px-1.5 py-0.5 rounded">
+                            Gemini AI
+                          </span>
+                        </div>
+                        {/* AI 요약 내용 */}
+                        <div className="prose prose-xs sm:prose-sm dark:prose-invert max-w-none text-gray-755 dark:text-gray-300 font-medium text-xs sm:text-sm leading-relaxed space-y-2.5">
+                          {aiSummaries[prec.id].split('\n').map((line, idx) => {
+                            if (line.startsWith('##') || line.startsWith('###')) {
+                              const cleanedLine = line.replace(/^##+\s*/, '');
+                              return (
+                                <h4 key={idx} className="text-xs sm:text-sm font-extrabold text-[#202124] dark:text-white mt-4 mb-2 flex items-center gap-1.5">
+                                  {cleanedLine}
+                                </h4>
+                              );
+                            }
+                            if (line.startsWith('-') || line.startsWith('*')) {
+                              const cleanedLine = line.replace(/^[-*]\s*/, '');
+                              return (
+                                <div key={idx} className="pl-4 relative before:content-['•'] before:absolute before:left-1 before:text-[var(--google-blue)] dark:before:text-[#8ab4f8] text-gray-650 dark:text-gray-400 py-0.5 font-medium">
+                                  {cleanedLine}
+                                </div>
+                              );
+                            }
+                            return line.trim() ? (
+                              <p key={idx} className="text-gray-650 dark:text-gray-400 font-medium">{line}</p>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    )}
 
                     {/* 판결 요지 */}
                     {prec.judgmentSummary && (

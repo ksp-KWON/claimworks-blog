@@ -23,7 +23,7 @@ export async function onRequest(context: any) {
     }
 
     // Cloudflare Pages에 바인딩된 환경변수 로드
-    const LAW_API_KEY = env.LAW_API_KEY || 'ksp.claimworks';
+    const LAW_API_KEY = env.LAW_API_KEY || 'ksp78';
 
     // 공유 코어 서비스 모듈 호출
     const data = await searchAndFetchPrecedents(query, LAW_API_KEY);

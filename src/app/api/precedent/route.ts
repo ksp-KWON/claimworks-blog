@@ -12,7 +12,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, error: '검색어를 입력해 주세요.' }, { status: 400 });
     }
 
-    const LAW_API_KEY = process.env.LAW_API_KEY || 'ksp.claimworks';
+    const LAW_API_KEY = process.env.LAW_API_KEY || 'ksp78';
 
     // 공유 코어 서비스 모듈 호출
     const data = await searchAndFetchPrecedents(query, LAW_API_KEY);

@@ -23,9 +23,19 @@ NPM_VERSION=$(npm -v)
 echo "✅ Node.js 설치 확인: $NODE_VERSION"
 echo "✅ npm 설치 확인: $NPM_VERSION"
 
-# 3. 우분투 방화벽 8080 포트 개방
-echo "🛡️ [3/5] 중계 통로(8080 포트) 방화벽을 개방하고 있습니다..."
+# 3. 우분투 방화벽 8080 포트 개방 및 80포트 포워딩 (외부 80포트 -> 내부 8080포트)
+echo "🛡️ [3/5] 중계 통로 방화벽 개방 및 포트 포워딩(80 -> 8080)을 구성하고 있습니다..."
 sudo ufw allow 8080/tcp || true
+sudo ufw allow 80/tcp || true
+
+# 외부 80포트로 들어오는 HTTP 요청을 내부 8080포트의 Node 프록시로 토스
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080 || true
+
+# 가상 서버 재부팅 시에도 포트 포워딩 설정이 유실되지 않도록 저장 장치(iptables-persistent) 설치 및 저장
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
+sudo apt-get install -y iptables-persistent || true
+sudo iptables-save | sudo tee /etc/iptables/rules.v4 || true
 
 # 4. 작업 폴더 생성 및 프록시 소스코드 다운로드
 echo "📂 [4/5] 보상스쿨 중계 소스코드를 원격으로 다운로드하고 있습니다..."

@@ -3,7 +3,7 @@
   <!-- 메인 홈 -->
   <url>
     <loc>https://claim-works.com/</loc>
-    <lastmod>2026-06-17</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -48,6 +48,30 @@
     <loc>https://claim-works.com/terms</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://claim-works.com/blog/guide-private-health-insurance-non-reimbursable</loc>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://claim-works.com/blog/guide-traffic-settlement-strategy</loc>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://claim-works.com/blog/knee-cruciate-ligament-rupture-disability-preexisting-condition-dispute</loc>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://claim-works.com/blog/guide-lane-change-accident-liability</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://claim-works.com/blog/guide-permanent-disability-compensation</loc>

@@ -158,7 +158,7 @@ async function callGemini(prompt, schema = null) {
 
   const generationConfig = {
     temperature: 0.75,
-    maxOutputTokens: schema ? 4096 : 8192,
+    maxOutputTokens: schema ? 4096 : 24576,
   };
   if (schema) {
     generationConfig.responseMimeType = 'application/json';

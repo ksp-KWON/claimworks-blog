@@ -19,7 +19,7 @@ if (fs.existsSync(envPath)) {
 }
 
 const POSTS_DIR     = path.join(process.cwd(), 'src/content/posts');
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
+const GEMINI_MODELS = ['gemini-2.5-flash'];
 const LAW_API_KEY   = process.env.LAW_API_KEY;
 const LAW_PROXY_ENDPOINT = process.env.LAW_PROXY_ENDPOINT;
 const LAW_PROXY_TOKEN    = process.env.LAW_PROXY_TOKEN;

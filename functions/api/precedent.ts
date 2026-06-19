@@ -40,3 +40,4 @@ export async function onRequest(context: any) {
     );
   }
 }
+// Trigger redeploy to apply Cloudflare Pages environment variables

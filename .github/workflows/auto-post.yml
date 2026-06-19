@@ -72,5 +72,8 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add src/content/posts/ src/lib/posts-data.json public/data/posts-data.json public/rss.xml public/sitemap.xml
-          git diff --cached --quiet || git commit -m "auto: 자동글쓰기 $(TZ=Asia/Seoul date '+%Y-%m-%d')"
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "auto: 자동글쓰기 $(TZ=Asia/Seoul date '+%Y-%m-%d')"
+            git pull --rebase origin main
+            git push origin main
+          fi

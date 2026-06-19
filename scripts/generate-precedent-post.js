@@ -19,7 +19,7 @@ if (fs.existsSync(envPath)) {
 }
 
 const POSTS_DIR     = path.join(process.cwd(), 'src/content/posts');
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
 const LAW_API_KEY   = process.env.LAW_API_KEY;
 const LAW_PROXY_ENDPOINT = process.env.LAW_PROXY_ENDPOINT;
 const LAW_PROXY_TOKEN    = process.env.LAW_PROXY_TOKEN;
@@ -170,9 +170,9 @@ async function callGemini(prompt, schema = null) {
     
     for (let attempt = 1; attempt <= 5; attempt++) {
       let res;
-      // 45초 타임아웃 설정 (제미나이 글쓰기 지연에 대응)
+      // 90초 타임아웃 설정 (제미나이 대형 글쓰기 지연에 대응)
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      const timeoutId = setTimeout(() => controller.abort(), 90000);
 
       try {
         res = await fetch(url, {

@@ -29,6 +29,63 @@ function cleanLawText(text: string): string {
     .trim();
 }
 
+// 🧠 지능형 판례 요약 알고리즘: 토큰과 딜레이가 0인 상태에서 법제처 판결요지의 핵심 사실관계와 결론 문단만 찾아내 가독성을 대폭 향상시킵니다.
+function getSmartSummary(summary: string, content: string): string {
+  if (!summary && !content) return '판례 상세 내용을 확인해 주세요.';
+  
+  // 우선순위 1: 법제처 판결요지 파싱 및 핵심 단락 추출
+  if (summary) {
+    // [1], [2] 와 같은 챕터 표식을 기준으로 문단 쪼개기
+    const sections = summary.split(/\[\d+\]/g).map(s => s.trim()).filter(Boolean);
+    if (sections.length > 0) {
+      // 구체적 사건 및 법적 결론 핵심 키워드가 들어간 섹션 선별
+      const targetKeywords = ['사안', '사례', '보험금', '해당', '지급', '책임', '과실', '타당'];
+      const bestSection = sections.find(sec => targetKeywords.some(kw => sec.includes(kw)));
+      if (bestSection) {
+        return bestSection.length > 220 ? bestSection.slice(0, 220) + '...' : bestSection;
+      }
+      
+      // 쟁점 설명만 있고 결론이 분리되어 있다면 가장 구체적인 마지막 결론 섹션을 타겟팅
+      const lastSection = sections[sections.length - 1];
+      if (lastSection) {
+        return lastSection.length > 220 ? lastSection.slice(0, 220) + '...' : lastSection;
+      }
+    }
+    
+    // 구분 기호가 없는 단일 텍스트면 결론 위주 문장 추출
+    const sentences = summary.split(/[.?!]\s+/);
+    const coreSentences = sentences.filter(s => 
+      s.includes('사안') || s.includes('사례') || s.includes('타당하다') || s.includes('지급하여야') || s.includes('책임이')
+    );
+    if (coreSentences.length > 0) {
+      return coreSentences.join('. ').slice(0, 220) + '...';
+    }
+
+    return summary.length > 180 ? summary.slice(0, 180) + '...' : summary;
+  }
+
+  // 우선순위 2: 판결요지가 없어 판례 본문에서 찾아내야 할 때
+  if (content) {
+    // 판결문은 대개 '이유를 판단한다' 혹은 '판단한다' 이후에 실질적 판단이 시작됨
+    const startIdx = content.indexOf('판단한다');
+    const targetText = startIdx !== -1 ? content.slice(startIdx) : content;
+    
+    const sentences = targetText.split(/[.?!]\s+/);
+    // 분쟁 핵심 키워드를 포함한 주요 2~3개 문장 조합
+    const coreSentences = sentences.filter(s => 
+      s.includes('보험금') || s.includes('지급') || s.includes('배상') || s.includes('책임이') || s.includes('타당하다')
+    ).slice(0, 3);
+    
+    if (coreSentences.length > 0) {
+      return coreSentences.join('. ').slice(0, 220) + '...';
+    }
+    
+    return content.length > 180 ? content.slice(0, 180) + '...' : content;
+  }
+
+  return '판례 정보를 읽어올 수 없습니다.';
+}
+
 // 세션 스토리지 기반 검색 캐싱: 불필요한 법제처 API 중복 호출을 방지하고 0ms 로딩 속도를 달성합니다.
 const getCachedSearch = (query: string): Precedent[] | null => {
   try {
@@ -433,10 +490,7 @@ export default function PrecedentSearchPage() {
                         🔍 판례 요약 (줄거리)
                       </div>
                       <p className="text-gray-600 dark:text-gray-400 font-medium">
-                        {prec.judgmentSummary 
-                          ? (prec.judgmentSummary.length > 150 ? prec.judgmentSummary.slice(0, 150) + '...' : prec.judgmentSummary)
-                          : (prec.caseContent ? (prec.caseContent.length > 150 ? prec.caseContent.slice(0, 150) + '...' : prec.caseContent) : '판례 상세 내용을 확인해 주세요.')
-                        }
+                        {getSmartSummary(prec.judgmentSummary, prec.caseContent)}
                       </p>
                     </div>
 

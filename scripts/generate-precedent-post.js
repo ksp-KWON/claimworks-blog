@@ -314,7 +314,7 @@ async function main() {
   console.log('=== 판례 기반 자동글쓰기 프로세스 시작 ===');
   
   if (!LAW_API_KEY) {
-    throw new Error('.env.local 파일에 LAW_API_KEY가 등록되지 않았습니다.');
+    throw new Error('법제처 API 인증키(LAW_API_KEY)가 등록되지 않았습니다. 로컬 개발 시에는 .env.local 파일에, GitHub Actions 실행 시에는 Secrets에 등록해 주세요.');
   }
 
   // 대표 손해사정 키워드 목록 (명함 서비스 범위 확대 반영)

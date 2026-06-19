@@ -87,6 +87,21 @@ function getSmartSummary(summary: string, content: string): string {
   return '판례 정보를 읽어올 수 없습니다.';
 }
 
+// 날짜 포맷팅 헬퍼: '20250626' 형태의 원본 값을 '2025. 6. 26.' 표준 법원 판결 선고일 형식으로 정제합니다.
+function formatJudgmentDate(dateStr: string): string {
+  if (!dateStr) return '';
+  if (dateStr.includes('.')) {
+    return dateStr.trim();
+  }
+  if (dateStr.length === 8 && /^\d+$/.test(dateStr)) {
+    const y = dateStr.slice(0, 4);
+    const m = parseInt(dateStr.slice(4, 6), 10);
+    const d = parseInt(dateStr.slice(6, 8), 10);
+    return `${y}. ${m}. ${d}.`;
+  }
+  return dateStr;
+}
+
 // 세션 스토리지 기반 검색 캐싱: 불필요한 법제처 API 중복 호출을 방지하고 0ms 로딩 속도를 달성합니다.
 const getCachedSearch = (query: string): Precedent[] | null => {
   try {
@@ -445,21 +460,13 @@ export default function PrecedentSearchPage() {
                   className="bg-white dark:bg-[#2b2c2f] rounded-2xl border border-gray-200/60 dark:border-white/5 shadow-sm hover:shadow-md transition-all duration-300 hover:translate-y-[-2px] p-6 flex flex-col justify-between"
                 >
                   <div className="space-y-4">
-                    {/* 상단 메타데이터 배지 */}
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex flex-wrap gap-2 items-center">
-                        <span className="px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-[#1a73e8] dark:text-[#8ab4f8] text-[10px] sm:text-xs font-bold tracking-tight">
-                          🏛️ {prec.courtName || '법원'}
+                    {/* 상단 액션 바 (카테고리 표시 및 담기 버튼 정렬) */}
+                    <div className="flex justify-between items-center gap-3">
+                      {prec.caseType ? (
+                        <span className="px-2.5 py-1 rounded-md bg-gray-50 dark:bg-black/20 text-gray-500 dark:text-gray-400 text-[10px] font-bold border border-gray-100 dark:border-white/5">
+                          {prec.caseType}
                         </span>
-                        <span className="px-3 py-1 rounded-full bg-gray-50 dark:bg-white/5 text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs font-semibold">
-                          📅 {prec.judgmentDate || '선고일'}
-                        </span>
-                        {prec.caseType && (
-                          <span className="px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 text-[10px] sm:text-xs font-semibold">
-                            {prec.caseType}
-                          </span>
-                        )}
-                      </div>
+                      ) : <div />}
                       
                       {/* 담기 버튼 */}
                       <div className="shrink-0">
@@ -476,13 +483,14 @@ export default function PrecedentSearchPage() {
                       </div>
                     </div>
 
-                    {/* 제목 및 판례 사건번호 */}
-                    <div className="space-y-1.5">
+                    {/* 제목 및 대법원 공식 서식에 준하는 표준 문단 표기 */}
+                    <div className="space-y-2.5">
                       <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 leading-snug">
                         {prec.title}
                       </h3>
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-blue-50/50 dark:bg-blue-950/20 text-[11px] font-bold text-[var(--google-blue)] dark:text-[#8ab4f8] border border-blue-100/30">
-                        ⚖️ 공식 판례번호: {prec.caseNo}
+                      {/* [대법원 2025. 6. 26. 선고 2025다210853 판결] 형태의 표준 인용구 표기 */}
+                      <div className="text-[11px] sm:text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-black/15 py-1.5 px-3 rounded-lg border border-gray-100 dark:border-white/5 inline-block tracking-tight">
+                        [{prec.courtName || '법원'} {formatJudgmentDate(prec.judgmentDate)} 선고 {prec.caseNo} 판결]
                       </div>
                     </div>
 
@@ -496,13 +504,13 @@ export default function PrecedentSearchPage() {
                           // 판시사항이 존재하는 경우: 개행문자로 분할하여 한 줄씩 렌더링 (대표님 요청대로 점 제외)
                           prec.casePoints.split('\n').map((point, index) => (
                             <p key={index} className="leading-relaxed">
-                              ⚖️ {point.trim()}
+                              {point.trim()}
                             </p>
                           ))
                         ) : (
                           // 판시사항이 없는 판례의 경우: 스마트 줄거리 요약 작동 (2차 방어망)
                           <p className="leading-relaxed">
-                            ⚖️ {getSmartSummary(prec.judgmentSummary, prec.caseContent)}
+                            {getSmartSummary(prec.judgmentSummary, prec.caseContent)}
                           </p>
                         )}
                       </div>

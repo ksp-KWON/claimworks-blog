@@ -226,6 +226,7 @@ interface BlogPostContentProps { content: string; }
 export default function BlogPostContent({ content }: BlogPostContentProps) {
   const [toc, setToc] = useState<TOCItem[]>([]);
   const [activeId, setActiveId] = useState('');
+  const [calcOpen, setCalcOpen] = useState(false);
 
   const keyPoints    = extractKeyPoints(content);
   const glossaryItems = extractGlossary(content);
@@ -353,26 +354,54 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
       const isMedical = props.type === 'medical';
       if (!isAuto && !isMedical) return null;
       return (
-        <div className="my-12 relative w-full mx-auto">
-          <div className="bg-white dark:bg-[#202124] rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.07)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.45)] border border-gray-100 dark:border-white/8 overflow-visible">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-white/8">
-              <div className="flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-[#1A73E8] animate-pulse shadow-[0_0_6px_#1A73E8]" />
-                <span className="text-[11px] font-extrabold text-[#1A73E8] dark:text-[#8ab4f8] tracking-[0.15em] uppercase">
-                  {isAuto ? 'AUTO INSURANCE SIMULATOR' : 'MEDICAL BILL ESTIMATOR'}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#d93025]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#f29900]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#34A853]" />
-                <span className="ml-2 text-[11px] font-bold text-gray-400 dark:text-gray-500">보상스쿨 안심 계산기</span>
+        <div className="my-8 relative w-full mx-auto">
+          <button
+            onClick={() => setCalcOpen(!calcOpen)}
+            className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 text-left cursor-pointer shadow-xs hover:shadow-sm ${
+              isAuto 
+                ? 'bg-blue-50/50 hover:bg-blue-50 border-blue-100 dark:bg-blue-950/10 dark:hover:bg-blue-950/20 dark:border-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8]' 
+                : 'bg-green-50/50 hover:bg-green-50 border-green-100 dark:bg-green-950/10 dark:hover:bg-green-950/20 dark:border-green-900/30 text-[#34A853] dark:text-[#81c995]'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl shrink-0">{isAuto ? '🚗' : '🏥'}</span>
+              <div>
+                <div className="text-sm sm:text-base font-extrabold tracking-tight">
+                  {isAuto ? '자동차보험 예상 합의금 계산기 열기' : '실손의료비 예상 보상금 계산기 열기'}
+                </div>
+                <div className="text-[10.5px] text-gray-500 dark:text-gray-400 font-bold mt-0.5 leading-tight">
+                  나의 사고 상황 및 치료 조건으로 예상 수령액을 1분 만에 시뮬레이션해 봅니다.
+                </div>
               </div>
             </div>
-            <div className="p-5 sm:p-8">
-              {isAuto ? <AutoCalculatorContainer /> : <MedicalCalculator />}
+            <div className="shrink-0 pl-2">
+              <span className="px-3 py-1.5 bg-white dark:bg-zinc-800 text-[11px] font-extrabold rounded-lg border border-inherit shadow-2xs hover:scale-102 transition-transform">
+                {calcOpen ? '접기 📂' : '펼치기 📁'}
+              </span>
             </div>
-          </div>
+          </button>
+          
+          {calcOpen && (
+            <div className="mt-4 bg-white dark:bg-[#202124] rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.4)] border border-gray-150 dark:border-white/8 overflow-visible animate-in slide-in-from-top-3 fade-in duration-200">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-white/8">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#1A73E8] animate-pulse shadow-[0_0_6px_#1A73E8]" />
+                  <span className="text-[11px] font-extrabold text-[#1A73E8] dark:text-[#8ab4f8] tracking-[0.15em] uppercase">
+                    {isAuto ? 'AUTO INSURANCE SIMULATOR' : 'MEDICAL BILL ESTIMATOR'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#d93025]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#f29900]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#34A853]" />
+                  <span className="ml-2 text-[11px] font-bold text-gray-400 dark:text-gray-500">보상스쿨 안심 계산기</span>
+                </div>
+              </div>
+              <div className="p-5 sm:p-8">
+                {isAuto ? <AutoCalculatorContainer /> : <MedicalCalculator />}
+              </div>
+            </div>
+          )}
         </div>
       );
     },

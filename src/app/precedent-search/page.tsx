@@ -63,8 +63,7 @@ export default function PrecedentSearchPage() {
   // 로컬 블로그 포스트 리스트 데이터 (실무 칼럼 매핑용)
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
 
-  // 자가진단 선택 체크 상태 추적용
-  const [checklistState, setChecklistState] = useState<Record<string, boolean[]>>({});
+  // 자가진단 제거됨
 
   // AI 상태값 제거됨
 
@@ -213,22 +212,7 @@ export default function PrecedentSearchPage() {
 
   // handleRequestAiSummary 제거됨
 
-  // 1분 자가진단 체크박스 토글
-  const handleChecklistChange = (precId: string, index: number) => {
-    const current = checklistState[precId] || [false, false, false, false];
-    const next = [...current];
-    next[index] = !next[index];
-    setChecklistState({
-      ...checklistState,
-      [precId]: next
-    });
-  };
-
-  // 자가진단 조건 부합 개수 계산
-  const getCheckedCount = (precId: string) => {
-    const current = checklistState[precId] || [false, false, false, false];
-    return current.filter(Boolean).length;
-  };
+  // 자가진단 핸들러 제거됨
 
   // 대법원 판례에 해당되는 보상스쿨의 전문 해설글 자동 매핑 알고리즘
   const getRelatedBlogPosts = (prec: Precedent) => {
@@ -393,68 +377,62 @@ export default function PrecedentSearchPage() {
             {results.map((prec) => {
               const isDetailOpen = openDetailId === prec.id;
               const isAdded = basket.some(x => x.id === prec.id);
-              
-              // 체크박스 배열 상태 (없으면 기본값 전부 false)
-              const currentChecks = checklistState[prec.id] || [false, false, false, false];
-              const checkedCount = getCheckedCount(prec.id);
-
               // 🔗 보상스쿨 블로그 내 관련 분석글 가져오기
               const relatedPosts = getRelatedBlogPosts(prec);
               
               return (
                 <article
                   key={prec.id}
-                  className="bg-white dark:bg-[#202124] rounded-[24px] border border-gray-100 dark:border-white/5 shadow-[0_8px_25px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] p-5 sm:p-6 hover:border-[var(--google-blue)]/50 dark:hover:border-[#8ab4f8]/50 transition-all flex flex-col justify-between"
+                  className="bg-white dark:bg-[#2b2c2f] rounded-2xl border border-gray-200/60 dark:border-white/5 shadow-sm hover:shadow-md transition-all duration-300 hover:translate-y-[-2px] p-6 flex flex-col justify-between"
                 >
                   <div className="space-y-4">
                     {/* 상단 메타데이터 배지 */}
-                    <div className="flex flex-wrap items-center justify-between gap-2.5">
-                      <div className="flex flex-wrap gap-1.5 items-center">
-                        <span className="px-2.5 py-1 rounded-md bg-[#e8f0fe] dark:bg-[#174ea6]/20 text-[var(--google-blue)] dark:text-[#8ab4f8] text-[10px] font-bold">
-                          {prec.courtName || '법원'}
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <span className="px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-[#1a73e8] dark:text-[#8ab4f8] text-[10px] sm:text-xs font-bold tracking-tight">
+                          🏛️ {prec.courtName || '법원'}
                         </span>
-                        <span className="px-2.5 py-1 rounded-md bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-[10px] font-bold">
-                          {prec.judgmentDate || '선고일'}
+                        <span className="px-3 py-1 rounded-full bg-gray-50 dark:bg-white/5 text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs font-semibold">
+                          📅 {prec.judgmentDate || '선고일'}
                         </span>
                         {prec.caseType && (
-                          <span className="px-2.5 py-1 rounded-md bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 text-[10px] font-bold">
+                          <span className="px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 text-[10px] sm:text-xs font-semibold">
                             {prec.caseType}
                           </span>
                         )}
                       </div>
                       
                       {/* 담기 버튼 */}
-                      <div className="flex items-center gap-1.5">
+                      <div className="shrink-0">
                         <button
                           onClick={() => toggleBasket(prec)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer shadow-xs ${
                             isAdded 
-                              ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-sm' 
-                              : 'bg-[#e8f0fe] hover:bg-[#d2e3fc] text-[var(--google-blue)] dark:bg-[#174ea6]/20 dark:hover:bg-[#174ea6]/30 dark:text-[#8ab4f8]'
+                              ? 'bg-rose-500 hover:bg-rose-600 text-white' 
+                              : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-[#3f3f42] dark:hover:bg-[#4d4d50] dark:text-gray-200'
                           }`}
                         >
-                          {isAdded ? '❌ 바구니에서 제외' : '📥 담기'}
+                          {isAdded ? '❌ 바구니 제외' : '📥 상담 보관함 담기'}
                         </button>
                       </div>
                     </div>
 
-                    {/* 제목 및 판례 사건번호 (매우 중요) */}
-                    <div>
-                      <h3 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] leading-snug">
+                    {/* 제목 및 판례 사건번호 */}
+                    <div className="space-y-1.5">
+                      <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 leading-snug">
                         {prec.title}
                       </h3>
-                      {/* 판례번호 명시적 굵게 노출 */}
-                      <div className="text-sm font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] mt-1 flex items-center gap-1.5">
-                        <span className="text-xs">⚖️ 공식 판례번호:</span> {prec.caseNo}
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-blue-50/50 dark:bg-blue-950/20 text-[11px] font-bold text-[var(--google-blue)] dark:text-[#8ab4f8] border border-blue-100/30">
+                        ⚖️ 공식 판례번호: {prec.caseNo}
                       </div>
                     </div>
 
-                    {/* 판례 내용 기반 콤팩트 요약 프리뷰 (AI 비용 0원, 지연시간 0초) */}
-                    <div className="bg-gray-50 dark:bg-white/2 p-4 rounded-xl text-xs sm:text-sm text-gray-600 dark:text-[#9aa0a6] leading-relaxed break-all font-medium border border-gray-100/50 dark:border-white/2">
-                      <div className="font-bold text-[#202124] dark:text-[#e8eaed] mb-1.5 flex items-center gap-1 text-[11px] text-[var(--google-blue)] dark:text-[#8ab4f8]">
-                        <span>📝</span> 판례 요약 (줄거리)
+                    {/* 판례 내용 기반 콤팩트 요약 프리뷰 (세련된 인용구 스타일) */}
+                    <div className="bg-slate-50/50 dark:bg-black/10 p-4 rounded-xl text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-medium border-l-2 border-[var(--google-blue)] dark:border-[#8ab4f8]">
+                      <div className="font-extrabold text-gray-900 dark:text-white mb-1 flex items-center gap-1 text-[11px] tracking-wide uppercase">
+                        🔍 판례 요약 (줄거리)
                       </div>
-                      <p className="text-gray-650 dark:text-gray-400">
+                      <p className="text-gray-600 dark:text-gray-400 font-medium">
                         {prec.judgmentSummary 
                           ? (prec.judgmentSummary.length > 150 ? prec.judgmentSummary.slice(0, 150) + '...' : prec.judgmentSummary)
                           : (prec.caseContent ? (prec.caseContent.length > 150 ? prec.caseContent.slice(0, 150) + '...' : prec.caseContent) : '판례 상세 내용을 확인해 주세요.')
@@ -462,67 +440,24 @@ export default function PrecedentSearchPage() {
                       </p>
                     </div>
 
-                    {/* 🛡️ 1분 자가진단 체크리스트와 상담 연동 */}
-                    <div className="p-4 bg-[#e8f0fe]/10 dark:bg-[#174ea6]/5 rounded-xl border border-[#d2e3fc]/20 dark:border-[#174ea6]/10 space-y-3">
-                      <div className="text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center justify-between">
-                        <span className="flex items-center gap-1">🛡️ 내 사례 대조 진단 체크리스트</span>
-                        {checkedCount > 0 && (
-                          <span className="text-[var(--google-blue)] dark:text-[#8ab4f8] font-extrabold text-[10px]">
-                            {checkedCount} / 4개 조건 충족
-                          </span>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-medium text-gray-600 dark:text-[#9aa0a6]">
-                        {[
-                          '사고 경위가 이 판례와 비슷합니다. (예: 교통사고, 낙상 등)',
-                          '진단서 부상 부위가 본 판례와 같습니다. (예: 척추, 암, 신경 등)',
-                          '보험사에서도 비슷한 핑계(기왕증 등)로 삭감을 요구하고 있습니다.',
-                          '부상 및 질환 발생 또는 청구일로부터 3년이 경과하지 않았습니다.'
-                        ].map((chkText, index) => (
-                          <label key={index} className="flex items-start gap-2.5 cursor-pointer select-none py-0.5 hover:text-[#202124] dark:hover:text-white transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={currentChecks[index] || false}
-                              onChange={() => handleChecklistChange(prec.id, index)}
-                              className="rounded border-gray-300 text-[var(--google-blue)] focus:ring-[var(--google-blue)] mt-0.5 shrink-0"
-                            />
-                            <span>{chkText}</span>
-                          </label>
-                        ))}
-                      </div>
-                      {checkedCount >= 3 && (
-                        <div className="text-[10px] text-[var(--google-blue)] dark:text-[#8ab4f8] font-bold bg-[#e8f0fe]/60 dark:bg-[#174ea6]/20 p-2 rounded-lg border border-[#d2e3fc]/30 dark:border-[#174ea6]/30 flex items-center justify-between animate-in fade-in duration-200">
-                          <span>🎯 3개 이상의 조건이 충족되었습니다. 본 대법원 판례를 보상금 청구 논리로 응용할 수 있으니 손해사정사 상담을 신청해 보세요!</span>
-                          <button
-                            onClick={() => {
-                              if (!isAdded) toggleBasket(prec);
-                            }}
-                            className="bg-[var(--google-blue)] hover:bg-[#174ea6] text-white text-[9px] font-extrabold px-2 py-1 rounded shrink-0 cursor-pointer"
-                          >
-                            바구니 담기
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* 🔗 [NEW] 보상스쿨 블로그 내 유사 보상 분석 칼럼 연동 */}
+                    {/* 🔗 보상스쿨 블로그 내 유사 보상 분석 칼럼 연동 */}
                     {relatedPosts.length > 0 && (
-                      <div className="border-t border-dashed border-gray-200 dark:border-white/10 pt-3">
-                        <div className="text-[11px] font-bold text-gray-400 dark:text-gray-500 mb-2 flex items-center gap-1">
-                          📚 이 판례와 관련이 있는 보상스쿨의 전문 실무 칼럼:
+                      <div className="border-t border-dashed border-gray-200 dark:border-white/10 pt-4 mt-2">
+                        <div className="text-[11px] font-bold text-gray-400 dark:text-gray-500 mb-2.5 flex items-center gap-1">
+                          📚 이 판례와 연결된 보상스쿨 전문 칼럼:
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           {relatedPosts.map((post: any) => (
                             <Link
                               key={post.slug}
                               href={`/blog/${post.slug}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center justify-between p-2.5 rounded-lg border border-gray-150 dark:border-white/5 bg-gray-50/50 dark:bg-white/1 hover:bg-[#e8f0fe]/10 dark:hover:bg-[#174ea6]/10 hover:border-[#8ab4f8]/30 transition-all text-xs font-bold text-gray-800 dark:text-gray-200"
+                              className="flex items-center justify-between p-3 rounded-xl border border-gray-200/60 dark:border-white/5 bg-white dark:bg-[#202124] hover:bg-[#e8f0fe]/20 dark:hover:bg-[#174ea6]/10 hover:border-[#8ab4f8]/30 transition-all duration-200 text-xs font-bold text-gray-800 dark:text-gray-200 shadow-xs hover:shadow-sm"
                             >
-                              <span className="truncate pr-2">{post.title}</span>
-                              <span className="text-[10px] text-[var(--google-blue)] dark:text-[#8ab4f8] shrink-0 font-medium hover:underline flex items-center gap-0.5">
-                                실무 해설 읽기 🔗
+                              <span className="truncate pr-2 font-semibold">{post.title}</span>
+                              <span className="text-[10px] text-[var(--google-blue)] dark:text-[#8ab4f8] shrink-0 font-bold hover:underline flex items-center gap-0.5">
+                                읽기 🔗
                               </span>
                             </Link>
                           ))}
@@ -532,32 +467,32 @@ export default function PrecedentSearchPage() {
 
                     {/* 판결문 전문 아코디언 */}
                     {prec.caseContent && (
-                      <div className="space-y-2 pt-1">
+                      <div className="space-y-2 pt-2">
                         <button
                           onClick={() => setOpenDetailId(isDetailOpen ? null : prec.id)}
-                          className="w-full flex items-center justify-between p-2.5 bg-gray-50/50 dark:bg-white/2 rounded-xl text-xs font-bold text-[#5f6368] dark:text-zinc-400 hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] transition-colors cursor-pointer border border-transparent hover:border-[var(--google-blue)]/20"
+                          className="w-full flex items-center justify-between p-3 bg-gray-50/50 dark:bg-black/10 rounded-xl text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] transition-all duration-200 cursor-pointer border border-gray-150 dark:border-white/5 hover:border-[var(--google-blue)]/20"
                         >
                           <span className="flex items-center gap-1.5">
                             <span>📜</span>
-                            {isDetailOpen ? '법제처 공식 판결문 전문 접기' : '법제처 공식 판결문 전문 전체 확인하기'}
+                            {isDetailOpen ? '공식 판결문 전문 접기' : '공식 판결문 전문 전체 확인하기'}
                           </span>
-                          <svg className={`w-3.5 h-3.5 transition-transform duration-200 ${isDetailOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                          <svg className={`w-3.5 h-3.5 transition-transform duration-300 ${isDetailOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
                         
                         {isDetailOpen && (
-                          <div className="p-4 bg-gray-50/20 dark:bg-white/1 rounded-xl border border-gray-100 dark:border-white/5 animate-in slide-in-from-top-2 duration-200">
-                            <pre className="text-xs text-gray-500 dark:text-[#9aa0a6] font-medium leading-relaxed max-h-[350px] overflow-y-auto whitespace-pre-wrap font-sans pr-2">
+                          <div className="p-4 bg-slate-50/20 dark:bg-black/10 rounded-xl border border-gray-150 dark:border-white/5 animate-in slide-in-from-top-2 duration-200">
+                            <pre className="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed max-h-[350px] overflow-y-auto whitespace-pre-wrap font-sans pr-2">
                               {prec.caseContent}
                             </pre>
-                            <div className="mt-4 pt-3 border-t border-gray-100 dark:border-white/5 flex items-center justify-between text-[11px] font-bold">
-                              <span className="text-[#9aa0a6]">데이터 출처: 국가법령정보공동활용 API</span>
+                            <div className="mt-4 pt-3 border-t border-gray-250/20 dark:border-white/5 flex items-center justify-between text-[10px] font-bold">
+                              <span className="text-gray-400 dark:text-gray-500">출처: 국가법령정보공동활용 API</span>
                               <a
                                 href={prec.officialUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-[var(--google-blue)] dark:text-[#8ab4f8] hover:underline flex items-center gap-1"
                               >
-                                법제처 공식 사이트에서 보기 (새창) 🔗
+                                법제처 원문 새창 보기 🔗
                               </a>
                             </div>
                           </div>

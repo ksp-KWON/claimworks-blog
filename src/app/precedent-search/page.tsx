@@ -332,10 +332,10 @@ export default function PrecedentSearchPage() {
       {/* 헤더 타이틀 */}
       <div className="text-center space-y-3">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
-          보상스쿨 <span className="bg-gradient-to-r from-[var(--google-blue)] to-[#174ea6] bg-clip-text text-transparent">AI 손해사정 법률센터</span>
+          보상스쿨 <span className="bg-gradient-to-r from-[var(--google-blue)] to-[#174ea6] bg-clip-text text-transparent">손해사정 법률분석센터</span>
         </h1>
-        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-lg mx-auto leading-relaxed">
-          보험사의 복잡한 약관과 지급 거절 핑계에 당황하지 마세요. 억울한 보상 사연을 평소 대화하듯 편하게 작성하시면 실시간 법제처 판례와 손해사정 핵심 기준을 분석해 드립니다.
+        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
+          복잡한 보험 약관과 지급 거절 주장 앞에서도 명확한 판례가 있다면 정당한 권리를 지킬 수 있습니다. 겪으신 상황을 입력하시면 실시간 법제처 데이터베이스와 손해사정 핵심 기준을 분석하여 가장 부합하는 판례를 찾아드립니다.
         </p>
       </div>
 

@@ -44,6 +44,8 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           LAW_API_KEY: ${{ secrets.LAW_API_KEY }}
+          LAW_PROXY_ENDPOINT: ${{ secrets.LAW_PROXY_ENDPOINT }}
+          LAW_PROXY_TOKEN: ${{ secrets.LAW_PROXY_TOKEN }}
         run: |
           POST_TYPE="${{ github.event.inputs.post_type }}"
           if [ -z "$POST_TYPE" ]; then

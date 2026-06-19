@@ -332,10 +332,10 @@ export default function PrecedentSearchPage() {
       {/* 헤더 타이틀 */}
       <div className="text-center space-y-3">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
-          보상스쿨 <span className="bg-gradient-to-r from-[var(--google-blue)] to-[#174ea6] bg-clip-text text-transparent">AI 판례검색센터</span>
+          보상스쿨 <span className="bg-gradient-to-r from-[var(--google-blue)] to-[#174ea6] bg-clip-text text-transparent">AI 손해사정 법률센터</span>
         </h1>
         <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-lg mx-auto leading-relaxed">
-          보험사가 주장하는 까다로운 법률 핑계에 기죽지 마세요. 억울한 보상 사연을 평소 대화하듯 편하게 작성하시면 실시간 법제처 데이터를 매칭해 드립니다.
+          보험사의 복잡한 약관과 지급 거절 핑계에 당황하지 마세요. 억울한 보상 사연을 평소 대화하듯 편하게 작성하시면 실시간 법제처 판례와 손해사정 핵심 기준을 분석해 드립니다.
         </p>
       </div>
 
@@ -460,13 +460,18 @@ export default function PrecedentSearchPage() {
                   className="bg-white dark:bg-[#2b2c2f] rounded-2xl border border-gray-200/60 dark:border-white/5 shadow-sm hover:shadow-md transition-all duration-300 hover:translate-y-[-2px] p-6 flex flex-col justify-between"
                 >
                   <div className="space-y-4">
-                    {/* 상단 액션 바 (카테고리 표시 및 담기 버튼 정렬) */}
-                    <div className="flex justify-between items-center gap-3">
-                      {prec.caseType ? (
-                        <span className="px-2.5 py-1 rounded-md bg-gray-50 dark:bg-black/20 text-gray-500 dark:text-gray-400 text-[10px] font-bold border border-gray-100 dark:border-white/5">
-                          {prec.caseType}
+                    {/* 상단 메타 바 (사건종류 배지 + 공식 판결 서식 + 우측 담기 버튼) */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-white/5">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        {prec.caseType && (
+                          <span className="px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-900/20 text-[#1a73e8] dark:text-[#8ab4f8] text-[10px] font-bold border border-blue-100/30">
+                            {prec.caseType}
+                          </span>
+                        )}
+                        <span className="text-[11px] sm:text-xs font-bold text-gray-400 dark:text-gray-500">
+                          {prec.courtName || '법원'} {formatJudgmentDate(prec.judgmentDate)} 선고 {prec.caseNo} 판결
                         </span>
-                      ) : <div />}
+                      </div>
                       
                       {/* 담기 버튼 */}
                       <div className="shrink-0">
@@ -483,15 +488,11 @@ export default function PrecedentSearchPage() {
                       </div>
                     </div>
 
-                    {/* 제목 및 대법원 공식 서식에 준하는 표준 문단 표기 */}
-                    <div className="space-y-2.5">
+                    {/* 제목 */}
+                    <div className="pt-1.5">
                       <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 leading-snug">
                         {prec.title}
                       </h3>
-                      {/* [대법원 2025. 6. 26. 선고 2025다210853 판결] 형태의 표준 인용구 표기 */}
-                      <div className="text-[11px] sm:text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-black/15 py-1.5 px-3 rounded-lg border border-gray-100 dark:border-white/5 inline-block tracking-tight">
-                        [{prec.courtName || '법원'} {formatJudgmentDate(prec.judgmentDate)} 선고 {prec.caseNo} 판결]
-                      </div>
                     </div>
 
                     {/* 판시사항 및 쟁점 요약 프리뷰 (세련된 인용구 스타일) */}
@@ -518,26 +519,22 @@ export default function PrecedentSearchPage() {
 
                     {/* 🔗 보상스쿨 블로그 내 유사 보상 분석 칼럼 연동 */}
                     {relatedPosts.length > 0 && (
-                      <div className="border-t border-dashed border-gray-200 dark:border-white/10 pt-4 mt-2">
-                        <div className="text-[11px] font-bold text-gray-400 dark:text-gray-500 mb-2.5 flex items-center gap-1">
+                      <div className="border-t border-dashed border-gray-200 dark:border-white/10 pt-4 mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                        <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 flex items-center gap-1 shrink-0">
                           📚 이 판례와 연결된 보상스쿨 전문 칼럼:
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          {relatedPosts.map((post: any) => (
-                            <Link
-                              key={post.slug}
-                              href={`/blog/${post.slug}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center justify-between p-3 rounded-xl border border-gray-200/60 dark:border-white/5 bg-white dark:bg-[#202124] hover:bg-[#e8f0fe]/20 dark:hover:bg-[#174ea6]/10 hover:border-[#8ab4f8]/30 transition-all duration-200 text-xs font-bold text-gray-800 dark:text-gray-200 shadow-xs hover:shadow-sm"
-                            >
-                              <span className="truncate pr-2 font-semibold">{post.title}</span>
-                              <span className="text-[10px] text-[var(--google-blue)] dark:text-[#8ab4f8] shrink-0 font-bold hover:underline flex items-center gap-0.5">
-                                읽기 🔗
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
+                        </span>
+                        {relatedPosts.map((post: any) => (
+                          <Link
+                            key={post.slug}
+                            href={`/blog/${post.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200/50 dark:border-white/5 bg-gray-50/50 dark:bg-black/10 hover:bg-[#e8f0fe]/30 dark:hover:bg-[#174ea6]/10 text-xs font-bold text-[#1A73E8] dark:text-[#8ab4f8] hover:underline transition-all duration-200 max-w-[260px] truncate"
+                          >
+                            <span className="truncate font-semibold">{post.title}</span>
+                            <span className="text-[10px] text-gray-400 shrink-0">🔗</span>
+                          </Link>
+                        ))}
                       </div>
                     )}
 

@@ -213,7 +213,7 @@ function preprocessBody(content: string): string {
   const processed = result
     .join('\n')
     .replace(/<calculator\s+type="([^"]+)"\s*\/>/g, '<calculator type="$1"></calculator>')
-    .replace(/\[SEO_SUMMARY\]:.*/gi, '')
+    .replace(/\[SEO_SUMMARY\]\s*:\s*.*/gi, '')
     .replace(/\[[^\]]*(?:카카오|상담)[^\]]*\]\([^)]*\)/g, '')
     .trim();
 

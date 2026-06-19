@@ -521,7 +521,7 @@ export default function PrecedentSearchPage() {
                     {relatedPosts.length > 0 && (
                       <div className="border-t border-dashed border-gray-200 dark:border-white/10 pt-4 mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5">
                         <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 flex items-center gap-1 shrink-0">
-                          📚 이 판례와 연결된 보상스쿨 전문 칼럼:
+                          📚 이 판례와 연결된 보상스쿨 전문 칼럼 : 
                         </span>
                         {relatedPosts.map((post: any) => (
                           <Link

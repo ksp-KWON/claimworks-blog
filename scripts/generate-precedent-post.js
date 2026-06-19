@@ -76,9 +76,20 @@ async function fetchLawAPI(type, params) {
     }
   }
 
-  const res = await fetch(url, { headers });
-  if (!res.ok) throw new Error(`법제처 통신 실패 (상태 코드: ${res.status})`);
-  return await res.text();
+  // 10초 타임아웃 설정 (네트워크 지연으로 인한 무한 대기 현상 방어)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const res = await fetch(url, { 
+      headers,
+      signal: controller.signal
+    });
+    if (!res.ok) throw new Error(`법제처 통신 실패 (상태 코드: ${res.status})`);
+    return await res.text();
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 // ── 1. 대표 손해사정 키워드로 법제처 판례 검색 ───────────────────────────────
@@ -141,7 +152,9 @@ function resolveUniqueSlug(baseSlug) {
 // ── 4. 제미나이 호출 ─────────────────────────────────────────────────────────
 async function callGemini(prompt, schema = null) {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey.length < 10) throw new Error('유효하지 않은 GEMINI_API_KEY');
+  if (!apiKey || apiKey.length < 10) {
+    throw new Error('GEMINI_API_KEY가 등록되지 않았거나 유효하지 않습니다. GitHub Secrets 또는 .env.local 설정을 확인해 주세요.');
+  }
 
   const generationConfig = {
     temperature: 0.75,
@@ -157,15 +170,22 @@ async function callGemini(prompt, schema = null) {
     
     for (let attempt = 1; attempt <= 5; attempt++) {
       let res;
+      // 45초 타임아웃 설정 (제미나이 글쓰기 지연에 대응)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
+
       try {
         res = await fetch(url, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig }),
+          signal:  controller.signal
         });
       } catch (networkErr) {
         if (attempt < 5) { await sleep(3000 * attempt); continue; }
         continue modelLoop;
+      } finally {
+        clearTimeout(timeoutId);
       }
 
       if (!res.ok) {
@@ -365,17 +385,33 @@ async function main() {
     list.push(...fallbackList);
   }
 
-  // 최신 판례 중 하나 선정
-  const selectedCase = list[0];
-  console.log(`[확정] 분석 대상 판례 사건번호: ${selectedCase.caseNo} (ID: ${selectedCase.id})`);
+  // 2. 유효한 판결요지를 가진 판례 탐색 (최대 5개 후보 순차 검증)
+  let detail = null;
+  let selectedCase = null;
+  
+  for (let i = 0; i < Math.min(list.length, 5); i++) {
+    const candidate = list[i];
+    console.log(`[조회] 후보 판례 사건번호: ${candidate.caseNo} (ID: ${candidate.id}) 상세 조회 중...`);
+    try {
+      const candidateDetail = await getPrecedentDetail(candidate.id);
+      if (candidateDetail.judgmentSummary && candidateDetail.judgmentSummary.trim().length >= 40) {
+        detail = candidateDetail;
+        selectedCase = candidate;
+        console.log(`[확정] 유효한 판결요지 확인됨. 사건번호: ${selectedCase.caseNo}`);
+        break;
+      } else {
+        console.log(`[-] 후보 ${i + 1}번 판례는 판결 요지가 부족하여 건너뜁니다.`);
+      }
+    } catch (err) {
+      console.log(`[-] 후보 ${i + 1}번 상세조회 실패: ${err.message}`);
+    }
+  }
 
-  // 2. 판례 상세정보 조회
-  const detail = await getPrecedentDetail(selectedCase.id);
-  if (!detail.judgmentSummary || detail.judgmentSummary.length < 20) {
-    console.log('[!] 판결 요지가 부족하여 다른 판례로 대체하여 다시 조회합니다.');
-    const alternativeCase = list[1] ?? list[0];
-    const altDetail = await getPrecedentDetail(alternativeCase.id);
-    Object.assign(detail, altDetail);
+  // 5개 후보 모두 요지가 마땅치 않은 경우, 목록의 첫 번째 판례를 fallback으로 지정
+  if (!detail) {
+    console.log('[⚠️ 경고] 유효한 판결요지가 있는 판례를 찾지 못했습니다. 목록의 첫 번째 판례를 기본값으로 진행합니다.');
+    selectedCase = list[0];
+    detail = await getPrecedentDetail(selectedCase.id);
   }
 
   // 3. 토픽 선정 (기획안 생성)

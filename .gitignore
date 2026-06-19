@@ -48,9 +48,3 @@ next-env.d.ts
 # generated redirects for Cloudflare
 /public/_redirects
 
-# build generated files (must not be committed to avoid merge conflicts)
-/src/lib/posts-data.json
-/public/data/posts-data.json
-/public/rss.xml
-/public/sitemap.xml
-

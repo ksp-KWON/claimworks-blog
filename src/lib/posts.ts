@@ -1,4 +1,6 @@
-import postsData from './posts-data.json';
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
 
 export interface PostData {
   slug: string;
@@ -14,6 +16,8 @@ export interface PostData {
   content: string;
   published?: boolean;
 }
+
+const postsDirectory = path.join(process.cwd(), 'src/content/posts');
 
 // 안전하게 날짜를 문자열(YYYY-MM-DD)로 변환하는 함수
 function formatDate(dateVal: unknown): string {
@@ -36,21 +40,58 @@ function formatDate(dateVal: unknown): string {
   return String(dateVal);
 }
 
+// 전체 마크다운 파일들을 조회하여 파싱하는 내부 헬퍼 함수
+function getAllPosts(): PostData[] {
+  try {
+    if (!fs.existsSync(postsDirectory)) {
+      return [];
+    }
+    const fileNames = fs.readdirSync(postsDirectory);
+    return fileNames
+      .filter((fileName) => fileName.endsWith('.md'))
+      .map((fileName) => {
+        const slug = fileName.replace(/\.md$/, '');
+        const fullPath = path.join(postsDirectory, fileName);
+        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const { data, content } = matter(fileContents);
+
+        return {
+          slug,
+          title: data.title || '',
+          date: formatDate(data.date),
+          updatedAt: data.updatedAt ? formatDate(data.updatedAt) : undefined,
+          summary: data.summary || '',
+          category: data.category || '',
+          caseNumber: data.caseNumber || '',
+          regionCategory: data.regionCategory || '',
+          specialtyCategory: data.specialtyCategory || '',
+          tags: Array.isArray(data.tags) ? data.tags : [],
+          published: data.published !== false,
+          content: content,
+        };
+      });
+  } catch (error) {
+    console.error('Error reading directory: ', error);
+    return [];
+  }
+}
+
 // 전체 블로그 목록을 날짜 최신순으로 가져오는 함수 (관리자용은 비공개 글 포함 가능)
 export function getSortedPostsData(includeUnpublished = false): Omit<PostData, 'content'>[] {
-  const allPostsData = (postsData as unknown as PostData[])
+  const allPosts = getAllPosts();
+  const allPostsData = allPosts
     .map((post) => {
       return {
         slug: post.slug,
         title: post.title || '',
-        date: formatDate(post.date),
-        updatedAt: post.updatedAt ? formatDate(post.updatedAt) : undefined,
+        date: post.date,
+        updatedAt: post.updatedAt,
         summary: post.summary || '',
         category: post.category || '',
         caseNumber: post.caseNumber || '',
         regionCategory: post.regionCategory || '',
         specialtyCategory: post.specialtyCategory || '',
-        tags: Array.isArray(post.tags) ? post.tags : [],
+        tags: post.tags,
         published: post.published !== false,
       };
     })
@@ -70,12 +111,14 @@ export function getSortedPostsData(includeUnpublished = false): Omit<PostData, '
 // 특정 블로그 글 하나를 가져오는 함수 (비공개 글은 관리자 권한 없이 조회 불가)
 export function getPostData(slug: string, includeUnpublished = false): PostData | null {
   try {
-    const post = (postsData as unknown as PostData[]).find((p) => p.slug === slug);
-    if (!post) {
+    const fullPath = path.join(postsDirectory, `${slug}.md`);
+    if (!fs.existsSync(fullPath)) {
       return null;
     }
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const { data, content } = matter(fileContents);
 
-    const published = post.published !== false;
+    const published = data.published !== false;
 
     // 비공개 글이고 비공개 비포함 옵션일 때 차단
     if (!published && !includeUnpublished) {
@@ -84,16 +127,16 @@ export function getPostData(slug: string, includeUnpublished = false): PostData 
 
     return {
       slug,
-      title: post.title || '',
-      date: formatDate(post.date),
-      updatedAt: post.updatedAt ? formatDate(post.updatedAt) : undefined,
-      summary: post.summary || '',
-      category: post.category || '',
-      caseNumber: post.caseNumber || '',
-      regionCategory: post.regionCategory || '',
-      specialtyCategory: post.specialtyCategory || '',
-      tags: Array.isArray(post.tags) ? post.tags : [],
-      content: post.content || '',
+      title: data.title || '',
+      date: formatDate(data.date),
+      updatedAt: data.updatedAt ? formatDate(data.updatedAt) : undefined,
+      summary: data.summary || '',
+      category: data.category || '',
+      caseNumber: data.caseNumber || '',
+      regionCategory: data.regionCategory || '',
+      specialtyCategory: data.specialtyCategory || '',
+      tags: Array.isArray(data.tags) ? data.tags : [],
+      content: content || '',
       published,
     };
   } catch (error) {

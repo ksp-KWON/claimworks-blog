@@ -191,9 +191,9 @@ export default function BlogPageClient() {
   const [hiraData, setHiraData] = useState<HiraData | null>(null);
   const [loading, setLoading] = useState(!!region);
 
-  // 포스트 목록 로드 (정적 JSON에서)
+  // 포스트 목록 로드 (API를 통해)
   useEffect(() => {
-    fetch('/data/posts-data.json')
+    fetch('/api/posts')
       .then(r => r.ok ? r.json() : [])
       .then(data => {
         const list = Array.isArray(data) ? data : [];

@@ -75,9 +75,9 @@ export default function PrecedentSearchPage() {
     const savedBasket = localStorage.getItem('prec_basket');
     if (savedBasket) setBasket(JSON.parse(savedBasket));
 
-    // prebuild 단계에서 public/data/posts-data.json에 저장된 포스트 데이터 불러오기
-    fetch('/data/posts-data.json')
-      .then(res => res.json())
+    // API를 통해 포스트 데이터 불러오기
+    fetch('/api/posts')
+      .then(res => res.ok ? res.json() : [])
       .then(data => setBlogPosts(data))
       .catch(err => console.warn('블로그 포스트 연동 로드 실패:', err));
   }, []);

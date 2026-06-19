@@ -212,10 +212,10 @@ export default function AdminPage() {
       const githubFiles = await res.json() as GitHubFile[];
       const mdFiles = githubFiles.filter((f: GitHubFile) => f.name.endsWith('.md'));
 
-      // 2. 빠르고 직관적인 제목 매핑을 위해 빌드된 posts-data.json 활용
+      // 2. 빠르고 직관적인 제목 매핑을 위해 API 활용
       const titlesMap: Record<string, string> = {};
       try {
-        const dataRes = await fetch('/data/posts-data.json');
+        const dataRes = await fetch('/api/posts');
         if (dataRes.ok) {
           const postsData = await dataRes.json() as { slug: string; title: string }[];
           postsData.forEach((post) => {

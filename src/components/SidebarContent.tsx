@@ -1,29 +1,34 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import postsData from '@/lib/posts-data.json';
 import { SpecialtyDiseaseCategories, RegionalCategories } from '@/components/SidebarCategories';
 
 export default function SidebarContent() {
   const [showAllTags, setShowAllTags] = useState(false);
   const [isCalcOpen, setIsCalcOpen] = useState(false);
   const [isColOpen, setIsColOpen] = useState(false);
+  const [sortedTags, setSortedTags] = useState<string[]>([]);
 
-  // 인기 태그 계산 (빈도수 기준 내림차순 정렬)
-  const sortedTags = useMemo(() => {
-    const tagCounts: Record<string, number> = {};
-    const posts = postsData as unknown as { tags?: string[] }[];
-    posts.forEach(p => {
-      if (Array.isArray(p.tags)) {
-        p.tags.forEach(tag => {
-          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+  // 인기 태그 계산 (API를 통해 런타임에 가져옴)
+  useEffect(() => {
+    fetch('/api/posts')
+      .then(res => res.ok ? res.json() : [])
+      .then(posts => {
+        const tagCounts: Record<string, number> = {};
+        posts.forEach((p: any) => {
+          if (Array.isArray(p.tags)) {
+            p.tags.forEach((tag: string) => {
+              tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+            });
+          }
         });
-      }
-    });
-    return Object.entries(tagCounts)
-      .sort((a, b) => b[1] - a[1]) // 빈도수 높은 순 정렬
-      .map(entry => entry[0]);
+        const sorted = Object.entries(tagCounts)
+          .sort((a, b) => b[1] - a[1]) // 빈도수 높은 순 정렬
+          .map(entry => entry[0]);
+        setSortedTags(sorted);
+      })
+      .catch(() => setSortedTags([]));
   }, []);
 
   const INITIAL_TAG_COUNT = 15;

@@ -248,6 +248,54 @@ async function main() {
   console.log(`  🗺️  시도: ${regionCount}개  /  구군: ${districtCount}개`);
   console.log(`  🏥 원본 병원 수: ${totalFetched}건`);
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+  // 데이터 수집 즉시 쪼개진 파편 파일로 분할
+  splitHiraData();
+}
+
+function splitHiraData() {
+  const hiraSourcePath = path.join(process.cwd(), 'public/data/hira-hospitals.json');
+  const hospitalsOutputDir = path.join(process.cwd(), 'public/data/hospitals');
+
+  if (fs.existsSync(hiraSourcePath)) {
+    console.log('  📡 HIRA 병원 데이터를 구군별 파편 파일로 분할 중...');
+    const hiraData = JSON.parse(fs.readFileSync(hiraSourcePath, 'utf8'));
+    
+    if (!fs.existsSync(hospitalsOutputDir)) {
+      fs.mkdirSync(hospitalsOutputDir, { recursive: true });
+    } else {
+      const files = fs.readdirSync(hospitalsOutputDir);
+      for (const file of files) {
+        if (file.endsWith('.json')) {
+          fs.unlinkSync(path.join(hospitalsOutputDir, file));
+        }
+      }
+    }
+
+    let splitCount = 0;
+    if (hiraData && hiraData.regions) {
+      for (const [sidoName, sidoData] of Object.entries(hiraData.regions)) {
+        if (!sidoData || !sidoData.districts) continue;
+        for (const [districtName, districtData] of Object.entries(sidoData.districts)) {
+          const fileContent = {
+            sido: sidoName,
+            district: districtName,
+            specialties: districtData.specialties || {}
+          };
+          const outputFileName = `${sidoName}-${districtName}.json`;
+          fs.writeFileSync(
+            path.join(hospitalsOutputDir, outputFileName),
+            JSON.stringify(fileContent, null, 2),
+            'utf8'
+          );
+          splitCount++;
+        }
+      }
+    }
+    console.log(`  ✅ 성공: ${splitCount}개의 구군별 파일 생성 완료 (${hospitalsOutputDir})`);
+  } else {
+    console.warn(`  ⚠️ HIRA 원본 데이터 파일 없음: ${hiraSourcePath}. 분할을 건너뜁니다.`);
+  }
 }
 
 main().catch(e => { console.error('오류:', e.message); process.exit(1); });

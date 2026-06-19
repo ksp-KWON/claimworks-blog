@@ -26,7 +26,7 @@ function SearchResults() {
     const fetchPosts = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch('/data/posts-data.json');
+        const res = await fetch('/api/posts');
         if (res.ok) {
           const allPosts: Post[] = await res.json();
           const filtered = allPosts.filter(post => 

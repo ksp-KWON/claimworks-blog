@@ -13,6 +13,7 @@ interface Precedent {
   caseContent: string;
   caseType: string;
   officialUrl: string;
+  casePoints: string; // ⚖️ 공식 판시사항 (필수 필드로 지정해 형식 일치시킴)
 }
 
 // 텍스트 클리닝 헬퍼: 법제처 판결요지 및 판례본문의 HTML 태그와 엔티티를 정제하여 줄바꿈을 깔끔하게 유지합니다.
@@ -230,6 +231,7 @@ export default function PrecedentSearchPage() {
               courtName: getValue('법원명'),
               judgmentSummary: cleanLawText(getValue('판결요지')),
               caseContent: cleanLawText(getValue('판례내용')),
+              casePoints: cleanLawText(getValue('판시사항')), // ⚖️ 판시사항 파싱 추가
               caseType: getValue('사건종류명'),
               officialUrl: `https://www.law.go.kr/LSW/precInfoP.do?precSeq=${id}`
             };
@@ -484,14 +486,26 @@ export default function PrecedentSearchPage() {
                       </div>
                     </div>
 
-                    {/* 판례 내용 기반 콤팩트 요약 프리뷰 (세련된 인용구 스타일) */}
+                    {/* 판시사항 및 쟁점 요약 프리뷰 (세련된 인용구 스타일) */}
                     <div className="bg-slate-50/50 dark:bg-black/10 p-4 rounded-xl text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-medium border-l-2 border-[var(--google-blue)] dark:border-[#8ab4f8]">
-                      <div className="font-extrabold text-gray-900 dark:text-white mb-1 flex items-center gap-1 text-[11px] tracking-wide uppercase">
-                        🔍 판례 요약 (줄거리)
+                      <div className="font-extrabold text-gray-900 dark:text-white mb-2.5 flex items-center gap-1 text-[11px] tracking-wide uppercase">
+                        🔍 대법원 판시사항 (핵심 쟁점)
                       </div>
-                      <p className="text-gray-600 dark:text-gray-400 font-medium">
-                        {getSmartSummary(prec.judgmentSummary, prec.caseContent)}
-                      </p>
+                      <div className="space-y-2 text-gray-600 dark:text-gray-400 font-medium">
+                        {prec.casePoints ? (
+                          // 판시사항이 존재하는 경우: 개행문자로 분할하여 한 줄씩 렌더링 (대표님 요청대로 점 제외)
+                          prec.casePoints.split('\n').map((point, index) => (
+                            <p key={index} className="leading-relaxed">
+                              ⚖️ {point.trim()}
+                            </p>
+                          ))
+                        ) : (
+                          // 판시사항이 없는 판례의 경우: 스마트 줄거리 요약 작동 (2차 방어망)
+                          <p className="leading-relaxed">
+                            ⚖️ {getSmartSummary(prec.judgmentSummary, prec.caseContent)}
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     {/* 🔗 보상스쿨 블로그 내 유사 보상 분석 칼럼 연동 */}

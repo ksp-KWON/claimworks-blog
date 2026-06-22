@@ -58,6 +58,7 @@ interface AccidentZone {
   slightCount: number;
   latitude: number;
   longitude: number;
+  isFallback?: boolean; // true = 샘플 데이터(API 키 미설정), false = 실제 공공 데이터
 }
 
 interface Hospital {
@@ -405,8 +406,23 @@ export default function TrafficCarePage() {
             <span className="text-[#137333] dark:text-[#81c995] font-extrabold">
               📍 {loadedGugun} 실시간 교통사고 다발 위험 분석 리포트
             </span>
-            <span className="text-[10px] text-gray-400 font-medium">실시간 통계 반영</span>
+            <span className="text-[10px] text-gray-400 font-medium">
+              {zones[0]?.isFallback ? '참고용 샘플' : '실시간 공공 데이터'}
+            </span>
           </h2>
+
+          {/* 데이터 출처 안내 배너 — 실제/샘플 여부에 따라 자동 전환 */}
+          {zones[0]?.isFallback ? (
+            <div className="flex items-start gap-2.5 px-4 py-3 rounded-2xl bg-amber-50 dark:bg-amber-950/15 border border-amber-200/50 dark:border-amber-700/30 text-xs text-amber-700 dark:text-amber-400 font-semibold leading-relaxed">
+              <span className="shrink-0 mt-0.5">⚠️</span>
+              <span>현재 표시된 사고 다발 위치와 통계는 <strong>API 연동 대기 중인 참고용 샘플 데이터</strong>입니다. 실제 도로교통공단 데이터와 다를 수 있으며, 지도 핀포인트는 해당 구역 중심부 근방에 표시됩니다.</span>
+            </div>
+          ) : (
+            <div className="flex items-start gap-2.5 px-4 py-3 rounded-2xl bg-green-50 dark:bg-green-950/15 border border-green-200/50 dark:border-green-700/30 text-xs text-[#137333] dark:text-[#81c995] font-semibold leading-relaxed">
+              <span className="shrink-0 mt-0.5">✅</span>
+              <span><strong>도로교통공단(TAAS) 실시간 공식 데이터</strong>를 기반으로 합니다. 지도 핀포인트는 실제 교통사고 다발 지점의 공식 GPS 좌표입니다.</span>
+            </div>
+          )}
 
           {/* 단일 카드 완결형 레이아웃 */}
           <article className="bg-white dark:bg-[#202124] rounded-3xl border border-gray-100 dark:border-white/5 shadow-md p-6 sm:p-7 flex flex-col space-y-5">

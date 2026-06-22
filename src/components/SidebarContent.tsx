@@ -65,6 +65,34 @@ export default function SidebarContent() {
         </div>
       </Link>
 
+      {/* 🏛️ 금감원 소비자보호센터 바로가기 배너 */}
+      <Link href="/fss-news" className="block group">
+        <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(239,68,68,0.15)] hover:border-red-500 transition-all duration-300 relative overflow-hidden">
+          {/* 장식용 배경 이모지 */}
+          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+            🏛️
+          </div>
+          <div className="relative z-10 space-y-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-red-500 pl-2.5">
+                <span className="text-red-500 text-lg leading-none">🏛️</span>
+                금감원 소비자보호센터
+              </h3>
+              <span className="bg-red-50 dark:bg-red-950/20 text-red-500 dark:text-red-400 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-red-100/30 dark:border-red-950/30">
+                실시간 연동
+              </span>
+            </div>
+            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
+              금감원 소비자경보, 분쟁조정사례, 금융꿀팁, 약관 보도자료를 실시간 분석하여 권리를 지켜드립니다.
+            </p>
+            <div className="pt-1 flex items-center gap-1 text-xs font-bold text-red-500 dark:text-red-400 group-hover:underline">
+              소비자보호 데이터 조회하기
+              <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </Link>
+
       {/* 🧮 보상금·합의금 계산기 (통합 아코디언) */}
       <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 group relative overflow-hidden">
         <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">

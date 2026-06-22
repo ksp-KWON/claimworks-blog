@@ -498,7 +498,16 @@ export default function TrafficCarePage() {
                 style={{ border: 0 }}
                 src={
                   activeZone.id.startsWith('fallback-')
-                    ? `https://maps.google.com/maps?q=${encodeURIComponent(selectedSido + ' ' + selectedGugun)}&z=14&output=embed`
+                    ? `https://maps.google.com/maps?q=${encodeURIComponent(
+                        selectedSido + 
+                        ' ' + 
+                        selectedGugun + 
+                        (activeZone.id.endsWith('-2') 
+                          ? ' 교차로' 
+                          : activeZone.id.endsWith('-3') 
+                          ? ' 초등학교' 
+                          : ' 사거리')
+                      )}&z=15&output=embed`
                     : `https://maps.google.com/maps?q=${activeZone.latitude},${activeZone.longitude}&z=16&output=embed`
                 }
                 allowFullScreen

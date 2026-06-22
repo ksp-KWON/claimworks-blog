@@ -67,8 +67,8 @@ export async function onRequest(context: any) {
     }
 
     const url = new URL(context.request.url);
-    sido = url.searchParams.get('sido') || '경기도';
-    gugun = url.searchParams.get('gugun') || '의정부시';
+    sido = (url.searchParams.get('sido') || '경기도').normalize('NFC');
+    gugun = (url.searchParams.get('gugun') || '의정부시').normalize('NFC');
     const env = context?.env || {};
 
     if (!sido || !gugun) {

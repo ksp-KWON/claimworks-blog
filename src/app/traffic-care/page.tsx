@@ -131,6 +131,8 @@ const HOSPITAL_SIDO_PREFIX: Record<string, string> = {
 export default function TrafficCarePage() {
   const [selectedSido, setSelectedSido] = useState('경기도');
   const [selectedGugun, setSelectedGugun] = useState('의정부시');
+  const [loadedSido, setLoadedSido] = useState('경기도');
+  const [loadedGugun, setLoadedGugun] = useState('의정부시');
   const [loading, setLoading] = useState(false);
   const [zones, setZones] = useState<AccidentZone[]>([]);
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
@@ -226,24 +228,28 @@ export default function TrafficCarePage() {
           
           // 정형외과, 신경외과, 재활의학과, 마취통증의학과 등 주요 과목의 병원들만 병합
           const targetSpecialties = ['정형외과', '신경외과', '재활의학과', '마취통증의학과', '응급의학과'];
-        let mergedHospitals: Hospital[] = [];
+          let mergedHospitals: Hospital[] = [];
 
-        if (hiraData && hiraData.specialties) {
-          Object.entries(hiraData.specialties).forEach(([specName, specData]) => {
-            if (targetSpecialties.includes(specName) && specData.hospitals) {
-              mergedHospitals.push(...specData.hospitals);
-            }
-          });
+          if (hiraData && hiraData.specialties) {
+            Object.entries(hiraData.specialties).forEach(([specName, specData]) => {
+              if (targetSpecialties.includes(specName) && specData.hospitals) {
+                mergedHospitals.push(...specData.hospitals);
+              }
+            });
+          }
+          
+          // 병원 이름 중복 제거
+          const uniqueHospitals = mergedHospitals.filter((item, index, self) =>
+            self.findIndex(t => t.name === item.name) === index
+          );
+
+          setHospitals(uniqueHospitals);
         }
-        
-        // 병원 이름 중복 제거
-        const uniqueHospitals = mergedHospitals.filter((item, index, self) =>
-          self.findIndex(t => t.name === item.name) === index
-        );
-
-        setHospitals(uniqueHospitals);
       }
-      }
+      
+      // 데이터가 완전히 동기화되어 받아와졌을 때만 렌더링 지역 변수를 변경합니다.
+      setLoadedSido(sidoName);
+      setLoadedGugun(gugunName);
       
       await delayPromise;
     } catch (e: any) {
@@ -322,7 +328,7 @@ export default function TrafficCarePage() {
 
   // 상담 신청 Kakao 링크 빌더
   const getKakaoLink = (zone: AccidentZone) => {
-    const text = `안녕하세요 대표님, 보상스쿨 교통사고 케어센터에서 [${selectedSido} ${selectedGugun} - ${zone.locationName}] 사고 위험 지점 정보를 보고 무료 손해사정 상담을 신청합니다.`;
+    const text = `안녕하세요 대표님, 보상스쿨 교통사고 케어센터에서 [${loadedSido} ${loadedGugun} - ${zone.locationName}] 사고 위험 지점 정보를 보고 무료 손해사정 상담을 신청합니다.`;
     return `https://open.kakao.com/o/sWeszp7?text=${encodeURIComponent(text)}`;
   };
 
@@ -426,7 +432,7 @@ export default function TrafficCarePage() {
         <div className="space-y-6">
           <h2 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] border-b border-gray-100 dark:border-white/5 pb-2 flex justify-between items-center">
             <span className="text-[#137333] dark:text-[#81c995] font-extrabold">
-              📍 {selectedGugun} 실시간 교통사고 다발 위험 분석 리포트
+              📍 {loadedGugun} 실시간 교통사고 다발 위험 분석 리포트
             </span>
             <span className="text-[10px] text-gray-400 font-medium">실시간 통계 반영</span>
           </h2>
@@ -494,7 +500,7 @@ export default function TrafficCarePage() {
             {/* 구글 지도 임베드 시각화 (단일 카드 안에서 동적 이동) */}
             <div className="w-full h-[320px] rounded-2xl overflow-hidden border border-gray-150 dark:border-white/5 shadow-sm mt-1 relative bg-gray-50">
               <iframe
-                key={`${selectedSido}-${selectedGugun}-${activeZone.id}`}
+                key={`${loadedSido}-${loadedGugun}-${activeZone.id}`}
                 width="100%"
                 height="100%"
                 frameBorder="0"
@@ -502,21 +508,21 @@ export default function TrafficCarePage() {
                 src={
                   activeZone.id.startsWith('fallback-')
                     ? (() => {
-                        const baseName = selectedGugun === '세종특별자치시' || selectedGugun === '세종시' 
+                        const baseName = loadedGugun === '세종특별자치시' || loadedGugun === '세종시' 
                           ? '세종시' 
-                          : selectedGugun;
+                          : loadedGugun;
                         
-                        let landmark = '청'; // 기본값 시청/구청/군청
+                        const pureName = baseName.replace(/(시|구|군)$/, '');
+                        let queryText = '';
+
                         if (activeZone.id.endsWith('-2')) {
-                          landmark = ' 보건소';
+                          queryText = `${loadedSido} ${pureName}보건소`;
                         } else if (activeZone.id.endsWith('-3')) {
-                          landmark = ' 소방서';
+                          queryText = `${loadedSido} ${pureName}소방서`;
                         } else {
-                          // 구나 시, 군으로 끝나는 경우 청을 붙임 (예: 양주시청, 강남구청, 가평군청)
-                          landmark = baseName.endsWith('시') || baseName.endsWith('구') || baseName.endsWith('군') ? '청' : '청';
+                          queryText = `${loadedSido} ${baseName}청`;
                         }
                         
-                        const queryText = `${selectedSido} ${baseName}${landmark}`;
                         return `https://maps.google.com/maps?q=${encodeURIComponent(queryText)}&z=15&output=embed`;
                       })()
                     : `https://maps.google.com/maps?q=${activeZone.latitude},${activeZone.longitude}&z=16&output=embed`
@@ -547,7 +553,7 @@ export default function TrafficCarePage() {
                   <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 dark:border-white/5 shrink-0">
                     <span className="text-xs font-black text-gray-800 dark:text-gray-100 flex items-center gap-1.5">
                       <span className="text-[#137333]"><IconHospital className="w-4.5 h-4.5" /></span>
-                      {selectedGugun} 안심 의료기관
+                      {loadedGugun} 안심 의료기관
                     </span>
                     <button 
                       onClick={() => setIsHospitalSheetOpen(false)}

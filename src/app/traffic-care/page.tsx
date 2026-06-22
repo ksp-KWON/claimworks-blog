@@ -496,7 +496,11 @@ export default function TrafficCarePage() {
                 height="100%"
                 frameBorder="0"
                 style={{ border: 0 }}
-                src={`https://maps.google.com/maps?q=${activeZone.latitude},${activeZone.longitude}&z=16&output=embed`}
+                src={
+                  activeZone.id.startsWith('fallback-')
+                    ? `https://maps.google.com/maps?q=${encodeURIComponent(selectedSido + ' ' + selectedGugun)}&z=14&output=embed`
+                    : `https://maps.google.com/maps?q=${activeZone.latitude},${activeZone.longitude}&z=16&output=embed`
+                }
                 allowFullScreen
                 loading="lazy"
               />

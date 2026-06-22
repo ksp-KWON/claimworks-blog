@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { SpecialtyDiseaseCategories, RegionalCategories } from '@/components/SidebarCategories';
 
 export default function SidebarContent() {
+  const pathname = usePathname();
   const [showAllTags, setShowAllTags] = useState(false);
   const [isCalcOpen, setIsCalcOpen] = useState(false);
   const [isColOpen, setIsColOpen] = useState(false);
@@ -94,32 +96,34 @@ export default function SidebarContent() {
       </Link>
 
       {/* 🚗 교통사고 로컬 안심케어 센터 바로가기 배너 (패밀리룩 반영, 에메랄드 그린 테마로 분리) */}
-      <Link href="/traffic-care" className="block group">
-        <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(19,115,51,0.15)] hover:border-[#137333] transition-all duration-300 relative overflow-hidden">
-          {/* 장식용 배경 이모지 */}
-          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
-            🚗
-          </div>
-          <div className="relative z-10 space-y-2">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[#137333] pl-2.5">
-                <span className="text-[#137333] text-lg leading-none">🚗</span>
-                교통사고 로컬 안심케어
-              </h3>
-              <span className="bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-green-100/30 dark:border-green-950/30">
-                실시간 연동
-              </span>
+      {pathname !== '/traffic-care' && (
+        <Link href="/traffic-care" className="block group">
+          <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(19,115,51,0.15)] hover:border-[#137333] transition-all duration-300 relative overflow-hidden">
+            {/* 장식용 배경 이모지 */}
+            <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+              🚗
             </div>
-            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
-              도로교통공단 안전 통계와 우수 신경/정형외과 병원 및 사고 맞춤형 손해사정 지식을 안내해 드립니다.
-            </p>
-            <div className="pt-1 flex items-center gap-1 text-xs font-bold text-[#137333] dark:text-[#81c995] group-hover:underline">
-              내 지역 교통사고 케어 가기
-              <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <div className="relative z-10 space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[#137333] pl-2.5">
+                  <span className="text-[#137333] text-lg leading-none">🚗</span>
+                  교통사고 로컬 안심케어
+                </h3>
+                <span className="bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-green-100/30 dark:border-green-950/30">
+                  실시간 연동
+                </span>
+              </div>
+              <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
+                도로교통공단 안전 통계와 우수 신경/정형외과 병원 및 사고 맞춤형 손해사정 지식을 안내해 드립니다.
+              </p>
+              <div className="pt-1 flex items-center gap-1 text-xs font-bold text-[#137333] dark:text-[#81c995] group-hover:underline">
+                내 지역 교통사고 케어 가기
+                <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
             </div>
           </div>
-        </div>
-      </Link>
+        </Link>
+      )}
 
       {/* 🧮 보상금·합의금 계산기 (통합 아코디언) */}
       <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 group relative overflow-hidden">

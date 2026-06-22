@@ -431,19 +431,13 @@ export default function PrecedentSearchPage() {
         </button>
       </div>
 
-      {/* ⚠️ 법률 면책 고지 배너 */}
-      <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-3.5 rounded-2xl flex items-start gap-2.5 text-xs font-semibold leading-relaxed shadow-sm">
-        <span className="text-base shrink-0 mt-0.5">⚠️</span>
-        <span>본 판례 검색 시스템은 법제처 공공 API에 기반하여 참고용 판례 정보를 제공하며, 어떠한 법률 자문 대행도 하지 않습니다. 실제 지급 거절 및 삭감 대처 시에는 반드시 전문 손해사정사와 상담하십시오.</span>
-      </div>
-
       {/* 헤더 타이틀 */}
       <div className="text-center space-y-3">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
           보상스쿨 <span className="bg-gradient-to-r from-[var(--google-blue)] to-[#174ea6] bg-clip-text text-transparent">손해사정 법률분석센터</span>
         </h1>
-        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
-          복잡한 보험 약관과 지급 거절 주장 앞에서도 명확한 판례가 있다면 정당한 권리를 지킬 수 있습니다. 겪으신 상황을 입력하시면 실시간 법제처 데이터베이스와 손해사정 핵심 기준을 분석하여 가장 부합하는 판례를 찾아드립니다.
+        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-lg mx-auto leading-relaxed font-medium">
+          보험사의 억울한 지급 거절과 삭감 주장도 명확한 판례가 있다면 방어할 수 있습니다. 겪으신 상황을 검색하시면 가장 부합하는 법원 판결을 찾아드립니다.
         </p>
       </div>
 
@@ -658,6 +652,12 @@ export default function PrecedentSearchPage() {
           </div>
         </div>
       )}
+
+      {/* ⚠️ 법률 면책 고지 배너 */}
+      <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-3.5 rounded-2xl flex items-start gap-2.5 text-xs font-semibold leading-relaxed shadow-sm mt-8">
+        <span className="text-base shrink-0 mt-0.5">⚠️</span>
+        <span>본 판례 검색 시스템은 법제처 공공 API에 기반하여 참고용 판례 정보를 제공하며, 어떠한 법률 자문 대행도 하지 않습니다. 실제 지급 거절 및 삭감 대처 시에는 반드시 전문 손해사정사와 상담하십시오.</span>
+      </div>
     </div>
   );
 }

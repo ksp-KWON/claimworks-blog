@@ -1,8 +1,7 @@
 // Cloudflare Pages Function: /api/taas-accidents
 export async function onRequest(context: any) {
-  const url = new URL(context.request.url);
-  const sido = url.searchParams.get('sido') || '경기도';
-  const gugun = url.searchParams.get('gugun') || '의정부시';
+  let sido = '경기도';
+  let gugun = '의정부시';
 
   // API 키가 없거나 통신 장애 시 작동할 0ms 무오류 동적 백업 데이터 생성기
   const getFallbackAccidents = (sidoName: string, gugunName: string) => {
@@ -49,7 +48,16 @@ export async function onRequest(context: any) {
   };
 
   try {
-    const { env } = context;
+    // try 문 안에서 context 객체의 유효성을 먼저 안전하게 검증하여 예외 차단
+    if (!context || !context.request) {
+      throw new Error('Cloudflare Pages context.request 객체가 존재하지 않습니다.');
+    }
+
+    const url = new URL(context.request.url);
+    sido = url.searchParams.get('sido') || '경기도';
+    gugun = url.searchParams.get('gugun') || '의정부시';
+
+    const env = context?.env || {};
 
     if (!sido || !gugun) {
       return new Response(JSON.stringify({ success: false, error: '시도 및 구군 파라미터가 누락되었습니다.' }), {
@@ -209,15 +217,52 @@ export async function onRequest(context: any) {
     const finalSido = codeSido || '41';
     const finalGugun = codeGugun || '150';
 
-    const taasUrl = `https://apis.data.go.kr/B552061/frequentzoneLg/getRestFrequentzoneLg?serviceKey=${encodeURIComponent(API_KEY)}&searchYearCd=2024&siDo=${finalSido}&guGun=${finalGugun}&_type=json`;
+    // [근본 원인 해결 1] 공공데이터포털 인증키는 이미 인코딩된 형태로 제공되는 경우가 흔합니다.
+    // 키에 '%' 문자가 포함되어 있다면 이미 인코딩된 키로 간주하고 중복 인코딩 처리를 피해 그대로 사용합니다.
+    const serviceKey = API_KEY.includes('%') ? API_KEY : encodeURIComponent(API_KEY);
+    const taasUrl = `https://apis.data.go.kr/B552061/frequentzoneLg/getRestFrequentzoneLg?serviceKey=${serviceKey}&searchYearCd=2024&siDo=${finalSido}&guGun=${finalGugun}&_type=json`;
 
-    // 3. 외부 API 호출하되 5초 컷 타임아웃 지정해 로딩 무한 렉 방지
-    const taasRes = await fetch(taasUrl, { signal: AbortSignal.timeout(5000) });
+    // [최신 표준 & 효율성 반영] 5초 타임아웃 지정을 위해 AbortSignal.timeout 최신 자바스크립트 표준 API를 적용합니다.
+    // Edge/Workers 구버전 런타임을 감안한 하이브리드 자동 대비 코드로 작성해 무결성을 확보합니다.
+    const fetchOptions: RequestInit = {};
+    let fallbackTimeoutId: any;
+    
+    if (typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal) {
+      fetchOptions.signal = (AbortSignal as any).timeout(5000);
+    } else {
+      const controller = new AbortController();
+      fallbackTimeoutId = setTimeout(() => controller.abort(), 5000);
+      fetchOptions.signal = controller.signal;
+    }
+
+    let taasRes;
+    try {
+      taasRes = await fetch(taasUrl, fetchOptions);
+    } finally {
+      if (fallbackTimeoutId) clearTimeout(fallbackTimeoutId);
+    }
+
     if (!taasRes.ok) {
       throw new Error(`외부 연동 실패 (HTTP ${taasRes.status})`);
     }
 
-    const taasData: any = await taasRes.json();
+    // [근본 원인 해결 2] 공공데이터 API는 인증 실패 시 JSON이 아닌 XML 에러를 반환해 파싱 에러(JSON.parse)를 유발합니다.
+    // 텍스트 형태로 먼저 읽어내어 XML인지 사전에 검증하고 에러 원인을 디코딩해냅니다.
+    const rawText = await taasRes.text();
+    if (rawText.trim().startsWith('<')) {
+      const authMsg = rawText.match(/<returnAuthMsg>([^<]+)<\/returnAuthMsg>/)?.[1];
+      const errMsg = rawText.match(/<returnErrMsg>([^<]+)<\/returnErrMsg>/)?.[1] || rawText.match(/<errMsg>([^<]+)<\/errMsg>/)?.[1];
+      const details = authMsg || errMsg || '인증키 등록 오류 혹은 권한 없음';
+      throw new Error(`공공 API 인증/권한 오류: ${details}`);
+    }
+
+    let taasData: any;
+    try {
+      taasData = JSON.parse(rawText);
+    } catch (e) {
+      throw new Error('공공 API 응답을 JSON 형식으로 변환하지 못했습니다.');
+    }
+
     const items = taasData?.response?.body?.items?.item || [];
     const rawList = Array.isArray(items) ? items : [items];
 
@@ -279,7 +324,8 @@ export async function onRequest(context: any) {
     });
 
   } catch (error: any) {
-    console.error('  ⚠️ TAAS 실시간 연동 장애 발생: 백업 모드로 자동 대체합니다.', error.message);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('  ⚠️ TAAS 실시간 연동 장애 발생: 백업 모드로 자동 대체합니다.', errorMsg);
     // 외부 API 연결 장애나 인증서 실패 시 즉각 가상 백업 데이터로 원격 대체 반환
     return new Response(JSON.stringify(getFallbackAccidents(sido, gugun)), {
       headers: {

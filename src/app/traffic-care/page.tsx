@@ -232,7 +232,7 @@ export default function TrafficCarePage() {
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* 💡 상단 정보성 띠 배너 */}
-      <div className="bg-[var(--google-blue)] text-white px-4 py-3 rounded-2xl flex items-center justify-between flex-wrap gap-3 shadow-md">
+      <div className="bg-[#137333] text-white px-4 py-3 rounded-2xl flex items-center justify-between flex-wrap gap-3 shadow-md">
         <div className="flex items-center gap-2.5">
           <span className="text-lg shrink-0">💡</span>
           <div className="text-xs sm:text-sm font-extrabold tracking-tight">
@@ -245,7 +245,7 @@ export default function TrafficCarePage() {
             const el = document.getElementById('region-selector-area');
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }}
-          className="text-[10px] font-black uppercase tracking-wider bg-white text-[var(--google-blue)] px-2.5 py-1 rounded-lg border border-white hover:bg-blue-50 transition-colors cursor-pointer"
+          className="text-[10px] font-black uppercase tracking-wider bg-white text-[#137333] px-2.5 py-1 rounded-lg border border-white hover:bg-green-50 transition-colors cursor-pointer"
         >
           지역선택
         </button>
@@ -254,7 +254,7 @@ export default function TrafficCarePage() {
       {/* 헤더 타이틀 */}
       <div className="text-center space-y-3">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
-          보상스쿨 <span className="bg-gradient-to-r from-[var(--google-blue)] to-[#174ea6] bg-clip-text text-transparent">교통사고 로컬 안심케어 센터</span>
+          보상스쿨 <span className="bg-gradient-to-r from-[#188038] to-[#137333] bg-clip-text text-transparent">교통사고 로컬 안심케어 센터</span>
         </h1>
         <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-lg mx-auto leading-relaxed font-medium">
           내가 걷는 보도와 매일 지나는 사거리는 안전할까요? 사시는 동네를 선택하시면 도로교통공단 공식 위험 다발지역과 교통사고 발생 시 뼈·신경 치료 전문 병원 정보를 즉석에서 융합해 드립니다.
@@ -270,7 +270,7 @@ export default function TrafficCarePage() {
               <select
                 value={selectedSido}
                 onChange={(e) => handleSidoChange(e.target.value)}
-                className="w-full px-3 py-2.5 sm:py-3 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-[var(--google-blue)] focus:ring-1 focus:ring-[var(--google-blue)] dark:text-white text-xs font-semibold shadow-inner"
+                className="w-full px-3 py-2.5 sm:py-3 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-[#137333] focus:ring-1 focus:ring-[#137333] dark:text-white text-xs font-semibold shadow-inner"
               >
                 {Object.keys(SIDO_GUGUN_MAP).map(sido => (
                   <option key={sido} value={sido}>{sido}</option>
@@ -282,7 +282,7 @@ export default function TrafficCarePage() {
               <select
                 value={selectedGugun}
                 onChange={(e) => setSelectedGugun(e.target.value)}
-                className="w-full px-3 py-2.5 sm:py-3 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-[var(--google-blue)] focus:ring-1 focus:ring-[var(--google-blue)] dark:text-white text-xs font-semibold shadow-inner"
+                className="w-full px-3 py-2.5 sm:py-3 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-[#137333] focus:ring-1 focus:ring-[#137333] dark:text-white text-xs font-semibold shadow-inner"
               >
                 {(SIDO_GUGUN_MAP[selectedSido] || []).map(gugun => (
                   <option key={gugun} value={gugun}>{gugun}</option>
@@ -293,7 +293,7 @@ export default function TrafficCarePage() {
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="sm:mt-5 px-6 py-3 rounded-xl bg-[var(--google-blue)] hover:bg-[#174ea6] text-white font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1"
+            className="sm:mt-5 px-6 py-3 rounded-xl bg-[#137333] hover:bg-[#0b6623] text-white font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1"
           >
             {loading ? '안전망 분석 중...' : '실시간 지역 분석'}
           </button>
@@ -303,7 +303,7 @@ export default function TrafficCarePage() {
       {/* 실시간 로딩 창 */}
       {loading && (
         <div className="bg-white dark:bg-[#202124] rounded-3xl py-14 px-6 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--google-blue)] border-t-transparent rounded-full animate-spin" />
+          <div className="inline-block w-8 h-8 border-4 border-[#137333] border-t-transparent rounded-full animate-spin" />
           <div className="text-sm font-bold text-[#202124] dark:text-[#e8eaed]">📡 도로교통공단 실시간 교통사고 통계 및 안전망 분석 중...</div>
           <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] max-w-xs mx-auto leading-relaxed">
             전국 도로의 위험 위치 좌표와 상해 요인을 융합하고 주변 우수 의료진 정보를 매칭하고 있습니다.
@@ -334,7 +334,7 @@ export default function TrafficCarePage() {
                     onClick={() => setSelectedZoneId(zone.id)}
                     className={`w-full text-left p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between space-y-2 shadow-xs ${
                       selectedZoneId === zone.id
-                        ? 'bg-blue-50/45 border-[var(--google-blue)] dark:bg-blue-950/20 dark:border-[#8ab4f8]'
+                        ? 'bg-green-50/30 border-[#137333] dark:bg-green-950/20 dark:border-[#81c995]'
                         : 'bg-white border-gray-100 hover:bg-gray-50 dark:bg-[#202124] dark:border-white/5 dark:hover:bg-white/2'
                     }`}
                   >
@@ -342,7 +342,7 @@ export default function TrafficCarePage() {
                       {zone.locationName}
                     </span>
                     <div className="flex justify-between items-center text-[10px] font-bold text-gray-400">
-                      <span>연간 사고 <span className="text-[var(--google-blue)] dark:text-[#8ab4f8] font-extrabold">{zone.occurCount}건</span></span>
+                      <span>연간 사고 <span className="text-[#137333] dark:text-[#81c995] font-extrabold">{zone.occurCount}건</span></span>
                       <span>사상자 <span className="text-red-500 font-extrabold">{zone.casualtyCount}명</span></span>
                     </div>
                   </button>
@@ -378,8 +378,8 @@ export default function TrafficCarePage() {
                   </div>
 
                   {/* 🧠 AI 3줄 요약 */}
-                  <div className="bg-blue-50/20 dark:bg-blue-950/10 p-4 rounded-2xl border border-blue-100/30 dark:border-blue-900/25 space-y-2.5">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#1a73e8] dark:text-[#8ab4f8]">
+                  <div className="bg-green-50/10 dark:bg-green-950/10 p-4 rounded-2xl border border-green-100/30 dark:border-green-900/25 space-y-2.5">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#188038] dark:text-[#81c995]">
                       <span className="text-sm">🧠</span>
                       AI 위험 3줄 요약
                     </div>
@@ -433,7 +433,7 @@ export default function TrafficCarePage() {
                       href={getKakaoLink(activeZone)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 text-center py-2.5 bg-[var(--google-blue)] hover:bg-[#174ea6] text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="flex-1 text-center py-2.5 bg-[#137333] hover:bg-[#0b6623] text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       💬 내 보상 무료 검토 신청 (카톡)
                     </a>
@@ -459,7 +459,7 @@ export default function TrafficCarePage() {
                       type="checkbox"
                       checked={onlyNight}
                       onChange={(e) => setOnlyNight(e.target.checked)}
-                      className="rounded border-gray-300 text-[var(--google-blue)] focus:ring-[var(--google-blue)] cursor-pointer"
+                      className="rounded border-gray-300 text-[#137333] focus:ring-[#137333] cursor-pointer"
                     />
                     주말진료 병원만
                   </label>
@@ -468,7 +468,7 @@ export default function TrafficCarePage() {
                       type="checkbox"
                       checked={onlyEmergency}
                       onChange={(e) => setOnlyEmergency(e.target.checked)}
-                      className="rounded border-gray-300 text-[var(--google-blue)] focus:ring-[var(--google-blue)] cursor-pointer"
+                      className="rounded border-gray-300 text-[#137333] focus:ring-[#137333] cursor-pointer"
                     />
                     종합 대형병원만
                   </label>
@@ -484,7 +484,7 @@ export default function TrafficCarePage() {
                     return (
                       <div
                         key={idx}
-                        className="p-4 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/30 dark:bg-white/2 hover:border-blue-100 dark:hover:border-blue-900/40 transition-colors flex flex-col justify-between space-y-2.5"
+                        className="p-4 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/30 dark:bg-white/2 hover:border-green-100 dark:hover:border-green-900/40 transition-colors flex flex-col justify-between space-y-2.5"
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
@@ -495,7 +495,7 @@ export default function TrafficCarePage() {
                               </span>
                             )}
                             {isBig && (
-                              <span className="px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/20 text-[#1a73e8] dark:text-[#8ab4f8] text-[9px] font-extrabold border border-blue-100/30">
+                              <span className="px-1.5 py-0.5 rounded bg-green-50 dark:bg-green-950/20 text-[#188038] dark:text-[#81c995] text-[9px] font-extrabold border border-green-100/30">
                                 대형병원
                               </span>
                             )}

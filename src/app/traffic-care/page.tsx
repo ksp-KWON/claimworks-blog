@@ -46,15 +46,7 @@ function IconPhone({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   );
 }
 
-function IconAlertTriangle({ className = 'w-4.5 h-4.5' }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-      <line x1="12" y1="9" x2="12" y2="13" />
-      <line x1="12" y1="17" x2="12.01" y2="17" />
-    </svg>
-  );
-}
+// IconAlertTriangle: 제거됨 (미사용 컴포넌트 정리)
 
 interface AccidentZone {
   id: string;
@@ -107,26 +99,7 @@ const SIDO_GUGUN_MAP: Record<string, string[]> = {
   '제주특별자치도': ['서귀포시', '제주시']
 };
 
-// 1-1. 심평원 파일명 구조(서울, 경기 등)와 한글 시도 명칭을 매핑하는 사전
-const HOSPITAL_SIDO_PREFIX: Record<string, string> = {
-  '서울특별시': '서울',
-  '부산광역시': '부산',
-  '대구광역시': '대구',
-  '인천광역시': '인천',
-  '광주광역시': '광주',
-  '대전광역시': '대전',
-  '울산광역시': '울산',
-  '세종특별자치시': '세종특별자치시',
-  '경기도': '경기',
-  '강원특별자치도': '강원',
-  '충청북도': '충북',
-  '충청남도': '충남',
-  '전북특별자치도': '전북',
-  '전라남도': '전남',
-  '경상북도': '경북',
-  '경상남도': '경남',
-  '제주특별자치도': '제주'
-};
+// HOSPITAL_SIDO_PREFIX: 제거됨 (법정코드 기반 파일명으로 대체됨, 미사용 상수 정리)
 
 export default function TrafficCarePage() {
   const [selectedSido, setSelectedSido] = useState('경기도');
@@ -497,7 +470,7 @@ export default function TrafficCarePage() {
               </h3>
             </div>
 
-            {/* 구글 지도 임베드 시각화 (단일 카드 안에서 동적 이동) */}
+            {/* 구글 지도 임베드 시각화 — 위경도 좌표 직접 방식으로 100% 핀포인트 보장 */}
             <div className="w-full h-[320px] rounded-2xl overflow-hidden border border-gray-150 dark:border-white/5 shadow-sm mt-1 relative bg-gray-50">
               <iframe
                 key={`${loadedSido}-${loadedGugun}-${activeZone.id}`}
@@ -505,28 +478,7 @@ export default function TrafficCarePage() {
                 height="100%"
                 frameBorder="0"
                 style={{ border: 0 }}
-                src={
-                  activeZone.id.startsWith('fallback-')
-                    ? (() => {
-                        const baseName = loadedGugun === '세종특별자치시' || loadedGugun === '세종시' 
-                          ? '세종시' 
-                          : loadedGugun;
-                        
-                        const pureName = baseName.replace(/(시|구|군)$/, '');
-                        let queryText = '';
-
-                        if (activeZone.id.endsWith('-2')) {
-                          queryText = `${loadedSido} ${pureName}보건소`;
-                        } else if (activeZone.id.endsWith('-3')) {
-                          queryText = `${loadedSido} ${pureName}소방서`;
-                        } else {
-                          queryText = `${loadedSido} ${baseName}청`;
-                        }
-                        
-                        return `https://maps.google.com/maps?q=${encodeURIComponent(queryText)}&z=15&output=embed`;
-                      })()
-                    : `https://maps.google.com/maps?q=${activeZone.latitude},${activeZone.longitude}&z=16&output=embed`
-                }
+                src={`https://maps.google.com/maps?q=${activeZone.latitude},${activeZone.longitude}&z=16&output=embed`}
                 allowFullScreen
                 loading="lazy"
               />

@@ -181,6 +181,70 @@ function getSmartSummary(summary: string, content: string): string {
   return '판례 정보를 읽어올 수 없습니다.';
 }
 
+// 🏆 보상스쿨 선정 5대 핵심 분쟁 판례 정적 데이터
+const INITIAL_PRECEDENTS: Precedent[] = [
+  {
+    id: "init-001",
+    title: "백내장 수술 후 비급여 다초점 인공수정체 삽입술의 실손의료보험금 지급 청구 사건",
+    caseNo: "대법원 2022. 6. 16. 선고 2022다21612X 판결 등",
+    judgmentDate: "20220616",
+    courtName: "대법원",
+    judgmentSummary: "백내장 수술 시 환자가 통원 치료만으로 수술을 마칠 수 있는 상태였는지, 아니면 부작용 방지나 집중 관찰을 위해 6시간 이상의 입원 치료가 불가피했는지 여부는 주치의의 의학적 판단과 실제 입원 기록을 바탕으로 개별 구체적으로 심사해야 합니다. 일률적인 입원 요건 부정으로 실손보험 지급을 일방적으로 거절하는 것은 부당합니다.",
+    caseContent: "백내장 수술을 시행한 후 다초점 수정체를 삽입하는 경우, 치료 목적의 수술 과정과 비급여 렌즈 비용의 실손 청구에 대해 보험사는 통원 한도로 제한하려 합니다. 그러나 환자의 합병증 위험성이나 집중 관찰이 요구되어 입원실에서 6시간 이상 체류한 의학적 소견이 확인될 시 입원의료비 기준 전액 지급 대상에 해당할 수 있음을 규정합니다.",
+    casePoints: "1. 백내장 수술 후 입원의료비 지급 여부에 대한 객관적 판단 기준\n2. 단순 외래 통원과 6시간 집중 입원 치료의 차이점 입증 책임\n3. 실손보험 약관상 비급여 수정체 삽입이 치료 목적으로 인정받기 위한 증명 방법",
+    caseType: "보험금",
+    officialUrl: "https://www.law.go.kr"
+  },
+  {
+    id: "init-002",
+    title: "요추 추간판탈출증(디스크) 진단에 대한 기왕증(퇴행성 질환) 감액 삭감 소송 사건",
+    caseNo: "대법원 2013. 7. 25. 선고 2011다8462X 판결 등",
+    judgmentDate: "20130725",
+    courtName: "대법원",
+    judgmentSummary: "기왕증이 장해 발생이나 손해 확대에 기여하였다 하더라도, 사고 발생 당시 급격하고도 우연한 외상으로 인해 증상이 비약적으로 악화되었음이 의학적으로 부합할 시 보험사는 기왕증 비율을 임의로 50% 일괄 삭감할 수 없습니다. 외상 관여도를 면밀히 산정하여 정당한 상해 후유장해금을 책정해야 합니다.",
+    caseContent: "신청인은 차량 추돌 사고로 디스크가 파열되어 영구 장해를 판정받았으나, 보험사는 과거 가벼운 요통 이력을 근거로 퇴행성 질환이 장해 원인의 절반을 차지한다며 감액하려 했습니다. 대법원은 기왕증의 엄격한 판정 원칙을 적용, 과거 치료의 구체적 성격과 사고 강도를 감정하여 가입자의 피해 복구를 온전히 보장하라고 선고했습니다.",
+    casePoints: "1. 추간판탈출증(디스크) 후유장해 청구 시 기왕증 감액의 법적 한계\n2. 사고 전 단순 요통 치료 이력이 기왕증 기여도에 미치는 영향 분석\n3. 외상 관여도 평가 방식 및 보험사 일방 삭감 통보에 대한 대응 기준",
+    caseType: "손해배상",
+    officialUrl: "https://www.law.go.kr"
+  },
+  {
+    id: "init-003",
+    title: "심한 우울증 등 자유로운 의사결정을 할 수 없는 상태에서의 자살에 대한 재해사망보험금 지급 청구 사건",
+    caseNo: "대법원 2014. 6. 12. 선고 2013다411X 판결 등",
+    judgmentDate: "20140612",
+    courtName: "대법원",
+    judgmentSummary: "보험 약관상 피보험자가 고의로 자신을 해친 경우 보험금 지급을 면책하도록 규정하고 있으나, 정신질환이나 극도의 흥분, 약물 복용 등 의식 장애로 인해 인지능력이나 자유로운 의사결정을 결여한 상태에서 사망에 이른 경우 면책 예외 사유(재해)에 해당하므로 재해/상해사망보험금을 전액 지급해야 합니다.",
+    caseContent: "피보험자가 우울증 치료를 받던 중 극단적 선택을 한 사안에서, 보험사는 가입자의 의도가 개입된 자살이므로 상해사망금을 줄 수 없다고 주장했습니다. 법원은 망인의 병리학적 기록, 유서의 부재, 직전의 이상 행동 등을 고려할 때 자유로운 지배력이 불가능한 재해성 사고임을 공인하여 보험금 지급 판정을 내렸습니다.",
+    casePoints: "1. 고의 사고(자살) 면책 조항과 그 예외가 되는 심신상실 상태의 판정 기준\n2. 망인의 우울증 치료 강도 및 주변 정황 조사를 통한 입증 책임 분담\n3. 손해사정 실무에서 상해사망보험금을 청구하기 위한 객관적 의학 증거 확보 방안",
+    caseType: "보험금",
+    officialUrl: "https://www.law.go.kr"
+  },
+  {
+    id: "init-004",
+    title: "암 환자의 요양병원 입원 치료비에 대한 약관상 암의 '직접적인 치료' 해당 여부 분쟁 사건",
+    caseNo: "대법원 2020. 10. 15. 선고 2020다246X 판결 등",
+    judgmentDate: "20201015",
+    courtName: "대법원",
+    judgmentSummary: "요양병원에서의 입원 치료라 할지라도 대학병원의 항암 화학요법이나 방사선 치료 주기 도중에 발생한 필수적인 부작용 치료, 암세포 억제를 위한 필수 면역 치료 등이 병행되었다면 이는 약관에 명시된 암의 '직접적인 치료 목적 입원'에 해당하므로 관련 암입원일당을 전액 지급하는 것이 타당합니다.",
+    caseContent: "유방암 수술 후 신체 기능이 크게 저하되어 요양병원에서 항암 통증 관리와 면역 주사를 맞은 가입자에 대해 보험사는 단순 요양 목적이라며 입원비를 거절했습니다. 대법원은 대학병원 항암 스케줄을 유지하기 위해 필수불가결했던 의료 행위였음을 인정하여 가입자의 손을 들어주었습니다.",
+    casePoints: "1. 요양병원 입원 치료의 암 '직접 치료' 부합 여부 판정 원칙\n2. 대학병원 항암 화학 요법 기간과 연계된 요양병원 입원 기간의 보상 한계\n3. 약관 해석상 작성자 불이익 원칙에 입각한 가입자 권리 보호 기준",
+    caseType: "보험금",
+    officialUrl: "https://www.law.go.kr"
+  },
+  {
+    id: "init-005",
+    title: "교통사고로 발생한 척추 압박골절에 대한 후유장해진단비 지급 및 장해률 판정 기준 분쟁 사건",
+    caseNo: "대법원 2007. 4. 26. 선고 2005다108X 판결 등",
+    judgmentDate: "20070426",
+    courtName: "대법원",
+    judgmentSummary: "사고 충격으로 척추가 주저앉은 압박골절 환자에게 후유장해 평가 시, 장해 측정 방식의 합리성과 보험 약관 조항의 명확성 요건을 다룹니다. 장해 평가서 발행 시 법원이 공인하는 맥브라이드 및 AMA 기준에 맞추어 척추 변형률과 기형 정도를 과학적으로 규명한다면 영구 장해 기준 보험금을 수령하는 것이 마땅합니다.",
+    caseContent: "피해자는 등뼈 압박골절로 척추 유합술을 받거나 고정 장해 판정을 받았으나, 보험사는 뼈가 단단해진 상태(강직이 가벼움)를 내세워 장해율을 크게 낮추려 했습니다. 대법원은 약관의 취지상 신체 영구 훼손 가치를 공정하게 매겨야 함을 선언하며 가입자에게 적법한 보상 청구권을 부여했습니다.",
+    casePoints: "1. 척추 압박골절로 인한 운동/기형 장해 판독 및 후유장해 청구 노하우\n2. 골다공증 등 기왕증이 뼈 찌그러짐에 미친 비율 공제 방어 논리\n3. 보험사 현장 조사관의 장해 하향 유도 제안에 대항하는 실무 지침",
+    caseType: "보험금",
+    officialUrl: "https://www.law.go.kr"
+  }
+];
+
 export default function PrecedentSearchPage() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -189,6 +253,10 @@ export default function PrecedentSearchPage() {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [openDetailId, setOpenDetailId] = useState<string | null>(null);
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
+
+  // 사용자가 아직 검색을 시도하지 않아 결과가 없는 초기 상태인지 판단
+  const showInitial = results.length === 0 && !loading && !error;
+  const displayResults = showInitial ? INITIAL_PRECEDENTS : results;
 
   // 로컬스토리지 로드 및 블로그 포스트 정적 DB 로드
   useEffect(() => {
@@ -446,14 +514,22 @@ export default function PrecedentSearchPage() {
       )}
 
       {/* 검색 결과 목록 */}
-      {!loading && results.length > 0 && (
+      {!loading && displayResults.length > 0 && (
         <div className="space-y-6">
           <h2 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] border-b border-gray-100 dark:border-white/5 pb-2">
-            유사 법원 판례 검색 결과 총 <span className="text-[var(--google-blue)] dark:text-[#8ab4f8]">{results.length}</span>건
+            {showInitial ? (
+              <span className="flex items-center gap-1.5 text-[var(--google-blue)] dark:text-[#8ab4f8]">
+                🏆 보상스쿨 선정 5대 핵심 분쟁 판례
+              </span>
+            ) : (
+              <>
+                유사 법원 판례 검색 결과 총 <span className="text-[var(--google-blue)] dark:text-[#8ab4f8]">{results.length}</span>건
+              </>
+            )}
           </h2>
 
           <div className="space-y-6">
-            {results.map((prec) => {
+            {displayResults.map((prec) => {
               const isDetailOpen = openDetailId === prec.id;
               const relatedPosts = getRelatedBlogPosts(prec);
               

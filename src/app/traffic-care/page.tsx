@@ -582,10 +582,10 @@ export default function TrafficCarePage() {
             </div>
           </article>
 
-          {/* 🏥 [하단 분리 섹션]: 우리 동네 안심 전문 의료기관 정보 */}
+          {/* 🏥 [하단 분리 섹션]: 우리 동네 안심 전문 의료기관 정보 (가로 스크롤 프리미엄 슬라이더 개편) */}
           {hospitals.length > 0 && (
-            <div className="bg-white dark:bg-[#202124] rounded-3xl border border-gray-100 dark:border-white/5 shadow-md p-6 sm:p-8 space-y-6 mt-8">
-              <div className="flex flex-col gap-3 pb-4 border-b border-gray-100 dark:border-white/5 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+            <div className="bg-white dark:bg-[#202124] rounded-3xl border border-gray-100 dark:border-white/5 shadow-md p-6 sm:p-8 space-y-4.5 mt-8">
+              <div className="flex flex-col gap-3 pb-3 border-b border-gray-100 dark:border-white/5 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
                 <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed] flex items-center gap-1.5">
                   <span className="text-[#137333]"><IconHospital className="w-5 h-5" /></span>
                   {selectedGugun} 뼈·신경 특화 추천 안심 의료기관
@@ -614,8 +614,10 @@ export default function TrafficCarePage() {
                 </div>
               </div>
 
-              {/* 병원 카드 그리드 목록 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[480px] overflow-y-auto pr-1">
+              {/* 병원 카드 가로 스크롤 덱 (Snap-scroll 및 은은한 맞춤형 스크롤바 디자인) */}
+              <div 
+                className="flex flex-row gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:rounded-full"
+              >
                 {filteredHospitals.length > 0 ? (
                   filteredHospitals.map((h, idx) => {
                     const isWeekend = h.name.includes('한방') || h.name.includes('한의');
@@ -624,11 +626,11 @@ export default function TrafficCarePage() {
                     return (
                       <div
                         key={idx}
-                        className="p-4 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/20 dark:bg-white/2 hover:border-green-100/50 dark:hover:border-green-900/40 transition-colors flex flex-col justify-between space-y-2.5"
+                        className="min-w-[280px] md:min-w-[320px] max-w-[320px] snap-start p-5 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/20 dark:bg-white/2 hover:border-green-150/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-4"
                       >
-                        <div className="space-y-1">
+                        <div className="space-y-2">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-xs font-extrabold text-gray-800 dark:text-gray-100">{h.name}</span>
+                            <span className="text-xs font-black text-gray-800 dark:text-gray-100">{h.name}</span>
                             {isWeekend && (
                               <span className="px-1.5 py-0.5 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[9px] font-extrabold border border-green-100/10">
                                 주말진료
@@ -640,10 +642,12 @@ export default function TrafficCarePage() {
                               </span>
                             )}
                           </div>
-                          <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">{h.address}</p>
+                          <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed min-h-[40px] line-clamp-2" title={h.address}>
+                            {h.address}
+                          </p>
                         </div>
                         {h.tel && (
-                          <div className="text-[10px] font-bold text-[#137333] dark:text-[#81c995] flex items-center gap-1.5">
+                          <div className="text-[10px] font-bold text-[#137333] dark:text-[#81c995] flex items-center gap-1.5 pt-2 border-t border-gray-100 dark:border-white/5">
                             <IconPhone className="w-3.5 h-3.5" />
                             <span>{h.tel}</span>
                           </div>
@@ -652,7 +656,7 @@ export default function TrafficCarePage() {
                     );
                   })
                 ) : (
-                  <div className="py-12 col-span-2 text-center text-xs font-bold text-gray-400 dark:text-gray-500">
+                  <div className="py-16 w-full text-center text-xs font-bold text-gray-400 dark:text-gray-500">
                     조건에 부합하는 병원 정보가 없습니다.
                   </div>
                 )}

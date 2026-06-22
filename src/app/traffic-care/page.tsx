@@ -494,6 +494,7 @@ export default function TrafficCarePage() {
             {/* 구글 지도 임베드 시각화 (단일 카드 안에서 동적 이동) */}
             <div className="w-full h-[320px] rounded-2xl overflow-hidden border border-gray-150 dark:border-white/5 shadow-sm mt-1 relative bg-gray-50">
               <iframe
+                key={`${selectedSido}-${selectedGugun}-${activeZone.id}`}
                 width="100%"
                 height="100%"
                 frameBorder="0"

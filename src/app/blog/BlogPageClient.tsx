@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import HospitalSitemap from '@/components/HospitalSitemap';
 import { REGIONS_DATA } from '@/components/SidebarCategories';
+import standardData from '../../../functions/api/taas-standard-data.json';
 
 // 포스트 타입 (lib/posts에서 읽어온 데이터 형태)
 interface Post {
@@ -222,10 +223,33 @@ export default function BlogPageClient() {
       }
     }
 
-    // 2. SIDO_MAP을 이용해 HIRA 파일 구조에 맞는 짧은 이름(예: '서울특별시' -> '서울')으로 매핑
-    const mappedSido = finalSido ? (SIDO_MAP[finalSido] || finalSido) : '';
+    // 2. TaaS standard-data를 기반으로 법정코드 매핑
+    const sidoCode = (standardData.TAAS_SIDO_CODES as Record<string, string>)[finalSido || ''] || '';
+    let gugunCode = '';
 
-    if (!mappedSido) {
+    if (sidoCode && (standardData.TAAS_GUGUN_CODES as Record<string, Record<string, string>>)[sidoCode]) {
+      const codes = (standardData.TAAS_GUGUN_CODES as Record<string, Record<string, string>>)[sidoCode];
+      if (codes[region]) {
+        gugunCode = codes[region];
+      } else {
+        const cleanGugun = region.replace(/^(인천|대구|광주|대전|울산|부산|서울)/, '');
+        if (cleanGugun.includes('부천')) {
+          gugunCode = codes['부천시'] || '';
+        } else if (cleanGugun.includes('화성')) {
+          gugunCode = codes['화성시'] || '';
+        } else {
+          for (const [key, code] of Object.entries(codes)) {
+            const cleanKey = key.replace('시', '');
+            if (cleanGugun === key || cleanGugun === cleanKey || cleanGugun.includes(key) || key.includes(cleanGugun)) {
+              gugunCode = code;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    if (!sidoCode || !gugunCode) {
       clearTimeout(timer);
       setTimeout(() => {
         setHiraData(null);
@@ -234,8 +258,8 @@ export default function BlogPageClient() {
       return;
     }
 
-    // 3. 해당 시도-구군에 대응하는 쪼개진 가벼운 JSON 파일만 가져옴
-    const filePath = `/data/hospitals/${encodeURIComponent(mappedSido)}-${encodeURIComponent(region)}.json`;
+    // 3. 해당 시도-구군에 대응하는 법정코드 JSON 파일 가져옴
+    const filePath = `/data/hospitals/${sidoCode}-${gugunCode}.json`;
 
     fetch(filePath)
       .then(r => {

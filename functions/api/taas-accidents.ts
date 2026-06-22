@@ -125,10 +125,14 @@ export async function onRequest(context: { request: Request; env: Record<string,
   }
 
   // 2. API 키 확인 → 미설정 시 샘플 모드
-  const API_KEY = context.env?.PUBLIC_DATA_API_KEY ?? '';
+  // ⚠️ 진단 모드: env 상태 확인 (배포 후 확인되면 제거)
+  const envKeys = Object.keys(context.env ?? {});
+  const API_KEY = (context.env?.PUBLIC_DATA_API_KEY ?? '').toString();
   if (!API_KEY || API_KEY === '여기에_입력') {
-    console.warn('[TAAS] PUBLIC_DATA_API_KEY 미설정 → 샘플 모드');
-    return jsonResponse(getFallbackAccidents(sido, gugun));
+    console.warn('[TAAS] PUBLIC_DATA_API_KEY 미설정 → 샘플 모드', { envKeys, hasEnv: !!context.env, keyLength: API_KEY.length });
+    // 진단: 응답에 _debug 필드 포함 (확인 후 제거)
+    const fallback = getFallbackAccidents(sido, gugun);
+    return jsonResponse([...fallback, { _debug: { envKeys, hasEnv: !!context.env, keyLength: API_KEY.length } } as any]);
   }
 
   // 3. 실제 TAAS API 호출

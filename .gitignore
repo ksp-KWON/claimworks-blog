@@ -48,3 +48,6 @@ next-env.d.ts
 # generated redirects for Cloudflare
 /public/_redirects
 
+# Cloudflare Wrangler env secrets
+.dev.vars
+

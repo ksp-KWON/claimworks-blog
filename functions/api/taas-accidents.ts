@@ -307,13 +307,22 @@ export async function onRequest(context: any) {
       let lat = cityCoord.lat;
       let lng = cityCoord.lng;
 
-      // 1순위: la_crd, lo_crd 필드 우선 활용 (도로교통공단 다발지 고유 위경도 필드)
+      // [지능형 매핑 핵심 알고리즘]
+      // 공공데이터 API는 la_crd(위도)에 경도값(127.x)을 넣거나, lo_crd(경도)에 위도값(37.x)을 거꾸로 넣어 배포하는 경우가 잦습니다.
+      // 값이 큰 쪽(120~135 범위)은 무조건 경도(lng)로 배정하고, 값이 작은 쪽(30~45 범위)은 무조건 위도(lat)로 지능적으로 분류 배정합니다.
       if (item.la_crd && item.lo_crd) {
-        const parsedLat = parseFloat(item.la_crd);
-        const parsedLng = parseFloat(item.lo_crd);
-        if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
-          lat = parsedLat;
-          lng = parsedLng;
+        const val1 = parseFloat(item.la_crd);
+        const val2 = parseFloat(item.lo_crd);
+        if (!isNaN(val1) && !isNaN(val2)) {
+          if (val1 > val2) {
+            // val1이 127.x 대, val2가 37.x 대인 경우
+            lng = val1;
+            lat = val2;
+          } else {
+            // val2가 127.x 대, val1이 37.x 대인 경우
+            lng = val2;
+            lat = val1;
+          }
         }
       } 
       // 2순위: geom_json 파싱 시도

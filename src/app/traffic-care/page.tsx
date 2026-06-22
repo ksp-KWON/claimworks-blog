@@ -134,6 +134,7 @@ export default function TrafficCarePage() {
   const [zones, setZones] = useState<AccidentZone[]>([]);
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [error, setError] = useState('');
+  const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
   
   // 병원 추가 필터
   const [onlyNight, setOnlyNight] = useState(false);
@@ -171,6 +172,7 @@ export default function TrafficCarePage() {
     setError('');
     setZones([]);
     setHospitals([]);
+    setSelectedZoneId(null);
 
     const delayPromise = new Promise(resolve => setTimeout(resolve, 800));
 
@@ -183,6 +185,9 @@ export default function TrafficCarePage() {
       }
       const taasData: AccidentZone[] = await taasRes.json();
       setZones(taasData);
+      if (taasData.length > 0) {
+        setSelectedZoneId(taasData[0].id);
+      }
 
       // 2. 심평원(HIRA) 구군별 병원 데이터 비동기 로드
       const sidoPrefix = HOSPITAL_SIDO_PREFIX[sidoName] || sidoName;
@@ -293,6 +298,9 @@ export default function TrafficCarePage() {
   };
 
   const filteredHospitals = getFilteredHospitals();
+  
+  // 현재 선택된 구역(Active Zone) 탐색
+  const activeZone = zones.find(z => z.id === selectedZoneId) || zones[0] || null;
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
@@ -384,131 +392,147 @@ export default function TrafficCarePage() {
         </div>
       )}
 
-      {/* 분석 결과 목록 (Top 5 위험 도로 카드 세로 1단 나열) */}
-      {!loading && zones.length > 0 && (
-        <div className="space-y-8">
+      {/* 분석 결과 단일 카드 및 상단 구역 드롭다운 선택 */}
+      {!loading && zones.length > 0 && activeZone && (
+        <div className="space-y-6">
           <h2 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] border-b border-gray-100 dark:border-white/5 pb-2 flex justify-between items-center">
             <span className="text-[#137333] dark:text-[#81c995] font-extrabold">
-              📍 {selectedGugun} 실시간 교통사고 다발 위험 도로 Top {zones.length}
+              📍 {selectedGugun} 실시간 교통사고 다발 위험 분석 리포트
             </span>
             <span className="text-[10px] text-gray-400 font-medium">실시간 통계 반영</span>
           </h2>
 
-          <div className="space-y-6">
-            {zones.map((zone, idx) => {
-              const matchedCol = getMatchedColumn(zone);
-              const kakaoLink = getKakaoLink(zone);
-              
-              return (
-                <article
-                  key={zone.id}
-                  className="bg-white dark:bg-[#202124] rounded-3xl border border-gray-100 dark:border-white/5 shadow-md hover:shadow-lg transition-all duration-300 p-6 sm:p-7 flex flex-col justify-between space-y-4"
+          {/* 단일 카드 완결형 레이아웃 */}
+          <article className="bg-white dark:bg-[#202124] rounded-3xl border border-gray-100 dark:border-white/5 shadow-md p-6 sm:p-7 flex flex-col space-y-5">
+            
+            {/* 위험 구역 선택 드롭다운 박스 (탑3를 드롭다운 형태로 한박스에 통합) */}
+            <div className="bg-green-50/10 dark:bg-green-950/5 p-4.5 rounded-2xl border border-green-100/20 dark:border-white/5 space-y-2">
+              <label className="block text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">
+                ⚠️ 위험 다발 구역 선택 (교차로별 위험 순위 Top {zones.length})
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedZoneId || ''}
+                  onChange={(e) => setSelectedZoneId(e.target.value)}
+                  className="w-full bg-white dark:bg-[#303134] text-xs sm:text-sm font-extrabold text-gray-800 dark:text-gray-100 px-3.5 py-3 rounded-xl border border-gray-200 dark:border-white/5 focus:outline-none focus:border-[#137333] cursor-pointer appearance-none shadow-sm pr-10"
                 >
-                  <div className="space-y-4">
-                    {/* 상단 메타 바 (사고규모 배지들 나열) */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-white/5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="px-2.5 py-1 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-bold border border-green-100/30">
-                          사고 {zone.occurCount}건
-                        </span>
-                        <span className="px-2.5 py-1 rounded bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold border border-rose-100/30">
-                          사상자 {zone.casualtyCount}명
-                        </span>
-                        {zone.deathCount > 0 && (
-                          <span className="px-2.5 py-1 rounded bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 text-[10px] font-bold border border-red-100/30">
-                            사망 {zone.deathCount}명
-                          </span>
-                        )}
-                        {zone.seriousCount > 0 && (
-                          <span className="px-2.5 py-1 rounded bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-100/30">
-                            중상 {zone.seriousCount}명
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[10px] sm:text-xs font-bold text-gray-400 dark:text-gray-500">
-                        위치 순위 #{idx + 1}
-                      </span>
-                    </div>
+                  {zones.map((zone, index) => (
+                    <option key={zone.id} value={zone.id}>
+                      [위험 {index + 1}순위] {zone.locationName} (사고 {zone.occurCount}건 / 사상 {zone.casualtyCount}명)
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-gray-500">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
 
-                    {/* 위험 구역 제목 */}
-                    <div>
-                      <h3 className="text-base sm:text-lg font-extrabold text-[#202124] dark:text-[#e8eaed] leading-snug">
-                        {zone.locationName}
-                      </h3>
-                    </div>
+            {/* 카드 본문 콘텐츠: 상단 메타 바 */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-white/5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-1 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-bold border border-green-100/30">
+                  사고 {activeZone.occurCount}건
+                </span>
+                <span className="px-2.5 py-1 rounded bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold border border-rose-100/30">
+                  사상자 {activeZone.casualtyCount}명
+                </span>
+                {activeZone.deathCount > 0 && (
+                  <span className="px-2.5 py-1 rounded bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 text-[10px] font-bold border border-red-100/30">
+                    사망 {activeZone.deathCount}명
+                  </span>
+                )}
+                {activeZone.seriousCount > 0 && (
+                  <span className="px-2.5 py-1 rounded bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-100/30">
+                    중상 {activeZone.seriousCount}명
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] sm:text-xs font-bold text-gray-400 dark:text-gray-500">
+                위경도: N {activeZone.latitude.toFixed(5)}°, E {activeZone.longitude.toFixed(5)}°
+              </span>
+            </div>
 
-                    {/* 구글 지도 임베드 시각화 (각 카드 내부에 반응형으로 탑재) */}
-                    <div className="w-full h-[280px] rounded-2xl overflow-hidden border border-gray-150 dark:border-white/5 shadow-sm mt-3 relative bg-gray-50">
-                      <iframe
-                        width="100%"
-                        height="100%"
-                        frameBorder="0"
-                        style={{ border: 0 }}
-                        src={`https://maps.google.com/maps?q=${zone.latitude},${zone.longitude}&z=16&output=embed`}
-                        allowFullScreen
-                        loading="lazy"
-                      />
-                    </div>
+            {/* 구역 명칭 대형 타이틀 */}
+            <div>
+              <h3 className="text-base sm:text-lg font-extrabold text-[#202124] dark:text-[#e8eaed] leading-snug">
+                {activeZone.locationName}
+              </h3>
+            </div>
 
-                    {/* 🧠 AI 3줄 요약 카드 (에메랄드 그린 패밀리룩) */}
-                    <div className="bg-green-50/20 dark:bg-green-950/10 p-4 rounded-2xl border border-green-100/30 dark:border-green-900/25 space-y-2.5 mt-4">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-[#137333] dark:text-[#81c995]">
-                        <span className="text-sm"><IconBrain className="w-4 h-4" /></span>
-                        AI 실시간 사고위험 분석 보고
-                      </div>
-                      <ul className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium space-y-1.5 list-disc pl-4">
-                        {getAiSummary(zone).map((line, sumIdx) => (
-                          <li key={sumIdx} className="marker:text-[#137333]">{line}</li>
-                        ))}
-                      </ul>
-                    </div>
+            {/* 구글 지도 임베드 시각화 (단일 카드 안에서 동적 이동) */}
+            <div className="w-full h-[320px] rounded-2xl overflow-hidden border border-gray-150 dark:border-white/5 shadow-sm mt-1 relative bg-gray-50">
+              <iframe
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                style={{ border: 0 }}
+                src={`https://maps.google.com/maps?q=${activeZone.latitude},${activeZone.longitude}&z=16&output=embed`}
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
 
-                    {/* 👨‍🏫 손해사정사 대처 족보 코멘트 (황색 전문가 박스 패밀리룩) */}
-                    <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-2xl border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2 mt-3">
-                      <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
-                        <span className="text-sm"><IconBriefcase className="w-4 h-4" /></span>
-                        보상스쿨 손해사정사 대처 족보
-                      </div>
-                      <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium pl-1">
-                        {getPracticeComment(zone)}
-                      </p>
-                    </div>
+            {/* 🧠 AI 3줄 요약 카드 (에메랄드 그린 패밀리룩) */}
+            <div className="bg-green-50/20 dark:bg-green-950/10 p-4 rounded-2xl border border-green-100/30 dark:border-green-900/25 space-y-2.5 mt-2">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#137333] dark:text-[#81c995]">
+                <span className="text-sm"><IconBrain className="w-4 h-4" /></span>
+                AI 실시간 사고위험 분석 보고
+              </div>
+              <ul className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium space-y-1.5 list-disc pl-4">
+                {getAiSummary(activeZone).map((line, sumIdx) => (
+                  <li key={sumIdx} className="marker:text-[#137333]">{line}</li>
+                ))}
+              </ul>
+            </div>
 
-                    {/* 액션 버튼 영역 (가로 분할 가독성 극대화) */}
-                    <div className="flex items-center gap-3 pt-3 border-t border-gray-55 dark:border-white/2 flex-wrap sm:flex-nowrap">
-                      {matchedCol ? (
-                        <Link
-                          href={`/blog/${matchedCol.slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer"
-                        >
-                          📖 사고원인 맞춤 칼럼 읽기 (1건)
-                        </Link>
-                      ) : (
-                        <Link
-                          href="/blog"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer"
-                        >
-                          📖 보상스쿨 전체 칼럼 읽기
-                        </Link>
-                      )}
-                      <a
-                        href={kakaoLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 text-center py-2.5 bg-[#137333] hover:bg-[#0b6623] text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                      >
-                        💬 내 과실·보상 무료 상담 (카톡)
-                      </a>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+            {/* 👨‍🏫 손해사정사 대처 족보 코멘트 (황색 전문가 박스 패밀리룩) */}
+            <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-2xl border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2 mt-1">
+              <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
+                <span className="text-sm"><IconBriefcase className="w-4 h-4" /></span>
+                보상스쿨 손해사정사 대처 족보
+              </div>
+              <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium pl-1">
+                {getPracticeComment(activeZone)}
+              </p>
+            </div>
+
+            {/* 액션 버튼 영역 (가로 분할 가독성 극대화) */}
+            <div className="flex items-center gap-3 pt-3 border-t border-gray-55 dark:border-white/2 flex-wrap sm:flex-nowrap">
+              {(() => {
+                const matchedCol = getMatchedColumn(activeZone);
+                return matchedCol ? (
+                  <Link
+                    href={`/blog/${matchedCol.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer border border-gray-200/40 dark:border-white/5"
+                  >
+                    📖 사고원인 맞춤 칼럼 읽기 (1건)
+                  </Link>
+                ) : (
+                  <Link
+                    href="/blog"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer border border-gray-200/40 dark:border-white/5"
+                  >
+                    📖 보상스쿨 전체 칼럼 읽기
+                  </Link>
+                );
+              })()}
+              <a
+                href={getKakaoLink(activeZone)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 text-center py-2.5 bg-[#137333] hover:bg-[#0b6623] text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                💬 내 과실·보상 무료 상담 (카톡)
+              </a>
+            </div>
+          </article>
 
           {/* 🏥 [하단 분리 섹션]: 우리 동네 안심 전문 의료기관 정보 */}
           {hospitals.length > 0 && (

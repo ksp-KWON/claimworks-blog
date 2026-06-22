@@ -498,16 +498,24 @@ export default function TrafficCarePage() {
                 style={{ border: 0 }}
                 src={
                   activeZone.id.startsWith('fallback-')
-                    ? `https://maps.google.com/maps?q=${encodeURIComponent(
-                        selectedSido + 
-                        ' ' + 
-                        selectedGugun + 
-                        (activeZone.id.endsWith('-2') 
-                          ? ' 교차로' 
-                          : activeZone.id.endsWith('-3') 
-                          ? ' 초등학교' 
-                          : ' 사거리')
-                      )}&z=15&output=embed`
+                    ? (() => {
+                        const baseName = selectedGugun === '세종특별자치시' || selectedGugun === '세종시' 
+                          ? '세종시' 
+                          : selectedGugun;
+                        
+                        let landmark = '청'; // 기본값 시청/구청/군청
+                        if (activeZone.id.endsWith('-2')) {
+                          landmark = ' 보건소';
+                        } else if (activeZone.id.endsWith('-3')) {
+                          landmark = ' 소방서';
+                        } else {
+                          // 구나 시, 군으로 끝나는 경우 청을 붙임 (예: 양주시청, 강남구청, 가평군청)
+                          landmark = baseName.endsWith('시') || baseName.endsWith('구') || baseName.endsWith('군') ? '청' : '청';
+                        }
+                        
+                        const queryText = `${selectedSido} ${baseName}${landmark}`;
+                        return `https://maps.google.com/maps?q=${encodeURIComponent(queryText)}&z=15&output=embed`;
+                      })()
                     : `https://maps.google.com/maps?q=${activeZone.latitude},${activeZone.longitude}&z=16&output=embed`
                 }
                 allowFullScreen

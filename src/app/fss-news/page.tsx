@@ -98,11 +98,11 @@ export default function FssNewsPage() {
   const getCategoryName = (category: string) => {
     switch (category) {
       case 'alert':
-        return '🚨 금융감독정보';
+        return '🚨 소비자경보';
       case 'case':
-        return '⚖️ 금융소비자 뉴스';
+        return '⚖️ 분쟁사례';
       case 'tip':
-        return '💡 금융꿀팁 200선';
+        return '💡 금융꿀팁';
       case 'press':
         return '📢 보도자료';
       default:
@@ -164,20 +164,20 @@ export default function FssNewsPage() {
         </form>
 
         {/* 탭 카테고리 메뉴 */}
-        <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-gray-100 dark:border-white/5">
+        <div className="flex w-full gap-1.5 sm:gap-2 mt-5 pt-4 border-t border-gray-100 dark:border-white/5">
           {[
             { id: 'all', label: '전체보기' },
-            { id: 'alert', label: '🚨 금융감독정보' },
-            { id: 'case', label: '⚖️ 금융소비자 뉴스' },
-            { id: 'tip', label: '💡 금융꿀팁 200선' },
+            { id: 'alert', label: '🚨 소비자경보' },
+            { id: 'case', label: '⚖️ 분쟁사례' },
+            { id: 'tip', label: '💡 금융꿀팁' },
             { id: 'press', label: '📢 보도자료' }
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id as any)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex-1 min-w-0 text-center py-2 sm:py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer truncate px-0.5 ${
                 activeTab === tab.id
-                  ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm'
+                  ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm font-black'
                   : 'bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10'
               }`}
             >

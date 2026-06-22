@@ -17,24 +17,11 @@ interface FssNewsItem {
   officialUrl?: string;
 }
 
-interface FssProductItem {
-  kor_co_nm: string;
-  fin_prdt_nm: string;
-  join_way: string;
-  pnsn_recp_trm_nm: string; // 수령기간 또는 만기이율
-  pnsn_entr_age_nm: string; // 가입연령 또는 우대조건
-  mon_pay_atm_nm: string;   // 납입금액 또는 금리
-}
-
 export default function FssNewsPage() {
   const [query, setQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'alert' | 'case' | 'tip' | 'press' | 'products'>('all');
-  const [productType, setProductType] = useState<'annuity' | 'deposit'>('annuity');
+  const [activeTab, setActiveTab] = useState<'all' | 'alert' | 'case' | 'tip' | 'press'>('all');
   const [loading, setLoading] = useState(true);
   const [results, setResults] = useState<FssNewsItem[]>([]);
-  const [products, setProducts] = useState<FssProductItem[]>([]);
-  const [isRealTimeProduct, setIsRealTimeProduct] = useState(false);
-  const [productMessage, setProductMessage] = useState('');
   const [latestAlert, setLatestAlert] = useState<FssNewsItem | null>(null);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
   const [error, setError] = useState('');
@@ -71,67 +58,21 @@ export default function FssNewsPage() {
     }
   };
 
-  // 2. 금감원 금융상품 통합비교공시 API 조회 (대표님 인증키 적용)
-  const fetchFssProducts = async (type: 'annuity' | 'deposit') => {
-    setLoading(true);
-    setError('');
-    const delayPromise = new Promise(resolve => setTimeout(resolve, 800));
-
-    try {
-      const url = `/api/fss-products?type=${type}`;
-      const res = await fetch(url);
-
-      if (!res.ok) {
-        throw new Error(`금융상품 실시간 연동 중 통신 오류가 발생했습니다. (HTTP ${res.status})`);
-      }
-
-      const data = await res.json();
-      await delayPromise;
-
-      if (data.success) {
-        setProducts(data.products || []);
-        setIsRealTimeProduct(data.isRealTime);
-        setProductMessage(data.message);
-      } else {
-        throw new Error(data.error || '상품 정보를 파싱하지 못했습니다.');
-      }
-    } catch (e: any) {
-      await delayPromise;
-      setError(e.message || '금융상품을 조회하는 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // 마운트 시 최초 호출
   useEffect(() => {
     fetchFssData('', 'all');
   }, []);
 
   // 메인 탭 변경 핸들러
-  const handleTabChange = (tab: 'all' | 'alert' | 'case' | 'tip' | 'press' | 'products') => {
+  const handleTabChange = (tab: 'all' | 'alert' | 'case' | 'tip' | 'press') => {
     setActiveTab(tab);
-    if (tab === 'products') {
-      fetchFssProducts(productType);
-    } else {
-      fetchFssData(query, tab);
-    }
-  };
-
-  // 상품 서브 카테고리 변경 핸들러
-  const handleProductTypeChange = (type: 'annuity' | 'deposit') => {
-    setProductType(type);
-    fetchFssProducts(type);
+    fetchFssData(query, tab);
   };
 
   // 검색 폼 제출 핸들러
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (activeTab === 'products') {
-      fetchFssProducts(productType);
-    } else {
-      fetchFssData(query, activeTab);
-    }
+    fetchFssData(query, activeTab);
   };
 
   const getKakaoLink = (itemTitle: string) => {
@@ -157,11 +98,11 @@ export default function FssNewsPage() {
   const getCategoryName = (category: string) => {
     switch (category) {
       case 'alert':
-        return '🚨 소비자경보';
+        return '🚨 금융감독정보';
       case 'case':
-        return '⚖️ 분쟁조정사례';
+        return '⚖️ 금융소비자 뉴스';
       case 'tip':
-        return '💡 금융꿀팁';
+        return '💡 금융꿀팁 200선';
       case 'press':
         return '📢 보도자료';
       default:
@@ -172,7 +113,7 @@ export default function FssNewsPage() {
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* 🚨 실시간 소비자 이슈 브리핑 상단 띠 배너 */}
-      {latestAlert && activeTab !== 'products' && (
+      {latestAlert && (
         <div className="bg-red-600 text-white px-4 py-3 rounded-2xl flex items-center justify-between flex-wrap gap-3 shadow-md animate-pulse">
           <div className="flex items-center gap-2.5">
             <span className="text-lg shrink-0">🚨</span>
@@ -210,13 +151,12 @@ export default function FssNewsPage() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            disabled={activeTab === 'products'}
-            placeholder={activeTab === 'products' ? '금융상품 비교 탭에서는 검색이 아닌 필터링만 제공됩니다.' : '검색어를 입력해 보세요 (예: 도수치료, 백내장, 단체보험)'}
-            className="flex-1 px-4 py-3 sm:py-3.5 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 dark:text-white text-sm font-medium shadow-inner disabled:opacity-50"
+            placeholder="검색어를 입력해 보세요 (예: 도수치료, 백내장, 단체보험)"
+            className="flex-1 px-4 py-3 sm:py-3.5 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 dark:text-white text-sm font-medium shadow-inner"
           />
           <button
             type="submit"
-            disabled={loading || activeTab === 'products'}
+            disabled={loading}
             className="px-6 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-red-500 to-amber-500 hover:opacity-90 text-white font-bold text-sm tracking-wide shadow-md transition-opacity cursor-pointer disabled:opacity-50"
           >
             {loading ? '연동 중...' : '실시간 조회'}
@@ -227,11 +167,10 @@ export default function FssNewsPage() {
         <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-gray-100 dark:border-white/5">
           {[
             { id: 'all', label: '전체보기' },
-            { id: 'alert', label: '🚨 소비자경보' },
-            { id: 'case', label: '⚖️ 분쟁사례' },
-            { id: 'tip', label: '💡 금융꿀팁' },
-            { id: 'press', label: '📢 보도자료' },
-            { id: 'products', label: '📊 금융상품 비교 (공식 API)' }
+            { id: 'alert', label: '🚨 금융감독정보' },
+            { id: 'case', label: '⚖️ 금융소비자 뉴스' },
+            { id: 'tip', label: '💡 금융꿀팁 200선' },
+            { id: 'press', label: '📢 보도자료' }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -267,7 +206,7 @@ export default function FssNewsPage() {
       )}
 
       {/* 카테고리 1: 뉴스 / 분쟁 / 꿀팁 데이터 카드 */}
-      {!loading && activeTab !== 'products' && (
+      {!loading && (
         <>
           {results.length === 0 && !error && (
             <div className="bg-white dark:bg-[#202124] rounded-3xl py-14 px-5 border border-gray-100 dark:border-white/5 text-center text-sm font-bold text-gray-500 dark:text-gray-400">
@@ -396,107 +335,6 @@ export default function FssNewsPage() {
             </div>
           )}
         </>
-      )}
-
-      {/* 카테고리 2: 금융상품 비교 탭 화면 */}
-      {!loading && activeTab === 'products' && (
-        <div className="space-y-6">
-          {/* 금감원 API 연결 상태 표시 배너 */}
-          <div className={`p-4 rounded-2xl border flex items-center justify-between flex-wrap gap-2 text-xs font-bold ${
-            isRealTimeProduct
-              ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400'
-              : 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
-          }`}>
-            <div className="flex items-center gap-2">
-              <span>{isRealTimeProduct ? '🟢' : '⚠️'}</span>
-              <span>{productMessage}</span>
-            </div>
-            {!isRealTimeProduct && (
-              <span className="text-[10px] font-medium bg-amber-500/20 px-2 py-0.5 rounded">인증키 IP 등록 또는 정기 점검 시 폴백 가동</span>
-            )}
-          </div>
-
-          {/* 서브 상품군 선택 탭 */}
-          <div className="flex gap-2 bg-gray-100 dark:bg-[#303134] p-1 rounded-xl w-fit">
-            <button
-              onClick={() => handleProductTypeChange('annuity')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold cursor-pointer transition-colors ${
-                productType === 'annuity'
-                  ? 'bg-white dark:bg-[#202124] text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900'
-              }`}
-            >
-              📊 연금저축보험 (보험사)
-            </button>
-            <button
-              onClick={() => handleProductTypeChange('deposit')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold cursor-pointer transition-colors ${
-                productType === 'deposit'
-                  ? 'bg-white dark:bg-[#202124] text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900'
-              }`}
-            >
-              💰 정기예금 (시중은행)
-            </button>
-          </div>
-
-          {/* 금융상품 목록 표시 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {products.map((prod, idx) => (
-              <div
-                key={idx}
-                className="bg-white dark:bg-[#202124] p-5 rounded-3xl border border-gray-100 dark:border-white/5 shadow-md hover:shadow-lg transition-all duration-200 flex flex-col justify-between space-y-4"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/2 px-2 py-1 rounded-md">
-                      🏛️ {prod.kor_co_nm}
-                    </span>
-                    <span className="text-xs font-extrabold text-amber-500">
-                      {productType === 'annuity' ? '연금보험' : '기본금리: ' + prod.mon_pay_atm_nm}
-                    </span>
-                  </div>
-                  <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">
-                    {prod.fin_prdt_nm}
-                  </h3>
-                  <div className="text-[11px] text-gray-600 dark:text-gray-400 space-y-1.5 pt-2">
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-gray-400">가입방법</span>
-                      <span>{prod.join_way}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-gray-400">
-                        {productType === 'annuity' ? '수령기간' : '만기이율'}
-                      </span>
-                      <span className="text-right max-w-[200px] truncate">{prod.pnsn_recp_trm_nm}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-semibold text-gray-400">
-                        {productType === 'annuity' ? '가입연령' : '우대조건'}
-                      </span>
-                      <span className="text-right max-w-[200px] truncate">{prod.pnsn_entr_age_nm}</span>
-                    </div>
-                    {productType === 'annuity' && (
-                      <div className="flex justify-between">
-                        <span className="font-semibold text-gray-400">최소납입금액</span>
-                        <span>{prod.mon_pay_atm_nm}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <a
-                  href={getKakaoLink(`${prod.kor_co_nm} - ${prod.fin_prdt_nm}`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full text-center py-2 bg-amber-400 hover:bg-amber-500 text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  💬 상품 기준 상담 신청하기 (카톡)
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
       )}
     </div>
   );

@@ -497,9 +497,6 @@ export default function PrecedentSearchPage() {
 
                     {/* 판시사항 및 쟁점 요약 프리뷰 (세련된 인용구 스타일) */}
                     <div className="bg-slate-50/50 dark:bg-black/10 p-4 rounded-xl text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-medium border-l-2 border-[var(--google-blue)] dark:border-[#8ab4f8]">
-                      <div className="font-extrabold text-gray-900 dark:text-white mb-2.5 flex items-center gap-1 text-[11px] tracking-wide uppercase">
-                        🔍 대법원 판시사항 (핵심 쟁점)
-                      </div>
                       <div className="space-y-2 text-gray-600 dark:text-gray-400 font-medium">
                         {prec.casePoints ? (
                           // 판시사항이 존재하는 경우: 개행문자로 분할하여 한 줄씩 렌더링 (대표님 요청대로 점 제외)

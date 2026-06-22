@@ -488,11 +488,11 @@ export default function TrafficCarePage() {
               </ul>
             </div>
 
-            {/* 👨‍🏫 손해사정사 대처 족보 코멘트 (황색 전문가 박스 패밀리룩) */}
+            {/* 👨‍🏫 손해사정사 실무 코멘트 (황색 전문가 박스 패밀리룩) */}
             <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-2xl border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2 mt-1">
               <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
                 <span className="text-sm"><IconBriefcase className="w-4 h-4" /></span>
-                보상스쿨 손해사정사 대처 족보
+                보상스쿨 손해사정사 실무 코멘트
               </div>
               <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium pl-1">
                 {getPracticeComment(activeZone)}

@@ -1,0 +1,54 @@
+{
+  "annuity": [
+    {
+      "kor_co_nm": "삼성생명보험주식회사",
+      "fin_prdt_nm": "인터넷 연금저축보험",
+      "join_way": "인터넷",
+      "pnsn_recp_trm_nm": "10년, 20년, 30년, 종신",
+      "pnsn_entr_age_nm": "만 19세 이상",
+      "mon_pay_atm_nm": "월 10만원 이상"
+    },
+    {
+      "kor_co_nm": "한화생명보험주식회사",
+      "fin_prdt_nm": "e연금저축보험",
+      "join_way": "인터넷",
+      "pnsn_recp_trm_nm": "10년, 20년, 30년, 종신",
+      "pnsn_entr_age_nm": "만 19세 이상",
+      "mon_pay_atm_nm": "월 5만원 이상"
+    },
+    {
+      "kor_co_nm": "교보생명보험주식회사",
+      "fin_prdt_nm": "교보e연금저축보험",
+      "join_way": "인터넷/모바일",
+      "pnsn_recp_trm_nm": "10년, 15년, 20년, 종신",
+      "pnsn_entr_age_nm": "만 19세 이상",
+      "mon_pay_atm_nm": "월 10만원 이상"
+    }
+  ],
+  "deposit": [
+    {
+      "kor_co_nm": "신한은행",
+      "fin_prdt_nm": "쏠편한 정기예금",
+      "join_way": "스마트폰",
+      "mtrt_int": "만기 후 1개월 이내: 약정이율의 50%, 1개월 초과: 연 0.2%",
+      "spcl_cnd": "우대조건 없음 (온라인 가입 시 기본 우대금리 반영)",
+      "intr_rate": "3.55%"
+    },
+    {
+      "kor_co_nm": "주식회사 국민은행",
+      "fin_prdt_nm": "KB Star 정기예금",
+      "join_way": "스마트폰/인터넷",
+      "mtrt_int": "만기 후 1개월 이내: 약정이율의 50%, 1개월 초과: 연 0.1%",
+      "spcl_cnd": "KB국민카드 이용 실적 및 신규 가입 우대 적용",
+      "intr_rate": "3.50%"
+    },
+    {
+      "kor_co_nm": "주식회사 우리은행",
+      "fin_prdt_nm": "WON 플러스 예금",
+      "join_way": "스마트폰",
+      "mtrt_int": "만기 후 1개월 이내: 약정이율의 50%, 1개월 초과: 연 0.15%",
+      "spcl_cnd": "우리은행 첫 거래 고객 우대 0.2%p 추가",
+      "intr_rate": "3.60%"
+    }
+  ]
+}

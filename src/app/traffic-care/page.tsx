@@ -115,7 +115,7 @@ export default function TrafficCarePage() {
   // 병원 추가 필터
   const [onlyNight, setOnlyNight] = useState(false);
   const [onlyEmergency, setOnlyEmergency] = useState(false);
-  const [isHospitalSheetOpen, setIsHospitalSheetOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // 로컬 블로그 포스트 데이터 (칼럼 매핑용)
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
@@ -150,7 +150,7 @@ export default function TrafficCarePage() {
     setZones([]);
     setHospitals([]);
     setSelectedZoneId(null);
-    setIsHospitalSheetOpen(false);
+    setIsExpanded(false);
 
     const delayPromise = new Promise(resolve => setTimeout(resolve, 800));
 
@@ -471,7 +471,7 @@ export default function TrafficCarePage() {
             </div>
 
             {/* 구글 지도 임베드 시각화 — 위경도 좌표 직접 방식으로 100% 핀포인트 보장 */}
-            <div className="w-full h-[320px] rounded-2xl overflow-hidden border border-gray-150 dark:border-white/5 shadow-sm mt-1 relative bg-gray-50">
+            <div className="w-full h-[320px] rounded-2xl overflow-hidden border border-gray-150 dark:border-white/5 shadow-sm mt-1 bg-gray-50">
               <iframe
                 key={`${loadedSido}-${loadedGugun}-${activeZone.id}`}
                 width="100%"
@@ -482,109 +482,124 @@ export default function TrafficCarePage() {
                 allowFullScreen
                 loading="lazy"
               />
-              
-              {/* 🏥 안심병원 플로팅 버튼 (네비게이션 앱 스타일) */}
-              {hospitals.length > 0 && (
+            </div>
+
+            {/* 📋 안심 의료기관 정보 아코디언 접이식 리스트 (대표님 피드백 반영 2안) */}
+            {hospitals.length > 0 && (
+              <div className="space-y-3 mt-2">
+                {/* 토글 버튼 바 */}
                 <button
-                  onClick={() => setIsHospitalSheetOpen(true)}
-                  className="absolute bottom-4 right-4 z-10 bg-[#137333] hover:bg-[#0b6623] text-white rounded-full px-4 py-2.5 flex items-center gap-2 text-xs font-black shadow-lg shadow-black/30 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="w-full flex items-center justify-between px-5 py-3.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/2 dark:hover:bg-white/5 rounded-2xl border border-gray-250 dark:border-white/5 cursor-pointer transition-colors text-xs font-black text-gray-800 dark:text-gray-100"
                 >
-                  <IconHospital className="w-4 h-4" />
-                  <span>추천 전문병원 ({filteredHospitals.length})</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#137333]"><IconHospital className="w-4.5 h-4.5" /></span>
+                    <span>{loadedGugun} 추천 전문병원 ({filteredHospitals.length}곳)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-gray-400 dark:text-gray-500 font-bold">
+                    <span>{isExpanded ? '접기' : '목록 보기'}</span>
+                    <svg
+                      className={`w-4 h-4 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2.5"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                  </div>
                 </button>
-              )}
 
-              {/* 팝업 오버레이 시트 */}
-              {hospitals.length > 0 && (
-                <div 
-                  className={`absolute inset-x-0 bottom-0 z-20 bg-white/95 dark:bg-[#202124]/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 transition-all duration-300 ease-out flex flex-col rounded-t-2xl shadow-[0_-8px_30px_rgba(0,0,0,0.15)] ${
-                    isHospitalSheetOpen ? 'h-[250px]' : 'h-0 pointer-events-none opacity-0'
-                  }`}
-                >
-                  {/* 팝업 헤더 */}
-                  <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 dark:border-white/5 shrink-0">
-                    <span className="text-xs font-black text-gray-800 dark:text-gray-100 flex items-center gap-1.5">
-                      <span className="text-[#137333]"><IconHospital className="w-4.5 h-4.5" /></span>
-                      {loadedGugun} 안심 의료기관
-                    </span>
-                    <button 
-                      onClick={() => setIsHospitalSheetOpen(false)}
-                      className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                  </div>
+                {/* 펼쳐졌을 때의 병원 리스트 */}
+                {isExpanded && (
+                  <div className="p-4 rounded-3xl border border-gray-100 dark:border-white/5 bg-gray-50/10 dark:bg-white/1 space-y-4">
+                    {/* 필터 칩 */}
+                    <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-gray-100 dark:border-white/5">
+                      <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500">원하시는 진료 조건의 병원만 걸러볼 수 있습니다.</span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setOnlyNight(!onlyNight)}
+                          className={`px-3 py-1.5 rounded-xl text-[10px] font-extrabold transition-all border cursor-pointer flex items-center gap-1 ${
+                            onlyNight 
+                              ? 'bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] border-[#137333]/30' 
+                              : 'bg-white dark:bg-[#303134] text-gray-500 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5'
+                          }`}
+                        >
+                          <span>🌙</span> 주말진료
+                        </button>
+                        <button
+                          onClick={() => setOnlyEmergency(!onlyEmergency)}
+                          className={`px-3 py-1.5 rounded-xl text-[10px] font-extrabold transition-all border cursor-pointer flex items-center gap-1 ${
+                            onlyEmergency 
+                              ? 'bg-emerald-50 dark:bg-emerald-950/20 text-[#0b6623] dark:text-[#81c995] border-[#0b6623]/30' 
+                              : 'bg-white dark:bg-[#303134] text-gray-500 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5'
+                          }`}
+                        >
+                          <span>🏥</span> 대형병원
+                        </button>
+                      </div>
+                    </div>
 
-                  {/* 미니 필터 칩 */}
-                  <div className="flex gap-2.5 px-4 py-1.5 border-b border-gray-50 dark:border-white/2 bg-gray-50/50 dark:bg-white/1 shrink-0">
-                    <button
-                      onClick={() => setOnlyNight(!onlyNight)}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border cursor-pointer ${
-                        onlyNight 
-                          ? 'bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] border-[#137333]/30' 
-                          : 'bg-white dark:bg-[#303134] text-gray-500 border-gray-200 dark:border-white/5'
-                      }`}
-                    >
-                      🌙 주말진료
-                    </button>
-                    <button
-                      onClick={() => setOnlyEmergency(!onlyEmergency)}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border cursor-pointer ${
-                        onlyEmergency 
-                          ? 'bg-emerald-50 dark:bg-emerald-950/20 text-[#0b6623] dark:text-[#81c995] border-[#0b6623]/30' 
-                          : 'bg-white dark:bg-[#303134] text-gray-500 border-gray-200 dark:border-white/5'
-                      }`}
-                    >
-                      🏥 대형병원
-                    </button>
-                  </div>
-
-                  {/* 팝업 내용물 리스트 (세로 스크롤) */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:rounded-full">
+                    {/* 세로형 병원 목록 그리드 (2열 구조로 PC와 모바일 모두에 시원하게 매칭) */}
                     {filteredHospitals.length > 0 ? (
-                      filteredHospitals.map((h, idx) => {
-                        const isWeekend = h.name.includes('한방') || h.name.includes('한의');
-                        const isBig = h.name.includes('종합') || (h.name.includes('병원') && !h.name.includes('의원'));
-                        
-                        return (
-                          <div 
-                            key={idx}
-                            className="p-3.5 rounded-xl border border-gray-100/80 dark:border-white/5 bg-gray-50/10 dark:bg-white/1 flex flex-col justify-between space-y-2 hover:border-green-150/40 transition-colors"
-                          >
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="text-xs font-extrabold text-gray-800 dark:text-gray-100">{h.name}</span>
-                                {isWeekend && (
-                                  <span className="px-1 py-0.5 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[8px] font-extrabold border border-green-100/5">
-                                    주말진료
-                                  </span>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 max-h-[360px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:rounded-full">
+                        {filteredHospitals.map((h, idx) => {
+                          const isWeekend = h.name.includes('한방') || h.name.includes('한의');
+                          const isBig = h.name.includes('종합') || (h.name.includes('병원') && !h.name.includes('의원'));
+                          
+                          return (
+                            <div 
+                              key={idx}
+                              className="p-4 rounded-2xl border border-gray-250 dark:border-white/5 bg-white dark:bg-[#202124] flex flex-col justify-between space-y-3 shadow-sm hover:border-[#137333]/30 dark:hover:border-[#137333]/50 transition-all duration-200"
+                            >
+                              <div className="space-y-1.5">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="text-xs font-black text-gray-800 dark:text-gray-100 tracking-tight leading-tight">{h.name}</span>
+                                  {isWeekend && (
+                                    <span className="px-1.5 py-0.5 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[8px] font-black border border-green-100/10">
+                                      주말진료
+                                    </span>
+                                  )}
+                                  {isBig && (
+                                    <span className="px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/20 text-[#0b6623] dark:text-[#81c995] text-[8px] font-black border border-emerald-100/10">
+                                      대형병원
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed line-clamp-2 min-h-[30px]">{h.address}</p>
+                              </div>
+                              
+                              <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-white/5 shrink-0">
+                                {h.tel ? (
+                                  <div className="text-[10px] font-bold text-[#137333] dark:text-[#81c995] flex items-center gap-1">
+                                    <IconPhone className="w-3.5 h-3.5" />
+                                    <span>{h.tel}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[9px] text-gray-400 font-medium">전화번호 정보 없음</span>
                                 )}
-                                {isBig && (
-                                  <span className="px-1 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/20 text-[#0b6623] dark:text-[#81c995] text-[8px] font-extrabold border border-emerald-100/5">
-                                    대형병원
-                                  </span>
+                                {h.tel && (
+                                  <a
+                                    href={`tel:${h.tel}`}
+                                    className="px-2.5 py-1 text-[9px] font-black text-white bg-[#137333] hover:bg-[#0b6623] rounded-lg transition-colors cursor-pointer"
+                                  >
+                                    전화 연결
+                                  </a>
                                 )}
                               </div>
-                              <p className="text-[9px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">{h.address}</p>
                             </div>
-                            {h.tel && (
-                              <div className="text-[9px] font-bold text-[#137333] dark:text-[#81c995] flex items-center gap-1">
-                                <IconPhone className="w-3 h-3" />
-                                <span>{h.tel}</span>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })
+                          );
+                        })}
+                      </div>
                     ) : (
-                      <div className="py-12 text-center text-xs font-bold text-gray-400 dark:text-gray-500">
-                        조건에 부합하는 병원 정보가 없습니다.
+                      <div className="py-12 text-center text-xs font-bold text-gray-400 dark:text-gray-500 bg-white dark:bg-[#202124] rounded-2xl border border-dashed border-gray-200 dark:border-white/5">
+                        필터 조건에 부합하는 병원 정보가 없습니다.
                       </div>
                     )}
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             {/* 🧠 AI 3줄 요약 카드 (에메랄드 그린 패밀리룩) */}
             <div className="bg-green-50/20 dark:bg-green-950/10 p-4 rounded-2xl border border-green-100/30 dark:border-green-900/25 space-y-2.5 mt-2">

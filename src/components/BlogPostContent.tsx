@@ -212,6 +212,7 @@ function preprocessBody(content: string): string {
 
   const processed = result
     .join('\n')
+    .replace(/\[BLOCKS?-\d+[^\]]*\]/gi, '') // ◀ AI용 블록 지시어 마커 제거
     .replace(/<calculator\s+type="([^"]+)"\s*\/>/g, '<calculator type="$1"></calculator>')
     .replace(/\[SEO_SUMMARY\]\s*:\s*.*/gi, '')
     .replace(/\[[^\]]*(?:카카오|상담)[^\]]*\]\([^)]*\)/g, '')

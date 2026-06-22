@@ -13,6 +13,8 @@ interface FssNewsItem {
   comment: string;
   keywords: string[];
   relColumn: string;
+  fullContent?: string;
+  officialUrl?: string;
 }
 
 interface FssProductItem {
@@ -34,6 +36,7 @@ export default function FssNewsPage() {
   const [isRealTimeProduct, setIsRealTimeProduct] = useState(false);
   const [productMessage, setProductMessage] = useState('');
   const [latestAlert, setLatestAlert] = useState<FssNewsItem | null>(null);
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
   const [error, setError] = useState('');
 
   // 1. 금감원 뉴스/소비자 데이터 조회
@@ -335,6 +338,40 @@ export default function FssNewsPage() {
                         </span>
                       ))}
                     </div>
+
+                    {/* HWP 파일 무설치 전문보기 및 공식 사이트 새창 이동 */}
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      {item.fullContent && (
+                        <button
+                          onClick={() => setExpandedCardId(expandedCardId === item.id ? null : item.id)}
+                          className="flex-1 sm:flex-initial px-3.5 py-2 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                        >
+                          <span>📄</span>
+                          {expandedCardId === item.id ? '보도/결정문 전문 닫기' : '금감원 보도·결정문 전문 확인 (HWP 변환)'}
+                        </button>
+                      )}
+                      {item.officialUrl && (
+                        <a
+                          href={item.officialUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3.5 py-2 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 shadow-sm"
+                        >
+                          <span>🔗</span> 금감원 원문 새창보기
+                        </a>
+                      )}
+                    </div>
+
+                    {/* 전문 텍스트 노출 영역 */}
+                    {expandedCardId === item.id && item.fullContent && (
+                      <div className="bg-gray-50/50 dark:bg-[#303134]/30 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-white/5 text-xs text-gray-800 dark:text-gray-200 leading-relaxed space-y-3 whitespace-pre-wrap font-medium animate-in fade-in slide-in-from-top-2 duration-200 shadow-inner">
+                        <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-white/5 pb-2 mb-2 flex justify-between">
+                          <span>📄 금융감독원 보도문/결정문 전문 (한글 HWP 대체 텍스트)</span>
+                          <span>HWP 뷰어 무설치 열람 중</span>
+                        </div>
+                        {item.fullContent}
+                      </div>
+                    )}
 
                     {/* 액션 */}
                     <div className="flex items-center gap-2.5 pt-3 border-t border-gray-50 dark:border-white/2 flex-wrap sm:flex-nowrap">

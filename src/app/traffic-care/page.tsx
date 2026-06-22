@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import standardData from '../../../functions/api/taas-standard-data.json';
 
 // --- SVG Icons (이모지 대신 사용되는 고품격 전문 아이콘 세트) ---
 function IconShield({ className = 'w-4.5 h-4.5' }: { className?: string }) {
@@ -190,14 +191,39 @@ export default function TrafficCarePage() {
       }
 
       // 2. 심평원(HIRA) 구군별 병원 데이터 비동기 로드
-      const sidoPrefix = HOSPITAL_SIDO_PREFIX[sidoName] || sidoName;
-      const hiraUrl = `/data/hospitals/${encodeURIComponent(sidoPrefix)}-${encodeURIComponent(gugunName)}.json`;
-      const hiraRes = await fetch(hiraUrl);
-      if (hiraRes.ok) {
-        const hiraData: DistrictHospitals = await hiraRes.json();
-        
-        // 정형외과, 신경외과, 재활의학과, 마취통증의학과 등 주요 과목의 병원들만 병합
-        const targetSpecialties = ['정형외과', '신경외과', '재활의학과', '마취통증의학과', '응급의학과'];
+      const sidoCode = (standardData.TAAS_SIDO_CODES as Record<string, string>)[sidoName];
+      let gugunCode = '';
+
+      if (sidoCode && (standardData.TAAS_GUGUN_CODES as Record<string, Record<string, string>>)[sidoCode]) {
+        const codes = (standardData.TAAS_GUGUN_CODES as Record<string, Record<string, string>>)[sidoCode];
+        if (codes[gugunName]) {
+          gugunCode = codes[gugunName];
+        } else {
+          const cleanGugun = gugunName.replace(/^(인천|대구|광주|대전|울산|부산|서울)/, '');
+          if (cleanGugun.includes('부천')) {
+            gugunCode = codes['부천시'] || '';
+          } else if (cleanGugun.includes('화성')) {
+            gugunCode = codes['화성시'] || '';
+          } else {
+            for (const [key, code] of Object.entries(codes)) {
+              const cleanKey = key.replace('시', '');
+              if (cleanGugun === key || cleanGugun === cleanKey || cleanGugun.includes(key) || key.includes(cleanGugun)) {
+                gugunCode = code;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      if (sidoCode && gugunCode) {
+        const hiraUrl = `/data/hospitals/${sidoCode}-${gugunCode}.json`;
+        const hiraRes = await fetch(hiraUrl);
+        if (hiraRes.ok) {
+          const hiraData: DistrictHospitals = await hiraRes.json();
+          
+          // 정형외과, 신경외과, 재활의학과, 마취통증의학과 등 주요 과목의 병원들만 병합
+          const targetSpecialties = ['정형외과', '신경외과', '재활의학과', '마취통증의학과', '응급의학과'];
         let mergedHospitals: Hospital[] = [];
 
         if (hiraData && hiraData.specialties) {
@@ -214,6 +240,7 @@ export default function TrafficCarePage() {
         );
 
         setHospitals(uniqueHospitals);
+      }
       }
       
       await delayPromise;
@@ -469,7 +496,7 @@ export default function TrafficCarePage() {
                 height="100%"
                 frameBorder="0"
                 style={{ border: 0 }}
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(selectedSido + ' ' + selectedGugun + ' ' + activeZone.locationName)}&z=16&output=embed`}
+                src={`https://maps.google.com/maps?q=${activeZone.latitude},${activeZone.longitude}&z=16&output=embed`}
                 allowFullScreen
                 loading="lazy"
               />

@@ -93,6 +93,34 @@ export default function SidebarContent() {
         </div>
       </Link>
 
+      {/* 🚗 교통사고 로컬 안심케어 센터 바로가기 배너 (패밀리룩 반영) */}
+      <Link href="/traffic-care" className="block group">
+        <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.15)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden">
+          {/* 장식용 배경 이모지 */}
+          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+            🚗
+          </div>
+          <div className="relative z-10 space-y-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">
+                <span className="text-[var(--google-blue)] text-lg leading-none">🚗</span>
+                교통사고 로컬 안심케어
+              </h3>
+              <span className="bg-[#e8f0fe] dark:bg-[#174ea6]/20 text-[var(--google-blue)] dark:text-[#8ab4f8] text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-[#d2e3fc]/30 dark:border-[#174ea6]/30">
+                실시간 연동
+              </span>
+            </div>
+            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
+              도로교통공단 안전 통계와 우수 신경/정형외과 병원 및 사고 맞춤형 손해사정 지식을 안내해 드립니다.
+            </p>
+            <div className="pt-1 flex items-center gap-1 text-xs font-bold text-[var(--google-blue)] dark:text-[#8ab4f8] group-hover:underline">
+              내 지역 교통사고 케어 가기
+              <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </Link>
+
       {/* 🧮 보상금·합의금 계산기 (통합 아코디언) */}
       <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 group relative overflow-hidden">
         <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">

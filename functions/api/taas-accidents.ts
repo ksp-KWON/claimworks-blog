@@ -1,35 +1,36 @@
 // Cloudflare Pages Function: /api/taas-accidents
+
+// 각 시도별 실제 지청/시청 기준 좌표 설정 (전역 공통)
+const BASE_COORDS: Record<string, { lat: number; lng: number }> = {
+  '서울특별시': { lat: 37.5665, lng: 126.9780 },
+  '부산광역시': { lat: 35.1796, lng: 129.0756 },
+  '대구광역시': { lat: 35.8714, lng: 128.6014 },
+  '인천광역시': { lat: 37.4563, lng: 126.7052 },
+  '광주광역시': { lat: 35.1595, lng: 126.8526 },
+  '대전광역시': { lat: 36.3504, lng: 127.3845 },
+  '울산광역시': { lat: 35.5389, lng: 129.3114 },
+  '세종특별자치시': { lat: 36.4800, lng: 127.2890 },
+  '경기도': { lat: 37.2750, lng: 127.0093 },
+  '강원특별자치도': { lat: 37.7518, lng: 128.8761 },
+  '충청북도': { lat: 36.6358, lng: 127.4914 },
+  '충청남도': { lat: 36.6588, lng: 126.6728 },
+  '전북특별자치도': { lat: 35.8242, lng: 127.1480 },
+  '전라남도': { lat: 34.8160, lng: 126.4629 },
+  '경상북도': { lat: 36.5760, lng: 128.5056 },
+  '경상남도': { lat: 35.2376, lng: 128.6919 },
+  '제주특별자치도': { lat: 33.4890, lng: 126.4983 },
+  '강원도': { lat: 37.7518, lng: 128.8761 },
+  '전라북도': { lat: 35.8242, lng: 127.1480 },
+  '제주도': { lat: 33.4890, lng: 126.4983 }
+};
+
 export async function onRequest(context: any) {
   let sido = '경기도';
   let gugun = '의정부시';
 
-  // API 키가 없거나 통신 장애 시 작동할 동적 백업 데이터 생성기 (지역명 해싱으로 실제 데이터처럼 동적 다변화)
+  // API 키가 없거나 통신 장애 시 작동할 동적 백업 데이터 생성기
   const getFallbackAccidents = (sidoName: string, gugunName: string) => {
-    // 각 시도별 실제 지청/시청 기준 좌표 설정
-    const baseCoords: Record<string, { lat: number; lng: number }> = {
-      '서울특별시': { lat: 37.5665, lng: 126.9780 },
-      '부산광역시': { lat: 35.1796, lng: 129.0756 },
-      '대구광역시': { lat: 35.8714, lng: 128.6014 },
-      '인천광역시': { lat: 37.4563, lng: 126.7052 },
-      '광주광역시': { lat: 35.1595, lng: 126.8526 },
-      '대전광역시': { lat: 36.3504, lng: 127.3845 },
-      '울산광역시': { lat: 35.5389, lng: 129.3114 },
-      '세종특별자치시': { lat: 36.4800, lng: 127.2890 },
-      '경기도': { lat: 37.2750, lng: 127.0093 },
-      '강원특별자치도': { lat: 37.7518, lng: 128.8761 },
-      '충청북도': { lat: 36.6358, lng: 127.4914 },
-      '충청남도': { lat: 36.6588, lng: 126.6728 },
-      '전북특별자치도': { lat: 35.8242, lng: 127.1480 },
-      '전라남도': { lat: 34.8160, lng: 126.4629 },
-      '경상북도': { lat: 36.5760, lng: 128.5056 },
-      '경상남도': { lat: 35.2376, lng: 128.6919 },
-      '제주특별자치도': { lat: 33.4890, lng: 126.4983 },
-      '강원도': { lat: 37.7518, lng: 128.8761 },
-      '전라북도': { lat: 35.8242, lng: 127.1480 },
-      '제주도': { lat: 33.4890, lng: 126.4983 }
-    };
-
-    const coord = baseCoords[sidoName] || { lat: 37.7381, lng: 127.0337 };
+    const coord = BASE_COORDS[sidoName] || { lat: 37.7381, lng: 127.0337 };
     
     // 시도와 구군 텍스트로 고유값(시드) 계산
     const nameSeed = (sidoName + gugunName).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -78,7 +79,6 @@ export async function onRequest(context: any) {
   };
 
   try {
-    // try 문 안에서 context 객체의 유효성을 먼저 안전하게 검증하여 예외 차단
     if (!context || !context.request) {
       throw new Error('Cloudflare Pages context.request 객체가 존재하지 않습니다.');
     }
@@ -247,13 +247,9 @@ export async function onRequest(context: any) {
     const finalSido = codeSido || '41';
     const finalGugun = codeGugun || '150';
 
-    // [근본 원인 해결 1] 공공데이터포털 인증키는 이미 인코딩된 형태로 제공되는 경우가 흔합니다.
-    // 키에 '%' 문자가 포함되어 있다면 이미 인코딩된 키로 간주하고 중복 인코딩 처리를 피해 그대로 사용합니다.
     const serviceKey = API_KEY.includes('%') ? API_KEY : encodeURIComponent(API_KEY);
     const taasUrl = `https://apis.data.go.kr/B552061/frequentzoneLg/getRestFrequentzoneLg?serviceKey=${serviceKey}&searchYearCd=2024&siDo=${finalSido}&guGun=${finalGugun}&_type=json`;
 
-    // [최신 표준 & 효율성 반영] 5초 타임아웃 지정을 위해 AbortSignal.timeout 최신 자바스크립트 표준 API를 적용합니다.
-    // Edge/Workers 구버전 런타임을 감안한 하이브리드 자동 대비 코드로 작성해 무결성을 확보합니다.
     const fetchOptions: RequestInit = {};
     let fallbackTimeoutId: any;
     
@@ -276,8 +272,6 @@ export async function onRequest(context: any) {
       throw new Error(`외부 연동 실패 (HTTP ${taasRes.status})`);
     }
 
-    // [근본 원인 해결 2] 공공데이터 API는 인증 실패 시 JSON이 아닌 XML 에러를 반환해 파싱 에러(JSON.parse)를 유발합니다.
-    // 텍스트 형태로 먼저 읽어내어 XML인지 사전에 검증하고 에러 원인을 디코딩해냅니다.
     const rawText = await taasRes.text();
     if (rawText.trim().startsWith('<')) {
       const authMsg = rawText.match(/<returnAuthMsg>([^<]+)<\/returnAuthMsg>/)?.[1];
@@ -306,30 +300,49 @@ export async function onRequest(context: any) {
       });
     }
 
-    // 4. 데이터 정제 가공
+    // 4. 데이터 정제 가공 (위경도 파싱 및 동적 fallback 핫픽스 적용)
     const cleanedData = rawList.filter(Boolean).map((item: any, idx: number) => {
-      const rawCenter = item.geom_json ? JSON.parse(item.geom_json) : null;
-      let lat = 37.7381;
-      let lng = 127.0337;
+      // 해당 조회 시도의 기준 좌표를 디폴트로 잡음 (의정부 고정 오류 해결)
+      const cityCoord = BASE_COORDS[sido] || { lat: 37.7381, lng: 127.0337 };
+      let lat = cityCoord.lat;
+      let lng = cityCoord.lng;
 
-      if (rawCenter && rawCenter.coordinates) {
-        const coords = rawCenter.coordinates;
-        if (Array.isArray(coords[0])) {
-          if (Array.isArray(coords[0][0])) {
-            lng = coords[0][0][0];
-            lat = coords[0][0][1];
-          } else {
-            lng = coords[0][0];
-            lat = coords[0][1];
+      // 1순위: la_crd, lo_crd 필드 우선 활용 (도로교통공단 다발지 고유 위경도 필드)
+      if (item.la_crd && item.lo_crd) {
+        const parsedLat = parseFloat(item.la_crd);
+        const parsedLng = parseFloat(item.lo_crd);
+        if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+          lat = parsedLat;
+          lng = parsedLng;
+        }
+      } 
+      // 2순위: geom_json 파싱 시도
+      else if (item.geom_json) {
+        try {
+          const rawCenter = JSON.parse(item.geom_json);
+          if (rawCenter && rawCenter.coordinates) {
+            const coords = rawCenter.coordinates;
+            if (Array.isArray(coords[0])) {
+              if (Array.isArray(coords[0][0])) {
+                lng = coords[0][0][0];
+                lat = coords[0][0][1];
+              } else {
+                lng = coords[0][0];
+                lat = coords[0][1];
+              }
+            } else {
+              lng = coords[0];
+              lat = coords[1];
+            }
           }
-        } else {
-          lng = coords[0];
-          lat = coords[1];
+        } catch (e) {
+          console.warn('geom_json 파싱 에러:', e);
         }
       }
 
-      if (lat < 30 || lat > 45) lat = 37.7381;
-      if (lng < 120 || lng > 135) lng = 127.0337;
+      // 최종 범위 체크 및 보정 (대한민국 범위를 벗어나면 시도 기준 좌표로 회귀)
+      if (lat < 30 || lat > 45) lat = cityCoord.lat;
+      if (lng < 120 || lng > 135) lng = cityCoord.lng;
 
       return {
         id: `taas-${item.afFrequentzoneId || idx}`,
@@ -356,7 +369,6 @@ export async function onRequest(context: any) {
   } catch (error: any) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     console.error('  ⚠️ TAAS 실시간 연동 장애 발생: 백업 모드로 자동 대체합니다.', errorMsg);
-    // 외부 API 연결 장애나 인증서 실패 시 즉각 가상 백업 데이터로 원격 대체 반환
     return new Response(JSON.stringify(getFallbackAccidents(sido, gugun)), {
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',

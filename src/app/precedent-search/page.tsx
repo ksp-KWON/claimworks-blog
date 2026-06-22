@@ -13,7 +13,7 @@ interface Precedent {
   caseContent: string;
   caseType: string;
   officialUrl: string;
-  casePoints: string; // ⚖️ 공식 판시사항 (필수 필드로 지정해 형식 일치시킴)
+  casePoints: string; // ⚖️ 공식 판시사항
 }
 
 // 텍스트 클리닝 헬퍼: 법제처 판결요지 및 판례본문의 HTML 태그와 엔티티를 정제하여 줄바꿈을 깔끔하게 유지합니다.
@@ -30,61 +30,85 @@ function cleanLawText(text: string): string {
     .trim();
 }
 
-// 🧠 지능형 판례 요약 알고리즘: 토큰과 딜레이가 0인 상태에서 법제처 판결요지의 핵심 사실관계와 결론 문단만 찾아내 가독성을 대폭 향상시킵니다.
-function getSmartSummary(summary: string, content: string): string {
-  if (!summary && !content) return '판례 상세 내용을 확인해 주세요.';
+// 🧠 AI 핵심 3줄 요약 알고리즘: 법제처 판시사항 또는 판결요지에서 핵심 문장을 파싱해 가독성 높은 3줄 불렛 포인트를 리턴합니다.
+function getAiThreeLineSummary(prec: Precedent): string[] {
+  // 1. 판시사항(casePoints)이 존재하는 경우 최우선으로 분석
+  if (prec.casePoints) {
+    const lines = prec.casePoints
+      .split('\n')
+      .map(line => line.replace(/^[\s・\-\*]+/g, '').trim())
+      .filter(line => line.length > 5);
+    
+    if (lines.length >= 3) {
+      return lines.slice(0, 3);
+    }
+    if (lines.length > 0) {
+      const result = [...lines];
+      while (result.length < 3) {
+        result.push('상세 판결 내용 및 증거 관계를 확인하여 부합 여부를 검토해야 합니다.');
+      }
+      return result;
+    }
+  }
+
+  // 2. 판결요지(judgmentSummary) 분석 및 문장 분할
+  if (prec.judgmentSummary) {
+    const sentences = prec.judgmentSummary
+      .split(/(?:\[\d+\]|\n|\.\s+)/)
+      .map(s => s.trim().replace(/^[가-힣]\./, ''))
+      .filter(s => s.length > 10);
+    
+    if (sentences.length >= 3) {
+      return sentences.slice(0, 3).map(s => s.endsWith('.') ? s : s + '.');
+    }
+    if (sentences.length > 0) {
+      const result = sentences.map(s => s.endsWith('.') ? s : s + '.');
+      while (result.length < 3) {
+        result.push('보험 가입 시기의 약관 조항과 구체적 쟁점에 따른 전문가 분석이 요구됩니다.');
+      }
+      return result;
+    }
+  }
+
+  // 3. 예외 방어용 디폴트 요약 문구
+  return [
+    `본 사건은 [${prec.title || '사건번호 ' + prec.caseNo}]에 관한 법원 판단의 결정 기준입니다.`,
+    "보험금 지급 거절 사유에 대응할 수 있는 법리적 근거와 쟁점이 수록되어 있습니다.",
+    "구체적인 약관 분석 및 내 사례의 대입 가능성은 전문 손해사정사의 검토가 필요합니다."
+  ];
+}
+
+// 👨‍🏫 베테랑 손해사정사 실무 코멘트 사전 (Dictionary)
+const PRACTICAL_COMMENTS: Record<string, string> = {
+  '기왕증': '기왕증(이미 가지고 있던 질환이나 퇴행성 변화)을 이유로 보험금을 감액하거나 합의금을 삭감하려는 주장에 대항할 수 있는 중요한 판례입니다. 대법원은 기왕증의 기여도를 매우 엄격하게 입증할 것을 요구하므로, 보험사 측 의료자문 동의서에 서명하기 전 반드시 전문가와 상의하셔야 합니다.',
+  '기여도': '보험사나 법원에서 기왕증 기여도를 대입하여 보상금을 깎으려 할 때 방어 논리로 유용합니다. 퇴행성 질환이라 하더라도 외상(상해) 사고로 급격히 악화되었다면 사고 관여도를 최대로 인정받아야 하므로 객관적인 감정 자료 배치가 핵심입니다.',
+  '자살': '보험사가 가입자의 극단적 선택(고의 사고)을 주장하며 사망보험금 지급을 거절(면책)할 때 가입자 측 대응 논리가 되는 판례입니다. 망인이 심신상실이나 자유로운 의사결정이 불가능한 극도의 우울증 상태 하에서 발생한 사고임을 객관적으로 소명해야 합니다.',
+  '사망': '사망보험금 청구는 지급 규모가 크기 때문에 보험사 측의 까다로운 현장 조사와 의료자문 절차가 수반됩니다. 사인 미상이나 자살 의혹 등 면책 사유를 들이밀 때 초기 조사 단계부터 전문가와 논리를 구축해 청구해야 불이익이 없습니다.',
+  '백내장': '백내장 수술 및 다초점 렌즈 삽입 관련 실손의료비 부지급 사태에 대응하기 위한 기준 판례입니다. 단순 외래 수술이 아닌 입원 치료가 필요했던 정당성을 증명할 세극등 현미경 검사 결과지 등 객관적 소견을 꼼꼼하게 다듬어야 이길 수 있습니다.',
+  '도수치료': '도수치료나 체외충격파의 횟수 과다를 이유로 보상을 차단하는 분쟁에 있어 아주 긴요한 판례입니다. 치료 전후로 실제 증상 호전이나 객관적 검사상 개선 효과가 있었음을 의료 기록으로 소명하는 전략이 필수적입니다.',
+  '실손': '실손보험금 청구 시 보험사가 내부 심사 지침이나 약관 조항의 모호함을 틈타 지급을 보류할 때 대항할 근거입니다. 가입자에게 유리하게 약관을 해석하도록 규정한 작성자 불이익 원칙을 적극 피력하여 보상 전략을 짜야 합니다.',
+  '암': '암 진단비 분쟁은 주로 조직검사 결과지 상의 병리 진단 코드가 약관의 일반암 분류표에 부합하는지에 대한 해석 싸움입니다. 주치의 코딩뿐만 아니라 임상학적인 암 판정 가능 여부를 추가 입증하여 보험사에 맞서야 합니다.',
+  '뇌': '뇌경색(I63)이나 뇌졸중 청구 시, 정밀 검사 미비나 신경학적 결손 부족을 이유로 지급을 보류하거나 하향 조정을 제안할 때 대응할 기준입니다. 제3의 대학병원 전문의 정밀 판독지를 선제적으로 배치해 청구하는 것이 안전합니다.',
+  '심장': '급성심근경색이나 허혈성심장질환 진단비는 심전도나 효소 수치가 미달한다는 이유로 부지급하기 쉽습니다. 임상적인 관점에서 의학적 정당성을 짚어내고 이의제기를 정교하게 밀고 나가야 숨은 보험금을 지킬 수 있습니다.',
+  '디스크': '추간판탈출증(디스크)은 대개 퇴행성이 가미되어 있어 보험사가 무조건 기왕증 감액을 고집합니다. 이 판례를 기초 삼아 사고 충격으로 인해 디스크가 급격히 돌출되었음을 증명하는 외상 관여도 평가를 철저히 진행해야 정당한 금액을 받습니다.',
+  '압박골절': '척추 압박골절은 척추의 찌그러진 정도에 따라 고액의 후유장해진단비 청구가 가능한 핵심 분쟁입니다. 최초 장해진단서를 끊을 때 판례 기준에 완벽히 입각해 평가받아야 보험사의 삭감 주장을 방어할 수 있습니다.',
+  '장해': '후유장해 보험금은 맥브라이드식 또는 AMA식 장해 평가 방식과 한시장해 판정 유무에 따라 최종 보상 금액이 천차만별입니다. 개인이 청구하여 보험사 심사팀을 이기기는 거의 불가능하므로 장해진단서 발행 단계부터 동행이 유리합니다.',
+  '교통사고': '교통사고 피해 시 예상 밖의 과실 비율 적용이나 터무니없는 합의금 산출을 겪을 때 대항력을 갖추는 기준이 됩니다. 법원이 판단한 과실 비율 계산식과 정당한 일실수입 산정 기준을 전문가와 꼼꼼히 대입해야 손해를 줄입니다.',
+  '과실': '과실 비율은 가해자와 피해자 간 책임 한계를 그어 합의금을 좌우하는 가장 결정적인 요소입니다. 상대 보험사가 제시한 과실이 타당한지 대법원 사고 판결 요소를 근거로 조목조목 반박하여 과실을 한 자리 수라도 낮춰야 합니다.',
+  '보험금': '보험사가 고지의무 위반이나 통지의무 위반을 이유로 보험계약 해지 및 보험금 지급 거절을 통보할 때 대항할 수 있는 판례입니다. 인과관계의 부존재나 제척기간의 도과 여부를 법리적으로 날카롭게 파헤쳐 대응해야 합니다.',
+  '배상책임': '일상생활배상책임이나 시설물 배상책임 사고 시 피해 규모 입증과 보상 책임의 범위를 결정짓는 기준 판례입니다. 피해 사실에 대한 엄격한 소득 손실 입증과 지출 비용 명세서를 빈틈없이 꾸려야 온전한 보상이 완성됩니다.',
+};
+
+function getPracticeComment(prec: Precedent): string {
+  const textToSearch = `${prec.title} ${prec.casePoints || ''} ${prec.judgmentSummary || ''}`.toLowerCase();
   
-  // 우선순위 1: 법제처 판결요지 파싱 및 핵심 단락 추출
-  if (summary) {
-    // [1], [2] 와 같은 챕터 표식을 기준으로 문단 쪼개기
-    const sections = summary.split(/\[\d+\]/g).map(s => s.trim()).filter(Boolean);
-    if (sections.length > 0) {
-      // 구체적 사건 및 법적 결론 핵심 키워드가 들어간 섹션 선별
-      const targetKeywords = ['사안', '사례', '보험금', '해당', '지급', '책임', '과실', '타당'];
-      const bestSection = sections.find(sec => targetKeywords.some(kw => sec.includes(kw)));
-      if (bestSection) {
-        return bestSection.length > 220 ? bestSection.slice(0, 220) + '...' : bestSection;
-      }
-      
-      // 쟁점 설명만 있고 결론이 분리되어 있다면 가장 구체적인 마지막 결론 섹션을 타겟팅
-      const lastSection = sections[sections.length - 1];
-      if (lastSection) {
-        return lastSection.length > 220 ? lastSection.slice(0, 220) + '...' : lastSection;
-      }
+  for (const [key, comment] of Object.entries(PRACTICAL_COMMENTS)) {
+    if (textToSearch.includes(key)) {
+      return comment;
     }
-    
-    // 구분 기호가 없는 단일 텍스트면 결론 위주 문장 추출
-    const sentences = summary.split(/[.?!]\s+/);
-    const coreSentences = sentences.filter(s => 
-      s.includes('사안') || s.includes('사례') || s.includes('타당하다') || s.includes('지급하여야') || s.includes('책임이')
-    );
-    if (coreSentences.length > 0) {
-      return coreSentences.join('. ').slice(0, 220) + '...';
-    }
-
-    return summary.length > 180 ? summary.slice(0, 180) + '...' : summary;
   }
 
-  // 우선순위 2: 판결요지가 없어 판례 본문에서 찾아내야 할 때
-  if (content) {
-    // 판결문은 대개 '이유를 판단한다' 혹은 '판단한다' 이후에 실질적 판단이 시작됨
-    const startIdx = content.indexOf('판단한다');
-    const targetText = startIdx !== -1 ? content.slice(startIdx) : content;
-    
-    const sentences = targetText.split(/[.?!]\s+/);
-    // 분쟁 핵심 키워드를 포함한 주요 2~3개 문장 조합
-    const coreSentences = sentences.filter(s => 
-      s.includes('보험금') || s.includes('지급') || s.includes('배상') || s.includes('책임이') || s.includes('타당하다')
-    ).slice(0, 3);
-    
-    if (coreSentences.length > 0) {
-      return coreSentences.join('. ').slice(0, 220) + '...';
-    }
-    
-    return content.length > 180 ? content.slice(0, 180) + '...' : content;
-  }
-
-  return '판례 정보를 읽어올 수 없습니다.';
+  return '본 판례는 해당 분쟁에서 법원이 적용한 핵심 법리와 증명 책임 분담 기준을 명시한 판례입니다. 약관 조항의 세밀한 차이와 개별 사실관계에 따라 인용 가능성과 손해사정 방향이 완전히 달라지므로, 권리 행사를 결정하기 전 반드시 전문가와 상담하시기 바랍니다.';
 }
 
 // 날짜 포맷팅 헬퍼: '20250626' 형태의 원본 값을 '2025. 6. 26.' 표준 법원 판결 선고일 형식으로 정제합니다.
@@ -102,7 +126,7 @@ function formatJudgmentDate(dateStr: string): string {
   return dateStr;
 }
 
-// 세션 스토리지 기반 검색 캐싱: 불필요한 법제처 API 중복 호출을 방지하고 0ms 로딩 속도를 달성합니다.
+// 세션 스토리지 기반 검색 캐싱: 불필요한 법제처 API 중복 호출을 방지하고 빠른 로딩 속도를 달성합니다.
 const getCachedSearch = (query: string): Precedent[] | null => {
   try {
     const key = `prec_cache_${query.trim()}`;
@@ -120,9 +144,42 @@ const setCachedSearch = (query: string, data: Precedent[]) => {
   } catch {}
 };
 
+// 🧠 지능형 판례 요약 알고리즘 (백업/대비용 프리뷰 텍스트 요약)
+function getSmartSummary(summary: string, content: string): string {
+  if (!summary && !content) return '판례 상세 내용을 확인해 주세요.';
+  
+  if (summary) {
+    const sections = summary.split(/\[\d+\]/g).map(s => s.trim()).filter(Boolean);
+    if (sections.length > 0) {
+      const targetKeywords = ['사안', '사례', '보험금', '해당', '지급', '책임', '과실', '타당'];
+      const bestSection = sections.find(sec => targetKeywords.some(kw => sec.includes(kw)));
+      if (bestSection) {
+        return bestSection.length > 220 ? bestSection.slice(0, 220) + '...' : bestSection;
+      }
+      const lastSection = sections[sections.length - 1];
+      if (lastSection) {
+        return lastSection.length > 220 ? lastSection.slice(0, 220) + '...' : lastSection;
+      }
+    }
+    return summary.length > 180 ? summary.slice(0, 180) + '...' : summary;
+  }
 
+  if (content) {
+    const startIdx = content.indexOf('판단한다');
+    const targetText = startIdx !== -1 ? content.slice(startIdx) : content;
+    const sentences = targetText.split(/[.?!]\s+/);
+    const coreSentences = sentences.filter(s => 
+      s.includes('보험금') || s.includes('지급') || s.includes('배상') || s.includes('책임이') || s.includes('타당하다')
+    ).slice(0, 2);
+    
+    if (coreSentences.length > 0) {
+      return coreSentences.join('. ').slice(0, 220) + '...';
+    }
+    return content.length > 180 ? content.slice(0, 180) + '...' : content;
+  }
 
-// 보상스쿨 AI 판례검색센터의 핵심 프론트엔드 컴포넌트입니다.
+  return '판례 정보를 읽어올 수 없습니다.';
+}
 
 export default function PrecedentSearchPage() {
   const [query, setQuery] = useState('');
@@ -130,23 +187,13 @@ export default function PrecedentSearchPage() {
   const [results, setResults] = useState<Precedent[]>([]);
   const [error, setError] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [basket, setBasket] = useState<Precedent[]>([]);
   const [openDetailId, setOpenDetailId] = useState<string | null>(null);
-  
-  // 로컬 블로그 포스트 리스트 데이터 (실무 칼럼 매핑용)
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
-
-  // 자가진단 제거됨
-
-  // AI 상태값 제거됨
 
   // 로컬스토리지 로드 및 블로그 포스트 정적 DB 로드
   useEffect(() => {
     const saved = localStorage.getItem('recent_prec_searches');
     if (saved) setRecentSearches(JSON.parse(saved));
-
-    const savedBasket = localStorage.getItem('prec_basket');
-    if (savedBasket) setBasket(JSON.parse(savedBasket));
 
     // API를 통해 포스트 데이터 불러오기
     fetch('/api/posts')
@@ -199,11 +246,9 @@ export default function PrecedentSearchPage() {
         return;
       }
 
-      // 브라우저의 Native DOMParser 사용 (서버 렌더링 시점에는 실행되지 않는 이벤트 핸들러 내부이므로 안전)
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(listXml, "text/xml");
       
-      // XML 파싱 에러 검출
       const parserError = xmlDoc.getElementsByTagName('parsererror')[0];
       if (parserError) {
         throw new Error('법제처 응답 XML 파싱 중 오류가 발생했습니다.');
@@ -230,7 +275,6 @@ export default function PrecedentSearchPage() {
             const detailXml = await detailRes.text();
             const detailDoc = parser.parseFromString(detailXml, "text/xml");
             
-            // XML 파싱 에러 검출
             if (detailDoc.getElementsByTagName('parsererror')[0]) return null;
 
             const getValue = (tagName: string) => {
@@ -246,7 +290,7 @@ export default function PrecedentSearchPage() {
               courtName: getValue('법원명'),
               judgmentSummary: cleanLawText(getValue('판결요지')),
               caseContent: cleanLawText(getValue('판례내용')),
-              casePoints: cleanLawText(getValue('판시사항')), // ⚖️ 판시사항 파싱 추가
+              casePoints: cleanLawText(getValue('판시사항')),
               caseType: getValue('사건종류명'),
               officialUrl: `https://www.law.go.kr/LSW/precInfoP.do?precSeq=${id}`
             };
@@ -262,7 +306,6 @@ export default function PrecedentSearchPage() {
       if (parsedData.length === 0) {
         setError('입력하신 조건과 일치하는 판례 상세 정보를 불러오지 못했습니다.');
       } else {
-        // 세션 캐시에 검색 결과 저장
         setCachedSearch(trimmedQuery, parsedData);
       }
     } catch (err: any) {
@@ -273,56 +316,53 @@ export default function PrecedentSearchPage() {
     }
   };
 
-  const toggleBasket = (prec: Precedent) => {
-    let next;
-    if (basket.some(x => x.id === prec.id)) {
-      next = basket.filter(x => x.id !== prec.id);
-    } else {
-      next = [...basket, prec];
-    }
-    setBasket(next);
-    localStorage.setItem('prec_basket', JSON.stringify(next));
-  };
-
-  // handleRequestAiSummary 제거됨
-
-  // 자가진단 핸들러 제거됨
-
   // 대법원 판례에 해당되는 보상스쿨의 전문 해설글 자동 매핑 알고리즘
   const getRelatedBlogPosts = (prec: Precedent) => {
     if (blogPosts.length === 0) return [];
     
     return blogPosts.filter(post => {
-      // 1. 사건번호가 마크다운 frontmatter에 있는 caseNumber와 일치하는지 비교 (빈칸 제거 후 비교)
       if (post.caseNumber && prec.caseNo) {
         const pNum = post.caseNumber.replace(/\s+/g, '');
         const cNum = prec.caseNo.replace(/\s+/g, '');
         if (pNum.includes(cNum) || cNum.includes(pNum)) return true;
       }
       
-      // 2. 제목 내 주요 매칭 키워드가 겹치는지 비교
       const titleLower = prec.title.toLowerCase();
       const postTitleLower = post.title.toLowerCase();
       const matchKeywords = ['기왕증', '압박골절', '자살', '사망보험금', '백내장', '도수치료', '실손', '교통사고', '장해', '배상책임'];
       
       return matchKeywords.some(kw => titleLower.includes(kw) && postTitleLower.includes(kw));
-    }).slice(0, 2); // 최대 2개의 연계 포스트만 노출
+    }).slice(0, 2);
   };
 
-  // 상담 신청용 URL 빌더
-  const getKakaoLink = () => {
-    const precList = basket.map(x => `${x.caseNo} (${x.title})`).join(', ');
-    const text = `안녕하세요 대표님, 보상스쿨 AI판례센터에서 [${precList}] 판례를 바탕으로 무료 손해사정 가능성 검토를 요청합니다.`;
+  // 상담 신청용 URL 빌더 (단일 판례 연계 방식)
+  const getKakaoLink = (prec: Precedent) => {
+    const text = `안녕하세요 대표님, 보상스쿨 AI판례센터에서 [${prec.caseNo} (${prec.title})] 판례를 바탕으로 무료 손해사정 가능성 검토를 요청합니다.`;
     return `https://open.kakao.com/o/sWeszp7?text=${encodeURIComponent(text)}`;
-  };
-
-  const getFormLink = () => {
-    const precList = basket.map(x => `${x.caseNo}(${x.title})`).join(', ');
-    return `https://forms.gle/E9vj7iqAHeJGhJ549?entry_prec=${encodeURIComponent(precList)}`;
   };
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
+      {/* 💡 실시간 판례 트렌드 상단 띠 배너 */}
+      <div className="bg-[var(--google-blue)] text-white px-4 py-3 rounded-2xl flex items-center justify-between flex-wrap gap-3 shadow-md">
+        <div className="flex items-center gap-2.5">
+          <span className="text-lg shrink-0">💡</span>
+          <div className="text-xs sm:text-sm font-extrabold tracking-tight">
+            <span className="underline decoration-wavy mr-1.5">[보상 트렌드]</span>
+            법원의 실시간 대법원 판례 기준을 파악하면 보험사의 일방적 삭감 주장을 방어할 수 있습니다.
+          </div>
+        </div>
+        <button 
+          onClick={() => {
+            const el = document.getElementById('search-box-area');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }}
+          className="text-[10px] font-black uppercase tracking-wider bg-white text-[var(--google-blue)] px-2.5 py-1 rounded-lg border border-white hover:bg-blue-50 transition-colors cursor-pointer"
+        >
+          검색하기
+        </button>
+      </div>
+
       {/* ⚠️ 법률 면책 고지 배너 */}
       <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-3.5 rounded-2xl flex items-start gap-2.5 text-xs font-semibold leading-relaxed shadow-sm">
         <span className="text-base shrink-0 mt-0.5">⚠️</span>
@@ -339,10 +379,8 @@ export default function PrecedentSearchPage() {
         </p>
       </div>
 
-      {/* 상황 마법사 제거됨 */}
-
       {/* 검색 박스 영역 */}
-      <div className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-4">
+      <div id="search-box-area" className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-4">
         <div className="flex gap-2 flex-col sm:flex-row">
           <input
             type="text"
@@ -381,40 +419,7 @@ export default function PrecedentSearchPage() {
         )}
       </div>
 
-      {/* 📥 보상 바구니 현황 바 */}
-      {basket.length > 0 && (
-        <div className="bg-[#e8f0fe] dark:bg-[#174ea6]/20 p-4 sm:p-5 rounded-2xl border border-[#d2e3fc]/30 flex items-center justify-between flex-wrap gap-3.5 shadow-sm animate-in fade-in duration-200">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">📥</span>
-            <div>
-              <div className="text-xs font-bold text-[#202124] dark:text-[#e8eaed]">
-                보상 상담 바구니에 판례가 담겼습니다! (<span className="text-[var(--google-blue)] dark:text-[#8ab4f8] font-extrabold">{basket.length}건</span>)
-              </div>
-              <div className="text-[10px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed mt-0.5">상담 신청 시 선택한 판례 목록이 자동으로 전달되어 더욱 유리하고 현실적인 보상 전략을 컨설팅 해드립니다.</div>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <a
-              href={getKakaoLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3.5 py-2 bg-amber-400 hover:bg-amber-500 text-white text-xs font-bold rounded-lg shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              카톡 상담신청
-            </a>
-            <a
-              href={getFormLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3.5 py-2 bg-[var(--google-blue)] hover:bg-[#174ea6] text-white text-xs font-bold rounded-lg shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              상담 신청서 작성
-            </a>
-          </div>
-        </div>
-      )}
-
-      {/* 검색 진행상태 및 로딩창 */}
+      {/* 검색 진행상태 및 로딩창 (파란색 테마) */}
       {loading && (
         <div className="bg-white dark:bg-[#202124] rounded-3xl py-16 px-4 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4">
           <div className="inline-block w-9 h-9 border-4 border-[var(--google-blue)] border-t-transparent rounded-full animate-spin" />
@@ -450,125 +455,126 @@ export default function PrecedentSearchPage() {
           <div className="space-y-6">
             {results.map((prec) => {
               const isDetailOpen = openDetailId === prec.id;
-              const isAdded = basket.some(x => x.id === prec.id);
-              // 🔗 보상스쿨 블로그 내 관련 분석글 가져오기
               const relatedPosts = getRelatedBlogPosts(prec);
               
               return (
                 <article
                   key={prec.id}
-                  className="bg-white dark:bg-[#2b2c2f] rounded-2xl border border-gray-200/60 dark:border-white/5 shadow-sm hover:shadow-md transition-all duration-300 hover:translate-y-[-2px] p-6 flex flex-col justify-between"
+                  className="bg-white dark:bg-[#202124] rounded-3xl border border-gray-100 dark:border-white/5 shadow-md hover:shadow-lg transition-all duration-300 p-6 sm:p-7 flex flex-col justify-between space-y-4"
                 >
                   <div className="space-y-4">
-                    {/* 상단 메타 바 (사건종류 배지 + 공식 판결 서식 + 우측 담기 버튼) */}
+                    {/* 상단 메타 바 (사건종류 배지 + 공식 판결 서식) */}
                     <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-white/5">
                       <div className="flex flex-wrap items-center gap-2.5">
                         {prec.caseType && (
                           <span className="px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-900/20 text-[#1a73e8] dark:text-[#8ab4f8] text-[10px] font-bold border border-blue-100/30">
-                            {prec.caseType}
+                            ⚖️ {prec.caseType}
                           </span>
                         )}
                         <span className="text-[11px] sm:text-xs font-bold text-gray-400 dark:text-gray-500">
                           {prec.courtName || '법원'} {formatJudgmentDate(prec.judgmentDate)} 선고 {prec.caseNo} 판결
                         </span>
                       </div>
-                      
-                      {/* 담기 버튼 */}
-                      <div className="shrink-0">
-                        <button
-                          onClick={() => toggleBasket(prec)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer shadow-xs ${
-                            isAdded 
-                              ? 'bg-rose-500 hover:bg-rose-600 text-white' 
-                              : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-[#3f3f42] dark:hover:bg-[#4d4d50] dark:text-gray-200'
-                          }`}
-                        >
-                          {isAdded ? '❌ 바구니 제외' : '📥 상담 보관함 담기'}
-                        </button>
-                      </div>
                     </div>
 
                     {/* 제목 */}
-                    <div className="pt-1.5">
-                      <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 leading-snug">
+                    <div>
+                      <h3 className="text-base sm:text-lg font-extrabold text-[#202124] dark:text-[#e8eaed] leading-snug">
                         {prec.title}
                       </h3>
                     </div>
 
-                    {/* 판시사항 및 쟁점 요약 프리뷰 (세련된 인용구 스타일) */}
-                    <div className="bg-slate-50/50 dark:bg-black/10 p-4 rounded-xl text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-medium border-l-2 border-[var(--google-blue)] dark:border-[#8ab4f8]">
-                      <div className="space-y-2 text-gray-600 dark:text-gray-400 font-medium">
-                        {prec.casePoints ? (
-                          // 판시사항이 존재하는 경우: 개행문자로 분할하여 한 줄씩 렌더링 (대표님 요청대로 점 제외)
-                          prec.casePoints.split('\n').map((point, index) => (
-                            <p key={index} className="leading-relaxed">
-                              {point.trim()}
-                            </p>
-                          ))
-                        ) : (
-                          // 판시사항이 없는 판례의 경우: 스마트 줄거리 요약 작동 (2차 방어망)
-                          <p className="leading-relaxed">
-                            {getSmartSummary(prec.judgmentSummary, prec.caseContent)}
-                          </p>
-                        )}
+                    {/* 본문 프리뷰 (법제처 원문 첫 몇 줄) */}
+                    <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed font-medium line-clamp-3">
+                      {prec.casePoints ? prec.casePoints.replace(/\n/g, ' ') : getSmartSummary(prec.judgmentSummary, prec.caseContent)}
+                    </p>
+
+                    {/* 🧠 AI 핵심 3줄 요약 (파란색 테마) */}
+                    <div className="bg-blue-50/20 dark:bg-blue-950/10 p-4 rounded-2xl border border-blue-100/30 dark:border-blue-900/25 space-y-2.5">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-[#1a73e8] dark:text-[#8ab4f8]">
+                        <span className="text-sm">🧠</span>
+                        AI 핵심 3줄 요약
                       </div>
+                      <ul className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium space-y-1.5 list-disc pl-4">
+                        {getAiThreeLineSummary(prec).map((sumLine, idx) => (
+                          <li key={idx}>{sumLine}</li>
+                        ))}
+                      </ul>
                     </div>
 
-                    {/* 🔗 보상스쿨 블로그 내 유사 보상 분석 칼럼 연동 */}
-                    {relatedPosts.length > 0 && (
-                      <div className="border-t border-dashed border-gray-200 dark:border-white/10 pt-4 mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5">
-                        <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 flex items-center gap-1 shrink-0">
-                          📚 이 판례와 연결된 보상스쿨 전문 칼럼 : 
-                        </span>
-                        {relatedPosts.map((post: any) => (
-                          <Link
-                            key={post.slug}
-                            href={`/blog/${post.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200/50 dark:border-white/5 bg-gray-50/50 dark:bg-black/10 hover:bg-[#e8f0fe]/30 dark:hover:bg-[#174ea6]/10 text-xs font-bold text-[#1A73E8] dark:text-[#8ab4f8] hover:underline transition-all duration-200 max-w-[260px] truncate"
-                          >
-                            <span className="truncate font-semibold">{post.title}</span>
-                            <span className="text-[10px] text-gray-400 shrink-0">🔗</span>
-                          </Link>
-                        ))}
+                    {/* 👨‍🏫 보상스쿨 손해사정사 실무 코멘트 (황색 전문가 박스) */}
+                    <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-2xl border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2">
+                      <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
+                        <span className="text-sm">👨‍🏫</span>
+                        보상스쿨 손해사정사 실무 코멘트
+                      </div>
+                      <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium pl-1">
+                        {getPracticeComment(prec)}
+                      </p>
+                    </div>
+
+                    {/* 📜 전문 아코디언 및 🔗 법제처 원문 새창보기 가로(좌우) 배치 */}
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        onClick={() => setOpenDetailId(isDetailOpen ? null : prec.id)}
+                        className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-750 dark:text-gray-300 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                      >
+                        <span>📜</span>
+                        {isDetailOpen ? '공식 판결문 전문 닫기' : '공식 판결문 전문 전체 확인하기'}
+                      </button>
+                      <a
+                        href={prec.officialUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 shadow-sm text-center"
+                      >
+                        <span>🔗</span> 법제처 원문 새창보기
+                      </a>
+                    </div>
+
+                    {/* 전문 텍스트 노출 영역 */}
+                    {isDetailOpen && prec.caseContent && (
+                      <div className="bg-gray-50/50 dark:bg-[#303134]/30 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-white/5 text-xs text-gray-800 dark:text-gray-200 leading-relaxed space-y-3 whitespace-pre-wrap font-medium animate-in fade-in slide-in-from-top-2 duration-200 shadow-inner">
+                        <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-white/5 pb-2 mb-2 flex justify-between">
+                          <span>📜 대법원 공식 판결문 전문</span>
+                          <span>원본 열람 중</span>
+                        </div>
+                        <pre className="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed max-h-[350px] overflow-y-auto whitespace-pre-wrap font-sans pr-2">
+                          {prec.caseContent}
+                        </pre>
                       </div>
                     )}
 
-                    {/* 판결문 전문 아코디언 */}
-                    {prec.caseContent && (
-                      <div className="space-y-2 pt-2">
-                        <button
-                          onClick={() => setOpenDetailId(isDetailOpen ? null : prec.id)}
-                          className="w-full flex items-center justify-between p-3 bg-gray-50/50 dark:bg-black/10 rounded-xl text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] transition-all duration-200 cursor-pointer border border-gray-150 dark:border-white/5 hover:border-[var(--google-blue)]/20"
+                    {/* 액션 버튼 영역 (패밀리룩 & 파란색 테마) */}
+                    <div className="flex items-center gap-2.5 pt-3 border-t border-gray-50 dark:border-white/2 flex-wrap sm:flex-nowrap">
+                      {relatedPosts.length > 0 ? (
+                        <Link 
+                          href={`/blog/${relatedPosts[0].slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer"
                         >
-                          <span className="flex items-center gap-1.5">
-                            <span>📜</span>
-                            {isDetailOpen ? '공식 판결문 전문 접기' : '공식 판결문 전문 전체 확인하기'}
-                          </span>
-                          <svg className={`w-3.5 h-3.5 transition-transform duration-300 ${isDetailOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </button>
-                        
-                        {isDetailOpen && (
-                          <div className="p-4 bg-slate-50/20 dark:bg-black/10 rounded-xl border border-gray-150 dark:border-white/5 animate-in slide-in-from-top-2 duration-200">
-                            <pre className="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed max-h-[350px] overflow-y-auto whitespace-pre-wrap font-sans pr-2">
-                              {prec.caseContent}
-                            </pre>
-                            <div className="mt-4 pt-3 border-t border-gray-250/20 dark:border-white/5 flex items-center justify-between text-[10px] font-bold">
-                              <span className="text-gray-400 dark:text-gray-500">출처: 국가법령정보공동활용 API</span>
-                              <a
-                                href={prec.officialUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-[var(--google-blue)] dark:text-[#8ab4f8] hover:underline flex items-center gap-1"
-                              >
-                                법제처 원문 새창 보기 🔗
-                              </a>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                          📖 관련 분석 칼럼 읽기 ({relatedPosts.length}건)
+                        </Link>
+                      ) : (
+                        <Link 
+                          href="/blog"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                        >
+                          📖 보상스쿨 전체 칼럼 읽기
+                        </Link>
+                      )}
+                      <a 
+                        href={getKakaoLink(prec)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 text-center py-2.5 bg-[var(--google-blue)] hover:bg-[#174ea6] text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        💬 내 보상 무료 검토 신청 (카톡)
+                      </a>
+                    </div>
                   </div>
                 </article>
               );
@@ -576,8 +582,6 @@ export default function PrecedentSearchPage() {
           </div>
         </div>
       )}
-
-      {/* 사전 섹션 제거됨 */}
     </div>
   );
 }

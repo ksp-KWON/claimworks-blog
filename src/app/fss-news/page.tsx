@@ -25,6 +25,7 @@ export default function FssNewsPage() {
   const [latestAlert, setLatestAlert] = useState<FssNewsItem | null>(null);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
 
   // 1. 금감원 뉴스/소비자 데이터 조회
   const fetchFssData = async (searchQuery: string, categoryTab: string) => {
@@ -61,7 +62,48 @@ export default function FssNewsPage() {
   // 마운트 시 최초 호출
   useEffect(() => {
     fetchFssData('', 'all');
+
+    // API를 통해 포스트 데이터 불러오기
+    fetch('/api/posts')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setBlogPosts(data))
+      .catch(err => console.warn('블로그 포스트 연동 로드 실패:', err));
   }, []);
+
+  // 금감원 자료에 해당되는 보상스쿨의 전문 해설글 자동 매핑 알고리즘
+  const getRelatedBlogPostsForFss = (item: FssNewsItem) => {
+    if (blogPosts.length === 0) {
+      return item.relColumn ? [{ slug: item.relColumn.replace('/blog/', ''), title: item.title }] : [];
+    }
+    
+    let matchPosts: any[] = [];
+    
+    // 1. relColumn에 지정된 포스트 매핑
+    if (item.relColumn) {
+      const slug = item.relColumn.replace('/blog/', '');
+      const matched = blogPosts.find(post => post.slug === slug);
+      if (matched) {
+        matchPosts.push(matched);
+      }
+    }
+    
+    // 2. 키워드 기반 추가 포스트 매핑 (최대 2건 제한)
+    const titleLower = item.title.toLowerCase();
+    const contentLower = item.content.toLowerCase();
+    
+    const extra = blogPosts.filter(post => {
+      if (matchPosts.some(m => m.slug === post.slug)) return false;
+      
+      const postTitleLower = post.title.toLowerCase();
+      return item.keywords.some(kw => {
+        const k = kw.toLowerCase();
+        return (titleLower.includes(k) || contentLower.includes(k)) && postTitleLower.includes(k);
+      });
+    });
+    
+    matchPosts = [...matchPosts, ...extra];
+    return matchPosts.slice(0, 2);
+  };
 
   // 메인 탭 변경 핸들러
   const handleTabChange = (tab: 'all' | 'alert' | 'case' | 'tip' | 'press') => {
@@ -278,15 +320,15 @@ export default function FssNewsPage() {
                       ))}
                     </div>
 
-                    {/* HWP 파일 무설치 전문보기 및 공식 사이트 새창 이동 */}
-                    <div className="flex flex-wrap gap-2 pt-2">
+                    {/* HWP 파일 무설치 전문보기 및 공식 사이트 새창 이동 (좌우 50% 균등 배치) */}
+                    <div className="flex gap-2 pt-2 w-full">
                       {item.fullContent && (
                         <button
                           onClick={() => setExpandedCardId(expandedCardId === item.id ? null : item.id)}
-                          className="flex-1 sm:flex-initial px-3.5 py-2 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                          className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-750 dark:text-gray-300 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
                         >
                           <span>📄</span>
-                          {expandedCardId === item.id ? '보도/결정문 전문 닫기' : '금감원 보도·결정문 전문 확인 (HWP 변환)'}
+                          {expandedCardId === item.id ? '보도/결정문 전문 닫기' : '전문 확인 (HWP 변환)'}
                         </button>
                       )}
                       {item.officialUrl && (
@@ -294,7 +336,7 @@ export default function FssNewsPage() {
                           href={item.officialUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-3.5 py-2 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 shadow-sm"
+                          className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 shadow-sm text-center"
                         >
                           <span>🔗</span> 금감원 원문 새창보기
                         </a>
@@ -312,14 +354,34 @@ export default function FssNewsPage() {
                       </div>
                     )}
 
-                    {/* 액션 */}
+                     {/* 액션 */}
                     <div className="flex items-center gap-2.5 pt-3 border-t border-gray-50 dark:border-white/2 flex-wrap sm:flex-nowrap">
-                      <Link 
-                        href={item.relColumn}
-                        className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer"
-                      >
-                        📖 관련 분석 칼럼 읽기
-                      </Link>
+                      {(() => {
+                        const related = getRelatedBlogPostsForFss(item);
+                        if (related.length > 0) {
+                          return (
+                            <Link 
+                              href={`/blog/${related[0].slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                            >
+                              📖 관련 분석 칼럼 읽기 ({related.length}건)
+                            </Link>
+                          );
+                        } else {
+                          return (
+                            <Link 
+                              href="/blog"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                            >
+                              📖 보상스쿨 전체 칼럼 읽기
+                            </Link>
+                          );
+                        }
+                      })()}
                       <a 
                         href={getKakaoLink(item.title)}
                         target="_blank"

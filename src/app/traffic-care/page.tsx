@@ -104,8 +104,8 @@ const SIDO_GUGUN_MAP: Record<string, string[]> = {
 export default function TrafficCarePage() {
   const [selectedSido, setSelectedSido] = useState('경기도');
   const [selectedGugun, setSelectedGugun] = useState('의정부시');
-  const [loadedSido, setLoadedSido] = useState('경기도');
-  const [loadedGugun, setLoadedGugun] = useState('의정부시');
+  const [loadedSido, setLoadedSido] = useState('');
+  const [loadedGugun, setLoadedGugun] = useState('');
   const [loading, setLoading] = useState(false);
   const [zones, setZones] = useState<AccidentZone[]>([]);
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
@@ -120,14 +120,12 @@ export default function TrafficCarePage() {
   // 로컬 블로그 포스트 데이터 (칼럼 매핑용)
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
 
-  // 초기 로드 시 블로그 포스트 가져오기 및 최초 경기도 의정부시 로드
+  // 초기 로드 시 블로그 포스트만 가져오기 (지도는 사용자가 직접 지역 선택 후 분석 버튼 누를 때ꭌ 로드)
   useEffect(() => {
     fetch('/api/posts')
       .then(res => res.ok ? res.json() : [])
       .then(data => setBlogPosts(data))
       .catch(err => console.warn('블로그 포스트 연동 로드 실패:', err));
-
-    fetchData('경기도', '의정부시');
   }, []);
 
   // 시도 변경 시 구군을 해당 시도의 첫번째 구군으로 리셋

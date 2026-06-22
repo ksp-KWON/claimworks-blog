@@ -7,6 +7,7 @@ interface Coords {
 }
 
 const BASE_COORDS = taasData.BASE_COORDS as Record<string, Coords>;
+const GUGUN_COORDS = taasData.GUGUN_COORDS as Record<string, Coords>;
 const TAAS_SIDO_CODES = taasData.TAAS_SIDO_CODES as Record<string, string>;
 const TAAS_GUGUN_CODES = taasData.TAAS_GUGUN_CODES as Record<string, Record<string, string>>;
 
@@ -16,7 +17,8 @@ export async function onRequest(context: any) {
 
   // API 키가 없거나 통신 장애 시 작동할 동적 백업 데이터 생성기
   const getFallbackAccidents = (sidoName: string, gugunName: string) => {
-    const coord = BASE_COORDS[sidoName] || { lat: 37.7381, lng: 127.0337 };
+    // 구군 단위 정밀 좌표 우선, 없으면 시도 단위, 두 것 다 없으면 대한민국 중심 좌표 사용
+    const coord = GUGUN_COORDS[gugunName] || BASE_COORDS[sidoName] || { lat: 36.5, lng: 127.7 };
     const nameSeed = (sidoName + gugunName).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     
     const pseudoRandom = (seed: number, offset: number) => {
@@ -93,6 +95,17 @@ export async function onRequest(context: any) {
       }
     }
 
+    // 구군 코드 미발견 시 엉뚱한 지역(수원 등)으로 API 요청하지 않고 즉시 fallback 전환
+    if (!codeSido || !codeGugun) {
+      console.warn(`  ⚠️ 지역 코드 미발견 (sido: ${codeSido}, gugun: ${codeGugun}). 백업 모드 전환.`);
+      return new Response(JSON.stringify(getFallbackAccidents(sido, gugun)), {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+
     const API_KEY = env.PUBLIC_DATA_API_KEY;
     if (!API_KEY || API_KEY === '여기에_입력') {
       console.warn('  ⚠️ 서버 인증키(PUBLIC_DATA_API_KEY) 누락. 백업 모드로 전환합니다.');
@@ -104,8 +117,8 @@ export async function onRequest(context: any) {
       });
     }
 
-    const finalSido = codeSido || '41';
-    const finalGugun = codeGugun || '150';
+    const finalSido = codeSido;
+    const finalGugun = codeGugun;
     const serviceKey = API_KEY.includes('%') ? API_KEY : encodeURIComponent(API_KEY);
     const taasUrl = `https://apis.data.go.kr/B552061/frequentzoneLg/getRestFrequentzoneLg?serviceKey=${serviceKey}&searchYearCd=2024&siDo=${finalSido}&guGun=${finalGugun}&_type=json`;
 
@@ -144,7 +157,8 @@ export async function onRequest(context: any) {
     }
 
     const cleanedData = rawList.filter(Boolean).map((item: any, idx: number) => {
-      const cityCoord = BASE_COORDS[sido] || { lat: 37.7381, lng: 127.0337 };
+      // 대한민국 중심 좌표를 기본값으로 사용 — 수원 등 특정 도시 오해 방지
+      const cityCoord = BASE_COORDS[sido] || { lat: 36.5, lng: 127.7 };
       let lat = cityCoord.lat;
       let lng = cityCoord.lng;
 

@@ -435,7 +435,7 @@ async function main() {
     while (contentStart < lines.length && lines[contentStart].trim() === '') contentStart++;
   }
 
-  const content = lines.slice(contentStart).join('\n').trim();
+  const content = lines.slice(contentStart).join('\n').replace(/\[BLOCK-\d+:[^\]]*\]/gi, '').trim();
 
   if (!summary) {
     summary = content.replace(/[#*`>[\]!]/g, '').replace(/\s+/g, ' ').trim().slice(0, 140);

@@ -161,7 +161,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
     }
 
     const parsed = JSON.parse(rawText);
-    const items  = parsed?.response?.body?.items?.item ?? [];
+    const items  = parsed?.items?.item ?? parsed?.response?.body?.items?.item ?? [];
     const rawList: Record<string, string>[] = Array.isArray(items) ? items : (items ? [items] : []);
 
     if (rawList.length === 0) {

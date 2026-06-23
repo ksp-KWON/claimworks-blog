@@ -54,6 +54,10 @@ jobs:
           
           echo "📊 선택된 발행 유형: $POST_TYPE"
           
+          # 모든 자동글쓰기에 공동 활용될 당일의 트렌드 및 법제처 판례를 선 수집 확정합니다.
+          echo "🔍 오늘의 주제 및 판례 사전 탐색 실행 (scripts/select-daily-topic.js)"
+          node scripts/select-daily-topic.js
+          
           if [ "$POST_TYPE" = "all" ] || [ "$POST_TYPE" = "trend" ]; then
             echo "🔥 트렌드 글쓰기 기동 (scripts/generate-blog-post.js)"
             node scripts/generate-blog-post.js

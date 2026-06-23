@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { getPostData, getSortedPostsData } from '@/lib/posts';
+import { getSortedPostsData } from '@/lib/posts';
 import fs from 'fs';
 import path from 'path';
 
@@ -15,10 +15,7 @@ export const size = {
 };
 export const contentType = 'image/png';
 
-export default async function Image({ params }: { params: { slug: string } }) {
-  const post = getPostData(params.slug);
-  const title = post ? post.title : '보상스쿨 헬스케어 & 손해사정 보상가이드';
-
+export default async function Image() {
   let logoBase64 = '';
   try {
     const logoPath = path.join(process.cwd(), 'public/logo.png');
@@ -41,50 +38,33 @@ export default async function Image({ params }: { params: { slug: string } }) {
           backgroundColor: '#ffffff',
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            padding: '0 80px',
-            textAlign: 'center',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '40px' }}>
-            {logoBase64 ? (
-              <img
-                src={logoBase64}
-                alt="보상스쿨"
-                style={{
-                  width: '80px',
-                  height: '80px',
-                  borderRadius: '40px',
-                }}
-              />
-            ) : (
-              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="2">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-              </svg>
-            )}
-            <span style={{ fontSize: 40, fontWeight: 800, color: '#0f172a', marginLeft: 20 }}>보상스쿨</span>
-          </div>
-          
-          <h1
+        {logoBase64 ? (
+          <img
+            src={logoBase64}
+            alt="보상스쿨"
             style={{
-              fontSize: '68px',
-              fontWeight: 900,
-              color: '#0f172a',
-              lineHeight: 1.3,
-              marginTop: 0,
-              marginBottom: 0,
-              wordBreak: 'keep-all',
+              width: '540px',
+              height: '540px',
+              borderRadius: '270px',
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: '540px',
+              height: '540px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#f1f5f9',
+              borderRadius: '270px',
             }}
           >
-            {title}
-          </h1>
-        </div>
+            <svg width="240" height="240" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="1.5">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+          </div>
+        )}
       </div>
     ),
     {

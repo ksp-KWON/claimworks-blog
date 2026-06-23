@@ -31,7 +31,7 @@ if (fs.existsSync(envPath)) {
 
 // ── 상수 ────────────────────────────────────────────────────────────────────
 const POSTS_DIR     = path.join(process.cwd(), 'src/content/posts');
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
 
 // ── 유틸 ────────────────────────────────────────────────────────────────────
 const sleep = ms => new Promise(r => setTimeout(r, ms));

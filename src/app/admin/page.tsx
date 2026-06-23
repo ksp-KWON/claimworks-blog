@@ -269,33 +269,60 @@ export default function AdminPage() {
     if (!geminiKey) return alert('Gemini API 키가 필요합니다.');
     setIsLoading(true);
     setStatusMessage('✨ AI가 글을 작성하고 있습니다... (10~20초 소요)');
-    try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7 }
-        })
-      });
-      const data = await response.json() as { error?: { message: string }; candidates: { content: { parts: { text: string }[] } }[] };
-      if (data.error) throw new Error(data.error.message);
-      
-      const text = data.candidates[0].content.parts[0].text;
-      
-      const slugMatch = text.match(/slug:\s*"?([^"\n]+)"?/);
-      if (slugMatch) {
-        setSlug(slugMatch[1].trim());
-      } else {
-        setSlug(`post-${Date.now()}`);
+    
+    const models = [
+      'gemini-flash-latest',       // 1순위: 최신 3.5 Flash
+      'gemini-flash-lite-latest',  // 2순위: 최신 3.1 Flash-Lite (할당량 대비)
+      'gemini-2.5-flash',          // 3순위: 백업
+      'gemini-2.0-flash'           // 4순위: 예비용
+    ];
+    
+    let success = false;
+    let lastError = '';
+    
+    for (const model of models) {
+      try {
+        setStatusMessage(`✨ AI가 글을 작성하고 있습니다... (사용 모델: ${model})`);
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.7 }
+          })
+        });
+        
+        if (!response.ok) {
+          const errData = await response.json() as any;
+          throw new Error(errData?.error?.message || `HTTP ${response.status}`);
+        }
+        
+        const data = await response.json() as { error?: { message: string }; candidates: { content: { parts: { text: string }[] } }[] };
+        if (data.error) throw new Error(data.error.message);
+        
+        const text = data.candidates[0].content.parts[0].text;
+        
+        const slugMatch = text.match(/slug:\s*"?([^"\n]+)"?/);
+        if (slugMatch) {
+          setSlug(slugMatch[1].trim());
+        } else {
+          setSlug(`post-${Date.now()}`);
+        }
+        
+        setGeneratedMarkdown(text);
+        setIsPreview(true);
+        setStatusMessage('🎉 작성이 완료되었습니다! 미리보기를 확인하고 발행하세요.');
+        success = true;
+        break; // 성공 시 종료
+      } catch (error) {
+        const err = error as Error;
+        console.warn(`${model} 호출 실패:`, err.message);
+        lastError = err.message;
       }
-      
-      setGeneratedMarkdown(text);
-      setIsPreview(true);
-      setStatusMessage('🎉 작성이 완료되었습니다! 미리보기를 확인하고 발행하세요.');
-    } catch (error) {
-      const err = error as Error;
-      setStatusMessage(`API 오류: ${err.message}`);
+    }
+    
+    if (!success) {
+      setStatusMessage(`API 오류: 모든 모델 호출에 실패했습니다. (마지막 에러: ${lastError})`);
     }
     setIsLoading(false);
   };

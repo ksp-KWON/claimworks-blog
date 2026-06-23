@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { SpecialtyDiseaseCategories, RegionalCategories } from '@/components/SidebarCategories';
 
 export default function SidebarContent() {
-  const pathname = usePathname();
   const [showAllTags, setShowAllTags] = useState(false);
   const [isCalcOpen, setIsCalcOpen] = useState(false);
   const [isColOpen, setIsColOpen] = useState(false);

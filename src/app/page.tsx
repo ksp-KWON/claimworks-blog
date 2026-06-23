@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getSortedPostsData } from "@/lib/posts";
 import YouTubeBriefing from "@/components/YouTubeBriefing";
 import HomePostList from "@/components/HomePostList";

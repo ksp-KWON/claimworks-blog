@@ -203,7 +203,7 @@ export default function TrafficCarePage() {
           
           // 정형외과, 신경외과, 재활의학과, 마취통증의학과 등 주요 과목의 병원들만 병합
           const targetSpecialties = ['정형외과', '신경외과', '재활의학과', '마취통증의학과', '응급의학과'];
-          let mergedHospitals: Hospital[] = [];
+          const mergedHospitals: Hospital[] = [];
 
           if (hiraData && hiraData.specialties) {
             Object.entries(hiraData.specialties).forEach(([specName, specData]) => {

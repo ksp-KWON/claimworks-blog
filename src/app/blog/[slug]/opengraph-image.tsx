@@ -1,5 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { getPostData, getSortedPostsData } from '@/lib/posts';
+import fs from 'fs';
+import path from 'path';
 
 export function generateStaticParams() {
   const posts = getSortedPostsData(false);
@@ -17,6 +19,15 @@ export default async function Image({ params }: { params: { slug: string } }) {
   const post = getPostData(params.slug);
   const title = post ? post.title : '보상스쿨 헬스케어 & 손해사정 보상가이드';
 
+  let logoBase64 = '';
+  try {
+    const logoPath = path.join(process.cwd(), 'public/logo.png');
+    const logoBuffer = fs.readFileSync(logoPath);
+    logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+  } catch (error) {
+    console.error('Error reading logo file for blog OG image:', error);
+  }
+
   return new ImageResponse(
     (
       <div
@@ -27,9 +38,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#202124', // Google Dark
-          backgroundImage: 'radial-gradient(circle at 25px 25px, #303134 2%, transparent 0%), radial-gradient(circle at 75px 75px, #303134 2%, transparent 0%)',
-          backgroundSize: '100px 100px',
+          backgroundColor: '#ffffff',
         }}
       >
         <div
@@ -38,26 +47,34 @@ export default async function Image({ params }: { params: { slug: string } }) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#ffffff',
-            padding: '60px 80px',
-            borderRadius: '40px',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-            maxWidth: '1000px',
+            width: '800px',
             textAlign: 'center',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="2">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
-            <span style={{ fontSize: 32, fontWeight: 800, color: '#1a73e8', marginLeft: 16 }}>보상스쿨</span>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '40px' }}>
+            {logoBase64 ? (
+              <img
+                src={logoBase64}
+                alt="보상스쿨"
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '30px',
+                }}
+              />
+            ) : (
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+            )}
+            <span style={{ fontSize: 32, fontWeight: 800, color: '#0f172a', marginLeft: 16 }}>보상스쿨</span>
           </div>
           
           <h1
             style={{
-              fontSize: 64,
+              fontSize: '54px',
               fontWeight: 900,
-              color: '#202124',
+              color: '#0f172a',
               lineHeight: 1.3,
               marginTop: 0,
               marginBottom: 0,
@@ -74,3 +91,4 @@ export default async function Image({ params }: { params: { slug: string } }) {
     }
   );
 }
+

@@ -1,4 +1,6 @@
 import { ImageResponse } from 'next/og';
+import fs from 'fs';
+import path from 'path';
 
 export const dynamic = 'force-static';
 
@@ -10,6 +12,15 @@ export const size = {
 export const contentType = 'image/png';
 
 export default async function Image() {
+  let logoBase64 = '';
+  try {
+    const logoPath = path.join(process.cwd(), 'public/logo.png');
+    const logoBuffer = fs.readFileSync(logoPath);
+    logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+  } catch (error) {
+    console.error('Error reading logo file for OG image:', error);
+  }
+
   return new ImageResponse(
     (
       <div
@@ -20,9 +31,7 @@ export default async function Image() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#202124', // Google Dark
-          backgroundImage: 'radial-gradient(circle at 25px 25px, #303134 2%, transparent 0%), radial-gradient(circle at 75px 75px, #303134 2%, transparent 0%)',
-          backgroundSize: '100px 100px',
+          backgroundColor: '#ffffff',
         }}
       >
         <div
@@ -31,29 +40,48 @@ export default async function Image() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#ffffff',
-            padding: '60px 80px',
-            borderRadius: '40px',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-            maxWidth: '1000px',
+            width: '600px',
             textAlign: 'center',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d93025" strokeWidth="2.5">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
-            <span style={{ fontSize: 32, fontWeight: 800, color: '#d93025', marginLeft: 16 }}>보상스쿨</span>
-          </div>
+          {logoBase64 ? (
+            <img
+              src={logoBase64}
+              alt="보상스쿨"
+              style={{
+                width: '180px',
+                height: '180px',
+                marginBottom: '32px',
+                borderRadius: '90px',
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: '180px',
+                height: '180px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#f1f5f9',
+                borderRadius: '90px',
+                marginBottom: '32px',
+              }}
+            >
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#d93025" strokeWidth="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
+          )}
           
           <h1
             style={{
-              fontSize: 60,
+              fontSize: '52px',
               fontWeight: 900,
-              color: '#202124',
-              lineHeight: 1.3,
+              color: '#0f172a',
+              lineHeight: 1.2,
               marginTop: 0,
-              marginBottom: 10,
+              marginBottom: '12px',
               wordBreak: 'keep-all',
             }}
           >
@@ -61,9 +89,9 @@ export default async function Image() {
           </h1>
           <p
             style={{
-              fontSize: 28,
+              fontSize: '24px',
               fontWeight: 600,
-              color: '#5f6368',
+              color: '#64748b',
               margin: 0,
               wordBreak: 'keep-all',
             }}
@@ -78,3 +106,4 @@ export default async function Image() {
     }
   );
 }
+

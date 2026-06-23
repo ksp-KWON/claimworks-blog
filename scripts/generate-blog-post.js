@@ -40,23 +40,7 @@ function yamlSafe(str) {
   return String(str).replace(/"/g, "'").replace(/\n/g, ' ').trim();
 }
 
-// ── 구글 트렌드 수집 ────────────────────────────────────────────────────────
-async function fetchGoogleTrends() {
-  try {
-    const res = await fetch(
-      'https://trends.google.com/trends/trendingsearches/daily/rss?geo=KR',
-      { signal: AbortSignal.timeout(10000) }
-    );
-    if (!res.ok) return [];
-    const text = await res.text();
-    return [...text.matchAll(/<title>(.*?)<\/title>/g)]
-      .map(m => m[1].trim())
-      .filter(t => t && t !== '대한민국에서 인기 있는 트렌드')
-      .slice(0, 15);
-  } catch {
-    return [];
-  }
-}
+
 
 // ── 기존 포스트 목록 ────────────────────────────────────────────────────────
 function getExistingPosts() {
@@ -204,45 +188,23 @@ const TOPIC_SCHEMA = {
   required: ['slug', 'title', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
 };
 
-// ── 토픽 선정 프롬프트 ──────────────────────────────────────────────────────
-function buildTopicPrompt(existingPosts, trendCtx) {
+// ── 토픽 기획 프롬프트 ──────────────────────────────────────────────────────
+function buildTopicPromptFromKeyword(keyword, trendTitle, existingPosts) {
   return `당신은 독립 신체손해사정사 전문 블로그 '보상스쿨'의 콘텐츠 기획자입니다.
-보상스쿨 손해사정사의 업무 영역은 3가지입니다:
-  1) 사고 조사 전문가 : 교통사고·산재사고·일상생활 안전사고·질병사고의 손해 발생 사실 확인
-  2) 법률 전문가 : 보험약관 및 관계 법규 적용의 적정성 판단
-  3) 의학 전문가 : 손해액 및 보험금 사정
+오늘 확정된 대표 키워드는 [${keyword}] 이며, 관련된 오늘의 실시간 트렌드 문맥은 [${trendTitle || '없음'}] 입니다.
 
 기존 슬러그 (중복 금지) : [${existingPosts.join(', ')}]
-${trendCtx}
 
-── 키워드 선정 원칙 (반드시 준수) ──
+위 키워드와 트렌드 맥락을 바탕으로 다음 항목들을 기획하십시오:
+1. slug: 영문 소문자와 하이픈(-)으로만 구성된 고유 주소 (예: daily-accident-compensation)
+2. title: 피해자가 검색하기 쉬운 일상 용어와 법률적 혜택이 어우러진 SEO 최적화 제목
+3. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 적절한 카테고리 기재 (쉼표 구분 나열 가능)
+4. specialtyCategory: 전문 진료과목 (예: 정형외과, 신경외과, 내과 등)
+5. tags: 관련 태그 5개
+6. keywords: 타겟 키워드 목록
+7. calculatorType: 관련 분야에 맞춰 "auto"(교통사고/배상/장해/산재 등) 또는 "medical"(실손/치료비 등) 지정.
 
-[금지] 총론·가이드형 주제
-  - "후유장해 청구 가이드", "실손보험 청구 방법", "암진단비 총정리" 같은
-    포괄적이고 일반적인 주제는 절대 선정 금지.
-
-[필수] 각론·구체적 분쟁 장면 키워드
-  - 반드시 아래 3요소를 모두 포함하는 구체적인 키워드를 선정할 것:
-    ① 구체적 상병명 또는 사고 유형 (예: 반월상연골판 파열, 쿠팡이츠 배달사고, 필러 시술 부작용)
-    ② 보험사와의 분쟁 포인트 (예: 부분파열 vs 완전파열 판정, 기왕증 공제 비율, 재해사망 vs 질병사망)
-    ③ 손해사정사 개입이 필요한 이유 (예: 후유장해 등급 상향, 휴업손해 과소지급 정정, 보험금 부지급 번복)
-
-[트렌드 활용 원칙]
-  - 트렌드 키워드가 있을 경우, 그 키워드와 관련된 사고 유형에서
-    실제로 발생하는 보험 분쟁 장면을 구체적으로 결합할 것.
-  - 트렌드와 손해사정 업무의 연결이 억지스러우면 트렌드를 무시하고
-    독자 기획 키워드를 선정할 것.
-
-[독자 전제]
-  - 이 글을 검색하는 사람은 이미 사고 또는 질병의 당사자이거나
-    보험금 지급 결과에 의문을 품고 있는 상태임.
-  - 검색 시점 = 손해사정사 상담이 필요한지 판단하는 시점.
-
-[calculatorType 선정 기준]
-  - 교통사고, 배상책임, 후유장해, 맥브라이드, 일실수입, 휴업손해, 산재 → "auto"
-  - 실손의료비, 병원비, 입원비, 수술비 → "medical"
-
-위 원칙에 따라 검색량 높고 경쟁 강도가 낮은 각론 키워드 1개를 선정하십시오.`;
+반드시 YMYL 및 구글 E-E-A-T 기준에 부합하도록 전문적이면서도 클릭하고 싶은 주제로 기획하여 JSON으로 반환하십시오.`;
 }
 
 // ── 본문 프롬프트 — 스켈레톤 강제 출력 방식 ─────────────────────────────────
@@ -435,23 +397,31 @@ async function main() {
   console.log(`=== 자동글쓰기 시작 (${new Date().toISOString()}) ===`);
   if (!fs.existsSync(POSTS_DIR)) fs.mkdirSync(POSTS_DIR, { recursive: true });
 
+  // 1단계에서 저장한 daily-topic.json 로드
+  const topicJsonPath = path.join(process.cwd(), 'scripts/daily-topic.json');
+  if (!fs.existsSync(topicJsonPath)) {
+    throw new Error('daily-topic.json 파일이 존재하지 않습니다. 먼저 select-daily-topic.js를 실행해 주세요.');
+  }
+
+  const dailyTopic = JSON.parse(fs.readFileSync(topicJsonPath, 'utf8'));
+  console.log(`  [로드] 확정된 오늘의 키워드: '${dailyTopic.keyword}' (출처: ${dailyTopic.source})`);
+
   const existingPosts = getExistingPosts();
 
-  // Step 1 : 트렌드 수집
-  const trends   = await fetchGoogleTrends();
-  const trendCtx = trends.length > 0
-    ? `오늘 구글 트렌드 : ${trends.join(', ')}\n(손해사정/보험/의료 관련이면 타겟팅, 아니면 독자 키워드 선정)`
-    : '(트렌드 수집 실패 - 독자 키워드로 선정)';
-
-  // Step 2 : 토픽 선정 (calculatorType 포함)
-  const topic = await callGemini(buildTopicPrompt(existingPosts, trendCtx), TOPIC_SCHEMA);
-  console.log(`[1] 토픽 확정 : ${topic.title} (${topic.slug})`);
+  // Step 2 : 토픽 정보 상세 기획 (AI 호출)
+  console.log('[2] 제미나이를 통한 오늘의 토픽 상세 기획 생성 중...');
+  const topic = await callGemini(
+    buildTopicPromptFromKeyword(dailyTopic.keyword, dailyTopic.trendTitle, existingPosts),
+    TOPIC_SCHEMA
+  );
+  console.log(`    토픽 기획 완료 : ${topic.title} (${topic.slug})`);
   console.log(`    계산기 타입 : ${topic.calculatorType}`);
 
-  console.log('  [대기] 30초 쿨다운...');
-  await sleep(30000);
+  console.log('  [대기] 10초 쿨다운...');
+  await sleep(10000);
 
   // Step 3 : 본문 생성
+  console.log('[3] 제미나이를 통한 블로그 본문 칼럼 작성 중...');
   const rawOutput = await callGemini(buildPrompt(topic, existingPosts));
 
   // SEO_META 파싱
@@ -473,7 +443,7 @@ async function main() {
   }
   if (summary.length > 158) summary = summary.slice(0, 155) + '...';
 
-  console.log(`[2] 본문 생성 완료 (${content.length}자) | SEO : ${summary.slice(0, 30)}...`);
+  console.log(`[4] 본문 생성 완료 (${content.length}자) | SEO : ${summary.slice(0, 30)}...`);
 
   // Step 4 : 저장
   const slug    = resolveUniqueSlug(topic.slug);
@@ -498,7 +468,7 @@ ${content}
 
   const filePath = path.join(POSTS_DIR, `${slug}.md`);
   fs.writeFileSync(filePath, md, 'utf8');
-  console.log(`[3] 저장 완료 : ${filePath}`);
+  console.log(`[5] 저장 완료 : ${filePath}`);
   console.log('=== 자동글쓰기 종료 ===');
 }
 

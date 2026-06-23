@@ -47,87 +47,7 @@ function getXmlTags(xml, tag) {
   return results;
 }
 
-// ── 법제처 API 공통 호출 헬퍼 (프록시 우회 및 다이렉트 처리) ───────────────────
-async function fetchLawAPI(type, params) {
-  let url = '';
-  const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-  };
 
-  if (LAW_PROXY_ENDPOINT && LAW_PROXY_ENDPOINT.trim().length > 0) {
-    // 프록시 사용 시 (GCP 고정 IP 서버 경유)
-    if (type === 'list') {
-      url = `${LAW_PROXY_ENDPOINT.trim()}/api/precedent?query=${encodeURIComponent(params.query)}`;
-    } else {
-      url = `${LAW_PROXY_ENDPOINT.trim()}/api/precedent-detail?ID=${params.id}`;
-    }
-    if (LAW_PROXY_TOKEN) {
-      headers['X-Proxy-Token'] = LAW_PROXY_TOKEN.trim();
-    }
-  } else {
-    // 다이렉트 호출 시
-    if (!LAW_API_KEY) {
-      throw new Error('법제처 API 인증키(LAW_API_KEY)가 등록되지 않았습니다. 로컬 개발 시에는 .env.local 파일에, GitHub Actions 실행 시에는 Secrets에 등록해 주세요.');
-    }
-    if (type === 'list') {
-      url = `https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=${LAW_API_KEY}&search=2&query=${encodeURIComponent(params.query)}`;
-    } else {
-      url = `https://www.law.go.kr/DRF/lawService.do?target=prec&type=XML&OC=${LAW_API_KEY}&ID=${params.id}`;
-    }
-  }
-
-  // 10초 타임아웃 설정 (네트워크 지연으로 인한 무한 대기 현상 방어)
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-  try {
-    const res = await fetch(url, { 
-      headers,
-      signal: controller.signal
-    });
-    if (!res.ok) throw new Error(`법제처 통신 실패 (상태 코드: ${res.status})`);
-    return await res.text();
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
-
-// ── 1. 대표 손해사정 키워드로 법제처 판례 검색 ───────────────────────────────
-async function searchPrecedents(query) {
-  console.log(`[1] 법제처 API 판례 검색 중 (키워드: ${query})...`);
-  const xml = await fetchLawAPI('list', { query });
-  
-  if (xml.includes('사용자 정보 검증에 실패하였습니다')) {
-    throw new Error('법제처 API 인증 실패: 등록된 IP와 현재 요청 IP가 일치하지 않거나 서버 동기화 지연 중입니다.');
-  }
-
-  const ids = getXmlTags(xml, '판례일련번호');
-  const titles = getXmlTags(xml, '사건명');
-  const caseNos = getXmlTags(xml, '사건번호');
-
-  return ids.map((id, index) => ({
-    id,
-    title: titles[index],
-    caseNo: caseNos[index],
-  }));
-}
-
-// ── 2. 판례 상세 조회 ────────────────────────────────────────────────────────
-async function getPrecedentDetail(id) {
-  console.log(`[2] 상세 판결문 본문 조회 중 (판례 ID: ${id})...`);
-  const xml = await fetchLawAPI('detail', { id });
-
-  return {
-    id,
-    caseName: getXmlTagContent(xml, '사건명'),
-    caseNo: getXmlTagContent(xml, '사건번호'),
-    judgmentDate: getXmlTagContent(xml, '선고일자'),
-    courtName: getXmlTagContent(xml, '법원명'),
-    judgmentSummary: getXmlTagContent(xml, '판결요지'),
-    caseContent: getXmlTagContent(xml, '판례내용'),
-    caseType: getXmlTagContent(xml, '사건종류명'),
-  };
-}
 
 // ── 3. 기존 글 읽기 (슬러그 중복 및 내부 링크용) ──────────────────────────────
 function getExistingPosts() {
@@ -359,72 +279,28 @@ ${postsCtx}
 // ── 8. 메인 오케스트레이터 ──────────────────────────────────────────────────
 async function main() {
   console.log('=== 판례 기반 자동글쓰기 프로세스 시작 ===');
-  
-  if (!LAW_API_KEY) {
-    throw new Error('법제처 API 인증키(LAW_API_KEY)가 등록되지 않았습니다. 로컬 개발 시에는 .env.local 파일에, GitHub Actions 실행 시에는 Secrets에 등록해 주세요.');
+
+  // 1단계에서 저장한 daily-topic.json 로드
+  const topicJsonPath = path.join(process.cwd(), 'scripts/daily-topic.json');
+  if (!fs.existsSync(topicJsonPath)) {
+    throw new Error('daily-topic.json 파일이 존재하지 않습니다. 먼저 select-daily-topic.js를 실행해 주세요.');
   }
 
-  // 대표 손해사정 키워드 목록 (명함 서비스 범위 확대 반영)
-  const keywords = [
-    '사망보험금', '자살보험금', '암진단비', '뇌출혈', '급성심근경색', 
-    '실손의료비', '소비자선임권', '교통사고 과실비율', '교통사고 위자료', '휴업손해', 
-    '장해진단', '영업배상책임', '의료사고', '근재보험', '산재보험', 
-    '장해평가', '면책보험금', '보험금 지급거절'
-  ];
-  const targetKeyword = keywords[Math.floor(Math.random() * keywords.length)];
+  const dailyTopic = JSON.parse(fs.readFileSync(topicJsonPath, 'utf8'));
+  const detail = dailyTopic.precedent;
+  console.log(`  [로드] 확정된 판례 확보: ${detail.caseNo} (${detail.caseName})`);
 
-  // 1. 판례 목록 수집
-  const list = await searchPrecedents(targetKeyword);
-  if (list.length === 0) {
-    console.log(`[!] 키워드 '${targetKeyword}'에 대해 수집된 판례가 없어 '보험금' 키워드로 재조회합니다.`);
-    const fallbackList = await searchPrecedents('보험금');
-    if (fallbackList.length === 0) {
-      console.log('[-] 수집 가능한 판례가 없습니다. 프로세스를 종료합니다.');
-      return;
-    }
-    list.push(...fallbackList);
-  }
-
-  // 2. 유효한 판결요지를 가진 판례 탐색 (최대 5개 후보 순차 검증)
-  let detail = null;
-  let selectedCase = null;
-  
-  for (let i = 0; i < Math.min(list.length, 5); i++) {
-    const candidate = list[i];
-    console.log(`[조회] 후보 판례 사건번호: ${candidate.caseNo} (ID: ${candidate.id}) 상세 조회 중...`);
-    try {
-      const candidateDetail = await getPrecedentDetail(candidate.id);
-      if (candidateDetail.judgmentSummary && candidateDetail.judgmentSummary.trim().length >= 40) {
-        detail = candidateDetail;
-        selectedCase = candidate;
-        console.log(`[확정] 유효한 판결요지 확인됨. 사건번호: ${selectedCase.caseNo}`);
-        break;
-      } else {
-        console.log(`[-] 후보 ${i + 1}번 판례는 판결 요지가 부족하여 건너뜁니다.`);
-      }
-    } catch (err) {
-      console.log(`[-] 후보 ${i + 1}번 상세조회 실패: ${err.message}`);
-    }
-  }
-
-  // 5개 후보 모두 요지가 마땅치 않은 경우, 목록의 첫 번째 판례를 fallback으로 지정
-  if (!detail) {
-    console.log('[⚠️ 경고] 유효한 판결요지가 있는 판례를 찾지 못했습니다. 목록의 첫 번째 판례를 기본값으로 진행합니다.');
-    selectedCase = list[0];
-    detail = await getPrecedentDetail(selectedCase.id);
-  }
-
-  // 3. 토픽 선정 (기획안 생성)
-  console.log('[3] 제미나이를 이용한 포스팅 기획안 생성 중...');
+  // 1. 토픽 선정 (기획안 생성)
+  console.log('[2] 제미나이를 이용한 포스팅 기획안 생성 중...');
   const existingPosts = getExistingPosts();
   const topic = await callGemini(buildPlanningPrompt(detail, existingPosts), TOPIC_SCHEMA);
   console.log(`    기획 완료: ${topic.title} (${topic.slug})`);
 
-  // 4. 본문 생성
-  console.log('[4] 제미나이를 이용한 판례 분석 칼럼 작성 중...');
+  // 2. 본문 생성
+  console.log('[3] 제미나이를 이용한 판례 분석 칼럼 작성 중...');
   const rawOutput = await callGemini(buildWritingPrompt(detail, topic, existingPosts));
 
-  // 5. 파싱 및 빌드
+  // 3. 파싱 및 빌드
   const lines = rawOutput.split('\n');
   let summary = '';
   let contentStart = 0;
@@ -442,7 +318,7 @@ async function main() {
   }
   if (summary.length > 158) summary = summary.slice(0, 155) + '...';
 
-  // 6. 마크다운 저장
+  // 4. 마크다운 저장
   const uniqueSlug = resolveUniqueSlug(topic.slug);
   const kstDate = new Date(Date.now() + 9 * 3600 * 1000).toISOString().split('T')[0];
   const tagsStr = topic.tags.map(t => `"${yamlSafe(t)}"`).join(', ');
@@ -466,23 +342,7 @@ ${content}
 
   const filePath = path.join(POSTS_DIR, `${uniqueSlug}.md`);
   fs.writeFileSync(filePath, md, 'utf8');
-  console.log(`[5] 블로그 포스팅 저장 완료: ${filePath}`);
-  
-  // 7. prebuild 실행으로 인덱스 정보 갱신
-  console.log('[6] prebuild.js 실행하여 포스팅 데이터 갱신 중...');
-  try {
-    const prebuild = require('./prebuild.js');
-    if (prebuild && typeof prebuild.main === 'function') {
-      await prebuild.main();
-    } else {
-      // prebuild 스크립트 모듈 로드 실패 시, 빌드용 동적 실행
-      const { execSync } = require('child_process');
-      execSync('node scripts/prebuild.js', { stdio: 'inherit' });
-    }
-    console.log('    포스팅 인덱싱이 정상 반영되었습니다.');
-  } catch (err) {
-    console.warn(`    [경고] prebuild 실행 중 비치명적 경고: ${err.message}`);
-  }
+  console.log(`[4] 블로그 포스팅 저장 완료: ${filePath}`);
 
   console.log('=== 프로세스 완료 ===');
 }

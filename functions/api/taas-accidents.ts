@@ -139,7 +139,13 @@ export async function onRequest(context: { request: Request; env: Record<string,
     const apiUrl = `https://apis.data.go.kr/B552061/frequentzoneLgrViolt/getRestFrequentzoneLgrViolt` +
       `?serviceKey=${serviceKey}&searchYearCd=2023&siDo=${codeSido}&guGun=${codeGugun}&_type=json`;
 
-    const res = await fetch(apiUrl, { signal: AbortSignal.timeout(7000) });
+    const res = await fetch(apiUrl, {
+      signal: AbortSignal.timeout(7000),
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*'
+      }
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const rawText = await res.text();

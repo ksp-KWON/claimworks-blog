@@ -218,6 +218,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[TAAS] API 연동 오류 → 샘플 모드:', msg);
-    return jsonResponse(getFallbackAccidents(sido, gugun));
+    const fb = getFallbackAccidents(sido, gugun);
+    return jsonResponse([...fb, { _debug: { reason: 'API_FETCH_ERROR', error: msg, keyLength: API_KEY.length } } as any]);
   }
 }

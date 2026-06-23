@@ -78,7 +78,7 @@ async function callGemini(prompt, schema = null) {
 
   const generationConfig = {
     temperature: 0.75,
-    maxOutputTokens: schema ? 4096 : 24576,
+    maxOutputTokens: schema ? 4096 : 65536,
   };
   if (schema) {
     generationConfig.responseMimeType = 'application/json';
@@ -179,7 +179,7 @@ function buildWritingPrompt(detail, topic, existingPosts) {
 
 # Objective
 아래의 대법원/법원 판례 데이터와 기획안을 바탕으로, 구글 E-E-A-T 및 YMYL 기준을 완벽히 만족하며 일반인도 이해하기 쉬운 스토리텔링형 포스팅을 작성합니다.
-분량은 전문성을 높이기 위해 최소 5,000자 이상으로 상세하게 작성해 주십시오.
+분량은 전문성을 높이기 위해 최소 15,000자 이상으로 매우 상세하고 깊이 있게 기술해 주십시오. 각 섹션마다 실무적인 쟁점과 분석을 최대한 꼼꼼하게 풀어서 써야 합니다.
 
 [원본 판례 정보]
 * 사건번호: ${detail.caseNo} (${detail.courtName} ${detail.judgmentDate} 선고)

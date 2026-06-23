@@ -15,6 +15,15 @@ const nextConfig: NextConfig = {
   pageExtensions: isDev
     ? ['tsx', 'ts', 'jsx', 'js', 'dev.ts', 'dev.tsx']
     : ['tsx', 'ts', 'jsx', 'js'],
+  async rewrites() {
+    if (!isDev) return [];
+    return [
+      {
+        source: '/api/taas-accidents',
+        destination: 'http://localhost:8788/api/taas-accidents',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

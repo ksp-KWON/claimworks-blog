@@ -154,14 +154,22 @@ export default function TrafficCarePage() {
     const delayPromise = new Promise(resolve => setTimeout(resolve, 800));
 
     try {
-      // 1. 도로교통공단 실시간 사고다발지역 데이터 호출
-      const taasUrl = `/api/taas-accidents?sido=${encodeURIComponent(sidoName)}&gugun=${encodeURIComponent(gugunName)}`;
+      // 로컬 개발 환경(3000포트)에서는 백엔드 wrangler dev 포트(8788)를 직접 찌르고, 그 외에는 상대경로 사용
+      const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+      const apiBase = isLocal ? 'http://localhost:8788' : '';
+      const taasUrl = `${apiBase}/api/taas-accidents?sido=${encodeURIComponent(sidoName)}&gugun=${encodeURIComponent(gugunName)}`;
+      
       const taasRes = await fetch(taasUrl);
       if (!taasRes.ok) {
         throw new Error(`교통사고 다발지역 실시간 조회 실패 (HTTP ${taasRes.status})`);
       }
       const taasData: AccidentZone[] = await taasRes.json();
       setZones(taasData);
+      
+      // 사고 데이터를 정상 수신했으므로 지도 렌더링용 지역 상태를 즉시 갱신
+      setLoadedSido(sidoName);
+      setLoadedGugun(gugunName);
+      
       if (taasData.length > 0) {
         setSelectedZoneId(taasData[0].id);
       }
@@ -219,9 +227,7 @@ export default function TrafficCarePage() {
         }
       }
       
-      // 데이터가 완전히 동기화되어 받아와졌을 때만 렌더링 지역 변수를 변경합니다.
-      setLoadedSido(sidoName);
-      setLoadedGugun(gugunName);
+      // 병원 데이터 로드 단계를 완전히 마침
       
       await delayPromise;
     } catch (e: any) {

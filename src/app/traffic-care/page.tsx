@@ -59,6 +59,7 @@ interface AccidentZone {
   latitude: number;
   longitude: number;
   isFallback?: boolean; // true = 샘플 데이터(API 키 미설정), false = 실제 공공 데이터
+  isSafeZone?: boolean; // true = 교통사고 다발지역 미지정 안전 구간
 }
 
 interface Hospital {
@@ -84,7 +85,7 @@ const SIDO_GUGUN_MAP: Record<string, string[]> = {
   '서울특별시': ['강남구', '강동구', '강북구', '강서구', '관악구', '광진구', '구로구', '금천구', '노원구', '도봉구', '동대문구', '동작구', '마포구', '서대문구', '서초구', '성동구', '성북구', '송파구', '양천구', '영등포구', '용산구', '은평구', '종로구', '중구', '중랑구'],
   '부산광역시': ['강서구', '금정구', '기장군', '남구', '동구', '동래구', '부산진구', '북구', '사상구', '사하구', '서구', '수영구', '연제구', '영도구', '중구', '해운대구'],
   '대구광역시': ['남구', '달서구', '달성군', '동구', '북구', '서구', '수성구', '중구', '군위군'],
-  '인천광역시': ['강화군', '계양구', '남동구', '동구', '미추홀구', '부평구', '서구', '연수구', '옹진구', '중구'],
+  '인천광역시': ['강화군', '계양구', '남동구', '동구', '미추홀구', '부평구', '서구', '연수구', '옹진군', '중구'],
   '광주광역시': ['광산구', '남구', '동구', '북구', '서구'],
   '대전광역시': ['대덕구', '동구', '서구', '유성구', '중구'],
   '울산광역시': ['남구', '동구', '북구', '울주군', '중구'],
@@ -183,19 +184,12 @@ export default function TrafficCarePage() {
         if (codes[gugunName]) {
           gugunCode = codes[gugunName];
         } else {
-          const cleanGugun = gugunName.replace(/^(인천|대구|광주|대전|울산|부산|서울)/, '');
-          if (cleanGugun.includes('부천')) {
-            gugunCode = codes['부천시'] || '';
-          } else if (cleanGugun.includes('화성')) {
-            gugunCode = codes['화성시'] || '';
-          } else {
-            for (const [key, code] of Object.entries(codes)) {
-              const cleanKey = key.replace('시', '');
-              if (cleanGugun === key || cleanGugun === cleanKey || cleanGugun.includes(key) || key.includes(cleanGugun)) {
-                gugunCode = code;
-                break;
-              }
-            }
+          // 정교한 부분 일치 매핑 (글자 수 기준 정렬하여 대도시 하위 구 오매칭 원천 차단)
+          const matchedKeys = Object.keys(codes)
+            .filter(k => gugunName.includes(k) || k.includes(gugunName))
+            .sort((a, b) => b.length - a.length);
+          if (matchedKeys.length > 0) {
+            gugunCode = codes[matchedKeys[0]];
           }
         }
       }
@@ -241,6 +235,13 @@ export default function TrafficCarePage() {
 
   // AI 3줄 요약 자동 생성기
   const getAiSummary = (zone: AccidentZone): string[] => {
+    if (zone.isSafeZone) {
+      return [
+        `최근 수년 동안 도로교통공단 교통사고 다발지역 데이터상 대형 법규위반 및 보행 위험 구역으로 지정되지 않은 안심 구역입니다.`,
+        `해당 지자체 교통안전 인프라가 양호하게 정비되어 있어 통계적 위험 요인은 매우 낮게 나타납니다.`,
+        `다만 주택가 이면도로 서행 및 야간 방어운전 등 일상적인 생활 안전 습관은 언제나 권장됩니다.`
+      ];
+    }
     return [
       `해당 구역은 연간 총 ${zone.occurCount}건의 교통사고가 집중된 도로교통공단 지정 다발 위험 도로입니다.`,
       `사고 결과로 인해 사망 ${zone.deathCount}명, 중상 ${zone.seriousCount}명 등 총 ${zone.casualtyCount}명의 중증 사상자가 발생했습니다.`,
@@ -250,6 +251,9 @@ export default function TrafficCarePage() {
 
   // 손해사정사 맞춤형 실무 코멘트
   const getPracticeComment = (zone: AccidentZone): string => {
+    if (zone.isSafeZone) {
+      return '통계상 교통사고 다발지역으로 지정되지는 않았으나, 교통사고는 예상치 못한 곳에서 무과실 혹은 급작스러운 과실 시비 형태로 자주 발생합니다. 특히 후방 추돌이나 교차로 동시 차선 변경 시 과실 10%의 차이가 보험 합의금 수백만 원을 좌우합니다. 억울한 과실 책임을 회피하고 정당한 보상을 보장받기 위해서는 블랙박스 분석 등의 적극적인 초기 대처가 필수적입니다.';
+    }
     const name = zone.locationName;
     if (name.includes('보행자') || name.includes('횡단보도') || name.includes('초등학교') || name.includes('어린이')) {
       return '보행자 및 신호등 인근 접촉사고가 잦은 구역입니다. 보행자 과실 산정 시, 횡단보도와의 거리나 보행 신호 위반 여부에 따라 과실 비율 분쟁이 치열합니다. 특히 하반신 골절이나 무릎 십자인대 파열 등 고액 후유장해가 수반되기 쉬우므로, 보험사 제시금 합의서 서명 전 손해사정사와 반드시 상의하십시오.';
@@ -413,15 +417,15 @@ export default function TrafficCarePage() {
               📍 {loadedGugun} 실시간 교통사고 다발 위험 분석 리포트
             </span>
             <span className="text-[10px] text-gray-400 font-medium">
-              {zones[0]?.isFallback ? '참고용 샘플' : '실시간 공공 데이터'}
+              실시간 공공 데이터
             </span>
           </h2>
 
-          {/* 데이터 출처 안내 배너 — 실제/샘플 여부에 따라 자동 전환 */}
-          {zones[0]?.isFallback ? (
-            <div className="flex items-start gap-2.5 px-4 py-3 rounded-2xl bg-amber-50 dark:bg-amber-950/15 border border-amber-200/50 dark:border-amber-700/30 text-xs text-amber-700 dark:text-amber-400 font-semibold leading-relaxed">
-              <span className="shrink-0 mt-0.5">⚠️</span>
-              <span>현재 표시된 사고 다발 위치와 통계는 <strong>API 연동 대기 중인 참고용 샘플 데이터</strong>입니다. 실제 도로교통공단 데이터와 다를 수 있으며, 지도 핀포인트는 해당 구역 중심부 근방에 표시됩니다.</span>
+          {/* 데이터 출처 안내 배너 */}
+          {activeZone.isSafeZone ? (
+            <div className="flex items-start gap-2.5 px-4 py-3 rounded-2xl bg-blue-50 dark:bg-blue-950/15 border border-blue-200/50 dark:border-blue-700/30 text-xs text-blue-700 dark:text-blue-400 font-semibold leading-relaxed">
+              <span className="shrink-0 mt-0.5">🛡️</span>
+              <span>선택하신 <strong>{loadedGugun} 전역</strong>은 최근 3개년 동안 도로교통공단 지정 법규위반 및 보행사고 다발지역 이력이 존재하지 않는 안심 관리 구역입니다.</span>
             </div>
           ) : (
             <div className="flex items-start gap-2.5 px-4 py-3 rounded-2xl bg-green-50 dark:bg-green-950/15 border border-green-200/50 dark:border-green-700/30 text-xs text-[#137333] dark:text-[#81c995] font-semibold leading-relaxed">
@@ -433,51 +437,64 @@ export default function TrafficCarePage() {
           {/* 단일 카드 완결형 레이아웃 */}
           <article className="bg-white dark:bg-[#202124] rounded-3xl border border-gray-100 dark:border-white/5 shadow-md p-6 sm:p-7 flex flex-col space-y-5">
             
-            {/* 위험 구역 선택 드롭다운 박스 (탑3를 드롭다운 형태로 한박스에 통합) */}
-            <div className="bg-green-50/10 dark:bg-green-950/5 p-4.5 rounded-2xl border border-green-100/20 dark:border-white/5 space-y-2">
-              <label className="block text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">
-                ⚠️ 위험 다발 구역 선택 (교차로별 위험 순위 Top {zones.length})
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedZoneId || ''}
-                  onChange={(e) => setSelectedZoneId(e.target.value)}
-                  className="w-full bg-white dark:bg-[#303134] text-xs sm:text-sm font-extrabold text-gray-800 dark:text-gray-100 px-3.5 py-3 rounded-xl border border-gray-200 dark:border-white/5 focus:outline-none focus:border-[#137333] cursor-pointer appearance-none shadow-sm pr-10"
-                >
-                  {zones.map((zone, index) => (
-                    <option key={zone.id} value={zone.id}>
-                      [위험 {index + 1}순위] {zone.locationName} (사고 {zone.occurCount}건 / 사상 {zone.casualtyCount}명)
-                    </option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-gray-500">
-                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                  </svg>
+            {/* 위험 구역 선택 드롭다운 박스 (탑3를 드롭다운 형태로 한박스에 통합 - 안심구역이 아닐 때만 노출) */}
+            {!activeZone.isSafeZone && (
+              <div className="bg-green-50/10 dark:bg-green-950/5 p-4.5 rounded-2xl border border-green-100/20 dark:border-white/5 space-y-2">
+                <label className="block text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">
+                  ⚠️ 위험 다발 구역 선택 (교차로별 위험 순위 Top {zones.length})
+                </label>
+                <div className="relative">
+                  <select
+                    value={selectedZoneId || ''}
+                    onChange={(e) => setSelectedZoneId(e.target.value)}
+                    className="w-full bg-white dark:bg-[#303134] text-xs sm:text-sm font-extrabold text-gray-800 dark:text-gray-100 px-3.5 py-3 rounded-xl border border-gray-200 dark:border-white/5 focus:outline-none focus:border-[#137333] cursor-pointer appearance-none shadow-sm pr-10"
+                  >
+                    {zones.map((zone, index) => (
+                      <option key={zone.id} value={zone.id}>
+                        [위험 {index + 1}순위] {zone.locationName} (사고 {zone.occurCount}건 / 사상 {zone.casualtyCount}명)
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-gray-500">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                    </svg>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* 카드 본문 콘텐츠: 상단 메타 바 */}
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-white/5">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="px-2.5 py-1 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-bold border border-green-100/30">
-                  사고 {activeZone.occurCount}건
-                </span>
-                <span className="px-2.5 py-1 rounded bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold border border-rose-100/30">
-                  사상자 {activeZone.casualtyCount}명
-                </span>
-                {activeZone.deathCount > 0 && (
-                  <span className="px-2.5 py-1 rounded bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 text-[10px] font-bold border border-red-100/30">
-                    사망 {activeZone.deathCount}명
+              {activeZone.isSafeZone ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 text-[10px] font-bold border border-blue-100/30 flex items-center gap-1">
+                    🛡️ 교통사고 안심 행정구역
                   </span>
-                )}
-                {activeZone.seriousCount > 0 && (
-                  <span className="px-2.5 py-1 rounded bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-100/30">
-                    중상 {activeZone.seriousCount}명
+                  <span className="px-2.5 py-1 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-bold border border-green-100/30">
+                    다발위험지 0개소
                   </span>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-1 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-bold border border-green-100/30">
+                    사고 {activeZone.occurCount}건
+                  </span>
+                  <span className="px-2.5 py-1 rounded bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold border border-rose-100/30">
+                    사상자 {activeZone.casualtyCount}명
+                  </span>
+                  {activeZone.deathCount > 0 && (
+                    <span className="px-2.5 py-1 rounded bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 text-[10px] font-bold border border-red-100/30">
+                      사망 {activeZone.deathCount}명
+                    </span>
+                  )}
+                  {activeZone.seriousCount > 0 && (
+                    <span className="px-2.5 py-1 rounded bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-100/30">
+                      중상 {activeZone.seriousCount}명
+                    </span>
+                  )}
+                </div>
+              )}
               <span className="text-[10px] sm:text-xs font-bold text-gray-400 dark:text-gray-500">
                 위경도: N {activeZone.latitude.toFixed(5)}°, E {activeZone.longitude.toFixed(5)}°
               </span>

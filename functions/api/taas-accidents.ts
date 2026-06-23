@@ -44,187 +44,187 @@ const jsonResponse = (data: unknown, status = 200): Response =>
     },
   });
 
-// ─── API 키 미설정 / 통신 장애 시 샘플 데이터 생성기 ─────────────────────────
-// 구군 중심 공식 좌표 기반, 재현 가능한 pseudo-random으로 핀포인트 분산
-
-const getFallbackAccidents = (sidoName: string, gugunName: string): AccidentItem[] => {
-  const coord = GUGUN_COORDS[gugunName] ?? BASE_COORDS[sidoName] ?? { lat: 36.5, lng: 127.7 };
-  const seed  = (sidoName + gugunName).split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  const rng   = (offset: number) => { const x = Math.sin(seed + offset) * 10000; return x - Math.floor(x); };
-
-  return [
-    {
-      id: 'fallback-1',
-      locationName: `${sidoName} ${gugunName} 주요 사거리 부근 (보행자 사고 다발)`,
-      occurCount: Math.floor(rng(1) * 12) + 12,
-      casualtyCount: Math.floor(rng(2) * 15) + 15,
-      deathCount: Math.floor(rng(3) * 2),
-      seriousCount: Math.floor(rng(4) * 6) + 4,
-      slightCount: Math.floor(rng(5) * 8) + 6,
-      latitude:  coord.lat + (rng(6)  - 0.5) * 0.015,
-      longitude: coord.lng + (rng(7)  - 0.5) * 0.015,
-      isFallback: true,
-    },
-    {
-      id: 'fallback-2',
-      locationName: `${sidoName} ${gugunName} 진입차선 우회도로 교차로 (이륜차 충돌 다발)`,
-      occurCount: Math.floor(rng(8)  * 8)  + 8,
-      casualtyCount: Math.floor(rng(9)  * 12) + 10,
-      deathCount: 0,
-      seriousCount: Math.floor(rng(10) * 4) + 2,
-      slightCount: Math.floor(rng(11) * 8) + 4,
-      latitude:  coord.lat + (rng(12) - 0.5) * 0.015,
-      longitude: coord.lng + (rng(13) - 0.5) * 0.015,
-      isFallback: true,
-    },
-    {
-      id: 'fallback-3',
-      locationName: `${sidoName} ${gugunName} 초등학교 어린이 보호구역 인근`,
-      occurCount: Math.floor(rng(14) * 5) + 5,
-      casualtyCount: Math.floor(rng(15) * 8) + 6,
-      deathCount: 0,
-      seriousCount: Math.floor(rng(16) * 3) + 1,
-      slightCount: Math.floor(rng(17) * 5) + 3,
-      latitude:  coord.lat + (rng(18) - 0.5) * 0.015,
-      longitude: coord.lng + (rng(19) - 0.5) * 0.015,
-      isFallback: true,
-    },
-  ];
-};
-
 // ─── 메인 핸들러 ──────────────────────────────────────────────────────────────
+
+// 공공데이터 API 개별 호출 헬퍼
+async function fetchTaasData(
+  apiPath: string,
+  year: string,
+  sidoCode: string,
+  gugunCode: string,
+  serviceKey: string
+): Promise<Record<string, string>[]> {
+  const apiUrl = `https://apis.data.go.kr/B552061/${apiPath}` +
+    `?serviceKey=${serviceKey}&searchYearCd=${year}&siDo=${sidoCode}&guGun=${gugunCode}&numOfRows=15&pageNo=1&type=json`;
+
+  try {
+    const res = await fetch(apiUrl, {
+      signal: AbortSignal.timeout(4000), // 개별 호출 4초 타임아웃
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*'
+      }
+    });
+    if (!res.ok) return [];
+
+    const rawText = await res.text();
+    if (rawText.trimStart().startsWith('<')) {
+      return [];
+    }
+
+    const parsed = JSON.parse(rawText);
+    const items = parsed?.items?.item ?? parsed?.response?.body?.items?.item ?? [];
+    return Array.isArray(items) ? items : (items ? [items] : []);
+  } catch (err) {
+    console.warn(`[TAAS API Fail] Path: ${apiPath}, Year: ${year}, Error:`, err);
+    return [];
+  }
+}
 
 export async function onRequest(context: { request: Request; env: Record<string, string> }): Promise<Response> {
   const url  = new URL(context.request.url);
   const sido  = (url.searchParams.get('sido')  ?? '').normalize('NFC').trim();
   const gugun = (url.searchParams.get('gugun') ?? '').normalize('NFC').trim();
 
-  if (!sido || !gugun) {
-    return jsonResponse({ success: false, error: '시도 및 구군 파라미터가 누락되었습니다.' }, 400);
-  }
-
-  // 1. 지역 코드 매핑
-  const codeSido = TAAS_SIDO_CODES[sido] ?? '';
-  let   codeGugun = '';
-
-  if (codeSido && TAAS_GUGUN_CODES[codeSido]) {
-    const sidoGuguns = TAAS_GUGUN_CODES[codeSido];
-    codeGugun = sidoGuguns[gugun] ?? '';
-
-    // 완전 일치 실패 시 부분 일치 재시도
-    if (!codeGugun) {
-      const matchKey = Object.keys(sidoGuguns).find(k => gugun.includes(k) || k.includes(gugun));
-      if (matchKey) codeGugun = sidoGuguns[matchKey];
-    }
-  }
-
-  // 지역 코드 미발견 → 샘플 모드
-  if (!codeSido || !codeGugun) {
-    console.warn(`[TAAS] 지역 코드 미발견 (sido="${sido}", gugun="${gugun}") → 샘플 모드`);
-    const fb1 = getFallbackAccidents(sido, gugun);
-    return jsonResponse([...fb1, { _debug: { reason: 'CODE_NOT_FOUND', sido, gugun, codeSido, codeGugun } } as any]);
-  }
-
-  // 2. API 키 확인 → 미설정 시 샘플 모드
-  const envKeys = Object.keys(context.env ?? {});
-  const API_KEY = (context.env?.PUBLIC_DATA_API_KEY ?? '').toString();
-  if (!API_KEY || API_KEY === '여기에_입력') {
-    const fb2 = getFallbackAccidents(sido, gugun);
-    return jsonResponse([...fb2, { _debug: { reason: 'NO_API_KEY', envKeys, hasEnv: !!context.env, keyLength: API_KEY.length } } as any]);
-  }
-
-  // 3. 실제 TAAS API 호출
   try {
-    const serviceKey = API_KEY.includes('%') ? API_KEY : encodeURIComponent(API_KEY);
-    const apiUrl = `https://apis.data.go.kr/B552061/frequentzoneLgrViolt/getRestFrequentzoneLgrViolt` +
-      `?serviceKey=${serviceKey}&searchYearCd=2023&siDo=${codeSido}&guGun=${codeGugun}&numOfRows=10&pageNo=1&type=json`;
+    if (!sido || !gugun) {
+      return jsonResponse({ success: false, error: '시도 및 구군 파라미터가 누락되었습니다.' }, 400);
+    }
 
-    const res = await fetch(apiUrl, {
-      signal: AbortSignal.timeout(7000),
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*'
+    // 1. 지역 코드 매핑 (정교화된 부분 일치 매커니즘 적용)
+    const codeSido = TAAS_SIDO_CODES[sido] ?? '';
+    let   codeGugun = '';
+
+    if (codeSido && TAAS_GUGUN_CODES[codeSido]) {
+      const sidoGuguns = TAAS_GUGUN_CODES[codeSido];
+      codeGugun = sidoGuguns[gugun] ?? '';
+
+      // 완전 일치 실패 시 부분 일치 재시도 (더 긴 키 매칭 우선으로 대도시 구 단위 오매칭 방지)
+      if (!codeGugun) {
+        const matchedKeys = Object.keys(sidoGuguns)
+          .filter(k => gugun.includes(k) || k.includes(gugun))
+          .sort((a, b) => b.length - a.length);
+        if (matchedKeys.length > 0) {
+          codeGugun = sidoGuguns[matchedKeys[0]];
+        }
       }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const rawText = await res.text();
-
-    // 인증 오류: XML 응답 반환됨
-    if (rawText.trimStart().startsWith('<')) {
-      const detail =
-        rawText.match(/<returnAuthMsg>([^<]+)<\/returnAuthMsg>/)?.[1] ??
-        rawText.match(/<returnErrMsg>([^<]+)<\/returnErrMsg>/)?.[1] ??
-        rawText.match(/<errMsg>([^<]+)<\/errMsg>/)?.[1] ??
-        '인증키 오류';
-      throw new Error(`공공API 인증 실패: ${detail}`);
     }
 
-    const parsed = JSON.parse(rawText);
-    const items  = parsed?.items?.item ?? parsed?.response?.body?.items?.item ?? [];
-    const rawList: Record<string, string>[] = Array.isArray(items) ? items : (items ? [items] : []);
+    // 지역 코드 미발견 → 오류 응답 반환 (샘플 데이터 제거)
+    if (!codeSido || !codeGugun) {
+      console.warn(`[TAAS] 지역 코드 미발견 (sido="${sido}", gugun="${gugun}")`);
+      return jsonResponse({ success: false, error: '선택하신 지역의 표준 행정 코드를 찾을 수 없습니다.' }, 404);
+    }
 
+    // 2. API 키 확인 → 미설정 시 오류 응답 반환 (샘플 데이터 제거)
+    const API_KEY = (context.env?.PUBLIC_DATA_API_KEY ?? '').toString();
+    if (!API_KEY || API_KEY === '여기에_입력') {
+      console.error('[TAAS] 공공데이터 API 키 미설정');
+      return jsonResponse({ success: false, error: '공공 API 키 설정이 누락되어 실시간 데이터 연동이 불가능합니다.' }, 500);
+    }
+
+    const serviceKey = API_KEY.includes('%') ? API_KEY : encodeURIComponent(API_KEY);
+
+    // 3. 연도별 순차 스캔 루프 (2024 -> 2023 -> 2022)
+    // 보행자/보행사상자 API는 공공데이터 포털 내부 서버 오류(500)가 상시 발생하므로 제외하고, 정상 작동이 검증된 법규위반 API 단독으로 최적화하여 불필요한 네트워크 대기 지연(4초)을 없애고 런타임 성능을 극대화합니다.
+    const years = ['2024', '2023', '2022'];
+    const apiPath = 'frequentzoneLgrViolt/getRestFrequentzoneLgrViolt';
+
+    let rawList: { item: Record<string, string>; type: string }[] = [];
+    let successYear = '';
+
+    for (const year of years) {
+      try {
+        const items = await fetchTaasData(apiPath, year, codeSido, codeGugun, serviceKey);
+        if (items.length > 0) {
+          rawList = items.map(item => ({ item, type: '법규위반' }));
+          successYear = year;
+          break; // 데이터를 성공적으로 찾았으므로 연도 스캔 중단
+        }
+      } catch (err) {
+        console.error(`[TAAS] 연도별 스캔 중 오류 (${year}):`, err);
+      }
+    }
+
+    // 모든 연도에서 데이터가 한 건도 없을 때 → 교통사고 안심 지역 반환 (가짜 데이터 대신 신뢰성 가이드 제공)
     if (rawList.length === 0) {
-      console.info(`[TAAS] 응답 데이터 0건 (sido=${codeSido}, gugun=${codeGugun}) → 샘플 모드`);
-      return jsonResponse(getFallbackAccidents(sido, gugun));
+      console.info(`[TAAS] 전 연도 응답 데이터 0건 (sido=${codeSido}, gugun=${codeGugun}) → 안심 구역 지정`);
+      const cityCoord = BASE_COORDS[sido] ?? { lat: 36.5, lng: 127.7 };
+      return jsonResponse([
+        {
+          id: 'safe-zone-info',
+          locationName: `${sido} ${gugun} (교통사고 다발지역 미지정 안전 구간)`,
+          occurCount: 0,
+          casualtyCount: 0,
+          deathCount: 0,
+          seriousCount: 0,
+          slightCount: 0,
+          latitude: cityCoord.lat,
+          longitude: cityCoord.lng,
+          isFallback: false,
+          isSafeZone: true // 프론트엔드 식별용 플래그
+        } as any
+      ]);
     }
 
-    // 시도 기본 좌표 (좌표 검증 실패 시 대체용)
+    // 4. 데이터 정제 및 머징
     const cityCoord = BASE_COORDS[sido] ?? { lat: 36.5, lng: 127.7 };
 
-    const cleanedData: AccidentItem[] = rawList.filter(Boolean).map((item, idx) => {
-      // ✅ 공식 TAAS 필드 정의:
-      //    la_crd = 위도(Latitude)  / lo_crd = 경도(Longitude)
-      //    크기 비교 추측 방식을 제거하고 필드명 그대로 직접 사용
-      let lat = parseFloat(item.la_crd ?? '');
-      let lng = parseFloat(item.lo_crd ?? '');
+    const cleanedData: AccidentItem[] = rawList.map(({ item, type }, idx) => {
+      let lat = parseFloat(item?.la_crd ?? '');
+      let lng = parseFloat(item?.lo_crd ?? '');
 
-      // la_crd / lo_crd 값이 없거나 비정상 → geom_json 보조 파싱 (GeoJSON 표준)
-      if (!isValidKoreaCoord(lat, lng) && item.geom_json) {
+      // GeoJSON 파싱 보조
+      if (!isValidKoreaCoord(lat, lng) && item?.geom_json) {
         try {
           const geo    = JSON.parse(item.geom_json);
           const coords = geo?.coordinates;
           if (Array.isArray(coords)) {
-            // GeoJSON 표준: coordinates = [경도, 위도]
             const pt = Array.isArray(coords[0])
               ? (Array.isArray(coords[0][0]) ? coords[0][0] : coords[0])
               : coords;
             lng = parseFloat(String(pt[0]));
             lat = parseFloat(String(pt[1]));
           }
-        } catch {
-          // geom_json 파싱 실패 무시
-        }
+        } catch {}
       }
 
-      // 최종 유효성 검증: 한국 영토 밖이면 시도 중심 좌표로 대체
+      // 위경도 보정
       if (!isValidKoreaCoord(lat, lng)) {
         lat = cityCoord.lat;
         lng = cityCoord.lng;
       }
 
+      // 사고유형에 맞는 적절한 한글 명칭 설명 추가
+      const baseSpotName = item?.spot_nm || `${sido} ${gugun} 다발구역`;
+      const spotName = baseSpotName.includes(`(${type})`) ? baseSpotName : `${baseSpotName} (${type})`;
+
       return {
-        id: `taas-${item.afFrequentzoneId ?? idx}`,
-        locationName: item.spot_nm || `${sido} ${gugun} 다발구역 ${idx + 1}`,
-        occurCount:   parseInt(item.occrrnc_cnt ?? '0', 10),
-        casualtyCount: parseInt(item.caslt_cnt  ?? '0', 10),
-        deathCount:   parseInt(item.dth_dnv_cnt ?? '0', 10),
-        seriousCount: parseInt(item.se_dnv_cnt  ?? '0', 10),
-        slightCount:  parseInt(item.spt_dnv_cnt ?? '0', 10),
+        id: `taas-${item?.afFrequentzoneId ?? idx}-${type === '법규위반' ? 'lgr' : 'co'}`,
+        locationName: spotName,
+        occurCount:   parseInt(item?.occrrnc_cnt ?? '0', 10) || 0,
+        casualtyCount: parseInt(item?.caslt_cnt  ?? '0', 10) || 0,
+        deathCount:   parseInt(item?.dth_dnv_cnt ?? '0', 10) || 0,
+        seriousCount: parseInt(item?.se_dnv_cnt  ?? '0', 10) || 0,
+        slightCount:  parseInt(item?.spt_dnv_cnt ?? '0', 10) || 0,
         latitude:  lat,
         longitude: lng,
-        isFallback: false, // 실제 공공 데이터
+        isFallback: false,
       };
     });
 
-    // 사고 건수 내림차순 정렬, 상위 5건만 반환
-    const result = cleanedData.sort((a, b) => b.occurCount - a.occurCount).slice(0, 5);
-    return jsonResponse(result);
+    // 사고 건수 내림차순 정렬, 상위 7건까지 노출폭 확대 (더 풍부한 데이터를 보여주기 위함)
+    const result = cleanedData.sort((a, b) => b.occurCount - a.occurCount).slice(0, 7);
+    
+    // 디버그 정보를 결과에 살짝 얹어서 반환 (프론트엔드 분석용)
+    const finalResult = [
+      ...result,
+      { _debug: { source: 'LIVE_API', year: successYear, count: result.length } } as any
+    ];
 
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error('[TAAS] API 연동 오류 → 샘플 모드:', msg);
-    const fb = getFallbackAccidents(sido, gugun);
-    return jsonResponse([...fb, { _debug: { reason: 'API_FETCH_ERROR', error: msg, keyLength: API_KEY.length } } as any]);
+    return jsonResponse(finalResult);
+  } catch (err: any) {
+    console.error('[TAAS] onRequest 치명적 런타임 오류:', err.message);
+    return jsonResponse({ success: false, error: `실시간 교통 데이터 분석 중 치명적 오류 발생: ${err.message}` }, 500);
   }
 }

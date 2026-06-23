@@ -216,13 +216,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
     // 사고 건수 내림차순 정렬, 상위 7건까지 노출폭 확대 (더 풍부한 데이터를 보여주기 위함)
     const result = cleanedData.sort((a, b) => b.occurCount - a.occurCount).slice(0, 7);
     
-    // 디버그 정보를 결과에 살짝 얹어서 반환 (프론트엔드 분석용)
-    const finalResult = [
-      ...result,
-      { _debug: { source: 'LIVE_API', year: successYear, count: result.length } } as any
-    ];
-
-    return jsonResponse(finalResult);
+    return jsonResponse(result);
   } catch (err: any) {
     console.error('[TAAS] onRequest 치명적 런타임 오류:', err.message);
     return jsonResponse({ success: false, error: `실시간 교통 데이터 분석 중 치명적 오류 발생: ${err.message}` }, 500);

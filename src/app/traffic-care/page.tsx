@@ -165,14 +165,15 @@ export default function TrafficCarePage() {
         throw new Error(`교통사고 다발지역 실시간 조회 실패 (HTTP ${taasRes.status})`);
       }
       const taasData: AccidentZone[] = await taasRes.json();
-      setZones(taasData);
+      const cleanZones = taasData.filter((z: any) => !z._debug);
+      setZones(cleanZones);
       
       // 사고 데이터를 정상 수신했으므로 지도 렌더링용 지역 상태를 즉시 갱신
       setLoadedSido(sidoName);
       setLoadedGugun(gugunName);
       
-      if (taasData.length > 0) {
-        setSelectedZoneId(taasData[0].id);
+      if (cleanZones.length > 0) {
+        setSelectedZoneId(cleanZones[0].id);
       }
 
       // 2. 심평원(HIRA) 구군별 병원 데이터 비동기 로드

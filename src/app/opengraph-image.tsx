@@ -40,7 +40,8 @@ export default async function Image() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '600px',
+            width: '100%',
+            padding: '0 80px',
             textAlign: 'center',
           }}
         >
@@ -49,26 +50,26 @@ export default async function Image() {
               src={logoBase64}
               alt="보상스쿨"
               style={{
-                width: '180px',
-                height: '180px',
-                marginBottom: '32px',
-                borderRadius: '90px',
+                width: '240px',
+                height: '240px',
+                marginBottom: '40px',
+                borderRadius: '120px',
               }}
             />
           ) : (
             <div
               style={{
-                width: '180px',
-                height: '180px',
+                width: '240px',
+                height: '240px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 backgroundColor: '#f1f5f9',
-                borderRadius: '90px',
-                marginBottom: '32px',
+                borderRadius: '120px',
+                marginBottom: '40px',
               }}
             >
-              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#d93025" strokeWidth="2">
+              <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#d93025" strokeWidth="2">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
             </div>
@@ -76,12 +77,12 @@ export default async function Image() {
           
           <h1
             style={{
-              fontSize: '52px',
+              fontSize: '68px',
               fontWeight: 900,
               color: '#0f172a',
               lineHeight: 1.2,
               marginTop: 0,
-              marginBottom: '12px',
+              marginBottom: '20px',
               wordBreak: 'keep-all',
             }}
           >
@@ -89,7 +90,7 @@ export default async function Image() {
           </h1>
           <p
             style={{
-              fontSize: '24px',
+              fontSize: '30px',
               fontWeight: 600,
               color: '#64748b',
               margin: 0,

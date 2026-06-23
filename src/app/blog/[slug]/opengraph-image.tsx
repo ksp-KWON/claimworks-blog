@@ -47,7 +47,8 @@ export default async function Image({ params }: { params: { slug: string } }) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '800px',
+            width: '100%',
+            padding: '0 80px',
             textAlign: 'center',
           }}
         >
@@ -57,22 +58,22 @@ export default async function Image({ params }: { params: { slug: string } }) {
                 src={logoBase64}
                 alt="보상스쿨"
                 style={{
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: '30px',
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '40px',
                 }}
               />
             ) : (
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="2">
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="2">
                 <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
               </svg>
             )}
-            <span style={{ fontSize: 32, fontWeight: 800, color: '#0f172a', marginLeft: 16 }}>보상스쿨</span>
+            <span style={{ fontSize: 40, fontWeight: 800, color: '#0f172a', marginLeft: 20 }}>보상스쿨</span>
           </div>
           
           <h1
             style={{
-              fontSize: '54px',
+              fontSize: '68px',
               fontWeight: 900,
               color: '#0f172a',
               lineHeight: 1.3,

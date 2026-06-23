@@ -11,13 +11,17 @@ export default function MobileSidebarDrawer() {
   const pathname = usePathname();
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (!mounted) {
+      setMounted(true);
+    }
+  }, [mounted]);
 
   // 페이지 이동 시 서랍 닫기
   useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
+    if (isOpen) {
+      setIsOpen(false);
+    }
+  }, [pathname, isOpen]);
 
   // 서랍이 열려있을 때 body 스크롤 방지
   useEffect(() => {

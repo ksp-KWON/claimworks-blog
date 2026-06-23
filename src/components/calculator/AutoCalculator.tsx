@@ -48,15 +48,7 @@ export default function AutoCalculator() {
     setData(prev => ({ ...prev, [field]: finalValue }));
   };
 
-  const addValue = (field: keyof AutoInsuranceData, addAmount: number, max?: number) => {
-    setData(prev => {
-      const current = Number(prev[field] || 0);
-      let next = current + addAmount;
-      if (max !== undefined && next > max) next = max;
-      if (next < 0) next = 0;
-      return { ...prev, [field]: next };
-    });
-  };
+
 
   const fmt = (val: number | string) => {
     if (!val) return '';

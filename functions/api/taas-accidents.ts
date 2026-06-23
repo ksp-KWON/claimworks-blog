@@ -22,7 +22,6 @@ interface AccidentItem {
 // ─── 정적 데이터 로드 ─────────────────────────────────────────────────────────
 
 const BASE_COORDS    = taasData.BASE_COORDS    as Record<string, Coords>;
-const GUGUN_COORDS   = taasData.GUGUN_COORDS   as Record<string, Coords>;
 const TAAS_SIDO_CODES  = taasData.TAAS_SIDO_CODES  as Record<string, string>;
 const TAAS_GUGUN_CODES = taasData.TAAS_GUGUN_CODES as Record<string, Record<string, string>>;
 
@@ -131,14 +130,12 @@ export async function onRequest(context: { request: Request; env: Record<string,
     const apiPath = 'frequentzoneLgrViolt/getRestFrequentzoneLgrViolt';
 
     let rawList: { item: Record<string, string>; type: string }[] = [];
-    let successYear = '';
 
     for (const year of years) {
       try {
         const items = await fetchTaasData(apiPath, year, codeSido, codeGugun, serviceKey);
         if (items.length > 0) {
           rawList = items.map(item => ({ item, type: '법규위반' }));
-          successYear = year;
           break; // 데이터를 성공적으로 찾았으므로 연도 스캔 중단
         }
       } catch (err) {

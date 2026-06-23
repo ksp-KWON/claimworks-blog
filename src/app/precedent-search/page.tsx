@@ -250,7 +250,13 @@ export default function PrecedentSearchPage() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Precedent[]>([]);
   const [error, setError] = useState('');
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('recent_prec_searches');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
   const [openDetailId, setOpenDetailId] = useState<string | null>(null);
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
 
@@ -258,11 +264,8 @@ export default function PrecedentSearchPage() {
   const showInitial = results.length === 0 && !loading && !error;
   const displayResults = showInitial ? INITIAL_PRECEDENTS : results;
 
-  // 로컬스토리지 로드 및 블로그 포스트 정적 DB 로드
+  // 블로그 포스트 정적 DB 로드
   useEffect(() => {
-    const saved = localStorage.getItem('recent_prec_searches');
-    if (saved) setRecentSearches(JSON.parse(saved));
-
     // API를 통해 포스트 데이터 불러오기
     fetch('/api/posts')
       .then(res => res.ok ? res.json() : [])

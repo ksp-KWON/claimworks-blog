@@ -136,7 +136,7 @@ export async function onRequest(context: { request: Request; env: Record<string,
   // 3. 실제 TAAS API 호출
   try {
     const serviceKey = API_KEY.includes('%') ? API_KEY : encodeURIComponent(API_KEY);
-    const apiUrl = `https://apis.data.go.kr/B552061/frequentzoneLg/getRestFrequentzoneLg` +
+    const apiUrl = `https://apis.data.go.kr/B552061/frequentzoneLgrViolt/getRestFrequentzoneLgrViolt` +
       `?serviceKey=${serviceKey}&searchYearCd=2024&siDo=${codeSido}&guGun=${codeGugun}&_type=json`;
 
     const res = await fetch(apiUrl, { signal: AbortSignal.timeout(7000) });

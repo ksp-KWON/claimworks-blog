@@ -242,9 +242,15 @@ export default function TrafficCarePage() {
         `다만 주택가 이면도로 서행 및 야간 방어운전 등 일상적인 생활 안전 습관은 언제나 권장됩니다.`
       ];
     }
+    const details = [
+      zone.deathCount > 0 ? `사망 ${zone.deathCount}명` : '',
+      zone.seriousCount > 0 ? `중상 ${zone.seriousCount}명` : '',
+      zone.slightCount > 0 ? `경상 ${zone.slightCount}명` : ''
+    ].filter(Boolean).join(', ');
+
     return [
       `해당 구역은 연간 총 ${zone.occurCount}건의 교통사고가 집중된 도로교통공단 지정 다발 위험 도로입니다.`,
-      `사고 결과로 인해 사망 ${zone.deathCount}명, 중상 ${zone.seriousCount}명 등 총 ${zone.casualtyCount}명의 중증 사상자가 발생했습니다.`,
+      `사고 결과로 인해 ${details || '경상 수준의'} 사상자가 발생하여 총 ${zone.casualtyCount}명의 사상자가 기록되었습니다.`,
       `차량 통행량 대비 보행자 및 교차로 꼬리물기로 인한 골절/추간판탈출 손상 비율이 매우 높게 나타납니다.`
     ];
   };
@@ -491,6 +497,11 @@ export default function TrafficCarePage() {
                   {activeZone.seriousCount > 0 && (
                     <span className="px-2.5 py-1 rounded bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-100/30">
                       중상 {activeZone.seriousCount}명
+                    </span>
+                  )}
+                  {activeZone.slightCount > 0 && (
+                    <span className="px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 text-[10px] font-bold border border-blue-100/30">
+                      경상 {activeZone.slightCount}명
                     </span>
                   )}
                 </div>

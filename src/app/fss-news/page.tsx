@@ -17,6 +17,44 @@ interface FssNewsItem {
   officialUrl?: string;
 }
 
+// 텍스트 클리닝 헬퍼: 금감원 API 특유의 깨진 개행(nn) 및 HTML 엔티티를 정제하여 미려한 줄바꿈을 유지합니다.
+function cleanFssText(text: string): string {
+  if (!text) return '';
+  return text
+    // 1. HTML 엔티티 및 기호 복원
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&rsquo;/g, "'")
+    .replace(/&lsquo;/g, "'")
+    .replace(/&rdquo;/g, '"')
+    .replace(/&ldquo;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/u203B/g, '※')
+    .replace(/\\u203B/g, '※')
+    
+    // 2. 따옴표 중복 제거 (예: ''26.6.22. -> '26.6.22.')
+    .replace(/''/g, "'")
+    .replace(/""/g, '"')
+    
+    // 3. 깨진 개행 문자 복원 (nn, nnnn 등)
+    .replace(/n{2,}/g, '\n')
+    .replace(/nn/g, '\n')
+    
+    // 4. 문단 기호 정돈 및 가독성 개선 (ㅁ -> ■, ㅇ -> •)
+    .replace(/(?:^|\n)\s*ㅁ\s*/g, '\n■ ')
+    .replace(/(?:^|\n)\s*ㅇ\s*/g, '\n  • ')
+    .replace(/(?:^|\n)\s*\*\s*/g, '\n  - ')
+    
+    // 5. 불필요한 안내 멘트 정리
+    .replace(/※\s*자세한\s*내용은\s*첨부파일을\s*참고하시기\s*바랍니다\.?/g, '')
+    
+    // 6. 빈 줄 정리 (과도한 줄바꿈 축소)
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+
 export default function FssNewsPage() {
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'alert' | 'case' | 'tip' | 'press'>('all');
@@ -356,7 +394,7 @@ export default function FssNewsPage() {
                           <span>📄 금융감독원 보도문/결정문 전문 (한글 HWP 대체 텍스트)</span>
                           <span>HWP 뷰어 무설치 열람 중</span>
                         </div>
-                        {item.fullContent}
+                        {cleanFssText(item.fullContent)}
                       </div>
                     )}
 

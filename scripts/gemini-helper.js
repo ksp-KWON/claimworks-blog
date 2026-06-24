@@ -13,9 +13,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const GEMINI_MODELS = [
   'gemini-pro-latest',
   'gemini-flash-latest',
-  'gemini-flash-lite-latest',
-  'gemini-2.0-flash'
+  'gemini-flash-lite-latest'
 ];
+
 
 
 /**

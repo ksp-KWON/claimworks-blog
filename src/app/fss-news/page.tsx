@@ -152,6 +152,20 @@ export default function FssNewsPage() {
     }
   };
 
+  const getSummaryBoxTitle = (category: string) => {
+    switch (category) {
+      case 'alert':
+        return '🚨 소비자경보 핵심 가이드';
+      case 'case':
+        return '⚖️ 분쟁사례 핵심 요지';
+      case 'tip':
+        return '💡 실용 금융꿀팁 요약';
+      case 'press':
+      default:
+        return '📢 금감원 핵심 보도 요약';
+    }
+  };
+
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* 🚨 실시간 소비자 이슈 브리핑 상단 띠 배너 */}
@@ -282,16 +296,11 @@ export default function FssNewsPage() {
                       {item.title}
                     </h3>
 
-                    {/* 본문 */}
-                    <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed font-medium">
-                      {item.content}
-                    </p>
-
-                    {/* AI 요약 */}
+                    {/* 핵심 요약 가이드 (기존 요약 박스 통합 및 지저분한 프리뷰 텍스트 삭제) */}
                     <div className="bg-gray-50 dark:bg-white/2 p-4 rounded-2xl border border-gray-150/50 dark:border-white/2 space-y-2.5">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
-                        <span className="text-sm">🧠</span>
-                        AI 핵심 3줄 요약
+                        <span className="text-sm">📢</span>
+                        {getSummaryBoxTitle(item.category)}
                       </div>
                       <ul className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium space-y-1.5 list-disc pl-4">
                         {item.summary.map((sumLine, idx) => (

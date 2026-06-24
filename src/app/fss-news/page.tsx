@@ -31,7 +31,6 @@ export default function FssNewsPage() {
   const fetchFssData = async (searchQuery: string, categoryTab: string) => {
     setLoading(true);
     setError('');
-    const delayPromise = new Promise(resolve => setTimeout(resolve, 800));
     
     try {
       const url = `/api/fss-news?query=${encodeURIComponent(searchQuery)}&type=${categoryTab}`;
@@ -42,7 +41,6 @@ export default function FssNewsPage() {
       }
       
       const data: FssNewsItem[] = await res.json();
-      await delayPromise;
       setResults(data);
       
       if (categoryTab === 'all' || categoryTab === 'alert') {
@@ -52,7 +50,6 @@ export default function FssNewsPage() {
         }
       }
     } catch (e: any) {
-      await delayPromise;
       setError(e.message || '데이터를 가져오는 중 알 수 없는 오류가 발생했습니다.');
     } finally {
       setLoading(false);

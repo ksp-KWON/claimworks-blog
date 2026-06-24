@@ -274,9 +274,9 @@ export default function AdminPage() {
       'gemini-pro-latest',         // 1순위: 최고 품질 글쓰기용 Pro 모델 (3.1 Pro Preview 등)
       'gemini-flash-latest',       // 2순위: 속도 지향형 Flash (3.5 Flash)
       'gemini-flash-lite-latest',  // 3순위: 경량형 Flash-Lite (할당량 대비)
-      'gemini-2.5-flash',          // 4순위: 백업
-      'gemini-2.0-flash'           // 5순위: 예비용
+      'gemini-2.0-flash'           // 4순위: 예비용
     ];
+
     
     let success = false;
     let lastError = '';

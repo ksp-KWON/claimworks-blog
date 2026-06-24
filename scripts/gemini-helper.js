@@ -14,9 +14,9 @@ const GEMINI_MODELS = [
   'gemini-pro-latest',
   'gemini-flash-latest',
   'gemini-flash-lite-latest',
-  'gemini-2.5-flash',
   'gemini-2.0-flash'
 ];
+
 
 /**
  * Gemini API를 호출합니다.

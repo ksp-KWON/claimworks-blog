@@ -146,6 +146,8 @@ function preprocessBody(content: string): string {
   let skipType: 'NONE' | 'KEY_POINTS' | 'CHECKLIST' | 'GLOSSARY' | 'FAQ' | 'CTA' = 'NONE';
   let clBuffer: string[] = [];
 
+  const singleLinkRegex = /^\s*\[([^\]]+)\]\(([^)]+)\)\s*$/;
+
   const flushChecklist = () => {
     if (clBuffer.length > 0) {
       result.push(`<inlinechecklist data="${encodeURIComponent(clBuffer.join('||'))}"></inlinechecklist>`);
@@ -155,6 +157,15 @@ function preprocessBody(content: string): string {
 
   for (const line of lines) {
     const trimmed = line.trim();
+
+    // 단독 줄 마크다운 링크 감지 -> 커스텀 추천 칼럼 카드로 치환
+    const singleLinkMatch = trimmed.match(singleLinkRegex);
+    if (singleLinkMatch) {
+      const text = singleLinkMatch[1].trim();
+      const href = singleLinkMatch[2].trim();
+      result.push(`<calloutlink href="${href}" text="${text}"></calloutlink>`);
+      continue;
+    }
 
     if (/^##\s+/.test(trimmed)) {
       const prevSkipType = skipType;
@@ -319,15 +330,14 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
     a: ({ href = '', children }) => (
       <a
         href={href}
-        className="inline-flex items-center gap-2 px-3 py-1.5 mx-1 my-1 align-middle bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 rounded-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:shadow-[0_8px_24px_rgba(26,115,232,0.18)] hover:border-[#1A73E8]/40 dark:hover:border-[#8ab4f8]/40 transition-all duration-300 hover:-translate-y-[2px] text-[#1A73E8] dark:text-[#8ab4f8] font-bold text-[14.5px] group no-underline break-keep"
+        className="inline-flex items-center gap-0.5 text-[#1A73E8] dark:text-[#8ab4f8] font-bold border-b border-b-[#1A73E8]/30 hover:border-b-[#1A73E8] dark:border-b-[#8ab4f8]/30 dark:hover:border-b-[#8ab4f8] no-underline transition-colors mx-0.5 align-middle"
         target={href.startsWith('http') ? '_blank' : undefined}
         rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
       >
-        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#e8f0fe] dark:bg-[#1A73E8]/20 flex items-center justify-center">
-          <svg className="w-2.5 h-2.5 text-[#1A73E8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 0 0-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 0 05.656 0l4-4a4 4 0 0 0-5.656-5.656l-1.1 1.1" /></svg>
-        </span>
-        <span className="leading-[1.4] mt-[1px]">{children}</span>
-        <svg className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 transition-transform duration-300 group-hover:translate-x-[2px] group-hover:-translate-y-[2px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7V17" /></svg>
+        {children}
+        {href.startsWith('http') && (
+          <svg className="w-3.5 h-3.5 opacity-60 inline-block align-middle shrink-0 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7V17" /></svg>
+        )}
       </a>
     ),
     p: ({ children }) => (
@@ -411,6 +421,28 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
     green: ({ children }: { children: React.ReactNode }) => <strong className="text-[#34A853] dark:text-[#81c995] font-bold">{children}</strong>,
     blue: ({ children }: { children: React.ReactNode }) => <strong className="text-[#1A73E8] dark:text-[#8ab4f8] font-bold">{children}</strong>,
     purple: ({ children }: { children: React.ReactNode }) => <strong className="text-[#9333ea] dark:text-[#c084fc] font-bold">{children}</strong>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    calloutlink: ({ ...props }: any) => {
+      const href = props.href || '';
+      const text = props.text || '';
+      return (
+        <a
+          href={href}
+          className="flex items-center justify-between p-4.5 my-6 bg-gray-50/60 dark:bg-white/[0.02] border border-gray-150 dark:border-white/5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.08)] hover:border-[#1A73E8]/30 dark:hover:border-[#8ab4f8]/30 transition-all duration-300 hover:-translate-y-[2px] text-[#1A73E8] dark:text-[#8ab4f8] group no-underline break-keep"
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#e8f0fe] dark:bg-[#1A73E8]/20 flex items-center justify-center shadow-2xs">
+              <svg className="w-4 h-4 text-[#1A73E8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 0 0-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 0 05.656 0l4-4a4 4 0 0 0-5.656-5.656l-1.1 1.1" /></svg>
+            </span>
+            <div className="flex flex-col text-left">
+              <span className="text-[10px] font-extrabold text-[#1A73E8] dark:text-[#8ab4f8] uppercase tracking-wider mb-0.5">추천 칼럼</span>
+              <span className="text-[14px] sm:text-[14.5px] font-extrabold text-gray-800 dark:text-[#e8eaed] leading-snug group-hover:text-[#1A73E8] dark:group-hover:text-[#8ab4f8] transition-colors">{text}</span>
+            </div>
+          </div>
+          <svg className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-transform duration-300 group-hover:translate-x-[4px] group-hover:-translate-y-[4px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7V17" /></svg>
+        </a>
+      );
+    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     inlinechecklist: ({ ...props }: any) => {
       const encoded = (props['data'] as string) || '';

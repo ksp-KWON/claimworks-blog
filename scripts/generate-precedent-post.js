@@ -53,11 +53,25 @@ function getXmlTags(xml, tag) {
 // ── 3. 기존 글 읽기 (슬러그 중복 및 내부 링크용) ──────────────────────────────
 function getExistingPosts() {
   if (!fs.existsSync(POSTS_DIR)) return [];
-  return fs.readdirSync(POSTS_DIR)
+  const files = fs.readdirSync(POSTS_DIR)
     .filter(f => f.endsWith('.md'))
     .sort()
-    .slice(-20)
-    .map(f => f.replace(/\.md$/, ''));
+    .slice(-25);
+
+  const posts = [];
+  for (const file of files) {
+    try {
+      const filePath = path.join(POSTS_DIR, file);
+      const content = fs.readFileSync(filePath, 'utf8');
+      const slug = file.replace(/\.md$/, '');
+      const titleMatch = content.match(/^title:\s*["']?(.*?)["']?\r?$/m);
+      const title = titleMatch ? titleMatch[1].trim() : slug;
+      posts.push({ slug, title });
+    } catch {
+      // 스킵
+    }
+  }
+  return posts;
 }
 
 function resolveUniqueSlug(baseSlug) {
@@ -110,7 +124,7 @@ ${existingPosts.join(', ')}
 // ── 7. 본문 작성 프롬프트 (스켈레톤 강제 출력 방식) ───────────────────────────
 function buildWritingPrompt(detail, topic, existingPosts) {
   const postsCtx = existingPosts.length > 0
-    ? existingPosts.map(s => `- /blog/${s}`).join('\n')
+    ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
     : '- (없음)';
 
   const calcTag = topic.calculatorType === 'medical'

@@ -45,11 +45,25 @@ function yamlSafe(str) {
 // ── 기존 포스트 목록 ────────────────────────────────────────────────────────
 function getExistingPosts() {
   if (!fs.existsSync(POSTS_DIR)) return [];
-  return fs.readdirSync(POSTS_DIR)
+  const files = fs.readdirSync(POSTS_DIR)
     .filter(f => f.endsWith('.md'))
     .sort()
-    .slice(-20)
-    .map(f => f.replace(/\.md$/, ''));
+    .slice(-25);
+
+  const posts = [];
+  for (const file of files) {
+    try {
+      const filePath = path.join(POSTS_DIR, file);
+      const content = fs.readFileSync(filePath, 'utf8');
+      const slug = file.replace(/\.md$/, '');
+      const titleMatch = content.match(/^title:\s*["']?(.*?)["']?\r?$/m);
+      const title = titleMatch ? titleMatch[1].trim() : slug;
+      posts.push({ slug, title });
+    } catch {
+      // 스킵
+    }
+  }
+  return posts;
 }
 
 // ── 슬러그 중복 방지 ────────────────────────────────────────────────────────
@@ -127,7 +141,7 @@ function buildTopicPromptFromKeyword(keyword, trendTitle, existingPosts) {
 // ── 본문 프롬프트 — 스켈레톤 강제 출력 방식 ─────────────────────────────────
 function buildPrompt(topic, existingPosts) {
   const postsCtx = existingPosts.length > 0
-    ? existingPosts.map(s => `- /blog/${s}`).join('\n')
+    ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
     : '- (없음)';
 
   // 토픽 선정 단계에서 결정된 계산기 타입을 본문 프롬프트에 직접 주입

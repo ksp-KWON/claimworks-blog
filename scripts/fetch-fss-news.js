@@ -270,7 +270,9 @@ ${textContent}
         comment: aiResult.comment,
         keywords: aiResult.keywords,
         relColumn: "/blog", // 연계 칼럼 기본값
-        officialUrl: item.link || `https://www.fss.or.kr/fss/bbs/B0000188/list.do?menuNo=200218`,
+        officialUrl: /^\d+$/.test(contentId)
+          ? `https://www.fss.or.kr/fss/bbs/B0000188/view.do?nttId=${contentId}&menuNo=200218`
+          : (item.link || `https://www.fss.or.kr/fss/bbs/B0000188/list.do?menuNo=200218`),
         fullContent: `■ 금감원 보도 요지\n\n${textContent}`
       };
 

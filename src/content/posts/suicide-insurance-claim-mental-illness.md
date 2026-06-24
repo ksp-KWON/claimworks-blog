@@ -59,8 +59,8 @@ published: true
 심신상실 여부를 판단하는 핵심은 피보험자가 사망 당시 '사물의 변별 능력'을 상실했느냐는 점입니다. 이는 단순히 정신과 진단서 한 장으로 해결되지 않습니다. 사망에 이르게 된 경위, 약물 복용 이력, 과거 자살 시도 여부, 직장 또는 가정 내에서의 스트레스 요인을 종합적으로 분석하는 **'심리 부검'**적 접근이 필요합니다.
 
 관련된 분쟁을 겪고 계신다면 아래의 전문 가이드를 함께 참고하시기 바랍니다.
-- [/blog/injury-insurance-claim-guide](/blog/injury-insurance-claim-guide) : 재해 사고 입증을 위한 손해사정의 기본 원칙
-- [/blog/loss-adjuster-appointment-guide](/blog/loss-adjuster-appointment-guide) : 왜 전문가 선임이 결과의 차이를 만드는가
+- [상해 보험금 청구 완벽 가이드 : 쉽고 빠르게 보상받는 법](/blog/injury-insurance-claim-guide) : 재해 사고 입증을 위한 손해사정의 기본 원칙
+- [손해사정사 선임, 현명한 선택을 위한 완벽 가이드](/blog/loss-adjuster-appointment-guide) : 왜 전문가 선임이 결과의 차이를 만드는가
 
 ## [🛡️ 지금 손해사정사가 필요한 상황인지 1분 체크]
 

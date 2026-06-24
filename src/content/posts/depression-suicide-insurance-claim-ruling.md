@@ -58,7 +58,7 @@ published: true
 2. **투약 기록:** 항우울제, 항불안제 등 복용 이력과 투약 순응도.
 3. **자살 시도 경력:** 과거 시도 이력이 있다면 반드시 별도로 정리하여 제출.
 
-유사한 사건으로 고민 중이라면 [suicide-insurance-claim-mental-illness](/blog/suicide-insurance-claim-mental-illness)에서 더 자세한 내용을 확인하십시오. 또한, 보험사의 부당한 면책 주장에 대응하는 구체적인 전략은 [insurance-company-future-claim-liability-ruling](/blog/insurance-company-future-claim-liability-ruling) 글을 참고하시기 바랍니다.
+유사한 사건으로 고민 중이라면 [우울증 자살보험금, '심신상실' 입증으로 면책 거절 대응하는 방법](/blog/suicide-insurance-claim-mental-illness)에서 더 자세한 내용을 확인하십시오. 또한, 보험사의 부당한 면책 주장에 대응하는 구체적인 전략은 [대법원 판결 : 보험사 책임준비금, 미래 보험금 지급의무의 '숨겨진 부채' 될 수 있나?](/blog/insurance-company-future-claim-liability-ruling) 글을 참고하시기 바랍니다.
 
 
 ## [🛡️ 지금 손해사정사가 필요한 상황인지 1분 체크]

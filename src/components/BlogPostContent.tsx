@@ -330,13 +330,13 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
     a: ({ href = '', children }) => (
       <a
         href={href}
-        className="inline-flex items-center gap-0.5 text-[#1A73E8] dark:text-[#8ab4f8] font-bold border-b border-b-[#1A73E8]/30 hover:border-b-[#1A73E8] dark:border-b-[#8ab4f8]/30 dark:hover:border-b-[#8ab4f8] no-underline transition-colors mx-0.5 align-middle"
+        className="text-[#1A73E8] dark:text-[#8ab4f8] hover:text-[#1557b0] dark:hover:text-[#aecbfa] font-bold underline underline-offset-4 decoration-[#1A73E8]/35 hover:decoration-[#1A73E8] transition-all duration-150 mx-0.5 inline break-all"
         target={href.startsWith('http') ? '_blank' : undefined}
         rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
       >
         {children}
         {href.startsWith('http') && (
-          <svg className="w-3.5 h-3.5 opacity-60 inline-block align-middle shrink-0 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7V17" /></svg>
+          <svg className="w-3.5 h-3.5 opacity-60 inline align-baseline shrink-0 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7V17" /></svg>
         )}
       </a>
     ),
@@ -428,18 +428,18 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
       return (
         <a
           href={href}
-          className="flex items-center justify-between p-4.5 my-6 bg-gray-50/60 dark:bg-white/[0.02] border border-gray-150 dark:border-white/5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.08)] hover:border-[#1A73E8]/30 dark:hover:border-[#8ab4f8]/30 transition-all duration-300 hover:-translate-y-[2px] text-[#1A73E8] dark:text-[#8ab4f8] group no-underline break-keep"
+          className="flex items-center justify-between p-4 my-5 bg-[#e8f0fe]/30 hover:bg-[#e8f0fe]/60 dark:bg-[#1a2540]/15 dark:hover:bg-[#1a2540]/30 border-l-4 border-l-[#1A73E8] rounded-r-xl transition-all duration-200 text-[#1A73E8] dark:text-[#8ab4f8] group no-underline break-keep shadow-2xs"
         >
           <div className="flex items-center gap-3">
-            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#e8f0fe] dark:bg-[#1A73E8]/20 flex items-center justify-center shadow-2xs">
+            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#e8f0fe] dark:bg-[#1A73E8]/20 flex items-center justify-center">
               <svg className="w-4 h-4 text-[#1A73E8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 0 0-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 0 05.656 0l4-4a4 4 0 0 0-5.656-5.656l-1.1 1.1" /></svg>
             </span>
             <div className="flex flex-col text-left">
-              <span className="text-[10px] font-extrabold text-[#1A73E8] dark:text-[#8ab4f8] uppercase tracking-wider mb-0.5">추천 칼럼</span>
-              <span className="text-[14px] sm:text-[14.5px] font-extrabold text-gray-800 dark:text-[#e8eaed] leading-snug group-hover:text-[#1A73E8] dark:group-hover:text-[#8ab4f8] transition-colors">{text}</span>
+              <span className="text-[10px] font-extrabold text-[#1A73E8] dark:text-[#8ab4f8] uppercase tracking-wider mb-0.5">관련 추천 글</span>
+              <span className="text-[13.5px] sm:text-[14px] font-extrabold text-gray-800 dark:text-[#e8eaed] leading-snug group-hover:text-[#1A73E8] dark:group-hover:text-[#8ab4f8] transition-colors">{text}</span>
             </div>
           </div>
-          <svg className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-transform duration-300 group-hover:translate-x-[4px] group-hover:-translate-y-[4px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7V17" /></svg>
+          <svg className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-transform duration-300 group-hover:translate-x-[3px] shrink-0 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
         </a>
       );
     },

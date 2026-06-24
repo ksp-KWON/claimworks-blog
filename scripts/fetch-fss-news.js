@@ -123,14 +123,34 @@ const GEMINI_RESPONSE_SCHEMA = {
   required: ['isRelevant', 'category', 'easyTitle', 'summary', 'comment', 'keywords']
 };
 
+// 진짜 인터넷 표준 시간을 조회하여 로컬 시계의 왜곡을 방지합니다 (Zero-dependency)
+async function getRealToday() {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000); // 4초 타임아웃
+    const response = await fetch('http://worldtimeapi.org/api/timezone/Asia/Seoul', { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (response.ok) {
+      const data = await response.json();
+      if (data.datetime) {
+        console.log(`  [동기화] 인터넷 표준 시간 동기화 완료: ${data.datetime}`);
+        return new Date(data.datetime);
+      }
+    }
+  } catch (e) {
+    console.warn(`  [주의] 인터넷 표준 시간 동기화 실패 (${e.message}). 로컬 시스템 시계를 사용합니다.`);
+  }
+  return new Date();
+}
+
 // 5. 메인 자동화 프로세스 실행
 async function run() {
   console.log('====== 금감원 보도자료 자동 수집 & 가공 봇 기동 ======');
   
   let rawItems = [];
   
-  // 1차 시도: 오늘(로컬 시스템 시간) 기준 최근 15일 조회
-  const today = new Date();
+  // 진짜 오늘 날짜(인터넷 시간 기반) 기준 최근 15일 범위 산정
+  const today = await getRealToday();
   const past15Days = new Date(today.getTime() - 15 * 24 * 60 * 60 * 1000);
   const endDateStr = formatDate(today);
   const startDateStr = formatDate(past15Days);
@@ -138,19 +158,8 @@ async function run() {
   try {
     rawItems = await fetchFssApi(startDateStr, endDateStr);
   } catch (err) {
-    console.warn(`[주의] 1차 동적 조회 실패: ${err.message}. 하드코딩된 동기화 날짜로 2차 시도합니다.`);
-  }
-
-  // 2차 시도 (폴백): 1차에서 가져온 데이터가 없거나 에러가 났을 때 작동
-  if (rawItems.length === 0) {
-    const fallbackStart = '2024-06-01';
-    const fallbackEnd = '2024-06-24';
-    try {
-      rawItems = await fetchFssApi(fallbackStart, fallbackEnd);
-    } catch (err2) {
-      console.error(`[오류] 2차 폴백 조회 최종 실패: ${err2.message}`);
-      process.exit(1);
-    }
+    console.error(`[오류] 금감원 API 호출 최종 실패: ${err.message}`);
+    process.exit(1);
   }
 
   console.log(`[성공] 금감원 API로부터 총 ${rawItems.length}건의 보도자료 목록을 확보했습니다.`);

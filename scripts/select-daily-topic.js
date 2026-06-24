@@ -19,11 +19,63 @@ if (fs.existsSync(envPath)) {
 }
 
 // ── 상수 및 설정 ───────────────────────────────────────────────────────────
+const { callGemini } = require('./gemini-helper');
+
 const OUTPUT_JSON_PATH = path.join(process.cwd(), 'scripts/daily-topic.json');
-const GEMINI_MODELS    = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+const POSTS_DIR        = path.join(process.cwd(), 'src/content/posts');
 const LAW_API_KEY      = process.env.LAW_API_KEY;
 const LAW_PROXY_ENDPOINT = process.env.LAW_PROXY_ENDPOINT;
 const LAW_PROXY_TOKEN    = process.env.LAW_PROXY_TOKEN;
+
+// 기존 작성된 포스트들로부터 이미 사용된 사건번호(caseNumber)와 키워드(tags) 목록을 수집하는 함수
+function getUsedMetadata() {
+  const usedCaseNumbers = new Set();
+  const usedKeywords = new Set();
+
+  if (fs.existsSync(POSTS_DIR)) {
+    const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'));
+    for (const file of files) {
+      try {
+        const filePath = path.join(POSTS_DIR, file);
+        const content = fs.readFileSync(filePath, 'utf8');
+        
+        // Frontmatter 영역 파싱 (맨 위 --- 와 --- 사이)
+        const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+        if (match) {
+          const yamlText = match[1];
+          // caseNumber: "..." 또는 caseNumber: ... 추출
+          const caseNoMatch = yamlText.match(/caseNumber:\s*["']?(.*?)["']?\r?$/m);
+          if (caseNoMatch && caseNoMatch[1]) {
+            usedCaseNumbers.add(caseNoMatch[1].trim());
+          }
+          
+          // tags: [...] 또는 tags 목록 추출
+          const tagsMatch = yamlText.match(/tags:\s*\[(.*?)\]/);
+          if (tagsMatch && tagsMatch[1]) {
+            tagsMatch[1].split(',').forEach(t => {
+              const tag = t.replace(/["']/g, '').trim();
+              if (tag) usedKeywords.add(tag);
+            });
+          } else {
+            // 줄 단위로 나열된 태그들 (예: tags:\n  - 태그1\n  - 태그2)
+            const tagsBlockMatch = yamlText.match(/tags:\r?\n((?:\s*-\s*.*?\r?\n)*)/);
+            if (tagsBlockMatch && tagsBlockMatch[1]) {
+              const lines = tagsBlockMatch[1].split('\n');
+              lines.forEach(l => {
+                const tag = l.replace(/^\s*-\s*/, '').replace(/["']/g, '').trim();
+                if (tag) usedKeywords.add(tag);
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.warn(`    [-] 기존 포스트 분석 실패 (${file}): ${err.message}`);
+      }
+    }
+  }
+
+  return { usedCaseNumbers, usedKeywords };
+}
 
 // 50대 전문 손해사정 백업 키워드 리스트
 const BACKUP_KEYWORDS = [
@@ -85,44 +137,7 @@ async function fetchGoogleTrends() {
   }
 }
 
-// ── Gemini API 공통 호출 ────────────────────────────────────────────────────
-async function callGemini(prompt, schema = null) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey.length < 10) throw new Error('유효하지 않은 GEMINI_API_KEY');
 
-  const generationConfig = {
-    temperature: 0.2, // 주제 선정이므로 창의성보다 정확성에 포커스
-    maxOutputTokens: 2048,
-  };
-  if (schema) {
-    generationConfig.responseMimeType = 'application/json';
-    generationConfig.responseSchema = schema;
-  }
-
-  for (const model of GEMINI_MODELS) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    try {
-      const res = await fetch(url, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig }),
-        signal:  AbortSignal.timeout(30000)
-      });
-      if (!res.ok) continue;
-      const data = await res.json();
-      const text = (data?.candidates?.[0]?.content?.parts ?? []).map(p => p.text ?? '').join('');
-      if (!text) continue;
-      
-      if (schema) {
-        return JSON.parse(text.trim());
-      }
-      return text;
-    } catch {
-      continue;
-    }
-  }
-  throw new Error('주제 선정을 위한 Gemini API 호출 실패');
-}
 
 // ── 제미나이를 이용한 손해사정 키워드 분석 ─────────────────────────────────────
 async function filterTrendsForInsurance(trends) {
@@ -232,11 +247,19 @@ async function getPrecedentDetail(id) {
 }
 
 // ── 판례 상세 검증 루프 ──────────────────────────────────────────────────────
-async function scanPrecedentList(list, query) {
+async function scanPrecedentList(list, query, usedCaseNumbers = new Set()) {
   for (let i = 0; i < Math.min(list.length, 5); i++) {
     const candidate = list[i];
+    if (usedCaseNumbers.has(candidate.caseNo)) {
+      console.log(`    [-] 중복 판례 건너뜀 (목록에서 감지): ${candidate.caseNo}`);
+      continue;
+    }
     try {
       const detail = await getPrecedentDetail(candidate.id);
+      if (usedCaseNumbers.has(detail.caseNo)) {
+        console.log(`    [-] 중복 판례 건너뜀 (상세내용에서 감지): ${detail.caseNo}`);
+        continue;
+      }
       if (detail.judgmentSummary && detail.judgmentSummary.trim().length >= 40 && detail.caseContent) {
         console.log(`    [성공] 유효한 판례 확보: ${detail.caseNo} (${detail.caseName})`);
         return detail;
@@ -257,6 +280,10 @@ async function main() {
   let trendTitle = '';
   let precedentDetail = null;
 
+  // 기존 작성 포스트 분석 (중복 방지용)
+  const { usedCaseNumbers, usedKeywords } = getUsedMetadata();
+  console.log(`  [분석] 기발행 포스트 수: ${usedCaseNumbers.size}개 | 기사용 키워드 수: ${usedKeywords.size}개`);
+
   // 1. 구글 트렌드 수집
   const trends = await fetchGoogleTrends();
 
@@ -271,7 +298,7 @@ async function main() {
     try {
       const list = await searchPrecedents(query);
       if (list && list.length > 0) {
-        const detail = await scanPrecedentList(list, query);
+        const detail = await scanPrecedentList(list, query, usedCaseNumbers);
         if (detail) {
           selectedKeyword = query;
           selectedSource = 'trend';
@@ -291,11 +318,16 @@ async function main() {
   if (!precedentDetail) {
     console.log('[4/5] ⚠️ 트렌드 키워드에서 판례를 찾지 못했습니다. 50대 백업 전문 키워드로 2차 스캔을 시작합니다.');
     for (const query of BACKUP_KEYWORDS) {
+      // 이미 포스팅에 쓰인 키워드(태그)면 건너뜀
+      if (usedKeywords.has(query)) {
+        console.log(`  [백업 스킵] 이미 사용된 키워드 제외: '${query}'`);
+        continue;
+      }
       console.log(`  [백업 탐색] 키워드 '${query}' 조회 중...`);
       try {
         const list = await searchPrecedents(query);
         if (list && list.length > 0) {
-          const detail = await scanPrecedentList(list, query);
+          const detail = await scanPrecedentList(list, query, usedCaseNumbers);
           if (detail) {
             selectedKeyword = query;
             selectedSource = 'backup';

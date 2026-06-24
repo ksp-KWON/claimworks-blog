@@ -18,8 +18,9 @@ if (fs.existsSync(envPath)) {
   });
 }
 
+const { callGemini } = require('./gemini-helper');
+
 const POSTS_DIR     = path.join(process.cwd(), 'src/content/posts');
-const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
 const LAW_API_KEY   = process.env.LAW_API_KEY;
 const LAW_PROXY_ENDPOINT = process.env.LAW_PROXY_ENDPOINT;
 const LAW_PROXY_TOKEN    = process.env.LAW_PROXY_TOKEN;
@@ -69,65 +70,7 @@ function resolveUniqueSlug(baseSlug) {
   return slug;
 }
 
-// ── 4. 제미나이 호출 ─────────────────────────────────────────────────────────
-async function callGemini(prompt, schema = null) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey.length < 10) {
-    throw new Error('GEMINI_API_KEY가 등록되지 않았거나 유효하지 않습니다. GitHub Secrets 또는 .env.local 설정을 확인해 주세요.');
-  }
 
-  const generationConfig = {
-    temperature: 0.75,
-    maxOutputTokens: schema ? 4096 : 65536,
-  };
-  if (schema) {
-    generationConfig.responseMimeType = 'application/json';
-    generationConfig.responseSchema = schema;
-  }
-
-  modelLoop: for (const model of GEMINI_MODELS) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    
-    for (let attempt = 1; attempt <= 5; attempt++) {
-      let res;
-      // 90초 타임아웃 설정 (제미나이 대형 글쓰기 지연에 대응)
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 90000);
-
-      try {
-        res = await fetch(url, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig }),
-          signal:  controller.signal
-        });
-      } catch (networkErr) {
-        if (attempt < 5) { await sleep(3000 * attempt); continue; }
-        continue modelLoop;
-      } finally {
-        clearTimeout(timeoutId);
-      }
-
-      if (!res.ok) {
-        if (res.status === 429) { await sleep(65000); continue; }
-        if (res.status >= 500) { await sleep(3000 * attempt); continue; }
-        continue modelLoop;
-      }
-
-      const data = await res.json();
-      const text = (data?.candidates?.[0]?.content?.parts ?? []).map(p => p.text ?? '').join('');
-      
-      if (!text) continue;
-      
-      if (schema) {
-        try { return JSON.parse(text.trim()); }
-        catch { continue; }
-      }
-      return text;
-    }
-  }
-  throw new Error('제미나이 모델 응답 실패');
-}
 
 // ── 5. 토픽 정보 구조화용 스키마 ──────────────────────────────────────────────
 const TOPIC_SCHEMA = {
@@ -279,6 +222,9 @@ ${postsCtx}
 // ── 8. 메인 오케스트레이터 ──────────────────────────────────────────────────
 async function main() {
   console.log('=== 판례 기반 자동글쓰기 프로세스 시작 ===');
+
+  console.log('  [쿨다운] API 과부하 및 429 차단 방지를 위해 65초간 대기합니다...');
+  await sleep(65000);
 
   // 1단계에서 저장한 daily-topic.json 로드
   const topicJsonPath = path.join(process.cwd(), 'scripts/daily-topic.json');

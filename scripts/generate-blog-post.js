@@ -29,9 +29,9 @@ if (fs.existsSync(envPath)) {
   });
 }
 
-// ── 상수 ────────────────────────────────────────────────────────────────────
-const POSTS_DIR     = path.join(process.cwd(), 'src/content/posts');
-const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+const { callGemini } = require('./gemini-helper');
+
+const POSTS_DIR = path.join(process.cwd(), 'src/content/posts');
 
 // ── 유틸 ────────────────────────────────────────────────────────────────────
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -63,90 +63,7 @@ function resolveUniqueSlug(baseSlug) {
   return slug;
 }
 
-// ── Gemini API 호출 ─────────────────────────────────────────────────────────
-async function callGemini(prompt, schema = null) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey.length < 10) throw new Error('유효하지 않은 GEMINI_API_KEY');
 
-  const generationConfig = {
-    temperature: 0.75,
-    maxOutputTokens: schema ? 4096 : 65536,
-  };
-  if (schema) {
-    generationConfig.responseMimeType = 'application/json';
-    generationConfig.responseSchema = schema;
-  }
-
-  modelLoop: for (const model of GEMINI_MODELS) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    console.log(`  [API] 모델 '${model}' 호출 중...`);
-
-    for (let attempt = 1; attempt <= 5; attempt++) {
-      let res;
-
-      try {
-        res = await fetch(url, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig }),
-        });
-      } catch (networkErr) {
-        if (attempt < 5) {
-          const wait = 5000 * Math.pow(2, attempt - 1);
-          console.warn(`  [네트워크 오류] ${networkErr.message.slice(0, 60)}. ${wait / 1000}초 후 재시도... (${attempt}/5)`);
-          await sleep(wait);
-          continue;
-        }
-        console.error(`  [실패] '${model}' 네트워크 오류 5회. 다음 모델 시도.`);
-        continue modelLoop;
-      }
-
-      if (!res.ok) {
-        await res.text().catch(() => '');
-        if (res.status === 404) {
-          console.error(`  [폴백] '${model}' 404. 다음 모델로 전환.`);
-          continue modelLoop;
-        }
-        if (res.status === 429) {
-          console.warn(`  [429] 분당 한도 초과. 65초 대기... (${attempt}/5)`);
-          await sleep(65000);
-          if (attempt < 5) continue;
-          console.error(`  [실패] '${model}' 429 해소 불가. 다음 모델 시도.`);
-          continue modelLoop;
-        }
-        if (res.status >= 500) {
-          const wait = 5000 * Math.pow(2, attempt - 1);
-          console.warn(`  [${res.status}] 서버 오류. ${wait / 1000}초 후 재시도... (${attempt}/5)`);
-          await sleep(wait);
-          if (attempt < 5) continue;
-          console.error(`  [실패] '${model}' 500대 오류 5회. 다음 모델 시도.`);
-          continue modelLoop;
-        }
-        throw new Error(`HTTP ${res.status}`);
-      }
-
-      const data = await res.json();
-      const text = (data?.candidates?.[0]?.content?.parts ?? []).map(p => p.text ?? '').join('');
-
-      if (!text) {
-        if (attempt < 5) { console.warn(`  [빈 응답] 재시도... (${attempt}/5)`); await sleep(3000); continue; }
-        console.error(`  [실패] '${model}' 빈 응답 5회. 다음 모델 시도.`);
-        continue modelLoop;
-      }
-
-      if (schema) {
-        try { return JSON.parse(text.trim()); }
-        catch (e) {
-          if (attempt < 5) { console.warn(`  [JSON 파싱 실패] 재시도... (${attempt}/5)`); await sleep(3000); continue; }
-          throw new Error(`JSON 파싱 최종 실패: ${e.message}`);
-        }
-      }
-      return text;
-    }
-  }
-
-  throw new Error('모든 모델이 응답하지 않았습니다. 잠시 후 다시 실행해 주세요.');
-}
 
 // ── 토픽 선정 스키마 ────────────────────────────────────────────────────────
 const TOPIC_SCHEMA = {

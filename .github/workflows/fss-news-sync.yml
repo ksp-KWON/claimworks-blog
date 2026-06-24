@@ -1,0 +1,43 @@
+name: FSS News Automatic Sync
+
+on:
+  schedule:
+    # 매일 밤 12시(한국 시간) = 매일 15:00 UTC 기동
+    - cron: '0 15 * * *'
+  workflow_dispatch: # 수동 기동 지원
+
+jobs:
+  sync-fss-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run FSS News Fetch & AI Summary
+        env:
+          FSS_API_KEY: ${{ secrets.FSS_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/fetch-fss-news.js
+
+      - name: Check for Changes
+        id: git-check
+        run: |
+          git diff --exit-code || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and Push Changes
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/fss-consumer-data.json
+          git commit -m "auto: 금감원 오픈 API 기반 최신 보상 뉴스 자동 업데이트"
+          git push origin main

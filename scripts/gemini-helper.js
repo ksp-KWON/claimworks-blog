@@ -42,92 +42,56 @@ async function callGemini(prompt, schema = null) {
   modelLoop: for (const model of GEMINI_MODELS) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     
-    // 모델당 최대 3회 시도
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      let res;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 90000); // 90초 타임아웃
+    let res;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90000); // 90초 타임아웃
 
-      try {
-        console.log(`  [API] 모델 '${model}' 호출 중... (시도 ${attempt}/3)`);
-        res = await fetch(url, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig }),
-          signal:  controller.signal
-        });
-      } catch (networkErr) {
-        if (attempt < 3) {
-          const wait = 3000 * attempt;
-          console.warn(`  [네트워크 오류] ${networkErr.message.slice(0, 60)}. ${wait / 1000}초 후 재시도...`);
-          await sleep(wait);
-          continue;
-        }
-        console.error(`  [실패] '${model}' 네트워크 오류 3회. 다음 모델로 전환.`);
-        continue modelLoop;
-      } finally {
-        clearTimeout(timeoutId);
-      }
-
-      if (!res.ok) {
-        // 응답 스트림 소모하여 리소스 해제
-        await res.text().catch(() => '');
-
-        if (res.status === 429) {
-          if (attempt === 1) {
-            // 한도 초기화(1분)를 위해 65초간 대기 후 딱 1회만 더 재시도
-            console.warn(`  [429 한도 초과] 분당 요청 한도 도달. 65초 대기 후 재시도합니다...`);
-            await sleep(65000);
-            continue;
-          } else {
-            console.error(`  [실패] '${model}' 65초 대기 후에도 429 재발생. 백업 모델로 즉시 전환.`);
-            continue modelLoop;
-          }
-        }
-        
-        if (res.status >= 500) {
-          if (attempt < 3) {
-            const wait = 3000 * attempt;
-            console.warn(`  [${res.status} 서버 오류] ${wait / 1000}초 후 재시도...`);
-            await sleep(wait);
-            continue;
-          }
-          console.error(`  [실패] '${model}' 서버 오류 3회. 다음 모델로 전환.`);
-          continue modelLoop;
-        }
-        
-        // 400, 404 등 재시도가 의미 없는 HTTP 에러는 즉시 다음 모델로 전환
-        console.error(`  [HTTP ${res.status} 오류] 다음 모델로 즉시 폴백.`);
-        continue modelLoop;
-      }
-
-      const data = await res.json();
-      const text = (data?.candidates?.[0]?.content?.parts ?? []).map(p => p.text ?? '').join('');
-      
-      if (!text) {
-        if (attempt < 3) {
-          console.warn(`  [빈 응답] 3초 후 재시도...`);
-          await sleep(3000);
-          continue;
-        }
-        continue modelLoop;
-      }
-      
-      if (schema) {
-        try {
-          return JSON.parse(text.trim());
-        } catch (e) {
-          if (attempt < 3) {
-            console.warn(`  [JSON 파싱 실패] 3초 후 재시도...`);
-            await sleep(3000);
-            continue;
-          }
-          console.error(`  [실패] '${model}' JSON 파싱 오류. 다음 모델로 전환.`);
-          continue modelLoop;
-        }
-      }
-      return text;
+    try {
+      console.log(`  [API] 모델 '${model}' 호출 중...`);
+      res = await fetch(url, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig }),
+        signal:  controller.signal
+      });
+    } catch (networkErr) {
+      console.error(`  [실패] '${model}' 네트워크 오류: ${networkErr.message.slice(0, 60)}. 다음 모델로 전환.`);
+      continue modelLoop;
+    } finally {
+      clearTimeout(timeoutId);
     }
+
+    if (!res.ok) {
+      // 응답 스트림 소모하여 리소스 해제
+      await res.text().catch(() => '');
+      console.error(`  [실패] '${model}' HTTP 오류 ${res.status}. 다음 모델로 전환.`);
+      continue modelLoop;
+    }
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (jsonErr) {
+      console.error(`  [실패] '${model}' 응답 JSON 파싱 오류. 다음 모델로 전환.`);
+      continue modelLoop;
+    }
+
+    const text = (data?.candidates?.[0]?.content?.parts ?? []).map(p => p.text ?? '').join('');
+    
+    if (!text) {
+      console.error(`  [실패] '${model}' 빈 응답 수신. 다음 모델로 전환.`);
+      continue modelLoop;
+    }
+    
+    if (schema) {
+      try {
+        return JSON.parse(text.trim());
+      } catch (e) {
+        console.error(`  [실패] '${model}' 스키마 JSON 파싱 최종 실패. 다음 모델로 전환.`);
+        continue modelLoop;
+      }
+    }
+    return text;
   }
   throw new Error('모든 제미나이 모델이 응답하지 않았습니다. 잠시 후 다시 실행해 주세요.');
 }

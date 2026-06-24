@@ -99,8 +99,8 @@ published: true
 
 이러한 분쟁 발생 시, <green>손해사정사는 약관의 법률적 해석</green>과 함께 유사 판례, 금융감독원 분쟁조정 사례 등을 종합적으로 검토하여 피보험자의 권리를 대변합니다. 만약 보험사와의 협의가 원만하지 않을 경우, 금융감독원 민원, 보험금 청구 소송 등 <blue>적절한 법적 절차</blue>를 통해 분쟁을 해결해 나갈 수 있도록 조력합니다.
 
-*   손해사정사의 조력이 필요한 순간, 더 자세한 정보는 [손해사정사 선임 가이드](/blog/loss-adjuster-appointment-guide)에서 확인하실 수 있습니다.
-*   후유장해 보상에 대한 종합적인 이해는 [후유장해 보상 가이드](/blog/guide-permanent-disability-compensation)를 참고하시기 바랍니다.
+*   손해사정사의 조력이 필요한 순간, 더 자세한 정보는 [손해사정사 선임, 현명한 선택을 위한 완벽 가이드](/blog/loss-adjuster-appointment-guide)에서 확인하실 수 있습니다.
+*   후유장해 보상에 대한 종합적인 이해는 [후유장해 보험금, 제대로 알고 내 권리 찾는 법](/blog/guide-permanent-disability-compensation)를 참고하시기 바랍니다.
 
 ## [🛡️ 지금 손해사정사가 필요한 상황인지 1분 체크]
 

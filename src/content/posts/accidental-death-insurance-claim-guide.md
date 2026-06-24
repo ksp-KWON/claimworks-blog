@@ -58,7 +58,7 @@ published: true
 
 **외인사 입증**은 단순히 사망진단서 한 장으로 해결되지 않습니다. 사망진단서상 '병사'로 기재되어 있더라도, 실질적인 사고의 경위와 의학적 인과관계를 입증할 수 있다면 보험금의 성격은 완전히 바뀔 수 있습니다. 
 
-특히 [산업재해 관련 분쟁](/blog/industrial-accident-compensation-guide)이나 [교통사고 사망](/blog/traffic-accident-ankle-fracture-disability-preexisting-condition)과 연계된 경우, 근로복지공단이나 경찰 조사 기록과 보험사 약관 사이의 간극을 메우는 것이 중요합니다. 보험사는 유족에게 모든 입증 책임을 떠넘기지만, 손해사정사는 **사고의 급격성, 우연성, 외래성**을 입증하기 위한 전문적인 의학적 근거를 구축합니다. [보험사 미래 손해배상 책임](/blog/insurance-company-future-claim-liability-ruling)과 관련된 판례를 활용하여 보험사의 부당한 면책 주장을 논리적으로 반박해야 합니다.
+특히 [산재 보상 완벽 가이드 : 신청 절차, 보상 종류 및 합의금 계산 총정리](/blog/industrial-accident-compensation-guide)이나 [교통사고 발목 골절 후유장해, 기왕증 공제 분쟁 해결 손해사정사 핵심 역할](/blog/traffic-accident-ankle-fracture-disability-preexisting-condition)과 연계된 경우, 근로복지공단이나 경찰 조사 기록과 보험사 약관 사이의 간극을 메우는 것이 중요합니다. 보험사는 유족에게 모든 입증 책임을 떠넘기지만, 손해사정사는 **사고의 급격성, 우연성, 외래성**을 입증하기 위한 전문적인 의학적 근거를 구축합니다. [대법원 판결 : 보험사 책임준비금, 미래 보험금 지급의무의 '숨겨진 부채' 될 수 있나?](/blog/insurance-company-future-claim-liability-ruling)과 관련된 판례를 활용하여 보험사의 부당한 면책 주장을 논리적으로 반박해야 합니다.
 
 ## [🛡️ 지금 손해사정사가 필요한 상황인지 1분 체크]
 

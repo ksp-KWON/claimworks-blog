@@ -122,7 +122,7 @@ published: true
 
 이러한 복잡한 과정은 일반인이 홀로 감당하기 어렵습니다. 보험 약관 해석, 관계 법규 적용, 의학적 판단까지 아우르는 전문적인 지식이 필요합니다. 보상스쿨 손해사정사는 이러한 과정을 대신하여 라이더가 정당한 보상을 받을 수 있도록 조력합니다.
 
-<green>교통사고 후 합의금 산정 전략에 대해 더 자세히 알고 싶다면</green>, [교통사고 합의금, 현명하게 받는 전략](/blog/guide-traffic-settlement-strategy) 글을 참고하십시오. 또한, [후유장해 보상금, 제대로 알고 받으세요](/blog/guide-permanent-disability-compensation)는 장해평가와 상실수익액에 대한 심층적인 정보를 제공합니다.
+<green>교통사고 후 합의금 산정 전략에 대해 더 자세히 알고 싶다면</green>, [교통사고 합의금, 보험사가 제시하는 첫 금액에 절대 현혹되지 마세요](/blog/guide-traffic-settlement-strategy) 글을 참고하십시오. 또한, [후유장해 보험금, 제대로 알고 내 권리 찾는 법](/blog/guide-permanent-disability-compensation)는 장해평가와 상실수익액에 대한 심층적인 정보를 제공합니다.
 
 ## [🛡️ 지금 손해사정사가 필요한 상황인지 1분 체크]
 

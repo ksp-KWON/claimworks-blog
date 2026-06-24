@@ -54,8 +54,8 @@ published: true
 
 관련하여 보험금 청구 시 반드시 알아야 할 지식들을 정리한 기존 칼럼을 참고하시기 바랍니다.
 
-- [갑상선암 소액암 vs 일반암 분쟁](/blog/thyroid-cancer-minor-vs-general-cancer-dispute)
-- [손해사정사 선임의 중요성과 가이드](/blog/loss-adjuster-appointment-guide)
+- [갑상선암 소액암 vs 일반암 진단비 분쟁, 보험금 제대로 받는 법](/blog/thyroid-cancer-minor-vs-general-cancer-dispute)
+- [손해사정사 선임, 현명한 선택을 위한 완벽 가이드](/blog/loss-adjuster-appointment-guide)
 
 ## [🛡️ 지금 손해사정사가 필요한 상황인지 1분 체크]
 

@@ -557,22 +557,15 @@ export default function PrecedentSearchPage() {
                       </h3>
                     </div>
 
-                    {/* 본문 프리뷰 (법제처 원문 첫 몇 줄) */}
-                    <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed font-medium line-clamp-3">
-                      {getSmartSummary('', prec.caseContent || prec.judgmentSummary || prec.casePoints || '')}
-                    </p>
-
-                    {/* 🧠 AI 핵심 3줄 요약 (파란색 테마) */}
+                    {/* ⚖️ 판결 핵심 요지 및 미리보기 (기존 AI 요약 박스 디자인 통합) */}
                     <div className="bg-blue-50/20 dark:bg-blue-950/10 p-4 rounded-2xl border border-blue-100/30 dark:border-blue-900/25 space-y-2.5">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-[#1a73e8] dark:text-[#8ab4f8]">
-                        <span className="text-sm">🧠</span>
-                        AI 핵심 3줄 요약
+                        <span className="text-sm">⚖️</span>
+                        판결 핵심 요지 및 미리보기
                       </div>
-                      <ul className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium space-y-1.5 list-disc pl-4">
-                        {getAiThreeLineSummary(prec).map((sumLine, idx) => (
-                          <li key={idx}>{sumLine}</li>
-                        ))}
-                      </ul>
+                      <div className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium whitespace-pre-wrap">
+                        {prec.casePoints || prec.judgmentSummary || getSmartSummary('', prec.caseContent)}
+                      </div>
                     </div>
 
                     {/* 👨‍🏫 보상스쿨 손해사정사 실무 코멘트 (황색 전문가 박스) */}

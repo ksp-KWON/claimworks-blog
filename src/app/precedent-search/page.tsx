@@ -559,7 +559,7 @@ export default function PrecedentSearchPage() {
 
                     {/* 본문 프리뷰 (법제처 원문 첫 몇 줄) */}
                     <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed font-medium line-clamp-3">
-                      {prec.casePoints ? prec.casePoints.replace(/\n/g, ' ') : getSmartSummary(prec.judgmentSummary, prec.caseContent)}
+                      {getSmartSummary('', prec.caseContent || prec.judgmentSummary || prec.casePoints || '')}
                     </p>
 
                     {/* 🧠 AI 핵심 3줄 요약 (파란색 테마) */}

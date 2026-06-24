@@ -19,7 +19,14 @@ if (fs.existsSync(envPath)) {
 }
 
 const { callGemini } = require('./gemini-helper');
-const { STRICT_RULES } = require('../src/lib/prompt-rules.js');
+const { 
+  STRICT_RULES, 
+  getPrecedentRole, 
+  getPrecedentObjective, 
+  getPrecedentMetaFirstLine, 
+  getPrecedentPlanningPrompt, 
+  getPrecedentSkeleton 
+} = require('../src/lib/prompt-rules.js');
 
 const POSTS_DIR     = path.join(process.cwd(), 'src/content/posts');
 const LAW_API_KEY   = process.env.LAW_API_KEY;
@@ -104,25 +111,9 @@ const TOPIC_SCHEMA = {
 
 // ── 6. 기획 프롬프트 ──────────────────────────────────────────────────────────
 function buildPlanningPrompt(detail, existingPosts) {
-  return `당신은 독립 신체손해사정사 블로그 '보상스쿨'의 콘텐츠 디렉터입니다.
-아래의 법제처 수집 판례 데이터를 바탕으로, 블로그 포스팅 기획 정보(슬러그, 제목, 카테고리 등)를 생성해 주세요.
-
-[수집된 판례 데이터]
-- 법원명: ${detail.courtName}
-- 사건명: ${detail.caseName}
-- 사건번호: ${detail.caseNo}
-- 선고일자: ${detail.judgmentDate}
-- 판결요지: ${detail.judgmentSummary}
-
-[기존 슬러그 목록 (중복 절대 금지)]
-${existingPosts.join(', ')}
-
-[기획 원칙]
-1. 제목은 딱딱한 법률 용어를 버리고, 피해자가 검색할 법한 일상 언어와 실무적 혜택을 결합하여 작성해 주세요. (예: "대법원 판결로 보는 척추 압박골절 합의금, 보험사 삭감 주장 대처법")
-2. 계산기 타입(calculatorType)은 교통사고, 배상책임, 후유장해, 산재 등 신체장해/일실수입 관련이면 "auto", 실손의료비나 단순 입원비/치료비 관련이면 "medical"을 지정하십시오.`;
+  return getPrecedentPlanningPrompt(detail, existingPosts.join(', '));
 }
 
-// ── 7. 본문 작성 프롬프트 (스켈레톤 강제 출력 방식) ───────────────────────────
 function buildWritingPrompt(detail, topic, existingPosts) {
   const postsCtx = existingPosts.length > 0
     ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
@@ -132,12 +123,9 @@ function buildWritingPrompt(detail, topic, existingPosts) {
     ? '<calculator type="medical" />'
     : '<calculator type="auto" />';
 
-  return `# Role
-당신은 '보상스쿨' 블로그의 수석 테크니컬 라이터이자 손해사정 판례 전문 분석가입니다.
+  return `${getPrecedentRole()}
 
-# Objective
-아래의 대법원/법원 판례 데이터와 기획안을 바탕으로, 공통 글쓰기 헌법 규칙을 완벽히 만족하며 일반인도 이해하기 쉬운 스토리텔링형 포스팅을 작성합니다.
-분량은 전문성을 높이기 위해 **최소 7,500자 이상, 최대 15,000자 이하**의 방대한 내용으로 매우 상세하고 깊이 있게 기술해 주십시오.
+${getPrecedentObjective()}
 
 # ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
 ${STRICT_RULES}
@@ -154,81 +142,13 @@ ${detail.caseContent.slice(0, 3000)} (본문 일부)
 * 카테고리: ${topic.category}
 * 핵심 키워드: ${topic.keywords}
 
-# 출력 첫 줄 (절대 필수)
-응답의 첫 번째 줄에 반드시 아래 형식으로 SEO 요약문을 출력하고, 빈 줄 하나를 두고 본문을 시작하십시오:
-SEO_META:[구글 검색 결과에 노출될 150자 이내의 판례 분석 클릭 유도용 요약문]
+${getPrecedentMetaFirstLine()}
 
-# ════════════════════════════════════════════════════════════════
-# 출력 뼈대 (OUTPUT SKELETON) — 이 순서를 절대 변경하지 마십시오
-# ════════════════════════════════════════════════════════════════
+${getPrecedentSkeleton(detail, calcTag, postsCtx)}
 
-[BLOCK-1: 오프닝 — 공감 및 문제 제기]
-실제 이 판례 사건과 유사한 고통을 겪고 있거나 보험사로부터 부당한 안내를 받은 독자들에게 공감하는 문단.
-마지막 문장은 "이번 포스팅에서는 대법원 판례 [${detail.caseNo}]를 통해 실무 보상 기준과 대처법을 상세히 분석해 드리겠습니다."로 마무리.
-
-[BLOCK-2: 저자 경험 박스 — 아래 한 줄 그대로 출력]
-> ✍️ 이 글은 보상스쿨 손해사정사가 실제 법원 판례 분석 및 보상 실무 경험을 바탕으로 작성한 전문 콘텐츠입니다.
-
-[BLOCK-3: Key Points]
-## [💡 Key Points]
-- {이 판례에서 독자가 반드시 알아야 할 핵심 포인트 1}
-- {핵심 포인트 2}
-- {핵심 포인트 3}
-
-[BLOCK-4: 본론 1 — 판례 사건의 배경과 쟁점 해설]
-## 1. ${detail.caseName} 사건의 발단 : 어떤 분쟁이 있었나
-독자가 흥미진진하게 읽을 수 있도록 실제 사고 배경과 피해 상황을 스토리텔링식으로 해설.
-쟁점이 된 법률 및 의학적 한계점을 표 형태로 정리.
-
-[BLOCK-5: 본론 2 — 법원의 판단과 그 뒤에 숨겨진 메커니즘]
-## 2. 법원의 판단과 판결 요지 : 보험사가 패소한(혹은 승소한) 이유
-법원(${detail.courtName})이 왜 이러한 판결을 내렸는지 판결 논리를 일반인 눈높이로 해설.
-대법원 판례 판시사항 인용 및 보상 실무 해설.
-
-[BLOCK-6: 계산기 삽입 — 형식 엄수]
-아래 태그를 단독 줄에 그대로 출력하십시오:
-${calcTag}
-
-[BLOCK-7: 본론 3 — 실무 적용 비교 : 손해사정사 도움의 차이]
-## 3. 손해사정 실무 관점에서의 해석 : 나에게 적용하는 방법
-일반 소비자가 혼자 대응했을 때와 손해사정사의 조력을 받아 판례 법리를 적용했을 때의 예상 결과를 3열 비교 표로 표현.
-
-[BLOCK-8: 본론 4 — 추가 분쟁 포인트 및 예방 가이드]
-## 4. 유사한 보상 분쟁을 방지하기 위한 핵심 대처법
-피해자가 합의 전 반드시 확보해야 하는 서류, 진단 기준 설명.
-내부 링크 자연스럽게 1~2개 삽입 (마크다운 링크 포맷 '[텍스트](/blog/${p.slug})' 엄수).
-기존 글 목록:
-${postsCtx}
-
-[BLOCK-9: 자가진단 체크리스트]
-## [🛡️ 지금 손해사정사가 필요한 상황인지 1분 체크]
-☑️ {판례 쟁점과 연결된 구체적 자가진단 질문 1}
-☑️ {질문 2}
-☑️ {질문 3}
-☑️ {질문 4}
-☑️ 위 항목 중 하나라도 해당된다면 손해사정사 검토가 필요한 상황입니다.
-
-[BLOCK-10: 본론 5 — 상담 유도 및 마무리]
-## 5. 정당한 보상을 위한 첫걸음
-독자를 격려하고 전문가 조언의 중요성 안내 (외부 상담 링크 금지, 텍스트로만 표현).
-
-[BLOCK-11: 핵심 보상 용어 사전]
-## [💡 핵심 보상 용어 사전]
-- **{용어1}** : {간결한 정의 1문장}
-- **{용어2}** : {간결한 정의 1문장}
-
-[BLOCK-12: FAQ TOP 3]
-## 💡 자주 묻는 질문 (FAQ) TOP 3
-### Q1 : {질문 내용 (Q1 문자는 질문 안에 포함하지 말 것)}
-${팩트 기반 답변}
-### Q2 : {질문 내용 (Q2 문자는 질문 안에 포함하지 말 것)}
-${팩트 기반 답변}
-### Q3 : 손해사정사에게 판례 분석 상담을 받으려면 비용이 드나요?
-{무료 검토 절차 안내 및 상담 유도}
-`;
+위 뼈대와 규칙을 바탕으로 상세하게 본문을 작성해 주세요.`;
 }
 
-// ── 8. 메인 오케스트레이터 ──────────────────────────────────────────────────
 async function main() {
   console.log('=== 판례 기반 자동글쓰기 프로세스 시작 ===');
 

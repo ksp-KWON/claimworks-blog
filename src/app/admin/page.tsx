@@ -3,7 +3,14 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BlogPostContent from '@/components/BlogPostContent';
-import { STRICT_RULES } from '@/lib/prompt-rules';
+import { 
+  STRICT_RULES, 
+  getBlogRole, 
+  getBlogLengthRulesManual, 
+  getBlogLengthRulesSemiAuto, 
+  getBlogFrontmatter, 
+  getBlogSkeleton 
+} from '@/lib/prompt-rules';
 
 
 const REPO_OWNER = 'ksp-KWON';
@@ -329,82 +336,65 @@ export default function AdminPage() {
       setStatusMessage(`API 오류: 모든 모델 호출에 실패했습니다. (마지막 에러: ${lastError})`);
     }
     setIsLoading(false);
-  };;
+  };
 
   const handleGenerate = () => {
     if (!inputText.trim()) return alert('내용을 입력해주세요.');
     
-    // 기존 포스트 리스트를 자연스러운 링크 예시로 제공하기 위한 텍스트 추출
     const existingPostsList = postList.length > 0
       ? postList.slice(0, 5).map(p => `- [${p.title}](/blog/${p.name.replace('.md', '')})`).join('\n')
       : "- (없음)";
 
     const strictRulesPrompt = `${STRICT_RULES}\n\n# 기존 글 슬러그 목록 (참고용):\n${existingPostsList}`;
+    const calcTag = '<calculator type="auto" />'; // 기본값 auto 주입
+    const currentDate = new Date().toISOString().split('T')[0];
 
     let prompt = "";
     if (mode === 'manual') {
       prompt = `
+${getBlogRole()}
+
 # Objective
 제시된 유튜브 대본(원문)을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 준수하는 **최소 7,500자 이상, 최대 15,000자 이하**의 전문적이고 방대한 분량의 초고품질 블로그 칼럼을 작성하십시오.
 
-# 분량 확보 및 정보 보완 규칙 (최소 7,500자 필수 보장)
-- 원문에 기재된 사건 팩트(진단 결과, 합의 상황 등)는 절대 임의로 변형하거나 왜곡하지 마십시오.
-- 다만, 7,550자 이상의 풍부한 내용을 확보하기 위해 원문에는 생략되어 있는 **의학적/법률적 세부 정보(맥브라이드 장해 진단 기준, 퇴행성 기왕증 삭감 수법, 판례 및 관계 법령, 구체적인 계산 방식 등)**를 당신의 전문 지식을 동원하여 최대한 상세히 덧붙여서 확장 서술하십시오.
-- 각 본론 문단은 최소 3개 이상의 풍부한 서술형 문단으로 깊이 있게 채우십시오.
+${getBlogLengthRulesManual()}
 
 # ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
-\${strictRulesPrompt}
+${strictRulesPrompt}
 
-반드시 다음 형식의 YAML Frontmatter를 최상단에 포함해야 합니다:
----
-title: "알맞은 제목 생성 (어색한 콜론 사용 금지, 단어 구분이 필요할 때만 콜론 앞뒤 한 칸 공백 적용)"
-date: "\${new Date().toISOString().split('T')[0]}"
-summary: "1~2줄 핵심 요약"
-category: "보상가이드"
-specialtyCategory: "정형외과"
-tags:
-  - "태그1"
-  - "태그2"
-slug: "구글 SEO에 적합한 영문 URL 슬러그 생성. 규칙: [카테고리영문명]-[핵심키워드영어단어2~3개] (예: 교통사고 카테고리이고 합의금 가이드면 'traffic-settlement-guide', 보상가이드 카테고리이고 십자인대 보상이면 'guide-cruciate-ligament-compensation')"
-published: true
----
+${getBlogFrontmatter('알맞은 제목 생성 (어색한 콜론 사용 금지, 단어 구분이 필요할 때만 콜론 앞뒤 한 칸 공백 적용)', currentDate)}
 
 제시된 원문 대본 내용:
-\${inputText}
+${inputText}
+
+${getBlogSkeleton(calcTag, existingPostsList)}
+
+위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.
 `;
     } else if (mode === 'semi-auto') {
       prompt = `
+${getBlogRole()}
+
 # Objective
 제시된 주제/키워드/참고내용을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 만족하며 구글 검색 최적화(SEO)에 적합한 **최소 7,500자 이상, 최대 15,000자 이하**의 깊이 있는 전문 칼럼을 새롭게 창작하십시오.
 
-# 분량 확보 및 정보 보완 규칙 (최소 7,500자 필수 보장)
-- 입력된 링크나 참고 내용의 주제와 핵심 인사이트를 철저히 벤치마킹하되, 단순히 요약하지 말고 완전히 새로운 관점의 깊이 있는 내용으로 구성하십시오.
-- 7,500자 이상의 충분한 분량을 달성하기 위해 **의학적 장해 측정 기준, 보험사 면책 분쟁 전술, 대법원 판례 논리 및 실무 합의금 계산 방식 등**의 유익하고 구체적인 정보를 매우 풍부하게 보완하여 작성하십시오.
-- 각 본론 문단은 단순히 요약 나열하는 것을 절대 금지하며, 최소 3개 이상의 상세 서술형 문단으로 깊이 있게 작성하십시오.
+${getBlogLengthRulesSemiAuto()}
 
 # ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
-\${strictRulesPrompt}
+${strictRulesPrompt}
 
-반드시 다음 형식의 YAML Frontmatter를 최상단에 포함해야 합니다:
----
-title: "매력적인 제목 생성 (어색한 콜론 사용 금지, 단어 구분이 필요할 때만 콜론 앞뒤 한 칸 공백 적용)"
-date: "\${new Date().toISOString().split('T')[0]}"
-summary: "1~2줄 핵심 요약"
-category: "보상가이드"
-specialtyCategory: "정형외과"
-tags:
-  - "태그1"
-  - "태그2"
-slug: "구글 SEO에 적합한 영문 URL 슬러그 생성. 규칙: [카테고리영문명]-[핵심키워드영어단어2~3개] (예: 교통사고 카테고리이고 합의금 가이드면 'traffic-settlement-guide', 보상가이드 카테고리이고 십자인대 보상이면 'guide-cruciate-ligament-compensation')"
-published: true
----
+${getBlogFrontmatter('매력적인 제목 생성 (어색한 콜론 사용 금지, 단어 구분이 필요할 때만 콜론 앞뒤 한 칸 공백 적용)', currentDate)}
 
 제시된 주제/키워드/참고링크:
-\${inputText}
+${inputText}
+
+${getBlogSkeleton(calcTag, existingPostsList)}
+
+위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.
 `;
     }
     callGeminiAPI(prompt);
-  };;
+  };
 
   const publishToGithub = async () => {
     if (!githubToken) return alert('GitHub 토큰이 필요합니다.');

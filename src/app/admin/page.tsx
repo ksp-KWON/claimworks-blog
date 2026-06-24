@@ -277,13 +277,10 @@ export default function AdminPage() {
       'gemini-flash-latest',       // 2순위: 속도 지향형 Flash (3.5 Flash)
       'gemini-flash-lite-latest'   // 3순위: 경량형 Flash-Lite (할당량 대비)
     ];
-
-
     
     let success = false;
     let lastError = '';
 
-    
     for (const model of models) {
       try {
         setStatusMessage(`✨ AI가 글을 작성하고 있습니다... (사용 모델: ${model})`);
@@ -292,7 +289,10 @@ export default function AdminPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.7 }
+            generationConfig: { 
+              temperature: 0.7,
+              maxOutputTokens: 65536
+            }
           })
         });
         
@@ -329,7 +329,7 @@ export default function AdminPage() {
       setStatusMessage(`API 오류: 모든 모델 호출에 실패했습니다. (마지막 에러: ${lastError})`);
     }
     setIsLoading(false);
-  };
+  };;
 
   const handleGenerate = () => {
     if (!inputText.trim()) return alert('내용을 입력해주세요.');
@@ -341,17 +341,24 @@ export default function AdminPage() {
 
     const strictRulesPrompt = `${STRICT_RULES}\n\n# 기존 글 슬러그 목록 (참고용):\n${existingPostsList}`;
 
-
     let prompt = "";
     if (mode === 'manual') {
       prompt = `
-다음은 유튜브 영상 대본입니다. 이 내용을 절대 변형하거나 왜곡하지 말고, 보험회사 및 법무법인 출신의 베테랑 전문가들로 구성된 '보상스쿨 전문가 그룹'의 실무적이고 공신력 있는 톤앤매너로 다듬어 주세요.
-${strictRulesPrompt}
+# Objective
+제시된 유튜브 대본(원문)을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 준수하는 **최소 7,500자 이상, 최대 15,000자 이하**의 전문적이고 방대한 분량의 초고품질 블로그 칼럼을 작성하십시오.
+
+# 분량 확보 및 정보 보완 규칙 (최소 7,500자 필수 보장)
+- 원문에 기재된 사건 팩트(진단 결과, 합의 상황 등)는 절대 임의로 변형하거나 왜곡하지 마십시오.
+- 다만, 7,550자 이상의 풍부한 내용을 확보하기 위해 원문에는 생략되어 있는 **의학적/법률적 세부 정보(맥브라이드 장해 진단 기준, 퇴행성 기왕증 삭감 수법, 판례 및 관계 법령, 구체적인 계산 방식 등)**를 당신의 전문 지식을 동원하여 최대한 상세히 덧붙여서 확장 서술하십시오.
+- 각 본론 문단은 최소 3개 이상의 풍부한 서술형 문단으로 깊이 있게 채우십시오.
+
+# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
+\${strictRulesPrompt}
 
 반드시 다음 형식의 YAML Frontmatter를 최상단에 포함해야 합니다:
 ---
 title: "알맞은 제목 생성 (어색한 콜론 사용 금지, 단어 구분이 필요할 때만 콜론 앞뒤 한 칸 공백 적용)"
-date: "${new Date().toISOString().split('T')[0]}"
+date: "\${new Date().toISOString().split('T')[0]}"
 summary: "1~2줄 핵심 요약"
 category: "보상가이드"
 specialtyCategory: "정형외과"
@@ -362,20 +369,26 @@ slug: "구글 SEO에 적합한 영문 URL 슬러그 생성. 규칙: [카테고�
 published: true
 ---
 
-대본 내용:
-${inputText}
+제시된 원문 대본 내용:
+\${inputText}
 `;
     } else if (mode === 'semi-auto') {
       prompt = `
-다음은 블로그 포스팅 작성을 위한 참고 자료(키워드, 개요, 또는 벤치마킹할 블로그/유튜브 링크)입니다.
-만약 링크가 포함되어 있다면, 해당 링크의 콘텐츠나 영상을 분석하여 핵심 주제와 인사이트를 파악하되 원문을 복사하지 마세요. 
-보험회사 및 법무법인 출신의 베테랑 전문가들이 모인 '보상스쿨 전문가 그룹'의 실무 관점에서 완전히 새로운 구도와 독창적인 내용으로 벤치마킹하여 깊이 있는 블로그 포스팅을 창작해 주세요.
-${strictRulesPrompt}
+# Objective
+제시된 주제/키워드/참고내용을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 만족하며 구글 검색 최적화(SEO)에 적합한 **최소 7,500자 이상, 최대 15,000자 이하**의 깊이 있는 전문 칼럼을 새롭게 창작하십시오.
+
+# 분량 확보 및 정보 보완 규칙 (최소 7,500자 필수 보장)
+- 입력된 링크나 참고 내용의 주제와 핵심 인사이트를 철저히 벤치마킹하되, 단순히 요약하지 말고 완전히 새로운 관점의 깊이 있는 내용으로 구성하십시오.
+- 7,500자 이상의 충분한 분량을 달성하기 위해 **의학적 장해 측정 기준, 보험사 면책 분쟁 전술, 대법원 판례 논리 및 실무 합의금 계산 방식 등**의 유익하고 구체적인 정보를 매우 풍부하게 보완하여 작성하십시오.
+- 각 본론 문단은 단순히 요약 나열하는 것을 절대 금지하며, 최소 3개 이상의 상세 서술형 문단으로 깊이 있게 작성하십시오.
+
+# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
+\${strictRulesPrompt}
 
 반드시 다음 형식의 YAML Frontmatter를 최상단에 포함해야 합니다:
 ---
 title: "매력적인 제목 생성 (어색한 콜론 사용 금지, 단어 구분이 필요할 때만 콜론 앞뒤 한 칸 공백 적용)"
-date: "${new Date().toISOString().split('T')[0]}"
+date: "\${new Date().toISOString().split('T')[0]}"
 summary: "1~2줄 핵심 요약"
 category: "보상가이드"
 specialtyCategory: "정형외과"
@@ -386,20 +399,12 @@ slug: "구글 SEO에 적합한 영문 URL 슬러그 생성. 규칙: [카테고�
 published: true
 ---
 
-주제/키워드/참고링크:
-${inputText}
+제시된 주제/키워드/참고링크:
+\${inputText}
 `;
     }
-
-
-
-
-
-
-
-    
     callGeminiAPI(prompt);
-  };
+  };;
 
   const publishToGithub = async () => {
     if (!githubToken) return alert('GitHub 토큰이 필요합니다.');

@@ -20,3 +20,6 @@ export function getPrecedentSkeleton(
   calcTag: string,
   postsCtx: string
 ): string;
+
+export function calculateModelCapacity(maxTokens: number): string;
+export function cleanAnalysisBlock(text: string): string;

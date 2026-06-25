@@ -36,7 +36,8 @@ const {
   getBlogObjective, 
   getBlogMetaFirstLine, 
   getTopicPlanningPrompt, 
-  getBlogSkeleton 
+  getBlogSkeleton,
+  cleanAnalysisBlock
 } = require('../src/lib/prompt-rules.js');
 
 const POSTS_DIR = path.join(process.cwd(), 'src/content/posts');
@@ -190,10 +191,7 @@ async function main() {
   const rawOutput = await callGemini(buildPrompt(topic, existingPosts));
 
   // [ANALYSIS] 영역 도려내기
-  let cleanOutput = rawOutput;
-  if (rawOutput.includes('[ANALYSIS_START]')) {
-    cleanOutput = rawOutput.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
-  }
+  const cleanOutput = cleanAnalysisBlock(rawOutput);
 
   // SEO_META 파싱
   const lines = cleanOutput.split('\n');

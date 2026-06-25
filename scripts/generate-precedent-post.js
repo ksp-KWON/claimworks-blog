@@ -25,7 +25,8 @@ const {
   getPrecedentObjective, 
   getPrecedentMetaFirstLine, 
   getPrecedentPlanningPrompt, 
-  getPrecedentSkeleton 
+  getPrecedentSkeleton,
+  cleanAnalysisBlock
 } = require('../src/lib/prompt-rules.js');
 
 const POSTS_DIR     = path.join(process.cwd(), 'src/content/posts');
@@ -176,10 +177,7 @@ async function main() {
   const rawOutput = await callGemini(buildWritingPrompt(detail, topic, existingPosts));
 
   // [ANALYSIS] 영역 도려내기
-  let cleanOutput = rawOutput;
-  if (rawOutput.includes('[ANALYSIS_START]')) {
-    cleanOutput = rawOutput.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
-  }
+  const cleanOutput = cleanAnalysisBlock(rawOutput);
 
   // 3. 파싱 및 빌드
   const lines = cleanOutput.split('\n');

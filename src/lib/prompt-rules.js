@@ -426,6 +426,24 @@ ${postsCtx}
 `;
 }
 
+function calculateModelCapacity(maxTokens) {
+  const safetyLimitChar = Math.floor(maxTokens / 3.0); // 한글 1글자당 3토큰 안전 마진 기준
+  const minRecommended = Math.floor(safetyLimitChar * 0.45);
+  const maxRecommended = Math.floor(safetyLimitChar * 0.85);
+  const minNoSpace = Math.floor(minRecommended * 0.7);
+  const maxNoSpace = Math.floor(maxRecommended * 0.7);
+
+  return `할당된 인공지능 모델 용량 스펙 (최대 출력 ${maxTokens.toLocaleString()} 토큰) | 권장량: 현재 할당된 인공지능의 하드웨어적 출력 허용량을 고려하여, 1회 생성 한계치인 한글 약 ${safetyLimitChar.toLocaleString()}자 내에서 끊김 및 품질 저하를 방지하기 위한 최적 작성 분량은 **공백 포함 약 ${minRecommended.toLocaleString()}자 ~ ${maxRecommended.toLocaleString()}자 (공백 제외 약 ${minNoSpace.toLocaleString()}자 ~ ${maxNoSpace.toLocaleString()}자)** 입니다. 무작정 분량을 늘리는 사족 반복을 지양하고, 이 동적 용량 설계 기준 안에서 핵심 전문성(의학/법률 디테일 및 판례 법리)을 최대한 깊이 있고 짜임새 있게 전개하십시오.`;
+}
+
+function cleanAnalysisBlock(text) {
+  if (!text) return '';
+  if (text.includes('[ANALYSIS_START]')) {
+    return text.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
+  }
+  return text.trim();
+}
+
 module.exports = {
   STRICT_RULES,
   getBlogRole,
@@ -440,5 +458,7 @@ module.exports = {
   getTopicPlanningPrompt,
   getPrecedentPlanningPrompt,
   getBlogSkeleton,
-  getPrecedentSkeleton
+  getPrecedentSkeleton,
+  calculateModelCapacity,
+  cleanAnalysisBlock
 };

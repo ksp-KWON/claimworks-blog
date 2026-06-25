@@ -9,7 +9,9 @@ import {
   getBlogLengthRulesManual, 
   getBlogLengthRulesSemiAuto, 
   getBlogFrontmatter, 
-  getBlogSkeleton 
+  getBlogSkeleton,
+  calculateModelCapacity,
+  cleanAnalysisBlock
 } from '@/lib/prompt-rules';
 
 
@@ -293,13 +295,7 @@ export default function AdminPage() {
       const maxTokens = model.includes('lite') ? 16384 : 32768;
       
       // 모델 사양별 지능형 분량 권장사항 텍스트 동적 계산 (Self-Adaptive Token-Aware)
-      const safetyLimitChar = Math.floor(maxTokens / 3.0); // 한글 1글자당 3토큰 안전 마진 기준
-      const minRecommended = Math.floor(safetyLimitChar * 0.45);
-      const maxRecommended = Math.floor(safetyLimitChar * 0.85);
-      const minNoSpace = Math.floor(minRecommended * 0.7);
-      const maxNoSpace = Math.floor(maxRecommended * 0.7);
-
-      const modelCapacityText = `할당된 인공지능 모델 용량 스펙 (최대 출력 ${maxTokens.toLocaleString()} 토큰) | 권장량: 현재 할당된 인공지능의 하드웨어적 출력 허용량을 고려하여, 1회 생성 한계치인 한글 약 ${safetyLimitChar.toLocaleString()}자 내에서 끊김 및 품질 저하를 방지하기 위한 최적 작성 분량은 **공백 포함 약 ${minRecommended.toLocaleString()}자 ~ ${maxRecommended.toLocaleString()}자 (공백 제외 약 ${minNoSpace.toLocaleString()}자 ~ ${maxNoSpace.toLocaleString()}자)** 입니다. 무작정 분량을 늘리는 사족 반복을 지양하고, 이 동적 용량 설계 기준 안에서 핵심 전문성(의학/법률 디테일 및 판례 법리)을 최대한 깊이 있고 짜임새 있게 전개하십시오.`;
+      const modelCapacityText = calculateModelCapacity(maxTokens);
 
       const finalizedPrompt = prompt.replace(/\{\{TARGET_MODEL_CAPACITY\}\}/g, modelCapacityText);
 
@@ -328,9 +324,7 @@ export default function AdminPage() {
         let text = data.candidates[0].content.parts[0].text;
         
         // CoT [ANALYSIS] 영역 도려내기
-        if (text.includes('[ANALYSIS_START]')) {
-          text = text.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
-        }
+        text = cleanAnalysisBlock(text);
         
         const slugMatch = text.match(/slug:\s*"?([^"\n]+)"?/);
         if (slugMatch) {

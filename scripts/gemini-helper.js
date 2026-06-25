@@ -7,13 +7,11 @@
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// gemini-pro-latest -> gemini-3.1-pro-preview
-// gemini-flash-latest -> gemini-3.5-flash
-// gemini-flash-lite-latest -> gemini-3.1-flash-lite
+// 모델별 실제 허용 최대 출력 토큰 (보수적 설정 — 공식 API 한도보다 약간 낮게 잡아 안전 마진 확보)
 const GEMINI_MODELS = [
-  'gemini-pro-latest',
-  'gemini-flash-latest',
-  'gemini-flash-lite-latest'
+  { name: 'gemini-pro-latest',       maxTokens: 32768 },
+  { name: 'gemini-flash-latest',     maxTokens: 32768 },
+  { name: 'gemini-flash-lite-latest',maxTokens: 16384 },
 ];
 
 
@@ -30,28 +28,43 @@ async function callGemini(prompt, schema = null) {
     throw new Error('GEMINI_API_KEY가 등록되지 않았거나 유효하지 않습니다. GitHub Secrets 또는 .env.local 설정을 확인해 주세요.');
   }
 
-  const generationConfig = {
-    temperature: schema ? 0.2 : 0.75, // 기획/주제 추출 등 스키마가 있으면 정확도 위주, 본문은 창의성 위주
-    maxOutputTokens: schema ? 4096 : 65536,
+  // 기본 generationConfig — maxOutputTokens는 모델별로 루프 안에서 설정
+  const baseGenerationConfig = {
+    temperature: schema ? 0.2 : 0.75, // 기획/주제 추출: 정확도 위주 | 본문 생성: 창의성 위주
   };
   if (schema) {
-    generationConfig.responseMimeType = 'application/json';
-    generationConfig.responseSchema = schema;
+    baseGenerationConfig.responseMimeType = 'application/json';
+    baseGenerationConfig.responseSchema = schema;
   }
 
-  modelLoop: for (const model of GEMINI_MODELS) {
+  modelLoop: for (const { name: model, maxTokens } of GEMINI_MODELS) {
+    const generationConfig = {
+      ...baseGenerationConfig,
+      maxOutputTokens: schema ? Math.min(4096, maxTokens) : maxTokens,
+    };
+
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     
     let res;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 90000); // 90초 타임아웃
 
+    // 모델 사양별 지능형 분량 권장사항 텍스트 동적 맵핑 (Self-Adaptive Token-Aware)
+    let modelCapacityText = "";
+    if (model.includes('pro')) {
+      modelCapacityText = "대용량 Pro 모델 (물리적 1회 출력 한도 32,768토큰 내외 대용량 생성 특화) | 권장량: 풍부한 법률/의학 디테일을 동반하여, 전체 본문 분량 7,500자~12,000자(공백 제외 약 5,000자~8,000자) 목표로 상세하게 전개하십시오.";
+    } else {
+      modelCapacityText = "중/소용량 Flash 모델 (물리적 1회 출력 한도 16,384~32,768토큰이지만, 한글 출력 특성상 1회 생성 안전 한도 고려) | 권장량: 불필요한 반복(사족)을 과감히 제거하고 알짜 정보만 압축하여, 전체 본문 분량 4,500자~6,500자(공백 제외 약 3,000자~4,500자) 범위로 안정적으로 끊김 없이 완결하십시오.";
+    }
+
+    const finalizedPrompt = prompt.replace(/\{\{TARGET_MODEL_CAPACITY\}\}/g, modelCapacityText);
+
     try {
-      console.log(`  [API] 모델 '${model}' 호출 중...`);
+      console.log(`  [API] 모델 '${model}' 호출 중... (maxOutputTokens: ${generationConfig.maxOutputTokens})`);
       res = await fetch(url, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig }),
+        body:    JSON.stringify({ contents: [{ parts: [{ text: finalizedPrompt }] }], generationConfig }),
         signal:  controller.signal
       });
     } catch (networkErr) {
@@ -76,10 +89,14 @@ async function callGemini(prompt, schema = null) {
       continue modelLoop;
     }
 
-    const text = (data?.candidates?.[0]?.content?.parts ?? []).map(p => p.text ?? '').join('');
+    const candidate = data?.candidates?.[0];
+    const finishReason = candidate?.finishReason ?? 'UNKNOWN';
+    const text = (candidate?.content?.parts ?? []).map(p => p.text ?? '').join('');
     
     if (!text) {
-      console.error(`  [실패] '${model}' 빈 응답 수신. 다음 모델로 전환.`);
+      // finishReason 을 로그에 포함해 원인 파악 용이하게
+      console.error(`  [실패] '${model}' 빈 응답 수신 (finishReason: ${finishReason}). 다음 모델로 전환.`);
+      // MAX_TOKENS 인 경우 해당 모델의 한계이므로 계속 시도할 의미 없음 — 다음 모델로
       continue modelLoop;
     }
     

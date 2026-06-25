@@ -175,12 +175,18 @@ async function main() {
   console.log('[3] 제미나이를 이용한 판례 분석 칼럼 작성 중...');
   const rawOutput = await callGemini(buildWritingPrompt(detail, topic, existingPosts));
 
+  // [ANALYSIS] 영역 도려내기
+  let cleanOutput = rawOutput;
+  if (rawOutput.includes('[ANALYSIS_START]')) {
+    cleanOutput = rawOutput.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
+  }
+
   // 3. 파싱 및 빌드
-  const lines = rawOutput.split('\n');
+  const lines = cleanOutput.split('\n');
   let summary = '';
   let contentStart = 0;
 
-  if (lines[0].startsWith('SEO_META:')) {
+  if (lines[0] && lines[0].startsWith('SEO_META:')) {
     summary = yamlSafe(lines[0].replace('SEO_META:', '').trim());
     contentStart = 1;
     while (contentStart < lines.length && lines[contentStart].trim() === '') contentStart++;

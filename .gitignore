@@ -51,3 +51,5 @@ next-env.d.ts
 # Cloudflare Wrangler env secrets
 .dev.vars
 
+# Temporary daily topic JSON (generated during blog build)
+scripts/daily-topic.json

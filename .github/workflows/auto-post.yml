@@ -36,6 +36,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: 'npm'
 
       - name: 의존성 설치
         run: npm ci
@@ -69,21 +70,9 @@ jobs:
           fi
 
       - name: 변경사항 커밋 & 푸시
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # 1. 새롭게 자동 작성된 포스트(.md) 파일만 스테이징
-          git add src/content/posts/
-          
-          # 2. 신규 작성글이 존재하는 경우에만 처리 진행
-          if ! git diff --cached --quiet; then
-            # 3. 신규 글을 커밋 (글 파일명은 겹치지 않으므로 100% 충돌 없음)
-            git commit -m "auto: 자동글쓰기 콘텐츠 생성 $(TZ=Asia/Seoul date '+%Y-%m-%d')"
-            
-            # 4. 원격 저장소의 최신 커밋을 땡겨와 안전하게 리베이스 진행
-            git pull --rebase origin main
-            
-            # 5. 원격 저장소에 최종 푸시
-            git push origin main
-          fi
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "auto: 자동글쓰기 콘텐츠 생성"
+          file_pattern: 'src/content/posts/*.md'
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"

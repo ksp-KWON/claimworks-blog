@@ -289,16 +289,29 @@ export default function AdminPage() {
     let lastError = '';
 
     for (const model of models) {
+      // 모델별 실제 허용 한계 토큰 (maxOutputTokens 설정 다중화)
+      const maxTokens = model.includes('pro') ? 32768 : 16384;
+      
+      // 모델 사양별 지능형 분량 권장사항 텍스트 동적 맵핑 (Self-Adaptive Token-Aware)
+      let modelCapacityText = "";
+      if (model.includes('pro')) {
+        modelCapacityText = "대용량 Pro 모델 (물리적 1회 출력 한도 32,768토큰 내외 대용량 생성 특화) | 권장량: 풍부한 법률/의학 디테일을 동반하여, 전체 본문 분량 7,500자~12,000자(공백 제외 약 5,000자~8,000자) 목표로 상세하게 전개하십시오.";
+      } else {
+        modelCapacityText = "중/소용량 Flash 모델 (물리적 1회 출력 한도 16,384~32,768토큰이지만, 한글 출력 특성상 1회 생성 안전 한도 고려) | 권장량: 불필요한 반복(사족)을 과감히 제거하고 알짜 정보만 압축하여, 전체 본문 분량 4,500자~6,500자(공백 제외 약 3,000자~4,500자) 범위로 안정적으로 끊김 없이 완결하십시오.";
+      }
+
+      const finalizedPrompt = prompt.replace(/\{\{TARGET_MODEL_CAPACITY\}\}/g, modelCapacityText);
+
       try {
         setStatusMessage(`✨ AI가 글을 작성하고 있습니다... (사용 모델: ${model})`);
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
+            contents: [{ parts: [{ text: finalizedPrompt }] }],
             generationConfig: { 
               temperature: 0.7,
-              maxOutputTokens: 65536
+              maxOutputTokens: maxTokens
             }
           })
         });
@@ -311,7 +324,12 @@ export default function AdminPage() {
         const data = await response.json() as { error?: { message: string }; candidates: { content: { parts: { text: string }[] } }[] };
         if (data.error) throw new Error(data.error.message);
         
-        const text = data.candidates[0].content.parts[0].text;
+        let text = data.candidates[0].content.parts[0].text;
+        
+        // CoT [ANALYSIS] 영역 도려내기
+        if (text.includes('[ANALYSIS_START]')) {
+          text = text.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
+        }
         
         const slugMatch = text.match(/slug:\s*"?([^"\n]+)"?/);
         if (slugMatch) {
@@ -355,7 +373,7 @@ export default function AdminPage() {
 ${getBlogRole()}
 
 # Objective
-제시된 유튜브 대본(원문)을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 준수하는 **최소 7,500자 이상, 최대 15,000자 이하**의 전문적이고 방대한 분량의 초고품질 블로그 칼럼을 작성하십시오.
+제시된 유튜브 대본(원문)을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 준수하며 타겟 모델의 물리 한계 스펙 내에서 아주 상세하고 방대한 분량의 초고품질 전문 칼럼을 작성하십시오.
 
 ${getBlogLengthRulesManual()}
 
@@ -376,7 +394,7 @@ ${getBlogSkeleton(calcTag, existingPostsList)}
 ${getBlogRole()}
 
 # Objective
-제시된 주제/키워드/참고내용을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 만족하며 구글 검색 최적화(SEO)에 적합한 **최소 7,500자 이상, 최대 15,000자 이하**의 깊이 있는 전문 칼럼을 새롭게 창작하십시오.
+제시된 주제/키워드/참고내용을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 만족하며 구글 검색 최적화(SEO)에 적합한 깊이 있는 전문 칼럼을 타겟 모델의 물리 한계 스펙 내에서 새롭게 창작하십시오.
 
 ${getBlogLengthRulesSemiAuto()}
 

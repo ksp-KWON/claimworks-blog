@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { getPostData, getSortedPostsData } from '@/lib/posts';
 import type { Metadata } from 'next';
 import BlogPostContent from '@/components/BlogPostContent';
+import { extractFAQ } from '@/lib/blog-utils';
+
 
 export const dynamicParams = false;
 
@@ -71,32 +73,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  // FAQ 파싱 헬퍼 (마크다운 본문에서 동적으로 FAQ 스키마 생성용 데이터 추출)
-  const lines = post.content.split('\n');
-  const faqs: { q: string; a: string }[] = [];
-  let inFAQSection = false;
-  let currentQ = '';
-  let currentA = '';
+  // FAQ 파싱 — blog-utils의 공통 함수 사용 (BlogPostContent.tsx와 동일 로직)
+  const faqs = extractFAQ(post.content);
 
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (/^##\s+/.test(trimmed) && /(?:faq|자주\s*묻는)/i.test(trimmed)) {
-      inFAQSection = true;
-      continue;
-    }
-    if (inFAQSection) {
-      if (/^##\s+/.test(trimmed)) break; // 다음 H2 대제목을 만나면 종료
-      if (/^#+\s*/.test(trimmed)) {
-        if (currentQ) faqs.push({ q: currentQ, a: currentA.trim() });
-        currentQ = trimmed.replace(/^(?:#+\s*)+/, '').replace(/^Q\d+\s*[:.-]?\s*/i, '').trim();
-        currentA = '';
-      } else if (currentQ) {
-        if (trimmed === '---') continue;
-        currentA += line + '\n';
-      }
-    }
-  }
-  if (currentQ) faqs.push({ q: currentQ, a: currentA.trim() });
 
   const postUrl = `https://claim-works.com/blog/${slug}`;
   const ogImageUrl = `https://claim-works.com/blog/${slug}/opengraph-image`;

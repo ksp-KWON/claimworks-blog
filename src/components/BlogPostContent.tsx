@@ -10,12 +10,6 @@
  * - FAQ 아코디언
  * - CTA 배너 (헤더 배너 스타일 + 그림자)
  * - 저자 바이오 카드 (E-E-A-T 신호)
- *
- * [FIX v6.1] extractFAQ — Q1Q1 이중표기 버그 수정
- *   AI가 ### **Q1** : 질문 처럼 볼드(**)·이탤릭(*)·이모지를
- *   Q번호 앞뒤에 섞어 출력할 때 기존 정규식이 제거에 실패해
- *   화면에 "Q1Q1 : 질문" 형태로 이중 표기되던 문제를 해결.
- *   수정 위치: extractFAQ 함수 내 currentQ 정규식 1줄.
  */
 
 import ReactMarkdown from 'react-markdown';
@@ -36,201 +30,16 @@ import ChecklistBox from './blog/ChecklistBox';
 import AuthorBioCard from './blog/AuthorBioCard';
 import TableOfContents from './blog/TableOfContents';
 
+// 파싱 유틸리티 공통 모듈 (blog/[slug]/page.tsx와 공유)
+import {
+  extractKeyPoints,
+  extractFAQ,
+  extractGlossary,
+  preprocessBody,
+} from '@/lib/blog-utils';
+
 // ─── 스크롤 오프셋: header(64) + sticky banner(52) + 버퍼(20) = 136px ───
 const SCROLL_OFFSET = 140;
-
-// ─── 본문에서 식별할 섹션 패턴 ───
-const KEY_POINT_PATTERNS = /(?:핵심\s*요약|key\s*point)/i;
-const CHECKLIST_PATTERNS = /(?:자가진단|체크리스트|1분\s*체크|체크)/i;
-const GLOSSARY_PATTERNS = /(?:용어\s*사전|보상\s*용어)/i;
-const FAQ_PATTERNS = /(?:faq|자주\s*묻는)/i;
-const CTA_PATTERNS = /(?:카카오톡|call\s*to\s*action|상담\s*신청)/i;
-
-// ─── 핵심 요약 추출 ───
-function extractKeyPoints(content: string): string[] {
-  const lines = content.split('\n');
-  const points: string[] = [];
-  let inSection = false;
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (/^##\s+/.test(trimmed) && KEY_POINT_PATTERNS.test(trimmed)) {
-      inSection = true;
-      continue;
-    }
-    if (inSection) {
-      if (/^#{1,2}\s/.test(trimmed)) break; // Stop at next H1/H2
-      if (/\[SEO_SUMMARY\]/.test(trimmed)) break;
-      
-      if (/^---/.test(trimmed)) continue;
-      
-      if (/^[-*]\s+/.test(trimmed) || /^[🛡️💡✅☑️⭐]/.test(trimmed)) {
-        const text = trimmed.replace(/^[-*]\s*/, '').replace(/^[🛡️💡✅☑️⭐]+\s*/, '').trim();
-        if (text) points.push(text);
-      }
-    }
-  }
-  return points.slice(0, 3);
-}
-
-// ─── FAQ 추출 ───
-function extractFAQ(content: string): { q: string; a: string }[] {
-  const lines = content.split('\n');
-  const faqs: { q: string; a: string }[] = [];
-  let inSection = false;
-  let currentQ = '';
-  let currentA = '';
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (/^##\s+/.test(trimmed) && FAQ_PATTERNS.test(trimmed)) {
-      inSection = true;
-      continue;
-    }
-    if (inSection) {
-      if (/^#{1,2}\s/.test(trimmed)) break; // Stop at H1 or H2
-      if (/\[SEO_SUMMARY\]/.test(trimmed)) break;
-
-      if (/^#+\s*/.test(trimmed)) {
-        if (currentQ) faqs.push({ q: currentQ, a: currentA.trim() });
-        // [FIX] Q번호 앞에 **·*·이모지·공백이 어떤 조합으로 와도 제거
-        //       Q번호 뒤에 남는 **·* 마커도 함께 제거
-        currentQ = trimmed
-          .replace(/^(?:#+\s*)+/, '')
-          .replace(/^[*_💬✅☑️🛡️⭐\s]*Q\d+[*_]*\s*[:.-]?\s*/i, '')
-          .trim();
-        currentA = '';
-      } else if (currentQ) {
-        if (trimmed === '---') continue;
-        currentA += line + '\n';
-      }
-    }
-  }
-  if (currentQ) faqs.push({ q: currentQ, a: currentA.trim() });
-  return faqs;
-}
-
-// ─── 용어 사전 추출 ───
-function extractGlossary(content: string): { term: string; definition: string }[] {
-  const lines = content.split('\n');
-  const glossary: { term: string; definition: string }[] = [];
-  let inSection = false;
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (/^##\s+/.test(trimmed) && GLOSSARY_PATTERNS.test(trimmed)) {
-      inSection = true;
-      continue;
-    }
-    if (inSection) {
-      if (/^#{1,2}\s/.test(trimmed)) break; // Stop at next H1/H2
-      if (/\[SEO_SUMMARY\]/.test(trimmed)) break;
-
-      if (/^[-*]\s+/.test(trimmed)) {
-        const text = trimmed.replace(/^[-*]\s*/, '').trim();
-        // "**용어**: 설명", "**용어** : 설명", "**용어 :** 설명" 등 다양한 패턴 매칭
-        const match = text.replace(/\*\*/g, '').match(/^([^:]+):\s*(.*)/);
-        if (match) {
-          glossary.push({ term: match[1].trim(), definition: match[2].trim() });
-        }
-      }
-    }
-  }
-  return glossary;
-}
-
-// ─── 본문 전처리 ───
-function preprocessBody(content: string): string {
-  const lines = content.split('\n');
-  const result: string[] = [];
-  let skipType: 'NONE' | 'KEY_POINTS' | 'CHECKLIST' | 'GLOSSARY' | 'FAQ' | 'CTA' = 'NONE';
-  let clBuffer: string[] = [];
-
-  const singleLinkRegex = /^\s*\[([^\]]+)\]\(([^)]+)\)\s*$/;
-
-  const flushChecklist = () => {
-    if (clBuffer.length > 0) {
-      result.push(`<inlinechecklist data="${encodeURIComponent(clBuffer.join('||'))}"></inlinechecklist>`);
-      clBuffer = [];
-    }
-  };
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-
-    // 단독 줄 마크다운 링크 감지 -> 커스텀 추천 칼럼 카드로 치환
-    const singleLinkMatch = trimmed.match(singleLinkRegex);
-    if (singleLinkMatch) {
-      const text = singleLinkMatch[1].trim();
-      const href = singleLinkMatch[2].trim();
-      result.push(`<calloutlink href="${href}" text="${text}"></calloutlink>`);
-      continue;
-    }
-
-    if (/^##\s+/.test(trimmed)) {
-      const prevSkipType = skipType;
-      let newSkipType: 'NONE' | 'KEY_POINTS' | 'CHECKLIST' | 'GLOSSARY' | 'FAQ' | 'CTA' = skipType;
-      let matched = false;
-
-      if (KEY_POINT_PATTERNS.test(trimmed)) { newSkipType = 'KEY_POINTS'; matched = true; }
-      else if (CHECKLIST_PATTERNS.test(trimmed)) { newSkipType = 'CHECKLIST'; clBuffer = []; matched = true; }
-      else if (GLOSSARY_PATTERNS.test(trimmed)) { newSkipType = 'GLOSSARY'; matched = true; }
-      else if (FAQ_PATTERNS.test(trimmed)) { newSkipType = 'FAQ'; matched = true; }
-      else if (CTA_PATTERNS.test(trimmed)) { newSkipType = 'CTA'; matched = true; }
-
-      if (matched) {
-        if (prevSkipType === 'CHECKLIST') {
-          flushChecklist();
-        }
-        skipType = newSkipType;
-        continue;
-      }
-    }
-
-    if (skipType === 'KEY_POINTS') {
-      if (trimmed !== '' && !/^[-*]/.test(trimmed) && !/^#/.test(trimmed)) skipType = 'NONE';
-      else if (/^#/.test(trimmed)) skipType = 'NONE';
-    } else if (skipType === 'CHECKLIST') {
-      if (/^#{1,6}\s/.test(trimmed)) {
-        flushChecklist();
-        skipType = 'NONE';
-      } else if (/^[-*]\s+/.test(trimmed) || /^[\u2611\u2705\uFE0F[\]]/.test(trimmed)) {
-        const text = trimmed
-          .replace(/^[-*]\s*/, '')
-          .replace(/^\[[ x]\]\s*/i, '')
-          .replace(/^[\u2611\u2705\uFE0F]+\s*/gu, '')
-          .trim();
-        if (text) clBuffer.push(text);
-        continue;
-      } else {
-        // 설명 문구나 빈 줄 등은 무시하고, 다음 H2/H1 소제목을 만날 때까지 CHECKLIST 모드를 계속 유지합니다.
-        continue;
-      }
-    } else if (skipType === 'GLOSSARY') {
-      if (/^#{1,2}\s/.test(trimmed)) skipType = 'NONE';
-    } else if (skipType === 'FAQ') {
-      if (/^#{1,2}\s/.test(trimmed)) skipType = 'NONE';
-    } else if (skipType === 'CTA') {
-      if (/^#{1,2}\s/.test(trimmed)) skipType = 'NONE';
-    }
-
-    if (skipType === 'NONE') {
-      result.push(line);
-    }
-  }
-
-  flushChecklist();
-
-  const processed = result
-    .join('\n')
-    .replace(/\[BLOCKS?-\d+[^\]]*\]/gi, '') // ◀ AI용 블록 지시어 마커 제거
-    .replace(/<calculator\s+type="([^"]+)"\s*\/>/g, '<calculator type="$1"></calculator>')
-    .replace(/\[SEO_SUMMARY\]\s*:\s*.*/gi, '')
-    .replace(/\[[^\]]*(?:카카오|상담)[^\]]*\]\([^)]*\)/g, '')
-    .trim();
-
-  return processed.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
-}
 
 interface TOCItem { id: string; text: string; }
 interface BlogPostContentProps { content: string; }

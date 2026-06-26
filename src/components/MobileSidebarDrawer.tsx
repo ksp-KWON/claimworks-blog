@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import SidebarContent from './SidebarContent';
 import { usePathname } from 'next/navigation';
 
-export default function MobileSidebarDrawer() {
+export default function MobileSidebarDrawer({ tags = [] }: { tags?: string[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
@@ -84,7 +84,7 @@ export default function MobileSidebarDrawer() {
             
             {/* SidebarContent를 감싸서 서랍 내부에 렌더링 */}
             <div className="overflow-y-auto flex-1 p-4 overscroll-contain">
-              <SidebarContent />
+              <SidebarContent tags={tags} />
             </div>
           </div>
         </>,

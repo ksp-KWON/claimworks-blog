@@ -11,6 +11,7 @@ import SearchBar from "@/components/SearchBar";
 import SmartStickyLayout from "@/components/SmartStickyLayout";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import MobileSidebarDrawer from "@/components/MobileSidebarDrawer";
+import { getSortedPostsData } from "@/lib/posts";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // 서버에서 태그 목록 계산 → SidebarContent에 정적 주입 (클라이언트 API 호출 불필요)
+  const posts = getSortedPostsData(false);
+  const tagCounts: Record<string, number> = {};
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+    }
+  }
+  const sortedTags = Object.entries(tagCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([tag]) => tag);
+
   return (
     <html
       lang="ko"
@@ -85,18 +98,17 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-300 pb-[calc(env(safe-area-inset-bottom,20px)+60px)] lg:pb-0 overflow-x-clip">
-        {/* 카카오 SDK */}
+        {/* 카카오 SDK — onLoad는 static export 미지원으로 Script id 분리 방식 사용 */}
         <Script 
           src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" 
           strategy="afterInteractive"
         />
         <Script id="kakao-init" strategy="afterInteractive">
           {`
-            window.onload = function() {
-              if (window.Kakao && !window.Kakao.isInitialized()) {
-                window.Kakao.init('c60e479ca3c78009474b748414de3a1b');
-              }
-            };
+            (function() {
+              var K = window.Kakao;
+              if (K && !K.isInitialized()) { K.init('c60e479ca3c78009474b748414de3a1b'); }
+            })();
           `}
         </Script>
         <ScrollProgressBar />
@@ -166,7 +178,7 @@ export default function RootLayout({
                 
                 {/* 햄버거 메뉴 서랍 (카테고리) - 우측 사이드바가 숨겨지는 lg 미만에서만 노출 */}
                 <div className="lg:hidden flex items-center">
-                  <MobileSidebarDrawer />
+                  <MobileSidebarDrawer tags={sortedTags} />
                 </div>
 
                 {/* 플랫폼 소개 아이콘 (맨 우측으로 이동) */}
@@ -185,7 +197,7 @@ export default function RootLayout({
         {/* 3. 티스토리 2단 레이아웃 본문 75% : 사이드바 25% 구조 */}
         <SmartStickyLayout
           mainContent={children}
-          sidebarContent={<SidebarContent />}
+          sidebarContent={<SidebarContent tags={sortedTags} />}
         />
 
         {/* 4. 구글 표면 색상 푸터 */}

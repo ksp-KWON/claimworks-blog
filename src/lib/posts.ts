@@ -19,8 +19,8 @@ export interface PostData {
 
 const postsDirectory = path.join(process.cwd(), 'src/content/posts');
 
-// 안전하게 날짜를 문자열(YYYY-MM-DD)로 변환하는 함수
-function formatDate(dateVal: unknown): string {
+// 안전하게 날짜를 문자열(YYYY-MM-DD)로 변환하는 함수 (api/posts/route.ts에서도 공유)
+export function formatDate(dateVal: unknown): string {
   if (!dateVal) return '';
   try {
     let d: Date;

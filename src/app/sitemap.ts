@@ -14,22 +14,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const routes = [
-    '',
-    '/about',
-    '/blog',
-    '/calculator',
-    '/calculator/auto',
-    '/calculator/medical',
-    '/calculator/liability',
-    '/privacy',
-    '/terms',
-  ].map((route) => ({
-    url: `${siteUrl}${route}`,
+  const routes: { path: string; freq: 'daily' | 'weekly' | 'monthly'; priority: number }[] = [
+    { path: '',                   freq: 'daily',   priority: 1.0 },
+    { path: '/blog',              freq: 'daily',   priority: 0.9 },
+    { path: '/fss-news',          freq: 'daily',   priority: 0.8 },
+    { path: '/precedent-search',  freq: 'weekly',  priority: 0.8 },
+    { path: '/traffic-care',      freq: 'weekly',  priority: 0.8 },
+    { path: '/search',            freq: 'weekly',  priority: 0.7 },
+    { path: '/calculator',        freq: 'monthly', priority: 0.7 },
+    { path: '/calculator/auto',   freq: 'monthly', priority: 0.7 },
+    { path: '/calculator/medical',    freq: 'monthly', priority: 0.7 },
+    { path: '/calculator/liability',  freq: 'monthly', priority: 0.7 },
+    { path: '/about',             freq: 'monthly', priority: 0.7 },
+    { path: '/privacy',           freq: 'monthly', priority: 0.4 },
+    { path: '/terms',             freq: 'monthly', priority: 0.4 },
+  ];
+
+  const staticSitemap = routes.map(({ path, freq, priority }) => ({
+    url: `${siteUrl}${path}`,
     lastModified: new Date().toISOString().split('T')[0],
-    changeFrequency: (route === '' || route === '/blog' ? 'daily' : 'monthly') as 'daily' | 'monthly',
-    priority: route === '' ? 1.0 : route === '/about' ? 0.5 : 0.7,
+    changeFrequency: freq,
+    priority,
   }));
 
-  return [...routes, ...postsSitemap];
+  return [...staticSitemap, ...postsSitemap];
 }
+

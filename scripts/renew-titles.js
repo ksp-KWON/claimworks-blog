@@ -9,7 +9,7 @@ const path = require('path');
 const matter = require('gray-matter');
 const { google } = require('googleapis');
 const { callGemini } = require('./gemini-helper');
-const { getTitleRenewalPrompt } = require('../src/lib/prompt-rules.js');
+const { getRenewalPrompt } = require('../src/lib/prompt-rules.js');
 
 const IMPRESSION_THRESHOLD = 30; // 최소 노출수 기준
 const CTR_THRESHOLD = 0.03;      // 클릭률(CTR) 3% 미만 타겟팅
@@ -107,24 +107,40 @@ async function renewTitleForPage(target) {
   console.log(`  - 핵심 검색어(Query): "${target.topQuery}"`);
   console.log(`  - 기존 제목: ${currentTitle}`);
   
-  const prompt = getTitleRenewalPrompt(currentTitle, target.topQuery);
-  const rawNewTitle = await callGemini(prompt);
+  const prompt = getRenewalPrompt(currentTitle, target.topQuery);
+  const rawResponse = await callGemini(prompt);
   
-  // 쌍따옴표 등 불필요한 기호 제거
-  const newTitle = rawNewTitle.replace(/^["']|["']$/g, '').trim();
+  let aiData;
+  try {
+    // 마크다운 코드 블록 제거
+    const jsonStr = rawResponse.replace(/```(?:json)?\s*([\s\S]*?)\s*```/ig, '$1').trim();
+    aiData = JSON.parse(jsonStr);
+  } catch (e) {
+    console.log(`  [실패] AI 응답 파싱 에러: ${e.message}`);
+    return false;
+  }
+
+  const { newTitle, faqQ, faqA } = aiData;
   
   if (!newTitle || newTitle === currentTitle) {
     console.log(`  [유지] AI가 새 제목 생성을 스킵했거나 동일합니다.`);
     return false;
   }
   
-  console.log(`  ✨ [리뉴얼 완료] 새 제목: ${newTitle}`);
+  console.log(`  ✨ [제목 갱신] ${newTitle}`);
+  console.log(`  ✨ [FAQ 추가] Q: ${faqQ}`);
   
-  // 기존 파일 내용에서 title 부분만 정규식으로 안전하게 교체
-  const updatedContent = fileContent.replace(
+  // 1. 기존 파일 내용에서 title 부분 정규식 교체
+  let updatedContent = fileContent.replace(
     /title:\s*['"]?(.*?)['"]?(\r?\n)/,
     `title: "${newTitle}"$2`
   );
+  
+  // 2. 파일 끝에 FAQ 덧붙이기(Append) - 기존 레이아웃 보존
+  if (faqQ && faqA) {
+    const faqBlock = `\n\n## 💡 자주 묻는 질문 (FAQ)\n### Q: ${faqQ}\nA: ${faqA}\n`;
+    updatedContent += faqBlock;
+  }
   
   fs.writeFileSync(filePath, updatedContent, 'utf8');
   return true;

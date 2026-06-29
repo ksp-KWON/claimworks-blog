@@ -98,13 +98,15 @@ async function callGemini(prompt, schema = null) {
         
         if (retryAfter && !isNaN(parseInt(retryAfter, 10))) {
            delaySec = parseInt(retryAfter, 10);
-           console.error(`  [헤더 감지] '${model}' 서버 지시(Retry-After): ${delaySec}초 대기 후 재시도...`);
+           console.error(`  [지능형 판단] '${model}' 서버 지시(Retry-After) 수신: ${delaySec}초 대기 후 재시도...`);
         } else {
-           // 3. 지수 백오프 (Exponential Backoff + Jitter)
-           const base = 10;
-           const jitter = Math.floor(Math.random() * 3) + 1; // 1~3초 지터
-           delaySec = (base * Math.pow(2, attempt)) + jitter; // 0차: 10+a, 1차: 20+a
-           console.error(`  [지수 백오프] '${model}' HTTP ${res.status} (Rate Limit). ${delaySec}초 대기 후 재시도...`);
+           // 3. 지수 백오프 (서버에서 대기 시간을 안 알려줬을 때의 최후의 안전망)
+           const base = res.status >= 500 ? 5 : 10; // 서버 뻗음(500대)은 5초, 트래픽 초과(429)는 10초 베이스
+           const jitter = Math.floor(Math.random() * 3) + 1;
+           delaySec = (base * Math.pow(2, attempt)) + jitter; 
+           
+           const errorType = res.status >= 500 ? '구글 서버 다운/과부하' : '트래픽 몰림(Rate Limit)';
+           console.error(`  [안전망 백오프] '${model}' HTTP ${res.status} (${errorType}). 서버 지시가 없어 자체 알고리즘으로 ${delaySec}초 대기...`);
         }
         
         await sleep(delaySec * 1000);

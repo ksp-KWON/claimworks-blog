@@ -1,0 +1,36 @@
+name: Search Console CTR Title Renewal
+on:
+  schedule:
+    # 매주 일요일 밤 23:00 KST (UTC 14:00)
+    - cron: '0 14 * * 0'
+  workflow_dispatch: # 수동 실행 버튼
+
+jobs:
+  renew:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Title Renewal Bot
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+          GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+        run: node scripts/renew-titles.js
+        
+      - name: Commit and Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "auto: Search Console CTR 기반 지능형 제목 리뉴얼"
+          file_pattern: "src/content/posts/*.md"

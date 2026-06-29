@@ -273,6 +273,22 @@ function cleanAnalysisBlock(text) {
   return text.trim();
 }
 
+function getTitleRenewalPrompt(currentTitle, query) {
+  return `당신은 '보상스쿨'의 최고 SEO 카피라이터입니다.
+현재 블로그의 한 글이 구글 상위 노출은 잘 되고 있으나 클릭(CTR)이 저조합니다.
+
+- 현재 제목: [${currentTitle}]
+- 유저들이 구글에 실제로 검색한 핵심 키워드(Query): [${query}]
+
+위의 실제 유저 검색어(Query)를 바탕으로, 유저가 검색 결과를 보자마자 클릭할 수밖에 없도록 SEO와 후킹(Hooking)이 극대화된 새로운 제목을 딱 1개만 제안해 주세요.
+
+[제약 조건]
+1. 기존 제목의 핵심 의도를 훼손하지 말 것.
+2. 30~50자 내외로 작성할 것.
+3. 어그로성 거짓말은 금지하되, 실무적 혜택을 강조할 것.
+4. 부연 설명 없이 오직 새로 작성된 제목 딱 1줄만 출력할 것. (따옴표나 기호 제외)`;
+}
+
 module.exports = {
   STRICT_RULES,
   getRandomAngle,
@@ -285,5 +301,6 @@ module.exports = {
   getBlogSkeleton,
   getPrecedentSkeleton,
   calculateModelCapacity,
-  cleanAnalysisBlock
+  cleanAnalysisBlock,
+  getTitleRenewalPrompt
 };

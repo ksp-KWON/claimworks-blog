@@ -16,12 +16,6 @@
   --google-green: #34a853;
   --google-surface-variant: #f1f3f4;
   --google-border: #dadce0;
-
-  /* Portal Theme Colors */
-  --portal-blue: #03c75a; /* 네이버 그린 대신 신뢰감 있는 블루/그린 등 선택. 대표님이 블루/레드를 요구했으므로 짙은 블루 채택 */
-  --portal-blue: #0056b3; 
-  --portal-red: #d32f2f;
-  --portal-gray: #f5f6f7; /* 네이버 배경색 느낌 */
 }
 
 :root.dark {
@@ -35,11 +29,6 @@
   --google-green: #81c995;
   --google-surface-variant: #303134;
   --google-border: #5f6368;
-
-  /* Portal Theme Colors Dark */
-  --portal-blue: #4dabf7; 
-  --portal-red: #ff6b6b;
-  --portal-gray: #1e1e1e;
 }
 
 @theme inline {
@@ -51,9 +40,6 @@
   --color-google-green: var(--google-green);
   --color-google-surface: var(--google-surface-variant);
   --color-google-border: var(--google-border);
-  --color-portal-blue: var(--portal-blue);
-  --color-portal-red: var(--portal-red);
-  --color-portal-gray: var(--portal-gray);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

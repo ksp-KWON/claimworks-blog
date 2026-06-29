@@ -8,18 +8,25 @@ on:
 jobs:
   renew:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      
     steps:
-      - uses: actions/checkout@v4
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          fetch-depth: 1
           
-      - name: Setup Node.js
+      - name: Node.js 설정
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           
-      - name: Install Dependencies
+      - name: 의존성 설치
         run: npm ci
 
       - name: Run Title Renewal Bot
@@ -29,8 +36,10 @@ jobs:
           GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
         run: node scripts/renew-titles.js
         
-      - name: Commit and Push changes
+      - name: 변경사항 커밋 & 푸시
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "auto: Search Console CTR 기반 지능형 제목 리뉴얼"
+          commit_message: "auto: Search Console CTR 기반 지능형 제목 리뉴얼 및 FAQ 추가"
           file_pattern: "src/content/posts/*.md"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"

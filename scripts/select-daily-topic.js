@@ -1,4 +1,4 @@
-/**
+﻿/**
  * select-daily-topic.js
  * 1단계: 실시간 트렌드 및 법제처 판례 연쇄 탐색을 통한 당일 주제 확정 스크립트
  */
@@ -113,28 +113,53 @@ function getXmlTags(xml, tag) {
 // ── 구글 트렌드 RSS 최대 50개 파싱 ──────────────────────────────────────────
 async function fetchGoogleTrends() {
   console.log('[1/5] 구글 실시간 인기 트렌드 키워드 수집 중...');
-  try {
-    const res = await fetch(
-      'https://trends.google.com/trends/trendingsearches/daily/rss?geo=KR',
-      { signal: AbortSignal.timeout(10000) }
-    );
-    if (!res.ok) {
-      console.warn('구글 트렌드 RSS 응답 실패, 기본 배열 반환');
-      return [];
+
+  // 시도할 URL 목록 (GitHub Actions 환경에서 봇 차단 우회를 위해 여러 엔드포인트 폴백)
+  const TREND_URLS = [
+    'https://trends.google.com/trends/trendingsearches/daily/rss?geo=KR',
+    'https://trends.google.co.kr/trends/trendingsearches/daily/rss?geo=KR',
+  ];
+
+  const HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+    'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+    'Accept-Language': 'ko-KR,ko;q=0.9',
+  };
+
+  for (const url of TREND_URLS) {
+    try {
+      const res = await fetch(url, {
+        headers: HEADERS,
+        signal: AbortSignal.timeout(12000),
+      });
+
+      if (!res.ok) {
+        console.warn(`    구글 트렌드 RSS 응답 실패 (HTTP ${res.status}) — 다음 URL 시도...`);
+        continue;
+      }
+
+      const text = await res.text();
+
+      // RSS XML 아닌 HTML(오류/캡차 페이지)이 반환된 경우 체크
+      if (!text.includes('<rss') && !text.includes('<item>')) {
+        console.warn('    구글 트렌드가 유효한 RSS XML을 반환하지 않음 (봇 차단 가능성) — 다음 URL 시도...');
+        continue;
+      }
+
+      const trends = [...text.matchAll(/<title>(.*?)<\/title>/g)]
+        .map(m => m[1].trim())
+        .filter(t => t && t !== '대한민국에서 인기 있는 트렌드' && !t.startsWith('Google'));
+
+      const list = trends.slice(0, 50);
+      console.log(`    총 ${list.length}개의 트렌드 키워드를 수집했습니다.`);
+      return list;
+    } catch (err) {
+      console.warn(`    [경고] 구글 트렌드 수집 중 오류: ${err.message}`);
     }
-    const text = await res.text();
-    const trends = [...text.matchAll(/<title>(.*?)<\/title>/g)]
-      .map(m => m[1].trim())
-      .filter(t => t && t !== '대한민국에서 인기 있는 트렌드');
-    
-    // 최대 50개까지 수집
-    const list = trends.slice(0, 50);
-    console.log(`    총 ${list.length}개의 트렌드 키워드를 수집했습니다.`);
-    return list;
-  } catch (err) {
-    console.warn(`    [경고] 구글 트렌드 수집 중 오류: ${err.message}`);
-    return [];
   }
+
+  console.warn('    구글 트렌드 RSS 수집 실패. 백업 키워드만 사용합니다.');
+  return [];
 }
 
 

@@ -47,6 +47,8 @@ jobs:
           LAW_API_KEY: ${{ secrets.LAW_API_KEY }}
           LAW_PROXY_ENDPOINT: ${{ secrets.LAW_PROXY_ENDPOINT }}
           LAW_PROXY_TOKEN: ${{ secrets.LAW_PROXY_TOKEN }}
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
         run: |
           POST_TYPE="${{ github.event.inputs.post_type }}"
           if [ -z "$POST_TYPE" ]; then

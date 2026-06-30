@@ -31,8 +31,8 @@ export default function YouTubeBriefingClient({ videos: initialVideos }: { video
   return (
     <section className="mb-12 relative">
       
-      {/* 1. 사이드바 스타일 헤더 */}
-      <div className="mb-4">
+      {/* 1. 사이드바 스타일 헤더 (입체 박스) */}
+      <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 mb-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(255,0,0,0.2)] hover:border-[#FF0000] transition-all duration-300 relative overflow-hidden group/headerbox">
         <div className="flex items-end justify-between mb-3">
           <h3 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[#FF0000] pl-2.5 sm:pl-3">
             <span className="text-[#FF0000] text-2xl leading-none">📺</span>

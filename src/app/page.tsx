@@ -21,9 +21,9 @@ export default function Home() {
       {/* 유튜브 전문가 브리핑 섹션 (소개글 위쪽 배치) */}
       <YouTubeBriefing />
 
-      {/* 2. 메인 페이지 인트로 헤더 (라벨지 스타일) */}
-      <div className="flex flex-col items-start gap-2.5 sm:gap-3 mb-6 px-1 sm:px-0 mt-4">
-        <h1 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] tracking-tight flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5 sm:pl-3">
+      {/* 2. 메인 페이지 인트로 헤더 (입체 박스 스타일) */}
+      <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 mb-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden group/headerbox mt-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] tracking-tight flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5 sm:pl-3 mb-3">
           분야별 전문 보상 가이드 & 판례 분석
         </h1>
         <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">

@@ -122,18 +122,22 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
         return (
           <section key={category} className="bg-white dark:bg-[#1e1e20] border border-gray-200 dark:border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm">
             
-            {/* 블록 헤더 */}
-            <div className="border-b border-[var(--google-border)] pb-4 mb-6 flex items-center justify-between">
-              <h2 className="text-lg sm:text-xl font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2">
-                <span className="text-2xl" aria-hidden="true">{primaryColor.icon}</span>
-                {category}
-              </h2>
+            {/* 블록 헤더 - 프리미엄 디자인 */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gray-50 dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-700/50 shadow-sm ${primaryColor.arrowColor}`}>
+                  <span className="text-xl sm:text-2xl drop-shadow-sm" aria-hidden="true">{primaryColor.icon}</span>
+                </div>
+                <h2 className="text-lg sm:text-2xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
+                  {category}
+                </h2>
+              </div>
               <Link 
                 href={`/search?q=${encodeURIComponent(category)}`}
-                className="text-xs sm:text-sm font-bold text-[#FF0000] hover:text-[#cc0000] transition-colors flex items-center gap-1"
+                className="group flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-gray-50 dark:bg-zinc-800/50 hover:bg-gray-100 dark:hover:bg-zinc-800 text-[11px] sm:text-sm font-bold text-gray-600 dark:text-gray-300 transition-all border border-gray-200 dark:border-zinc-700/50 hover:border-gray-300 shadow-sm hover:shadow-md"
               >
-                더 많은 글보기
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+                전체보기
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
               </Link>
             </div>
 
@@ -145,7 +149,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
                 return (
                   <article 
                     key={post.slug}
-                    className={`group bg-white dark:bg-[#202124] rounded-[20px] sm:rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] ${primaryColor.border} hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300 flex flex-col min-h-[220px]`}
+                    className={`group relative bg-white dark:bg-[#1a1a1c] rounded-[20px] sm:rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-[0_12px_40px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] hover:border-gray-200 dark:hover:border-white/20 hover:-translate-y-1 transition-all duration-300 flex flex-col min-h-[220px]`}
                   >
                     <Link href={`/blog/${post.slug}`} className="p-4 sm:p-5 flex flex-col justify-between h-full flex-1">
                       

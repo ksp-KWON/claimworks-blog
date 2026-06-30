@@ -3,7 +3,6 @@ export async function onRequest(context: any) {
   const channelUrl = 'https://www.youtube.com/@bosangschool/videos';
 
   try {
-    // @ts-ignore: Cloudflare specific fetch option
     const res = await fetch(channelUrl, {
       cf: {
         cacheTtl: 3600,
@@ -13,7 +12,7 @@ export async function onRequest(context: any) {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
       }
-    });
+    } as any);
 
     if (!res.ok) {
       throw new Error(`YouTube HTML fetch failed: ${res.status}`);

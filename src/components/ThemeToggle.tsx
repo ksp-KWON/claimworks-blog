@@ -47,14 +47,14 @@ export default function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="w-[36px] h-[36px] rounded-full hover:bg-[var(--google-surface-variant)] dark:hover:bg-white/10 transition-colors animate-pulse" />
+      <div className="w-[36px] h-[36px] sm:w-[42px] sm:h-[42px] rounded-none animate-pulse bg-gray-100 dark:bg-[#202124]" />
     );
   }
 
   return (
     <button
       onClick={cycleTheme}
-      className="flex items-center justify-center p-2 rounded-full hover:bg-[var(--google-surface-variant)] dark:hover:bg-white/10 transition-colors group text-[#5f6368] dark:text-[#9aa0a6] cursor-pointer"
+      className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-gray-200 dark:hover:border-gray-700 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-gray-50 dark:hover:bg-[#202124] hover:text-[var(--google-blue)] transition-all duration-200 flex items-center justify-center group cursor-pointer"
       title={`테마 변경 (현재: ${
         theme === "light" ? "라이트 모드" : theme === "dark" ? "다크 모드" : "시스템 기본값"
       })`}

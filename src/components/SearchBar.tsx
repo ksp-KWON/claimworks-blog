@@ -22,10 +22,11 @@ export default function SearchBar() {
     <div className="flex items-center">
       <button 
         onClick={() => setIsOpen(true)} 
-        className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-[#5f6368] hover:bg-[#e8eaed] dark:text-[#9aa0a6] dark:hover:bg-[#3c4043] transition-colors focus:outline-none"
+        className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-gray-200 dark:hover:border-gray-700 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-gray-50 dark:hover:bg-[#202124] hover:text-[var(--google-blue)] transition-all duration-200 flex items-center justify-center group"
         aria-label="검색 열기"
+        title="검색"
       >
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       </button>
 
       {/* Full Screen Search Modal */}

@@ -6,11 +6,11 @@ export default function CTABanner() {
     <div className="mt-12 mb-4">
       {/* 캐치 문구 */}
       <div className="text-center mb-4">
-        <p className="text-sm font-bold bg-gradient-to-r from-red-600 to-[#1a73e8] bg-clip-text text-transparent">
-          ⚠️ 혼자 고민하면 수백만 원 손해 봅니다
+        <p className="text-[15px] font-extrabold bg-gradient-to-r from-blue-700 to-[#1a73e8] dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent tracking-tight">
+          정당한 권리, 보상스쿨과 함께라면 결과가 달라집니다.
         </p>
-        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">
-          지금 바로 보상스쿨 전문가에게 무료로 진단받아 보세요
+        <p className="text-[13px] text-[#5f6368] dark:text-[#9aa0a6] mt-1.5 font-medium">
+          수많은 성공 사례로 증명된 전문 손해사정사가 최적의 해답을 제시해 드립니다.
         </p>
       </div>
 

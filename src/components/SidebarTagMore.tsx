@@ -17,34 +17,32 @@ export default function SidebarTagMore({ tags }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <>
-      {isOpen && tags.map((tag) => (
-        <Link
-          key={tag}
-          href={`/blog?tag=${encodeURIComponent(tag)}`}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--google-surface-variant)] dark:bg-[#303134] text-[#5f6368] dark:text-[#c4c7c5] border border-transparent hover:border-[var(--google-blue)] hover:bg-[#e8f0fe] dark:hover:bg-[#174ea6]/20 hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] transition-all duration-200 text-xs font-bold shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
-        >
-          <span className="text-[var(--google-red)] opacity-70">#</span>
-          {tag}
-        </Link>
-      ))}
+    <div className="mt-2">
+      {isOpen && (
+        <div className="flex flex-wrap gap-2 text-xs font-bold mb-3 mt-3 animate-in slide-in-from-top-2 fade-in duration-200">
+          {tags.map((tag) => (
+            <Link
+              key={tag}
+              href={`/blog?tag=${encodeURIComponent(tag)}`}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--google-surface-variant)] dark:bg-[#303134] text-[#5f6368] dark:text-[#c4c7c5] border border-transparent hover:border-[var(--google-blue)] hover:bg-[#e8f0fe] dark:hover:bg-[#174ea6]/20 hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] transition-all duration-200 text-xs font-bold shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
+            >
+              <span className="text-[var(--google-red)] opacity-70">#</span>
+              {tag}
+            </Link>
+          ))}
+        </div>
+      )}
 
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-[#202124] text-[#5f6368] dark:text-[#c4c7c5] border border-gray-200 dark:border-white/5 hover:border-[var(--google-blue)] hover:bg-[#e8f0fe] dark:hover:bg-[#174ea6]/20 hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] transition-all duration-200 text-xs font-bold shadow-sm cursor-pointer"
+        className={`w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer ${!isOpen ? 'mt-3' : ''}`}
       >
-        {isOpen ? (
-          <>
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
-            접기
-          </>
-        ) : (
-          <>
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            더보기 (+{tags.length})
-          </>
-        )}
+        <div className="flex items-center gap-2">
+          <svg className="w-4 h-4 text-[var(--google-red)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
+          {isOpen ? '인기 태그 접기' : `인기 태그 더보기 (+${tags.length})`}
+        </div>
+        <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
       </button>
-    </>
+    </div>
   );
 }

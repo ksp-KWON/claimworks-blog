@@ -114,48 +114,32 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
         </div>
       </Link>
 
+      {/* 지역별 의료기관 (계산기 바로 아래로 이동) */}
+      <RegionalCategories />
+
       {/* 📂 분야별 보상 칼럼 */}
-      <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(251,188,4,0.3)] hover:border-[var(--google-yellow)] transition-all duration-300 relative overflow-hidden">
-        <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-yellow)] pl-2.5">
-          <span className="text-[var(--google-yellow)] text-lg leading-none">📂</span>
-          분야별 보상 칼럼
-        </h3>
-        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">보상스쿨 손해사정사의 핵심 전문 칼럼들을 주제별로 분류하여 제공합니다.</p>
-        <button onClick={() => setIsColOpen(!isColOpen)} className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer">
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-[var(--google-yellow)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
-            칼럼 카테고리 보기
+      <Link href="/blog" className="block group">
+        <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(251,188,4,0.3)] hover:border-[var(--google-yellow)] transition-all duration-300 relative overflow-hidden">
+          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">📂</div>
+          <div className="relative z-10 space-y-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-yellow)] pl-2.5">
+                <span className="text-[var(--google-yellow)] text-lg leading-none">📂</span>
+                분야별 보상 칼럼
+              </h3>
+              <span className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-yellow-100/30 dark:border-yellow-900/30">핵심 실무</span>
+            </div>
+            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">보상스쿨 손해사정사의 핵심 전문 칼럼들을 주제별로 분류하여 제공합니다.</p>
+            <div className="pt-1 flex items-center gap-1 text-xs font-bold text-yellow-600 dark:text-yellow-500 group-hover:underline">
+              전체 칼럼 보기
+              <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
           </div>
-          <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isColOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
-        {isColOpen && (
-          <div className="grid grid-cols-2 gap-2 mt-4 animate-in slide-in-from-top-2 fade-in duration-200">
-            {[
-              { name: '판례·법률 해석',   color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
-              { name: '사망·자살 보험금', color: 'text-rose-500',   bg: 'bg-rose-50 dark:bg-rose-900/20' },
-              { name: '질병진단·실손',    color: 'text-blue-500',   bg: 'bg-blue-50 dark:bg-blue-900/20' },
-              { name: '교통사고 보상',    color: 'text-red-500',    bg: 'bg-red-50 dark:bg-red-900/20' },
-              { name: '배상책임·의료',    color: 'text-green-500',  bg: 'bg-green-50 dark:bg-green-900/20' },
-              { name: '근재·산재 사고',   color: 'text-teal-500',   bg: 'bg-teal-50 dark:bg-teal-900/20' },
-              { name: '장해평가·면책',    color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
-              { name: '보상가이드',       color: 'text-yellow-600', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
-            ].map(cat => (
-              <Link key={cat.name} href={`/blog?category=${encodeURIComponent(cat.name)}`} className="flex flex-col items-center justify-center p-3 rounded-none bg-gray-50 dark:bg-[#303134] border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:bg-[#e8f0fe] dark:hover:bg-[#174ea6]/20 transition-all group/item">
-                <div className={`w-9 h-9 rounded-none flex items-center justify-center mb-1.5 ${cat.bg} ${cat.color} group-hover/item:scale-105 transition-transform`}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-                </div>
-                <span className="text-[11px] font-bold text-[#202124] dark:text-[#e8eaed] text-center group-hover/item:text-[var(--google-blue)] transition-colors break-keep leading-tight">{cat.name}</span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+      </Link>
 
       {/* 진료과목별 분쟁 가이드 */}
       <SpecialtyDiseaseCategories />
-
-      {/* 지역별 의료기관 */}
-      <RegionalCategories />
 
       {/* 인기 키워드 태그 (layout.tsx 서버에서 전달된 정적 데이터) */}
       {tags.length > 0 && (
@@ -178,8 +162,8 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
                 {tag}
               </Link>
             ))}
-            {hiddenTags.length > 0 && <SidebarTagMore tags={hiddenTags} />}
           </div>
+          {hiddenTags.length > 0 && <SidebarTagMore tags={hiddenTags} />}
         </div>
       )}
     </div>

@@ -19,8 +19,8 @@ const nextConfig: NextConfig = {
     if (!isDev) return [];
     return [
       {
-        source: '/api/taas-accidents',
-        destination: 'http://localhost:8788/api/taas-accidents',
+        source: '/api/:path*',
+        destination: 'http://localhost:8788/api/:path*',
       },
     ];
   },

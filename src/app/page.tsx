@@ -23,8 +23,8 @@ export default function Home() {
 
       {/* 2. 메인 페이지 인트로 헤더 (입체 박스 스타일) */}
       <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 mb-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden group/headerbox mt-4">
-        <h1 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] tracking-tight flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5 sm:pl-3 mb-3">
-          분야별 전문 보상 가이드 & 판례 분석
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5 sm:pl-3 mb-3">
+          <span className="bg-gradient-to-r from-[var(--google-blue)] to-[#174ea6] bg-clip-text text-transparent">분야별 전문 보상 가이드 & 판례 분석</span>
         </h1>
         <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
           사망·후유장해부터 실손·질병 진단까지, 보상스쿨 전문가 그룹이 엄선한 핵심 실무 노하우와 명쾌한 해결책을 제공합니다.

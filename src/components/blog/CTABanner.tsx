@@ -3,26 +3,23 @@ import Link from 'next/link';
 
 export default function CTABanner() {
   return (
-    <div className="mt-12 mb-4 rounded-none overflow-hidden bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border border-gray-200 dark:border-white/10 shadow-[0_6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] relative">
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
+    <div className="mt-12 mb-8 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[#1a73e8] transition-all duration-300 relative overflow-hidden group">
+      <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+        🤝
+      </div>
       
-      {/* 헤더 섹션 */}
-      <div className="bg-gray-50/80 dark:bg-white/[0.03] px-5 sm:px-6 py-5 border-b border-gray-200 dark:border-white/10 flex items-start sm:items-center gap-4">
-        <div className="w-10 h-10 rounded-none bg-white dark:bg-[#202124] shadow-sm border border-gray-200 dark:border-white/10 flex items-center justify-center shrink-0">
-          <span className="text-xl">🤝</span>
-        </div>
+      <div className="relative z-10 space-y-5">
         <div>
-          <p className="font-extrabold text-gray-900 dark:text-white text-[16px] tracking-tight">
+          <h3 className="text-sm sm:text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[#1a73e8] pl-2.5">
+            <span className="text-[17px] leading-none">🤝</span>
             정당한 권리, 보상스쿨과 함께라면 결과가 달라집니다.
-          </p>
-          <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
+          </h3>
+          <p className="text-xs sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] mt-2 leading-relaxed ml-3.5">
             수많은 성공 사례로 증명된 전문 손해사정사가 최적의 해답을 제시해 드립니다.
           </p>
         </div>
-      </div>
 
-      <div className="p-5 sm:p-6 bg-white dark:bg-[#202124]">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {/* 카드 1: 카카오톡 상담 */}
         <a
           href="https://open.kakao.com/o/sWeszp7"

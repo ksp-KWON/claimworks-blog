@@ -279,24 +279,22 @@ function RelatedPostsBox({
   if (scored.length === 0) return null;
 
   return (
-    <div className="mt-12 rounded-none overflow-hidden bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border border-gray-200 dark:border-white/10 shadow-[0_6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] relative">
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
+    <div className="mt-12 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[#1a73e8] transition-all duration-300 relative overflow-hidden group">
+      <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+        🔗
+      </div>
       
-      <div className="bg-gray-50/80 dark:bg-white/[0.03] px-5 sm:px-6 py-5 border-b border-gray-200 dark:border-white/10 flex items-start sm:items-center gap-4">
-        <div className="w-10 h-10 rounded-none bg-white dark:bg-[#202124] shadow-sm border border-gray-200 dark:border-white/10 flex items-center justify-center shrink-0">
-          <svg className="w-5 h-5 text-[#1A73E8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-        </div>
+      <div className="relative z-10 space-y-5">
         <div>
-          <h2 className="font-extrabold text-gray-900 dark:text-white text-[16px] tracking-tight">
+          <h3 className="text-sm sm:text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[#1a73e8] pl-2.5">
+            <span className="text-[17px] leading-none">🔗</span>
             함께 읽으면 도움이 되는 글
-          </h2>
-          <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
+          </h3>
+          <p className="text-xs sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] mt-2 leading-relaxed ml-3.5">
             비슷한 주제의 다른 보상 사례들도 확인해 보세요
           </p>
         </div>
-      </div>
 
-      <div className="p-5 sm:p-6 bg-white dark:bg-[#202124]">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {scored.map(p => (
             <Link

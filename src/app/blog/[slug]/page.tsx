@@ -286,7 +286,7 @@ function RelatedPostsBox({
       
       <div className="relative z-10 space-y-5">
         <div>
-          <h3 className="text-sm sm:text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[#1a73e8] pl-2.5">
+          <h3 className="font-extrabold text-gray-900 dark:text-white text-[16px] tracking-tight flex items-center gap-2 border-l-4 border-[#1a73e8] pl-2.5">
             <span className="text-[17px] leading-none">🔗</span>
             함께 읽으면 도움이 되는 글
           </h3>
@@ -295,14 +295,13 @@ function RelatedPostsBox({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="flex flex-col gap-3">
           {scored.map(p => (
             <Link
               key={p.slug}
               href={`/blog/${p.slug}`}
-              className="group flex flex-col gap-2.5 p-4 rounded-none bg-gray-50 dark:bg-[#2d2e30] border border-gray-100 dark:border-white/5 hover:border-[#1A73E8]/30 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 hover:shadow-md transition-all duration-200 relative overflow-hidden"
+              className="group flex flex-col gap-2.5 p-4 rounded-none bg-gray-50 dark:bg-[#2d2e30] border border-gray-100 dark:border-white/5 hover:border-[#1A73E8] hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(26,115,232,0.15)] hover:bg-white dark:hover:bg-[#353638] transition-all duration-300 relative overflow-hidden"
             >
-              <div className="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-transparent to-transparent group-hover:from-red-500 group-hover:to-[#1a73e8] transition-colors" />
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-none bg-white dark:bg-white/10 text-[#1A73E8] dark:text-[#8ab4f8] w-fit border border-gray-200 dark:border-white/10 shadow-sm">
                   {p.category}

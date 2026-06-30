@@ -10,7 +10,7 @@ export default function CTABanner() {
       
       <div className="relative z-10 space-y-5">
         <div>
-          <h3 className="text-sm sm:text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[#1a73e8] pl-2.5">
+          <h3 className="font-extrabold text-gray-900 dark:text-white text-[16px] tracking-tight flex items-center gap-2 border-l-4 border-[#1a73e8] pl-2.5">
             <span className="text-[17px] leading-none">🤝</span>
             정당한 권리, 보상스쿨과 함께라면 결과가 달라집니다.
           </h3>

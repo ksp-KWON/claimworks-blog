@@ -170,7 +170,7 @@ export default function FssNewsPage() {
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* 🚨 실시간 소비자 이슈 브리핑 상단 띠 배너 */}
       {latestAlert && (
-        <div className="bg-red-600 text-white px-4 py-3 rounded-2xl flex items-center justify-between flex-wrap gap-3 shadow-md animate-pulse">
+        <div className="bg-red-600 text-white px-4 py-3 rounded-none flex items-center justify-between flex-wrap gap-3 shadow-md animate-pulse">
           <div className="flex items-center gap-2.5">
             <span className="text-lg shrink-0">🚨</span>
             <div className="text-xs sm:text-sm font-extrabold tracking-tight">
@@ -183,7 +183,7 @@ export default function FssNewsPage() {
               const el = document.getElementById(latestAlert.id);
               if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }}
-            className="text-[10px] font-black uppercase tracking-wider bg-white text-red-600 px-2.5 py-1 rounded-lg border border-white hover:bg-red-50 transition-colors cursor-pointer"
+            className="text-[10px] font-black uppercase tracking-wider bg-white text-red-600 px-2.5 py-1 rounded-none border border-white hover:bg-red-50 transition-colors cursor-pointer"
           >
             경보보기
           </button>
@@ -201,19 +201,19 @@ export default function FssNewsPage() {
       </div>
 
       {/* 검색 박스 영역 */}
-      <div className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+      <div className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)]">
         <form onSubmit={handleSearchSubmit} className="flex gap-2 flex-col sm:flex-row">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="검색어를 입력해 보세요 (예: 도수치료, 백내장, 단체보험)"
-            className="flex-1 px-4 py-3 sm:py-3.5 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 dark:text-white text-sm font-medium shadow-inner"
+            className="flex-1 px-4 py-3 sm:py-3.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 dark:text-white text-sm font-medium shadow-inner"
           />
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-red-500 to-amber-500 hover:opacity-90 text-white font-bold text-sm tracking-wide shadow-md transition-opacity cursor-pointer disabled:opacity-50"
+            className="px-6 py-3 sm:py-3.5 rounded-none bg-gradient-to-r from-red-500 to-amber-500 hover:opacity-90 text-white font-bold text-sm tracking-wide shadow-md transition-opacity cursor-pointer disabled:opacity-50"
           >
             {loading ? '연동 중...' : '실시간 조회'}
           </button>
@@ -231,7 +231,7 @@ export default function FssNewsPage() {
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id as any)}
-              className={`flex-1 min-w-0 text-center py-2 sm:py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer truncate px-0.5 ${
+              className={`flex-1 min-w-0 text-center py-2 sm:py-2.5 rounded-none text-[10px] sm:text-xs font-bold transition-all cursor-pointer truncate px-0.5 ${
                 activeTab === tab.id
                   ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm font-black'
                   : 'bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10'
@@ -245,7 +245,7 @@ export default function FssNewsPage() {
 
       {/* 실시간 로딩 피드백 안내창 */}
       {loading && (
-        <div className="bg-white dark:bg-[#202124] rounded-3xl py-14 px-6 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4 animate-pulse">
+        <div className="bg-white dark:bg-[#202124] rounded-none py-14 px-6 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4 animate-pulse">
           <div className="inline-block w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
           <div className="text-sm font-bold text-[#202124] dark:text-[#e8eaed]">🏛️ 금융감독원 공식 실시간 데이터를 연동 분석 중입니다...</div>
           <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] max-w-xs mx-auto leading-relaxed">
@@ -256,7 +256,7 @@ export default function FssNewsPage() {
 
       {/* 에러 및 피드백 */}
       {error && !loading && (
-        <div className="bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-3xl py-10 px-5 text-center font-bold text-sm">
+        <div className="bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-none py-10 px-5 text-center font-bold text-sm">
           {error}
         </div>
       )}
@@ -265,7 +265,7 @@ export default function FssNewsPage() {
       {!loading && (
         <>
           {results.length === 0 && !error && (
-            <div className="bg-white dark:bg-[#202124] rounded-3xl py-14 px-5 border border-gray-100 dark:border-white/5 text-center text-sm font-bold text-gray-500 dark:text-gray-400">
+            <div className="bg-white dark:bg-[#202124] rounded-none py-14 px-5 border border-gray-100 dark:border-white/5 text-center text-sm font-bold text-gray-500 dark:text-gray-400">
               조회된 데이터가 없습니다. 다른 검색어를 입력해 보세요.
             </div>
           )}
@@ -281,7 +281,7 @@ export default function FssNewsPage() {
                   <div
                     key={item.id}
                     id={item.id}
-                    className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-white/5 shadow-md hover:shadow-lg transition-all duration-300 space-y-4 scroll-mt-24"
+                    className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(255,0,0,0.2)] hover:border-current transition-all duration-300 space-y-4 scroll-mt-24"
                   >
                     {/* 헤더 */}
                     <div className="flex items-center justify-between flex-wrap gap-2">
@@ -297,7 +297,7 @@ export default function FssNewsPage() {
                     </h3>
 
                     {/* 핵심 요약 가이드 (기존 요약 박스 통합 및 지저분한 프리뷰 텍스트 삭제) */}
-                    <div className="bg-gray-50 dark:bg-white/2 p-4 rounded-2xl border border-gray-150/50 dark:border-white/2 space-y-2.5">
+                    <div className="bg-gray-50 dark:bg-white/2 p-4 rounded-none border border-gray-150/50 dark:border-white/2 space-y-2.5">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
                         <span className="text-sm">📢</span>
                         {getSummaryBoxTitle(item.category)}
@@ -310,7 +310,7 @@ export default function FssNewsPage() {
                     </div>
 
                     {/* 전문가 의견 */}
-                    <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-2xl border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2">
+                    <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-none border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2">
                       <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
                         <span className="text-sm">👨‍🏫</span>
                         보상스쿨 손해사정사 실무 코멘트
@@ -323,7 +323,7 @@ export default function FssNewsPage() {
                     {/* 태그 */}
                     <div className="flex flex-wrap gap-1.5 pt-2">
                       {item.keywords.map((kw, idx) => (
-                        <span key={idx} className="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-white/2 px-2 py-0.5 rounded-md">
+                        <span key={idx} className="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-white/2 px-2 py-0.5 rounded-none">
                           #{kw}
                         </span>
                       ))}
@@ -334,7 +334,7 @@ export default function FssNewsPage() {
                       {item.fullContent && (
                         <button
                           onClick={() => setExpandedCardId(expandedCardId === item.id ? null : item.id)}
-                          className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-750 dark:text-gray-300 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                          className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-750 dark:text-gray-300 border border-gray-250 dark:border-white/5 rounded-none text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
                         >
                           <span>📄</span>
                           {expandedCardId === item.id ? '보도/결정문 전문 닫기' : '전문 확인 (HWP 변환)'}
@@ -345,7 +345,7 @@ export default function FssNewsPage() {
                           href={item.officialUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 shadow-sm text-center"
+                          className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 border border-gray-250 dark:border-white/5 rounded-none text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 shadow-sm text-center"
                         >
                           <span>🔗</span> 금감원 원문 새창보기
                         </a>
@@ -354,7 +354,7 @@ export default function FssNewsPage() {
 
                     {/* 전문 텍스트 노출 영역 */}
                     {expandedCardId === item.id && item.fullContent && (
-                      <div className="bg-gray-50/50 dark:bg-[#303134]/30 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-white/5 text-xs text-gray-800 dark:text-gray-200 leading-relaxed space-y-3 whitespace-pre-wrap font-medium animate-in fade-in slide-in-from-top-2 duration-200 shadow-inner">
+                      <div className="bg-gray-50/50 dark:bg-[#303134]/30 p-4 sm:p-5 rounded-none border border-gray-200 dark:border-white/5 text-xs text-gray-800 dark:text-gray-200 leading-relaxed space-y-3 whitespace-pre-wrap font-medium animate-in fade-in slide-in-from-top-2 duration-200 shadow-inner">
                         <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-white/5 pb-2 mb-2 flex justify-between">
                           <span>📄 금융감독원 보도문/결정문 전문 (한글 HWP 대체 텍스트)</span>
                           <span>HWP 뷰어 무설치 열람 중</span>
@@ -373,7 +373,7 @@ export default function FssNewsPage() {
                               href={`/blog/${related[0].slug}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                              className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer"
                             >
                               📖 관련 분석 칼럼 읽기 ({related.length}건)
                             </Link>
@@ -384,7 +384,7 @@ export default function FssNewsPage() {
                               href="/blog"
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                              className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer"
                             >
                               📖 보상스쿨 전체 칼럼 읽기
                             </Link>
@@ -395,7 +395,7 @@ export default function FssNewsPage() {
                         href={getKakaoLink(item.title)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 text-center py-2.5 bg-amber-400 hover:bg-amber-500 text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="flex-1 text-center py-2.5 bg-amber-400 hover:bg-amber-500 text-white text-xs font-bold rounded-none shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         💬 내 보상 무료 검토 신청 (카톡)
                       </a>

@@ -330,7 +330,7 @@ export default function TrafficCarePage() {
     <div className="space-y-8 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
       
       {/* 💡 상단 정보성 띠 배너 (에메랄드 그린 포인트 테마 - 패밀리룩) */}
-      <div className="bg-[#137333] text-white px-4 py-3 rounded-2xl flex items-center justify-between flex-wrap gap-3 shadow-md">
+      <div className="bg-[#137333] text-white px-4 py-3 rounded-none flex items-center justify-between flex-wrap gap-3 shadow-md">
         <div className="flex items-center gap-2.5">
           <span className="text-lg shrink-0"><IconShield className="w-5 h-5" /></span>
           <div className="text-xs sm:text-sm font-extrabold tracking-tight">
@@ -343,7 +343,7 @@ export default function TrafficCarePage() {
             const el = document.getElementById('search-box-area');
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }}
-          className="text-[10px] font-black uppercase tracking-wider bg-white text-[#137333] px-2.5 py-1 rounded-lg border border-white hover:bg-green-50 transition-colors cursor-pointer"
+          className="text-[10px] font-black uppercase tracking-wider bg-white text-[#137333] px-2.5 py-1 rounded-none border border-white hover:bg-green-50 transition-colors cursor-pointer"
         >
           지역 변경하기
         </button>
@@ -360,10 +360,10 @@ export default function TrafficCarePage() {
       </div>
 
       {/* 행정구역 선택 박스 영역 */}
-      <div id="search-box-area" className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-4">
+      <div id="search-box-area" className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] space-y-4">
         <div className="flex gap-3 flex-col sm:flex-row items-stretch">
           <div className="flex-1 grid grid-cols-2 gap-3">
-            <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2">
+            <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2">
               <label className="block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">시/도 선택</label>
               <select
                 value={selectedSido}
@@ -375,7 +375,7 @@ export default function TrafficCarePage() {
                 ))}
               </select>
             </div>
-            <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2">
+            <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2">
               <label className="block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">구/군 선택</label>
               <select
                 value={selectedGugun}
@@ -391,7 +391,7 @@ export default function TrafficCarePage() {
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="px-6 py-3 sm:py-3.5 rounded-xl bg-[#137333] hover:bg-[#0b6623] text-white font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50 min-w-[120px] flex items-center justify-center"
+            className="px-6 py-3 sm:py-3.5 rounded-none bg-[#137333] hover:bg-[#0b6623] text-white font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50 min-w-[120px] flex items-center justify-center"
           >
             {loading ? '분석 중...' : '실시간 지역 분석'}
           </button>
@@ -400,7 +400,7 @@ export default function TrafficCarePage() {
 
       {/* 실시간 로딩바 (에메랄드 그린 테마) */}
       {loading && (
-        <div className="bg-white dark:bg-[#202124] rounded-3xl py-16 px-4 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4">
+        <div className="bg-white dark:bg-[#202124] rounded-none py-16 px-4 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4">
           <div className="inline-block w-9 h-9 border-4 border-[#137333] border-t-transparent rounded-full animate-spin" />
           <div className="text-sm font-bold text-[#202124] dark:text-[#e8eaed]">도로교통공단 실시간 교통 데이터 및 지역 의료망 분석 중...</div>
           <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] max-w-xs mx-auto leading-relaxed">
@@ -411,7 +411,7 @@ export default function TrafficCarePage() {
 
       {/* 에러 피드백 */}
       {error && !loading && (
-        <div className="bg-white dark:bg-[#202124] rounded-3xl py-12 px-5 border border-gray-100 dark:border-white/5 shadow-sm text-center font-bold text-sm text-rose-600 dark:text-rose-400">
+        <div className="bg-white dark:bg-[#202124] rounded-none py-12 px-5 border border-gray-100 dark:border-white/5 shadow-sm text-center font-bold text-sm text-rose-600 dark:text-rose-400">
           ⚠️ {error}
         </div>
       )}
@@ -430,23 +430,23 @@ export default function TrafficCarePage() {
 
           {/* 데이터 출처 안내 배너 */}
           {activeZone.isSafeZone ? (
-            <div className="flex items-start gap-2.5 px-4 py-3 rounded-2xl bg-blue-50 dark:bg-blue-950/15 border border-blue-200/50 dark:border-blue-700/30 text-xs text-blue-700 dark:text-blue-400 font-semibold leading-relaxed">
+            <div className="flex items-start gap-2.5 px-4 py-3 rounded-none bg-blue-50 dark:bg-blue-950/15 border border-blue-200/50 dark:border-blue-700/30 text-xs text-blue-700 dark:text-blue-400 font-semibold leading-relaxed">
               <span className="shrink-0 mt-0.5">🛡️</span>
               <span>선택하신 <strong>{loadedGugun} 전역</strong>은 최근 3개년 동안 도로교통공단 지정 법규위반 및 보행사고 다발지역 이력이 존재하지 않는 안심 관리 구역입니다.</span>
             </div>
           ) : (
-            <div className="flex items-start gap-2.5 px-4 py-3 rounded-2xl bg-green-50 dark:bg-green-950/15 border border-green-200/50 dark:border-green-700/30 text-xs text-[#137333] dark:text-[#81c995] font-semibold leading-relaxed">
+            <div className="flex items-start gap-2.5 px-4 py-3 rounded-none bg-green-50 dark:bg-green-950/15 border border-green-200/50 dark:border-green-700/30 text-xs text-[#137333] dark:text-[#81c995] font-semibold leading-relaxed">
               <span className="shrink-0 mt-0.5">✅</span>
               <span><strong>도로교통공단(TAAS) 실시간 공식 데이터</strong>를 기반으로 합니다. 지도 핀포인트는 실제 교통사고 다발 지점의 공식 GPS 좌표입니다.</span>
             </div>
           )}
 
           {/* 단일 카드 완결형 레이아웃 */}
-          <article className="bg-white dark:bg-[#202124] rounded-3xl border border-gray-100 dark:border-white/5 shadow-md p-6 sm:p-7 flex flex-col space-y-5">
+          <article className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(19,115,51,0.2)] hover:border-[#137333]/50 p-6 sm:p-7 flex flex-col space-y-5">
             
             {/* 위험 구역 선택 드롭다운 박스 (탑3를 드롭다운 형태로 한박스에 통합 - 안심구역이 아닐 때만 노출) */}
             {!activeZone.isSafeZone && (
-              <div className="bg-green-50/10 dark:bg-green-950/5 p-4.5 rounded-2xl border border-green-100/20 dark:border-white/5 space-y-2">
+              <div className="bg-green-50/10 dark:bg-green-950/5 p-4.5 rounded-none border border-green-100/20 dark:border-white/5 space-y-2">
                 <label className="block text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">
                   ⚠️ 위험 다발 구역 선택 (교차로별 위험 순위 Top {zones.length})
                 </label>
@@ -454,7 +454,7 @@ export default function TrafficCarePage() {
                   <select
                     value={selectedZoneId || ''}
                     onChange={(e) => setSelectedZoneId(e.target.value)}
-                    className="w-full bg-white dark:bg-[#303134] text-xs sm:text-sm font-extrabold text-gray-800 dark:text-gray-100 px-3.5 py-3 rounded-xl border border-gray-200 dark:border-white/5 focus:outline-none focus:border-[#137333] cursor-pointer appearance-none shadow-sm pr-10"
+                    className="w-full bg-white dark:bg-[#303134] text-xs sm:text-sm font-extrabold text-gray-800 dark:text-gray-100 px-3.5 py-3 rounded-none border border-gray-200 dark:border-white/5 focus:outline-none focus:border-[#137333] cursor-pointer appearance-none shadow-sm pr-10"
                   >
                     {zones.map((zone, index) => (
                       <option key={zone.id} value={zone.id}>
@@ -520,7 +520,7 @@ export default function TrafficCarePage() {
             </div>
 
             {/* 구글 지도 임베드 시각화 — 위경도 좌표 직접 방식으로 100% 핀포인트 보장 */}
-            <div className="w-full h-[320px] rounded-2xl overflow-hidden border border-gray-150 dark:border-white/5 shadow-sm mt-1 bg-gray-50">
+            <div className="w-full h-[320px] rounded-none overflow-hidden border border-gray-150 dark:border-white/5 shadow-sm mt-1 bg-gray-50">
               <iframe
                 key={`${loadedSido}-${loadedGugun}-${activeZone.id}`}
                 width="100%"
@@ -539,7 +539,7 @@ export default function TrafficCarePage() {
                 {/* 토글 버튼 바 */}
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="w-full flex items-center justify-between px-5 py-3.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/2 dark:hover:bg-white/5 rounded-2xl border border-gray-250 dark:border-white/5 cursor-pointer transition-colors text-xs font-black text-gray-800 dark:text-gray-100"
+                  className="w-full flex items-center justify-between px-5 py-3.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/2 dark:hover:bg-white/5 rounded-none border border-gray-250 dark:border-white/5 cursor-pointer transition-colors text-xs font-black text-gray-800 dark:text-gray-100"
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-[#137333]"><IconHospital className="w-4.5 h-4.5" /></span>
@@ -561,14 +561,14 @@ export default function TrafficCarePage() {
 
                 {/* 펼쳐졌을 때의 병원 리스트 */}
                 {isExpanded && (
-                  <div className="p-4 rounded-3xl border border-gray-100 dark:border-white/5 bg-gray-50/10 dark:bg-white/1 space-y-4">
+                  <div className="p-4 rounded-none border border-gray-100 dark:border-white/5 bg-gray-50/10 dark:bg-white/1 space-y-4">
                     {/* 필터 칩 */}
                     <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-gray-100 dark:border-white/5">
                       <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500">원하시는 진료 조건의 병원만 걸러볼 수 있습니다.</span>
                       <div className="flex gap-2">
                         <button
                           onClick={() => setOnlyNight(!onlyNight)}
-                          className={`px-3 py-1.5 rounded-xl text-[10px] font-extrabold transition-all border cursor-pointer flex items-center gap-1 ${
+                          className={`px-3 py-1.5 rounded-none text-[10px] font-extrabold transition-all border cursor-pointer flex items-center gap-1 ${
                             onlyNight 
                               ? 'bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] border-[#137333]/30' 
                               : 'bg-white dark:bg-[#303134] text-gray-500 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5'
@@ -578,7 +578,7 @@ export default function TrafficCarePage() {
                         </button>
                         <button
                           onClick={() => setOnlyEmergency(!onlyEmergency)}
-                          className={`px-3 py-1.5 rounded-xl text-[10px] font-extrabold transition-all border cursor-pointer flex items-center gap-1 ${
+                          className={`px-3 py-1.5 rounded-none text-[10px] font-extrabold transition-all border cursor-pointer flex items-center gap-1 ${
                             onlyEmergency 
                               ? 'bg-emerald-50 dark:bg-emerald-950/20 text-[#0b6623] dark:text-[#81c995] border-[#0b6623]/30' 
                               : 'bg-white dark:bg-[#303134] text-gray-500 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5'
@@ -599,7 +599,7 @@ export default function TrafficCarePage() {
                           return (
                             <div 
                               key={idx}
-                              className="p-4 rounded-2xl border border-gray-250 dark:border-white/5 bg-white dark:bg-[#202124] flex flex-col justify-between space-y-3 shadow-sm hover:border-[#137333]/30 dark:hover:border-[#137333]/50 transition-all duration-200"
+                              className="p-4 rounded-none border border-gray-250 dark:border-white/5 bg-white dark:bg-[#202124] flex flex-col justify-between space-y-3 shadow-sm hover:border-[#137333]/30 dark:hover:border-[#137333]/50 transition-all duration-200"
                             >
                               <div className="space-y-1.5">
                                 <div className="flex items-center gap-1.5 flex-wrap">
@@ -630,7 +630,7 @@ export default function TrafficCarePage() {
                                 {h.tel && (
                                   <a
                                     href={`tel:${h.tel}`}
-                                    className="px-2.5 py-1 text-[9px] font-black text-white bg-[#137333] hover:bg-[#0b6623] rounded-lg transition-colors cursor-pointer"
+                                    className="px-2.5 py-1 text-[9px] font-black text-white bg-[#137333] hover:bg-[#0b6623] rounded-none transition-colors cursor-pointer"
                                   >
                                     전화 연결
                                   </a>
@@ -641,7 +641,7 @@ export default function TrafficCarePage() {
                         })}
                       </div>
                     ) : (
-                      <div className="py-12 text-center text-xs font-bold text-gray-400 dark:text-gray-500 bg-white dark:bg-[#202124] rounded-2xl border border-dashed border-gray-200 dark:border-white/5">
+                      <div className="py-12 text-center text-xs font-bold text-gray-400 dark:text-gray-500 bg-white dark:bg-[#202124] rounded-none border border-dashed border-gray-200 dark:border-white/5">
                         필터 조건에 부합하는 병원 정보가 없습니다.
                       </div>
                     )}
@@ -651,7 +651,7 @@ export default function TrafficCarePage() {
             )}
 
             {/* 🧠 AI 3줄 요약 카드 (에메랄드 그린 패밀리룩) */}
-            <div className="bg-green-50/20 dark:bg-green-950/10 p-4 rounded-2xl border border-green-100/30 dark:border-green-900/25 space-y-2.5 mt-2">
+            <div className="bg-green-50/20 dark:bg-green-950/10 p-4 rounded-none border border-green-100/30 dark:border-green-900/25 space-y-2.5 mt-2">
               <div className="flex items-center gap-1.5 text-xs font-bold text-[#137333] dark:text-[#81c995]">
                 <span className="text-sm"><IconBrain className="w-4 h-4" /></span>
                 AI 실시간 사고위험 분석 보고
@@ -664,7 +664,7 @@ export default function TrafficCarePage() {
             </div>
 
             {/* 👨‍🏫 손해사정사 실무 코멘트 (황색 전문가 박스 패밀리룩) */}
-            <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-2xl border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2 mt-1">
+            <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-none border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2 mt-1">
               <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
                 <span className="text-sm"><IconBriefcase className="w-4 h-4" /></span>
                 보상스쿨 손해사정사 실무 코멘트
@@ -683,7 +683,7 @@ export default function TrafficCarePage() {
                     href={`/blog/${matchedCol.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer border border-gray-200/40 dark:border-white/5"
+                    className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer border border-gray-200/40 dark:border-white/5"
                   >
                     📖 사고원인 맞춤 칼럼 읽기 (1건)
                   </Link>
@@ -692,7 +692,7 @@ export default function TrafficCarePage() {
                     href="/blog"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer border border-gray-200/40 dark:border-white/5"
+                    className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer border border-gray-200/40 dark:border-white/5"
                   >
                     📖 보상스쿨 전체 칼럼 읽기
                   </Link>
@@ -702,7 +702,7 @@ export default function TrafficCarePage() {
                 href={getKakaoLink(activeZone)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 text-center py-2.5 bg-[#137333] hover:bg-[#0b6623] text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="flex-1 text-center py-2.5 bg-[#137333] hover:bg-[#0b6623] text-white text-xs font-bold rounded-none shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 💬 내 과실·보상 무료 상담 (카톡)
               </a>
@@ -714,7 +714,7 @@ export default function TrafficCarePage() {
       )}
 
       {/* ⚠️ 법률 면책 고지 배너 (패밀리룩 적용) */}
-      <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-3.5 rounded-2xl flex items-start gap-2.5 text-xs font-semibold leading-relaxed shadow-sm mt-8">
+      <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-3.5 rounded-none flex items-start gap-2.5 text-xs font-semibold leading-relaxed shadow-sm mt-8">
         <span className="text-base shrink-0 mt-0.5">⚠️</span>
         <span>본 교통사고 로컬 안심케어 서비스는 도로교통공단 및 심평원의 공공 데이터에 기반하여 참고용으로 제공되는 정보로, 법적 판결이나 배상 합의에 직접적인 대행 행위를 하지 않으며, 실제 사고 시에는 전문 손해사정사의 검토를 받으셔야 권리를 온전히 확보할 수 있습니다.</span>
       </div>

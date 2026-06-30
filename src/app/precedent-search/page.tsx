@@ -415,7 +415,7 @@ export default function PrecedentSearchPage() {
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* 💡 실시간 판례 트렌드 상단 띠 배너 */}
-      <div className="bg-[var(--google-blue)] text-white px-4 py-3 rounded-2xl flex items-center justify-between flex-wrap gap-3 shadow-md">
+      <div className="bg-[var(--google-blue)] text-white px-4 py-3 rounded-none flex items-center justify-between flex-wrap gap-3 shadow-md">
         <div className="flex items-center gap-2.5">
           <span className="text-lg shrink-0">💡</span>
           <div className="text-xs sm:text-sm font-extrabold tracking-tight">
@@ -428,7 +428,7 @@ export default function PrecedentSearchPage() {
             const el = document.getElementById('search-box-area');
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }}
-          className="text-[10px] font-black uppercase tracking-wider bg-white text-[var(--google-blue)] px-2.5 py-1 rounded-lg border border-white hover:bg-blue-50 transition-colors cursor-pointer"
+          className="text-[10px] font-black uppercase tracking-wider bg-white text-[var(--google-blue)] px-2.5 py-1 rounded-none border border-white hover:bg-blue-50 transition-colors cursor-pointer"
         >
           검색하기
         </button>
@@ -445,7 +445,7 @@ export default function PrecedentSearchPage() {
       </div>
 
       {/* 검색 박스 영역 */}
-      <div id="search-box-area" className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-3xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-4">
+      <div id="search-box-area" className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] space-y-4">
         <div className="flex gap-2 flex-col sm:flex-row">
           <input
             type="text"
@@ -453,12 +453,12 @@ export default function PrecedentSearchPage() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch(query)}
             placeholder="상황이나 키워드를 적어보세요 (예: 교통사고 과실 합의금 삭감)"
-            className="flex-1 px-4 py-3 sm:py-3.5 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-[var(--google-blue)] focus:ring-1 focus:ring-[var(--google-blue)] dark:text-white text-sm font-medium shadow-inner"
+            className="flex-1 px-4 py-3 sm:py-3.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-[var(--google-blue)] focus:ring-1 focus:ring-[var(--google-blue)] dark:text-white text-sm font-medium shadow-inner"
           />
           <button
             onClick={() => handleSearch(query)}
             disabled={loading}
-            className="px-6 py-3 sm:py-3.5 rounded-xl bg-[var(--google-blue)] hover:bg-[#174ea6] text-white font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50"
+            className="px-6 py-3 sm:py-3.5 rounded-none bg-[var(--google-blue)] hover:bg-[#174ea6] text-white font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50"
           >
             {loading ? '검색 중...' : '판례 검색'}
           </button>
@@ -473,7 +473,7 @@ export default function PrecedentSearchPage() {
                 <button
                   key={idx}
                   onClick={() => handleSearch(h)}
-                  className="px-2 py-0.5 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400 cursor-pointer text-[10px]"
+                  className="px-2 py-0.5 rounded-none hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400 cursor-pointer text-[10px]"
                 >
                   {h}
                 </button>
@@ -486,7 +486,7 @@ export default function PrecedentSearchPage() {
 
       {/* 검색 진행상태 및 로딩창 (파란색 테마) */}
       {loading && (
-        <div className="bg-white dark:bg-[#202124] rounded-3xl py-16 px-4 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4">
+        <div className="bg-white dark:bg-[#202124] rounded-none py-16 px-4 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4">
           <div className="inline-block w-9 h-9 border-4 border-[var(--google-blue)] border-t-transparent rounded-full animate-spin" />
           <div className="text-sm font-bold text-[#202124] dark:text-[#e8eaed]">AI 기반 법제처 실시간 데이터 연동 분석 중...</div>
           <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] max-w-xs mx-auto leading-relaxed">
@@ -497,11 +497,11 @@ export default function PrecedentSearchPage() {
 
       {/* 에러 및 안내 메시지 */}
       {error && !loading && (
-        <div className="bg-white dark:bg-[#202124] rounded-3xl py-12 px-5 border border-gray-100 dark:border-white/5 shadow-sm text-center space-y-3">
+        <div className="bg-white dark:bg-[#202124] rounded-none py-12 px-5 border border-gray-100 dark:border-white/5 shadow-sm text-center space-y-3">
           <div className="text-sm font-bold text-gray-700 dark:text-gray-300">{error}</div>
           
           {error.includes('인증 실패') && (
-            <div className="text-xs text-gray-500 dark:text-gray-400 max-w-lg mx-auto leading-relaxed space-y-1.5 bg-gray-50 dark:bg-white/2 p-3.5 rounded-xl border border-gray-150 dark:border-white/5">
+            <div className="text-xs text-gray-500 dark:text-gray-400 max-w-lg mx-auto leading-relaxed space-y-1.5 bg-gray-50 dark:bg-white/2 p-3.5 rounded-none border border-gray-150 dark:border-white/5">
               <div className="font-bold text-[var(--google-blue)] dark:text-[#8ab4f8]">💡 법제처 API IP 인증에 실패한 경우의 해결 방법:</div>
               <p>법제처 API는 국가에서 지정한 고정 IP 서버에서만 조회가 가능합니다. 현재 구글 클라우드(GCP) 중계 서버의 <b>고정 외부 IP</b>가 법제처 오픈 API 센터 마이페이지에 올바르게 등록되지 않았거나, 중계 서버 프로그램이 꺼져 있을 때 발생합니다.</p>
               <p className="font-bold text-[10px] text-gray-400">구글 클라우드 콘솔에서 발급받은 고정 IP 주소를 법제처 오픈 API 센터(open.law.go.kr) 마이페이지의 IP 주소 변경 메뉴에 등록해 주시면 정상 가동됩니다.</p>
@@ -533,14 +533,14 @@ export default function PrecedentSearchPage() {
               return (
                 <article
                   key={prec.id}
-                  className="bg-white dark:bg-[#202124] rounded-3xl border border-gray-100 dark:border-white/5 shadow-md hover:shadow-lg transition-all duration-300 p-6 sm:p-7 flex flex-col justify-between space-y-4"
+                  className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] hover:border-current transition-all duration-300 p-6 sm:p-7 flex flex-col justify-between space-y-4"
                 >
                   <div className="space-y-4">
                     {/* 상단 메타 바 (사건종류 배지 + 공식 판결 서식) */}
                     <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-white/5">
                       <div className="flex flex-wrap items-center gap-2.5">
                         {prec.caseType && (
-                          <span className="px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-900/20 text-[#1a73e8] dark:text-[#8ab4f8] text-[10px] font-bold border border-blue-100/30">
+                          <span className="px-2.5 py-1 rounded-none bg-blue-50 dark:bg-blue-900/20 text-[#1a73e8] dark:text-[#8ab4f8] text-[10px] font-bold border border-blue-100/30">
                             ⚖️ {prec.caseType}
                           </span>
                         )}
@@ -558,7 +558,7 @@ export default function PrecedentSearchPage() {
                     </div>
 
                     {/* ⚖️ 판결 핵심 요지 및 미리보기 (기존 AI 요약 박스 디자인 통합) */}
-                    <div className="bg-blue-50/20 dark:bg-blue-950/10 p-4 rounded-2xl border border-blue-100/30 dark:border-blue-900/25 space-y-2.5">
+                    <div className="bg-blue-50/20 dark:bg-blue-950/10 p-4 rounded-none border border-blue-100/30 dark:border-blue-900/25 space-y-2.5">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-[#1a73e8] dark:text-[#8ab4f8]">
                         <span className="text-sm">⚖️</span>
                         판결 핵심 요지 및 미리보기
@@ -569,7 +569,7 @@ export default function PrecedentSearchPage() {
                     </div>
 
                     {/* 👨‍🏫 보상스쿨 손해사정사 실무 코멘트 (황색 전문가 박스) */}
-                    <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-2xl border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2">
+                    <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-none border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2">
                       <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
                         <span className="text-sm">👨‍🏫</span>
                         보상스쿨 손해사정사 실무 코멘트
@@ -583,7 +583,7 @@ export default function PrecedentSearchPage() {
                     <div className="flex gap-2 pt-2">
                       <button
                         onClick={() => setOpenDetailId(isDetailOpen ? null : prec.id)}
-                        className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-750 dark:text-gray-300 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                        className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-750 dark:text-gray-300 border border-gray-250 dark:border-white/5 rounded-none text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
                       >
                         <span>📜</span>
                         {isDetailOpen ? '공식 판결문 전문 닫기' : '공식 판결문 전문 전체 확인하기'}
@@ -592,7 +592,7 @@ export default function PrecedentSearchPage() {
                         href={prec.officialUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 border border-gray-250 dark:border-white/5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 shadow-sm text-center"
+                        className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 border border-gray-250 dark:border-white/5 rounded-none text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 shadow-sm text-center"
                       >
                         <span>🔗</span> 법제처 원문 새창보기
                       </a>
@@ -600,7 +600,7 @@ export default function PrecedentSearchPage() {
 
                     {/* 전문 텍스트 노출 영역 */}
                     {isDetailOpen && prec.caseContent && (
-                      <div className="bg-gray-50/50 dark:bg-[#303134]/30 p-4 sm:p-5 rounded-2xl border border-gray-200 dark:border-white/5 text-xs text-gray-800 dark:text-gray-200 leading-relaxed space-y-3 whitespace-pre-wrap font-medium animate-in fade-in slide-in-from-top-2 duration-200 shadow-inner">
+                      <div className="bg-gray-50/50 dark:bg-[#303134]/30 p-4 sm:p-5 rounded-none border border-gray-200 dark:border-white/5 text-xs text-gray-800 dark:text-gray-200 leading-relaxed space-y-3 whitespace-pre-wrap font-medium animate-in fade-in slide-in-from-top-2 duration-200 shadow-inner">
                         <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-white/5 pb-2 mb-2 flex justify-between">
                           <span>📜 대법원 공식 판결문 전문</span>
                           <span>원본 열람 중</span>
@@ -618,7 +618,7 @@ export default function PrecedentSearchPage() {
                           href={`/blog/${relatedPosts[0].slug}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                          className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer"
                         >
                           📖 관련 분석 칼럼 읽기 ({relatedPosts.length}건)
                         </Link>
@@ -627,7 +627,7 @@ export default function PrecedentSearchPage() {
                           href="/blog"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                          className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer"
                         >
                           📖 보상스쿨 전체 칼럼 읽기
                         </Link>
@@ -636,7 +636,7 @@ export default function PrecedentSearchPage() {
                         href={getKakaoLink(prec)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 text-center py-2.5 bg-[var(--google-blue)] hover:bg-[#174ea6] text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="flex-1 text-center py-2.5 bg-[var(--google-blue)] hover:bg-[#174ea6] text-white text-xs font-bold rounded-none shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         💬 내 보상 무료 검토 신청 (카톡)
                       </a>
@@ -650,7 +650,7 @@ export default function PrecedentSearchPage() {
       )}
 
       {/* ⚠️ 법률 면책 고지 배너 */}
-      <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-3.5 rounded-2xl flex items-start gap-2.5 text-xs font-semibold leading-relaxed shadow-sm mt-8">
+      <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-3.5 rounded-none flex items-start gap-2.5 text-xs font-semibold leading-relaxed shadow-sm mt-8">
         <span className="text-base shrink-0 mt-0.5">⚠️</span>
         <span>본 판례 검색 시스템은 법제처 공공 API에 기반하여 참고용 판례 정보를 제공하며, 어떠한 법률 자문 대행도 하지 않습니다. 실제 지급 거절 및 삭감 대처 시에는 반드시 전문 손해사정사와 상담하십시오.</span>
       </div>

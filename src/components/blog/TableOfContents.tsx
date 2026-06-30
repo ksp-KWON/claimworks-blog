@@ -42,12 +42,19 @@ export default function TableOfContents({
                 onClick={(e) => onItemClick(e, item.id)}
                 className="group flex items-start gap-3 w-full"
               >
-                <span className={`w-8 h-8 rounded-none text-[13px] font-bold flex items-center justify-center shrink-0 mt-[2px] transition-colors ${
+                <span className={`relative w-7 h-7 shrink-0 mt-[2px] transition-transform duration-200 group-hover:-translate-y-0.5 ${
                   isActive
-                    ? 'bg-gradient-to-br from-red-500 to-[#1a73e8] text-white shadow-sm'
-                    : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'
+                    ? 'text-[#1a73e8] dark:text-[#8ab4f8]'
+                    : 'text-gray-400 dark:text-gray-500 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'
                 }`}>
-                  {i + 1}
+                  <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                    <path strokeLinecap="square" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
+                  <span className="absolute top-[60%] left-[45%] -translate-x-1/2 -translate-y-1/2 text-[11.5px] font-black">
+                    {i + 1}
+                  </span>
                 </span>
                 
                 <span className={`flex-1 text-[15px] leading-[1.7] break-keep transition-colors group-hover:underline underline-offset-4 decoration-2 ${
@@ -56,10 +63,6 @@ export default function TableOfContents({
                     : 'font-semibold text-gray-800 dark:text-[#e8eaed] group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] decoration-[#1a73e8]/30'
                 }`}>
                   {item.text}
-                </span>
-                <span className={`shrink-0 mt-1.5 flex items-center gap-1 text-[11px] font-bold transition-all duration-300 ${isActive ? 'text-[#1a73e8] dark:text-[#8ab4f8]' : 'text-gray-400 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'}`}>
-                  <span className="hidden sm:inline opacity-0 group-hover:opacity-100 transition-opacity">이동</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                 </span>
               </a>
             </li>

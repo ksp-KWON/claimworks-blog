@@ -99,11 +99,9 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
       <h2
         id={id}
         style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
-        className="text-[19px] sm:text-[22px] font-bold text-gray-900 dark:text-[#e8eaed] mt-12 mb-6 px-4 py-3 sm:px-6 bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex items-center gap-3 tracking-tight break-keep"
+        className="text-[19px] sm:text-[22px] font-bold text-gray-900 dark:text-[#e8eaed] mt-12 mb-6 px-4 py-3 sm:px-6 bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex items-center gap-3 tracking-tight break-keep"
       >
-        <span className="flex-shrink-0 w-7 h-7 rounded-full bg-[#fce8e6] dark:bg-[#d93025]/20 flex items-center justify-center shadow-sm">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#d93025]" />
-        </span>
+        <span className="flex-shrink-0 w-1.5 h-7 bg-gradient-to-b from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
         {children}
       </h2>
     ),
@@ -111,19 +109,19 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
       <h3
         id={id}
         style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
-        className="w-full flex items-center text-[16px] sm:text-[17px] font-bold text-gray-800 dark:text-[#e8eaed] mt-8 mb-4 px-4 py-3 bg-gray-50/80 dark:bg-white/[0.03] border-l-4 border-l-[#d93025] border border-y-gray-200 border-r-gray-200 dark:border-y-white/10 dark:border-r-white/10 rounded-r-xl tracking-tight break-keep shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+        className="w-full flex items-center text-[16px] sm:text-[17px] font-bold text-gray-800 dark:text-[#e8eaed] mt-8 mb-4 px-4 py-3 bg-gray-50/80 dark:bg-white/[0.03] border-l-4 border-l-[#1a73e8] border border-y-gray-200 border-r-gray-200 dark:border-y-white/10 dark:border-r-white/10 rounded-none tracking-tight break-keep shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.3)]"
       >
         {children}
       </h3>
     ),
     blockquote: ({ children }) => (
-      <div className="my-8 p-4 sm:p-6 rounded-2xl bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex items-start gap-3 relative overflow-hidden">
-        <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-[#34A853]" />
+      <div className="my-8 p-4 sm:p-6 rounded-none bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] flex items-start gap-3 relative overflow-hidden group">
+        <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
         <div className="text-[15px] text-gray-800 dark:text-[#e8eaed] leading-[1.8] [&>p]:m-0 flex-1">{children}</div>
       </div>
     ),
     table: ({ children }) => (
-      <div className="overflow-x-auto my-8 rounded-xl border border-[#e0e0e0] dark:border-[#5f6368] shadow-sm">
+      <div className="overflow-x-auto my-8 rounded-none border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.4)] bg-white dark:bg-[#202124]">
         <table className="w-full text-[14px] border-collapse">{children}</table>
       </div>
     ),

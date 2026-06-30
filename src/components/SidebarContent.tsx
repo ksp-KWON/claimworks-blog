@@ -140,27 +140,34 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
 
       {/* 인기 키워드 태그 (layout.tsx 서버에서 전달된 정적 데이터) */}
       {tags.length > 0 && (
-        <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)]">
-          <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-4 flex items-center gap-2 border-l-4 border-[var(--google-red)] pl-2.5">
-            <svg className="w-4 h-4 text-[var(--google-red)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
-              <line x1="7" y1="7" x2="7.01" y2="7" />
-            </svg>
-            인기 키워드 태그
-          </h3>
-          <div className="flex flex-wrap gap-2 text-xs font-bold">
-            {visibleTags.map((tag) => (
-              <Link
-                key={tag}
-                href={`/blog?tag=${encodeURIComponent(tag)}`}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--google-surface-variant)] dark:bg-[#303134] text-[#5f6368] dark:text-[#c4c7c5] border border-transparent hover:border-[var(--google-blue)] hover:bg-[#e8f0fe] dark:hover:bg-[#174ea6]/20 hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] transition-all duration-200 shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
-              >
-                <span className="text-[var(--google-red)] opacity-70">#</span>
-                {tag}
-              </Link>
-            ))}
+        <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(234,67,53,0.25)] hover:border-[var(--google-red)] transition-all duration-300 relative overflow-hidden group flex flex-col min-h-[160px]">
+          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">🏷️</div>
+          <div className="relative z-10 flex flex-col h-full flex-1">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-red)] pl-2.5">
+                <span className="text-[var(--google-red)] text-lg leading-none">🏷️</span>
+                인기 키워드 태그
+              </h3>
+            </div>
+            
+            <div className="flex flex-wrap gap-2 text-xs font-normal text-[#5f6368] dark:text-[#9aa0a6]">
+              {tags.slice(0, 5).map((tag) => (
+                <Link
+                  key={tag}
+                  href={`/blog?tag=${encodeURIComponent(tag)}`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--google-surface-variant)] dark:bg-[#303134] border border-transparent hover:border-[var(--google-blue)] hover:bg-[#e8f0fe] dark:hover:bg-[#174ea6]/20 hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] transition-all duration-200 shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
+                >
+                  <span className="text-[var(--google-red)] opacity-70">#</span>
+                  {tag}
+                </Link>
+              ))}
+            </div>
+            
+            <Link href="/search" className="pt-3 flex items-center gap-1 text-xs font-bold text-[var(--google-red)] dark:text-red-400 group-hover:underline mt-auto">
+              전체 태그 검색하기
+              <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </Link>
           </div>
-          {hiddenTags.length > 0 && <SidebarTagMore tags={hiddenTags} />}
         </div>
       )}
     </div>

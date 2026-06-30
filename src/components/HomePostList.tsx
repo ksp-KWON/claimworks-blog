@@ -23,6 +23,7 @@ export function getCategoryColor(category: string) {
       border: 'hover:border-red-400',
       hoverText: 'group-hover:text-red-600 dark:group-hover:text-red-400',
       arrowColor: 'text-red-500',
+      accentBg: 'bg-red-500',
       icon: '🚗'
     };
   }
@@ -32,6 +33,7 @@ export function getCategoryColor(category: string) {
       border: 'hover:border-rose-400',
       hoverText: 'group-hover:text-rose-600 dark:group-hover:text-rose-400',
       arrowColor: 'text-rose-500',
+      accentBg: 'bg-rose-500',
       icon: '⚖️'
     };
   }
@@ -41,6 +43,7 @@ export function getCategoryColor(category: string) {
       border: 'hover:border-blue-400',
       hoverText: 'group-hover:text-blue-600 dark:group-hover:text-blue-400',
       arrowColor: 'text-blue-500',
+      accentBg: 'bg-blue-500',
       icon: '🏥'
     };
   }
@@ -50,6 +53,7 @@ export function getCategoryColor(category: string) {
       border: 'hover:border-green-400',
       hoverText: 'group-hover:text-green-600 dark:group-hover:text-green-400',
       arrowColor: 'text-green-500',
+      accentBg: 'bg-green-500',
       icon: '🛡️'
     };
   }
@@ -59,6 +63,7 @@ export function getCategoryColor(category: string) {
       border: 'hover:border-teal-400',
       hoverText: 'group-hover:text-teal-600 dark:group-hover:text-teal-400',
       arrowColor: 'text-teal-500',
+      accentBg: 'bg-teal-500',
       icon: '👷'
     };
   }
@@ -68,6 +73,7 @@ export function getCategoryColor(category: string) {
       border: 'hover:border-purple-400',
       hoverText: 'group-hover:text-purple-600 dark:group-hover:text-purple-400',
       arrowColor: 'text-purple-500',
+      accentBg: 'bg-purple-500',
       icon: '♿'
     };
   }
@@ -77,6 +83,7 @@ export function getCategoryColor(category: string) {
       border: 'hover:border-indigo-400',
       hoverText: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400',
       arrowColor: 'text-indigo-500',
+      accentBg: 'bg-indigo-500',
       icon: '📖'
     };
   }
@@ -87,6 +94,7 @@ export function getCategoryColor(category: string) {
     border: 'hover:border-yellow-400',
     hoverText: 'group-hover:text-yellow-600 dark:group-hover:text-yellow-400',
     arrowColor: 'text-yellow-500',
+    accentBg: 'bg-yellow-500',
     icon: '💡'
   };
 }
@@ -117,27 +125,31 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
     <div className="space-y-8 sm:space-y-12">
       {categoriesWithPosts.map(({ category, posts }) => {
         const primaryColor = getCategoryColor(category);
-        const displayPosts = posts.slice(0, 4); // 각 블록당 최대 4개 노출
+        const displayPosts = posts.slice(0, 2); // 각 블록당 최대 2개 노출
 
         return (
           <section key={category} className="bg-white dark:bg-[#1e1e20] border border-gray-200 dark:border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm">
             
-            {/* 블록 헤더 - 프리미엄 배경 적용 */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-gray-50/80 to-white dark:from-zinc-800/40 dark:to-transparent -mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-4 sm:px-6 sm:py-5 mb-6 rounded-t-2xl sm:rounded-t-3xl border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gray-50 dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-700/50 shadow-sm ${primaryColor.arrowColor}`}>
-                  <span className="text-xl sm:text-2xl drop-shadow-sm" aria-hidden="true">{primaryColor.icon}</span>
+            {/* 블록 헤더 - 조화로운 프리미엄 디자인 */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-gray-50/80 to-white dark:from-zinc-800/40 dark:to-transparent -mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-4 sm:px-6 sm:py-5 mb-6 rounded-t-2xl sm:rounded-t-3xl border-b border-gray-100 dark:border-white/5 flex items-center justify-between group/header">
+              
+              {/* 좌측 악센트 바 (아이콘 색상 기반) */}
+              <div className={`absolute top-0 left-0 w-1.5 h-full ${primaryColor.accentBg}`}></div>
+              
+              <div className="relative z-10 pl-1.5 sm:pl-2 flex items-center gap-3">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 shadow-sm ${primaryColor.arrowColor}`}>
+                  <span className="text-lg sm:text-xl drop-shadow-sm" aria-hidden="true">{primaryColor.icon}</span>
                 </div>
-                <h2 className="text-lg sm:text-2xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
+                <h2 className="text-xl sm:text-2xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
                   {category}
                 </h2>
               </div>
               <Link 
                 href={`/search?q=${encodeURIComponent(category)}`}
-                className="group flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-gray-50 dark:bg-zinc-800/50 hover:bg-gray-100 dark:hover:bg-zinc-800 text-[11px] sm:text-sm font-bold text-gray-600 dark:text-gray-300 transition-all border border-gray-200 dark:border-zinc-700/50 hover:border-gray-300 shadow-sm hover:shadow-md"
+                className={`relative z-10 flex items-center gap-1 text-[13px] sm:text-sm font-semibold text-gray-500 dark:text-gray-400 ${primaryColor.hoverText} transition-colors`}
               >
                 전체보기
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+                <svg className="w-4 h-4 transition-transform group-hover/header:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
               </Link>
             </div>
 

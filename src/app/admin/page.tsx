@@ -486,10 +486,10 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           onSubmit={handleLogin} 
-          className="relative z-10 bg-white/60 dark:bg-[#303134]/60 backdrop-blur-xl p-10 rounded-[2rem] shadow-[0_8px_32px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/50 dark:border-white/10 w-[400px]"
+          className="relative z-10 bg-white/60 dark:bg-[#303134]/60 backdrop-blur-xl p-10 rounded-none shadow-[0_8px_32px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/50 dark:border-white/10 w-[400px]"
         >
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-none flex items-center justify-center shadow-lg">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             </div>
           </div>
@@ -500,11 +500,11 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-5 py-4 rounded-xl border border-white/40 dark:border-white/10 bg-white/50 dark:bg-black/20 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-black/40 transition-all mb-6"
+            className="w-full px-5 py-4 rounded-none border border-white/40 dark:border-white/10 bg-white/50 dark:bg-black/20 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-black/40 transition-all mb-6"
             placeholder="비밀번호 입력"
             autoFocus
           />
-          <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98]">
+          <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-none shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98]">
             잠금 해제
           </button>
         </motion.form>
@@ -527,9 +527,9 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
       >
         
         {/* Header Bar - Slim & Professional */}
-        <div className="bg-white/70 dark:bg-[#2a2a2c]/80 backdrop-blur-2xl px-5 py-3 rounded-2xl shadow-sm border border-white/50 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-3 flex-shrink-0">
+        <div className="bg-white/70 dark:bg-[#2a2a2c]/80 backdrop-blur-2xl px-5 py-3 rounded-none shadow-sm border border-white/50 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-3 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+            <div className="w-9 h-9 rounded-none bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
             </div>
             <div>
@@ -541,7 +541,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
             </div>
           </div>
           
-          <div className="flex items-center gap-2 bg-white/50 dark:bg-black/20 px-3 py-1.5 rounded-xl border border-gray-100 dark:border-white/5 w-full md:w-auto overflow-x-auto">
+          <div className="flex items-center gap-2 bg-white/50 dark:bg-black/20 px-3 py-1.5 rounded-none border border-gray-100 dark:border-white/5 w-full md:w-auto overflow-x-auto">
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-[10px] font-bold text-gray-400">Gemini:</span>
               <input 
@@ -563,7 +563,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                 placeholder="ghp_..."
               />
             </div>
-            <button onClick={saveKeys} className="ml-1 px-3 py-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 rounded-lg transition-all text-xs font-bold shadow active:scale-95">
+            <button onClick={saveKeys} className="ml-1 px-3 py-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 rounded-none transition-all text-xs font-bold shadow active:scale-95">
               키 저장
             </button>
           </div>
@@ -578,7 +578,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden flex-shrink-0"
             >
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-150 dark:border-blue-800/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-xl text-xs font-medium flex items-center justify-between shadow-sm">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-150 dark:border-blue-800/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-none text-xs font-medium flex items-center justify-between shadow-sm">
                 <span className="flex items-center gap-2">
                   {isLoading ? (
                      <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -593,7 +593,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
         </AnimatePresence>
 
         {/* Layout Mode Control - Slim */}
-        <div className="flex justify-between items-center bg-white/40 dark:bg-black/10 px-4 py-2 rounded-xl border border-gray-200 dark:border-white/5 flex-shrink-0 z-10">
+        <div className="flex justify-between items-center bg-white/40 dark:bg-black/10 px-4 py-2 rounded-none border border-gray-200 dark:border-white/5 flex-shrink-0 z-10">
           <div className="text-[11px] font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
             작업 공간
@@ -608,7 +608,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
               <button
                 key={view.id}
                 onClick={() => setLayoutView(view.id as 'split' | 'editor' | 'preview')}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all border ${
+                className={`px-2.5 py-1 rounded-none text-[11px] font-bold transition-all border ${
                   layoutView === view.id
                     ? 'bg-blue-600 border-blue-650 text-white shadow-sm'
                     : 'bg-white dark:bg-[#2a2a2c] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:bg-gray-150 dark:hover:bg-[#323235]'
@@ -626,12 +626,12 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
           layoutView === 'split' ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'
         }`}>
           {/* Left Column: Input Panel */}
-          <div className={`bg-white/70 dark:bg-[#2a2a2c]/80 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-white/50 dark:border-white/5 flex flex-col h-full min-h-0 ${
+          <div className={`bg-white/70 dark:bg-[#2a2a2c]/80 backdrop-blur-xl p-5 rounded-none shadow-sm border border-white/50 dark:border-white/5 flex flex-col h-full min-h-0 ${
             layoutView === 'preview' ? 'hidden' : ''
           }`}>
             
             {/* Mode Tab Switcher */}
-            <div className="flex bg-gray-100/50 dark:bg-black/20 p-1 rounded-xl mb-4 flex-shrink-0">
+            <div className="flex bg-gray-100/50 dark:bg-black/20 p-1 rounded-none mb-4 flex-shrink-0">
               {[
                 { id: 'manual', label: '수동 (대본 포장)' },
                 { id: 'semi-auto', label: '반자동 (링크/개요)' },
@@ -647,7 +647,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                       setShowPostList(true); // 수정 탭으로 갈 때는 목록을 펼칩니다
                     }
                   }}
-                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all ${mode === m.id ? 'bg-white dark:bg-[#3f3f42] text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                  className={`flex-1 py-2 px-3 rounded-none text-xs font-bold transition-all ${mode === m.id ? 'bg-white dark:bg-[#3f3f42] text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
                 >
                   {m.label}
                 </button>
@@ -680,12 +680,12 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                     )}
                   </div>
                 </div>
-                <div className="flex-1 overflow-y-auto border border-gray-200 dark:border-white/10 rounded-xl bg-white/40 dark:bg-black/25 p-2 space-y-1.5 custom-scrollbar min-h-[140px]">
+                <div className="flex-1 overflow-y-auto border border-gray-200 dark:border-white/10 rounded-none bg-white/40 dark:bg-black/25 p-2 space-y-1.5 custom-scrollbar min-h-[140px]">
                   {postList.length === 0 ? (
                     <div className="text-center py-8 text-xs text-gray-400">등록된 글이 없거나 GITHUB 토큰이 필요합니다.</div>
                   ) : (
                     postList.map(post => (
-                      <div key={post.name} className="flex justify-between items-center p-2 rounded-lg bg-white/80 dark:bg-[#202124]/70 border border-gray-100 dark:border-white/5 shadow-xs transition-all hover:bg-white dark:hover:bg-[#202124]">
+                      <div key={post.name} className="flex justify-between items-center p-2 rounded-none bg-white/80 dark:bg-[#202124]/70 border border-gray-100 dark:border-white/5 shadow-xs transition-all hover:bg-white dark:hover:bg-[#202124]">
                         <div className="flex-1 min-w-0 pr-3 text-left">
                           <div className="text-xs font-bold text-gray-900 dark:text-white truncate">{post.title}</div>
                           <div className="text-[10px] text-gray-400 mt-0.5 truncate">{post.name}</div>
@@ -693,13 +693,13 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                         <div className="flex items-center gap-1 shrink-0">
                           <button
                             onClick={() => loadPost(post.name, post.sha)}
-                            className="px-2 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 dark:bg-blue-950/30 dark:hover:bg-blue-950/60 dark:text-blue-400 rounded-lg text-[11px] font-bold transition-all"
+                            className="px-2 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 dark:bg-blue-950/30 dark:hover:bg-blue-950/60 dark:text-blue-400 rounded-none text-[11px] font-bold transition-all"
                           >
                             ✏️ 불러오기
                           </button>
                           <button
                             onClick={() => deletePost(post.name, post.sha)}
-                            className="p-1.5 hover:bg-red-50 dark:hover:bg-red-950/30 text-red-500 hover:text-red-600 rounded-lg transition-all"
+                            className="p-1.5 hover:bg-red-50 dark:hover:bg-red-950/30 text-red-500 hover:text-red-600 rounded-none transition-all"
                             title="글 삭제"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -717,7 +717,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                 <textarea
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  className="flex-1 w-full p-4 rounded-xl border border-gray-250 dark:border-white/10 bg-white/50 dark:bg-black/20 text-gray-950 dark:text-white placeholder-gray-400 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none transition-all leading-relaxed custom-scrollbar"
+                  className="flex-1 w-full p-4 rounded-none border border-gray-250 dark:border-white/10 bg-white/50 dark:bg-black/20 text-gray-950 dark:text-white placeholder-gray-400 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none transition-all leading-relaxed custom-scrollbar"
                   placeholder={mode === 'manual' 
                     ? "✨ 이곳에 유튜브 대본 등 원문을 붙여넣으세요.\nAI가 원문을 보존하면서 가독성을 극대화한 UI(소제목, 표, Q&A)를 덧씌워 포장합니다." 
                     : "💡 이곳에 타겟 키워드, 뼈대(개요), 또는 참고할 블로그/유튜브 링크를 적어주세요.\nAI가 인사이트를 추출하여 완전히 새로운 전문적인 포스팅을 창작합니다."}
@@ -725,7 +725,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                 <button 
                   onClick={handleGenerate}
                   disabled={isLoading}
-                  className="mt-3 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl shadow shadow-blue-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2 text-sm"
+                  className="mt-3 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-none shadow shadow-blue-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2 text-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                   AI 자율 작성 가동
@@ -735,7 +735,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
 
             {mode === 'auto' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col justify-center items-center p-6 text-center space-y-6">
-                <div className="w-20 h-20 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <div className="w-20 h-20 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-none flex items-center justify-center shadow-lg shadow-blue-500/20">
                   <svg className="w-10 h-10 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
@@ -749,7 +749,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                 </div>
                 <div className="w-full max-w-sm space-y-3 pt-4">
                   {/* 포스팅 종류 선택 단추 (딸깍기능) */}
-                  <div className="bg-gray-50 dark:bg-black/10 p-3.5 rounded-xl border border-gray-200 dark:border-white/5 text-left space-y-2">
+                  <div className="bg-gray-50 dark:bg-black/10 p-3.5 rounded-none border border-gray-200 dark:border-white/5 text-left space-y-2">
                     <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 block">📝 발행할 포스팅 종류 선택</span>
                     <div className="grid grid-cols-3 gap-2">
                       {[
@@ -761,7 +761,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                           key={type.id}
                           onClick={() => setSelectedPostType(type.id as 'all' | 'precedent' | 'trend')}
                           type="button"
-                          className={`flex flex-col items-center justify-center py-2 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
+                          className={`flex flex-col items-center justify-center py-2 rounded-none border text-xs font-bold transition-all cursor-pointer ${
                             selectedPostType === type.id
                               ? 'bg-blue-600 border-blue-650 text-white shadow-sm font-extrabold'
                               : 'bg-white dark:bg-[#303134] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-[#3f3f42]'
@@ -777,7 +777,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                   <button 
                     onClick={triggerAutoPost}
                     disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-xl shadow shadow-blue-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2 text-sm"
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-none shadow shadow-blue-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2 text-sm"
                   >
                     🚀 즉시 자동 발행 기동 (Run Workflow)
                   </button>
@@ -786,7 +786,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                     href={`https://github.com/${REPO_OWNER}/${REPO_NAME}/actions`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full bg-white dark:bg-[#303134] text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-[#3f3f42] font-bold py-3.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-xs"
+                    className="w-full bg-white dark:bg-[#303134] text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-[#3f3f42] font-bold py-3.5 rounded-none transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-xs"
                   >
                     📊 실시간 배포 로그 확인하기 (GitHub Actions)
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -801,7 +801,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col min-h-0 relative">
                   {/* 기존 글 목록이 접혀있을 때 펼치기 바 */}
                   {mode === 'edit' && !showPostList && (
-                    <div className="mb-2 flex items-center justify-between bg-blue-50/50 dark:bg-blue-900/10 px-3 py-1.5 rounded-lg border border-blue-100 dark:border-blue-900/20 flex-shrink-0">
+                    <div className="mb-2 flex items-center justify-between bg-blue-50/50 dark:bg-blue-900/10 px-3 py-1.5 rounded-none border border-blue-100 dark:border-blue-900/20 flex-shrink-0">
                       <span className="text-[10px] font-medium text-blue-800 dark:text-blue-300">
                         📁 수정 중: {slug}.md
                       </span>
@@ -814,7 +814,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                     </div>
                   )}
                   {/* 마크다운 빌더 툴바 영역 */}
-                  <div className="flex flex-col gap-2 p-2 bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-xl mb-2 flex-shrink-0">
+                  <div className="flex flex-col gap-2 p-2 bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-none mb-2 flex-shrink-0">
                     {/* 1층: 블로그 구성요소 생성 버튼들 */}
                     <div className="flex gap-1 overflow-x-auto pb-1 custom-scrollbar shrink-0">
                       <span className="text-[10px] font-bold text-gray-400 flex items-center shrink-0 pr-1.5 border-r border-gray-200 dark:border-white/10 mr-1.5">🧱 요소 빌더:</span>
@@ -831,7 +831,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                           key={item.label}
                           onClick={() => insertMarkdown(item.template)}
                           type="button"
-                          className="px-2 py-1 bg-white hover:bg-gray-100 dark:bg-[#303134] dark:hover:bg-[#3f3f42] border border-gray-200 dark:border-white/5 rounded-lg text-[10px] font-bold text-gray-700 dark:text-gray-200 transition-colors shrink-0 active:scale-95 shadow-xs"
+                          className="px-2 py-1 bg-white hover:bg-gray-100 dark:bg-[#303134] dark:hover:bg-[#3f3f42] border border-gray-200 dark:border-white/5 rounded-none text-[10px] font-bold text-gray-700 dark:text-gray-200 transition-colors shrink-0 active:scale-95 shadow-xs"
                         >
                           {item.label}
                         </button>
@@ -852,7 +852,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                           key={color.tag}
                           onClick={() => wrapTextWithTag(color.tag)}
                           type="button"
-                          className="px-2 py-0.5 bg-white hover:bg-gray-100 dark:bg-[#303134] dark:hover:bg-[#3f3f42] border border-gray-255 dark:border-white/5 rounded-md text-[10px] font-bold text-gray-750 dark:text-gray-200 transition-colors active:scale-95"
+                          className="px-2 py-0.5 bg-white hover:bg-gray-100 dark:bg-[#303134] dark:hover:bg-[#3f3f42] border border-gray-255 dark:border-white/5 rounded-none text-[10px] font-bold text-gray-750 dark:text-gray-200 transition-colors active:scale-95"
                         >
                           {color.label}
                         </button>
@@ -866,14 +866,14 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                     ref={textareaRef}
                     value={generatedMarkdown}
                     onChange={(e) => setGeneratedMarkdown(e.target.value)}
-                    className="flex-1 w-full p-4 font-mono text-xs leading-relaxed rounded-xl border border-gray-250 dark:border-white/10 bg-gray-50/50 dark:bg-[#1e1e20]/80 text-gray-800 dark:text-gray-300 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all custom-scrollbar"
+                    className="flex-1 w-full p-4 font-mono text-xs leading-relaxed rounded-none border border-gray-250 dark:border-white/10 bg-gray-50/50 dark:bg-[#1e1e20]/80 text-gray-800 dark:text-gray-300 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all custom-scrollbar"
                   />
                </motion.div>
             )}
           </div>
 
           {/* Right Column: Preview Panel */}
-          <div className={`bg-white/70 dark:bg-[#2a2a2c]/80 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-white/50 dark:border-white/5 flex flex-col h-full min-h-0 relative overflow-hidden ${
+          <div className={`bg-white/70 dark:bg-[#2a2a2c]/80 backdrop-blur-xl p-5 rounded-none shadow-sm border border-white/50 dark:border-white/5 flex flex-col h-full min-h-0 relative overflow-hidden ${
             layoutView === 'editor' ? 'hidden' : ''
           }`}>
             <div className="flex items-center justify-between mb-3 z-10 flex-shrink-0">
@@ -891,7 +891,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                     exit={{ opacity: 0, scale: 0.9 }}
                     onClick={publishToGithub}
                     disabled={isLoading}
-                    className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 text-xs font-bold rounded-xl transition-all disabled:opacity-50 flex items-center gap-1.5 shadow active:scale-95"
+                    className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 text-xs font-bold rounded-none transition-all disabled:opacity-50 flex items-center gap-1.5 shadow active:scale-95"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     GitHub 즉시 발행
@@ -900,7 +900,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
               </AnimatePresence>
             </div>
             
-            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar z-10 bg-white/40 dark:bg-black/10 rounded-xl p-4 sm:p-5 border border-white/40 dark:border-white/5 min-h-0">
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar z-10 bg-white/40 dark:bg-black/10 rounded-none p-4 sm:p-5 border border-white/40 dark:border-white/5 min-h-0">
               {generatedMarkdown ? (
                 <div className="prose prose-xs sm:prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
                   <BlogPostContent content={cleanFrontmatter(generatedMarkdown)} />

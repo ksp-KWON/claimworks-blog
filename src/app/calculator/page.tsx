@@ -12,7 +12,7 @@ export default function CalculatorIndex() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-gradient-to-b from-[var(--google-blue)]/5 via-[var(--google-blue)]/5 to-transparent rounded-full blur-3xl -z-10 pointer-events-none opacity-50 dark:opacity-20" />
       
       <header className="mb-16 text-center animate-in slide-in-from-bottom-8 duration-700 fade-in">
-        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-white dark:bg-[#303134] border border-gray-100 dark:border-white/10 shadow-sm mb-6">
+        <div className="inline-flex items-center justify-center p-3 rounded-none bg-white dark:bg-[#303134] border border-gray-100 dark:border-white/10 shadow-sm mb-6">
           <svg className="w-8 h-8 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
             <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
             <line x1="8" y1="6" x2="16" y2="6"></line>
@@ -40,11 +40,11 @@ export default function CalculatorIndex() {
         {/* 자동차보험 합의금 계산기 */}
         <Link 
           href="/calculator/auto" 
-          className="group flex flex-col bg-white dark:bg-[#202124] rounded-3xl p-8 border border-gray-100 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(26,115,232,0.1)] hover:-translate-y-2 transition-all duration-500 overflow-hidden relative"
+          className="group flex flex-col bg-white dark:bg-[#202124] rounded-none p-8 border border-gray-100 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(26,115,232,0.1)] hover:-translate-y-2 transition-all duration-500 overflow-hidden relative"
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#e8f0fe] to-transparent dark:from-[#8ab4f8]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
           
-          <div className="w-16 h-16 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner group-hover:rotate-12 transition-transform duration-500">
+          <div className="w-16 h-16 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-none flex items-center justify-center text-3xl mb-6 shadow-inner group-hover:rotate-12 transition-transform duration-500">
             🚗
           </div>
           
@@ -55,7 +55,7 @@ export default function CalculatorIndex() {
             교통사고 피해자 전용. 부상, 후유장해, 사망에 따른 대인배상 약관 지급기준 및 호프만계수를 적용하여 합의금을 산출합니다.
           </p>
           
-          <div className="flex items-center text-[var(--google-blue)] font-bold text-sm bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 px-5 py-3 rounded-xl w-fit group-hover:bg-[var(--google-blue)] group-hover:text-white transition-colors">
+          <div className="flex items-center text-[var(--google-blue)] font-bold text-sm bg-[#e8f0fe] dark:bg-[#8ab4f8]/10 px-5 py-3 rounded-none w-fit group-hover:bg-[var(--google-blue)] group-hover:text-white transition-colors">
             계산 시작하기 
             <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
           </div>
@@ -64,11 +64,11 @@ export default function CalculatorIndex() {
         {/* 실손의료비 보상 계산기 */}
         <Link 
           href="/calculator/medical" 
-          className="group flex flex-col bg-white dark:bg-[#202124] rounded-3xl p-8 border border-gray-100 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(52,168,83,0.1)] hover:-translate-y-2 transition-all duration-500 overflow-hidden relative"
+          className="group flex flex-col bg-white dark:bg-[#202124] rounded-none p-8 border border-gray-100 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(52,168,83,0.1)] hover:-translate-y-2 transition-all duration-500 overflow-hidden relative"
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#e6f4ea] to-transparent dark:from-[#1e8e3e]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
           
-          <div className="w-16 h-16 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner group-hover:rotate-12 transition-transform duration-500">
+          <div className="w-16 h-16 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-none flex items-center justify-center text-3xl mb-6 shadow-inner group-hover:rotate-12 transition-transform duration-500">
             🏥
           </div>
           
@@ -79,7 +79,7 @@ export default function CalculatorIndex() {
             가입 시기별 약관을 반영하여, 급여 및 비급여 병원비에서 본인부담금을 공제한 예상 실손 보험금을 정확하게 산출합니다.
           </p>
           
-          <div className="flex items-center text-[var(--google-green)] font-bold text-sm bg-[#e6f4ea] dark:bg-[#1e8e3e]/10 px-5 py-3 rounded-xl w-fit group-hover:bg-[var(--google-green)] group-hover:text-white transition-colors">
+          <div className="flex items-center text-[var(--google-green)] font-bold text-sm bg-[#e6f4ea] dark:bg-[#1e8e3e]/10 px-5 py-3 rounded-none w-fit group-hover:bg-[var(--google-green)] group-hover:text-white transition-colors">
             계산 시작하기 
             <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
           </div>
@@ -88,11 +88,11 @@ export default function CalculatorIndex() {
         {/* 배상책임 소송가액 계산기 */}
         <Link 
           href="/calculator/liability" 
-          className="group flex flex-col bg-white dark:bg-[#202124] rounded-3xl p-8 border border-gray-100 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(234,67,53,0.1)] hover:-translate-y-2 transition-all duration-500 overflow-hidden relative"
+          className="group flex flex-col bg-white dark:bg-[#202124] rounded-none p-8 border border-gray-100 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(234,67,53,0.1)] hover:-translate-y-2 transition-all duration-500 overflow-hidden relative"
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#fce8e6] to-transparent dark:from-[#d93025]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
           
-          <div className="w-16 h-16 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner group-hover:rotate-12 transition-transform duration-500">
+          <div className="w-16 h-16 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-none flex items-center justify-center text-3xl mb-6 shadow-inner group-hover:rotate-12 transition-transform duration-500">
             ⚖️
           </div>
           
@@ -103,7 +103,7 @@ export default function CalculatorIndex() {
             법원 판례 기준을 엄격히 적용. 위자료, 일실수입, 향후치료비 등 각종 손해배상액의 객관적인 예상 소송가액을 산출합니다.
           </p>
           
-          <div className="flex items-center text-[var(--google-red)] font-bold text-sm bg-[#fce8e6] dark:bg-[#d93025]/10 px-5 py-3 rounded-xl w-fit group-hover:bg-[var(--google-red)] group-hover:text-white transition-colors">
+          <div className="flex items-center text-[var(--google-red)] font-bold text-sm bg-[#fce8e6] dark:bg-[#d93025]/10 px-5 py-3 rounded-none w-fit group-hover:bg-[var(--google-red)] group-hover:text-white transition-colors">
             계산 시작하기 
             <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
           </div>

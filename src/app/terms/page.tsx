@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="bg-white dark:bg-[#202124] rounded-3xl p-6 sm:p-12 border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+    <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-12 border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)]">
       <h1 className="text-2xl sm:text-3xl font-bold text-[#202124] dark:text-[#e8eaed] mb-8 pb-4 border-b border-gray-100 dark:border-white/5">
         이용약관
       </h1>

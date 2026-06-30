@@ -25,9 +25,9 @@ export default function AboutPage() {
       </div>
 
       {/* 2. 우리의 미션 (단일 카드) */}
-      <article className="bg-white dark:bg-[#202124] rounded-3xl p-6 sm:p-8 border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+      <article className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-8 border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)]">
         <div className="mb-4">
-          <span className="px-2.5 py-1 text-[11px] font-bold rounded-md bg-[#e8f0fe] text-[var(--google-blue)] dark:bg-[#174ea6]/20 dark:text-[#8ab4f8]">
+          <span className="px-2.5 py-1 text-[11px] font-bold rounded-none bg-[#e8f0fe] text-[var(--google-blue)] dark:bg-[#174ea6]/20 dark:text-[#8ab4f8]">
             Our Mission
           </span>
         </div>
@@ -54,7 +54,7 @@ export default function AboutPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           
           {/* E: Experience */}
-          <article className="group bg-white dark:bg-[#202124] rounded-3xl p-5 border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300">
+          <article className="group bg-white dark:bg-[#202124] rounded-none p-5 border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300">
             <div className="flex items-center gap-2 mb-3">
               <span className="w-6 h-6 rounded-full bg-[#e8f0fe] text-[var(--google-blue)] dark:bg-[#174ea6]/20 dark:text-[#8ab4f8] flex items-center justify-center font-bold text-xs">E</span>
               <h4 className="text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">
@@ -67,7 +67,7 @@ export default function AboutPage() {
           </article>
 
           {/* E: Expertise */}
-          <article className="group bg-white dark:bg-[#202124] rounded-3xl p-5 border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300">
+          <article className="group bg-white dark:bg-[#202124] rounded-none p-5 border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300">
             <div className="flex items-center gap-2 mb-3">
               <span className="w-6 h-6 rounded-full bg-[#fce8e6] text-[var(--google-red)] dark:bg-[#c5221f]/20 dark:text-[#f28b82] flex items-center justify-center font-bold text-xs">E</span>
               <h4 className="text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-red)] transition-colors">
@@ -80,7 +80,7 @@ export default function AboutPage() {
           </article>
 
           {/* A: Authoritativeness */}
-          <article className="group bg-white dark:bg-[#202124] rounded-3xl p-5 border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300">
+          <article className="group bg-white dark:bg-[#202124] rounded-none p-5 border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300">
             <div className="flex items-center gap-2 mb-3">
               <span className="w-6 h-6 rounded-full bg-[#e6f4ea] text-[var(--google-green)] dark:bg-[#0d652d]/20 dark:text-[#81c995] flex items-center justify-center font-bold text-xs">A</span>
               <h4 className="text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-green)] transition-colors">
@@ -93,7 +93,7 @@ export default function AboutPage() {
           </article>
 
           {/* T: Trustworthiness */}
-          <article className="group bg-white dark:bg-[#202124] rounded-3xl p-5 border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300">
+          <article className="group bg-white dark:bg-[#202124] rounded-none p-5 border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300">
             <div className="flex items-center gap-2 mb-3">
               <span className="w-6 h-6 rounded-full bg-[#fef7e0] text-[#b06000] dark:bg-[#e37400]/20 dark:text-[#fde293] flex items-center justify-center font-bold text-xs">T</span>
               <h4 className="text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[#b06000] dark:group-hover:text-[#fde293] transition-colors">
@@ -109,7 +109,7 @@ export default function AboutPage() {
       </div>
 
       {/* 4. 법적 고지 (Empty State 스타일과 유사하게 미니멀) */}
-      <div className="bg-white dark:bg-[#202124] rounded-3xl p-6 sm:p-8 text-center border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+      <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-8 text-center border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)]">
         <svg className="w-8 h-8 text-[#dadce0] dark:text-[#5f6368] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
         <p className="text-[12px] sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] font-medium leading-relaxed break-keep max-w-2xl mx-auto">
           보상스쿨 헬스케어 & 손해사정 보상가이드에서 제공하는 모든 포스팅 및 통계 정보는 일반적인 참고용 자료입니다. 당사는 사이트 내 정보만으로 직접적인 법률 대리나 의료 진단 행위를 수행하지 않습니다. 정확한 장해 산정 및 합의 절차는 반드시 공인된 독립손해사정사나 법률 전문가와의 1:1 상담을 통해 결정하시기 바랍니다.
@@ -120,7 +120,7 @@ export default function AboutPage() {
       <div className="pt-2">
         <Link 
           href="/blog"
-          className="flex items-center justify-center w-full sm:w-auto mx-auto h-12 rounded-xl bg-white dark:bg-[#202124] px-6 text-sm font-bold text-[#202124] dark:text-[#e8eaed] border border-[var(--google-border)] shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all duration-300 gap-1.5"
+          className="flex items-center justify-center w-full sm:w-auto mx-auto h-12 rounded-none bg-white dark:bg-[#202124] px-6 text-sm font-bold text-[#202124] dark:text-[#e8eaed] border border-[var(--google-border)] shadow-sm hover:shadow-md hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all duration-300 gap-1.5"
         >
           보상 실무 가이드 홈으로 이동
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>

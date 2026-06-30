@@ -25,9 +25,9 @@ export default function MedicalCalculatorPage() {
         </nav>
       </div>
 
-      <article className="w-full bg-white dark:bg-[#202124] rounded-none sm:rounded-3xl px-3 py-6 sm:p-10 lg:p-12 border-y sm:border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] relative">
+      <article className="w-full bg-white dark:bg-[#202124] rounded-none sm:rounded-none px-3 py-6 sm:p-10 lg:p-12 border-y sm:border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] relative">
         <header className="mb-10 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[var(--google-green)] dark:text-[#81c995] mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-none bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[var(--google-green)] dark:text-[#81c995] mb-6">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight mb-4">
@@ -41,7 +41,7 @@ export default function MedicalCalculatorPage() {
 
         <div className="w-full mx-auto">
           {/* 스크롤바와 기기 프레임을 제거하고, 전체 화면에 넓고 세련되게 펼쳐지는 카드 형태로 변경 */}
-          <div className="bg-white dark:bg-[#202124] rounded-2xl sm:rounded-3xl p-2 sm:p-6 shadow-sm border border-gray-100 dark:border-white/5">
+          <div className="bg-white dark:bg-[#202124] rounded-none sm:rounded-none p-2 sm:p-6 shadow-sm border border-gray-100 dark:border-white/5">
             <MedicalCalculatorContainer />
           </div>
         </div>

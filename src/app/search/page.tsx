@@ -71,7 +71,7 @@ function SearchResults() {
             displayResults.map((post) => (
               <article
                 key={post.slug}
-                className="bg-white dark:bg-[#202124] rounded-[24px] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow p-5 sm:p-6"
+                className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow p-5 sm:p-6"
               >
                 <Link href={`/blog/${post.slug}`} className="block group">
                   <h3 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] mb-2 group-hover:text-[var(--google-blue)] transition-colors">
@@ -81,7 +81,7 @@ function SearchResults() {
                     {post.summary}
                   </p>
                   <div className="mt-4 flex items-center gap-2">
-                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md">
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-none">
                       {post.date}
                     </span>
                   </div>
@@ -89,7 +89,7 @@ function SearchResults() {
               </article>
             ))
           ) : (
-            <div className="text-center py-16 bg-white dark:bg-[#202124] rounded-none sm:rounded-[24px] border-y sm:border border-gray-100 dark:border-white/5 shadow-sm">
+            <div className="text-center py-16 bg-white dark:bg-[#202124] rounded-none sm:rounded-none border-y sm:border border-gray-100 dark:border-white/5 shadow-sm">
               <svg className="w-12 h-12 text-[#dadce0] dark:text-[#5f6368] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               <p className="text-sm font-bold tracking-wide text-[#5f6368] dark:text-[#9aa0a6]">
                 일치하는 검색 결과가 없습니다.

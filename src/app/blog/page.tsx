@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 function BlogFallback() {
   return (
     <div className="space-y-8">
-      <div className="text-center py-16 bg-[var(--background)] dark:bg-[#202124] rounded-2xl border border-[var(--google-border)]">
+      <div className="text-center py-16 bg-[var(--background)] dark:bg-[#202124] rounded-none border border-[var(--google-border)]">
         <div className="inline-block w-8 h-8 border-4 border-[var(--google-blue)] border-t-transparent rounded-full animate-spin mb-4" />
         <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6]">페이지 로딩 중...</p>
       </div>

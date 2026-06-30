@@ -160,7 +160,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   } : null;
 
   return (
-    <article className="w-full bg-white dark:bg-[#202124] rounded-none sm:rounded-3xl py-6 sm:p-10 lg:p-12 border-y sm:border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] relative">
+    <article className="w-full bg-white dark:bg-[#202124] rounded-none sm:rounded-none py-6 sm:p-10 lg:p-12 border-y sm:border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] relative">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
@@ -190,11 +190,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       {/* 글 헤더 */}
       <header className="border-b border-[var(--google-border)] pb-8 mb-8 sm:mb-10">
         <div className="flex flex-wrap items-center gap-3 text-xs mb-4">
-          <span className="px-2.5 py-1 font-bold rounded-md bg-[var(--google-surface-variant)] text-[#5f6368] dark:bg-[#303134] dark:text-[#9aa0a6] border border-transparent">
+          <span className="px-2.5 py-1 font-bold rounded-none bg-[var(--google-surface-variant)] text-[#5f6368] dark:bg-[#303134] dark:text-[#9aa0a6] border border-transparent">
             {post.category}
           </span>
           {post.caseNumber && (
-            <span className="px-2.5 py-1 font-bold rounded-md bg-[#fce8e6] dark:bg-[#c5221f]/10 text-[#c5221f] dark:text-[#f28b82] border border-[#f28b82]/30 flex items-center gap-1">
+            <span className="px-2.5 py-1 font-bold rounded-none bg-[#fce8e6] dark:bg-[#c5221f]/10 text-[#c5221f] dark:text-[#f28b82] border border-[#f28b82]/30 flex items-center gap-1">
               ⚖️ 사건번호: {post.caseNumber}
             </span>
           )}
@@ -211,7 +211,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </time>
           )}
           {post.specialtyCategory && (
-            <span className="px-2.5 py-1 font-bold rounded-md bg-[#e8f0fe] dark:bg-[#174ea6]/20 text-[var(--google-blue)] dark:text-[#8ab4f8] text-xs">
+            <span className="px-2.5 py-1 font-bold rounded-none bg-[#e8f0fe] dark:bg-[#174ea6]/20 text-[var(--google-blue)] dark:text-[#8ab4f8] text-xs">
               {post.specialtyCategory}
             </span>
           )}
@@ -287,7 +287,7 @@ function RelatedPostsBox({
           <Link
             key={p.slug}
             href={`/blog/${p.slug}`}
-            className="group flex flex-col gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-[#2d2e30] border border-gray-100 dark:border-white/5 hover:border-[#1A73E8]/30 hover:bg-[#f0f7ff] dark:hover:bg-[#1a2540] hover:shadow-md transition-all duration-200"
+            className="group flex flex-col gap-2 p-4 rounded-none bg-gray-50 dark:bg-[#2d2e30] border border-gray-100 dark:border-white/5 hover:border-[#1A73E8]/30 hover:bg-[#f0f7ff] dark:hover:bg-[#1a2540] hover:shadow-md transition-all duration-200"
           >
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e8f0fe] dark:bg-[#174ea6]/20 text-[#1A73E8] dark:text-[#8ab4f8] w-fit">
               {p.category}

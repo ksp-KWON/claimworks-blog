@@ -30,7 +30,7 @@ export default function YouTubeBriefingClient({ videos: initialVideos }: { video
   const sideVideos = videos.slice(1, 4); // 최대 3개 노출
 
   return (
-    <section className="mb-12 relative">
+    <section className="mb-12 relative bg-white dark:bg-[#1e1e20] border border-gray-200 dark:border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm">
       
       {/* 1. 메인 블로그 인트로와 동일한 헤더 스타일 유지하되 프리미엄 요소 추가 */}
       <div className="border-b border-[var(--google-border)] pb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-0 mb-6">
@@ -64,7 +64,7 @@ export default function YouTubeBriefingClient({ videos: initialVideos }: { video
           href={`https://youtu.be/${featuredVideo.id}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="group lg:col-span-2 relative block overflow-hidden rounded-2xl sm:rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_16px_40px_rgba(255,0,0,0.12)] transition-all duration-500 min-h-[260px] sm:min-h-[380px] bg-zinc-900"
+          className="group lg:col-span-2 relative block overflow-hidden rounded-2xl sm:rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_16px_40px_rgba(255,0,0,0.12)] transition-all duration-500 aspect-video bg-zinc-900"
         >
           {/* 썸네일 */}
           <Image 
@@ -106,7 +106,7 @@ export default function YouTubeBriefingClient({ videos: initialVideos }: { video
         </a>
 
         {/* 사이드 영상 리스트 */}
-        <div className="flex flex-col gap-3 sm:gap-4 h-full justify-between">
+        <div className="flex flex-col gap-3 sm:gap-4">
           {sideVideos.map((video) => (
             <a
               key={video.id}
@@ -133,7 +133,7 @@ export default function YouTubeBriefingClient({ videos: initialVideos }: { video
               
               {/* 텍스트 정보 */}
               <div className="flex flex-col flex-1 py-0.5 pr-1">
-                <h4 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[#FF0000] transition-colors line-clamp-2 leading-snug mb-2">
+                <h4 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[#FF0000] transition-colors leading-snug mb-2 break-keep">
                   {video.title}
                 </h4>
                 <div className="mt-auto flex items-center justify-between text-[11px] sm:text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6]">

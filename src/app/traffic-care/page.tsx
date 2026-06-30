@@ -327,10 +327,11 @@ export default function TrafficCarePage() {
   const activeZone = zones.find(z => z.id === selectedZoneId) || zones[0] || null;
 
   return (
+    <>
     <div className="space-y-8 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-      
+      <div className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:border-[#137333] hover:shadow-[0_16px_50px_rgba(19,115,51,0.2)] transition-all duration-300 overflow-hidden">
       {/* 💡 상단 정보성 띠 배너 (에메랄드 그린 포인트 테마 - 패밀리룩) */}
-      <div className="bg-[#137333] text-white px-4 py-3 rounded-none flex items-center justify-between flex-wrap gap-3 shadow-md">
+      <div className="bg-[#137333] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2.5">
           <span className="text-lg shrink-0"><IconShield className="w-5 h-5" /></span>
           <div className="text-xs sm:text-sm font-extrabold tracking-tight">
@@ -349,6 +350,7 @@ export default function TrafficCarePage() {
         </button>
       </div>
 
+      <div className="p-6 sm:p-10 space-y-8">
       {/* 헤더 타이틀 (다른 검색센터와 완벽한 패밀리룩 일치) */}
       <div className="text-center space-y-3">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
@@ -360,7 +362,7 @@ export default function TrafficCarePage() {
       </div>
 
       {/* 행정구역 선택 박스 영역 */}
-      <div id="search-box-area" className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] space-y-4">
+      <div id="search-box-area" className="space-y-4">
         <div className="flex gap-3 flex-col sm:flex-row items-stretch">
           <div className="flex-1 grid grid-cols-2 gap-3">
             <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2">
@@ -396,6 +398,9 @@ export default function TrafficCarePage() {
             {loading ? '분석 중...' : '실시간 지역 분석'}
           </button>
         </div>
+      </div>
+    </div>
+
       </div>
 
       {/* 실시간 로딩바 (에메랄드 그린 테마) */}
@@ -719,5 +724,6 @@ export default function TrafficCarePage() {
         <span>본 교통사고 로컬 안심케어 서비스는 도로교통공단 및 심평원의 공공 데이터에 기반하여 참고용으로 제공되는 정보로, 법적 판결이나 배상 합의에 직접적인 대행 행위를 하지 않으며, 실제 사고 시에는 전문 손해사정사의 검토를 받으셔야 권리를 온전히 확보할 수 있습니다.</span>
       </div>
     </div>
+    </>
   );
 }

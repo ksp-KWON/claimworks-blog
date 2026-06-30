@@ -167,10 +167,12 @@ export default function FssNewsPage() {
   };
 
   return (
+    <>
     <div className="space-y-8 max-w-4xl mx-auto">
+      <div className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:border-red-500 hover:shadow-[0_16px_50px_rgba(239,68,68,0.2)] transition-all duration-300 overflow-hidden">
       {/* 🚨 실시간 소비자 이슈 브리핑 상단 띠 배너 */}
       {latestAlert && (
-        <div className="bg-red-600 text-white px-4 py-3 rounded-none flex items-center justify-between flex-wrap gap-3 shadow-md animate-pulse">
+        <div className="bg-red-600 text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3 animate-pulse">
           <div className="flex items-center gap-2.5">
             <span className="text-lg shrink-0">🚨</span>
             <div className="text-xs sm:text-sm font-extrabold tracking-tight">
@@ -190,6 +192,7 @@ export default function FssNewsPage() {
         </div>
       )}
 
+      <div className="p-6 sm:p-10 space-y-8">
       {/* 헤더 타이틀 */}
       <div className="text-center space-y-3">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
@@ -201,7 +204,7 @@ export default function FssNewsPage() {
       </div>
 
       {/* 검색 박스 영역 */}
-      <div className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)]">
+      <div className="space-y-4">
         <form onSubmit={handleSearchSubmit} className="flex gap-2 flex-col sm:flex-row">
           <input
             type="text"
@@ -241,6 +244,10 @@ export default function FssNewsPage() {
             </button>
           ))}
         </div>
+      </div>
+    </div>
+
+      </div>
       </div>
 
       {/* 실시간 로딩 피드백 안내창 */}
@@ -407,6 +414,6 @@ export default function FssNewsPage() {
           )}
         </>
       )}
-    </div>
+    </>
   );
 }

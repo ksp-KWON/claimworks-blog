@@ -126,7 +126,7 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
       </div>
     ),
     th: ({ children }) => (
-      <th className="bg-[#E8F0FE] dark:bg-[#1A73E8]/20 p-3.5 text-left font-bold text-[#1A73E8] dark:text-[#8ab4f8] border-b border-[#dadce0]">{children}</th>
+      <th className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-3.5 text-center font-extrabold text-[#1a73e8] dark:text-[#8ab4f8] border-b border-[#dadce0]">{children}</th>
     ),
     td: ({ children }) => (
       <td className="p-3.5 border-b border-[#f1f3f4] dark:border-[#3c4043] align-top text-[#202124] dark:text-[#e8eaed]">{children}</td>
@@ -175,10 +175,10 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
         <div className="my-8 relative w-full mx-auto">
           <button
             onClick={() => setCalcOpen(!calcOpen)}
-            className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 text-left cursor-pointer shadow-xs hover:shadow-sm ${
+            className={`w-full flex items-center justify-between p-4 rounded-none border transition-all duration-300 text-left cursor-pointer shadow-[0_4px_15px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_30px_rgba(26,115,232,0.15)] ${
               isAuto 
-                ? 'bg-blue-50/50 hover:bg-blue-50 border-blue-100 dark:bg-blue-950/10 dark:hover:bg-blue-950/20 dark:border-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8]' 
-                : 'bg-green-50/50 hover:bg-green-50 border-green-100 dark:bg-green-950/10 dark:hover:bg-green-950/20 dark:border-green-900/30 text-[#34A853] dark:text-[#81c995]'
+                ? 'bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border-blue-200 dark:from-blue-900/10 dark:to-indigo-900/10 dark:hover:from-blue-900/20 dark:hover:to-indigo-900/20 dark:border-blue-800/30 text-[#1a73e8] dark:text-[#8ab4f8]' 
+                : 'bg-gradient-to-br from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 border-green-200 dark:from-green-900/10 dark:to-emerald-900/10 dark:hover:from-green-900/20 dark:hover:to-emerald-900/20 dark:border-green-800/30 text-[#34A853] dark:text-[#81c995]'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -200,8 +200,9 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
           </button>
           
           {calcOpen && (
-            <div className="mt-4 bg-white dark:bg-[#202124] rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.4)] border border-gray-150 dark:border-white/8 overflow-visible animate-in slide-in-from-top-3 fade-in duration-200">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-white/8">
+            <div className="mt-4 bg-white dark:bg-[#202124] rounded-none shadow-[0_6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] border border-gray-200 dark:border-white/10 overflow-visible animate-in slide-in-from-top-3 fade-in duration-200 relative group">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-white/8 mt-1.5">
                 <div className="flex items-center gap-2.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#1A73E8] animate-pulse shadow-[0_0_6px_#1A73E8]" />
                   <span className="text-[11px] font-extrabold text-[#1A73E8] dark:text-[#8ab4f8] tracking-[0.15em] uppercase">

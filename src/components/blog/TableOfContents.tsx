@@ -26,7 +26,10 @@ export default function TableOfContents({
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" />
           </svg>
         </div>
-        <span className="text-[13px] font-extrabold text-gray-900 dark:text-white uppercase tracking-[0.1em]">이 글의 목차</span>
+        <div>
+          <span className="block text-[15px] font-black text-gray-900 dark:text-white uppercase tracking-[0.05em]">이 글의 목차</span>
+          <span className="block text-[12px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">목차를 클릭하면 해당 내용으로 이동합니다</span>
+        </div>
       </div>
 
       <ul className="px-6 py-5 space-y-3">
@@ -37,7 +40,7 @@ export default function TableOfContents({
               <a
                 href={`#${item.id}`}
                 onClick={(e) => onItemClick(e, item.id)}
-                className="group flex items-start gap-3.5 w-full"
+                className="group flex items-start gap-3 w-full"
               >
                 <span className={`w-6 h-6 rounded-none text-[12px] font-bold flex items-center justify-center shrink-0 mt-[2px] transition-colors ${
                   isActive
@@ -47,12 +50,15 @@ export default function TableOfContents({
                   {i + 1}
                 </span>
                 
-                <span className={`text-[15px] leading-[1.7] break-keep transition-colors ${
+                <span className={`flex-1 text-[15.5px] leading-[1.7] break-keep transition-colors ${
                   isActive 
                     ? 'font-bold text-[#1a73e8] dark:text-[#8ab4f8]' 
-                    : 'font-medium text-gray-700 dark:text-gray-300 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'
+                    : 'font-semibold text-gray-700 dark:text-gray-300 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'
                 }`}>
                   {item.text}
+                </span>
+                <span className={`shrink-0 mt-1 transition-all duration-300 ${isActive ? 'opacity-100 text-[#1a73e8] dark:text-[#8ab4f8] translate-x-0' : 'opacity-0 text-gray-400 group-hover:opacity-100 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] -translate-x-2 group-hover:translate-x-0'}`}>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                 </span>
               </a>
             </li>

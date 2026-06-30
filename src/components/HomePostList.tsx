@@ -142,10 +142,10 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
             <div className="flex items-center justify-between mb-8 relative z-10 group/header">
               
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-none flex items-center justify-center bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50 shadow-sm ${primaryColor.arrowColor}`}>
-                  <span className="text-xl sm:text-2xl drop-shadow-sm" aria-hidden="true">{primaryColor.icon}</span>
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-none flex items-center justify-center bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50 shadow-sm ${primaryColor.arrowColor}`}>
+                  <span className="text-lg sm:text-xl drop-shadow-sm" aria-hidden="true">{primaryColor.icon}</span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] tracking-tight">
+                <h2 className="text-lg sm:text-xl font-bold text-[#202124] dark:text-[#e8eaed] tracking-tight">
                   {category}
                 </h2>
               </div>

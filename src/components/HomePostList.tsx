@@ -24,7 +24,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-red-600 dark:group-hover:text-red-400',
       arrowColor: 'text-red-500',
       accentBg: 'bg-red-500',
-      hoverBorder: 'hover:border-red-500 hover:shadow-[0_12px_40px_rgba(239,68,68,0.15)]',
+      hoverBorder: 'hover:border-red-500 hover:shadow-[0_16px_50px_rgba(239,68,68,0.3)]',
       icon: '🚗'
     };
   }
@@ -35,7 +35,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-rose-600 dark:group-hover:text-rose-400',
       arrowColor: 'text-rose-500',
       accentBg: 'bg-rose-500',
-      hoverBorder: 'hover:border-rose-500 hover:shadow-[0_12px_40px_rgba(244,63,94,0.15)]',
+      hoverBorder: 'hover:border-rose-500 hover:shadow-[0_16px_50px_rgba(244,63,94,0.3)]',
       icon: '⚖️'
     };
   }
@@ -46,7 +46,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-blue-600 dark:group-hover:text-blue-400',
       arrowColor: 'text-blue-500',
       accentBg: 'bg-blue-500',
-      hoverBorder: 'hover:border-blue-500 hover:shadow-[0_12px_40px_rgba(59,130,246,0.15)]',
+      hoverBorder: 'hover:border-blue-500 hover:shadow-[0_16px_50px_rgba(59,130,246,0.3)]',
       icon: '🏥'
     };
   }
@@ -57,7 +57,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-green-600 dark:group-hover:text-green-400',
       arrowColor: 'text-green-500',
       accentBg: 'bg-green-500',
-      hoverBorder: 'hover:border-green-500 hover:shadow-[0_12px_40px_rgba(34,197,94,0.15)]',
+      hoverBorder: 'hover:border-green-500 hover:shadow-[0_16px_50px_rgba(34,197,94,0.3)]',
       icon: '🛡️'
     };
   }
@@ -68,7 +68,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-teal-600 dark:group-hover:text-teal-400',
       arrowColor: 'text-teal-500',
       accentBg: 'bg-teal-500',
-      hoverBorder: 'hover:border-teal-500 hover:shadow-[0_12px_40px_rgba(20,184,166,0.15)]',
+      hoverBorder: 'hover:border-teal-500 hover:shadow-[0_16px_50px_rgba(20,184,166,0.3)]',
       icon: '👷'
     };
   }
@@ -79,7 +79,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-purple-600 dark:group-hover:text-purple-400',
       arrowColor: 'text-purple-500',
       accentBg: 'bg-purple-500',
-      hoverBorder: 'hover:border-purple-500 hover:shadow-[0_12px_40px_rgba(168,85,247,0.15)]',
+      hoverBorder: 'hover:border-purple-500 hover:shadow-[0_16px_50px_rgba(168,85,247,0.3)]',
       icon: '♿'
     };
   }
@@ -90,7 +90,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400',
       arrowColor: 'text-indigo-500',
       accentBg: 'bg-indigo-500',
-      hoverBorder: 'hover:border-indigo-500 hover:shadow-[0_12px_40px_rgba(99,102,241,0.15)]',
+      hoverBorder: 'hover:border-indigo-500 hover:shadow-[0_16px_50px_rgba(99,102,241,0.3)]',
       icon: '📖'
     };
   }
@@ -102,7 +102,7 @@ export function getCategoryColor(category: string) {
     hoverText: 'group-hover:text-yellow-600 dark:group-hover:text-yellow-400',
     arrowColor: 'text-yellow-500',
     accentBg: 'bg-yellow-500',
-    hoverBorder: 'hover:border-yellow-500 hover:shadow-[0_12px_40px_rgba(234,179,8,0.15)]',
+    hoverBorder: 'hover:border-yellow-500 hover:shadow-[0_16px_50px_rgba(234,179,8,0.3)]',
     icon: '💡'
   };
 }
@@ -136,7 +136,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
         const displayPosts = posts.slice(0, 2); // 각 블록당 최대 2개 노출
 
         return (
-          <section key={category} className={`bg-white dark:bg-[#202124] border border-gray-100 dark:border-white/5 rounded-none p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] ${primaryColor.hoverBorder} transition-all duration-300 relative overflow-hidden group/box`}>
+          <section key={category} className={`bg-white dark:bg-[#202124] border border-gray-100 dark:border-white/5 rounded-none p-6 sm:p-8 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] ${primaryColor.hoverBorder} transition-all duration-300 relative overflow-hidden group/box`}>
             
             {/* 블록 헤더 - 뉴모피즘 기반의 깔끔한 배치 */}
             <div className="flex items-center justify-between mb-8 relative z-10 group/header">
@@ -166,7 +166,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
                 return (
                   <article 
                     key={post.slug}
-                    className={`group relative bg-white dark:bg-zinc-800/40 rounded-none overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] ${primaryColor.hoverBorder} transition-all duration-300 flex flex-col min-h-[220px]`}
+                    className={`group relative bg-white dark:bg-zinc-800/40 rounded-none overflow-hidden border border-gray-100 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] ${primaryColor.hoverBorder} transition-all duration-300 flex flex-col min-h-[220px]`}
                   >
                     <Link href={`/blog/${post.slug}`} className="p-4 sm:p-5 flex flex-col justify-between h-full flex-1">
                       

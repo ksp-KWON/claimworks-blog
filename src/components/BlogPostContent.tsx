@@ -126,7 +126,7 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
       </div>
     ),
     th: ({ children }) => (
-      <th className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-3.5 text-center font-black text-[17px] text-[#1a73e8] dark:text-[#8ab4f8] border-b border-[#dadce0]">{children}</th>
+      <th className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-3.5 text-center font-bold text-[#1a73e8] dark:text-[#8ab4f8] border-b border-[#dadce0]">{children}</th>
     ),
     td: ({ children }) => (
       <td className="p-3.5 border-b border-[#f1f3f4] dark:border-[#3c4043] align-top text-[#202124] dark:text-[#e8eaed]">{children}</td>

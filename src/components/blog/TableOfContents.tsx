@@ -27,7 +27,7 @@ export default function TableOfContents({
           </svg>
         </div>
         <div>
-          <span className="block text-[15px] font-black text-gray-900 dark:text-white uppercase tracking-[0.05em]">이 글의 목차</span>
+          <span className="block text-[16px] font-extrabold text-gray-900 dark:text-white tracking-tight">이 글의 목차</span>
           <span className="block text-[12px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">목차를 클릭하면 해당 내용으로 이동합니다</span>
         </div>
       </div>

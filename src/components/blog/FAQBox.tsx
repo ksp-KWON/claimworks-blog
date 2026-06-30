@@ -23,7 +23,7 @@ export default function FAQBox({ items }: FAQBoxProps) {
           <span className="text-xl">💡</span>
         </div>
         <div>
-          <p className="font-black text-gray-900 dark:text-white text-[17px] tracking-tight">
+          <p className="font-extrabold text-gray-900 dark:text-white text-[16px] tracking-tight">
             자주 묻는 질문 FAQ TOP {items.length}
           </p>
           <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5 font-medium">

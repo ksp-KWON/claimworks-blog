@@ -14,7 +14,7 @@ export default function KeyPointsBox({ points }: KeyPointsBoxProps) {
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </div>
-        <span className="text-[15px] font-black text-gray-900 dark:text-white uppercase tracking-[0.05em]">핵심 요약 포인트</span>
+        <span className="text-[16px] font-extrabold text-gray-900 dark:text-white uppercase tracking-tight">핵심 요약 포인트</span>
       </div>
       <ul className="px-4 py-4 space-y-3">
         {points.map((point, i) => (

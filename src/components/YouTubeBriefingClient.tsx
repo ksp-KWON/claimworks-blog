@@ -29,30 +29,35 @@ export default function YouTubeBriefingClient({ videos: initialVideos }: { video
   const displayVideos = videos.slice(0, 4);
 
   return (
-    <section className="mb-12 relative bg-white dark:bg-[#1e1e20] border border-gray-200 dark:border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm">
+    <section className="mb-12 relative">
       
-      {/* 1. 메인 블로그 인트로와 동일한 헤더 스타일 유지하되 프리미엄 요소 추가 */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-red-50/80 via-white to-gray-50/50 dark:from-red-900/10 dark:via-[#1e1e20] dark:to-[#1e1e20] -mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-6 py-6 sm:px-8 sm:py-8 mb-6 rounded-t-2xl sm:rounded-t-3xl border-b border-gray-100 dark:border-white/5 flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-0">
-        <div className="absolute top-0 left-0 w-1.5 h-full bg-[#FF0000]"></div>
-        <div className="relative z-10 pl-2 sm:pl-3 flex-1">
-          <h2 className="text-xl sm:text-2xl font-extrabold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 tracking-tight">
-            <svg className="w-6 h-6 sm:w-7 sm:h-7 text-[#FF0000] drop-shadow-sm" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-            </svg>
-            보상스쿨 미디어 센터
-            <a 
-              href="https://www.youtube.com/@bosangschool" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-[#FF0000] transition-colors ml-1" 
-              title="유튜브 채널 홈으로 이동"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-            </a>
-          </h2>
-          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-2.5 break-keep leading-relaxed font-medium">
-            어렵고 복잡한 보상 실무와 의학 지식을 보상스쿨 전문가가 영상으로 알기 쉽게 브리핑합니다.
-          </p>
+      {/* 1. 라벨지 스타일 헤더 */}
+      <div className="flex flex-col items-start gap-2.5 sm:gap-3 mb-6 px-1 sm:px-0">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 dark:bg-red-900/30 text-[#FF0000] dark:text-red-400 font-bold text-xs sm:text-sm border border-red-100 dark:border-red-800/50 shadow-sm">
+          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+          전문가 브리핑
+        </div>
+        
+        <div className="flex w-full items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight flex items-center gap-2">
+              보상스쿨 미디어 센터
+              <a 
+                href="https://www.youtube.com/@bosangschool" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#FF0000] transition-colors ml-1" 
+                title="유튜브 채널 홈으로 이동"
+              >
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              </a>
+            </h2>
+            <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-2.5 break-keep leading-relaxed font-medium">
+              어렵고 복잡한 보상 실무와 의학 지식을 보상스쿨 전문가가 영상으로 알기 쉽게 브리핑합니다.
+            </p>
+          </div>
         </div>
       </div>
 

@@ -138,23 +138,21 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
         return (
           <section key={category} className={`bg-white dark:bg-[#202124] border border-gray-100 dark:border-white/5 rounded-none p-6 sm:p-8 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] ${primaryColor.hoverBorder} transition-all duration-300 relative overflow-hidden group/box`}>
             
-            {/* 블록 헤더 - 뉴모피즘 기반의 깔끔한 배치 */}
-            <div className="flex items-center justify-between mb-8 relative z-10 group/header">
+            {/* 블록 헤더 - 사이드바 패밀리룩 디자인으로 변경하여 안정감 부여 */}
+            <div className="flex items-end justify-between mb-6 pb-2 border-b border-gray-100 dark:border-white/5 relative z-10 group/header">
               
-              <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-none flex items-center justify-center bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50 shadow-sm ${primaryColor.arrowColor}`}>
-                  <span className="text-lg sm:text-xl drop-shadow-sm" aria-hidden="true">{primaryColor.icon}</span>
-                </div>
+              <div className={`flex items-center gap-2 border-l-4 border-current pl-2.5 sm:pl-3 ${primaryColor.arrowColor}`}>
+                <span className="text-xl sm:text-2xl leading-none" aria-hidden="true">{primaryColor.icon}</span>
                 <h2 className="text-lg sm:text-xl font-bold text-[#202124] dark:text-[#e8eaed] tracking-tight">
                   {category}
                 </h2>
               </div>
               <Link 
                 href={`/search?q=${encodeURIComponent(category)}`}
-                className={`flex items-center gap-1.5 px-4 py-2 sm:px-6 sm:py-2.5 rounded-none bg-white dark:bg-zinc-800 text-[13px] sm:text-sm font-bold ${primaryColor.arrowColor} border border-gray-100 dark:border-zinc-700/50 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all duration-300`}
+                className={`flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-current transition-colors group/link ${primaryColor.hoverText}`}
               >
                 전체보기
-                <svg className="w-4 h-4 transition-transform duration-300 group-hover/header:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
               </Link>
             </div>
 

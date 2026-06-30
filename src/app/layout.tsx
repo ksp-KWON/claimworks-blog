@@ -122,18 +122,16 @@ export default function RootLayout({
             <div className="flex items-center min-w-0 flex-1 mr-1 sm:mr-2">
               <div className="font-sans font-extrabold text-lg sm:text-xl min-w-0 tracking-tight">
                 <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-none bg-gradient-to-br from-[var(--google-blue)] to-indigo-600 text-white shadow-md group-hover:scale-105 transition-transform">
-                    <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
-                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                    </svg>
+                  <div className="relative w-8 h-8 sm:w-9 sm:h-9 shrink-0 group-hover:scale-105 transition-transform drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] dark:drop-shadow-[0_2px_6px_rgba(255,255,255,0.2)]">
+                    <img src="/images/logo-icon.png" alt="보상스쿨 TV" className="w-full h-full object-contain" />
                   </div>
-                  <span className="hidden sm:inline bg-gradient-to-r from-[var(--google-blue)] to-indigo-600 dark:from-[#8ab4f8] dark:to-indigo-400 bg-clip-text text-transparent drop-shadow-sm group-hover:opacity-80 transition-opacity truncate">
+                  <span className="hidden sm:inline bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-400 bg-clip-text text-transparent drop-shadow-sm group-hover:opacity-80 transition-opacity truncate">
                     보상스쿨 헬스케어 &amp; 손해사정 보상가이드
                   </span>
-                  <span className="sm:hidden text-[15px] bg-gradient-to-r from-[var(--google-blue)] to-indigo-600 bg-clip-text text-transparent truncate">
+                  <span className="sm:hidden text-[15px] bg-gradient-to-r from-red-600 to-[#1a73e8] bg-clip-text text-transparent truncate">
                     보상스쿨&apos;s 보상가이드
                   </span>
-                  <span className="hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-none border border-[var(--google-blue)]/30 bg-blue-50/50 dark:bg-blue-900/20 text-[9px] font-black text-[var(--google-blue)] dark:text-[#8ab4f8] tracking-widest uppercase">
+                  <span className="hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-none border border-[#1a73e8]/30 bg-blue-50/50 dark:bg-blue-900/20 text-[9px] font-black text-[#1a73e8] dark:text-[#8ab4f8] tracking-widest uppercase">
                     Integrated Hub
                   </span>
                 </Link>
@@ -148,14 +146,14 @@ export default function RootLayout({
               
               {/* 데스크탑 네비게이션 */}
               <nav className="hidden md:flex items-center space-x-1 sm:space-x-1.5">
-                <Link href="/" className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-gray-200 dark:hover:border-gray-700 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-gray-50 dark:hover:bg-[#202124] hover:text-[var(--google-blue)] transition-all duration-200 flex items-center justify-center group" aria-label="홈" title="홈">
-                  <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+                <Link href="/" className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 text-[#3c4043] dark:text-[#e8eaed] hover:bg-gradient-to-br hover:from-red-50/50 hover:to-blue-50/50 dark:hover:from-red-900/20 dark:hover:to-blue-900/20 hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:shadow-sm transition-all duration-200 flex items-center justify-center group" aria-label="홈" title="홈">
+                  <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                   </svg>
                 </Link>
-                <Link href="/calculator" className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-gray-200 dark:hover:border-gray-700 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-gray-50 dark:hover:bg-[#202124] hover:text-[var(--google-blue)] transition-all duration-200 flex items-center justify-center group" aria-label="계산기" title="계산기">
-                  <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+                <Link href="/calculator" className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 text-[#3c4043] dark:text-[#e8eaed] hover:bg-gradient-to-br hover:from-red-50/50 hover:to-blue-50/50 dark:hover:from-red-900/20 dark:hover:to-blue-900/20 hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:shadow-sm transition-all duration-200 flex items-center justify-center group" aria-label="계산기" title="계산기">
+                  <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
                     <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
                     <line x1="8" y1="6" x2="16" y2="6"></line>
                     <line x1="8" y1="10" x2="8.01" y2="10"></line>
@@ -169,8 +167,8 @@ export default function RootLayout({
                     <line x1="16" y1="18" x2="16.01" y2="18"></line>
                   </svg>
                 </Link>
-                <Link href="/blog" className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-gray-200 dark:hover:border-gray-700 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-gray-50 dark:hover:bg-[#202124] hover:text-[var(--google-blue)] transition-all duration-200 flex items-center justify-center group" aria-label="블로그" title="블로그">
-                  <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+                <Link href="/blog" className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 text-[#3c4043] dark:text-[#e8eaed] hover:bg-gradient-to-br hover:from-red-50/50 hover:to-blue-50/50 dark:hover:from-red-900/20 dark:hover:to-blue-900/20 hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:shadow-sm transition-all duration-200 flex items-center justify-center group" aria-label="블로그" title="블로그">
+                  <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
                     <path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"></path>
                     <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
                     <path d="M3 15h6"></path>
@@ -191,8 +189,8 @@ export default function RootLayout({
                 </div>
 
                 {/* 플랫폼 소개 아이콘 */}
-                <Link href="/about" className="p-1.5 sm:p-2 rounded-none border border-transparent hover:border-gray-200 dark:hover:border-gray-700 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-gray-50 dark:hover:bg-[#202124] hover:text-[var(--google-blue)] transition-all duration-200 flex items-center justify-center group" aria-label="플랫폼 소개" title="플랫폼 소개">
-                  <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+                <Link href="/about" className="p-1.5 sm:p-2 rounded-none border border-transparent hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 text-[#3c4043] dark:text-[#e8eaed] hover:bg-gradient-to-br hover:from-red-50/50 hover:to-blue-50/50 dark:hover:from-red-900/20 dark:hover:to-blue-900/20 hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:shadow-sm transition-all duration-200 flex items-center justify-center group" aria-label="플랫폼 소개" title="플랫폼 소개">
+                  <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="16" x2="12" y2="12"></line>
                     <line x1="12" y1="8" x2="12.01" y2="8"></line>

@@ -255,6 +255,41 @@ A: {팩트 기반 답변}
 `;
 }
 
+function getPrecedentRole() {
+  return `# Role\n당신은 '보상스쿨' 블로그의 판례 분석 전문가이자 손해사정 테크니컬 라이터입니다.`;
+}
+
+function getPrecedentObjective() {
+  return `# Objective\n제시된 판례를 바탕으로, 공통 글쓰기 규칙을 완벽히 만족하며 구글 E-E-A-T 기준에 부합하는 전문가 칼럼을 작성합니다.`;
+}
+
+function getBlogLengthRulesManual() {
+  return `## 분량 및 형식 규칙 (수동 대본 포장)
+- 사용자가 입력한 대본이나 원문을 **최대한 보존**하되, 가독성을 극대화하기 위해 적절한 소제목(H2), 불릿 포인트, 강조 태그 등을 덧붙여 **고품질의 블로그 포스팅** 형태로 포장(Packaging)하십시오.
+- 불필요하게 내용을 덧붙여 분량을 부풀리지 말고, 원문의 밀도와 흐름을 살리는 데 집중하십시오.`;
+}
+
+function getBlogLengthRulesSemiAuto() {
+  return `## 분량 및 창작 규칙 (반자동 창작)
+- 사용자가 입력한 키워드, 개요 또는 참고 링크만을 바탕으로 **완전히 새로운 방대한 양의 전문 칼럼**을 창작하십시오.
+- 타겟 모델의 물리 한계 스펙 내에서 허용하는 최대 분량으로, 각 H2 섹션마다 매우 상세하고 깊이 있는 전문가적 해설과 예시를 풍부하게 작성하십시오.`;
+}
+
+function getBlogFrontmatter(titleGuide, currentDate) {
+  return `## Frontmatter (YAML) 형식
+결과물 최상단에 반드시 아래 형식의 Frontmatter를 포함하십시오. (값은 주제에 맞게 AI가 스스로 판단하여 작성하세요.)
+\`\`\`yaml
+---
+title: "{${titleGuide}}"
+date: "${currentDate}"
+category: "{관련 카테고리 기입}"
+tags: [{관련 태그 3~5개}]
+slug: "{영어-소문자-하이픈-조합의-주소}"
+calculatorType: "auto"
+---
+\`\`\``;
+}
+
 function calculateModelCapacity(maxTokens) {
   const safetyLimitChar = Math.floor(maxTokens / 3.0);
   const minRecommended = Math.floor(safetyLimitChar * 0.45);
@@ -297,9 +332,14 @@ module.exports = {
   STRICT_RULES,
   getRandomAngle,
   getBlogRole,
+  getPrecedentRole,
   getBlogObjective,
+  getPrecedentObjective,
   getBlogMetaFirstLine,
   getPrecedentMetaFirstLine,
+  getBlogLengthRulesManual,
+  getBlogLengthRulesSemiAuto,
+  getBlogFrontmatter,
   getTopicPlanningPrompt,
   getPrecedentPlanningPrompt,
   getBlogSkeleton,

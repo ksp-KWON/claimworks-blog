@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import BlogPostContent from '@/components/BlogPostContent';
 import { 
   STRICT_RULES, 
+  getRandomAngle,
   getBlogRole, 
   getBlogLengthRulesManual, 
   getBlogLengthRulesSemiAuto, 
@@ -361,6 +362,7 @@ export default function AdminPage() {
     const strictRulesPrompt = `${STRICT_RULES}\n\n# 기존 글 슬러그 목록 (참고용):\n${existingPostsList}`;
     const calcTag = '<calculator type="auto" />'; // 기본값 auto 주입
     const currentDate = new Date().toISOString().split('T')[0];
+    const angle = getRandomAngle();
 
     let prompt = "";
     if (mode === 'manual') {
@@ -380,7 +382,7 @@ ${getBlogFrontmatter('알맞은 제목 생성 (어색한 콜론 사용 금지, �
 제시된 원문 대본 내용:
 ${inputText}
 
-${getBlogSkeleton(calcTag, existingPostsList)}
+${getBlogSkeleton(angle, calcTag, existingPostsList)}
 
 위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.
 `;
@@ -401,7 +403,7 @@ ${getBlogFrontmatter('매력적인 제목 생성 (어색한 콜론 사용 금지
 제시된 주제/키워드/참고링크:
 ${inputText}
 
-${getBlogSkeleton(calcTag, existingPostsList)}
+${getBlogSkeleton(angle, calcTag, existingPostsList)}
 
 위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.
 `;

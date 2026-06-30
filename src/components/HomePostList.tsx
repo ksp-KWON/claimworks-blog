@@ -145,7 +145,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
                 <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-none flex items-center justify-center bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50 shadow-sm ${primaryColor.arrowColor}`}>
                   <span className="text-xl sm:text-2xl drop-shadow-sm" aria-hidden="true">{primaryColor.icon}</span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] tracking-tight">
                   {category}
                 </h2>
               </div>
@@ -190,7 +190,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
 
                       {/* 중단: 제목 및 설명 */}
                       <div className="min-w-0 flex-1 space-y-2">
-                        <h3 className={`text-base font-bold text-[#202124] dark:text-[#e8eaed] ${primaryColor.hoverText} transition-colors line-clamp-2 leading-snug break-keep`}>
+                        <h3 className={`text-sm font-bold text-[#202124] dark:text-[#e8eaed] ${primaryColor.hoverText} transition-colors line-clamp-2 leading-snug break-keep`}>
                           {post.title}
                         </h3>
                         <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] line-clamp-2 leading-relaxed font-normal break-keep">

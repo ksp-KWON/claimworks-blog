@@ -33,9 +33,9 @@ export default function YouTubeBriefingClient({ videos: initialVideos }: { video
       
       {/* 1. 사이드바 스타일 헤더 */}
       <div className="mb-4">
-        <div className="flex items-end justify-between mb-2">
-          <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[#FF0000] pl-2.5">
-            <span className="text-[#FF0000] text-lg leading-none">📺</span>
+        <div className="flex items-end justify-between mb-3">
+          <h3 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[#FF0000] pl-2.5 sm:pl-3">
+            <span className="text-[#FF0000] text-2xl leading-none">📺</span>
             보상스쿨 미디어 센터
           </h3>
           <a 
@@ -81,7 +81,7 @@ export default function YouTubeBriefingClient({ videos: initialVideos }: { video
             
             {/* 텍스트 정보 */}
             <div className="flex flex-col flex-1 py-0.5 pr-1">
-              <h4 className="text-[15px] sm:text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[#FF0000] transition-colors leading-snug mb-2 break-keep">
+              <h4 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[#FF0000] transition-colors leading-snug mb-2 break-keep">
                 {video.title}
               </h4>
               <div className="mt-auto flex items-center justify-between text-[11px] sm:text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6]">

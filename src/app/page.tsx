@@ -22,12 +22,8 @@ export default function Home() {
       <YouTubeBriefing />
 
       {/* 2. 메인 페이지 인트로 헤더 (라벨지 스타일) */}
-      <div className="flex flex-col items-start gap-2.5 sm:gap-3 mb-8 px-1 sm:px-0">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-blue-400 font-bold text-xs sm:text-sm border border-blue-100 dark:border-blue-800/50 shadow-sm">
-          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" /><circle cx="12" cy="10" r="3" /></svg>
-          보상스쿨 핵심 가이드
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
+      <div className="flex flex-col items-start gap-2.5 sm:gap-3 mb-6 px-1 sm:px-0 mt-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] tracking-tight flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5 sm:pl-3">
           분야별 전문 보상 가이드 & 판례 분석
         </h1>
         <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">

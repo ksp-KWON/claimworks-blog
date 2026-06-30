@@ -44,7 +44,7 @@ export default function YouTubeBriefingClient({ videos: initialVideos }: { video
             rel="noopener noreferrer"
             className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-[#FF0000] transition-colors group/link"
           >
-            더 많은 보상 노하우 영상 보기
+            전체보기
             <svg className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </a>
         </div>

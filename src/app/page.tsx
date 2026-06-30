@@ -23,8 +23,8 @@ export default function Home() {
 
       {/* 2. 메인 페이지 인트로 헤더 */}
       <div className="border-b border-[var(--google-border)] pb-4">
-        <h1 className="text-lg sm:text-xl font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 tracking-tight">
-          <svg className="w-5 h-5 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" /><circle cx="12" cy="10" r="3" /></svg>
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 tracking-tight">
+          <svg className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" /><circle cx="12" cy="10" r="3" /></svg>
           분야별 전문 보상 가이드 & 판례 분석
         </h1>
         <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-1.5 break-keep">

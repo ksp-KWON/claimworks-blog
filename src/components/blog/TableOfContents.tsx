@@ -42,23 +42,24 @@ export default function TableOfContents({
                 onClick={(e) => onItemClick(e, item.id)}
                 className="group flex items-start gap-3 w-full"
               >
-                <span className={`w-6 h-6 rounded-none text-[12px] font-bold flex items-center justify-center shrink-0 mt-[2px] transition-colors ${
+                <span className={`w-8 h-8 rounded-none text-[13px] font-bold flex items-center justify-center shrink-0 mt-[2px] transition-colors ${
                   isActive
                     ? 'bg-gradient-to-br from-red-500 to-[#1a73e8] text-white shadow-sm'
-                    : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 group-hover:bg-[#1a73e8] group-hover:text-white'
+                    : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'
                 }`}>
                   {i + 1}
                 </span>
                 
-                <span className={`flex-1 text-[15.5px] leading-[1.7] break-keep transition-colors ${
+                <span className={`flex-1 text-[15px] leading-[1.7] break-keep transition-colors group-hover:underline underline-offset-4 decoration-2 ${
                   isActive 
-                    ? 'font-bold text-[#1a73e8] dark:text-[#8ab4f8]' 
-                    : 'font-semibold text-gray-700 dark:text-gray-300 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'
+                    ? 'font-extrabold text-[#1a73e8] dark:text-[#8ab4f8] decoration-[#1a73e8]/30' 
+                    : 'font-semibold text-gray-800 dark:text-[#e8eaed] group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] decoration-[#1a73e8]/30'
                 }`}>
                   {item.text}
                 </span>
-                <span className={`shrink-0 mt-1 transition-all duration-300 ${isActive ? 'opacity-100 text-[#1a73e8] dark:text-[#8ab4f8] translate-x-0' : 'opacity-0 text-gray-400 group-hover:opacity-100 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] -translate-x-2 group-hover:translate-x-0'}`}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                <span className={`shrink-0 mt-1.5 flex items-center gap-1 text-[11px] font-bold transition-all duration-300 ${isActive ? 'text-[#1a73e8] dark:text-[#8ab4f8]' : 'text-gray-400 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'}`}>
+                  <span className="hidden sm:inline opacity-0 group-hover:opacity-100 transition-opacity">이동</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                 </span>
               </a>
             </li>

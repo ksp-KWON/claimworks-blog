@@ -19,11 +19,11 @@ export default function KeyPointsBox({ points }: KeyPointsBoxProps) {
       <ul className="px-4 py-4 space-y-3">
         {points.map((point, i) => (
           <li key={i} className="flex items-start gap-3.5">
-            <span className="w-6 h-6 rounded-none bg-gradient-to-br from-red-500 to-[#1a73e8] text-white shadow-sm text-[12px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+            <span className="w-8 h-8 rounded-none bg-gradient-to-br from-red-500 to-[#1a73e8] text-white shadow-sm text-[13px] font-bold flex items-center justify-center shrink-0 mt-0.5">
               {i + 1}
             </span>
             <span
-              className="flex-1 text-[15.5px] font-semibold text-gray-800 dark:text-[#e8eaed] leading-[1.7] break-keep"
+              className="flex-1 text-[15px] font-semibold text-gray-800 dark:text-[#e8eaed] leading-[1.7] break-keep"
               dangerouslySetInnerHTML={{
                 __html: point.replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:800;color:#1a73e8">$1</strong>'),
               }}

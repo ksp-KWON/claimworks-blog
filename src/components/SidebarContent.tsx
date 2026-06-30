@@ -19,7 +19,7 @@ interface SidebarContentProps {
   tags?: string[];
 }
 
-const INITIAL_TAG_COUNT = 6;
+const INITIAL_TAG_COUNT = 4;
 
 export default function SidebarContent({ tags = [] }: SidebarContentProps) {
   const [isCalcOpen, setIsCalcOpen] = useState(false);
@@ -117,29 +117,26 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
       {/* 지역별 의료기관 (계산기 바로 아래로 이동) */}
       <RegionalCategories />
 
-      {/* 📂 분야별 보상 칼럼 */}
-      <Link href="/blog" className="block group">
+      {/* 📂 분야별 전문 보상 가이드 */}
+      <Link href="/categories" className="block group">
         <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(251,188,4,0.3)] hover:border-[var(--google-yellow)] transition-all duration-300 relative overflow-hidden">
           <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">📂</div>
           <div className="relative z-10 space-y-2">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-yellow)] pl-2.5">
                 <span className="text-[var(--google-yellow)] text-lg leading-none">📂</span>
-                분야별 보상 칼럼
+                분야별 전문 보상 가이드
               </h3>
               <span className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-yellow-100/30 dark:border-yellow-900/30">핵심 실무</span>
             </div>
-            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">보상스쿨 손해사정사의 핵심 전문 칼럼들을 주제별로 분류하여 제공합니다.</p>
+            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">보상스쿨 손해사정사의 핵심 전문 칼럼들과 진료과목별 주요 의료분쟁 가이드를 통합 제공합니다.</p>
             <div className="pt-1 flex items-center gap-1 text-xs font-bold text-yellow-600 dark:text-yellow-500 group-hover:underline">
-              전체 칼럼 보기
+              전체 가이드 보기
               <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </div>
           </div>
         </div>
       </Link>
-
-      {/* 진료과목별 분쟁 가이드 */}
-      <SpecialtyDiseaseCategories />
 
       {/* 인기 키워드 태그 (layout.tsx 서버에서 전달된 정적 데이터) */}
       {tags.length > 0 && (

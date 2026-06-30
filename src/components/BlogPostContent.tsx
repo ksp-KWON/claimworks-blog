@@ -237,15 +237,14 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
           className="flex items-center justify-between p-4 my-5 bg-[#e8f0fe]/30 hover:bg-[#e8f0fe]/60 dark:bg-[#1a2540]/15 dark:hover:bg-[#1a2540]/30 border-l-4 border-l-[#1A73E8] rounded-r-xl transition-all duration-200 text-[#1A73E8] dark:text-[#8ab4f8] group no-underline break-keep shadow-2xs"
         >
           <div className="flex items-center gap-3">
-            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#e8f0fe] dark:bg-[#1A73E8]/20 flex items-center justify-center">
-              <svg className="w-4 h-4 text-[#1A73E8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 0 0-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 0 05.656 0l4-4a4 4 0 0 0-5.656-5.656l-1.1 1.1" /></svg>
+            <span className="flex-shrink-0 w-8 h-8 rounded-none border border-[#1A73E8]/30 dark:border-[#8ab4f8]/30 bg-white dark:bg-[#1a2540] flex items-center justify-center shadow-sm">
+              <svg className="w-4 h-4 text-[#1A73E8] dark:text-[#8ab4f8] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </span>
             <div className="flex flex-col text-left">
               <span className="text-[10px] font-extrabold text-[#1A73E8] dark:text-[#8ab4f8] uppercase tracking-wider mb-0.5">관련 추천 글</span>
               <span className="text-[13.5px] sm:text-[14px] font-extrabold text-gray-800 dark:text-[#e8eaed] leading-snug group-hover:text-[#1A73E8] dark:group-hover:text-[#8ab4f8] transition-colors">{text}</span>
             </div>
           </div>
-          <svg className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-transform duration-300 group-hover:translate-x-[3px] shrink-0 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
         </a>
       );
     },

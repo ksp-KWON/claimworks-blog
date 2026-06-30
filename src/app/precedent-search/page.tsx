@@ -413,9 +413,11 @@ export default function PrecedentSearchPage() {
   };
 
   return (
+    <>
     <div className="space-y-8 max-w-4xl mx-auto">
+      <div className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:border-[var(--google-blue)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] transition-all duration-300 overflow-hidden">
       {/* 💡 실시간 판례 트렌드 상단 띠 배너 */}
-      <div className="bg-[var(--google-blue)] text-white px-4 py-3 rounded-none flex items-center justify-between flex-wrap gap-3 shadow-md">
+      <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2.5">
           <span className="text-lg shrink-0">💡</span>
           <div className="text-xs sm:text-sm font-extrabold tracking-tight">
@@ -434,8 +436,9 @@ export default function PrecedentSearchPage() {
         </button>
       </div>
 
-      {/* 헤더 타이틀 */}
-      <div className="text-center space-y-3">
+      <div className="p-6 sm:p-10 space-y-8">
+        {/* 헤더 타이틀 */}
+        <div className="text-center space-y-3">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
           보상스쿨 <span className="bg-gradient-to-r from-[var(--google-blue)] to-[#174ea6] bg-clip-text text-transparent">손해사정 법률분석센터</span>
         </h1>
@@ -444,8 +447,8 @@ export default function PrecedentSearchPage() {
         </p>
       </div>
 
-      {/* 검색 박스 영역 */}
-      <div id="search-box-area" className="bg-white dark:bg-[#202124] p-5 sm:p-7 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] space-y-4">
+        {/* 검색 박스 영역 */}
+        <div id="search-box-area" className="space-y-4">
         <div className="flex gap-2 flex-col sm:flex-row">
           <input
             type="text"
@@ -482,7 +485,9 @@ export default function PrecedentSearchPage() {
             <button onClick={clearRecent} className="text-gray-300 dark:text-gray-600 hover:text-[var(--google-red)] cursor-pointer shrink-0">지우기</button>
           </div>
         )}
+        </div>
       </div>
+    </div>
 
       {/* 검색 진행상태 및 로딩창 (파란색 테마) */}
       {loading && (
@@ -655,5 +660,6 @@ export default function PrecedentSearchPage() {
         <span>본 판례 검색 시스템은 법제처 공공 API에 기반하여 참고용 판례 정보를 제공하며, 어떠한 법률 자문 대행도 하지 않습니다. 실제 지급 거절 및 삭감 대처 시에는 반드시 전문 손해사정사와 상담하십시오.</span>
       </div>
     </div>
+    </>
   );
 }

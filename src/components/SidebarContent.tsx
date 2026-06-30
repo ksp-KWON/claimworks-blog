@@ -32,7 +32,7 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
     <div className="space-y-6">
       {/* ⚖️ AI 판례검색센터 바로가기 배너 */}
       <Link href="/precedent-search" className="block group">
-        <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.15)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden">
+        <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.15)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden">
           <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">⚖️</div>
           <div className="relative z-10 space-y-2">
             <div className="flex items-center justify-between">
@@ -53,7 +53,7 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
 
       {/* 🏛️ 금감원 소비자보호센터 바로가기 배너 */}
       <Link href="/fss-news" className="block group">
-        <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(239,68,68,0.15)] hover:border-red-500 transition-all duration-300 relative overflow-hidden">
+        <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(239,68,68,0.15)] hover:border-red-500 transition-all duration-300 relative overflow-hidden">
           <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">🏛️</div>
           <div className="relative z-10 space-y-2">
             <div className="flex items-center justify-between">
@@ -74,7 +74,7 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
 
       {/* 🚗 교통사고 로컬 안심케어 센터 */}
       <Link href="/traffic-care" className="block group">
-        <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(19,115,51,0.15)] hover:border-[#137333] transition-all duration-300 relative overflow-hidden">
+        <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(19,115,51,0.15)] hover:border-[#137333] transition-all duration-300 relative overflow-hidden">
           <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">🚗</div>
           <div className="relative z-10 space-y-2">
             <div className="flex items-center justify-between">
@@ -94,13 +94,13 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
       </Link>
 
       {/* 🧮 보상금·합의금 계산기 */}
-      <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden">
+      <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden">
         <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">
           <span className="text-[var(--google-blue)] text-lg leading-none">🧮</span>
           보상금·합의금 계산기
         </h3>
         <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">약관 지급기준 및 법원 판례 기준을 적용한 예상 합의금과 소송가액을 확인하세요.</p>
-        <button onClick={() => setIsCalcOpen(!isCalcOpen)} className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer">
+        <button onClick={() => setIsCalcOpen(!isCalcOpen)} className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer">
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
             계산기 선택하기
@@ -114,7 +114,7 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
               { href: '/calculator/medical',   emoji: '🏥', title: '실손의료비 계산기',          desc: '본인부담금 공제 후 예상 보상금' },
               { href: '/calculator/liability', emoji: '⚖️', title: '배상책임 소송가액 계산기',   desc: '법원 판례 기준 예상 손해배상액 산출' },
             ].map(item => (
-              <Link key={item.href} href={item.href} className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:bg-[#e8f0fe]/50 dark:hover:bg-[#174ea6]/10 transition-all group/item">
+              <Link key={item.href} href={item.href} className="flex items-center justify-between p-3 rounded-none border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:bg-[#e8f0fe]/50 dark:hover:bg-[#174ea6]/10 transition-all group/item">
                 <div className="flex items-center gap-2.5">
                   <span className="text-lg">{item.emoji}</span>
                   <div className="text-left">
@@ -130,13 +130,13 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
       </div>
 
       {/* 📂 분야별 보상 칼럼 */}
-      <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(251,188,4,0.2)] hover:border-[var(--google-yellow)] transition-all duration-300 relative overflow-hidden">
+      <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(251,188,4,0.2)] hover:border-[var(--google-yellow)] transition-all duration-300 relative overflow-hidden">
         <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-yellow)] pl-2.5">
           <span className="text-[var(--google-yellow)] text-lg leading-none">📂</span>
           분야별 보상 칼럼
         </h3>
         <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-4 leading-relaxed">보상스쿨 손해사정사의 핵심 전문 칼럼들을 주제별로 분류하여 제공합니다.</p>
-        <button onClick={() => setIsColOpen(!isColOpen)} className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer">
+        <button onClick={() => setIsColOpen(!isColOpen)} className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer">
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-[var(--google-yellow)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
             칼럼 카테고리 보기
@@ -155,8 +155,8 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
               { name: '장해평가·면책',    color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
               { name: '보상가이드',       color: 'text-yellow-600', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
             ].map(cat => (
-              <Link key={cat.name} href={`/blog?category=${encodeURIComponent(cat.name)}`} className="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50 dark:bg-[#303134] border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:bg-[#e8f0fe] dark:hover:bg-[#174ea6]/20 transition-all group/item">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center mb-1.5 ${cat.bg} ${cat.color} group-hover/item:scale-105 transition-transform`}>
+              <Link key={cat.name} href={`/blog?category=${encodeURIComponent(cat.name)}`} className="flex flex-col items-center justify-center p-3 rounded-none bg-gray-50 dark:bg-[#303134] border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:bg-[#e8f0fe] dark:hover:bg-[#174ea6]/20 transition-all group/item">
+                <div className={`w-9 h-9 rounded-none flex items-center justify-center mb-1.5 ${cat.bg} ${cat.color} group-hover/item:scale-105 transition-transform`}>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
                 </div>
                 <span className="text-[11px] font-bold text-[#202124] dark:text-[#e8eaed] text-center group-hover/item:text-[var(--google-blue)] transition-colors break-keep leading-tight">{cat.name}</span>
@@ -174,7 +174,7 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
 
       {/* 인기 키워드 태그 (layout.tsx 서버에서 전달된 정적 데이터) */}
       {tags.length > 0 && (
-        <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+        <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
           <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-4 flex items-center gap-2 border-l-4 border-[var(--google-red)] pl-2.5">
             <svg className="w-4 h-4 text-[var(--google-red)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />

@@ -24,7 +24,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-red-600 dark:group-hover:text-red-400',
       arrowColor: 'text-red-500',
       accentBg: 'bg-red-500',
-      glowShadow: 'hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] shadow-[0_0_15px_rgba(239,68,68,0.1)]',
+      hoverBorder: 'hover:border-red-500 hover:shadow-[0_12px_40px_rgba(239,68,68,0.15)]',
       icon: '🚗'
     };
   }
@@ -35,7 +35,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-rose-600 dark:group-hover:text-rose-400',
       arrowColor: 'text-rose-500',
       accentBg: 'bg-rose-500',
-      glowShadow: 'hover:shadow-[0_0_20px_rgba(244,63,94,0.4)] shadow-[0_0_15px_rgba(244,63,94,0.1)]',
+      hoverBorder: 'hover:border-rose-500 hover:shadow-[0_12px_40px_rgba(244,63,94,0.15)]',
       icon: '⚖️'
     };
   }
@@ -46,7 +46,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-blue-600 dark:group-hover:text-blue-400',
       arrowColor: 'text-blue-500',
       accentBg: 'bg-blue-500',
-      glowShadow: 'hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] shadow-[0_0_15px_rgba(59,130,246,0.1)]',
+      hoverBorder: 'hover:border-blue-500 hover:shadow-[0_12px_40px_rgba(59,130,246,0.15)]',
       icon: '🏥'
     };
   }
@@ -57,7 +57,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-green-600 dark:group-hover:text-green-400',
       arrowColor: 'text-green-500',
       accentBg: 'bg-green-500',
-      glowShadow: 'hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] shadow-[0_0_15px_rgba(34,197,94,0.1)]',
+      hoverBorder: 'hover:border-green-500 hover:shadow-[0_12px_40px_rgba(34,197,94,0.15)]',
       icon: '🛡️'
     };
   }
@@ -68,7 +68,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-teal-600 dark:group-hover:text-teal-400',
       arrowColor: 'text-teal-500',
       accentBg: 'bg-teal-500',
-      glowShadow: 'hover:shadow-[0_0_20px_rgba(20,184,166,0.4)] shadow-[0_0_15px_rgba(20,184,166,0.1)]',
+      hoverBorder: 'hover:border-teal-500 hover:shadow-[0_12px_40px_rgba(20,184,166,0.15)]',
       icon: '👷'
     };
   }
@@ -79,7 +79,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-purple-600 dark:group-hover:text-purple-400',
       arrowColor: 'text-purple-500',
       accentBg: 'bg-purple-500',
-      glowShadow: 'hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] shadow-[0_0_15px_rgba(168,85,247,0.1)]',
+      hoverBorder: 'hover:border-purple-500 hover:shadow-[0_12px_40px_rgba(168,85,247,0.15)]',
       icon: '♿'
     };
   }
@@ -90,7 +90,7 @@ export function getCategoryColor(category: string) {
       hoverText: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400',
       arrowColor: 'text-indigo-500',
       accentBg: 'bg-indigo-500',
-      glowShadow: 'hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] shadow-[0_0_15px_rgba(99,102,241,0.1)]',
+      hoverBorder: 'hover:border-indigo-500 hover:shadow-[0_12px_40px_rgba(99,102,241,0.15)]',
       icon: '📖'
     };
   }
@@ -102,7 +102,7 @@ export function getCategoryColor(category: string) {
     hoverText: 'group-hover:text-yellow-600 dark:group-hover:text-yellow-400',
     arrowColor: 'text-yellow-500',
     accentBg: 'bg-yellow-500',
-    glowShadow: 'hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] shadow-[0_0_15px_rgba(234,179,8,0.1)]',
+    hoverBorder: 'hover:border-yellow-500 hover:shadow-[0_12px_40px_rgba(234,179,8,0.15)]',
     icon: '💡'
   };
 }
@@ -136,13 +136,13 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
         const displayPosts = posts.slice(0, 2); // 각 블록당 최대 2개 노출
 
         return (
-          <section key={category} className="bg-gradient-to-b from-white to-gray-50/50 dark:from-[#1e1e20] dark:to-[#18191b] border border-white/50 dark:border-white/5 rounded-[32px] sm:rounded-[40px] p-6 sm:p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] transition-all duration-500 hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.6)] relative overflow-hidden group/box">
+          <section key={category} className={`bg-white dark:bg-[#202124] border border-gray-100 dark:border-white/5 rounded-none p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] ${primaryColor.hoverBorder} transition-all duration-300 relative overflow-hidden group/box`}>
             
             {/* 블록 헤더 - 뉴모피즘 기반의 깔끔한 배치 */}
             <div className="flex items-center justify-between mb-8 relative z-10 group/header">
               
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50 shadow-sm ${primaryColor.arrowColor}`}>
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-none flex items-center justify-center bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50 shadow-sm ${primaryColor.arrowColor}`}>
                   <span className="text-xl sm:text-2xl drop-shadow-sm" aria-hidden="true">{primaryColor.icon}</span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
@@ -151,7 +151,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
               </div>
               <Link 
                 href={`/search?q=${encodeURIComponent(category)}`}
-                className={`flex items-center gap-1.5 px-4 py-2 sm:px-6 sm:py-2.5 rounded-full bg-white dark:bg-zinc-800 text-[13px] sm:text-sm font-bold ${primaryColor.arrowColor} border border-gray-100 dark:border-zinc-700/50 ${primaryColor.glowShadow} transition-all duration-500 hover:-translate-y-0.5`}
+                className={`flex items-center gap-1.5 px-4 py-2 sm:px-6 sm:py-2.5 rounded-none bg-white dark:bg-zinc-800 text-[13px] sm:text-sm font-bold ${primaryColor.arrowColor} border border-gray-100 dark:border-zinc-700/50 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all duration-300`}
               >
                 전체보기
                 <svg className="w-4 h-4 transition-transform duration-300 group-hover/header:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
@@ -166,7 +166,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
                 return (
                   <article 
                     key={post.slug}
-                    className={`group relative bg-white/60 dark:bg-zinc-800/40 backdrop-blur-sm rounded-[24px] sm:rounded-[32px] overflow-hidden border border-gray-200/60 dark:border-white/5 shadow-sm hover:shadow-[0_12px_40px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] hover:bg-white dark:hover:bg-[#202124] hover:-translate-y-1 transition-all duration-300 flex flex-col min-h-[220px]`}
+                    className={`group relative bg-white dark:bg-zinc-800/40 rounded-none overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] ${primaryColor.hoverBorder} transition-all duration-300 flex flex-col min-h-[220px]`}
                   >
                     <Link href={`/blog/${post.slug}`} className="p-4 sm:p-5 flex flex-col justify-between h-full flex-1">
                       

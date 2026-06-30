@@ -69,10 +69,10 @@ export default function YouTubeBriefingClient({ videos: initialVideos }: { video
             href={`https://youtu.be/${video.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex gap-3 sm:gap-4 p-2.5 sm:p-3 rounded-2xl bg-white dark:bg-[#202124] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)] hover:border-[#FF0000]/20 transition-all duration-300 items-center"
+            className="group flex gap-3 sm:gap-4 p-2.5 sm:p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:border-[#FF0000] transition-all duration-300 items-center"
           >
             {/* 썸네일 */}
-            <div className="relative w-32 sm:w-36 shrink-0 aspect-video rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800">
+            <div className="relative w-32 sm:w-36 shrink-0 aspect-video rounded-none overflow-hidden bg-gray-100 dark:bg-zinc-800">
               <Image 
                 src={`https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`} 
                 alt={video.title} 
@@ -108,7 +108,7 @@ export default function YouTubeBriefingClient({ videos: initialVideos }: { video
         href="https://www.youtube.com/@bosangschool" 
         target="_blank" 
         rel="noopener noreferrer"
-        className="group flex items-center justify-between p-4 mt-4 rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 dark:from-[#2a2b2e] dark:to-[#323438] border border-gray-100 dark:border-gray-700 hover:border-[#FF0000]/30 transition-all duration-300"
+        className="group flex items-center justify-between p-4 mt-4 rounded-none bg-gradient-to-r from-gray-50 to-gray-100 dark:from-[#2a2b2e] dark:to-[#323438] border border-gray-100 dark:border-gray-700 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:border-[#FF0000] transition-all duration-300"
       >
         <div>
           <p className="text-[11px] sm:text-xs font-bold text-[#FF0000] mb-0.5">보상스쿨 공식 유튜브</p>

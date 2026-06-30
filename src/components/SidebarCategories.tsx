@@ -116,7 +116,7 @@ export function RegionalCategories() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(52,168,83,0.2)] hover:border-[var(--google-green)] transition-all duration-300 group relative overflow-hidden">
+    <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(52,168,83,0.2)] hover:border-[var(--google-green)] transition-all duration-300 group relative overflow-hidden">
       <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-green)] pl-2.5">
         <span className="text-[var(--google-green)] text-lg leading-none">🗺️</span>
         지역별 의료기관
@@ -127,7 +127,7 @@ export function RegionalCategories() {
 
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors group p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer"
+        className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors group p-2.5 rounded-none bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer"
       >
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-[var(--google-green)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -142,7 +142,7 @@ export function RegionalCategories() {
             <Link
               key={region.name}
               href={`/blog?sido=${encodeURIComponent(region.name)}`}
-              className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-gray-50 hover:bg-[#e8f0fe] dark:bg-white/5 dark:hover:bg-[#174ea6]/20 border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] text-xs font-bold text-[#202124] dark:text-[#e8eaed] hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] transition-all hover:scale-[1.02] shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
+              className="flex items-center gap-1.5 px-3 py-2.5 rounded-none bg-gray-50 hover:bg-[#e8f0fe] dark:bg-white/5 dark:hover:bg-[#174ea6]/20 border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] text-xs font-bold text-[#202124] dark:text-[#e8eaed] hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] transition-all hover:scale-[1.02] shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
             >
               <span className="text-[var(--google-green)] text-sm">📍</span>
               <span className="truncate">{region.name}</span>
@@ -262,7 +262,7 @@ export function SpecialtyDiseaseCategories() {
   ];
 
   return (
-    <div className="bg-white dark:bg-[#202124] p-5 rounded-2xl border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 group relative overflow-hidden">
+    <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 group relative overflow-hidden">
       <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] mb-2 flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">
         <span className="text-[var(--google-blue)] text-lg leading-none">🩺</span>
         진료과목별 분쟁 가이드
@@ -273,7 +273,7 @@ export function SpecialtyDiseaseCategories() {
 
       <button 
         onClick={() => setIsMainOpen(!isMainOpen)}
-        className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors group p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer"
+        className="w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors group p-2.5 rounded-none bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer"
       >
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
@@ -287,7 +287,7 @@ export function SpecialtyDiseaseCategories() {
           {specialties.map((specialty) => {
             const isOpen = !!openSpecialties[specialty.name];
             return (
-              <li key={specialty.name} className="border border-gray-100 dark:border-white/5 rounded-xl overflow-hidden bg-gray-50/50 dark:bg-white/2">
+              <li key={specialty.name} className="border border-gray-100 dark:border-white/5 rounded-none overflow-hidden bg-gray-50/50 dark:bg-white/2">
                 <button
                   onClick={() => toggleSpecialty(specialty.name)}
                   className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-[var(--google-surface-variant)] hover:text-[var(--google-blue)] transition-colors text-xs font-bold text-left cursor-pointer"

@@ -286,8 +286,8 @@ export default function TrafficCarePage() {
     }
 
     const matched = blogPosts.find(post => 
-      post.title.toLowerCase().includes(keyword) || 
-      post.content.toLowerCase().includes(keyword)
+      (post.title || '').toLowerCase().includes(keyword) || 
+      (post.content || post.summary || '').toLowerCase().includes(keyword)
     );
 
     return matched || blogPosts[0] || null;

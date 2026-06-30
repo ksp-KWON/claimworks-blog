@@ -122,8 +122,8 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
         return (
           <section key={category} className="bg-white dark:bg-[#1e1e20] border border-gray-200 dark:border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm">
             
-            {/* 블록 헤더 - 프리미엄 디자인 */}
-            <div className="flex items-center justify-between mb-6">
+            {/* 블록 헤더 - 프리미엄 배경 적용 */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-gray-50/80 to-white dark:from-zinc-800/40 dark:to-transparent -mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-4 sm:px-6 sm:py-5 mb-6 rounded-t-2xl sm:rounded-t-3xl border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gray-50 dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-700/50 shadow-sm ${primaryColor.arrowColor}`}>
                   <span className="text-xl sm:text-2xl drop-shadow-sm" aria-hidden="true">{primaryColor.icon}</span>

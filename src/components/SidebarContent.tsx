@@ -19,7 +19,7 @@ interface SidebarContentProps {
   tags?: string[];
 }
 
-const INITIAL_TAG_COUNT = 15;
+const INITIAL_TAG_COUNT = 6;
 
 export default function SidebarContent({ tags = [] }: SidebarContentProps) {
   const [isCalcOpen, setIsCalcOpen] = useState(false);

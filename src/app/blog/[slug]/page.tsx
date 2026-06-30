@@ -279,29 +279,45 @@ function RelatedPostsBox({
   if (scored.length === 0) return null;
 
   return (
-    <div className="mt-12">
-      <div className="flex items-center gap-2.5 mb-5">
-        <div className="w-1 h-5 rounded-full bg-[#1A73E8]" />
-        <h2 className="text-[15px] font-extrabold text-gray-900 dark:text-white tracking-tight">
-          함께 읽으면 도움이 되는 글
-        </h2>
+    <div className="mt-12 rounded-none overflow-hidden bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border border-gray-200 dark:border-white/10 shadow-[0_6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] relative">
+      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
+      
+      <div className="bg-gray-50/80 dark:bg-white/[0.03] px-5 sm:px-6 py-5 border-b border-gray-200 dark:border-white/10 flex items-start sm:items-center gap-4">
+        <div className="w-10 h-10 rounded-none bg-white dark:bg-[#202124] shadow-sm border border-gray-200 dark:border-white/10 flex items-center justify-center shrink-0">
+          <svg className="w-5 h-5 text-[#1A73E8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+        </div>
+        <div>
+          <h2 className="font-extrabold text-gray-900 dark:text-white text-[16px] tracking-tight">
+            함께 읽으면 도움이 되는 글
+          </h2>
+          <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
+            비슷한 주제의 다른 보상 사례들도 확인해 보세요
+          </p>
+        </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {scored.map(p => (
-          <Link
-            key={p.slug}
-            href={`/blog/${p.slug}`}
-            className="group flex flex-col gap-2 p-4 rounded-none bg-gray-50 dark:bg-[#2d2e30] border border-gray-100 dark:border-white/5 hover:border-[#1A73E8]/30 hover:bg-[#f0f7ff] dark:hover:bg-[#1a2540] hover:shadow-md transition-all duration-200"
-          >
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e8f0fe] dark:bg-[#174ea6]/20 text-[#1A73E8] dark:text-[#8ab4f8] w-fit">
-              {p.category}
-            </span>
-            <span className="text-[13px] font-bold text-gray-800 dark:text-gray-100 leading-snug line-clamp-2 group-hover:text-[#1A73E8] dark:group-hover:text-[#8ab4f8] transition-colors">
-              {p.title}
-            </span>
-            <span className="text-[11px] text-gray-400 dark:text-gray-500 mt-auto">{p.date}</span>
-          </Link>
-        ))}
+
+      <div className="p-5 sm:p-6 bg-white dark:bg-[#202124]">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {scored.map(p => (
+            <Link
+              key={p.slug}
+              href={`/blog/${p.slug}`}
+              className="group flex flex-col gap-2.5 p-4 rounded-none bg-gray-50 dark:bg-[#2d2e30] border border-gray-100 dark:border-white/5 hover:border-[#1A73E8]/30 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 hover:shadow-md transition-all duration-200 relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-transparent to-transparent group-hover:from-red-500 group-hover:to-[#1a73e8] transition-colors" />
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-none bg-white dark:bg-white/10 text-[#1A73E8] dark:text-[#8ab4f8] w-fit border border-gray-200 dark:border-white/10 shadow-sm">
+                  {p.category}
+                </span>
+                <svg className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="square" strokeLinejoin="miter" d="M9 5l7 7-7 7" /></svg>
+              </div>
+              <span className="text-[14px] font-bold text-gray-800 dark:text-gray-100 leading-snug line-clamp-2 group-hover:text-[#1A73E8] dark:group-hover:text-[#8ab4f8] transition-colors mt-1">
+                {p.title}
+              </span>
+              <span className="text-[11px] text-gray-400 dark:text-gray-500 mt-auto font-medium">{p.date}</span>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

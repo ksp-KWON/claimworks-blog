@@ -3,18 +3,25 @@ import Link from 'next/link';
 
 export default function CTABanner() {
   return (
-    <div className="mt-12 mb-4">
-      {/* 캐치 문구 */}
-      <div className="text-center mb-4">
-        <p className="text-[15px] font-extrabold bg-gradient-to-r from-blue-700 to-[#1a73e8] dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent tracking-tight">
-          정당한 권리, 보상스쿨과 함께라면 결과가 달라집니다.
-        </p>
-        <p className="text-[13px] text-[#5f6368] dark:text-[#9aa0a6] mt-1.5 font-medium">
-          수많은 성공 사례로 증명된 전문 손해사정사가 최적의 해답을 제시해 드립니다.
-        </p>
+    <div className="mt-12 mb-4 rounded-none overflow-hidden bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border border-gray-200 dark:border-white/10 shadow-[0_6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] relative">
+      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
+      
+      {/* 헤더 섹션 */}
+      <div className="bg-gray-50/80 dark:bg-white/[0.03] px-5 sm:px-6 py-5 border-b border-gray-200 dark:border-white/10 flex items-start sm:items-center gap-4">
+        <div className="w-10 h-10 rounded-none bg-white dark:bg-[#202124] shadow-sm border border-gray-200 dark:border-white/10 flex items-center justify-center shrink-0">
+          <span className="text-xl">🤝</span>
+        </div>
+        <div>
+          <p className="font-extrabold text-gray-900 dark:text-white text-[16px] tracking-tight">
+            정당한 권리, 보상스쿨과 함께라면 결과가 달라집니다.
+          </p>
+          <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
+            수많은 성공 사례로 증명된 전문 손해사정사가 최적의 해답을 제시해 드립니다.
+          </p>
+        </div>
       </div>
 
-      {/* 헤더 배너 4카드 그대로 복사 + 그림자 */}
+      <div className="p-5 sm:p-6 bg-white dark:bg-[#202124]">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {/* 카드 1: 카카오톡 상담 */}
         <a
@@ -77,6 +84,7 @@ export default function CTABanner() {
             <span className="block text-xs text-[#5f6368] dark:text-[#9aa0a6] truncate mt-0.5">유튜브 바로가기</span>
           </div>
         </a>
+      </div>
       </div>
     </div>
   );

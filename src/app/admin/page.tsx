@@ -46,7 +46,7 @@ export default function AdminPage() {
   });
   
   // App State
-  const [mode, setMode] = useState<'manual' | 'semi-auto' | 'auto' | 'edit'>('manual');
+  const [mode, setMode] = useState<'blank' | 'manual' | 'semi-auto' | 'auto' | 'edit'>('manual');
   const [selectedPostType, setSelectedPostType] = useState<'all' | 'precedent' | 'trend'>('all');
   const [inputText, setInputText] = useState('');
   const [generatedMarkdown, setGeneratedMarkdown] = useState('');
@@ -631,18 +631,28 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
             {/* Mode Tab Switcher */}
             <div className="flex bg-gray-100 dark:bg-zinc-950 p-1 rounded-md mb-4 flex-shrink-0">
               {[
-                { id: 'manual', label: '수동 (대본 포장)' },
-                { id: 'semi-auto', label: '반자동 (링크/개요)' },
+                { id: 'blank', label: '새 글 작성 (에디터)' },
+                { id: 'manual', label: 'AI 초안 다듬기' },
+                { id: 'semi-auto', label: 'AI 링크 요약' },
                 { id: 'auto', label: '자동 (데일리 발행)' },
                 { id: 'edit', label: '기존 글 수정' }
               ].map((m) => (
                 <button
                   key={m.id}
                   onClick={() => {
-                    setMode(m.id as 'manual' | 'semi-auto' | 'auto' | 'edit');
+                    setMode(m.id as 'blank' | 'manual' | 'semi-auto' | 'auto' | 'edit');
                     if (m.id === 'edit') {
                       fetchPostList();
                       setShowPostList(true); // 수정 탭으로 갈 때는 목록을 펼칩니다
+                    } else if (m.id === 'blank') {
+                      setIsPreview(true);
+                      if (!generatedMarkdown) {
+                        const today = new Date().toISOString().split('T')[0];
+                        setSlug(`post-${Date.now()}`);
+                        setGeneratedMarkdown(`---\ntitle: "제목을 입력하세요"\nsummary: "요약을 입력하세요"\ncategory: "판례법률석"\ndate: "${today}"\ntags: ["태그"]\n---\n\n`);
+                      }
+                    } else {
+                      setIsPreview(false);
                     }
                   }}
                   className={`flex-1 py-2 px-3 rounded-md text-xs font-bold transition-all ${mode === m.id ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300'}`}

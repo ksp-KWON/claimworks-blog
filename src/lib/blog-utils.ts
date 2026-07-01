@@ -129,21 +129,42 @@ export function extractTOC(content: string): { id: string; text: string }[] {
   return toc;
 }
 
+// ─── 체크리스트 추출 ──────────────────────────────────────────────────────────
+export function extractChecklist(content: string): string[] {
+  const lines = content.split('\n');
+  const items: string[] = [];
+  let inSection = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (/^##\s+/.test(trimmed) && CHECKLIST_PATTERNS.test(trimmed)) {
+      inSection = true;
+      continue;
+    }
+    if (inSection) {
+      if (/^#{1,6}\s/.test(trimmed)) break;
+      if (/\[SEO_SUMMARY\]/.test(trimmed)) break;
+      if (/^---/.test(trimmed)) continue;
+      if (/^[-*]\s+/.test(trimmed) || /^[\u2611\u2705\uFE0F[\]]/.test(trimmed)) {
+        const text = trimmed
+          .replace(/^[-*]\s*/, '')
+          .replace(/^\[[ x]\]\s*/i, '')
+          .replace(/^[\u2611\u2705\uFE0F]+\s*/gu, '')
+          .trim();
+        if (text) items.push(text);
+      }
+    }
+  }
+  return items;
+}
+
 // ─── 본문 전처리 ─────────────────────────────────────────────────────────────
 export function preprocessBody(content: string): string {
   const lines = content.split('\n');
   const result: string[] = [];
   let skipType: 'NONE' | 'KEY_POINTS' | 'CHECKLIST' | 'FAQ' | 'CTA' = 'NONE';
-  let clBuffer: string[] = [];
 
   const singleLinkRegex = /^\s*\[([^\]]+)\]\(([^)]+)\)\s*$/;
-
-  const flushChecklist = () => {
-    if (clBuffer.length > 0) {
-      result.push(`<inlinechecklist data="${encodeURIComponent(clBuffer.join('||'))}"></inlinechecklist>`);
-      clBuffer = [];
-    }
-  };
 
   for (const line of lines) {
     const trimmed = line.trim();
@@ -163,12 +184,11 @@ export function preprocessBody(content: string): string {
       let matched = false;
 
       if      (KEY_POINT_PATTERNS.test(trimmed))  { newSkipType = 'KEY_POINTS'; matched = true; }
-      else if (CHECKLIST_PATTERNS.test(trimmed))  { newSkipType = 'CHECKLIST';  clBuffer = []; matched = true; }
+      else if (CHECKLIST_PATTERNS.test(trimmed))  { newSkipType = 'CHECKLIST';  matched = true; }
       else if (FAQ_PATTERNS.test(trimmed))         { newSkipType = 'FAQ';        matched = true; }
       else if (CTA_PATTERNS.test(trimmed))         { newSkipType = 'CTA';        matched = true; }
 
       if (matched) {
-        if (prevSkipType === 'CHECKLIST') flushChecklist();
         skipType = newSkipType;
         continue;
       }
@@ -179,16 +199,7 @@ export function preprocessBody(content: string): string {
       else if (/^#/.test(trimmed)) skipType = 'NONE';
     } else if (skipType === 'CHECKLIST') {
       if (/^#{1,6}\s/.test(trimmed)) {
-        flushChecklist();
         skipType = 'NONE';
-      } else if (/^[-*]\s+/.test(trimmed) || /^[\u2611\u2705\uFE0F[\]]/.test(trimmed)) {
-        const text = trimmed
-          .replace(/^[-*]\s*/, '')
-          .replace(/^\[[ x]\]\s*/i, '')
-          .replace(/^[\u2611\u2705\uFE0F]+\s*/gu, '')
-          .trim();
-        if (text) clBuffer.push(text);
-        continue;
       } else {
         continue;
       }
@@ -200,8 +211,6 @@ export function preprocessBody(content: string): string {
       result.push(line);
     }
   }
-
-  flushChecklist();
 
   const processed = result
     .join('\n')

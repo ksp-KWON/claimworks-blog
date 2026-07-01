@@ -21,6 +21,7 @@ import KeyPointsBox from './blog/KeyPointsBox';
 import FAQBox from './blog/FAQBox';
 import CTABanner from './blog/CTABanner';
 import AuthorBioCard from './blog/AuthorBioCard';
+import ChecklistBox from './blog/ChecklistBox';
 import TableOfContents from './blog/TableOfContents';
 import GlobalCalculatorAccordion from './blog/GlobalCalculatorAccordion';
 import MarkdownRenderer from './blog/MarkdownRenderer';
@@ -29,6 +30,7 @@ import MarkdownRenderer from './blog/MarkdownRenderer';
 import {
   extractKeyPoints,
   extractFAQ,
+  extractChecklist,
   extractTOC,
   preprocessBody,
 } from '@/lib/blog-utils';
@@ -43,10 +45,11 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
   const [activeId, setActiveId] = useState('');
   const [calcOpen, setCalcOpen] = useState(false);
 
-  const keyPoints    = extractKeyPoints(content);
-  const faqItems     = extractFAQ(content);
-  const toc          = extractTOC(content);
-  const bodyContent  = preprocessBody(content);
+  const keyPoints      = extractKeyPoints(content);
+  const checklistItems = extractChecklist(content);
+  const faqItems       = extractFAQ(content);
+  const toc            = extractTOC(content);
+  const bodyContent    = preprocessBody(content);
 
   useEffect(() => {
     const onScroll = () => {
@@ -112,6 +115,9 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
 
       {/* 7. FAQ */}
       {faqItems.length > 0 && <FAQBox items={faqItems} />}
+
+      {/* 7.5. Checklist */}
+      {checklistItems.length > 0 && <ChecklistBox items={checklistItems} />}
 
       {/* 8. 저자 바이오 카드 (맨 하단) */}
       <AuthorBioCard />

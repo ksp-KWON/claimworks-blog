@@ -5,7 +5,6 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import type { Components } from 'react-markdown';
-import ChecklistBox from './ChecklistBox';
 
 const SCROLL_OFFSET = 140;
 
@@ -102,13 +101,6 @@ export const sharedComponents: any = {
         </div>
       </a>
     );
-  },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  inlinechecklist: ({ ...props }: any) => {
-    const encoded = (props['data'] as string) || '';
-    const items = decodeURIComponent(encoded).split('||').filter(Boolean);
-    if (items.length === 0) return null;
-    return <ChecklistBox items={items} />;
   },
   hr1: () => (
     <div className="my-16 flex items-center justify-center gap-4">

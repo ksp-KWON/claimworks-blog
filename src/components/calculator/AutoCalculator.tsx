@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { toPng } from 'html-to-image';
-import { jsPDF } from 'jspdf';
+import { useCalculatorExport } from "@/hooks/useCalculatorExport";
 import { AutoInsuranceData, initialAutoData, INJURY_ALIMONY_TABLE } from './auto/calculator-types';
 import { INJURY_DB } from './auto/injury-db';
 
@@ -142,40 +141,7 @@ export default function AutoCalculator() {
 
   const result = calculateResult();
 
-  const exportPDF = async () => {
-    if (!resultRef.current) return;
-    try {
-      const originalBg = resultRef.current.style.backgroundColor;
-      resultRef.current.style.backgroundColor = '#ffffff';
-      const imgData = await toPng(resultRef.current, { backgroundColor: '#ffffff', pixelRatio: 2 });
-      resultRef.current.style.backgroundColor = originalBg;
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (resultRef.current.offsetHeight * pdfWidth) / resultRef.current.offsetWidth;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save('보상스쿨_자동차사고_예상합의금.pdf');
-    } catch (e: unknown) {
-      alert(`PDF 생성 중 오류가 발생했습니다: ${e instanceof Error ? e.message : String(e)}`);
-    }
-  };
-
-  const shareResult = () => {
-    const text = `보상스쿨 자동차사고 계산결과\n▶ 예상 합의금: ${result.finalTotal.toLocaleString()}원\n\n자세한 내역은 보상스쿨에서 확인해보세요!`;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window as any).Kakao.Share.sendDefault({
-        objectType: 'feed',
-        content: { title: '보상스쿨 합의금 결과', description: `예상 합의금: ${result.finalTotal.toLocaleString()}원`, imageUrl: 'https://claim-works.com/og-image.png', link: { mobileWebUrl: window.location.href, webUrl: window.location.href } },
-        buttons: [{ title: '결과 보기', link: { mobileWebUrl: window.location.href, webUrl: window.location.href } }],
-      });
-    } else if (navigator.share) {
-      navigator.share({ title: '보상스쿨 자동차사고 계산결과', text: text, url: window.location.href }).catch(console.error);
-    } else {
-      navigator.clipboard.writeText(text + '\n' + window.location.href);
-      alert('결과가 클립보드에 복사되었습니다.');
-    }
-  };
+  const { exportPDF, shareResult } = useCalculatorExport(resultRef);
 
   return (
     <div className="w-full">
@@ -484,11 +450,11 @@ export default function AutoCalculator() {
             </a>
             
             <div className="grid grid-cols-2 gap-2">
-              <button onClick={shareResult} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#1a73e8] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#8ab4f8] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
+              <button onClick={() => shareResult('자동차', result.finalTotal)} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#1a73e8] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#8ab4f8] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
                 <svg className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
                 결과 공유하기
               </button>
-              <button onClick={exportPDF} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#202124] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#e8eaed] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
+              <button onClick={() => exportPDF('보상스쿨_자동차사고_예상합의금.pdf')} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#202124] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#e8eaed] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
                 <svg className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 PDF 다운로드
               </button>

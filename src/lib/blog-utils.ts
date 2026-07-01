@@ -6,6 +6,8 @@
  * 마크다운 파싱 함수들을 단일 모듈로 통합하여 중복을 제거합니다.
  */
 
+import GithubSlugger from 'github-slugger';
+
 // ─── 섹션 패턴 ───────────────────────────────────────────────────────────────
 export const KEY_POINT_PATTERNS   = /(?:핵심\s*요약|key\s*point)/i;
 export const CHECKLIST_PATTERNS   = /(?:자가진단|체크리스트|1분\s*체크|체크)/i;
@@ -102,6 +104,46 @@ export function extractGlossary(content: string): { term: string; definition: st
     }
   }
   return glossary;
+}
+
+// ─── 목차(TOC) 추출 ──────────────────────────────────────────────────────────
+export function extractTOC(content: string): { id: string; text: string }[] {
+  const lines = content.split('\n');
+  const slugger = new GithubSlugger();
+  const toc: { id: string; text: string }[] = [];
+  
+  let inCodeBlock = false;
+  
+  for (const line of lines) {
+    if (line.startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) continue;
+
+    const match = line.match(/^##\s+(.+)$/);
+    if (match) {
+      let rawText = match[1].trim();
+      
+      const plainTextForSlug = rawText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').trim();
+      const id = slugger.slug(plainTextForSlug);
+      
+      let text = rawText
+        .replace(/^\d+\.\s*/, '')
+        .replace(/\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu, '')
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/\[\s*\]/g, '')
+        .trim();
+        
+      if (text) {
+        toc.push({ id, text });
+      }
+    }
+  }
+  
+  return toc;
 }
 
 // ─── 본문 전처리 ─────────────────────────────────────────────────────────────

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
+import BlogBlockWrapper from './BlogBlockWrapper';
 
 interface FAQItem {
   q: string;
@@ -15,8 +16,7 @@ export default function FAQBox({ items }: FAQBoxProps) {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <div className="my-12 rounded-none overflow-hidden bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] relative">
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
+    <BlogBlockWrapper className="my-12">
       {/* 헤더 */}
       <div className="px-4 py-4 border-b border-gray-100 dark:border-white/5 flex items-center gap-3">
         <div className="w-10 h-10 rounded-none bg-gradient-to-br from-red-50 to-blue-50 dark:from-red-900/20 dark:to-blue-900/20 border border-gray-200 dark:border-white/10 flex items-center justify-center shrink-0 shadow-sm">
@@ -80,6 +80,6 @@ export default function FAQBox({ items }: FAQBoxProps) {
           </div>
         ))}
       </div>
-    </div>
+    </BlogBlockWrapper>
   );
 }

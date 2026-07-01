@@ -15,15 +15,18 @@ const nextConfig: NextConfig = {
   pageExtensions: isDev
     ? ['tsx', 'ts', 'jsx', 'js', 'dev.ts', 'dev.tsx']
     : ['tsx', 'ts', 'jsx', 'js'],
-  async rewrites() {
-    if (!isDev) return [];
+};
+
+// 정적 빌드(export) 모드 시 rewrites를 선언하면 경고가 발생하므로, 개발 환경에서만 조건부 할당합니다.
+if (isDev) {
+  nextConfig.rewrites = async () => {
     return [
       {
         source: '/api/:path*',
         destination: 'http://localhost:8788/api/:path*',
       },
     ];
-  },
-};
+  };
+}
 
 export default nextConfig;

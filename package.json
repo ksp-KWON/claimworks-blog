@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run check-quality && next build",
     "start": "next start",
     "lint": "eslint",
-    "fetch-hira": "node scripts/fetch-hira-data.js"
+    "fetch-hira": "node scripts/fetch-hira-data.js",
+    "check-quality": "node scripts/check-quality.js"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.20",

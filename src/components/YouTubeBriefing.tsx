@@ -1,4 +1,3 @@
-import React from 'react';
 import YouTubeBriefingClient from './YouTubeBriefingClient';
 
 export interface YouTubeVideo {

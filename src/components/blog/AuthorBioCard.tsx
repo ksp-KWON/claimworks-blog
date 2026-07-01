@@ -1,9 +1,9 @@
 import Image from 'next/image';
+import BlogBlockWrapper from './BlogBlockWrapper';
 
 export default function AuthorBioCard() {
   return (
-    <div className="mt-12 rounded-none overflow-hidden bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border border-gray-200 dark:border-white/10 shadow-[0_6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] relative">
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
+    <BlogBlockWrapper className="mt-12">
       <div className="flex items-start gap-4 p-5 sm:p-6">
         {/* 아바타 */}
         <div className="w-16 h-16 rounded-none bg-white flex items-center justify-center shrink-0 shadow-sm border border-gray-200 p-1">
@@ -35,6 +35,6 @@ export default function AuthorBioCard() {
           </div>
         </div>
       </div>
-    </div>
+    </BlogBlockWrapper>
   );
 }

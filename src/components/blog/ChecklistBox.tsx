@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
+import BlogBlockWrapper from './BlogBlockWrapper';
 
 interface ChecklistBoxProps {
   items: string[];
@@ -12,8 +13,7 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
   const pct = Math.round((count / items.length) * 100);
 
   return (
-    <div className="my-12 rounded-none overflow-hidden bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] relative">
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
+    <BlogBlockWrapper className="my-12">
       {/* 헤더 */}
       <div className="px-4 py-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-3.5">
@@ -94,6 +94,6 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
           </p>
         </div>
       )}
-    </div>
+    </BlogBlockWrapper>
   );
 }

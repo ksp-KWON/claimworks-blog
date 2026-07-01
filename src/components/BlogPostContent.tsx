@@ -29,12 +29,14 @@ import CTABanner from './blog/CTABanner';
 import ChecklistBox from './blog/ChecklistBox';
 import AuthorBioCard from './blog/AuthorBioCard';
 import TableOfContents from './blog/TableOfContents';
+import GlobalCalculatorAccordion from './blog/GlobalCalculatorAccordion';
 
 // 파싱 유틸리티 공통 모듈 (blog/[slug]/page.tsx와 공유)
 import {
   extractKeyPoints,
   extractFAQ,
   extractGlossary,
+  extractTOC,
   preprocessBody,
 } from '@/lib/blog-utils';
 
@@ -45,30 +47,14 @@ interface TOCItem { id: string; text: string; }
 interface BlogPostContentProps { content: string; }
 
 export default function BlogPostContent({ content }: BlogPostContentProps) {
-  const [toc, setToc] = useState<TOCItem[]>([]);
   const [activeId, setActiveId] = useState('');
   const [calcOpen, setCalcOpen] = useState(false);
 
   const keyPoints    = extractKeyPoints(content);
   const glossaryItems = extractGlossary(content);
   const faqItems     = extractFAQ(content);
+  const toc          = extractTOC(content);
   const bodyContent  = preprocessBody(content);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const headings = document.querySelectorAll<HTMLHeadingElement>('[data-blog-body] h2[id]');
-      const items = Array.from(headings).map(h => ({
-        id: h.id,
-        text: (h.textContent || '')
-          .trim()
-          .replace(/^\d+\.\s*/, '')
-          .replace(/\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu, '')
-          .trim(),
-      }));
-      setToc(items);
-    }, 150);
-    return () => clearTimeout(timer);
-  }, [bodyContent]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -164,64 +150,7 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const finalComponents: any = {
     ...components,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    calculator: ({ ...props }: any) => {
-      const isAuto = props.type === 'auto';
-      const isMedical = props.type === 'medical';
-      if (!isAuto && !isMedical) return null;
-      return (
-        <div className="my-8 relative w-full mx-auto">
-          <button
-            onClick={() => setCalcOpen(!calcOpen)}
-            className={`w-full flex items-center justify-between p-4 rounded-none border transition-all duration-300 text-left cursor-pointer shadow-[0_4px_15px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_30px_rgba(26,115,232,0.15)] ${
-              isAuto 
-                ? 'bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border-blue-200 dark:from-blue-900/10 dark:to-indigo-900/10 dark:hover:from-blue-900/20 dark:hover:to-indigo-900/20 dark:border-blue-800/30 text-[#1a73e8] dark:text-[#8ab4f8]' 
-                : 'bg-gradient-to-br from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 border-green-200 dark:from-green-900/10 dark:to-emerald-900/10 dark:hover:from-green-900/20 dark:hover:to-emerald-900/20 dark:border-green-800/30 text-[#34A853] dark:text-[#81c995]'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-xl shrink-0">{isAuto ? '🚗' : '🏥'}</span>
-              <div>
-                <div className="text-sm sm:text-base font-extrabold tracking-tight">
-                  {isAuto ? '자동차보험 예상 합의금 계산기 열기' : '실손의료비 예상 보상금 계산기 열기'}
-                </div>
-                <div className="text-[10.5px] text-gray-500 dark:text-gray-400 font-bold mt-0.5 leading-tight">
-                  나의 사고 상황 및 치료 조건으로 예상 수령액을 1분 만에 시뮬레이션해 봅니다.
-                </div>
-              </div>
-            </div>
-            <div className="shrink-0 pl-2">
-              <span className="px-3 py-1.5 bg-white dark:bg-zinc-800 text-[11px] font-extrabold rounded-lg border border-inherit shadow-2xs hover:scale-102 transition-transform">
-                {calcOpen ? '접기 📂' : '펼치기 📁'}
-              </span>
-            </div>
-          </button>
-          
-          {calcOpen && (
-            <div className="mt-4 bg-white dark:bg-[#202124] rounded-none shadow-[0_6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] border border-gray-200 dark:border-white/10 overflow-visible animate-in slide-in-from-top-3 fade-in duration-200 relative group">
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-white/8 mt-1.5">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#1A73E8] animate-pulse shadow-[0_0_6px_#1A73E8]" />
-                  <span className="text-[11px] font-extrabold text-[#1A73E8] dark:text-[#8ab4f8] tracking-[0.15em] uppercase">
-                    {isAuto ? 'AUTO INSURANCE SIMULATOR' : 'MEDICAL BILL ESTIMATOR'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#d93025]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#f29900]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#34A853]" />
-                  <span className="ml-2 text-[11px] font-bold text-gray-400 dark:text-gray-500">보상스쿨 안심 계산기</span>
-                </div>
-              </div>
-              <div className="p-5 sm:p-8">
-                {isAuto ? <AutoCalculatorContainer /> : <MedicalCalculator />}
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    },
+    calculator: () => null,
     red: ({ children }: { children: React.ReactNode }) => <strong className="text-[#d93025] dark:text-[#f28b82] font-bold">{children}</strong>,
     orange: ({ children }: { children: React.ReactNode }) => <strong className="text-[#f29900] dark:text-[#fde293] font-bold">{children}</strong>,
     green: ({ children }: { children: React.ReactNode }) => <strong className="text-[#34A853] dark:text-[#81c995] font-bold">{children}</strong>,
@@ -302,10 +231,13 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
       {/* 5. FAQ */}
       {faqItems.length > 0 && <FAQBox items={faqItems} />}
 
-      {/* 6. 저자 바이오 카드 (E-E-A-T 신호) */}
+      {/* 6. 글로벌 계산기 아코디언 */}
+      <GlobalCalculatorAccordion />
+
+      {/* 7. 저자 바이오 카드 (E-E-A-T 신호) */}
       <AuthorBioCard />
 
-      {/* 7. CTA 배너 */}
+      {/* 8. CTA 배너 */}
       <CTABanner />
     </div>
   );

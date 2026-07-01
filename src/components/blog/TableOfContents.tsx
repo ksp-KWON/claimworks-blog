@@ -1,4 +1,4 @@
-import React from 'react';
+import BlogBlockWrapper from './BlogBlockWrapper';
 
 interface TOCItem {
   id: string;
@@ -18,8 +18,7 @@ export default function TableOfContents({
 }: TableOfContentsProps) {
   if (!toc.length) return null;
   return (
-    <nav className="mb-14 rounded-none overflow-hidden bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_6px_25px_rgba(0,0,0,0.05)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] relative">
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
+    <BlogBlockWrapper className="mb-14">
       <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100 dark:border-white/5">
         <div className="w-8 h-8 rounded-none bg-gradient-to-br from-red-50 to-blue-50 dark:from-red-900/20 dark:to-blue-900/20 flex items-center justify-center shrink-0 border border-gray-200 dark:border-white/10 shadow-sm">
           <svg className="w-4 h-4 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
@@ -66,6 +65,6 @@ export default function TableOfContents({
           );
         })}
       </ul>
-    </nav>
+    </BlogBlockWrapper>
   );
 }

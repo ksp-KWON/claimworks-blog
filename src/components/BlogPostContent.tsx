@@ -17,7 +17,6 @@ import React, { useEffect, useState } from 'react';
 import KeyPointsBox from './blog/KeyPointsBox';
 import FAQBox from './blog/FAQBox';
 import CTABanner from './blog/CTABanner';
-import AuthorBioCard from './blog/AuthorBioCard';
 import ChecklistBox from './blog/ChecklistBox';
 import TableOfContents from './blog/TableOfContents';
 import GlobalCalculatorAccordion from './blog/GlobalCalculatorAccordion';
@@ -90,8 +89,6 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
         {sections.length <= 3 && <CTABanner />}
       </div>
 
-      {/* 4. 저자 바이오 카드 (맨 하단) */}
-      <AuthorBioCard />
     </div>
   );
 }

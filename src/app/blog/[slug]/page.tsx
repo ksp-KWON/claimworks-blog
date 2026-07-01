@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getPostData, getSortedPostsData } from '@/lib/posts';
 import type { Metadata } from 'next';
 import BlogPostContent from '@/components/BlogPostContent';
+import AuthorBioCard from '@/components/blog/AuthorBioCard';
 import { parseBlogPost } from '@/lib/blog-utils';
 
 export const dynamicParams = false;
@@ -231,6 +232,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
       {/* 관련 글 보기 — 내부 링크 SEO + 이탈율 감소 */}
       <RelatedPostsBox currentSlug={slug} currentPost={post} />
+
+      {/* 저자 바이오 카드 (맨 하단) */}
+      <AuthorBioCard />
 
       {/* 태그 목록 */}
       <footer className="mt-14 pt-8 border-t border-[var(--google-border)]">

@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function CTABanner() {
   return (
-    <div className="mt-12 mb-8 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[#1a73e8] transition-all duration-300 relative overflow-hidden group">
+    <div className="mt-12 mb-8 bg-white dark:bg-[#202124] px-4 py-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[#1a73e8] transition-all duration-300 relative overflow-hidden group">
       <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
         🤝
       </div>

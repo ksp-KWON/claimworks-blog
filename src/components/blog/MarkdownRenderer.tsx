@@ -9,13 +9,21 @@ import type { Components } from 'react-markdown';
 const SCROLL_OFFSET = 140;
 
 const baseComponents: Components = {
+  h1: ({ children, id }) => (
+    <h1
+      id={id}
+      style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
+      className="text-[24px] sm:text-[28px] font-black text-[#202124] dark:text-[#e8eaed] mt-16 mb-8 pb-4 border-b-4 border-[#1a73e8] dark:border-[#8ab4f8] tracking-tight break-keep"
+    >
+      {children}
+    </h1>
+  ),
   h2: ({ children, id }) => (
     <h2
       id={id}
       style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
-      className="text-[19px] sm:text-[22px] font-bold text-gray-900 dark:text-[#e8eaed] mt-12 mb-6 px-4 py-3 sm:px-6 bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex items-center gap-3 tracking-tight break-keep"
+      className="group flex items-center text-[20px] sm:text-[22px] font-black text-[#202124] dark:text-[#e8eaed] mt-14 mb-6 px-4 sm:px-5 py-3.5 bg-gradient-to-r from-gray-50 to-transparent dark:from-white/5 dark:to-transparent border-l-[6px] border-[#1a73e8] dark:border-[#8ab4f8] tracking-tight break-keep"
     >
-      <span className="flex-shrink-0 w-1.5 h-7 bg-gradient-to-b from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
       {children}
     </h2>
   ),
@@ -23,15 +31,15 @@ const baseComponents: Components = {
     <h3
       id={id}
       style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
-      className="w-full flex items-center text-[16px] sm:text-[17px] font-bold text-gray-800 dark:text-[#e8eaed] mt-8 mb-4 px-4 py-3 bg-gray-50/80 dark:bg-white/[0.03] border-l-4 border-l-[#1a73e8] border border-y-gray-200 border-r-gray-200 dark:border-y-white/10 dark:border-r-white/10 rounded-none tracking-tight break-keep shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.3)]"
+      className="flex items-center gap-2 text-[17px] sm:text-[18px] font-bold text-[#3c4043] dark:text-[#e8eaed] mt-10 mb-4 px-1 tracking-tight break-keep"
     >
+      <span className="text-[#1a73e8] dark:text-[#8ab4f8]">■</span>
       {children}
     </h3>
   ),
   blockquote: ({ children }) => (
-    <div className="my-8 p-4 sm:p-6 rounded-none bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_6px_25px_rgba(0,0,0,0.4)] flex items-start gap-3 relative overflow-hidden group">
-      <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-500" />
-      <div className="text-[15px] text-gray-800 dark:text-[#e8eaed] leading-[1.8] [&>p]:m-0 flex-1">{children}</div>
+    <div className="my-7 px-5 py-4 bg-gradient-to-br from-yellow-50/80 to-orange-50/50 dark:from-[#fbbc04]/10 dark:to-[#ea4335]/5 border border-yellow-200/50 dark:border-white/5 border-l-4 border-l-[#fbbc04] dark:border-l-[#fbbc04] text-[15px] font-medium text-gray-800 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep shadow-sm">
+      {children}
     </div>
   ),
   table: ({ children }) => (

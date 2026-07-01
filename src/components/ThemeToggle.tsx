@@ -60,12 +60,18 @@ export default function ThemeToggle() {
       })`}
       aria-label="Toggle theme"
     >
-      {/* 라이트 모드 (전구 아이콘) */}
+      {/* 라이트 모드 (해 아이콘) */}
       {theme === "light" && (
         <svg className="w-5 h-5 transition-transform duration-300 rotate-0 scale-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 2a7 7 0 0 0-7 7c0 2 1 3.9 2 5 .8 1 1 2 1 3v1a2 2 0 0 0 4 0v-1c0-1 .2-2 1-3 1-1.1 2-3 2-5a7 7 0 0 0-7-7z"></path>
-          <line x1="9" y1="22" x2="15" y2="22"></line>
-          <line x1="9" y1="18" x2="15" y2="18"></line>
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
         </svg>
       )}
 

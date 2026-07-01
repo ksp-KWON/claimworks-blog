@@ -152,21 +152,6 @@ export default function RootLayout({
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                   </svg>
                 </Link>
-                <Link href="/calculator" className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 text-[#3c4043] dark:text-[#e8eaed] hover:bg-gradient-to-br hover:from-red-50/50 hover:to-blue-50/50 dark:hover:from-red-900/20 dark:hover:to-blue-900/20 hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:shadow-sm transition-all duration-200 flex items-center justify-center group" aria-label="계산기" title="계산기">
-                  <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
-                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-                    <line x1="8" y1="6" x2="16" y2="6"></line>
-                    <line x1="8" y1="10" x2="8.01" y2="10"></line>
-                    <line x1="12" y1="10" x2="12.01" y2="10"></line>
-                    <line x1="16" y1="10" x2="16.01" y2="10"></line>
-                    <line x1="8" y1="14" x2="8.01" y2="14"></line>
-                    <line x1="12" y1="14" x2="12.01" y2="14"></line>
-                    <line x1="16" y1="14" x2="16.01" y2="14"></line>
-                    <line x1="8" y1="18" x2="8.01" y2="18"></line>
-                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                    <line x1="16" y1="18" x2="16.01" y2="18"></line>
-                  </svg>
-                </Link>
                 <Link href="/blog" className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 text-[#3c4043] dark:text-[#e8eaed] hover:bg-gradient-to-br hover:from-red-50/50 hover:to-blue-50/50 dark:hover:from-red-900/20 dark:hover:to-blue-900/20 hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:shadow-sm transition-all duration-200 flex items-center justify-center group" aria-label="블로그" title="블로그">
                   <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
                     <path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"></path>
@@ -179,7 +164,7 @@ export default function RootLayout({
                 </Link>
               </nav>
 
-              <div className="flex items-center gap-0.5 sm:gap-1 pl-1 sm:pl-2 ml-1 sm:ml-2 border-l border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-0.5 sm:gap-1">
                 {/* 테마 변경 아이콘 */}
                 <ThemeToggle />
                 
@@ -187,15 +172,6 @@ export default function RootLayout({
                 <div className="lg:hidden flex items-center">
                   <MobileSidebarDrawer tags={sortedTags} />
                 </div>
-
-                {/* 플랫폼 소개 아이콘 */}
-                <Link href="/about" className="p-1.5 sm:p-2 rounded-none border border-transparent hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 text-[#3c4043] dark:text-[#e8eaed] hover:bg-gradient-to-br hover:from-red-50/50 hover:to-blue-50/50 dark:hover:from-red-900/20 dark:hover:to-blue-900/20 hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:shadow-sm transition-all duration-200 flex items-center justify-center group" aria-label="플랫폼 소개" title="플랫폼 소개">
-                  <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                </Link>
               </div>
             </div>
           </div>
@@ -215,6 +191,8 @@ export default function RootLayout({
               © {new Date().getFullYear()} 보상스쿨 헬스케어 & 손해사정 보상가이드. All rights reserved.
             </p>
             <p className="iagree text-center md:text-right flex items-center gap-2">
+              <Link href="/about" className="hover:text-[var(--google-blue)] cursor-pointer transition-colors">플랫폼 소개</Link>
+              <span className="w-1 h-1 rounded-full bg-[#dadce0] dark:bg-[#5f6368]"></span>
               <Link href="/terms" className="hover:text-[var(--google-blue)] cursor-pointer transition-colors">이용약관</Link>
               <span className="w-1 h-1 rounded-full bg-[#dadce0] dark:bg-[#5f6368]"></span>
               <Link href="/privacy" className="hover:text-[var(--google-blue)] cursor-pointer transition-colors">개인정보처리방침</Link>

@@ -13,9 +13,6 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import AutoCalculatorContainer from './calculator/auto/AutoCalculatorContainer';
-import MedicalCalculator from './calculator/MedicalCalculator';
-
 // 분리된 서브 컴포넌트 임포트
 import KeyPointsBox from './blog/KeyPointsBox';
 import FAQBox from './blog/FAQBox';
@@ -31,13 +28,10 @@ import { parseBlogPost } from '@/lib/blog-utils';
 // ─── 스크롤 오프셋: header(64) + sticky banner(52) + 버퍼(20) = 136px ───
 const SCROLL_OFFSET = 140;
 
-interface TOCItem { id: string; text: string; }
 interface BlogPostContentProps { content: string; }
 
 export default function BlogPostContent({ content }: BlogPostContentProps) {
   const [activeId, setActiveId] = useState('');
-  const [calcOpen, setCalcOpen] = useState(false);
-
   // Single pass parser 호출
   const { keyPoints, checklistItems, faqItems, toc, sections } = parseBlogPost(content);
 

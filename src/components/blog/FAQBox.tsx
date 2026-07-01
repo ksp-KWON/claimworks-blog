@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface FAQItem {
   q: string;
@@ -56,12 +57,9 @@ export default function FAQBox({ items }: FAQBoxProps) {
                 }`}
               >
                 <div className="pb-4 pl-[26px] pr-4">
-                  <p
-                    className="text-[14px] text-gray-600 dark:text-[#bdc1c6] leading-relaxed break-keep"
-                    dangerouslySetInnerHTML={{
-                      __html: item.a.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight:700;color:currentColor">$1</strong>'),
-                    }}
-                  />
+                  <div className="text-[14px] text-gray-600 dark:text-[#bdc1c6] leading-relaxed break-keep">
+                    <MarkdownRenderer content={item.a} inline={false} />
+                  </div>
                 </div>
               </div>
             </div>

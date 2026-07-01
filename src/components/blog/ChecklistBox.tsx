@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface ChecklistBoxProps {
   items: string[];
@@ -67,14 +68,15 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
                   </svg>
                 )}
               </div>
-              <span
+              <div
                 className={`flex-1 text-[14.5px] leading-relaxed break-keep transition-colors ${
                   checked[i]
                     ? 'text-[var(--google-green)] dark:text-[#81c995] font-bold'
                     : 'text-gray-800 dark:text-[#e8eaed] font-medium group-hover:text-[var(--google-green)] dark:group-hover:text-[#81c995]'
                 }`}
-                dangerouslySetInnerHTML={{ __html: item }}
-              />
+              >
+                <MarkdownRenderer content={item} inline={true} />
+              </div>
             </button>
           ))}
         </div>

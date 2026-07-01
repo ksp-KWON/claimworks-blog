@@ -300,18 +300,15 @@ function RelatedPostsBox({
             <Link
               key={p.slug}
               href={`/blog/${p.slug}`}
-              className="group flex flex-col gap-2.5 p-4 rounded-none bg-gray-50 dark:bg-[#2d2e30] border border-gray-100 dark:border-white/5 hover:border-[#1A73E8] hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(26,115,232,0.15)] hover:bg-white dark:hover:bg-[#353638] transition-all duration-300 relative overflow-hidden"
+              className="group flex flex-row items-center gap-3 p-3.5 rounded-none bg-gray-50 dark:bg-[#2d2e30] border border-gray-100 dark:border-white/5 hover:border-[#1A73E8] hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(26,115,232,0.15)] hover:bg-white dark:hover:bg-[#353638] transition-all duration-300 relative overflow-hidden"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-none bg-white dark:bg-white/10 text-[#1A73E8] dark:text-[#8ab4f8] w-fit border border-gray-200 dark:border-white/10 shadow-sm">
-                  {p.category}
-                </span>
-                <svg className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="square" strokeLinejoin="miter" d="M9 5l7 7-7 7" /></svg>
-              </div>
-              <span className="text-[14px] font-bold text-gray-800 dark:text-gray-100 leading-snug line-clamp-2 group-hover:text-[#1A73E8] dark:group-hover:text-[#8ab4f8] transition-colors mt-1">
+              <span className="text-[10px] font-bold px-2 py-1 rounded-none bg-white dark:bg-white/10 text-[#1A73E8] dark:text-[#8ab4f8] border border-gray-200 dark:border-white/10 shadow-sm shrink-0">
+                {p.category}
+              </span>
+              <span className="flex-1 text-[14px] font-bold text-gray-800 dark:text-gray-100 leading-snug line-clamp-1 group-hover:text-[#1A73E8] dark:group-hover:text-[#8ab4f8] transition-colors">
                 {p.title}
               </span>
-              <span className="text-[11px] text-gray-400 dark:text-gray-500 mt-auto font-medium">{p.date}</span>
+              <svg className="w-4 h-4 shrink-0 text-gray-300 dark:text-gray-600 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="square" strokeLinejoin="miter" d="M9 5l7 7-7 7" /></svg>
             </Link>
           ))}
         </div>

@@ -23,9 +23,9 @@ export function useCalculatorExport(resultRef: RefObject<HTMLDivElement | null>)
 
   const shareResult = (calculatorName: string, resultTotal: number) => {
     const text = `보상스쿨 ${calculatorName} 계산결과\n▶ 예상 합의금: ${resultTotal.toLocaleString()}원\n\n자세한 내역은 보상스쿨에서 확인해보세요!`;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     if (typeof window !== 'undefined' && (window as any).Kakao && (window as any).Kakao.isInitialized()) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       (window as any).Kakao.Share.sendDefault({
         objectType: 'feed',
         content: {

@@ -1,5 +1,5 @@
 // Cloudflare Pages Function: /api/youtube
-export async function onRequest(context: any) {
+export const onRequest = async () => {
   const channelUrl = 'https://www.youtube.com/@bosangschool/videos';
 
   try {

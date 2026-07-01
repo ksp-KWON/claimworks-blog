@@ -30,53 +30,6 @@ function cleanLawText(text: string): string {
     .trim();
 }
 
-// 🧠 AI 핵심 3줄 요약 알고리즘: 법제처 판시사항 또는 판결요지에서 핵심 문장을 파싱해 가독성 높은 3줄 불렛 포인트를 리턴합니다.
-function getAiThreeLineSummary(prec: Precedent): string[] {
-  // 1. 판시사항(casePoints)이 존재하는 경우 최우선으로 분석
-  if (prec.casePoints) {
-    const lines = prec.casePoints
-      .split('\n')
-      .map(line => line.replace(/^[\s・\-\*]+/g, '').trim())
-      .filter(line => line.length > 5);
-    
-    if (lines.length >= 3) {
-      return lines.slice(0, 3);
-    }
-    if (lines.length > 0) {
-      const result = [...lines];
-      while (result.length < 3) {
-        result.push('상세 판결 내용 및 증거 관계를 확인하여 부합 여부를 검토해야 합니다.');
-      }
-      return result;
-    }
-  }
-
-  // 2. 판결요지(judgmentSummary) 분석 및 문장 분할
-  if (prec.judgmentSummary) {
-    const sentences = prec.judgmentSummary
-      .split(/(?:\[\d+\]|\n|\.\s+)/)
-      .map(s => s.trim().replace(/^[가-힣]\./, ''))
-      .filter(s => s.length > 10);
-    
-    if (sentences.length >= 3) {
-      return sentences.slice(0, 3).map(s => s.endsWith('.') ? s : s + '.');
-    }
-    if (sentences.length > 0) {
-      const result = sentences.map(s => s.endsWith('.') ? s : s + '.');
-      while (result.length < 3) {
-        result.push('보험 가입 시기의 약관 조항과 구체적 쟁점에 따른 전문가 분석이 요구됩니다.');
-      }
-      return result;
-    }
-  }
-
-  // 3. 예외 방어용 디폴트 요약 문구
-  return [
-    `본 사건은 [${prec.title || '사건번호 ' + prec.caseNo}]에 관한 법원 판단의 결정 기준입니다.`,
-    "보험금 지급 거절 사유에 대응할 수 있는 법리적 근거와 쟁점이 수록되어 있습니다.",
-    "구체적인 약관 분석 및 내 사례의 대입 가능성은 전문 손해사정사의 검토가 필요합니다."
-  ];
-}
 
 // 👨‍🏫 베테랑 손해사정사 실무 코멘트 사전 (Dictionary)
 const PRACTICAL_COMMENTS: Record<string, string> = {

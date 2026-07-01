@@ -80,7 +80,7 @@ const baseComponents: Components = {
   ),
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export const sharedComponents: any = {
   ...baseComponents,
   calculator: () => null,
@@ -101,7 +101,7 @@ export const sharedComponents: any = {
   'bg-red': ({ children }: { children: React.ReactNode }) => <span className="bg-red-200/60 dark:bg-red-900/40 px-1 py-0.5 rounded">{children}</span>,
   'bg-green': ({ children }: { children: React.ReactNode }) => <span className="bg-green-200/60 dark:bg-green-900/40 px-1 py-0.5 rounded">{children}</span>,
   
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   calloutlink: ({ ...props }: any) => {
     const href = props.href || '';
     const text = props.text || '';
@@ -149,7 +149,7 @@ interface MarkdownRendererProps {
 }
 
 export default function MarkdownRenderer({ content, inline = false }: MarkdownRendererProps) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const rendererComponents: any = {
     ...sharedComponents,
     p: ({ children }: { children: React.ReactNode }) => (

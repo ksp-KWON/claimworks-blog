@@ -10,9 +10,8 @@
  *         클라이언트에서 추가 네트워크 요청 없이 즉시 렌더링
  */
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { SpecialtyDiseaseCategories, RegionalCategories } from '@/components/SidebarCategories';
+import { RegionalCategories } from '@/components/SidebarCategories';
 import SidebarTagMore from './SidebarTagMore';
 
 interface SidebarContentProps {
@@ -22,9 +21,6 @@ interface SidebarContentProps {
 const INITIAL_TAG_COUNT = 4;
 
 export default function SidebarContent({ tags = [] }: SidebarContentProps) {
-  const [isCalcOpen, setIsCalcOpen] = useState(false);
-  const [isColOpen,  setIsColOpen]  = useState(false);
-
   const visibleTags = tags.slice(0, INITIAL_TAG_COUNT);
   const hiddenTags  = tags.slice(INITIAL_TAG_COUNT);
 

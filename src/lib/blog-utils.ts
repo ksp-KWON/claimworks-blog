@@ -16,6 +16,7 @@ export const CTA_PATTERNS         = /(?:카카오톡|call\s*to\s*action|상담\s
 
 // ─── 단일 통합 파서 (Single-pass Parser) ───────────────────────────────────
 export interface ParsedBlogPost {
+  opening: string;
   keyPoints: string[];
   checklistItems: string[];
   faqItems: { q: string; a: string }[];
@@ -28,6 +29,7 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   const slugger = new GithubSlugger();
   
   const result: ParsedBlogPost = {
+    opening: '',
     keyPoints: [],
     checklistItems: [],
     faqItems: [],
@@ -40,6 +42,7 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   let currentQ = '';
   let currentA = '';
   let inCodeBlock = false;
+  let hasFirstHeading = false;
 
   const pushCurrentSection = () => {
     if (currentSectionLines.length > 0) {
@@ -104,9 +107,12 @@ export function parseBlogPost(content: string): ParsedBlogPost {
         result.toc.push({ id, text });
       }
 
-      // 1번 섹션과 오프닝 텍스트(현재까지 모인 라인들)를 하나로 합침
-      if (result.sections.length === 0 && currentSectionLines.length > 0) {
-        currentSectionLines.push('\n' + line);
+      // 첫 번째 TOC 제목 등장 전까지의 텍스트를 오프닝으로 분리
+      if (!hasFirstHeading) {
+        hasFirstHeading = true;
+        const opStr = currentSectionLines.join('\n').trim();
+        if (opStr) result.opening = opStr;
+        currentSectionLines = [line];
       } else {
         pushCurrentSection();
         currentSectionLines.push(line);
@@ -172,13 +178,6 @@ export function parseBlogPost(content: string): ParsedBlogPost {
     result.faqItems.push({ q: currentQ, a: currentA.trim() });
   }
   pushCurrentSection();
-
-  // 파싱 완료 후, sections[0]이 헤딩(##)으로 시작하지 않고(오프닝 텍스트), sections[1]이 존재한다면 
-  // "오프닝 & 1번 섹션 문단"을 하나로 묶기 위해 병합합니다.
-  if (result.sections.length > 1 && !result.sections[0].trim().startsWith('##')) {
-    result.sections[0] = result.sections[0] + '\n\n' + result.sections[1];
-    result.sections.splice(1, 1);
-  }
 
   const applyBold = (str: string) => str.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
   

@@ -35,8 +35,7 @@ interface BlogPostContentProps {
 
 export default function BlogPostContent({ content, relatedPostsNode, authorBioNode }: BlogPostContentProps) {
   const [activeId, setActiveId] = useState('');
-  // Single pass parser 호출
-  const { keyPoints, checklistItems, faqItems, toc, sections } = parseBlogPost(content);
+  const { opening, keyPoints, checklistItems, faqItems, toc, sections } = parseBlogPost(content);
 
   useEffect(() => {
     const onScroll = () => {
@@ -63,48 +62,51 @@ export default function BlogPostContent({ content, relatedPostsNode, authorBioNo
     }
   };
 
+  // 본문 섹션(sections) 분리
+  // sections의 마지막 요소가 '클로징 본문'이 되며, 그 외는 '중간 본문'입니다.
+  const middleSections = sections.length > 1 ? sections.slice(0, -1) : [];
+  const closingSection = sections.length > 0 ? sections[sections.length - 1] : '';
+
   return (
     <div>
-      {/* 1. 목차 (최상단) */}
+      {/* 1. 핵심 요약 포인트 박스 */}
+      {keyPoints.length > 0 && <KeyPointsBox points={keyPoints} />}
+
+      {/* 2. 오프닝 (도입부 본문) */}
+      {opening && (
+        <div data-blog-body>
+          <MarkdownRenderer content={opening} />
+        </div>
+      )}
+
+      {/* 3. 이 글의 목차 */}
       {toc.length > 0 && (
         <TableOfContents toc={toc} activeId={activeId} onItemClick={handleTOCClick} />
       )}
 
-      {/* 2. Key Points */}
-      {keyPoints.length > 0 && <KeyPointsBox points={keyPoints} />}
-
-      {/* 3. 본문 (섹션별 렌더링 및 컴포넌트 자동 분배 삽입) */}
+      {/* 4. 중간 본문 섹션들 + (자가진단, FAQ 박스 분산 배치) */}
       <div data-blog-body>
         {(() => {
-          // 유효한 컴포넌트들을 순서대로 수집
-          const validBoxes = [
+          const innerBoxes = [
             checklistItems.length > 0 ? <ChecklistBox key="checklist" items={checklistItems} /> : null,
             faqItems.length > 0 ? <FAQBox key="faq" items={faqItems} /> : null,
-            <GlobalCalculatorAccordion key="calc" />,
-            <CTABanner key="cta" />,
-            relatedPostsNode ? <React.Fragment key="related">{relatedPostsNode}</React.Fragment> : null,
-            authorBioNode ? <React.Fragment key="author">{authorBioNode}</React.Fragment> : null
-          ].filter(Boolean); // null 제외
+          ].filter(Boolean);
 
-          const N = sections.length;
-          const M = validBoxes.length;
+          const N = middleSections.length;
+          const M = innerBoxes.length;
 
-          // 각 섹션 인덱스에 할당될 박스 배열 초기화
           const boxesPerSection: React.ReactNode[][] = Array.from({ length: Math.max(1, N) }, () => []);
 
           if (N > 0) {
-            // 박스 개수(M)를 섹션 개수(N)에 균등하게 분배
-            validBoxes.forEach((box, i) => {
+            innerBoxes.forEach((box, i) => {
               const sectionIndex = Math.floor((i * N) / M);
               boxesPerSection[sectionIndex].push(box);
             });
           } else {
-            // 섹션이 아예 없는 예외 경우 (모두 0번째에 몰아넣음)
-            boxesPerSection[0] = validBoxes;
+            boxesPerSection[0] = innerBoxes;
           }
 
-          // 섹션과 할당된 박스들을 순차적으로 렌더링
-          return sections.map((sec, idx) => (
+          return middleSections.map((sec, idx) => (
             <React.Fragment key={idx}>
               <MarkdownRenderer content={sec} />
               {boxesPerSection[idx] && boxesPerSection[idx].map((box) => box)}
@@ -113,6 +115,36 @@ export default function BlogPostContent({ content, relatedPostsNode, authorBioNo
         })()}
       </div>
 
+      {/* 5. 계산기 박스 */}
+      <div className="mt-8 mb-6">
+        <GlobalCalculatorAccordion />
+      </div>
+
+      {/* 6. 클로징 섹션 (마지막 본문) */}
+      {closingSection && (
+        <div data-blog-body>
+          <MarkdownRenderer content={closingSection} />
+        </div>
+      )}
+
+      {/* 7. CTA 박스 */}
+      <div className="mt-8 mb-10">
+        <CTABanner />
+      </div>
+
+      {/* 8. 관련글 박스 */}
+      {relatedPostsNode && (
+        <div className="mt-10">
+          {relatedPostsNode}
+        </div>
+      )}
+
+      {/* 9. 저자소개 박스 */}
+      {authorBioNode && (
+        <div className="mt-10">
+          {authorBioNode}
+        </div>
+      )}
     </div>
   );
 }

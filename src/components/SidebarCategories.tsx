@@ -128,9 +128,11 @@ export function RegionalCategories() {
           <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
             전국 17개 시/도, 226개 시/군/구별 보상 전문 의료기관 및 협력 병원 정보를 제공합니다.
           </p>
-          <div className="pt-1 flex items-center gap-1 text-xs font-bold text-[var(--google-green)] dark:text-[#81c995] group-hover:underline">
-            지역별 기관 찾기
-            <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          <div className="mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-green-50 dark:group-hover:bg-green-950/20 group-hover:text-[var(--google-green)] dark:group-hover:text-[#81c995]">
+            <div className="flex items-center gap-2">
+              지역별 기관 찾기
+            </div>
+            <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </div>
         </div>
       </div>
@@ -155,9 +157,11 @@ export function SpecialtyDiseaseCategories() {
           <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
             진료과목 및 질병에 따른 주요 의료분쟁 사례와 보상 청구 팁을 확인하세요.
           </p>
-          <div className="pt-1 flex items-center gap-1 text-xs font-bold text-[var(--google-blue)] dark:text-[#8ab4f8] group-hover:underline">
-            분쟁 가이드 살펴보기
-            <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          <div className="mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-[#e8f0fe] dark:group-hover:bg-[#174ea6]/20 group-hover:text-[var(--google-blue)] dark:group-hover:text-[#8ab4f8]">
+            <div className="flex items-center gap-2">
+              분쟁 가이드 살펴보기
+            </div>
+            <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </div>
         </div>
       </div>

@@ -25,7 +25,8 @@ export function getCategoryColor(category: string) {
       arrowColor: 'text-red-500',
       accentBg: 'bg-red-500',
       hoverBorder: 'hover:border-red-500 hover:shadow-[0_16px_50px_rgba(239,68,68,0.3)]',
-      icon: '🚗'
+      icon: '🚗',
+      borderLeft: 'border-l-red-500'
     };
   }
   if (c.includes('사망') || c.includes('자살')) {
@@ -36,7 +37,8 @@ export function getCategoryColor(category: string) {
       arrowColor: 'text-rose-500',
       accentBg: 'bg-rose-500',
       hoverBorder: 'hover:border-rose-500 hover:shadow-[0_16px_50px_rgba(244,63,94,0.3)]',
-      icon: '⚖️'
+      icon: '⚖️',
+      borderLeft: 'border-l-rose-500'
     };
   }
   if (c.includes('질병진단') || c.includes('실손') || c.includes('의료비')) {
@@ -47,7 +49,8 @@ export function getCategoryColor(category: string) {
       arrowColor: 'text-blue-500',
       accentBg: 'bg-blue-500',
       hoverBorder: 'hover:border-blue-500 hover:shadow-[0_16px_50px_rgba(59,130,246,0.3)]',
-      icon: '🏥'
+      icon: '🏥',
+      borderLeft: 'border-l-blue-500'
     };
   }
   if (c.includes('배상책임') || c.includes('의료')) {
@@ -58,7 +61,8 @@ export function getCategoryColor(category: string) {
       arrowColor: 'text-green-500',
       accentBg: 'bg-green-500',
       hoverBorder: 'hover:border-green-500 hover:shadow-[0_16px_50px_rgba(34,197,94,0.3)]',
-      icon: '🛡️'
+      icon: '🛡️',
+      borderLeft: 'border-l-green-500'
     };
   }
   if (c.includes('근재') || c.includes('산재')) {
@@ -69,7 +73,8 @@ export function getCategoryColor(category: string) {
       arrowColor: 'text-teal-500',
       accentBg: 'bg-teal-500',
       hoverBorder: 'hover:border-teal-500 hover:shadow-[0_16px_50px_rgba(20,184,166,0.3)]',
-      icon: '👷'
+      icon: '👷',
+      borderLeft: 'border-l-teal-500'
     };
   }
   if (c.includes('장해평가') || c.includes('면책') || c.includes('후유장해')) {
@@ -80,7 +85,8 @@ export function getCategoryColor(category: string) {
       arrowColor: 'text-purple-500',
       accentBg: 'bg-purple-500',
       hoverBorder: 'hover:border-purple-500 hover:shadow-[0_16px_50px_rgba(168,85,247,0.3)]',
-      icon: '♿'
+      icon: '♿',
+      borderLeft: 'border-l-purple-500'
     };
   }
   if (c.includes('판례') || c.includes('법률')) {
@@ -91,7 +97,8 @@ export function getCategoryColor(category: string) {
       arrowColor: 'text-indigo-500',
       accentBg: 'bg-indigo-500',
       hoverBorder: 'hover:border-indigo-500 hover:shadow-[0_16px_50px_rgba(99,102,241,0.3)]',
-      icon: '📖'
+      icon: '📖',
+      borderLeft: 'border-l-indigo-500'
     };
   }
   
@@ -100,10 +107,11 @@ export function getCategoryColor(category: string) {
     badge: 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
     border: 'hover:border-yellow-400',
     hoverText: 'group-hover:text-yellow-600 dark:group-hover:text-yellow-400',
-    arrowColor: 'text-yellow-500',
+    arrowColor: 'text-yellow-600',
     accentBg: 'bg-yellow-500',
     hoverBorder: 'hover:border-yellow-500 hover:shadow-[0_16px_50px_rgba(234,179,8,0.3)]',
-    icon: '💡'
+    icon: '💡',
+    borderLeft: 'border-l-yellow-500'
   };
 }
 
@@ -188,7 +196,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
 
                       {/* 중단: 제목 및 설명 */}
                       <div className="min-w-0 flex-1 space-y-2">
-                        <h3 className={`text-sm font-bold text-[#202124] dark:text-[#e8eaed] ${primaryColor.hoverText} transition-colors line-clamp-2 leading-snug break-keep`}>
+                        <h3 className={`text-sm font-bold text-[#202124] dark:text-[#e8eaed] ${primaryColor.hoverText} transition-colors line-clamp-2 leading-snug break-keep pl-2 border-l-[3px] ${primaryColor.borderLeft}`}>
                           {post.title}
                         </h3>
                         <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] line-clamp-2 leading-relaxed font-normal break-keep">
@@ -197,11 +205,11 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
                       </div>
 
                       {/* 하단: 디테일 바로가기 링크 */}
-                      <div className={`mt-3 pt-3 border-t border-gray-100 dark:border-white/5 flex items-center justify-between text-xs font-bold ${primaryColor.arrowColor}`}>
-                        <span>전문 읽기</span>
-                        <span className="transition-transform group-hover:translate-x-1">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </span>
+                      <div className={`mt-4 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-gray-100 dark:group-hover:bg-white/10 ${primaryColor.hoverText}`}>
+                        <div className="flex items-center gap-2">
+                          전문 읽기
+                        </div>
+                        <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                       </div>
 
                     </Link>

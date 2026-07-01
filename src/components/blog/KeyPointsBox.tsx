@@ -24,7 +24,13 @@ export default function KeyPointsBox({ points }: KeyPointsBoxProps) {
               <span
                 className="flex-1 text-[14.5px] font-normal text-gray-700 dark:text-[#bdc1c6] leading-[1.7] break-keep"
                 dangerouslySetInnerHTML={{
-                  __html: point.replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:800;color:var(--google-red)" class="dark:text-[#f28b82]">$1</strong>'),
+                  __html: point
+                    .replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:800;color:var(--google-red)" class="dark:text-[#f28b82]">$1</strong>')
+                    .replace(/<red>(.+?)<\/red>/gi, '<strong style="font-weight:800;color:#d93025" class="dark:text-[#f28b82]">$1</strong>')
+                    .replace(/<blue>(.+?)<\/blue>/gi, '<strong style="font-weight:800;color:#1A73E8" class="dark:text-[#8ab4f8]">$1</strong>')
+                    .replace(/<orange>(.+?)<\/orange>/gi, '<strong style="font-weight:800;color:#f29900" class="dark:text-[#fde293]">$1</strong>')
+                    .replace(/<green>(.+?)<\/green>/gi, '<strong style="font-weight:800;color:#34A853" class="dark:text-[#81c995]">$1</strong>')
+                    .replace(/<purple>(.+?)<\/purple>/gi, '<strong style="font-weight:800;color:#9333ea" class="dark:text-[#c084fc]">$1</strong>'),
                 }}
               />
             </li>

@@ -33,7 +33,7 @@ export default function FAQBox({ items }: FAQBoxProps) {
             <div key={i}>
               <button
                 onClick={() => setOpenIdx(openIdx === i ? null : i)}
-                className="w-full flex items-center gap-3 py-3 text-left transition-colors group/btn"
+                className="w-full flex items-center gap-3 py-2.5 text-left transition-colors group/btn"
               >
                 <span className={`text-[13px] font-black shrink-0 transition-colors mt-0.5 ${openIdx === i ? 'text-[var(--google-blue)]' : 'text-gray-400 dark:text-gray-500 group-hover/btn:text-[var(--google-blue)]'}`}>
                   Q{i + 1}
@@ -56,8 +56,8 @@ export default function FAQBox({ items }: FAQBoxProps) {
                   openIdx === i ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
-                <div className="pb-4 pl-[26px] pr-4">
-                  <div className="text-[14px] text-gray-600 dark:text-[#bdc1c6] leading-relaxed break-keep">
+                <div className="pb-3 pl-[26px] pr-4">
+                  <div className="text-[14px] text-gray-600 dark:text-[#bdc1c6] leading-[1.6] break-keep">
                     <MarkdownRenderer content={item.a} inline={false} />
                   </div>
                 </div>

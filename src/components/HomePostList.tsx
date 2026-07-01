@@ -148,7 +148,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: PostData[
                 </h2>
               </div>
               <Link 
-                href={`/search?q=${encodeURIComponent(category)}`}
+                href={`/search?q=${encodeURIComponent(category.split('·')[0].split(' ')[0])}`}
                 className={`flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-current transition-colors group/link ${primaryColor.hoverText}`}
               >
                 전체보기

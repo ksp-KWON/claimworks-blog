@@ -12,6 +12,8 @@ type Post = {
   date: string;
   summary: string;
   content: string;
+  category?: string;
+  tags?: string[];
 };
 
 function SearchResults() {
@@ -29,11 +31,16 @@ function SearchResults() {
         const res = await fetch('/api/posts');
         if (res.ok) {
           const allPosts: Post[] = await res.json();
-          const filtered = allPosts.filter(post => 
-            post.title.toLowerCase().includes(q.toLowerCase()) || 
-            post.summary.toLowerCase().includes(q.toLowerCase()) ||
-            post.content.toLowerCase().includes(q.toLowerCase())
-          );
+          const filtered = allPosts.filter(post => {
+            const query = q.toLowerCase();
+            return (
+              post.title.toLowerCase().includes(query) || 
+              post.summary.toLowerCase().includes(query) ||
+              post.content.toLowerCase().includes(query) ||
+              (post.category && post.category.toLowerCase().includes(query)) ||
+              (post.tags && post.tags.some(tag => tag.toLowerCase().includes(query)))
+            );
+          });
           setResults(filtered);
         }
       } catch (error) {

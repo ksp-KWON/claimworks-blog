@@ -3,8 +3,7 @@ import Link from 'next/link';
 import { getPostData, getSortedPostsData } from '@/lib/posts';
 import type { Metadata } from 'next';
 import BlogPostContent from '@/components/BlogPostContent';
-import { extractFAQ } from '@/lib/blog-utils';
-
+import { parseBlogPost } from '@/lib/blog-utils';
 
 export const dynamicParams = false;
 
@@ -73,8 +72,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  // FAQ 파싱 — blog-utils의 공통 함수 사용 (BlogPostContent.tsx와 동일 로직)
-  const faqs = extractFAQ(post.content);
+  // FAQ 파싱 — 단일 파서 사용
+  const { faqItems: faqs } = parseBlogPost(post.content);
 
 
   const postUrl = `https://claim-works.com/blog/${slug}`;

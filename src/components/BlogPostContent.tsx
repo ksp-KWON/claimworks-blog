@@ -26,14 +26,7 @@ import TableOfContents from './blog/TableOfContents';
 import GlobalCalculatorAccordion from './blog/GlobalCalculatorAccordion';
 import MarkdownRenderer from './blog/MarkdownRenderer';
 
-// 파싱 유틸리티 공통 모듈 (blog/[slug]/page.tsx와 공유)
-import {
-  extractKeyPoints,
-  extractFAQ,
-  extractChecklist,
-  extractTOC,
-  preprocessBody,
-} from '@/lib/blog-utils';
+import { parseBlogPost } from '@/lib/blog-utils';
 
 // ─── 스크롤 오프셋: header(64) + sticky banner(52) + 버퍼(20) = 136px ───
 const SCROLL_OFFSET = 140;
@@ -45,11 +38,8 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
   const [activeId, setActiveId] = useState('');
   const [calcOpen, setCalcOpen] = useState(false);
 
-  const keyPoints      = extractKeyPoints(content);
-  const checklistItems = extractChecklist(content);
-  const faqItems       = extractFAQ(content);
-  const toc            = extractTOC(content);
-  const bodyContent    = preprocessBody(content);
+  // Single pass parser 호출
+  const { keyPoints, checklistItems, faqItems, toc, sections } = parseBlogPost(content);
 
   useEffect(() => {
     const onScroll = () => {
@@ -61,37 +51,20 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
       setActiveId(current);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const handleTOCClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
-    const el = document.getElementById(id);
-    if (el) {
+    const element = document.getElementById(id);
+    if (element) {
       window.scrollTo({
-        top: el.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET,
-        behavior: 'smooth',
+        top: element.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET,
+        behavior: 'smooth'
       });
     }
   };
-
-  // Split bodyContent into chunks based on '## ' headings
-  const rawChunks = bodyContent.split(/(?=^##\s+)/m).filter(p => p.trim());
-  const sections: string[] = [];
-  let currentSec = '';
-  for (const chunk of rawChunks) {
-    if (!chunk.trim().startsWith('##') && sections.length === 0) {
-      currentSec = chunk; // Intro text
-    } else {
-      if (currentSec) {
-        sections.push(currentSec + '\n\n' + chunk);
-        currentSec = '';
-      } else {
-        sections.push(chunk);
-      }
-    }
-  }
-  if (currentSec) sections.push(currentSec);
 
   return (
     <div>

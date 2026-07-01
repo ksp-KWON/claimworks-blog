@@ -22,7 +22,7 @@ export default function KeyPointsBox({ points }: KeyPointsBoxProps) {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
               </span>
               <span
-                className="flex-1 text-[14.5px] font-semibold text-gray-800 dark:text-[#e8eaed] leading-[1.7] break-keep"
+                className="flex-1 text-[14.5px] font-normal text-gray-700 dark:text-[#bdc1c6] leading-[1.7] break-keep"
                 dangerouslySetInnerHTML={{
                   __html: point.replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:800;color:var(--google-red)" class="dark:text-[#f28b82]">$1</strong>'),
                 }}

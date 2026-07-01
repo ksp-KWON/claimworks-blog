@@ -72,6 +72,16 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
     }
   };
 
+  let mainBody = bodyContent;
+  let closingBody = '';
+
+  const headings = [...bodyContent.matchAll(/^##\s+.+$/gm)];
+  if (headings.length > 0) {
+    const lastHeadingIndex = headings[headings.length - 1].index;
+    mainBody = bodyContent.substring(0, lastHeadingIndex);
+    closingBody = bodyContent.substring(lastHeadingIndex);
+  }
+
   return (
     <div>
       {/* 1. 목차 (최상단) */}
@@ -82,22 +92,29 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
       {/* 2. Key Points */}
       {keyPoints.length > 0 && <KeyPointsBox points={keyPoints} />}
 
-      {/* 3. 본문 */}
+      {/* 3. 본문 (클로징 전까지) */}
       <div data-blog-body>
-        <MarkdownRenderer content={bodyContent} />
+        <MarkdownRenderer content={mainBody} />
       </div>
 
-      {/* 5. FAQ */}
-      {faqItems.length > 0 && <FAQBox items={faqItems} />}
-
-      {/* 6. 글로벌 계산기 아코디언 */}
+      {/* 4. 글로벌 계산기 아코디언 (클로징 바로 위) */}
       <GlobalCalculatorAccordion />
 
-      {/* 7. 저자 바이오 카드 (E-E-A-T 신호) */}
-      <AuthorBioCard />
+      {/* 5. 클로징 섹션 */}
+      {closingBody && (
+        <div data-blog-body>
+          <MarkdownRenderer content={closingBody} />
+        </div>
+      )}
 
-      {/* 8. CTA 배너 */}
+      {/* 6. CTA 배너 (클로징 바로 밑) */}
       <CTABanner />
+
+      {/* 7. FAQ */}
+      {faqItems.length > 0 && <FAQBox items={faqItems} />}
+
+      {/* 8. 저자 바이오 카드 (맨 하단) */}
+      <AuthorBioCard />
     </div>
   );
 }

@@ -11,7 +11,6 @@ import GithubSlugger from 'github-slugger';
 // ─── 섹션 패턴 ───────────────────────────────────────────────────────────────
 export const KEY_POINT_PATTERNS   = /(?:핵심\s*요약|key\s*point)/i;
 export const CHECKLIST_PATTERNS   = /(?:자가진단|체크리스트|1분\s*체크|체크)/i;
-export const GLOSSARY_PATTERNS    = /(?:용어\s*사전|보상\s*용어)/i;
 export const FAQ_PATTERNS         = /(?:faq|자주\s*묻는)/i;
 export const CTA_PATTERNS         = /(?:카카오톡|call\s*to\s*action|상담\s*신청)/i;
 
@@ -79,32 +78,6 @@ export function extractFAQ(content: string): { q: string; a: string }[] {
   return faqs;
 }
 
-// ─── 용어 사전 추출 ──────────────────────────────────────────────────────────
-export function extractGlossary(content: string): { term: string; definition: string }[] {
-  const lines = content.split('\n');
-  const glossary: { term: string; definition: string }[] = [];
-  let inSection = false;
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (/^##\s+/.test(trimmed) && GLOSSARY_PATTERNS.test(trimmed)) {
-      inSection = true;
-      continue;
-    }
-    if (inSection) {
-      if (/^#{1,2}\s/.test(trimmed)) break;
-      if (/\[SEO_SUMMARY\]/.test(trimmed)) break;
-      if (/^[-*]\s+/.test(trimmed)) {
-        const text = trimmed.replace(/^[-*]\s*/, '').trim();
-        const match = text.replace(/\*\*/g, '').match(/^([^:]+):\s*(.*)/);
-        if (match) {
-          glossary.push({ term: match[1].trim(), definition: match[2].trim() });
-        }
-      }
-    }
-  }
-  return glossary;
-}
 
 // ─── 목차(TOC) 추출 ──────────────────────────────────────────────────────────
 export function extractTOC(content: string): { id: string; text: string }[] {
@@ -129,7 +102,6 @@ export function extractTOC(content: string): { id: string; text: string }[] {
       if (
         KEY_POINT_PATTERNS.test(rawText) ||
         CHECKLIST_PATTERNS.test(rawText) ||
-        GLOSSARY_PATTERNS.test(rawText) ||
         FAQ_PATTERNS.test(rawText) ||
         CTA_PATTERNS.test(rawText)
       ) {
@@ -161,7 +133,7 @@ export function extractTOC(content: string): { id: string; text: string }[] {
 export function preprocessBody(content: string): string {
   const lines = content.split('\n');
   const result: string[] = [];
-  let skipType: 'NONE' | 'KEY_POINTS' | 'CHECKLIST' | 'GLOSSARY' | 'FAQ' | 'CTA' = 'NONE';
+  let skipType: 'NONE' | 'KEY_POINTS' | 'CHECKLIST' | 'FAQ' | 'CTA' = 'NONE';
   let clBuffer: string[] = [];
 
   const singleLinkRegex = /^\s*\[([^\]]+)\]\(([^)]+)\)\s*$/;
@@ -187,12 +159,11 @@ export function preprocessBody(content: string): string {
 
     if (/^##\s+/.test(trimmed)) {
       const prevSkipType = skipType;
-      let newSkipType: 'NONE' | 'KEY_POINTS' | 'CHECKLIST' | 'GLOSSARY' | 'FAQ' | 'CTA' = skipType;
+      let newSkipType: 'NONE' | 'KEY_POINTS' | 'CHECKLIST' | 'FAQ' | 'CTA' = skipType;
       let matched = false;
 
       if      (KEY_POINT_PATTERNS.test(trimmed))  { newSkipType = 'KEY_POINTS'; matched = true; }
       else if (CHECKLIST_PATTERNS.test(trimmed))  { newSkipType = 'CHECKLIST';  clBuffer = []; matched = true; }
-      else if (GLOSSARY_PATTERNS.test(trimmed))   { newSkipType = 'GLOSSARY';   matched = true; }
       else if (FAQ_PATTERNS.test(trimmed))         { newSkipType = 'FAQ';        matched = true; }
       else if (CTA_PATTERNS.test(trimmed))         { newSkipType = 'CTA';        matched = true; }
 
@@ -221,7 +192,7 @@ export function preprocessBody(content: string): string {
       } else {
         continue;
       }
-    } else if (skipType === 'GLOSSARY' || skipType === 'FAQ' || skipType === 'CTA') {
+    } else if (skipType === 'FAQ' || skipType === 'CTA') {
       if (/^#{1,2}\s/.test(trimmed)) skipType = 'NONE';
     }
 

@@ -24,7 +24,6 @@ import MedicalCalculator from './calculator/MedicalCalculator';
 // 분리된 서브 컴포넌트 임포트
 import KeyPointsBox from './blog/KeyPointsBox';
 import FAQBox from './blog/FAQBox';
-import GlossaryBox from './blog/GlossaryBox';
 import CTABanner from './blog/CTABanner';
 import ChecklistBox from './blog/ChecklistBox';
 import AuthorBioCard from './blog/AuthorBioCard';
@@ -35,7 +34,6 @@ import GlobalCalculatorAccordion from './blog/GlobalCalculatorAccordion';
 import {
   extractKeyPoints,
   extractFAQ,
-  extractGlossary,
   extractTOC,
   preprocessBody,
 } from '@/lib/blog-utils';
@@ -51,7 +49,6 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
   const [calcOpen, setCalcOpen] = useState(false);
 
   const keyPoints    = extractKeyPoints(content);
-  const glossaryItems = extractGlossary(content);
   const faqItems     = extractFAQ(content);
   const toc          = extractTOC(content);
   const bodyContent  = preprocessBody(content);
@@ -224,8 +221,6 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
         >
           {bodyContent}
         </ReactMarkdown>
-        {/* 4. 용어 사전 (본문 끝나는 부분에 위치) */}
-        {glossaryItems.length > 0 && <GlossaryBox items={glossaryItems} />}
       </div>
 
       {/* 5. FAQ */}

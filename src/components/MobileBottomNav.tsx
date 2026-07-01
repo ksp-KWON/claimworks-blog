@@ -31,7 +31,7 @@ export default function MobileBottomNav() {
       label: '홈',
       onClick: () => setOpenModal(openModal === 'home' ? 'none' : 'home'),
       icon: (
-        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'home' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'home' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
           <polyline points="9 22 9 12 15 12 15 22"></polyline>
         </svg>
@@ -43,7 +43,7 @@ export default function MobileBottomNav() {
       label: '제휴센터',
       onClick: () => setOpenModal(openModal === 'partner' ? 'none' : 'partner'),
       icon: (
-        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'partner' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'partner' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
           <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
           <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
         </svg>
@@ -55,7 +55,7 @@ export default function MobileBottomNav() {
       label: '계산기',
       onClick: () => setOpenModal(openModal === 'calculator' ? 'none' : 'calculator'),
       icon: (
-        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'calculator' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'calculator' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
           <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
           <line x1="8" y1="6" x2="16" y2="6"></line>
           <line x1="16" y1="14" x2="16.01" y2="14"></line>
@@ -76,7 +76,7 @@ export default function MobileBottomNav() {
       label: '의료기관',
       onClick: () => setOpenModal(openModal === 'hospital' ? 'none' : 'hospital'),
       icon: (
-        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'hospital' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'hospital' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
           <path d="M19 22V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"></path>
           <line x1="12" y1="10" x2="12" y2="14"></line>
           <line x1="10" y1="12" x2="14" y2="12"></line>
@@ -90,7 +90,7 @@ export default function MobileBottomNav() {
       label: '상담신청',
       onClick: () => setOpenModal(openModal === 'consult' ? 'none' : 'consult'),
       icon: (
-        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'consult' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'consult' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
         </svg>
       ),

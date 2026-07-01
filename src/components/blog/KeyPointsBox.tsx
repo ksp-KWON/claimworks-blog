@@ -4,19 +4,21 @@ interface KeyPointsBoxProps {
 
 export default function KeyPointsBox({ points }: KeyPointsBoxProps) {
   return (
-    <div className="my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden group">
+    <div className="my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(234,67,53,0.25)] hover:border-[var(--google-red)] transition-all duration-300 relative overflow-hidden group">
       <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
         💡
       </div>
       <div className="relative z-10">
-        <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5 mb-4">
-          <span className="text-[var(--google-blue)] text-lg leading-none">💡</span>
-          핵심 요약 포인트
-        </h3>
+        <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-4">
+          <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-red)] pl-2.5">
+            <span className="text-[var(--google-red)] text-lg leading-none">💡</span>
+            핵심 요약 포인트
+          </h3>
+        </div>
         <ul className="space-y-3">
           {points.map((point, i) => (
             <li key={i} className="flex items-start gap-2.5">
-              <span className="text-[var(--google-blue)] dark:text-[#8ab4f8] mt-0.5 font-bold shrink-0">
+              <span className="text-[var(--google-red)] dark:text-[#f28b82] mt-0.5 font-bold shrink-0">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
               </span>
               <span

@@ -12,28 +12,30 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
   const pct = Math.round((count / items.length) * 100);
 
   return (
-    <div className="my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden group">
+    <div className="my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(52,168,83,0.25)] hover:border-[var(--google-green)] transition-all duration-300 relative overflow-hidden group">
       <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
         ☑️
       </div>
       <div className="relative z-10">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">
-            <span className="text-[var(--google-blue)] text-lg leading-none">☑️</span>
-            1분 자가진단 체크리스트
-          </h3>
-          <div className="text-right flex items-center gap-2">
-            <span className="text-xs text-[#5f6368] font-bold">해당 항목 클릭</span>
-            <span className="text-lg font-black text-[var(--google-blue)] dark:text-[#8ab4f8]">
-              {count}<span className="text-xs font-bold text-gray-400">/{items.length}</span>
-            </span>
+        <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-green)] pl-2.5">
+              <span className="text-[var(--google-green)] text-lg leading-none">☑️</span>
+              1분 자가진단 체크리스트
+            </h3>
+            <div className="text-right flex items-center gap-2">
+              <span className="text-xs text-[#5f6368] font-bold">해당 항목 클릭</span>
+              <span className="text-lg font-black text-[var(--google-green)] dark:text-[#81c995]">
+                {count}<span className="text-xs font-bold text-gray-400">/{items.length}</span>
+              </span>
+            </div>
           </div>
         </div>
 
         {/* 진행 바 */}
         <div className="h-1 bg-gray-100 dark:bg-white/5 mb-4">
           <div
-            className="h-full bg-[var(--google-blue)] transition-all duration-500 rounded-none"
+            className="h-full bg-[var(--google-green)] transition-all duration-500 rounded-none"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -55,8 +57,8 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
               <div
                 className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center shrink-0 transition-all mt-0.5 ${
                   checked[i]
-                    ? 'bg-[var(--google-blue)] border-[var(--google-blue)] shadow-sm'
-                    : 'border-gray-300 dark:border-gray-600 group-hover:border-[var(--google-blue)]'
+                    ? 'bg-[var(--google-green)] border-[var(--google-green)] shadow-sm'
+                    : 'border-gray-300 dark:border-gray-600 group-hover:border-[var(--google-green)]'
                 }`}
               >
                 {checked[i] && (
@@ -68,8 +70,8 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
               <span
                 className={`flex-1 text-[14.5px] leading-relaxed break-keep transition-colors ${
                   checked[i]
-                    ? 'text-[var(--google-blue)] dark:text-[#8ab4f8] font-bold'
-                    : 'text-gray-800 dark:text-[#e8eaed] font-medium group-hover:text-[var(--google-blue)] dark:group-hover:text-[#8ab4f8]'
+                    ? 'text-[var(--google-green)] dark:text-[#81c995] font-bold'
+                    : 'text-gray-800 dark:text-[#e8eaed] font-medium group-hover:text-[var(--google-green)] dark:group-hover:text-[#81c995]'
                 }`}
                 dangerouslySetInnerHTML={{ __html: item }}
               />

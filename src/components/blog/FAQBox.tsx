@@ -20,12 +20,14 @@ export default function FAQBox({ items }: FAQBoxProps) {
         💬
       </div>
       <div className="relative z-10">
-        <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5 mb-4">
-          <span className="text-[var(--google-blue)] text-lg leading-none">💬</span>
-          자주 묻는 질문 FAQ TOP {items.length}
-        </h3>
+        <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-4">
+          <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">
+            <span className="text-[var(--google-blue)] text-lg leading-none">💬</span>
+            자주 묻는 질문 FAQ TOP {items.length}
+          </h3>
+        </div>
 
-        <div className="border-t border-gray-100 dark:border-white/5 divide-y divide-gray-100 dark:divide-white/5">
+        <div className="divide-y divide-gray-100 dark:divide-white/5">
           {items.map((item, i) => (
             <div key={i}>
               <button

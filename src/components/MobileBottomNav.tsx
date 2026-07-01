@@ -31,7 +31,7 @@ export default function MobileBottomNav() {
       label: '홈',
       onClick: () => setOpenModal(openModal === 'home' ? 'none' : 'home'),
       icon: (
-        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'home' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'home' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
           <polyline points="9 22 9 12 15 12 15 22"></polyline>
         </svg>
@@ -43,7 +43,7 @@ export default function MobileBottomNav() {
       label: '제휴센터',
       onClick: () => setOpenModal(openModal === 'partner' ? 'none' : 'partner'),
       icon: (
-        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'partner' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'partner' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
           <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
           <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
         </svg>
@@ -55,7 +55,7 @@ export default function MobileBottomNav() {
       label: '계산기',
       onClick: () => setOpenModal(openModal === 'calculator' ? 'none' : 'calculator'),
       icon: (
-        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'calculator' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'calculator' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
           <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
           <line x1="8" y1="6" x2="16" y2="6"></line>
           <line x1="16" y1="14" x2="16.01" y2="14"></line>
@@ -76,7 +76,7 @@ export default function MobileBottomNav() {
       label: '의료기관',
       onClick: () => setOpenModal(openModal === 'hospital' ? 'none' : 'hospital'),
       icon: (
-        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'hospital' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'hospital' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
           <path d="M19 22V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"></path>
           <line x1="12" y1="10" x2="12" y2="14"></line>
           <line x1="10" y1="12" x2="14" y2="12"></line>
@@ -90,7 +90,7 @@ export default function MobileBottomNav() {
       label: '상담신청',
       onClick: () => setOpenModal(openModal === 'consult' ? 'none' : 'consult'),
       icon: (
-        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'consult' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'consult' ? "3" : "2.5"} strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
         </svg>
       ),
@@ -111,7 +111,7 @@ export default function MobileBottomNav() {
 
       {/* 1. 홈 팝업 */}
       <div 
-        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'home' ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`lg:hidden fixed bottom-[64px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'home' ? 'translate-y-0' : 'translate-y-full'}`}
         style={{ touchAction: openModal === 'home' ? 'auto' : 'none' }}
       >
         <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto overscroll-contain">
@@ -155,7 +155,7 @@ export default function MobileBottomNav() {
 
       {/* 2. 제휴센터 팝업 */}
       <div 
-        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'partner' ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`lg:hidden fixed bottom-[64px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'partner' ? 'translate-y-0' : 'translate-y-full'}`}
         style={{ touchAction: openModal === 'partner' ? 'auto' : 'none' }}
       >
         <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto overscroll-contain">
@@ -199,7 +199,7 @@ export default function MobileBottomNav() {
 
       {/* 3. 계산기 팝업 */}
       <div 
-        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'calculator' ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`lg:hidden fixed bottom-[64px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'calculator' ? 'translate-y-0' : 'translate-y-full'}`}
         style={{ touchAction: openModal === 'calculator' ? 'auto' : 'none' }}
       >
         <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto overscroll-contain">
@@ -243,7 +243,7 @@ export default function MobileBottomNav() {
 
       {/* 4. 의료기관 팝업 */}
       <div 
-        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'hospital' ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`lg:hidden fixed bottom-[64px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'hospital' ? 'translate-y-0' : 'translate-y-full'}`}
         style={{ touchAction: openModal === 'hospital' ? 'auto' : 'none' }}
       >
         <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto overscroll-contain">
@@ -265,7 +265,7 @@ export default function MobileBottomNav() {
 
       {/* 5. 상담신청 팝업 */}
       <div 
-        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'consult' ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`lg:hidden fixed bottom-[64px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'consult' ? 'translate-y-0' : 'translate-y-full'}`}
         style={{ touchAction: openModal === 'consult' ? 'auto' : 'none' }}
       >
         <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto overscroll-contain">
@@ -297,7 +297,7 @@ export default function MobileBottomNav() {
       </div>
 
       {/* 5개의 탭 버튼 바 */}
-      <nav className="lg:hidden fixed bottom-0 left-0 w-full h-[54px] bg-white/90 dark:bg-[#121212]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-white/10 flex items-center justify-around px-1 z-[100] pb-[env(safe-area-inset-bottom)]">
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full h-[64px] bg-white/90 dark:bg-[#121212]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-white/10 flex items-center justify-around px-1 z-[100] pb-[env(safe-area-inset-bottom)]">
         {navItems.map((item) => (
           <button
             key={item.id}
@@ -305,7 +305,7 @@ export default function MobileBottomNav() {
             className={`flex flex-col items-center justify-center w-full h-full transition-colors duration-200 ${
               item.isActive
                 ? 'text-[var(--google-blue)] dark:text-[#8ab4f8]'
-                : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400'
+                : 'text-gray-900 dark:text-gray-200 hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8]'
             }`}
           >
             {item.icon}

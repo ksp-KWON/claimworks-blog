@@ -12,7 +12,7 @@
  * - 저자 바이오 카드 (E-E-A-T 신호)
  */
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AutoCalculatorContainer from './calculator/auto/AutoCalculatorContainer';
 import MedicalCalculator from './calculator/MedicalCalculator';
 
@@ -75,15 +75,23 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
     }
   };
 
-  let mainBody = bodyContent;
-  let closingBody = '';
-
-  const headings = [...bodyContent.matchAll(/^##\s+.+$/gm)];
-  if (headings.length > 0) {
-    const lastHeadingIndex = headings[headings.length - 1].index;
-    mainBody = bodyContent.substring(0, lastHeadingIndex);
-    closingBody = bodyContent.substring(lastHeadingIndex);
+  // Split bodyContent into chunks based on '## ' headings
+  const rawChunks = bodyContent.split(/(?=^##\s+)/m).filter(p => p.trim());
+  const sections: string[] = [];
+  let currentSec = '';
+  for (const chunk of rawChunks) {
+    if (!chunk.trim().startsWith('##') && sections.length === 0) {
+      currentSec = chunk; // Intro text
+    } else {
+      if (currentSec) {
+        sections.push(currentSec + '\n\n' + chunk);
+        currentSec = '';
+      } else {
+        sections.push(chunk);
+      }
+    }
   }
+  if (currentSec) sections.push(currentSec);
 
   return (
     <div>
@@ -95,31 +103,27 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
       {/* 2. Key Points */}
       {keyPoints.length > 0 && <KeyPointsBox points={keyPoints} />}
 
-      {/* 3. 본문 (클로징 전까지) */}
+      {/* 3. 본문 (섹션별 렌더링 및 컴포넌트 삽입) */}
       <div data-blog-body>
-        <MarkdownRenderer content={mainBody} />
+        {sections.map((sec, idx) => (
+          <React.Fragment key={idx}>
+            <MarkdownRenderer content={sec} />
+            
+            {idx === 0 && checklistItems.length > 0 && <ChecklistBox items={checklistItems} />}
+            {idx === 1 && faqItems.length > 0 && <FAQBox items={faqItems} />}
+            {idx === 2 && <GlobalCalculatorAccordion />}
+            {idx === 3 && <CTABanner />}
+          </React.Fragment>
+        ))}
+
+        {/* 남은 컴포넌트 처리 (섹션 개수가 모자랄 경우) */}
+        {sections.length <= 0 && checklistItems.length > 0 && <ChecklistBox items={checklistItems} />}
+        {sections.length <= 1 && faqItems.length > 0 && <FAQBox items={faqItems} />}
+        {sections.length <= 2 && <GlobalCalculatorAccordion />}
+        {sections.length <= 3 && <CTABanner />}
       </div>
 
-      {/* 4. 글로벌 계산기 아코디언 (클로징 바로 위) */}
-      <GlobalCalculatorAccordion />
-
-      {/* 5. 클로징 섹션 */}
-      {closingBody && (
-        <div data-blog-body>
-          <MarkdownRenderer content={closingBody} />
-        </div>
-      )}
-
-      {/* 6. CTA 배너 (클로징 바로 밑) */}
-      <CTABanner />
-
-      {/* 7. FAQ */}
-      {faqItems.length > 0 && <FAQBox items={faqItems} />}
-
-      {/* 7.5. Checklist */}
-      {checklistItems.length > 0 && <ChecklistBox items={checklistItems} />}
-
-      {/* 8. 저자 바이오 카드 (맨 하단) */}
+      {/* 4. 저자 바이오 카드 (맨 하단) */}
       <AuthorBioCard />
     </div>
   );

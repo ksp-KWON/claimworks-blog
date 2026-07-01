@@ -858,6 +858,22 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                           </button>
                         ))}
                       </div>
+
+                      {/* 3.5 글자색 */}
+                      <div className="flex gap-1 items-center shrink-0 border-l border-gray-200 dark:border-zinc-700 pl-4 ml-1">
+                        <span className="text-[10px] font-bold text-gray-400 mr-1">글자색</span>
+                        {[
+                          { label: '빨강', tag: 'red' },
+                          { label: '파랑', tag: 'blue' },
+                          { label: '초록', tag: 'green' },
+                          { label: '주황', tag: 'orange' },
+                          { label: '보라', tag: 'purple' }
+                        ].map(item => (
+                          <button key={item.label} onClick={() => wrapTextWithTag(item.tag)} className="px-2 py-1 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded text-[11px] font-bold transition-colors">
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Toolbar Row 2: 구조 템플릿 & 박스 */}

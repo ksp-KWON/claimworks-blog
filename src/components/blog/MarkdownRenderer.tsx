@@ -89,6 +89,18 @@ export const sharedComponents: any = {
   green: ({ children }: { children: React.ReactNode }) => <strong className="text-[#34A853] dark:text-[#81c995] font-bold">{children}</strong>,
   blue: ({ children }: { children: React.ReactNode }) => <strong className="text-[#1A73E8] dark:text-[#8ab4f8] font-bold">{children}</strong>,
   purple: ({ children }: { children: React.ReactNode }) => <strong className="text-[#9333ea] dark:text-[#c084fc] font-bold">{children}</strong>,
+  
+  // Alignment
+  left: ({ children }: { children: React.ReactNode }) => <div className="text-left w-full">{children}</div>,
+  center: ({ children }: { children: React.ReactNode }) => <div className="text-center w-full">{children}</div>,
+  right: ({ children }: { children: React.ReactNode }) => <div className="text-right w-full">{children}</div>,
+  
+  // Background Colors
+  'bg-yellow': ({ children }: { children: React.ReactNode }) => <span className="bg-yellow-200/60 dark:bg-yellow-900/40 px-1 py-0.5 rounded">{children}</span>,
+  'bg-blue': ({ children }: { children: React.ReactNode }) => <span className="bg-blue-200/60 dark:bg-blue-900/40 px-1 py-0.5 rounded">{children}</span>,
+  'bg-red': ({ children }: { children: React.ReactNode }) => <span className="bg-red-200/60 dark:bg-red-900/40 px-1 py-0.5 rounded">{children}</span>,
+  'bg-green': ({ children }: { children: React.ReactNode }) => <span className="bg-green-200/60 dark:bg-green-900/40 px-1 py-0.5 rounded">{children}</span>,
+  
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   calloutlink: ({ ...props }: any) => {
     const href = props.href || '';

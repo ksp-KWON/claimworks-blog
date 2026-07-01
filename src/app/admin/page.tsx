@@ -121,6 +121,29 @@ export default function AdminPage() {
     }, 0);
   };
 
+  // 일반 마크다운 서식을 입혀주는 함수
+  const wrapWithMarkdown = (prefix: string, suffix: string = '') => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selectedText = text.substring(start, end);
+    
+    const wrapped = `${prefix}${selectedText || '텍스트'}${suffix}`;
+    const before = text.substring(0, start);
+    const after = text.substring(end, text.length);
+    
+    setGeneratedMarkdown(before + wrapped + after);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.selectionStart = start + prefix.length;
+      textarea.selectionEnd = start + prefix.length + (selectedText.length || 3);
+    }, 0);
+  };
+
   // GitHub REST API를 사용하여 원격 파일 삭제 요청 전송
   const deletePost = async (filename: string, sha: string) => {
     if (!githubToken) return alert('GitHub 토큰이 필요합니다.');
@@ -468,80 +491,55 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-[#f8f9fa] to-[#e8eaed] dark:from-[#202124] dark:to-[#171717]">
-        {/* Straight aligned background blobs */}
-        <motion.div 
-          animate={{ scale: [1, 1.1, 1] }} 
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-0 left-0 w-full h-[400px] bg-blue-400/20 dark:bg-blue-600/10 blur-3xl"
-        />
-        <motion.div 
-          animate={{ scale: [1, 1.2, 1] }} 
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-0 left-0 w-full h-[400px] bg-purple-400/20 dark:bg-purple-600/10 blur-3xl"
-        />
-
-        <motion.form 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900">
+        <form 
           onSubmit={handleLogin} 
-          className="relative z-10 bg-white/60 dark:bg-[#303134]/60 backdrop-blur-xl p-10 rounded-none shadow-[0_8px_32px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/50 dark:border-white/10 w-[400px]"
+          className="bg-white dark:bg-zinc-800 p-8 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700 w-[400px]"
         >
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-none flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-2 tracking-tight">보안 관리자 접속</h1>
-          <p className="text-sm text-center text-gray-500 dark:text-gray-400 mb-8">안전한 글쓰기 환경을 위해 암호를 입력하세요</p>
+          <h1 className="text-xl font-bold text-center text-gray-900 dark:text-white mb-2">관리자 접속</h1>
+          <p className="text-sm text-center text-gray-500 dark:text-zinc-400 mb-8">암호를 입력하세요</p>
           
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-5 py-4 rounded-none border border-white/40 dark:border-white/10 bg-white/50 dark:bg-black/20 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white dark:focus:bg-black/40 transition-all mb-6"
+            className="w-full px-4 py-3 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6"
             placeholder="비밀번호 입력"
             autoFocus
           />
-          <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-none shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98]">
+          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md transition-colors">
             잠금 해제
           </button>
-        </motion.form>
+        </form>
       </div>
     );
   }
 
   return (
-    <div className="h-[calc(100vh-80px)] admin-page-container relative bg-[#f8f9fa] dark:bg-[#1e1e20] p-3 sm:p-4 font-sans overflow-hidden flex flex-col">
-      {/* Dynamic Background - Aligned straight to avoid diagonal tilt perception */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden flex flex-col">
-        <div className="w-full h-[50vh] bg-blue-100/40 dark:bg-blue-900/10 blur-[100px]" />
-        <div className="w-full h-[50vh] bg-purple-100/40 dark:bg-purple-900/10 blur-[100px]" />
-      </div>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-[1500px] w-full mx-auto flex flex-col flex-1 min-h-0 relative z-10 space-y-3"
-      >
+    <div className="h-[calc(100vh-80px)] admin-page-container bg-gray-100 dark:bg-zinc-950 p-3 sm:p-4 font-sans flex flex-col">
+      <div className="max-w-[1600px] w-full mx-auto flex flex-col flex-1 min-h-0 space-y-3">
         
-        {/* Header Bar - Slim & Professional */}
-        <div className="bg-white/70 dark:bg-[#2a2a2c]/80 backdrop-blur-2xl px-5 py-3 rounded-none shadow-sm border border-white/50 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-3 flex-shrink-0">
+        {/* Header Bar - Solid & Utilitarian */}
+        <div className="bg-white dark:bg-zinc-900 px-5 py-3 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 flex flex-col md:flex-row justify-between items-center gap-3 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-none bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+            <div className="w-9 h-9 rounded-md bg-blue-600 flex items-center justify-center shrink-0">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-base font-bold text-gray-900 dark:text-white tracking-tight">AI 블로그 관리 센터</h1>
-                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded">v2.1</span>
+                <h1 className="text-base font-bold text-gray-900 dark:text-white tracking-tight">대시보드 에디터</h1>
+                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded">v3.0</span>
               </div>
-              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">안전한 서버리스 보안 아키텍처</p>
+              <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-medium">관리자 전용 워크스페이스</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-2 bg-white/50 dark:bg-black/20 px-3 py-1.5 rounded-none border border-gray-100 dark:border-white/5 w-full md:w-auto overflow-x-auto">
+          <div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-950 px-3 py-1.5 rounded-md border border-gray-200 dark:border-zinc-800 w-full md:w-auto overflow-x-auto">
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-[10px] font-bold text-gray-400">Gemini:</span>
               <input 
@@ -626,12 +624,12 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
           layoutView === 'split' ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'
         }`}>
           {/* Left Column: Input Panel */}
-          <div className={`bg-white/70 dark:bg-[#2a2a2c]/80 backdrop-blur-xl p-5 rounded-none shadow-sm border border-white/50 dark:border-white/5 flex flex-col h-full min-h-0 ${
+          <div className={`bg-white dark:bg-zinc-900 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 flex flex-col h-full min-h-0 ${
             layoutView === 'preview' ? 'hidden' : ''
           }`}>
             
             {/* Mode Tab Switcher */}
-            <div className="flex bg-gray-100/50 dark:bg-black/20 p-1 rounded-none mb-4 flex-shrink-0">
+            <div className="flex bg-gray-100 dark:bg-zinc-950 p-1 rounded-md mb-4 flex-shrink-0">
               {[
                 { id: 'manual', label: '수동 (대본 포장)' },
                 { id: 'semi-auto', label: '반자동 (링크/개요)' },
@@ -647,7 +645,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                       setShowPostList(true); // 수정 탭으로 갈 때는 목록을 펼칩니다
                     }
                   }}
-                  className={`flex-1 py-2 px-3 rounded-none text-xs font-bold transition-all ${mode === m.id ? 'bg-white dark:bg-[#3f3f42] text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                  className={`flex-1 py-2 px-3 rounded-md text-xs font-bold transition-all ${mode === m.id ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300'}`}
                 >
                   {m.label}
                 </button>
@@ -813,51 +811,91 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                       </button>
                     </div>
                   )}
-                  {/* 마크다운 빌더 툴바 영역 */}
-                  <div className="flex flex-col gap-2 p-2 bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-none mb-2 flex-shrink-0">
-                    {/* 1층: 블로그 구성요소 생성 버튼들 */}
-                    <div className="flex gap-1 overflow-x-auto pb-1 custom-scrollbar shrink-0">
-                      <span className="text-[10px] font-bold text-gray-400 flex items-center shrink-0 pr-1.5 border-r border-gray-200 dark:border-white/10 mr-1.5">🧱 요소 빌더:</span>
-                      {[
-                        { label: '💡 요점', template: '\n## [💡 Key Points]\n- 여기에 핵심 요점을 입력하세요.\n- 여기에 핵심 요점을 입력하세요.\n- 여기에 핵심 요점을 입력하세요.\n' },
-                        { label: '📋 자가진단', template: '\n## [🛡️ 내 보험금/보상금 1분 자가진단 체크리스트]\n- [ ] ☑️ 자가진단 요건 1\n- [ ] ☑️ 자가진단 요건 2\n- [ ] ☑️ 자가진단 요건 3\n' },
-                        { label: '📊 표 그리기', template: '\n| 구분 | 상세 내용 | 보상 기준 |\n| :--- | :--- | :--- |\n| 항목1 | 내용1 | 기준1 |\n| 항목2 | 내용2 | 기준2 |\n' },
-                        { label: '❓ FAQ TOP3', template: '\n## [💡 자주 묻는 질문 (FAQ) TOP 3]\n### Q1. 질문 제목을 적으세요.\n답변 내용을 여기에 입력하세요.\n\n### Q2. 질문 제목을 적으세요.\n답변 내용을 여기에 입력하세요.\n\n### Q3. 질문 제목을 적으세요.\n답변 내용을 여기에 입력하세요.\n' },
-                        { label: '🚗 자동차계산기', template: '\n<calculator type="auto"></calculator>\n' },
-                        { label: '🏥 실손계산기', template: '\n<calculator type="medical"></calculator>\n' },
-                        { label: '📞 상담 CTA', template: '\n## [📞 보상 문제, 전문가의 도움으로 권리를 찾으세요]\n[👉 카카오톡 1:1 무료 상담하기 (클릭)](https://open.kakao.com/o/sWeszp7)\n' }
-                      ].map(item => (
-                        <button
-                          key={item.label}
-                          onClick={() => insertMarkdown(item.template)}
-                          type="button"
-                          className="px-2 py-1 bg-white hover:bg-gray-100 dark:bg-[#303134] dark:hover:bg-[#3f3f42] border border-gray-200 dark:border-white/5 rounded-none text-[10px] font-bold text-gray-700 dark:text-gray-200 transition-colors shrink-0 active:scale-95 shadow-xs"
-                        >
-                          {item.label}
-                        </button>
-                      ))}
+                  {/* 마크다운 빌더 툴바 영역 (Naver-style) */}
+                  <div className="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md mb-2 shrink-0 shadow-sm">
+                    {/* Toolbar Row 1: 정렬 & 기본 텍스트 서식 */}
+                    <div className="flex gap-4 overflow-x-auto pb-1 custom-scrollbar shrink-0 items-center">
+                      {/* 1. 정렬 */}
+                      <div className="flex gap-1 items-center border-r border-gray-200 dark:border-zinc-700 pr-4 shrink-0">
+                        <span className="text-[10px] font-bold text-gray-400 mr-1">정렬</span>
+                        {[
+                          { label: '⬅️ 좌', tag: 'left' },
+                          { label: '↔️ 중', tag: 'center' },
+                          { label: '➡️ 우', tag: 'right' }
+                        ].map(item => (
+                          <button key={item.label} onClick={() => wrapTextWithTag(item.tag)} className="px-2 py-1 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded text-[11px] font-bold transition-colors">
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* 2. 텍스트 포맷 */}
+                      <div className="flex gap-1 items-center border-r border-gray-200 dark:border-zinc-700 pr-4 shrink-0">
+                        <span className="text-[10px] font-bold text-gray-400 mr-1">서식</span>
+                        {[
+                          { label: '굵게(B)', prefix: '**', suffix: '**' },
+                          { label: '기울임(I)', prefix: '*', suffix: '*' },
+                          { label: '취소선', prefix: '~~', suffix: '~~' },
+                          { label: '인용구(”")', prefix: '\n> ', suffix: '' },
+                        ].map(item => (
+                          <button key={item.label} onClick={() => wrapWithMarkdown(item.prefix, item.suffix)} className="px-2 py-1 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded text-[11px] font-bold transition-colors">
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* 3. 글자 배경색 (형광펜) */}
+                      <div className="flex gap-1 items-center shrink-0">
+                        <span className="text-[10px] font-bold text-gray-400 mr-1">배경색</span>
+                        {[
+                          { label: '🖍️ 노랑', tag: 'bg-yellow' },
+                          { label: '🖍️ 파랑', tag: 'bg-blue' },
+                          { label: '🖍️ 빨강', tag: 'bg-red' },
+                          { label: '🖍️ 초록', tag: 'bg-green' }
+                        ].map(item => (
+                          <button key={item.label} onClick={() => wrapTextWithTag(item.tag)} className="px-2 py-1 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded text-[11px] font-bold transition-colors">
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    
-                    {/* 2층: 텍스트 강조 컬러 태그 버튼들 */}
-                    <div className="flex gap-1 items-center shrink-0">
-                      <span className="text-[10px] font-bold text-gray-400 flex items-center shrink-0 pr-1.5 border-r border-gray-200 dark:border-white/10 mr-1.5">🎨 강조 색상:</span>
-                      {[
-                        { label: '🔴 빨강', tag: 'red' },
-                        { label: '🟠 주황', tag: 'orange' },
-                        { label: '🟢 초록', tag: 'green' },
-                        { label: '🔵 파랑', tag: 'blue' },
-                        { label: '🟣 보라', tag: 'purple' }
-                      ].map(color => (
-                        <button
-                          key={color.tag}
-                          onClick={() => wrapTextWithTag(color.tag)}
-                          type="button"
-                          className="px-2 py-0.5 bg-white hover:bg-gray-100 dark:bg-[#303134] dark:hover:bg-[#3f3f42] border border-gray-255 dark:border-white/5 rounded-none text-[10px] font-bold text-gray-750 dark:text-gray-200 transition-colors active:scale-95"
-                        >
-                          {color.label}
-                        </button>
-                      ))}
-                      <span className="text-[9px] text-gray-400 font-medium ml-2 shrink-0">(글자 드래그 후 적용)</span>
+
+                    {/* Toolbar Row 2: 구조 템플릿 & 박스 */}
+                    <div className="flex gap-4 overflow-x-auto pb-1 custom-scrollbar shrink-0 items-center">
+                      {/* 4. 구조화 */}
+                      <div className="flex gap-1 items-center border-r border-gray-200 dark:border-zinc-700 pr-4 shrink-0">
+                        <span className="text-[10px] font-bold text-gray-400 mr-1">구조</span>
+                        {[
+                          { label: 'H2', prefix: '\n## ', suffix: '' },
+                          { label: 'H3', prefix: '\n### ', suffix: '' },
+                          { label: '링크', prefix: '[', suffix: '](https://)' },
+                          { label: '사진', prefix: '![이미지설명](', suffix: ')' },
+                          { label: '가로선', prefix: '\n---\n', suffix: '' }
+                        ].map(item => (
+                          <button key={item.label} onClick={() => wrapWithMarkdown(item.prefix, item.suffix)} className="px-2 py-1 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded text-[11px] font-bold transition-colors">
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* 5. 보상스쿨 박스 컴포넌트 */}
+                      <div className="flex gap-1 items-center shrink-0">
+                        <span className="text-[10px] font-bold text-blue-500 mr-1">컴포넌트 박스</span>
+                        {[
+                          { label: '📖 용어사전', template: '\n> 💡 **[용어명]** : 설명을 입력하세요.\n' },
+                          { label: '💡 팁', template: '\n> [!TIP]\n> 팁 내용을 입력하세요.\n' },
+                          { label: '⚠️ 경고', template: '\n> [!WARNING]\n> 경고 내용을 입력하세요.\n' },
+                          { label: '📋 요점박스', template: '\n## [💡 Key Points]\n- 요점 1\n- 요점 2\n' },
+                          { label: '☑️ 자가진단', template: '\n## [🛡️ 내 보험금/보상금 1분 자가진단 체크리스트]\n- [ ] 요건 1\n- [ ] 요건 2\n' },
+                          { label: '❓ FAQ', template: '\n## [💡 자주 묻는 질문 (FAQ) TOP 3]\n### Q1. 질문?\n답변.\n' },
+                          { label: '📊 표', template: '\n| 항목 | 내용 |\n| :--- | :--- |\n| 1 | A |\n' },
+                          { label: '🚗 車계산기', template: '\n<calculator type="auto"></calculator>\n' }
+                        ].map(item => (
+                          <button key={item.label} onClick={() => insertMarkdown(item.template)} className="px-2 py-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded text-[11px] font-bold transition-colors shadow-sm">
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -866,14 +904,14 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                     ref={textareaRef}
                     value={generatedMarkdown}
                     onChange={(e) => setGeneratedMarkdown(e.target.value)}
-                    className="flex-1 w-full p-4 font-mono text-xs leading-relaxed rounded-none border border-gray-250 dark:border-white/10 bg-gray-50/50 dark:bg-[#1e1e20]/80 text-gray-800 dark:text-gray-300 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all custom-scrollbar"
+                    className="flex-1 w-full p-4 font-mono text-[13px] leading-relaxed rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow custom-scrollbar shadow-inner"
                   />
                </motion.div>
             )}
           </div>
 
           {/* Right Column: Preview Panel */}
-          <div className={`bg-white/70 dark:bg-[#2a2a2c]/80 backdrop-blur-xl p-5 rounded-none shadow-sm border border-white/50 dark:border-white/5 flex flex-col h-full min-h-0 relative overflow-hidden ${
+          <div className={`bg-white dark:bg-zinc-900 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 flex flex-col h-full min-h-0 relative overflow-hidden ${
             layoutView === 'editor' ? 'hidden' : ''
           }`}>
             <div className="flex items-center justify-between mb-3 z-10 flex-shrink-0">
@@ -925,10 +963,10 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
              종단간 브라우저 샌드박스 암호화
            </span>
            <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono">
-             v2.1 (Glassmorphism UI)
+             v3.0 (Utilitarian UI)
            </span>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

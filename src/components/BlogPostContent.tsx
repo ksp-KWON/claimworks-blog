@@ -207,13 +207,13 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
 
   return (
     <div>
-      {/* 1. Key Points (최상단) */}
-      {keyPoints.length > 0 && <KeyPointsBox points={keyPoints} />}
-
-      {/* 2. 목차 */}
+      {/* 1. 목차 (최상단) */}
       {toc.length > 0 && (
         <TableOfContents toc={toc} activeId={activeId} onItemClick={handleTOCClick} />
       )}
+
+      {/* 2. Key Points */}
+      {keyPoints.length > 0 && <KeyPointsBox points={keyPoints} />}
 
       {/* 3. 본문 */}
       <div data-blog-body>

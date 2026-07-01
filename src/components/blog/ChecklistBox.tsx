@@ -42,7 +42,7 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
         </div>
 
         {/* 항목들 */}
-        <div className="divide-y divide-gray-100 dark:divide-white/5 border-t border-gray-100 dark:border-white/5">
+        <div className="divide-y divide-gray-100 dark:divide-white/5">
           {items.map((item, i) => (
             <button
               key={i}

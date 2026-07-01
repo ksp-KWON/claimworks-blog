@@ -172,6 +172,13 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   }
   pushCurrentSection();
 
+  // 파싱 완료 후, sections[0]이 헤딩(##)으로 시작하지 않고(오프닝 텍스트), sections[1]이 존재한다면 
+  // "오프닝 & 1번 섹션 문단"을 하나로 묶기 위해 병합합니다.
+  if (result.sections.length > 1 && !result.sections[0].trim().startsWith('##')) {
+    result.sections[0] = result.sections[0] + '\n\n' + result.sections[1];
+    result.sections.splice(1, 1);
+  }
+
   result.sections = result.sections.map(sec => sec.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>'));
 
   return result;

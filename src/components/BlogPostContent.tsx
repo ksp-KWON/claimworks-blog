@@ -27,9 +27,13 @@ import { parseBlogPost } from '@/lib/blog-utils';
 // ─── 스크롤 오프셋: header(64) + sticky banner(52) + 버퍼(20) = 136px ───
 const SCROLL_OFFSET = 140;
 
-interface BlogPostContentProps { content: string; }
+interface BlogPostContentProps { 
+  content: string;
+  relatedPostsNode?: React.ReactNode;
+  authorBioNode?: React.ReactNode;
+}
 
-export default function BlogPostContent({ content }: BlogPostContentProps) {
+export default function BlogPostContent({ content, relatedPostsNode, authorBioNode }: BlogPostContentProps) {
   const [activeId, setActiveId] = useState('');
   // Single pass parser 호출
   const { keyPoints, checklistItems, faqItems, toc, sections } = parseBlogPost(content);
@@ -69,24 +73,44 @@ export default function BlogPostContent({ content }: BlogPostContentProps) {
       {/* 2. Key Points */}
       {keyPoints.length > 0 && <KeyPointsBox points={keyPoints} />}
 
-      {/* 3. 본문 (섹션별 렌더링 및 컴포넌트 삽입) */}
+      {/* 3. 본문 (섹션별 렌더링 및 컴포넌트 자동 분배 삽입) */}
       <div data-blog-body>
-        {sections.map((sec, idx) => (
-          <React.Fragment key={idx}>
-            <MarkdownRenderer content={sec} />
-            
-            {idx === 0 && checklistItems.length > 0 && <ChecklistBox items={checklistItems} />}
-            {idx === 1 && faqItems.length > 0 && <FAQBox items={faqItems} />}
-            {idx === 2 && <GlobalCalculatorAccordion />}
-            {idx === 3 && <CTABanner />}
-          </React.Fragment>
-        ))}
+        {(() => {
+          // 유효한 컴포넌트들을 순서대로 수집
+          const validBoxes = [
+            checklistItems.length > 0 ? <ChecklistBox key="checklist" items={checklistItems} /> : null,
+            faqItems.length > 0 ? <FAQBox key="faq" items={faqItems} /> : null,
+            <GlobalCalculatorAccordion key="calc" />,
+            <CTABanner key="cta" />,
+            relatedPostsNode ? <React.Fragment key="related">{relatedPostsNode}</React.Fragment> : null,
+            authorBioNode ? <React.Fragment key="author">{authorBioNode}</React.Fragment> : null
+          ].filter(Boolean); // null 제외
 
-        {/* 남은 컴포넌트 처리 (섹션 개수가 모자랄 경우) */}
-        {sections.length <= 0 && checklistItems.length > 0 && <ChecklistBox items={checklistItems} />}
-        {sections.length <= 1 && faqItems.length > 0 && <FAQBox items={faqItems} />}
-        {sections.length <= 2 && <GlobalCalculatorAccordion />}
-        {sections.length <= 3 && <CTABanner />}
+          const N = sections.length;
+          const M = validBoxes.length;
+
+          // 각 섹션 인덱스에 할당될 박스 배열 초기화
+          const boxesPerSection: React.ReactNode[][] = Array.from({ length: Math.max(1, N) }, () => []);
+
+          if (N > 0) {
+            // 박스 개수(M)를 섹션 개수(N)에 균등하게 분배
+            validBoxes.forEach((box, i) => {
+              const sectionIndex = Math.floor((i * N) / M);
+              boxesPerSection[sectionIndex].push(box);
+            });
+          } else {
+            // 섹션이 아예 없는 예외 경우 (모두 0번째에 몰아넣음)
+            boxesPerSection[0] = validBoxes;
+          }
+
+          // 섹션과 할당된 박스들을 순차적으로 렌더링
+          return sections.map((sec, idx) => (
+            <React.Fragment key={idx}>
+              <MarkdownRenderer content={sec} />
+              {boxesPerSection[idx] && boxesPerSection[idx].map((box) => box)}
+            </React.Fragment>
+          ));
+        })()}
       </div>
 
     </div>

@@ -227,14 +227,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
       </header>
 
-      {/* 본문 — BlogPostContent 컴포넌트로 렌더링 */}
-      <BlogPostContent content={post.content} />
-
-      {/* 관련 글 보기 — 내부 링크 SEO + 이탈율 감소 */}
-      <RelatedPostsBox currentSlug={slug} currentPost={post} />
-
-      {/* 저자 바이오 카드 (맨 하단) */}
-      <AuthorBioCard />
+      {/* 본문 — BlogPostContent 컴포넌트로 렌더링 (내부에서 박스 자동 분배) */}
+      <BlogPostContent 
+        content={post.content} 
+        relatedPostsNode={<RelatedPostsBox currentSlug={slug} currentPost={post} />}
+        authorBioNode={<AuthorBioCard />}
+      />
 
       {/* 태그 목록 */}
       <footer className="mt-14 pt-8 border-t border-[var(--google-border)]">

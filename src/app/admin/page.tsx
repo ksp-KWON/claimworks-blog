@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import AdminSidebar from '@/components/admin/AdminSidebar';
+import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import BlogPostContent from '@/components/BlogPostContent';
 import { 
   STRICT_RULES, 
@@ -15,144 +17,167 @@ import {
   cleanAnalysisBlock
 } from '@/lib/prompt-rules';
 
-
 const REPO_OWNER = 'ksp-KWON';
 const REPO_NAME = 'claimworks-blog';
 const POSTS_PATH = 'src/content/posts';
 
-interface GitHubFile {
-  name: string;
-  sha: string;
-  download_url?: string;
-  content?: string;
+// YAML 파싱 유틸리티 (단순 버전)
+function parseYamlFrontmatter(markdown: string) {
+  const match = markdown.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return { content: markdown, data: {} as any };
+  
+  const yamlContent = match[1];
+  const restContent = markdown.replace(/^---\n[\s\S]*?\n---/, '').trim();
+  
+  const data: any = {};
+  const lines = yamlContent.split('\n');
+  lines.forEach(line => {
+    const colonIdx = line.indexOf(':');
+    if (colonIdx > 0) {
+      const key = line.slice(0, colonIdx).trim();
+      let value = line.slice(colonIdx + 1).trim();
+      if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
+      if (key === 'tags' && value.startsWith('[')) {
+        try { data[key] = JSON.parse(value); } catch(e) { data[key] = []; }
+      } else {
+        data[key] = value;
+      }
+    }
+  });
+  return { content: restContent, data };
 }
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   
-  // Settings - Lazy initialization to avoid calling setState synchronously in useEffect
-  const [geminiKey, setGeminiKey] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('GEMINI_API_KEY') || '';
-    }
-    return '';
-  });
-  const [githubToken, setGithubToken] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('GITHUB_TOKEN') || '';
-    }
-    return '';
-  });
+  const [geminiKey, setGeminiKey] = useState('');
+  const [githubToken, setGithubToken] = useState('');
+
+  useEffect(() => {
+    setGeminiKey(localStorage.getItem('GEMINI_API_KEY') || '');
+    setGithubToken(localStorage.getItem('GITHUB_TOKEN') || '');
+  }, []);
   
-  // App State
-  const [mode, setMode] = useState<'blank' | 'manual' | 'semi-auto' | 'auto' | 'edit'>('manual');
-  const [selectedPostType, setSelectedPostType] = useState<'all' | 'precedent' | 'trend'>('all');
-  const [inputText, setInputText] = useState('');
-  const [generatedMarkdown, setGeneratedMarkdown] = useState('');
+  // Editor State
+  const [title, setTitle] = useState('');
+  const [summary, setSummary] = useState('');
+  const [category, setCategory] = useState('판례법률석');
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [tagsInput, setTagsInput] = useState('');
+  const [content, setContent] = useState('');
   const [slug, setSlug] = useState('');
-  
-  // Edit State
-  const [postList, setPostList] = useState<{name: string, sha: string, title: string}[]>([]);
   const [selectedPostSha, setSelectedPostSha] = useState('');
+  
+  // GitHub Post List
+  const [postList, setPostList] = useState<{name: string, sha: string, title: string}[]>([]);
   
   // UI State
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
-  const [isPreview, setIsPreview] = useState(false);
-  
-  // 화면 레이아웃 보기 모드 (split: 반반, editor: 작성창만, preview: 미리보기만)
-  const [layoutView, setLayoutView] = useState<'split' | 'editor' | 'preview'>('split');
-  // 글 수정 탭에서 목록 창 접고 펼치기 상태
-  const [showPostList, setShowPostList] = useState(true);
+  const [showPreview, setShowPreview] = useState(true);
 
-  // 마크다운 최상단의 YAML Frontmatter(설정 영역)를 지워주는 함수
-  const cleanFrontmatter = (markdown: string) => {
-    if (!markdown) return '';
-    return markdown.replace(/^---[\s\S]*?---/, '').trim();
+  // 컴파일된 전체 마크다운 문자열 (미리보기 및 발행용)
+  const compiledTags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(Boolean) : [];
+  const compiledMarkdown = `---
+title: "${title.replace(/"/g, '\\"')}"
+summary: "${summary.replace(/"/g, '\\"')}"
+category: "${category}"
+date: "${date}"
+tags: ${JSON.stringify(compiledTags)}
+---
+
+${content}
+`;
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === '9913006') setIsLoggedIn(true);
+    else alert('비밀번호가 일치하지 않습니다.');
   };
 
-  // Textarea DOM reference for inserting markdown formatting
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const saveKeys = () => {
+    localStorage.setItem('GEMINI_API_KEY', geminiKey);
+    localStorage.setItem('GITHUB_TOKEN', githubToken);
+    setStatusMessage('🔑 키가 안전하게 저장되었습니다.');
+    setTimeout(() => setStatusMessage(''), 3000);
+  };
 
-  // 텍스트 영역의 커서 위치에 마크다운 템플릿을 자동으로 삽입해주는 헬퍼 함수
-  const insertMarkdown = (template: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) {
-      setGeneratedMarkdown(prev => prev + '\n' + template);
-      return;
+  const showStatus = (msg: string, autoHide = 0) => {
+    setStatusMessage(msg);
+    if (autoHide > 0) setTimeout(() => setStatusMessage(''), autoHide);
+  };
+
+  const fetchPostList = async () => {
+    if (!githubToken) return alert('GitHub 토큰이 필요합니다.');
+    setIsLoading(true);
+    try {
+      const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${POSTS_PATH}`, {
+        headers: { 'Authorization': `Bearer ${githubToken}` }
+      });
+      if (!res.ok) throw new Error('목록을 불러오지 못했습니다.');
+      const githubFiles = await res.json();
+      const mdFiles = githubFiles.filter((f: any) => f.name.endsWith('.md'));
+
+      const titlesMap: Record<string, string> = {};
+      try {
+        const dataRes = await fetch('/api/posts');
+        if (dataRes.ok) {
+          const postsData = await dataRes.json();
+          postsData.forEach((post: any) => {
+            titlesMap[`${post.slug}.md`] = post.title;
+          });
+        }
+      } catch (e) {}
+
+      const combined = mdFiles.map((file: any) => ({
+        name: file.name,
+        sha: file.sha,
+        title: titlesMap[file.name] || file.name.replace('.md', '')
+      }));
+
+      setPostList(combined);
+      showStatus('📄 기존 글 목록 로드 완료', 3000);
+    } catch (error: any) {
+      showStatus(`오류: ${error.message}`);
     }
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const before = text.substring(0, start);
-    const after = text.substring(end, text.length);
-    
-    setGeneratedMarkdown(before + template + after);
-    
-    // 포커스를 돌려주고 커서 위치를 삽입 텍스트 바로 뒤로 이동
-    setTimeout(() => {
-      textarea.focus();
-      textarea.selectionStart = textarea.selectionEnd = start + template.length;
-    }, 0);
+    setIsLoading(false);
   };
 
-  // 선택된(드래그) 텍스트를 특정 HTML 색상 태그 등으로 감싸주는 함수
-  const wrapTextWithTag = (tagName: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const selectedText = text.substring(start, end);
-    
-    const wrapped = `<${tagName}>${selectedText || '강조텍스트'}</${tagName}>`;
-    const before = text.substring(0, start);
-    const after = text.substring(end, text.length);
-    
-    setGeneratedMarkdown(before + wrapped + after);
-    
-    setTimeout(() => {
-      textarea.focus();
-      textarea.selectionStart = start;
-      textarea.selectionEnd = start + wrapped.length;
-    }, 0);
+  const loadPost = async (filename: string, sha: string) => {
+    if (!githubToken) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${POSTS_PATH}/${filename}`, {
+        headers: { 'Authorization': `Bearer ${githubToken}` }
+      });
+      const data = await res.json();
+      const rawMarkdown = decodeURIComponent(escape(window.atob(data.content)));
+      
+      const { content: rawContent, data: meta } = parseYamlFrontmatter(rawMarkdown);
+      
+      setSelectedPostSha(sha);
+      setSlug(filename.replace('.md', ''));
+      setTitle(meta.title || '');
+      setSummary(meta.summary || '');
+      setCategory(meta.category || '기타');
+      setDate(meta.date || new Date().toISOString().split('T')[0]);
+      setTagsInput(Array.isArray(meta.tags) ? meta.tags.join(', ') : '');
+      setContent(rawContent);
+      
+      showStatus(`📝 "${meta.title || filename}" 수정 모드`, 3000);
+    } catch (error: any) {
+      showStatus(`오류: ${error.message}`);
+    }
+    setIsLoading(false);
   };
 
-  // 일반 마크다운 서식을 입혀주는 함수
-  const wrapWithMarkdown = (prefix: string, suffix: string = '') => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const selectedText = text.substring(start, end);
-    
-    const wrapped = `${prefix}${selectedText || '텍스트'}${suffix}`;
-    const before = text.substring(0, start);
-    const after = text.substring(end, text.length);
-    
-    setGeneratedMarkdown(before + wrapped + after);
-    
-    setTimeout(() => {
-      textarea.focus();
-      textarea.selectionStart = start + prefix.length;
-      textarea.selectionEnd = start + prefix.length + (selectedText.length || 3);
-    }, 0);
-  };
-
-  // GitHub REST API를 사용하여 원격 파일 삭제 요청 전송
   const deletePost = async (filename: string, sha: string) => {
     if (!githubToken) return alert('GitHub 토큰이 필요합니다.');
-    const confirmed = window.confirm(`[⚠️ 영구 삭제 경고]\n정말로 "${filename}" 포스팅 파일을 원격 저장소에서 영구히 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`);
-    if (!confirmed) return;
+    if (!window.confirm(`[⚠️ 영구 삭제] 정말로 "${filename}" 파일을 삭제하시겠습니까?`)) return;
     
     setIsLoading(true);
-    setStatusMessage(`🗑️ GitHub에서 "${filename}" 파일을 영구 삭제하고 있습니다...`);
-    
+    showStatus(`🗑️ 삭제 중...`);
     try {
       const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${POSTS_PATH}/${filename}`, {
         method: 'DELETE',
@@ -161,35 +186,24 @@ export default function AdminPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: `docs: 관리자 페이지에서 포스팅 삭제 (${filename})`,
+          message: `docs: 포스팅 삭제 (${filename})`,
           sha: sha,
           branch: 'main'
         })
       });
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message);
-      }
-      
-      setStatusMessage(`✅ "${filename}" 포스팅이 성공적으로 삭제되었습니다! (반영까지 2~3분 소요)`);
-      setTimeout(() => setStatusMessage(''), 4000);
-      
-      // 글 목록 새로고침
+      if (!res.ok) throw new Error(await res.text());
+      showStatus(`✅ 삭제 성공!`, 4000);
       await fetchPostList();
-    } catch (error) {
-      const err = error as Error;
-      setStatusMessage(`삭제 실패: ${err.message}`);
+    } catch (error: any) {
+      showStatus(`삭제 실패: ${error.message}`);
     }
     setIsLoading(false);
   };
 
-  const triggerAutoPost = async () => {
+  const runAutoPublish = async (type: string) => {
     if (!githubToken) return alert('GitHub 토큰이 필요합니다.');
-    
     setIsLoading(true);
-    setStatusMessage('🤖 GitHub에 데일리 자동 발행(Auto Post) 트리거를 요청하고 있습니다...');
-    
+    showStatus('🤖 원격 자동 발행 기동 중...');
     try {
       const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/auto-post.yml/dispatches`, {
         method: 'POST',
@@ -198,270 +212,33 @@ export default function AdminPage() {
           'Accept': 'application/vnd.github+json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ref: 'main',
-          inputs: {
-            post_type: selectedPostType
-          }
-        })
+        body: JSON.stringify({ ref: 'main', inputs: { post_type: type } })
       });
-      
-      if (res.status === 204) {
-        setStatusMessage('✅ 자동 발행 기동 명령이 성공적으로 전송되었습니다! 아래 [실시간 배포 로그 확인]을 눌러 빌드 상태를 모니터링하세요.');
-      } else {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP 에러 상태 코드: ${res.status}`);
-      }
-    } catch (error) {
-      const err = error as Error;
-      setStatusMessage(`기동 실패: ${err.message}`);
+      if (res.status === 204) showStatus('✅ 자동 발행 기동 명령 전송 완료!');
+      else throw new Error(`HTTP ${res.status}`);
+    } catch (error: any) {
+      showStatus(`기동 실패: ${error.message}`);
     }
     setIsLoading(false);
-  };
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === '9913006') {
-      setIsLoggedIn(true);
-    } else {
-      alert('비밀번호가 일치하지 않습니다.');
-    }
-  };
-
-  const saveKeys = () => {
-    localStorage.setItem('GEMINI_API_KEY', geminiKey);
-    localStorage.setItem('GITHUB_TOKEN', githubToken);
-    setStatusMessage('🔑 인증 키가 브라우저에 안전하게 저장되었습니다.');
-    setTimeout(() => setStatusMessage(''), 3000);
-  };
-
-  const fetchPostList = async () => {
-    if (!githubToken) return alert('GitHub 토큰이 필요합니다.');
-    setIsLoading(true);
-    try {
-      // 1. GitHub API에서 최신 파일 목록과 SHA 추출
-      const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${POSTS_PATH}`, {
-        headers: { 'Authorization': `Bearer ${githubToken}` }
-      });
-      if (!res.ok) throw new Error('목록을 불러오지 못했습니다. 토큰을 확인해주세요.');
-      const githubFiles = await res.json() as GitHubFile[];
-      const mdFiles = githubFiles.filter((f: GitHubFile) => f.name.endsWith('.md'));
-
-      // 2. 빠르고 직관적인 제목 매핑을 위해 API 활용
-      const titlesMap: Record<string, string> = {};
-      try {
-        const dataRes = await fetch('/api/posts');
-        if (dataRes.ok) {
-          const postsData = await dataRes.json() as { slug: string; title: string }[];
-          postsData.forEach((post) => {
-            titlesMap[`${post.slug}.md`] = post.title;
-          });
-        }
-      } catch (e) {
-        console.warn('제목 매핑 데이터를 불러오지 못했습니다.', e);
-      }
-
-      // 3. 데이터 결합 (제목이 없으면 파일명 표시)
-      const combined = mdFiles.map((file: GitHubFile) => ({
-        name: file.name,
-        sha: file.sha,
-        title: titlesMap[file.name] || file.name.replace('.md', '')
-      }));
-
-      setPostList(combined);
-      setStatusMessage('📄 기존 글 목록을 성공적으로 불러왔습니다.');
-      setTimeout(() => setStatusMessage(''), 3000);
-    } catch (error) {
-      const err = error as Error;
-      setStatusMessage(`오류: ${err.message}`);
-    }
-    setIsLoading(false);
-  };
-
-  const loadPost = async (filename: string, sha: string) => {
-    if (!githubToken) return;
-    setIsLoading(true);
-    setSelectedPostSha(sha);
-    setSlug(filename.replace('.md', ''));
-    try {
-      const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${POSTS_PATH}/${filename}`, {
-        headers: { 'Authorization': `Bearer ${githubToken}` }
-      });
-      const data = await res.json() as { content: string };
-      const content = decodeURIComponent(escape(window.atob(data.content)));
-      setGeneratedMarkdown(content);
-      setIsPreview(true);
-      setShowPostList(false); // 기존 글 목록은 자동으로 접어서 작성창 크기를 극대화합니다.
-      setStatusMessage(`📝 편집 모드: 수정을 완료한 뒤 우측 발행 버튼을 누르세요.`);
-    } catch (error) {
-      const err = error as Error;
-      setStatusMessage(`오류: ${err.message}`);
-    }
-    setIsLoading(false);
-  };
-
-  const callGeminiAPI = async (prompt: string) => {
-    if (!geminiKey) return alert('Gemini API 키가 필요합니다.');
-    setIsLoading(true);
-    setStatusMessage('✨ AI가 글을 작성하고 있습니다... (10~20초 소요)');
-    
-    const models = [
-      'gemini-pro-latest',         // 1순위: 최고 품질 글쓰기용 Pro 모델 (3.1 Pro Preview 등)
-      'gemini-flash-latest',       // 2순위: 속도 지향형 Flash (3.5 Flash)
-      'gemini-flash-lite-latest'   // 3순위: 경량형 Flash-Lite (할당량 대비)
-    ];
-    
-    let success = false;
-    let lastError = '';
-
-    for (const model of models) {
-      // 모델별 실제 허용 한계 토큰 (기본 32768, lite 계열은 16384)
-      const maxTokens = model.includes('lite') ? 16384 : 32768;
-      
-      // 모델 사양별 지능형 분량 권장사항 텍스트 동적 계산 (Self-Adaptive Token-Aware)
-      const modelCapacityText = calculateModelCapacity(maxTokens);
-
-      const finalizedPrompt = prompt.replace(/\{\{TARGET_MODEL_CAPACITY\}\}/g, modelCapacityText);
-
-      try {
-        setStatusMessage(`✨ AI가 글을 작성하고 있습니다... (사용 모델: ${model})`);
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: finalizedPrompt }] }],
-            generationConfig: { 
-              temperature: 0.7,
-              maxOutputTokens: maxTokens
-            }
-          })
-        });
-        
-        if (!response.ok) {
-          const errData = await response.json() as any;
-          throw new Error(errData?.error?.message || `HTTP ${response.status}`);
-        }
-        
-        const data = await response.json() as { error?: { message: string }; candidates: { content: { parts: { text: string }[] } }[] };
-        if (data.error) throw new Error(data.error.message);
-        
-        let text = data.candidates[0].content.parts[0].text;
-        
-        // CoT [ANALYSIS] 영역 도려내기
-        text = cleanAnalysisBlock(text);
-        
-        const slugMatch = text.match(/slug:\s*"?([^"\n]+)"?/);
-        if (slugMatch) {
-          setSlug(slugMatch[1].trim());
-        } else {
-          setSlug(`post-${Date.now()}`);
-        }
-        
-        setGeneratedMarkdown(text);
-        setIsPreview(true);
-        setStatusMessage('🎉 작성이 완료되었습니다! 미리보기를 확인하고 발행하세요.');
-        success = true;
-        break; // 성공 시 종료
-      } catch (error) {
-        const err = error as Error;
-        console.warn(`${model} 호출 실패:`, err.message);
-        lastError = err.message;
-      }
-    }
-    
-    if (!success) {
-      setStatusMessage(`API 오류: 모든 모델 호출에 실패했습니다. (마지막 에러: ${lastError})`);
-    }
-    setIsLoading(false);
-  };
-
-  const handleGenerate = () => {
-    if (!inputText.trim()) return alert('내용을 입력해주세요.');
-    
-    const existingPostsList = postList.length > 0
-      ? postList.slice(0, 5).map(p => `- [${p.title}](/blog/${p.name.replace('.md', '')})`).join('\n')
-      : "- (없음)";
-
-    const strictRulesPrompt = `${STRICT_RULES}\n\n# 기존 글 슬러그 목록 (참고용):\n${existingPostsList}`;
-    const calcTag = '<calculator type="auto" />'; // 기본값 auto 주입
-    const currentDate = new Date().toISOString().split('T')[0];
-    const angle = getRandomAngle();
-
-    let prompt = "";
-    if (mode === 'manual') {
-      prompt = `
-${getBlogRole()}
-
-# Objective
-제시된 유튜브 대본(원문)을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 준수하며 타겟 모델의 물리 한계 스펙 내에서 아주 상세하고 방대한 분량의 초고품질 전문 칼럼을 작성하십시오.
-
-${getBlogLengthRulesManual()}
-
-# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
-${strictRulesPrompt}
-
-${getBlogFrontmatter('알맞은 제목 생성 (어색한 콜론 사용 금지, 단어 구분이 필요할 때만 콜론 앞뒤 한 칸 공백 적용)', currentDate)}
-
-제시된 원문 대본 내용:
-${inputText}
-
-${getBlogSkeleton(angle, calcTag, existingPostsList)}
-
-위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.
-`;
-    } else if (mode === 'semi-auto') {
-      prompt = `
-${getBlogRole()}
-
-# Objective
-제시된 주제/키워드/참고내용을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 만족하며 구글 검색 최적화(SEO)에 적합한 깊이 있는 전문 칼럼을 타겟 모델의 물리 한계 스펙 내에서 새롭게 창작하십시오.
-
-${getBlogLengthRulesSemiAuto()}
-
-# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
-${strictRulesPrompt}
-
-${getBlogFrontmatter('매력적인 제목 생성 (어색한 콜론 사용 금지, 단어 구분이 필요할 때만 콜론 앞뒤 한 칸 공백 적용)', currentDate)}
-
-제시된 주제/키워드/참고링크:
-${inputText}
-
-${getBlogSkeleton(angle, calcTag, existingPostsList)}
-
-위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.
-`;
-    }
-    callGeminiAPI(prompt);
   };
 
   const publishToGithub = async () => {
     if (!githubToken) return alert('GitHub 토큰이 필요합니다.');
-    if (!slug) return alert('슬러그(파일명)가 없습니다.');
-    if (!generatedMarkdown) return alert('발행할 글이 없습니다.');
-
-    setIsLoading(true);
-    setStatusMessage('🚀 GitHub에 안전하게 커밋하고 있습니다...');
+    const finalSlug = slug || `post-${Date.now()}`;
     
+    setIsLoading(true);
+    showStatus('🚀 GitHub에 발행하는 중...');
     try {
-      const contentBase64 = window.btoa(unescape(encodeURIComponent(generatedMarkdown)));
-      const filename = `${slug}.md`;
+      const contentBase64 = window.btoa(unescape(encodeURIComponent(compiledMarkdown)));
+      const filename = `${finalSlug}.md`;
       const path = `${POSTS_PATH}/${filename}`;
       
-      const body: {
-        message: string;
-        content: string;
-        branch: string;
-        sha?: string;
-      } = {
-        message: `docs: 관리자 페이지에서 자동 작성된 포스팅 발행 (${filename})`,
+      const body: any = {
+        message: selectedPostSha ? `docs: 포스팅 수정 (${filename})` : `docs: 새 포스팅 발행 (${filename})`,
         content: contentBase64,
         branch: 'main'
       };
-      
-      if (mode === 'edit' && selectedPostSha) {
-        body.sha = selectedPostSha;
-        body.message = `docs: 관리자 페이지에서 포스팅 수정 (${filename})`;
-      }
+      if (selectedPostSha) body.sha = selectedPostSha;
 
       const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`, {
         method: 'PUT',
@@ -471,527 +248,223 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
         },
         body: JSON.stringify(body)
       });
+      if (!res.ok) throw new Error(await res.text());
 
-      if (!res.ok) {
-        const errorData = await res.json() as { message: string };
-        throw new Error(errorData.message);
-      }
-
-      setStatusMessage('✅ 성공적으로 발행되었습니다! 2~3분 뒤 블로그에 반영됩니다.');
-      setIsPreview(false);
-      setGeneratedMarkdown('');
-      setInputText('');
+      showStatus('✅ 성공적으로 발행되었습니다!', 4000);
       setSelectedPostSha('');
-    } catch (error) {
-      const err = error as Error;
-      setStatusMessage(`발행 실패: ${err.message}`);
+    } catch (error: any) {
+      showStatus(`발행 실패: ${error.message}`);
     }
     setIsLoading(false);
+  };
+
+  const callGeminiAPI = async (mode: 'manual' | 'semi-auto', aiInput: string) => {
+    if (!geminiKey) return alert('Gemini API 키가 필요합니다.');
+    setIsLoading(true);
+    
+    const existingPostsList = postList.length > 0
+      ? postList.slice(0, 5).map(p => `- [${p.title}](/blog/${p.name.replace('.md', '')})`).join('\n')
+      : "- (없음)";
+    const strictRulesPrompt = `${STRICT_RULES}\n\n# 기존 글 슬러그 목록:\n${existingPostsList}`;
+    const calcTag = '<calculator type="auto" />';
+    const currentDate = new Date().toISOString().split('T')[0];
+    const angle = getRandomAngle();
+
+    let prompt = mode === 'manual' ? `
+${getBlogRole()}
+# Objective
+제시된 유튜브 대본(원문)을 바탕으로 상세하고 방대한 분량의 초고품질 전문 칼럼을 작성하십시오.
+${getBlogLengthRulesManual()}
+# ⚖️ STRICT WRITING RULES
+${strictRulesPrompt}
+${getBlogFrontmatter('알맞은 제목 생성', currentDate)}
+제시된 원문:
+${aiInput}
+${getBlogSkeleton(angle, calcTag, existingPostsList)}
+` : `
+${getBlogRole()}
+# Objective
+제시된 주제/참고내용을 바탕으로 깊이 있는 전문 칼럼을 새롭게 창작하십시오.
+${getBlogLengthRulesSemiAuto()}
+# ⚖️ STRICT WRITING RULES
+${strictRulesPrompt}
+${getBlogFrontmatter('매력적인 제목 생성', currentDate)}
+제시된 참고자료:
+${aiInput}
+${getBlogSkeleton(angle, calcTag, existingPostsList)}
+`;
+
+    const models = ['gemini-pro-latest', 'gemini-flash-latest'];
+    let success = false;
+    let lastError = '';
+
+    for (const model of models) {
+      const maxTokens = 32768;
+      const modelCapacityText = calculateModelCapacity(maxTokens);
+      const finalizedPrompt = prompt.replace(/\{\{TARGET_MODEL_CAPACITY\}\}/g, modelCapacityText);
+
+      try {
+        showStatus(`✨ AI 작동 중... (${model})`);
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: finalizedPrompt }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: maxTokens }
+          })
+        });
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (data.error) throw new Error(data.error.message);
+        
+        let text = data.candidates[0].content.parts[0].text;
+        text = cleanAnalysisBlock(text);
+        
+        // Parse the generated frontmatter and insert it into the GUI!
+        const { content: rawContent, data: meta } = parseYamlFrontmatter(text);
+        
+        const slugMatch = text.match(/slug:\s*"?([^"\n]+)"?/);
+        setSlug(slugMatch ? slugMatch[1].trim() : `post-${Date.now()}`);
+        
+        setTitle(meta.title || '');
+        setSummary(meta.summary || '');
+        if (meta.category) setCategory(meta.category);
+        if (meta.date) setDate(meta.date);
+        setTagsInput(Array.isArray(meta.tags) ? meta.tags.join(', ') : '');
+        setContent(rawContent);
+
+        showStatus('🎉 AI 작성이 완료되었습니다!', 4000);
+        success = true;
+        break;
+      } catch (error: any) {
+        lastError = error.message;
+      }
+    }
+    
+    if (!success) showStatus(`API 오류: ${lastError}`);
+    setIsLoading(false);
+  };
+
+  const createBlankPost = () => {
+    setSelectedPostSha('');
+    setSlug(`post-${Date.now()}`);
+    setTitle('');
+    setSummary('');
+    setTagsInput('');
+    setContent('');
+    setDate(new Date().toISOString().split('T')[0]);
   };
 
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900">
-        <form 
-          onSubmit={handleLogin} 
-          className="bg-white dark:bg-zinc-800 p-8 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700 w-[400px]"
-        >
+        <form onSubmit={handleLogin} className="bg-white dark:bg-zinc-800 p-8 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700 w-[400px]">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            </div>
+            <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center"><svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
           </div>
           <h1 className="text-xl font-bold text-center text-gray-900 dark:text-white mb-2">관리자 접속</h1>
           <p className="text-sm text-center text-gray-500 dark:text-zinc-400 mb-8">암호를 입력하세요</p>
-          
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6"
-            placeholder="비밀번호 입력"
-            autoFocus
-          />
-          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md transition-colors">
-            잠금 해제
-          </button>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6" placeholder="비밀번호 입력" autoFocus />
+          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md transition-colors">잠금 해제</button>
         </form>
       </div>
     );
   }
 
   return (
-    <div className="h-[calc(100vh-80px)] admin-page-container bg-gray-100 dark:bg-zinc-950 p-3 sm:p-4 font-sans flex flex-col">
-      <div className="max-w-[1600px] w-full mx-auto flex flex-col flex-1 min-h-0 space-y-3">
-        
-        {/* Header Bar - Solid & Utilitarian */}
-        <div className="bg-white dark:bg-zinc-900 px-5 py-3 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 flex flex-col md:flex-row justify-between items-center gap-3 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-md bg-blue-600 flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base font-bold text-gray-900 dark:text-white tracking-tight">대시보드 에디터</h1>
-                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded">v3.0</span>
-              </div>
-              <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-medium">관리자 전용 워크스페이스</p>
-            </div>
+    <div className="h-[calc(100vh-80px)] admin-page-container bg-white dark:bg-zinc-950 font-sans flex flex-col overflow-hidden">
+      
+      {/* 1. Header Bar */}
+      <header className="h-14 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-4 shrink-0 z-10 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center shrink-0">
+            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
           </div>
-          
-          <div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-950 px-3 py-1.5 rounded-md border border-gray-200 dark:border-zinc-800 w-full md:w-auto overflow-x-auto">
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[10px] font-bold text-gray-400">Gemini:</span>
-              <input 
-                type="password" 
-                value={geminiKey} 
-                onChange={e => setGeminiKey(e.target.value)} 
-                className="px-2 py-1 rounded bg-white dark:bg-[#1e1e20] border border-gray-255 dark:border-white/10 w-24 sm:w-32 text-[11px] focus:ring-1 focus:ring-blue-500 outline-none transition-all text-gray-700 dark:text-gray-200"
-                placeholder="AIzaSy..."
-              />
-            </div>
-            <div className="h-4 w-[1px] bg-gray-200 dark:bg-white/10 shrink-0 mx-1" />
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[10px] font-bold text-gray-400">GitHub:</span>
-              <input 
-                type="password" 
-                value={githubToken} 
-                onChange={e => setGithubToken(e.target.value)} 
-                className="px-2 py-1 rounded bg-white dark:bg-[#1e1e20] border border-gray-255 dark:border-white/10 w-24 sm:w-32 text-[11px] focus:ring-1 focus:ring-blue-500 outline-none transition-all text-gray-700 dark:text-gray-200"
-                placeholder="ghp_..."
-              />
-            </div>
-            <button onClick={saveKeys} className="ml-1 px-3 py-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 rounded-none transition-all text-xs font-bold shadow active:scale-95">
-              키 저장
-            </button>
+          <div className="flex items-center gap-2">
+            <h1 className="text-[15px] font-black text-gray-900 dark:text-white tracking-tight">대시보드</h1>
+            <span className="px-1.5 py-0.5 text-[9px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded">v4.0 Unified</span>
           </div>
         </div>
 
-        {/* Status Banner - Compact */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-950 px-2 py-1.5 rounded border border-gray-200 dark:border-zinc-800">
+            <span className="text-[10px] font-bold text-gray-400">Gemini:</span>
+            <input type="password" value={geminiKey} onChange={e => setGeminiKey(e.target.value)} className="px-1.5 py-0.5 rounded bg-white dark:bg-[#1e1e20] border border-gray-200 dark:border-white/10 w-24 text-[10px] outline-none" placeholder="AIzaSy..." />
+            <div className="h-3 w-[1px] bg-gray-200 dark:bg-white/10 mx-1" />
+            <span className="text-[10px] font-bold text-gray-400">GitHub:</span>
+            <input type="password" value={githubToken} onChange={e => setGithubToken(e.target.value)} className="px-1.5 py-0.5 rounded bg-white dark:bg-[#1e1e20] border border-gray-200 dark:border-white/10 w-24 text-[10px] outline-none" placeholder="ghp_..." />
+            <button onClick={saveKeys} className="ml-1 px-2 py-0.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded text-[10px] font-bold shadow-sm">저장</button>
+          </div>
+          
+          <button onClick={() => setShowPreview(!showPreview)} className="px-3 py-1.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-gray-200 rounded text-xs font-bold transition-colors">
+            {showPreview ? '미리보기 닫기' : '미리보기 열기'}
+          </button>
+          
+          <button onClick={createBlankPost} className="px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 rounded text-xs font-bold transition-colors shadow-sm flex items-center gap-1">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+            새 문서
+          </button>
+
+          <button onClick={publishToGithub} disabled={isLoading} className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold transition-colors shadow-sm disabled:opacity-50 flex items-center gap-1.5">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            GitHub 바로 발행
+          </button>
+        </div>
+      </header>
+
+      {/* 2. Main Workspace */}
+      <div className="flex flex-1 overflow-hidden relative">
+        <AdminSidebar 
+          githubToken={githubToken}
+          isLoading={isLoading}
+          postList={postList}
+          onLoadPost={loadPost}
+          onDeletePost={deletePost}
+          onRefreshList={fetchPostList}
+          onRunAi={callGeminiAPI}
+          onRunAuto={runAutoPublish}
+        />
+        
+        <MarkdownEditor 
+          title={title} setTitle={setTitle}
+          summary={summary} setSummary={setSummary}
+          category={category} setCategory={setCategory}
+          tagsInput={tagsInput} setTagsInput={setTagsInput}
+          content={content} setContent={setContent}
+        />
+
+        {showPreview && (
+          <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-black/20 p-6 border-l border-gray-200 dark:border-zinc-800">
+            {title || content ? (
+              <div className="prose prose-sm dark:prose-invert max-w-none">
+                <BlogPostContent content={content} />
+              </div>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-gray-400">
+                <p className="text-sm font-semibold">마법이 일어날 공간입니다</p>
+                <p className="text-[11px] mt-1 opacity-70">에디터에 내용을 작성하면 실시간으로 렌더링됩니다.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Global Loading / Status Overlay */}
         <AnimatePresence>
           {statusMessage && (
             <motion.div 
-              initial={{ opacity: 0, height: 0 }} 
-              animate={{ opacity: 1, height: 'auto' }} 
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden flex-shrink-0"
+              initial={{ opacity: 0, y: 20 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              exit={{ opacity: 0, y: 20 }}
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
             >
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-150 dark:border-blue-800/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-none text-xs font-medium flex items-center justify-between shadow-sm">
-                <span className="flex items-center gap-2">
-                  {isLoading ? (
-                     <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                  ) : (
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  )}
-                  {statusMessage}
-                </span>
+              <div className="bg-gray-900/90 dark:bg-white/90 backdrop-blur-sm border border-gray-700 dark:border-white/20 text-white dark:text-gray-900 px-5 py-2.5 rounded-full text-xs font-bold flex items-center shadow-lg">
+                {isLoading && <svg className="animate-spin h-3.5 w-3.5 mr-2" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>}
+                {statusMessage}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Layout Mode Control - Slim */}
-        <div className="flex justify-between items-center bg-white/40 dark:bg-black/10 px-4 py-2 rounded-none border border-gray-200 dark:border-white/5 flex-shrink-0 z-10">
-          <div className="text-[11px] font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-            작업 공간
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 mr-1 hidden sm:inline">📺 화면 구성:</span>
-            {[
-              { id: 'split', label: '🌓 좌우 분할', desc: '작성창과 미리보기를 함께 봅니다 (기본)' },
-              { id: 'editor', label: '📝 작성창 크게', desc: '마크다운 에디터만 넓게 봅니다' },
-              { id: 'preview', label: '👁️ 미리보기 크게', desc: '발행될 디자인을 실제 크기로 봅니다' }
-            ].map(view => (
-              <button
-                key={view.id}
-                onClick={() => setLayoutView(view.id as 'split' | 'editor' | 'preview')}
-                className={`px-2.5 py-1 rounded-none text-[11px] font-bold transition-all border ${
-                  layoutView === view.id
-                    ? 'bg-blue-600 border-blue-650 text-white shadow-sm'
-                    : 'bg-white dark:bg-[#2a2a2c] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:bg-gray-150 dark:hover:bg-[#323235]'
-                }`}
-                title={view.desc}
-              >
-                {view.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Main Workspace - Adaptive Grid */}
-        <div className={`grid gap-4 flex-1 min-h-0 ${
-          layoutView === 'split' ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'
-        }`}>
-          {/* Left Column: Input Panel */}
-          <div className={`bg-white dark:bg-zinc-900 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 flex flex-col h-full min-h-0 ${
-            layoutView === 'preview' ? 'hidden' : ''
-          }`}>
-            
-            {/* Mode Tab Switcher */}
-            <div className="flex bg-gray-100 dark:bg-zinc-950 p-1 rounded-md mb-4 flex-shrink-0">
-              {[
-                { id: 'blank', label: '새 글 작성 (에디터)' },
-                { id: 'manual', label: 'AI 초안 다듬기' },
-                { id: 'semi-auto', label: 'AI 링크 요약' },
-                { id: 'auto', label: '자동 (데일리 발행)' },
-                { id: 'edit', label: '기존 글 수정' }
-              ].map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => {
-                    setMode(m.id as 'blank' | 'manual' | 'semi-auto' | 'auto' | 'edit');
-                    if (m.id === 'edit') {
-                      fetchPostList();
-                      setShowPostList(true); // 수정 탭으로 갈 때는 목록을 펼칩니다
-                    } else if (m.id === 'blank') {
-                      setIsPreview(true);
-                      if (!generatedMarkdown) {
-                        const today = new Date().toISOString().split('T')[0];
-                        setSlug(`post-${Date.now()}`);
-                        setGeneratedMarkdown(`---\ntitle: "제목을 입력하세요"\nsummary: "요약을 입력하세요"\ncategory: "판례법률석"\ndate: "${today}"\ntags: ["태그"]\n---\n\n`);
-                      }
-                    } else {
-                      setIsPreview(false);
-                    }
-                  }}
-                  className={`flex-1 py-2 px-3 rounded-md text-xs font-bold transition-all ${mode === m.id ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300'}`}
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-
-            {mode === 'edit' && showPostList && (
-              <motion.div 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
-                className={`mb-3 flex-shrink-0 flex flex-col min-h-0 transition-all duration-300 ${
-                  isPreview ? 'max-h-40' : 'flex-1 max-h-none'
-                }`}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400">발행된 포스팅 목록 ({postList.length}개)</span>
-                  <div className="flex items-center gap-2">
-                    <button onClick={fetchPostList} className="text-[10px] font-bold text-blue-600 hover:text-blue-500 flex items-center gap-1">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89l-2.775 2.775M21 21v-5h-5.583"></path></svg>
-                      새로고침
-                    </button>
-                    {isPreview && (
-                      <button 
-                        onClick={() => setShowPostList(false)} 
-                        className="text-[10px] font-extrabold text-gray-500 hover:text-gray-750 dark:hover:text-gray-300"
-                        title="목록 접기"
-                      >
-                        [접기 📁]
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <div className="flex-1 overflow-y-auto border border-gray-200 dark:border-white/10 rounded-none bg-white/40 dark:bg-black/25 p-2 space-y-1.5 custom-scrollbar min-h-[140px]">
-                  {postList.length === 0 ? (
-                    <div className="text-center py-8 text-xs text-gray-400">등록된 글이 없거나 GITHUB 토큰이 필요합니다.</div>
-                  ) : (
-                    postList.map(post => (
-                      <div key={post.name} className="flex justify-between items-center p-2 rounded-none bg-white/80 dark:bg-[#202124]/70 border border-gray-100 dark:border-white/5 shadow-xs transition-all hover:bg-white dark:hover:bg-[#202124]">
-                        <div className="flex-1 min-w-0 pr-3 text-left">
-                          <div className="text-xs font-bold text-gray-900 dark:text-white truncate">{post.title}</div>
-                          <div className="text-[10px] text-gray-400 mt-0.5 truncate">{post.name}</div>
-                        </div>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            onClick={() => loadPost(post.name, post.sha)}
-                            className="px-2 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 dark:bg-blue-950/30 dark:hover:bg-blue-950/60 dark:text-blue-400 rounded-none text-[11px] font-bold transition-all"
-                          >
-                            ✏️ 불러오기
-                          </button>
-                          <button
-                            onClick={() => deletePost(post.name, post.sha)}
-                            className="p-1.5 hover:bg-red-50 dark:hover:bg-red-950/30 text-red-500 hover:text-red-600 rounded-none transition-all"
-                            title="글 삭제"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </motion.div>
-            )}
-
-            {(mode === 'manual' || mode === 'semi-auto') && !isPreview && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col min-h-0">
-                <textarea
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  className="flex-1 w-full p-4 rounded-none border border-gray-250 dark:border-white/10 bg-white/50 dark:bg-black/20 text-gray-950 dark:text-white placeholder-gray-400 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none transition-all leading-relaxed custom-scrollbar"
-                  placeholder={mode === 'manual' 
-                    ? "✨ 이곳에 유튜브 대본 등 원문을 붙여넣으세요.\nAI가 원문을 보존하면서 가독성을 극대화한 UI(소제목, 표, Q&A)를 덧씌워 포장합니다." 
-                    : "💡 이곳에 타겟 키워드, 뼈대(개요), 또는 참고할 블로그/유튜브 링크를 적어주세요.\nAI가 인사이트를 추출하여 완전히 새로운 전문적인 포스팅을 창작합니다."}
-                />
-                <button 
-                  onClick={handleGenerate}
-                  disabled={isLoading}
-                  className="mt-3 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-none shadow shadow-blue-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2 text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                  AI 자율 작성 가동
-                </button>
-              </motion.div>
-            )}
-
-            {mode === 'auto' && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col justify-center items-center p-6 text-center space-y-6">
-                <div className="w-20 h-20 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-none flex items-center justify-center shadow-lg shadow-blue-500/20">
-                  <svg className="w-10 h-10 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div className="max-w-md">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">원격 데일리 자동 발행</h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                    구글 트렌드 및 최신 이슈를 기반으로 <b>AI가 스스로 글을 분석하고 자동 발행</b>하는 파이프라인(GitHub Actions)을 즉시 기동시킵니다.<br />
-                    실행 후 배포가 완료되기까지 약 2~3분이 소요됩니다.
-                  </p>
-                </div>
-                <div className="w-full max-w-sm space-y-3 pt-4">
-                  {/* 포스팅 종류 선택 단추 (딸깍기능) */}
-                  <div className="bg-gray-50 dark:bg-black/10 p-3.5 rounded-none border border-gray-200 dark:border-white/5 text-left space-y-2">
-                    <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 block">📝 발행할 포스팅 종류 선택</span>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { id: 'all', label: '🔥 전체', desc: '둘 다 발행' },
-                        { id: 'precedent', label: '⚖️ 법률칼럼', desc: '판례분석만' },
-                        { id: 'trend', label: '📈 트렌드', desc: '가이드만' }
-                      ].map(type => (
-                        <button
-                          key={type.id}
-                          onClick={() => setSelectedPostType(type.id as 'all' | 'precedent' | 'trend')}
-                          type="button"
-                          className={`flex flex-col items-center justify-center py-2 rounded-none border text-xs font-bold transition-all cursor-pointer ${
-                            selectedPostType === type.id
-                              ? 'bg-blue-600 border-blue-650 text-white shadow-sm font-extrabold'
-                              : 'bg-white dark:bg-[#303134] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-[#3f3f42]'
-                          }`}
-                        >
-                          <span>{type.label}</span>
-                          <span className="text-[9px] opacity-70 mt-0.5 font-normal">{type.desc}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <button 
-                    onClick={triggerAutoPost}
-                    disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-none shadow shadow-blue-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2 text-sm"
-                  >
-                    🚀 즉시 자동 발행 기동 (Run Workflow)
-                  </button>
-                  
-                  <a 
-                    href={`https://github.com/${REPO_OWNER}/${REPO_NAME}/actions`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-white dark:bg-[#303134] text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-[#3f3f42] font-bold py-3.5 rounded-none transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-xs"
-                  >
-                    📊 실시간 배포 로그 확인하기 (GitHub Actions)
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
-                </div>
-              </motion.div>
-            )}
-
-            {isPreview && (
-               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col min-h-0 relative">
-                  {/* 기존 글 목록이 접혀있을 때 펼치기 바 */}
-                  {mode === 'edit' && !showPostList && (
-                    <div className="mb-2 flex items-center justify-between bg-blue-50/50 dark:bg-blue-900/10 px-3 py-1.5 rounded-none border border-blue-100 dark:border-blue-900/20 flex-shrink-0">
-                      <span className="text-[10px] font-medium text-blue-800 dark:text-blue-300">
-                        📁 수정 중: {slug}.md
-                      </span>
-                      <button
-                        onClick={() => setShowPostList(true)}
-                        className="text-[10px] font-bold text-blue-600 hover:text-blue-500 hover:underline"
-                      >
-                        기존 글 목록 열기 📂
-                      </button>
-                    </div>
-                  )}
-                  {/* 마크다운 빌더 툴바 영역 (Naver-style) */}
-                  <div className="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md mb-2 shrink-0 shadow-sm">
-                    {/* Toolbar Row 1: 정렬 & 기본 텍스트 서식 */}
-                    <div className="flex gap-4 overflow-x-auto pb-1 custom-scrollbar shrink-0 items-center">
-                      {/* 1. 정렬 */}
-                      <div className="flex gap-1 items-center border-r border-gray-200 dark:border-zinc-700 pr-4 shrink-0">
-                        <span className="text-[10px] font-bold text-gray-400 mr-1">정렬</span>
-                        {[
-                          { label: '⬅️ 좌', tag: 'left' },
-                          { label: '↔️ 중', tag: 'center' },
-                          { label: '➡️ 우', tag: 'right' }
-                        ].map(item => (
-                          <button key={item.label} onClick={() => wrapTextWithTag(item.tag)} className="px-2 py-1 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded text-[11px] font-bold transition-colors">
-                            {item.label}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* 2. 텍스트 포맷 */}
-                      <div className="flex gap-1 items-center border-r border-gray-200 dark:border-zinc-700 pr-4 shrink-0">
-                        <span className="text-[10px] font-bold text-gray-400 mr-1">서식</span>
-                        {[
-                          { label: '굵게(B)', prefix: '**', suffix: '**' },
-                          { label: '기울임(I)', prefix: '*', suffix: '*' },
-                          { label: '취소선', prefix: '~~', suffix: '~~' },
-                          { label: '인용구(”")', prefix: '\n> ', suffix: '' },
-                        ].map(item => (
-                          <button key={item.label} onClick={() => wrapWithMarkdown(item.prefix, item.suffix)} className="px-2 py-1 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded text-[11px] font-bold transition-colors">
-                            {item.label}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* 3. 글자 배경색 (형광펜) */}
-                      <div className="flex gap-1 items-center shrink-0">
-                        <span className="text-[10px] font-bold text-gray-400 mr-1">배경색</span>
-                        {[
-                          { label: '🖍️ 노랑', tag: 'bg-yellow' },
-                          { label: '🖍️ 파랑', tag: 'bg-blue' },
-                          { label: '🖍️ 빨강', tag: 'bg-red' },
-                          { label: '🖍️ 초록', tag: 'bg-green' }
-                        ].map(item => (
-                          <button key={item.label} onClick={() => wrapTextWithTag(item.tag)} className="px-2 py-1 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded text-[11px] font-bold transition-colors">
-                            {item.label}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* 3.5 글자색 */}
-                      <div className="flex gap-1 items-center shrink-0 border-l border-gray-200 dark:border-zinc-700 pl-4 ml-1">
-                        <span className="text-[10px] font-bold text-gray-400 mr-1">글자색</span>
-                        {[
-                          { label: '빨강', tag: 'red' },
-                          { label: '파랑', tag: 'blue' },
-                          { label: '초록', tag: 'green' },
-                          { label: '주황', tag: 'orange' },
-                          { label: '보라', tag: 'purple' }
-                        ].map(item => (
-                          <button key={item.label} onClick={() => wrapTextWithTag(item.tag)} className="px-2 py-1 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded text-[11px] font-bold transition-colors">
-                            {item.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Toolbar Row 2: 구조 템플릿 & 박스 */}
-                    <div className="flex gap-4 overflow-x-auto pb-1 custom-scrollbar shrink-0 items-center">
-                      {/* 4. 구조화 */}
-                      <div className="flex gap-1 items-center border-r border-gray-200 dark:border-zinc-700 pr-4 shrink-0">
-                        <span className="text-[10px] font-bold text-gray-400 mr-1">구조</span>
-                        {[
-                          { label: 'H2', prefix: '\n## ', suffix: '' },
-                          { label: 'H3', prefix: '\n### ', suffix: '' },
-                          { label: '링크', prefix: '[', suffix: '](https://)' },
-                          { label: '사진', prefix: '![이미지설명](', suffix: ')' },
-                          { label: '가로선', prefix: '\n---\n', suffix: '' }
-                        ].map(item => (
-                          <button key={item.label} onClick={() => wrapWithMarkdown(item.prefix, item.suffix)} className="px-2 py-1 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-700 dark:hover:bg-zinc-600 border border-gray-200 dark:border-zinc-600 rounded text-[11px] font-bold transition-colors">
-                            {item.label}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* 5. 보상스쿨 박스 컴포넌트 */}
-                      <div className="flex gap-1 items-center shrink-0">
-                        <span className="text-[10px] font-bold text-blue-500 mr-1">컴포넌트 박스</span>
-                        {[
-                          { label: '📖 용어사전', template: '\n> 💡 **[용어명]** : 설명을 입력하세요.\n' },
-                          { label: '💡 팁', template: '\n> [!TIP]\n> 팁 내용을 입력하세요.\n' },
-                          { label: '⚠️ 경고', template: '\n> [!WARNING]\n> 경고 내용을 입력하세요.\n' },
-                          { label: '📋 요점박스', template: '\n## [💡 Key Points]\n- 요점 1\n- 요점 2\n' },
-                          { label: '☑️ 자가진단', template: '\n## [🛡️ 내 보험금/보상금 1분 자가진단 체크리스트]\n- [ ] 요건 1\n- [ ] 요건 2\n' },
-                          { label: '❓ FAQ', template: '\n## [💡 자주 묻는 질문 (FAQ) TOP 3]\n### Q1. 질문?\n답변.\n' },
-                          { label: '📊 표', template: '\n| 항목 | 내용 |\n| :--- | :--- |\n| 1 | A |\n' },
-                          { label: '🚗 車계산기', template: '\n<calculator type="auto"></calculator>\n' }
-                        ].map(item => (
-                          <button key={item.label} onClick={() => insertMarkdown(item.template)} className="px-2 py-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded text-[11px] font-bold transition-colors shadow-sm">
-                            {item.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="absolute top-[80px] right-3 px-2 py-0.5 bg-yellow-100/80 text-yellow-800 text-[9px] font-bold rounded z-20 pointer-events-none">마크다운 편집기</div>
-                  <textarea
-                    ref={textareaRef}
-                    value={generatedMarkdown}
-                    onChange={(e) => setGeneratedMarkdown(e.target.value)}
-                    className="flex-1 w-full p-4 font-mono text-[13px] leading-relaxed rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow custom-scrollbar shadow-inner"
-                  />
-               </motion.div>
-            )}
-          </div>
-
-          {/* Right Column: Preview Panel */}
-          <div className={`bg-white dark:bg-zinc-900 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 flex flex-col h-full min-h-0 relative overflow-hidden ${
-            layoutView === 'editor' ? 'hidden' : ''
-          }`}>
-            <div className="flex items-center justify-between mb-3 z-10 flex-shrink-0">
-              <h2 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                </span>
-                실시간 미리보기
-              </h2>
-              <AnimatePresence>
-                {isPreview && (
-                  <motion.button 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    onClick={publishToGithub}
-                    disabled={isLoading}
-                    className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 text-xs font-bold rounded-none transition-all disabled:opacity-50 flex items-center gap-1.5 shadow active:scale-95"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    GitHub 즉시 발행
-                  </motion.button>
-                )}
-              </AnimatePresence>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar z-10 bg-white/40 dark:bg-black/10 rounded-none p-4 sm:p-5 border border-white/40 dark:border-white/5 min-h-0">
-              {generatedMarkdown ? (
-                <div className="prose prose-xs sm:prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
-                  <BlogPostContent content={cleanFrontmatter(generatedMarkdown)} />
-                </div>
-              ) : (
-                <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
-                  <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
-                    <svg className="w-16 h-16 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                  </motion.div>
-                  <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">마법이 일어날 공간입니다</p>
-                  <p className="text-[11px] mt-1 opacity-70">좌측에서 내용을 입력하고 AI 작성을 시작해 보세요.</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        
-        {/* Footer Info - Slim */}
-        <div className="flex justify-between items-center px-2 opacity-50 flex-shrink-0">
-           <span className="text-[10px] text-gray-500 dark:text-gray-400 flex items-center gap-1">
-             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-             종단간 브라우저 샌드박스 암호화
-           </span>
-           <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono">
-             v3.0 (Utilitarian UI)
-           </span>
-        </div>
       </div>
     </div>
   );

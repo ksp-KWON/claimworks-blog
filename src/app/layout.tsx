@@ -10,7 +10,6 @@ import FloatingKakaoButton from "@/components/FloatingKakaoButton";
 import SearchBar from "@/components/SearchBar";
 import SmartStickyLayout from "@/components/SmartStickyLayout";
 import MobileBottomNav from "@/components/MobileBottomNav";
-import MobileSidebarDrawer from "@/components/MobileSidebarDrawer";
 import { getSortedPostsData } from "@/lib/posts";
 
 const geistSans = Geist({
@@ -167,11 +166,6 @@ export default function RootLayout({
               <div className="flex items-center gap-0.5 sm:gap-1">
                 {/* 테마 변경 아이콘 */}
                 <ThemeToggle />
-                
-                {/* 모바일 햄버거 메뉴 */}
-                <div className="lg:hidden flex items-center">
-                  <MobileSidebarDrawer tags={sortedTags} />
-                </div>
               </div>
             </div>
           </div>

@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 
-type ModalType = 'none' | 'calculator' | 'category' | 'consult';
+type ModalType = 'none' | 'home' | 'partner' | 'calculator' | 'hospital' | 'consult';
 
 export default function MobileBottomNav() {
-  const pathname = usePathname();
   const [openModal, setOpenModal] = useState<ModalType>('none');
 
   const closeModals = () => setOpenModal('none');
@@ -16,7 +14,7 @@ export default function MobileBottomNav() {
   useEffect(() => {
     if (openModal !== 'none') {
       document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none'; // iOS Safari 대응 (배경 터치 무시)
+      document.body.style.touchAction = 'none'; // iOS Safari 대응
     } else {
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
@@ -31,17 +29,26 @@ export default function MobileBottomNav() {
     {
       id: 'home',
       label: '홈',
-      onClick: () => {
-        closeModals();
-        window.location.href = '/';
-      },
+      onClick: () => setOpenModal(openModal === 'home' ? 'none' : 'home'),
       icon: (
-        <svg className="w-5 h-5 sm:w-6 sm:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={pathname === '/' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-5 h-5 sm:w-6 sm:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'home' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
           <polyline points="9 22 9 12 15 12 15 22"></polyline>
         </svg>
       ),
-      isActive: pathname === '/' && openModal === 'none'
+      isActive: openModal === 'home'
+    },
+    {
+      id: 'partner',
+      label: '제휴센터',
+      onClick: () => setOpenModal(openModal === 'partner' ? 'none' : 'partner'),
+      icon: (
+        <svg className="w-5 h-5 sm:w-6 sm:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'partner' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+      ),
+      isActive: openModal === 'partner'
     },
     {
       id: 'calculator',
@@ -65,23 +72,18 @@ export default function MobileBottomNav() {
       isActive: openModal === 'calculator'
     },
     {
-      id: 'blog',
-      label: '블로그',
-      onClick: () => {
-        closeModals();
-        window.location.href = '/blog';
-      },
+      id: 'hospital',
+      label: '의료기관',
+      onClick: () => setOpenModal(openModal === 'hospital' ? 'none' : 'hospital'),
       icon: (
-        <svg className="w-5 h-5 sm:w-6 sm:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={pathname === '/blog' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"></path>
-          <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
-          <path d="M3 15h6"></path>
-          <path d="M3 19h6"></path>
-          <path d="M10 15h8"></path>
-          <path d="M10 19h8"></path>
+        <svg className="w-5 h-5 sm:w-6 sm:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={openModal === 'hospital' ? "2.5" : "2"} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 22V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"></path>
+          <line x1="12" y1="10" x2="12" y2="14"></line>
+          <line x1="10" y1="12" x2="14" y2="12"></line>
+          <line x1="3" y1="22" x2="21" y2="22"></line>
         </svg>
       ),
-      isActive: pathname === '/blog' && openModal === 'none'
+      isActive: openModal === 'hospital'
     },
     {
       id: 'consult',
@@ -107,7 +109,77 @@ export default function MobileBottomNav() {
         ></div>
       )}
 
-      {/* 1. 계산기 팝업 */}
+      {/* 1. 홈 팝업 */}
+      <div 
+        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'home' ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ touchAction: openModal === 'home' ? 'auto' : 'none' }}
+      >
+        <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto overscroll-contain">
+          <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
+          <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">전체 메뉴</h3>
+          
+          <Link href="/" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 gap-4">
+            <div className="w-12 h-12 shrink-0 bg-white dark:bg-[#353638] rounded-xl flex items-center justify-center text-xl shadow-sm group-hover:text-[var(--google-blue)] transition-colors">🏠</div>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">홈</h2>
+            </div>
+            <svg className="w-5 h-5 text-gray-400 group-hover:text-[var(--google-blue)] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+          </Link>
+
+          <Link href="/blog" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 gap-4">
+            <div className="w-12 h-12 shrink-0 bg-white dark:bg-[#353638] rounded-xl flex items-center justify-center text-xl shadow-sm group-hover:text-[var(--google-blue)] transition-colors">📝</div>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">블로그</h2>
+            </div>
+            <svg className="w-5 h-5 text-gray-400 group-hover:text-[var(--google-blue)] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+          </Link>
+
+          <Link href="#" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[#ff0000] hover:shadow-[0_8px_30px_rgba(255,0,0,0.15)] transition-all duration-300 gap-4">
+            <div className="w-12 h-12 shrink-0 bg-white dark:bg-[#353638] rounded-xl flex items-center justify-center text-xl shadow-sm group-hover:text-[#ff0000] transition-colors">▶️</div>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[#ff0000] transition-colors">유튜브</h2>
+            </div>
+            <svg className="w-5 h-5 text-gray-400 group-hover:text-[#ff0000] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+          </Link>
+        </div>
+      </div>
+
+      {/* 2. 제휴센터 팝업 */}
+      <div 
+        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'partner' ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ touchAction: openModal === 'partner' ? 'auto' : 'none' }}
+      >
+        <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto overscroll-contain">
+          <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
+          <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">제휴센터</h3>
+          
+          <Link href="#" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 gap-4">
+            <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-xl shadow-inner group-hover:rotate-12 transition-transform duration-300">🤖</div>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">AI판례센터</h2>
+            </div>
+            <svg className="w-5 h-5 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+          </Link>
+
+          <Link href="#" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 gap-4">
+            <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-xl shadow-inner group-hover:rotate-12 transition-transform duration-300">🏛️</div>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">금감원센터</h2>
+            </div>
+            <svg className="w-5 h-5 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+          </Link>
+
+          <Link href="#" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 gap-4">
+            <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-xl shadow-inner group-hover:rotate-12 transition-transform duration-300">🤝</div>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">로컬안심케어</h2>
+            </div>
+            <svg className="w-5 h-5 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+          </Link>
+        </div>
+      </div>
+
+      {/* 3. 계산기 팝업 */}
       <div 
         className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'calculator' ? 'translate-y-0' : 'translate-y-full'}`}
         style={{ touchAction: openModal === 'calculator' ? 'auto' : 'none' }}
@@ -116,98 +188,103 @@ export default function MobileBottomNav() {
           <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
           <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">보상 계산기 모음</h3>
           
-          <Link href="/calculator/auto" onClick={closeModals} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 relative overflow-hidden gap-4">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#e8f0fe] to-transparent dark:from-[#8ab4f8]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
+          <Link href="/calculator/auto" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 gap-4">
             <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">🚗</div>
-            <div className="flex flex-col flex-1 min-w-0">
-              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors truncate">자동차보험 합의금</h2>
-              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">부상, 장해, 사망 등 약관 지급기준 적용</p>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">자동차보험 합의금</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] mt-0.5">부상, 장해, 사망 약관 적용</p>
             </div>
-            <div className="text-[var(--google-blue)] shrink-0">
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
-            </div>
+            <svg className="w-5 h-5 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
           </Link>
 
-          <Link href="/calculator/medical" onClick={closeModals} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(52,168,83,0.15)] transition-all duration-300 relative overflow-hidden gap-4">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#e6f4ea] to-transparent dark:from-[#1e8e3e]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
+          <Link href="/calculator/medical" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[var(--google-green)] hover:shadow-[0_8px_30px_rgba(52,168,83,0.15)] transition-all duration-300 gap-4">
             <div className="w-12 h-12 shrink-0 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">🏥</div>
-            <div className="flex flex-col flex-1 min-w-0">
-              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-green)] transition-colors truncate">실손의료비 보상</h2>
-              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">가입시기별 급여/비급여 본인부담금 공제</p>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-green)] transition-colors">실손의료비 보상</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] mt-0.5">본인부담금 공제 산출</p>
             </div>
-            <div className="text-[var(--google-green)] shrink-0">
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
-            </div>
+            <svg className="w-5 h-5 text-[var(--google-green)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
           </Link>
 
-          <Link href="/calculator/liability" onClick={closeModals} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(234,67,53,0.15)] transition-all duration-300 relative overflow-hidden gap-4">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#fce8e6] to-transparent dark:from-[#d93025]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
+          <Link href="/calculator/liability" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[var(--google-red)] hover:shadow-[0_8px_30px_rgba(234,67,53,0.15)] transition-all duration-300 gap-4">
             <div className="w-12 h-12 shrink-0 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">⚖️</div>
-            <div className="flex flex-col flex-1 min-w-0">
-              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-red)] transition-colors truncate">배상책임 소송가액</h2>
-              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">호프만계수 적용 법원 판례 기준 손해액</p>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-red)] transition-colors">배상책임 소송가액</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] mt-0.5">법원 판례 기준 손해액</p>
             </div>
-            <div className="text-[var(--google-red)] shrink-0">
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
-            </div>
+            <svg className="w-5 h-5 text-[var(--google-red)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
           </Link>
         </div>
       </div>
 
-      {/* 3. 상담신청 팝업 */}
+      {/* 4. 의료기관 팝업 */}
+      <div 
+        className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'hospital' ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ touchAction: openModal === 'hospital' ? 'auto' : 'none' }}
+      >
+        <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto overscroll-contain">
+          <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
+          <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">의료기관 찾기</h3>
+          
+          <Link href="/regions" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 gap-4">
+            <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-xl shadow-inner group-hover:rotate-12 transition-transform duration-300">📍</div>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">지역별 정리</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] mt-0.5">전국 의료기관 및 병원 안내</p>
+            </div>
+            <svg className="w-5 h-5 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+          </Link>
+        </div>
+      </div>
+
+      {/* 5. 상담신청 팝업 */}
       <div 
         className={`lg:hidden fixed bottom-[54px] left-0 w-full bg-white dark:bg-[#202124] rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] z-[95] transition-transform duration-300 transform ${openModal === 'consult' ? 'translate-y-0' : 'translate-y-full'}`}
         style={{ touchAction: openModal === 'consult' ? 'auto' : 'none' }}
       >
         <div className="p-5 pb-8 space-y-4 max-h-[70vh] overflow-y-auto overscroll-contain">
           <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
-          <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">상담 신청하기</h3>
+          <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">상담 센터</h3>
           
-          <a href="#" onClick={(e) => { e.preventDefault(); alert('예약상담 신청 폼이 준비중입니다.'); closeModals(); }} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 relative overflow-hidden gap-4">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#e8f0fe] to-transparent dark:from-[#8ab4f8]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
-            <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">📝</div>
-            <div className="flex flex-col flex-1 min-w-0">
-              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors truncate">예약상담 신청서 작성</h2>
-              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">사고 내용을 꼼꼼히 검토 후 연락드립니다.</p>
+          <Link href="#" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 gap-4">
+            <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-xl shadow-inner group-hover:rotate-12 transition-transform duration-300">💬</div>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">채팅 상담</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] mt-0.5">카카오톡 1:1 실시간 상담</p>
             </div>
-            <div className="text-[var(--google-blue)] shrink-0">
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
-            </div>
-          </a>
+            <svg className="w-5 h-5 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+          </Link>
 
-          <a href="https://open.kakao.com/o/sWeszp7" target="_blank" rel="noopener noreferrer" onClick={closeModals} className="group flex items-center bg-white dark:bg-[#202124] rounded-2xl p-4 border border-gray-100 dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(254,229,0,0.2)] transition-all duration-300 relative overflow-hidden gap-4">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#FEE500]/20 to-transparent dark:from-[#FEE500]/10 dark:to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500" />
-            <div className="w-12 h-12 shrink-0 bg-[#FEE500] dark:bg-[#FEE500]/20 rounded-xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-12 transition-transform duration-300">💬</div>
-            <div className="flex flex-col flex-1 min-w-0">
-              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-yellow-600 dark:group-hover:text-[#FEE500] transition-colors truncate">카카오톡 실시간 상담</h2>
-              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] leading-snug mt-0.5 line-clamp-1">빠르고 간편하게 카카오톡으로 물어보세요.</p>
+          <Link href="#" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[var(--google-blue)] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 gap-4">
+            <div className="w-12 h-12 shrink-0 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-xl flex items-center justify-center text-xl shadow-inner group-hover:rotate-12 transition-transform duration-300">📅</div>
+            <div className="flex flex-col flex-1">
+              <h2 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors">예약 상담</h2>
+              <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[12px] mt-0.5">원하는 시간에 맞춰 전화 상담</p>
             </div>
-            <div className="text-[#FEE500] dark:text-[#FEE500] shrink-0">
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
-            </div>
-          </a>
+            <svg className="w-5 h-5 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
+          </Link>
         </div>
       </div>
 
-      {/* 하단 탭바 (높이 54px로 축소) */}
-      <div className="lg:hidden fixed bottom-0 left-0 z-[100] w-full h-[54px] bg-white/80 dark:bg-[#1a1b1e]/80 backdrop-blur-md border-t border-gray-200/50 dark:border-white/10 pb-[env(safe-area-inset-bottom,0px)]">
-        <div className="grid h-full w-full grid-cols-4 px-2">
-          {navItems.map((item) => (
-            <button 
-              key={item.id} 
-              onClick={item.onClick}
-              className="group flex flex-col items-center justify-center h-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors active:scale-95 duration-150 rounded-xl m-0.5"
-            >
-              <div className={`transition-colors duration-200 ${item.isActive ? 'text-[var(--google-blue)] dark:text-[#8ab4f8] -translate-y-0.5' : 'text-gray-500 dark:text-gray-400'}`}>
-                {item.icon}
-              </div>
-              <span className={`text-[10px] font-bold transition-all duration-200 ${item.isActive ? 'text-[var(--google-blue)] dark:text-[#8ab4f8] opacity-100' : 'text-gray-500 dark:text-gray-400 opacity-80'}`}>
-                {item.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* 5개의 탭 버튼 바 */}
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full h-[54px] bg-white/90 dark:bg-[#121212]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-white/10 flex items-center justify-around px-1 z-[100] pb-[env(safe-area-inset-bottom)]">
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={item.onClick}
+            className={`flex flex-col items-center justify-center w-full h-full transition-colors duration-200 ${
+              item.isActive
+                ? 'text-[var(--google-blue)] dark:text-[#8ab4f8]'
+                : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400'
+            }`}
+          >
+            {item.icon}
+            <span className={`text-[10px] font-bold ${item.isActive ? 'opacity-100' : 'opacity-80'}`}>
+              {item.label}
+            </span>
+          </button>
+        ))}
+      </nav>
     </>
   );
 }

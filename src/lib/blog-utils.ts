@@ -125,6 +125,17 @@ export function extractTOC(content: string): { id: string; text: string }[] {
     if (match) {
       let rawText = match[1].trim();
       
+      // 제외할 목차 필터링
+      if (
+        KEY_POINT_PATTERNS.test(rawText) ||
+        CHECKLIST_PATTERNS.test(rawText) ||
+        GLOSSARY_PATTERNS.test(rawText) ||
+        FAQ_PATTERNS.test(rawText) ||
+        CTA_PATTERNS.test(rawText)
+      ) {
+        continue;
+      }
+
       const plainTextForSlug = rawText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').trim();
       const id = slugger.slug(plainTextForSlug);
       

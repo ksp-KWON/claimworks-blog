@@ -51,9 +51,7 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
                 next[i] = !next[i];
                 setChecked(next);
               }}
-              className={`w-full flex items-start gap-3 py-2.5 text-left transition-colors group ${
-                checked[i] ? '' : ''
-              }`}
+              className="w-full flex items-start gap-3 py-2 text-left transition-colors group/btn"
             >
               <div
                 className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center shrink-0 transition-all mt-0.5 ${

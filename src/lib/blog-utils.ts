@@ -24,7 +24,7 @@ export interface ParsedBlogPost {
 }
 
 export function parseBlogPost(content: string): ParsedBlogPost {
-  const lines = content.split('\n');
+  const lines = content.split(/\r?\n/);
   const slugger = new GithubSlugger();
   
   const result: ParsedBlogPost = {

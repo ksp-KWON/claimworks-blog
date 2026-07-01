@@ -24,7 +24,7 @@ export default function KeyPointsBox({ points }: KeyPointsBoxProps) {
               <span
                 className="flex-1 text-[14.5px] font-semibold text-gray-800 dark:text-[#e8eaed] leading-[1.7] break-keep"
                 dangerouslySetInnerHTML={{
-                  __html: point.replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:800;color:#1a73e8">$1</strong>'),
+                  __html: point.replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:800;color:var(--google-red)" class="dark:text-[#f28b82]">$1</strong>'),
                 }}
               />
             </li>

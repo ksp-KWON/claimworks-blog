@@ -122,16 +122,16 @@ export default function RootLayout({
             <div className="flex items-center min-w-0 flex-1 mr-1 sm:mr-2">
               <div className="font-sans font-extrabold text-lg sm:text-xl min-w-0 tracking-tight">
                 <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden">
-                  <div className="relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-white dark:bg-[#202124] rounded-full border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.6)] group-hover:shadow-[0_8px_25px_rgba(26,115,232,0.25)] group-hover:border-[#1a73e8] group-hover:scale-105 transition-all duration-300 p-1.5 z-10">
-                    <img src="/images/logo-icon.png" alt="보상스쿨 TV" className="w-full h-full object-contain drop-shadow-sm" />
+                  <div className="relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-white dark:bg-[#202124] rounded-none border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.7)] group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.2)] dark:group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.9)] group-hover:border-gray-400 dark:group-hover:border-gray-500 group-hover:scale-105 transition-all duration-300 p-1.5 z-10">
+                    <img src="/images/logo-icon.png" alt="보상스쿨 TV" className="w-full h-full object-contain drop-shadow-sm grayscale group-hover:grayscale-0 transition-all duration-300" />
                   </div>
-                  <span className="hidden sm:inline bg-gradient-to-r from-red-600 to-[#1a73e8] dark:from-red-500 dark:to-blue-400 bg-clip-text text-transparent drop-shadow-sm group-hover:opacity-80 transition-opacity truncate">
+                  <span className="hidden sm:inline text-[#202124] dark:text-[#e8eaed] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] group-hover:opacity-80 transition-opacity truncate">
                     보상스쿨 헬스케어 &amp; 손해사정 보상가이드
                   </span>
-                  <span className="sm:hidden text-[15px] bg-gradient-to-r from-red-600 to-[#1a73e8] bg-clip-text text-transparent truncate">
+                  <span className="sm:hidden text-[15px] text-[#202124] dark:text-[#e8eaed] drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] truncate">
                     보상스쿨&apos;s 보상가이드
                   </span>
-                  <span className="hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-none border border-[#1a73e8]/30 bg-blue-50/50 dark:bg-blue-900/20 text-[9px] font-black text-[#1a73e8] dark:text-[#8ab4f8] tracking-widest uppercase">
+                  <span className="hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-none border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-[9px] font-black text-gray-600 dark:text-gray-300 tracking-widest uppercase drop-shadow-sm">
                     Integrated Hub
                   </span>
                 </Link>

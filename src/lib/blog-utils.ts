@@ -89,7 +89,7 @@ export function parseBlogPost(content: string): ParsedBlogPost {
 
       currentSectionType = 'NONE';
       
-      const id = slugger.slug(rawText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').trim());
+      const id = slugger.slug(rawText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/<[^>]+>/g, '').trim());
       const text = rawText
         .replace(/^\d+\.\s*/, '')
         .replace(/\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu, '')
@@ -97,6 +97,7 @@ export function parseBlogPost(content: string): ParsedBlogPost {
         .replace(/`([^`]+)`/g, '$1')
         .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
         .replace(/\[\s*\]/g, '')
+        .replace(/<[^>]+>/g, '')
         .trim();
         
       if (text) {
@@ -179,7 +180,12 @@ export function parseBlogPost(content: string): ParsedBlogPost {
     result.sections.splice(1, 1);
   }
 
-  result.sections = result.sections.map(sec => sec.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>'));
+  const applyBold = (str: string) => str.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+  
+  result.sections = result.sections.map(applyBold);
+  result.keyPoints = result.keyPoints.map(applyBold);
+  result.checklistItems = result.checklistItems.map(applyBold);
+  result.faqItems = result.faqItems.map(faq => ({ ...faq, a: applyBold(faq.a) }));
 
   return result;
 }

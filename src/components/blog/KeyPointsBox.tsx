@@ -1,35 +1,34 @@
-import BlogBlockWrapper from './BlogBlockWrapper';
-
 interface KeyPointsBoxProps {
   points: string[];
 }
 
 export default function KeyPointsBox({ points }: KeyPointsBoxProps) {
   return (
-    <BlogBlockWrapper className="mb-10 hover:shadow-[0_12px_40px_rgba(26,115,232,0.15)] transition-shadow duration-300 group">
-      <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-100 dark:border-white/5">
-        <div className="w-8 h-8 rounded-none bg-gradient-to-br from-red-50 to-blue-50 dark:from-red-900/20 dark:to-blue-900/20 border border-gray-200 dark:border-white/10 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-          <svg className="w-4 h-4 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </div>
-        <span className="text-[16px] font-extrabold text-gray-900 dark:text-white uppercase tracking-tight">핵심 요약 포인트</span>
+    <div className="my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden group">
+      <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+        💡
       </div>
-      <ul className="px-4 py-4 space-y-3">
-        {points.map((point, i) => (
-          <li key={i} className="flex items-start gap-3.5">
-            <span className="w-8 h-8 rounded-none bg-gradient-to-br from-red-500 to-[#1a73e8] text-white shadow-sm text-[13px] font-bold flex items-center justify-center shrink-0 mt-0.5">
-              {i + 1}
-            </span>
-            <span
-              className="flex-1 text-[15px] font-semibold text-gray-800 dark:text-[#e8eaed] leading-[1.7] break-keep"
-              dangerouslySetInnerHTML={{
-                __html: point.replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:800;color:#1a73e8">$1</strong>'),
-              }}
-            />
-          </li>
-        ))}
-      </ul>
-    </BlogBlockWrapper>
+      <div className="relative z-10">
+        <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5 mb-4">
+          <span className="text-[var(--google-blue)] text-lg leading-none">💡</span>
+          핵심 요약 포인트
+        </h3>
+        <ul className="space-y-3">
+          {points.map((point, i) => (
+            <li key={i} className="flex items-start gap-2.5">
+              <span className="text-[var(--google-blue)] dark:text-[#8ab4f8] mt-0.5 font-bold shrink-0">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+              </span>
+              <span
+                className="flex-1 text-[14.5px] font-semibold text-gray-800 dark:text-[#e8eaed] leading-[1.7] break-keep"
+                dangerouslySetInnerHTML={{
+                  __html: point.replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:800;color:#1a73e8">$1</strong>'),
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }

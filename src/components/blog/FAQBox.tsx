@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import BlogBlockWrapper from './BlogBlockWrapper';
 
 interface FAQItem {
   q: string;
@@ -16,70 +15,57 @@ export default function FAQBox({ items }: FAQBoxProps) {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <BlogBlockWrapper className="my-12">
-      {/* 헤더 */}
-      <div className="px-4 py-4 border-b border-gray-100 dark:border-white/5 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-none bg-gradient-to-br from-red-50 to-blue-50 dark:from-red-900/20 dark:to-blue-900/20 border border-gray-200 dark:border-white/10 flex items-center justify-center shrink-0 shadow-sm">
-          <span className="text-xl">💡</span>
-        </div>
-        <div>
-          <p className="font-extrabold text-gray-900 dark:text-white text-[16px] tracking-tight">
-            자주 묻는 질문 FAQ TOP {items.length}
-          </p>
-          <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
-            항목을 클릭하면 답변을 확인할 수 있습니다
-          </p>
-        </div>
+    <div className="my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden group">
+      <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+        💬
       </div>
+      <div className="relative z-10">
+        <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5 mb-4">
+          <span className="text-[var(--google-blue)] text-lg leading-none">💬</span>
+          자주 묻는 질문 FAQ TOP {items.length}
+        </h3>
 
-      {/* 항목들 */}
-      <div className="bg-white dark:bg-[#202124] divide-y divide-gray-100 dark:divide-white/5">
-        {items.map((item, i) => (
-          <div key={i}>
-            <button
-              onClick={() => setOpenIdx(openIdx === i ? null : i)}
-              className="w-full flex items-center gap-3.5 px-4 py-3.5 text-left hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors group"
-            >
-              <span className={`w-8 h-8 rounded-none text-[13px] font-bold flex items-center justify-center shrink-0 transition-colors ${openIdx === i ? 'bg-gradient-to-br from-red-500 to-[#1a73e8] text-white' : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'}`}>
-                Q{i + 1}
-              </span>
-              <span className={`flex-1 text-[15px] transition-colors break-keep ${openIdx === i ? 'font-extrabold text-[#1a73e8] dark:text-[#8ab4f8]' : 'font-semibold text-gray-800 dark:text-[#e8eaed] group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'}`}>
-                {item.q}
-              </span>
-              <svg
-                className={`w-4 h-4 shrink-0 transition-transform duration-300 ${openIdx === i ? 'rotate-180 text-[#1a73e8] dark:text-[#8ab4f8]' : 'text-gray-400 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth="2.5"
+        <div className="border-t border-gray-100 dark:border-white/5 divide-y divide-gray-100 dark:divide-white/5">
+          {items.map((item, i) => (
+            <div key={i}>
+              <button
+                onClick={() => setOpenIdx(openIdx === i ? null : i)}
+                className="w-full flex items-center gap-3 py-3 text-left transition-colors group/btn"
               >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </button>
-
-            <div 
-              className={`overflow-hidden transition-all duration-300 ease-in-out ${openIdx === i ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
-            >
-              <div className="px-4 pb-4 pt-1.5">
-                <div className="flex gap-3.5 p-4 rounded-none bg-blue-50/30 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30">
-                  <span className="w-8 h-8 rounded-none bg-gradient-to-br from-[#1a73e8] to-blue-800 text-white text-[13px] font-bold flex items-center justify-center shrink-0">
-                    A
-                  </span>
-                  <div
-                    className="text-[14.5px] text-gray-800 dark:text-gray-200 leading-[1.8] flex-1 break-keep"
+                <span className={`text-[13px] font-black shrink-0 transition-colors mt-0.5 ${openIdx === i ? 'text-[var(--google-blue)]' : 'text-gray-400 dark:text-gray-500 group-hover/btn:text-[var(--google-blue)]'}`}>
+                  Q{i + 1}
+                </span>
+                <span className={`flex-1 text-[14.5px] transition-colors break-keep ${openIdx === i ? 'font-bold text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'font-medium text-gray-800 dark:text-[#e8eaed] group-hover/btn:text-[var(--google-blue)] dark:group-hover/btn:text-[#8ab4f8]'}`}>
+                  {item.q}
+                </span>
+                <svg
+                  className={`w-4 h-4 shrink-0 transition-transform duration-300 ${openIdx === i ? 'rotate-180 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-400 group-hover/btn:text-[var(--google-blue)] dark:group-hover/btn:text-[#8ab4f8]'}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2.5"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  openIdx === i ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className="pb-4 pl-[26px] pr-4">
+                  <p
+                    className="text-[14px] text-gray-600 dark:text-[#bdc1c6] leading-relaxed break-keep"
                     dangerouslySetInnerHTML={{
-                      __html: item.a.replace(
-                        /\*\*(.+?)\*\*/g,
-                        '<strong style="font-weight:800;color:#1a73e8" class="dark:text-[#8ab4f8]">$1</strong>'
-                      ),
+                      __html: item.a.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight:700;color:currentColor">$1</strong>'),
                     }}
                   />
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </BlogBlockWrapper>
+    </div>
   );
 }

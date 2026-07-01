@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import BlogBlockWrapper from './BlogBlockWrapper';
 
 interface ChecklistBoxProps {
   items: string[];
@@ -13,87 +12,81 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
   const pct = Math.round((count / items.length) * 100);
 
   return (
-    <BlogBlockWrapper className="my-12">
-      {/* 헤더 */}
-      <div className="px-4 py-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-none bg-gradient-to-br from-red-50 to-blue-50 dark:from-red-900/20 dark:to-blue-900/20 border border-gray-200 dark:border-white/10 flex items-center justify-center shrink-0 shadow-sm">
-            <span className="text-xl">🛡️</span>
-          </div>
-          <div>
-            <p className="font-extrabold text-gray-900 dark:text-white text-[16px] tracking-tight">
-              보험 자가테스트
-            </p>
-            <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
-              해당 항목을 클릭해 체크해 보세요
-            </p>
+    <div className="my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden group">
+      <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+        ☑️
+      </div>
+      <div className="relative z-10">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5">
+            <span className="text-[var(--google-blue)] text-lg leading-none">☑️</span>
+            1분 자가진단 체크리스트
+          </h3>
+          <div className="text-right flex items-center gap-2">
+            <span className="text-xs text-[#5f6368] font-bold">해당 항목 클릭</span>
+            <span className="text-lg font-black text-[var(--google-blue)] dark:text-[#8ab4f8]">
+              {count}<span className="text-xs font-bold text-gray-400">/{items.length}</span>
+            </span>
           </div>
         </div>
-        <div className="text-right">
-          <p className="text-2xl font-black text-[#1a73e8] dark:text-[#8ab4f8]">
-            {count}<span className="text-sm font-bold text-gray-400 dark:text-gray-500">/{items.length}</span>
-          </p>
+
+        {/* 진행 바 */}
+        <div className="h-1 bg-gray-100 dark:bg-white/5 mb-4">
+          <div
+            className="h-full bg-[var(--google-blue)] transition-all duration-500 rounded-none"
+            style={{ width: `${pct}%` }}
+          />
         </div>
-      </div>
 
-      {/* 진행 바 */}
-      <div className="h-1 bg-gray-100 dark:bg-white/5">
-        <div
-          className="h-full bg-gradient-to-r from-red-500 to-[#1a73e8] transition-all duration-500 rounded-none"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-
-      {/* 항목들 */}
-      <div className="bg-white dark:bg-[#202124] divide-y divide-gray-100 dark:divide-white/5">
-        {items.map((item, i) => (
-          <button
-            key={i}
-            onClick={() => {
-              const next = [...checked];
-              next[i] = !next[i];
-              setChecked(next);
-            }}
-            className={`w-full flex items-center gap-3.5 px-4 py-3.5 text-left transition-colors group ${
-              checked[i]
-                ? 'bg-blue-50/50 dark:bg-blue-900/10'
-                : 'hover:bg-gray-50 dark:hover:bg-[#303134]'
-            }`}
-          >
-            <div
-              className={`w-5 h-5 rounded-none border-2 flex items-center justify-center shrink-0 transition-all ${
-                checked[i]
-                  ? 'bg-gradient-to-br from-red-500 to-[#1a73e8] border-transparent shadow-sm'
-                  : 'border-gray-300 dark:border-gray-600 group-hover:border-[#1a73e8]/50'
+        {/* 항목들 */}
+        <div className="divide-y divide-gray-100 dark:divide-white/5 border-t border-gray-100 dark:border-white/5">
+          {items.map((item, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                const next = [...checked];
+                next[i] = !next[i];
+                setChecked(next);
+              }}
+              className={`w-full flex items-start gap-3 py-3.5 text-left transition-colors group ${
+                checked[i] ? '' : ''
               }`}
             >
-              {checked[i] && (
-                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              )}
-            </div>
-            <span
-              className={`text-[15px] leading-relaxed break-keep transition-colors ${
-                checked[i]
-                  ? 'text-[#1a73e8] dark:text-[#8ab4f8] font-bold opacity-90'
-                  : 'text-gray-800 dark:text-[#e8eaed] font-medium group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8]'
-              }`}
-              dangerouslySetInnerHTML={{ __html: item }}
-            />
-          </button>
-        ))}
-      </div>
-
-      {/* 결과 메시지 */}
-      {count >= 3 && (
-        <div className="bg-red-50 dark:bg-red-900/10 border-t border-red-200 dark:border-red-800/30 px-4 py-3.5 flex items-center gap-3">
-          <span className="text-xl">⚠️</span>
-          <p className="text-red-700 dark:text-red-400 text-[14px] font-semibold leading-relaxed">
-            <strong className="font-extrabold">{count}개 이상 해당</strong>됩니다. 청구 가능한 보험금이 남아있을 가능성이 높으니 전문가 무료 진단을 받아보세요.
-          </p>
+              <div
+                className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center shrink-0 transition-all mt-0.5 ${
+                  checked[i]
+                    ? 'bg-[var(--google-blue)] border-[var(--google-blue)] shadow-sm'
+                    : 'border-gray-300 dark:border-gray-600 group-hover:border-[var(--google-blue)]'
+                }`}
+              >
+                {checked[i] && (
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                )}
+              </div>
+              <span
+                className={`flex-1 text-[14.5px] leading-relaxed break-keep transition-colors ${
+                  checked[i]
+                    ? 'text-[var(--google-blue)] dark:text-[#8ab4f8] font-bold'
+                    : 'text-gray-800 dark:text-[#e8eaed] font-medium group-hover:text-[var(--google-blue)] dark:group-hover:text-[#8ab4f8]'
+                }`}
+                dangerouslySetInnerHTML={{ __html: item }}
+              />
+            </button>
+          ))}
         </div>
-      )}
-    </BlogBlockWrapper>
+
+        {/* 결과 메시지 */}
+        {count >= 3 && (
+          <div className="mt-4 bg-[#fce8e6] dark:bg-[#c5221f]/10 border border-[#f28b82]/30 px-4 py-3 flex items-start gap-2 rounded-none">
+            <span className="text-[14px] mt-0.5">⚠️</span>
+            <p className="text-[#c5221f] dark:text-[#f28b82] text-[13px] font-semibold leading-relaxed">
+              <strong className="font-extrabold">{count}개 이상 해당</strong>됩니다. 숨은 보상금이 있을 가능성이 높으니 전문가 무료 진단을 권장합니다.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

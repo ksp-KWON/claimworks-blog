@@ -87,7 +87,37 @@ function parseGeneratedContent(rawOutput) {
   if (!summary) {
     summary = content.replace(/[#*`>[\]!]/g, '').replace(/\s+/g, ' ').trim().slice(0, 140);
   }
+
+  // SEO 괄호 제거 필터링
+  summary = summary.replace(/^\[(.*)\]$/, '$1').trim();
+  
   if (summary.length > 158) summary = summary.slice(0, 155) + '...';
+
+  // 글로벌 정제 필터링 (품질 검사 통과 보장)
+  content = content.replace(/<calculator type=".*?" \/>/gi, '');
+  content = content.replace(/\[이미지 제안:.*?\]/g, '');
+  content = content.replace(/\[관련 글 추천\]/g, '');
+  
+  // H2 콜론 띄어쓰기 교정
+  content = content.replace(/^##(.*)$/gm, (match, p1) => {
+    if (p1.includes(':')) {
+      return '## ' + p1.trim().split(':').map(s => s.trim()).join(' : ');
+    }
+    return match;
+  });
+
+  // CTA 텍스트 자연스러운 교정
+  content = content.replace(/<blue>보상스쿨에 문의하세요<\/blue>를 통해/g, '전문가의 조력을 통해');
+  content = content.replace(/<blue>보상스쿨에 문의하세요<\/blue>는/g, '전문가와의 상담은');
+  content = content.replace(/<blue>보상스쿨에 문의하세요<\/blue>와 같은/g, '보상스쿨과 같은');
+  content = content.replace(/언제든 <blue>보상스쿨에 문의하세요<\/blue>\./g, '언제든 전문가와 상의하십시오.');
+  content = content.replace(/<blue>보상스쿨에 문의하세요\.<\/blue>/g, '전문가와 상의하십시오.');
+  content = content.replace(/<blue>보상스쿨에 문의하세요<\/blue>\./g, '전문가와 상의하십시오.');
+  content = content.replace(/\*\s*<blue>보상스쿨에 문의하세요<\/blue>\s*:/g, '* 전문가와의 상담 :');
+  content = content.replace(/언제든 보상스쿨에 문의하세요\./g, '언제든 전문가와 상의하십시오.');
+  content = content.replace(/보상스쿨의 전문 상담 채널을 통해 현재 상황을 진단받아 보시기 바랍니다\.\s*전문가와 상의하십시오\./g, '보상스쿨의 전문 상담 채널을 통해 현재 상황을 진단받아 보시기 바랍니다.');
+
+  content = content.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
 
   return { summary, content };
 }

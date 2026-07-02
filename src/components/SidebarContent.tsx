@@ -11,7 +11,6 @@
  */
 
 import Link from 'next/link';
-import { RegionalCategories } from '@/components/SidebarCategories';
 import SidebarTagMore from './SidebarTagMore';
 
 interface SidebarContentProps {
@@ -119,7 +118,29 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
       </Link>
 
       {/* 지역별 의료기관 (계산기 바로 아래로 이동) */}
-      <RegionalCategories />
+      <Link href="/regions" className="block group">
+        <div className="bg-white dark:bg-[#202124] p-5 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(52,168,83,0.25)] hover:border-[var(--google-green)] transition-all duration-300 relative overflow-hidden">
+          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">🗺️</div>
+          <div className="relative z-10 space-y-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[var(--google-green)] pl-2.5">
+                <span className="text-[var(--google-green)] text-lg leading-none">🗺️</span>
+                지역별 의료기관
+              </h3>
+              <span className="bg-green-50 dark:bg-green-950/20 text-[var(--google-green)] dark:text-[#81c995] text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-green-100/30 dark:border-green-950/30">전국 매핑</span>
+            </div>
+            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
+              전국 17개 시/도, 226개 시/군/구별 보상 전문 의료기관 및 협력 병원 정보를 제공합니다.
+            </p>
+            <div className="mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-green-50 dark:group-hover:bg-green-950/20 group-hover:text-[var(--google-green)] dark:group-hover:text-[#81c995]">
+              <div className="flex items-center gap-2">
+                지역별 기관 찾기
+              </div>
+              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </Link>
 
       {/* 📂 분야별 전문 보상 가이드 */}
       <Link href="/categories" className="block group">

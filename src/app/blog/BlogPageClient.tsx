@@ -14,7 +14,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import HospitalSitemap from '@/components/HospitalSitemap';
-import { REGIONS_DATA } from '@/components/SidebarCategories';
+import { REGIONS_DATA } from '@/lib/constants';
 import standardData from '../../../functions/api/taas-standard-data.json';
 
 // 포스트 타입 (lib/posts에서 읽어온 데이터 형태)

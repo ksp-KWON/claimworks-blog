@@ -122,15 +122,15 @@ export default function RootLayout({
               <div className="font-sans font-extrabold text-lg sm:text-xl min-w-0 tracking-tight">
                 <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden">
                   <div className="relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-white dark:bg-[#202124] rounded-none border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.7)] group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.2)] dark:group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.9)] group-hover:border-gray-400 dark:group-hover:border-gray-500 group-hover:scale-105 transition-all duration-300 p-1.5 z-10">
-                    <img src="/images/logo-icon.png" alt="보상스쿨 TV" className="w-full h-full object-contain drop-shadow-sm grayscale group-hover:grayscale-0 transition-all duration-300" />
+                    <img src="/images/logo-icon.png" alt="보상스쿨 TV" className="w-full h-full object-contain drop-shadow-sm transition-all duration-300" />
                   </div>
-                  <span className="hidden sm:inline font-extrabold text-[#3c4043] dark:text-[#e8eaed] [text-shadow:1px_1px_0_rgba(255,255,255,0.8),_-1px_-1px_0_rgba(0,0,0,0.1)] dark:[text-shadow:1px_1px_0_rgba(0,0,0,0.8),_-1px_-1px_0_rgba(255,255,255,0.1)] group-hover:opacity-80 transition-opacity truncate tracking-tight">
+                  <span className="hidden sm:inline font-extrabold text-[#3c4043] dark:text-[#e8eaed] group-hover:opacity-80 transition-opacity truncate tracking-tight">
                     보상스쿨 헬스케어 &amp; 손해사정 보상가이드
                   </span>
-                  <span className="sm:hidden font-extrabold text-[15px] text-[#3c4043] dark:text-[#e8eaed] [text-shadow:1px_1px_0_rgba(255,255,255,0.8),_-1px_-1px_0_rgba(0,0,0,0.1)] dark:[text-shadow:1px_1px_0_rgba(0,0,0,0.8),_-1px_-1px_0_rgba(255,255,255,0.1)] truncate tracking-tight">
+                  <span className="sm:hidden font-extrabold text-[15px] text-[#3c4043] dark:text-[#e8eaed] truncate tracking-tight">
                     보상스쿨&apos;s 보상가이드
                   </span>
-                  <span className="hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-sm bg-[#f0f2f5] dark:bg-[#202124] text-[9px] font-black text-gray-500 dark:text-gray-400 tracking-widest uppercase shadow-[2px_2px_4px_rgba(0,0,0,0.1),_-2px_-2px_4px_rgba(255,255,255,0.8)] dark:shadow-[2px_2px_4px_rgba(0,0,0,0.4),_-2px_-2px_4px_rgba(255,255,255,0.05)] border-none">
+                  <span className="hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-sm bg-gray-100 dark:bg-gray-800 text-[9px] font-black text-gray-500 dark:text-gray-400 tracking-widest uppercase border border-gray-200 dark:border-gray-700">
                     Integrated Hub
                   </span>
                 </Link>

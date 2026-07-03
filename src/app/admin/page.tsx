@@ -74,6 +74,7 @@ export default function AdminPage() {
   // UI State
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 
   // 컴파일된 전체 마크다운 문자열 (미리보기 및 발행용)
   const compiledTags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(Boolean) : [];
@@ -250,6 +251,7 @@ ${content}
 
       showStatus('✅ 성공적으로 발행되었습니다!', 4000);
       setSelectedPostSha('');
+      setIsPublishModalOpen(false);
     } catch (error: any) {
       showStatus(`발행 실패: ${error.message}`);
     }
@@ -391,9 +393,9 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
             새 문서
           </button>
 
-          <button onClick={publishToGithub} disabled={isLoading} className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold transition-colors shadow-sm disabled:opacity-50 flex items-center gap-1.5">
+          <button onClick={() => setIsPublishModalOpen(true)} disabled={isLoading} className="px-4 py-1.5 bg-[#03c75a] hover:bg-[#02b351] text-white rounded text-xs font-bold transition-colors shadow-sm disabled:opacity-50 flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-            GitHub 바로 발행
+            발행
           </button>
         </div>
       </header>
@@ -417,9 +419,6 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
         
         <MarkdownEditor 
           title={title} setTitle={setTitle}
-          summary={summary} setSummary={setSummary}
-          category={category} setCategory={setCategory}
-          tagsInput={tagsInput} setTagsInput={setTagsInput}
           content={content} setContent={setContent}
         />
 
@@ -438,6 +437,88 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
                 {isLoading && <svg className="animate-spin h-3.5 w-3.5 mr-2" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>}
                 {statusMessage}
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Publish Modal (네이버 블로그 스타일) */}
+        <AnimatePresence>
+          {isPublishModalOpen && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] flex justify-end bg-black/20 backdrop-blur-sm"
+              onClick={() => setIsPublishModalOpen(false)}
+            >
+              <motion.div 
+                initial={{ x: 300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 300, opacity: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                className="w-[360px] bg-white dark:bg-zinc-900 h-full shadow-2xl flex flex-col border-l border-gray-200 dark:border-zinc-800"
+                onClick={e => e.stopPropagation()}
+              >
+                <div className="p-5 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center">
+                  <h2 className="text-lg font-bold text-gray-900 dark:text-white">발행 설정</h2>
+                  <button onClick={() => setIsPublishModalOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6">
+                  {/* Category */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">카테고리</label>
+                    <select 
+                      value={category}
+                      onChange={e => setCategory(e.target.value)}
+                      className="w-full text-sm border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2.5 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white outline-none focus:border-[#03c75a] focus:ring-1 focus:ring-[#03c75a] transition-all"
+                    >
+                      <option value="교통사고">교통사고</option>
+                      <option value="산재사고">산재사고</option>
+                      <option value="근재사고">근재사고</option>
+                      <option value="보험보상">보험보상</option>
+                      <option value="판례법률석">판례법률석</option>
+                      <option value="기타">기타</option>
+                    </select>
+                  </div>
+
+                  {/* Tags */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">태그</label>
+                    <input 
+                      type="text" 
+                      value={tagsInput}
+                      onChange={e => setTagsInput(e.target.value)}
+                      placeholder="쉼표(,)로 구분 (예: 십자인대,후유장해)" 
+                      className="w-full text-sm border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2.5 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white outline-none focus:border-[#03c75a] focus:ring-1 focus:ring-[#03c75a] transition-all"
+                    />
+                  </div>
+
+                  {/* Summary */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300">요약 (SEO)</label>
+                    <textarea 
+                      value={summary}
+                      onChange={e => setSummary(e.target.value)}
+                      placeholder="검색 결과에 노출될 요약문을 입력하세요" 
+                      rows={4}
+                      className="w-full text-sm border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2.5 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white outline-none focus:border-[#03c75a] focus:ring-1 focus:ring-[#03c75a] transition-all resize-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-5 border-t border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50">
+                  <button 
+                    onClick={publishToGithub} 
+                    disabled={isLoading}
+                    className="w-full py-3 bg-[#03c75a] hover:bg-[#02b351] text-white rounded-md font-bold text-lg transition-colors shadow-md disabled:opacity-50"
+                  >
+                    {isLoading ? '발행 중...' : '최종 발행하기'}
+                  </button>
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

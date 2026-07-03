@@ -10,6 +10,10 @@
     "fetch-hira": "node scripts/fetch-hira-data.js",
     "check-quality": "node scripts/check-quality.js"
   },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom"
+  },
   "dependencies": {
     "@mdxeditor/editor": "^4.0.4",
     "@tailwindcss/typography": "^0.5.20",

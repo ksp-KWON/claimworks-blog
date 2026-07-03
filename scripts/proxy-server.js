@@ -33,12 +33,13 @@ const server = http.createServer((req, res) => {
   const urlObj = new URL(req.url, `http://${req.headers.host}`);
   const query = urlObj.searchParams.get('query') || '';
   const id = urlObj.searchParams.get('ID') || '';
+  const display = urlObj.searchParams.get('display') || '100';
 
   let targetUrl = '';
   
   // 판례 목록 조회 및 상세 조회 경로 매핑
   if (urlObj.pathname === '/api/precedent') {
-    targetUrl = `https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=${LAW_API_KEY}&search=2&query=${encodeURIComponent(query)}`;
+    targetUrl = `https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=${LAW_API_KEY}&search=2&display=${display}&query=${encodeURIComponent(query)}`;
   } else if (urlObj.pathname === '/api/precedent-detail') {
     targetUrl = `https://www.law.go.kr/DRF/lawService.do?target=prec&type=XML&OC=${LAW_API_KEY}&ID=${id}`;
   } else {

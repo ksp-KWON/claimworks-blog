@@ -4,12 +4,13 @@ export async function onRequest(context: any) {
     const { request, env } = context;
     const url = new URL(request.url);
     const query = url.searchParams.get('query') || '';
+    const page = url.searchParams.get('page') || '1';
 
     // Cloudflare Pages 환경 변수에서 엔드포인트와 보안 토큰을 로드합니다.
     const proxyEndpoint = env.LAW_PROXY_ENDPOINT || 'http://localhost:8080';
     const proxyToken = env.LAW_PROXY_TOKEN || 'secure_secret_token_12345';
 
-    const targetUrl = `${proxyEndpoint}/api/precedent?query=${encodeURIComponent(query)}`;
+    const targetUrl = `${proxyEndpoint}/api/precedent?query=${encodeURIComponent(query)}&page=${page}`;
 
     const response = await fetch(targetUrl, {
       headers: {

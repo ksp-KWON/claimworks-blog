@@ -123,7 +123,10 @@ function getSmartSummary(summary: string, content: string): string {
 export default function PrecedentSearchPage() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [results, setResults] = useState<Precedent[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [error, setError] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
@@ -158,34 +161,14 @@ export default function PrecedentSearchPage() {
     localStorage.removeItem('recent_prec_searches');
   };
 
-  const handleSearch = async (searchQuery: string) => {
-    if (!searchQuery.trim()) return;
-    const trimmedQuery = searchQuery.trim();
-    setQuery(trimmedQuery);
-    setLoading(true);
-    setError('');
-    setResults([]);
-    setOpenDetailId(null);
-    saveSearch(trimmedQuery);
-
-    const cached = getCachedSearch(trimmedQuery);
-    if (cached) {
-      setResults(cached);
-      setLoading(false);
-      return;
-    }
-
+  const fetchPrecedents = async (searchQuery: string, pageNum: number, isLoadMore = false) => {
     try {
-      // 리스트 정보만 1번의 API로 순식간에 받아옵니다.
-      const listRes = await fetch(`/api/precedent?query=${encodeURIComponent(trimmedQuery)}`);
-      if (!listRes.ok) {
-        throw new Error(`목록 조회에 실패했습니다. (HTTP ${listRes.status})`);
-      }
+      const listRes = await fetch(`/api/precedent?query=${encodeURIComponent(searchQuery)}&page=${pageNum}`);
+      if (!listRes.ok) throw new Error(`목록 조회에 실패했습니다. (HTTP ${listRes.status})`);
       
       const listXml = await listRes.text();
       if (listXml.includes('사용자 정보 검증에 실패하였습니다')) {
         setError('법제처 API 인증 실패: 등록된 IP와 현재 요청 IP가 일치하지 않거나 서버 동기화 지연 중입니다.');
-        setLoading(false);
         return;
       }
 
@@ -195,7 +178,10 @@ export default function PrecedentSearchPage() {
         throw new Error('법제처 응답 XML 파싱 중 오류가 발생했습니다.');
       }
 
-      // API가 돌려주는 갯수 그대로 인위적 자르기(slice) 없이 모두 렌더링 준비
+      const totalCntNode = xmlDoc.getElementsByTagName('totalCnt')[0];
+      const tCount = totalCntNode ? parseInt(totalCntNode.textContent || '0', 10) : 0;
+      setTotalCount(tCount);
+
       const ids = Array.from(xmlDoc.getElementsByTagName('판례일련번호')).map(el => el.textContent?.trim() || '');
       const titles = Array.from(xmlDoc.getElementsByTagName('사건명')).map(el => el.textContent?.trim() || '');
       const caseNos = Array.from(xmlDoc.getElementsByTagName('사건번호')).map(el => el.textContent?.trim() || '');
@@ -203,9 +189,8 @@ export default function PrecedentSearchPage() {
       const courts = Array.from(xmlDoc.getElementsByTagName('법원명')).map(el => el.textContent?.trim() || '');
       const types = Array.from(xmlDoc.getElementsByTagName('사건종류명')).map(el => el.textContent?.trim() || '');
 
-      if (ids.length === 0) {
+      if (ids.length === 0 && !isLoadMore) {
         setError('입력하신 조건과 일치하는 판례 데이터를 찾을 수 없습니다.');
-        setLoading(false);
         return;
       }
 
@@ -216,20 +201,53 @@ export default function PrecedentSearchPage() {
         judgmentDate: dates[i] || '',
         courtName: courts[i] || '',
         caseType: types[i] || '',
-        judgmentSummary: '', // 상세정보는 빈칸 (지연 로딩)
+        judgmentSummary: '', 
         caseContent: '',
         casePoints: '',
         officialUrl: `https://www.law.go.kr/LSW/precInfoP.do?precSeq=${id}`
       }));
 
-      setResults(parsedData);
-      setCachedSearch(trimmedQuery, parsedData);
+      if (isLoadMore) {
+        setResults(prev => [...prev, ...parsedData]);
+      } else {
+        setResults(parsedData);
+        setCachedSearch(searchQuery, parsedData); // 캐시 업데이트 (첫 페이지만)
+      }
     } catch (err: any) {
       console.error(err);
       setError('법제처 API 조회 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
+    }
+  };
+
+  const handleSearch = async (searchQuery: string) => {
+    if (!searchQuery.trim()) return;
+    const trimmedQuery = searchQuery.trim();
+    setQuery(trimmedQuery);
+    setPage(1);
+    setLoading(true);
+    setError('');
+    setResults([]);
+    setOpenDetailId(null);
+    saveSearch(trimmedQuery);
+
+    const cached = getCachedSearch(trimmedQuery);
+    if (cached) {
+      setResults(cached);
+      setTotalCount(cached.length); // 임시 할당
       setLoading(false);
     }
+
+    await fetchPrecedents(trimmedQuery, 1, false);
+    setLoading(false);
+  };
+
+  const handleLoadMore = async () => {
+    if (loadingMore) return;
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    setPage(nextPage);
+    await fetchPrecedents(query, nextPage, true);
+    setLoadingMore(false);
   };
 
   // 💡 사용자가 클릭했을 때 호출되는 온디맨드 상세 조회 로직 (지연 로딩)
@@ -388,8 +406,8 @@ export default function PrecedentSearchPage() {
 
       {!loading && results.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] border-b border-gray-100 dark:border-white/5 pb-2">
-            유사 법원 판례 검색 결과 총 <span className="text-[var(--google-blue)] dark:text-[#8ab4f8]">{results.length}</span>건
+          <h2 className="text-xl font-black text-[#202124] dark:text-[#e8eaed] mb-1 tracking-tight flex items-center gap-2">
+            검색 결과 <span className="text-[var(--google-blue)]">{totalCount > 0 ? totalCount.toLocaleString() : results.length}</span>건
           </h2>
 
           <div className="flex flex-col border border-gray-200 dark:border-white/10 rounded-none bg-white dark:bg-[#202124] shadow-sm divide-y divide-gray-100 dark:divide-white/5">
@@ -508,6 +526,19 @@ export default function PrecedentSearchPage() {
               );
             })}
           </div>
+
+          {/* 더보기 버튼 */}
+          {results.length < totalCount && (
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="px-8 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-sm font-bold shadow-sm transition-colors flex items-center justify-center gap-2 rounded-full min-w-[200px]"
+              >
+                {loadingMore ? '데이터 불러오는 중...' : `나머지 판례 더보기 (${results.length} / ${totalCount})`}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

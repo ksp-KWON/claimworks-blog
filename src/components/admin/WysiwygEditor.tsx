@@ -1,6 +1,24 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { Editor } from '@toast-ui/react-editor';
-import '@toast-ui/editor/dist/toastui-editor.css';
+import { 
+  MDXEditor, 
+  MDXEditorMethods,
+  headingsPlugin, 
+  quotePlugin, 
+  listsPlugin, 
+  thematicBreakPlugin, 
+  markdownShortcutPlugin, 
+  toolbarPlugin, 
+  UndoRedo, 
+  BoldItalicUnderlineToggles, 
+  linkPlugin, 
+  linkDialogPlugin,
+  CreateLink, 
+  imagePlugin, 
+  tablePlugin,
+  InsertTable,
+  BlockTypeSelect
+} from '@mdxeditor/editor';
+import '@mdxeditor/editor/style.css';
 
 interface WysiwygEditorProps {
   initialValue: string;
@@ -14,51 +32,79 @@ export interface WysiwygEditorRef {
 }
 
 const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initialValue, onChange }, ref) => {
-  const editorRef = useRef<Editor>(null);
+  const editorRef = useRef<MDXEditorMethods>(null);
 
   useImperativeHandle(ref, () => ({
     insertText: (text: string) => {
-      editorRef.current?.getInstance().insertText(text);
+      editorRef.current?.insertMarkdown(text);
+      editorRef.current?.focus();
     },
     setMarkdown: (markdown: string) => {
-      editorRef.current?.getInstance().setMarkdown(markdown);
+      editorRef.current?.setMarkdown(markdown);
     },
     getMarkdown: () => {
-      return editorRef.current?.getInstance().getMarkdown() || '';
+      return editorRef.current?.getMarkdown() || '';
     }
   }));
 
-  // 외부(AI 생성, 파일 불러오기 등)에서 initialValue가 통째로 바뀌면 에디터 내용도 업데이트
+  // 외부 데이터 로딩 등으로 initialValue가 크게 변할 때
   useEffect(() => {
     if (editorRef.current && initialValue) {
-      const currentMd = editorRef.current.getInstance().getMarkdown();
+      const currentMd = editorRef.current.getMarkdown();
       if (currentMd !== initialValue) {
-        editorRef.current.getInstance().setMarkdown(initialValue);
+        editorRef.current.setMarkdown(initialValue);
       }
     }
   }, [initialValue]);
 
   return (
-    <Editor
-      ref={editorRef}
-      initialValue={initialValue}
-      previewStyle="vertical"
-      height="100%"
-      initialEditType="wysiwyg"
-      useCommandShortcut={true}
-      onChange={() => {
-        if (editorRef.current) {
-          onChange(editorRef.current.getInstance().getMarkdown());
+    <div className="mdx-editor-wrapper h-full flex flex-col prose prose-sm max-w-none dark:prose-invert">
+      <MDXEditor
+        ref={editorRef}
+        markdown={initialValue || ''}
+        onChange={onChange}
+        contentEditableClassName="prose max-w-none w-full h-full p-4 outline-none min-h-[500px]"
+        plugins={[
+          headingsPlugin(),
+          quotePlugin(),
+          listsPlugin(),
+          thematicBreakPlugin(),
+          linkPlugin(),
+          linkDialogPlugin(),
+          imagePlugin(),
+          tablePlugin(),
+          markdownShortcutPlugin(),
+          toolbarPlugin({
+            toolbarContents: () => (
+              <div className="flex items-center gap-2 flex-wrap">
+                <UndoRedo />
+                <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1" />
+                <BlockTypeSelect />
+                <BoldItalicUnderlineToggles />
+                <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1" />
+                <CreateLink />
+                <InsertTable />
+              </div>
+            )
+          })
+        ]}
+      />
+      <style>{`
+        .mdx-editor-wrapper .mdxeditor {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
         }
-      }}
-      toolbarItems={[
-        ['heading', 'bold', 'italic', 'strike'],
-        ['hr', 'quote'],
-        ['ul', 'ol', 'task', 'indent', 'outdent'],
-        ['table', 'image', 'link'],
-        ['code', 'codeblock']
-      ]}
-    />
+        .mdx-editor-wrapper .mdxeditor-toolbar {
+          flex-shrink: 0;
+          background: transparent;
+        }
+        .mdx-editor-wrapper [data-lexical-editor] {
+          flex: 1;
+          overflow-y: auto;
+        }
+      `}</style>
+    </div>
   );
 });
 

@@ -1,0 +1,14 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "금감원 소비자보호센터 - 보상스쿨",
+  description: "금융감독원 공식 API와 연동하여 소비자경보, 분쟁조정사례, 금융꿀팁 등 가장 공신력 있는 보상 지침을 실시간으로 제공합니다.",
+};
+
+export default function FssNewsLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <>{children}</>;
+}

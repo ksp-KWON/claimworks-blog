@@ -1,5 +1,5 @@
 import Link from "next/link";
-import MedicalCalculatorContainer from "@/components/calculator/medical/MedicalCalculatorContainer";
+import MedicalCalculator from "@/components/calculator/MedicalCalculator";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -51,7 +51,7 @@ export default function MedicalCalculatorPage() {
 
             <div className="w-full mx-auto">
               <div className="bg-white dark:bg-[#202124] rounded-none p-2 sm:p-6 shadow-sm border border-gray-100 dark:border-white/5">
-                <MedicalCalculatorContainer />
+                <MedicalCalculator />
               </div>
             </div>
           </div>

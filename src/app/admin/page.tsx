@@ -23,7 +23,7 @@ const POSTS_PATH = 'src/content/posts';
 // YAML 파싱 유틸리티 (향상된 버전)
 function parseYamlFrontmatter(markdown: string) {
   // AI 응답이 마크다운 코드 블록(```markdown)으로 감싸져 있을 경우 제거
-  let cleanMarkdown = markdown.replace(/^```(?:markdown|md)?\s*\n/i, '').replace(/\n```\s*$/, '').trim();
+  const cleanMarkdown = markdown.replace(/^```(?:markdown|md)?\s*\n/i, '').replace(/\n```\s*$/, '').trim();
   
   // 첫 번째 --- 부터 두 번째 --- 까지 매칭 (앞에 다른 텍스트가 있어도 매칭되도록)
   const match = cleanMarkdown.match(/---\n([\s\S]*?)\n---/);

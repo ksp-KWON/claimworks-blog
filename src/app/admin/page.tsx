@@ -20,13 +20,17 @@ const REPO_OWNER = 'ksp-KWON';
 const REPO_NAME = 'claimworks-blog';
 const POSTS_PATH = 'src/content/posts';
 
-// YAML 파싱 유틸리티 (단순 버전)
+// YAML 파싱 유틸리티 (향상된 버전)
 function parseYamlFrontmatter(markdown: string) {
-  const match = markdown.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return { content: markdown, data: {} as any };
+  // AI 응답이 마크다운 코드 블록(```markdown)으로 감싸져 있을 경우 제거
+  let cleanMarkdown = markdown.replace(/^```(?:markdown|md)?\s*\n/i, '').replace(/\n```\s*$/, '').trim();
+  
+  // 첫 번째 --- 부터 두 번째 --- 까지 매칭 (앞에 다른 텍스트가 있어도 매칭되도록)
+  const match = cleanMarkdown.match(/---\n([\s\S]*?)\n---/);
+  if (!match) return { content: cleanMarkdown, data: {} as any };
   
   const yamlContent = match[1];
-  const restContent = markdown.replace(/^---\n[\s\S]*?\n---/, '').trim();
+  const restContent = cleanMarkdown.substring(match.index! + match[0].length).trim();
   
   const data: any = {};
   const lines = yamlContent.split('\n');

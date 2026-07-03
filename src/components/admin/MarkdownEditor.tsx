@@ -95,7 +95,7 @@ export default function MarkdownEditor({
         <div className="max-w-[850px] mx-auto bg-white dark:bg-zinc-900 min-h-[1000px] shadow-sm border border-gray-100 dark:border-zinc-800 rounded-xl overflow-hidden flex flex-col">
           
           {/* Document Title Input */}
-          <div className="px-10 pt-16 pb-8 border-b border-gray-100 dark:border-zinc-800">
+          <div className="px-10 pt-16 pb-4">
             <input 
               type="text" 
               value={title}

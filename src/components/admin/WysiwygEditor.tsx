@@ -97,7 +97,9 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
         }
         .mdx-editor-wrapper .mdxeditor-toolbar {
           flex-shrink: 0;
-          background: transparent;
+          background: transparent !important;
+          border-bottom: none !important;
+          padding: 8px 24px !important;
         }
         .mdx-editor-wrapper [data-lexical-editor] {
           flex: 1;

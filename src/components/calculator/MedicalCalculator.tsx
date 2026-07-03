@@ -35,7 +35,8 @@ const GENERATIONS = [
   { id: 1, label: '1세대 실손', period: '~2009년 8월', color: '#1A73E8', note: '입원 전액 보상 / 통원 5천원 공제' },
   { id: 2, label: '2세대 실손', period: '2009년 10월 ~ 2017년 3월', color: '#34A853', note: '급여/비급여 통합 자기부담금 10% 공제' },
   { id: 3, label: '3세대 실손', period: '2017년 4월 ~ 2021년 6월', color: '#f29900', note: '기본형 10~20%, 3대 비급여 특약 30% 공제' },
-  { id: 4, label: '4세대 실손', period: '2021년 7월 ~ 현재', color: '#d93025', note: '급여 20%, 비급여 30%, 3대 비급여 특약 30% 공제' },
+  { id: 4, label: '4세대 실손', period: '2021년 7월 ~ 2026년 4월', color: '#d93025', note: '급여 20%, 비급여 30%, 3대 비급여 특약 30% 공제' },
+  { id: 5, label: '5세대 실손', period: '2026년 5월 ~ 현재', color: '#8e24aa', note: '급여 20%, 비급여 30%, 비중증(도수 등) 50% 공제' },
 ];
 
 const HOSPITAL_TYPES = [
@@ -151,6 +152,31 @@ export default function MedicalCalculator() {
         const specialDeduct = Math.max(30000 * days, totalSpecialNonCovered * 0.3);
         specialPayout = Math.max(0, totalSpecialNonCovered - specialDeduct);
         if (totalSpecialNonCovered > 0) formulas.push(`3대 비급여 공제: MAX(30%, 3만원×${days}일)`);
+
+        const totalCost = totalCovered + totalNormalNonCovered + totalSpecialNonCovered;
+        totalDeduction = totalCost - (coveredPayout + nonCoveredPayout + specialPayout);
+      }
+    }
+    else if (data.generation === 5) {
+      if (data.treatmentType === 'inpatient') {
+        coveredPayout = totalCovered * 0.8;
+        nonCoveredPayout = totalNormalNonCovered * 0.7;
+        specialPayout = totalSpecialNonCovered * 0.5;
+        totalDeduction = (totalCovered * 0.2) + (totalNormalNonCovered * 0.3) + (totalSpecialNonCovered * 0.5);
+        formulas.push(`급여 20%, 비급여 30%, 비중증(3대특약 등) 50% 각각 공제`);
+      } else {
+        const minCoveredDeduct = (data.clinicType === 'general' ? 20000 : 10000) * days;
+        const coveredDeduct = Math.max(minCoveredDeduct, totalCovered * 0.2);
+        coveredPayout = Math.max(0, totalCovered - coveredDeduct);
+        if (totalCovered > 0) formulas.push(`급여 통원 공제: MAX(20%, 최소공제금액×${days}일)`);
+
+        const nonCoveredDeduct = Math.max(30000 * days, totalNormalNonCovered * 0.3);
+        nonCoveredPayout = Math.max(0, totalNormalNonCovered - nonCoveredDeduct);
+        if (totalNormalNonCovered > 0) formulas.push(`일반 비급여 공제: MAX(30%, 3만원×${days}일)`);
+
+        const specialDeduct = Math.max(30000 * days, totalSpecialNonCovered * 0.5);
+        specialPayout = Math.max(0, totalSpecialNonCovered - specialDeduct);
+        if (totalSpecialNonCovered > 0) formulas.push(`비중증(3대특약) 공제: MAX(50%, 3만원×${days}일)`);
 
         const totalCost = totalCovered + totalNormalNonCovered + totalSpecialNonCovered;
         totalDeduction = totalCost - (coveredPayout + nonCoveredPayout + specialPayout);
@@ -295,12 +321,12 @@ export default function MedicalCalculator() {
             </div>
           </div>
 
-          {/* 4. 3대 비급여 특약 (3~4세대) */}
-          {(data.generation === 3 || data.generation === 4) && (
+          {/* 4. 3대 비급여 특약 (3~5세대) */}
+          {(data.generation >= 3) && (
             <div className="bg-[#fce8e6]/30 dark:bg-[#d93025]/5 rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-red-100 dark:border-red-900/20 transition-all animate-in fade-in slide-in-from-top-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center text-lg">💉</div>
-                <h3 className="text-sm font-extrabold text-[#d93025] dark:text-red-400">3대 비급여 특약 병원비</h3>
+                <h3 className="text-sm font-extrabold text-[#d93025] dark:text-red-400">3대 비급여 특약 병원비{data.generation === 5 && ' (비중증)'}</h3>
               </div>
               <p className="text-[10px] text-red-400 dark:text-red-500 font-semibold mb-5 pl-11">※ 위의 일반 비급여와 중복 입력하지 마세요.</p>
               
@@ -397,8 +423,8 @@ export default function MedicalCalculator() {
                 <div className="py-2.5 space-y-2 text-[12px] font-medium text-gray-500 dark:text-gray-400">
                   <div className="flex justify-between"><span className="flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-gray-300"></span>급여 지급액</span><span>{result.coveredPayout.toLocaleString()} 원</span></div>
                   <div className="flex justify-between"><span className="flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-gray-300"></span>비급여 지급액</span><span>{result.nonCoveredPayout.toLocaleString()} 원</span></div>
-                  {(data.generation === 3 || data.generation === 4) && (
-                    <div className="flex justify-between text-red-500 dark:text-red-400"><span className="flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-red-300"></span>3대 특약 지급액</span><span>{result.specialPayout.toLocaleString()} 원</span></div>
+                  {(data.generation >= 3) && (
+                    <div className="flex justify-between text-red-500 dark:text-red-400"><span className="flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-red-300"></span>{data.generation === 5 ? '비중증(3대특약) 지급액' : '3대 특약 지급액'}</span><span>{result.specialPayout.toLocaleString()} 원</span></div>
                   )}
                 </div>
 

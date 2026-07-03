@@ -45,7 +45,7 @@ export default function MedicalCalculatorPage() {
                 보상스쿨 <span className="bg-gradient-to-r from-[var(--google-green)] to-[#1e8e3e] bg-clip-text text-transparent">실손의료비 보상 계산기</span>
               </h1>
               <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-2xl mx-auto leading-relaxed font-medium">
-                1세대부터 4세대까지 세대별 약관이 모두 반영된 전문가용 계산기입니다. 영수증의 급여/비급여 금액을 입력하여 예상 보상금을 확인하세요.
+                1세대부터 5세대까지 세대별 약관이 모두 반영된 전문가용 계산기입니다. 영수증의 급여/비급여 금액을 입력하여 예상 보상금을 확인하세요.
               </p>
             </header>
 

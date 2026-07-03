@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 interface AdminSidebarProps {
-  githubToken: string;
   isLoading: boolean;
   postList: any[];
   onLoadPost: (filename: string, sha: string) => void;
@@ -12,7 +11,6 @@ interface AdminSidebarProps {
 }
 
 export default function AdminSidebar({
-  githubToken,
   isLoading,
   postList,
   onLoadPost,

@@ -38,7 +38,7 @@ function parseYamlFrontmatter(markdown: string) {
       let value = line.slice(colonIdx + 1).trim();
       if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
       if (key === 'tags' && value.startsWith('[')) {
-        try { data[key] = JSON.parse(value); } catch(e) { data[key] = []; }
+        try { data[key] = JSON.parse(value); } catch { data[key] = []; }
       } else {
         data[key] = value;
       }
@@ -128,7 +128,7 @@ ${content}
             titlesMap[`${post.slug}.md`] = post.title;
           });
         }
-      } catch (e) {}
+      } catch {}
 
       const combined = mdFiles.map((file: any) => ({
         name: file.name,
@@ -270,7 +270,7 @@ ${content}
     const currentDate = new Date().toISOString().split('T')[0];
     const angle = getRandomAngle();
 
-    let prompt = mode === 'manual' ? `
+    const prompt = mode === 'manual' ? `
 ${getBlogRole()}
 # Objective
 제시된 유튜브 대본(원문)을 바탕으로 상세하고 방대한 분량의 초고품질 전문 칼럼을 작성하십시오.

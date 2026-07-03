@@ -139,7 +139,7 @@ export default function MarkdownEditor({
       {/* 2. Markdown Toolbar */}
       <div className="flex flex-col gap-2 p-2 bg-gray-50 dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 shrink-0">
         {/* Row 1 */}
-        <div className="flex gap-4 overflow-x-auto custom-scrollbar pb-1 items-center">
+        <div className="flex flex-wrap gap-4 gap-y-2 pb-1 items-center">
           <div className="flex gap-1 items-center border-r border-gray-200 dark:border-zinc-700 pr-4 shrink-0">
             <span className="text-[10px] font-bold text-gray-400 mr-1">정렬</span>
             {[
@@ -190,7 +190,7 @@ export default function MarkdownEditor({
         </div>
         
         {/* Row 2 */}
-        <div className="flex gap-4 overflow-x-auto custom-scrollbar pb-1 items-center">
+        <div className="flex flex-wrap gap-4 gap-y-2 pb-1 items-center border-t border-gray-100 dark:border-zinc-800/50 pt-2">
           <div className="flex gap-1 items-center border-r border-gray-200 dark:border-zinc-700 pr-4 shrink-0">
             <span className="text-[10px] font-bold text-gray-400 mr-1">구조</span>
             {[

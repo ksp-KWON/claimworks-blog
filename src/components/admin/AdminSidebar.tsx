@@ -8,6 +8,11 @@ interface AdminSidebarProps {
   onRefreshList: () => void;
   onRunAi: (mode: 'manual' | 'semi-auto', inputText: string) => void;
   onRunAuto: (type: 'all' | 'precedent' | 'trend') => void;
+  geminiKey: string;
+  setGeminiKey: (val: string) => void;
+  githubToken: string;
+  setGithubToken: (val: string) => void;
+  saveKeys: () => void;
 }
 
 export default function AdminSidebar({
@@ -17,9 +22,14 @@ export default function AdminSidebar({
   onDeletePost,
   onRefreshList,
   onRunAi,
-  onRunAuto
+  onRunAuto,
+  geminiKey,
+  setGeminiKey,
+  githubToken,
+  setGithubToken,
+  saveKeys
 }: AdminSidebarProps) {
-  const [tab, setTab] = useState<'posts' | 'ai' | 'auto'>('ai');
+  const [tab, setTab] = useState<'posts' | 'ai' | 'auto' | 'settings'>('ai');
   const [inputText, setInputText] = useState('');
   const [aiMode, setAiMode] = useState<'manual' | 'semi-auto'>('manual');
   const [autoType, setAutoType] = useState<'all' | 'precedent' | 'trend'>('all');
@@ -32,7 +42,8 @@ export default function AdminSidebar({
         {[
           { id: 'ai', label: '✨ AI' },
           { id: 'posts', label: '📂 기존 글' },
-          { id: 'auto', label: '🤖 데일리' }
+          { id: 'auto', label: '🤖 데일리' },
+          { id: 'settings', label: '⚙️ 설정' }
         ].map((t) => (
           <button
             key={t.id}
@@ -195,6 +206,49 @@ export default function AdminSidebar({
             >
               🚀 깃허브 액션 즉시 기동
             </button>
+          </div>
+        )}
+
+        {/* Settings Tab */}
+        {tab === 'settings' && (
+          <div className="flex flex-col gap-4 animate-in fade-in duration-200">
+            <div className="flex flex-col gap-3 bg-gray-50 dark:bg-zinc-950 p-4 rounded-md border border-gray-200 dark:border-zinc-800">
+              <h3 className="text-xs font-bold text-gray-800 dark:text-white border-b border-gray-200 dark:border-zinc-800 pb-2 mb-1">
+                ⚙️ API 연동 설정
+              </h3>
+              
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-bold text-gray-500">Gemini API Key</span>
+                <input 
+                  type="password" 
+                  value={geminiKey} 
+                  onChange={e => setGeminiKey(e.target.value)} 
+                  className="px-2.5 py-2 rounded-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-xs outline-none focus:border-blue-500 transition-colors" 
+                  placeholder="AIzaSy..." 
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 mt-1">
+                <span className="text-[10px] font-bold text-gray-500">GitHub Personal Token</span>
+                <input 
+                  type="password" 
+                  value={githubToken} 
+                  onChange={e => setGithubToken(e.target.value)} 
+                  className="px-2.5 py-2 rounded-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-xs outline-none focus:border-blue-500 transition-colors" 
+                  placeholder="ghp_..." 
+                />
+              </div>
+
+              <button 
+                onClick={saveKeys} 
+                className="mt-3 w-full bg-gray-800 hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-gray-900 font-bold py-2.5 rounded-md text-xs shadow-sm transition-colors"
+              >
+                💾 저장하기
+              </button>
+            </div>
+            <p className="text-[9px] text-gray-400 text-center px-2 leading-relaxed">
+              API 키는 서버에 전송되지 않으며, 현재 사용 중인 브라우저(Local Storage)에만 안전하게 저장됩니다.
+            </p>
           </div>
         )}
       </div>

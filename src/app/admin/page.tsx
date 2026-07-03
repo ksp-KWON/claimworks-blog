@@ -388,15 +388,6 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-950 px-2 py-1.5 rounded border border-gray-200 dark:border-zinc-800">
-            <span className="text-[10px] font-bold text-gray-400">Gemini:</span>
-            <input type="password" value={geminiKey} onChange={e => setGeminiKey(e.target.value)} className="px-1.5 py-0.5 rounded bg-white dark:bg-[#1e1e20] border border-gray-200 dark:border-white/10 w-24 text-[10px] outline-none" placeholder="AIzaSy..." />
-            <div className="h-3 w-[1px] bg-gray-200 dark:bg-white/10 mx-1" />
-            <span className="text-[10px] font-bold text-gray-400">GitHub:</span>
-            <input type="password" value={githubToken} onChange={e => setGithubToken(e.target.value)} className="px-1.5 py-0.5 rounded bg-white dark:bg-[#1e1e20] border border-gray-200 dark:border-white/10 w-24 text-[10px] outline-none" placeholder="ghp_..." />
-            <button onClick={saveKeys} className="ml-1 px-2 py-0.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded text-[10px] font-bold shadow-sm">저장</button>
-          </div>
-          
           <button onClick={() => setShowPreview(!showPreview)} className="px-3 py-1.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-gray-200 rounded text-xs font-bold transition-colors">
             {showPreview ? '미리보기 닫기' : '미리보기 열기'}
           </button>
@@ -417,6 +408,10 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
       <div className="flex flex-1 overflow-hidden relative">
         <AdminSidebar 
           githubToken={githubToken}
+          setGithubToken={setGithubToken}
+          geminiKey={geminiKey}
+          setGeminiKey={setGeminiKey}
+          saveKeys={saveKeys}
           isLoading={isLoading}
           postList={postList}
           onLoadPost={loadPost}

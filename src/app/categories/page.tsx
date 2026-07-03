@@ -33,10 +33,6 @@ const SPECIALTIES = [
   { name: '한방의학과 (KM)', icon: '🌿', color: 'bg-emerald-600', desc: '교통사고 첩약, 추나요법 제한 분쟁' }
 ];
 
-export const metadata = {
-  title: '분야별 전문 보상 가이드 - 보상스쿨',
-  description: '손해사정사의 핵심 전문 칼럼들과 진료과목별 주요 의료분쟁 사례 및 보상 청구 팁을 확인하세요.',
-};
 
 export default function CategoriesIndex() {
   return (

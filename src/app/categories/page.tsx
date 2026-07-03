@@ -1,4 +1,13 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '분야별 전문 보상가이드 - 보상스쿨',
+  description: '사망/자살 보험금, 질병진단, 실손, 교통사고, 배상책임 등 보상스쿨 전문가 그룹의 핵심 실무 노하우를 제공합니다.',
+  alternates: {
+    canonical: 'https://claim-works.com/categories',
+  },
+};
 
 const COLUMN_CATEGORIES = [
   { name: '판례·법률 해석', icon: '⚖️', color: 'bg-[var(--google-blue)]', desc: '대법원 판례 및 법률 해석 기준' },

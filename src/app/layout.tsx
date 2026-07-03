@@ -6,7 +6,6 @@ import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import SidebarContent from "@/components/SidebarContent";
 import ScrollProgressBar from "@/components/ScrollProgressBar";
-import FloatingKakaoButton from "@/components/FloatingKakaoButton";
 import SearchBar from "@/components/SearchBar";
 import SmartStickyLayout from "@/components/SmartStickyLayout";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -111,7 +110,6 @@ export default function RootLayout({
           `}
         </Script>
         <ScrollProgressBar />
-        <FloatingKakaoButton />
         
         {/* 1. 프리미엄 패밀리룩 App Bar (White/Dark Glassmorphism + Sharp Edges) */}
         <header className="sticky top-0 z-50 w-full h-[64px] border-b border-gray-200/70 dark:border-white/10 bg-white/85 dark:bg-[#121212]/85 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-colors">

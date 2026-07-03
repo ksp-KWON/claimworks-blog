@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
-import BlogPostContent from '@/components/BlogPostContent';
 import { 
   STRICT_RULES, 
   getRandomAngle,
@@ -75,7 +74,6 @@ export default function AdminPage() {
   // UI State
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
-  const [showPreview, setShowPreview] = useState(true);
 
   // 컴파일된 전체 마크다운 문자열 (미리보기 및 발행용)
   const compiledTags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(Boolean) : [];
@@ -388,10 +386,6 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
         </div>
 
         <div className="flex items-center gap-3">
-          <button onClick={() => setShowPreview(!showPreview)} className="px-3 py-1.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-gray-200 rounded text-xs font-bold transition-colors">
-            {showPreview ? '미리보기 닫기' : '미리보기 열기'}
-          </button>
-          
           <button onClick={createBlankPost} className="px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 rounded text-xs font-bold transition-colors shadow-sm flex items-center gap-1">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
             새 문서
@@ -429,20 +423,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
           content={content} setContent={setContent}
         />
 
-        {showPreview && (
-          <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-black/20 p-6 border-l border-gray-200 dark:border-zinc-800">
-            {title || content ? (
-              <div className="prose prose-sm dark:prose-invert max-w-none">
-                <BlogPostContent content={content} />
-              </div>
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-gray-400">
-                <p className="text-sm font-semibold">마법이 일어날 공간입니다</p>
-                <p className="text-[11px] mt-1 opacity-70">에디터에 내용을 작성하면 실시간으로 렌더링됩니다.</p>
-              </div>
-            )}
-          </div>
-        )}
+
 
         {/* Global Loading / Status Overlay */}
         <AnimatePresence>

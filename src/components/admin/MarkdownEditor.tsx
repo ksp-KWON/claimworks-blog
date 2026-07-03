@@ -1,4 +1,8 @@
 import React, { useRef } from 'react';
+import dynamic from 'next/dynamic';
+import type { WysiwygEditorRef } from './WysiwygEditor';
+
+const WysiwygEditor = dynamic(() => import('./WysiwygEditor'), { ssr: false });
 
 interface MarkdownEditorProps {
   title: string;
@@ -21,71 +25,20 @@ export default function MarkdownEditor({
   content, setContent
 }: MarkdownEditorProps) {
   
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<WysiwygEditorRef>(null);
 
   const insertMarkdown = (template: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) {
-      setContent(prev => prev + '\n' + template);
-      return;
-    }
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const before = text.substring(0, start);
-    const after = text.substring(end, text.length);
-    
-    setContent(before + template + after);
-    
-    setTimeout(() => {
-      textarea.focus();
-      textarea.selectionStart = textarea.selectionEnd = start + template.length;
-    }, 0);
+    editorRef.current?.insertText('\n' + template);
   };
 
   const wrapTextWithTag = (tagName: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const selectedText = text.substring(start, end);
-    
-    const wrapped = `<${tagName}>${selectedText || '강조텍스트'}</${tagName}>`;
-    const before = text.substring(0, start);
-    const after = text.substring(end, text.length);
-    
-    setContent(before + wrapped + after);
-    
-    setTimeout(() => {
-      textarea.focus();
-      textarea.selectionStart = start;
-      textarea.selectionEnd = start + wrapped.length;
-    }, 0);
+    const wrapped = `<${tagName}>텍스트</${tagName}>`;
+    editorRef.current?.insertText(wrapped);
   };
 
   const wrapWithMarkdown = (prefix: string, suffix: string = '') => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const selectedText = text.substring(start, end);
-    
-    const wrapped = `${prefix}${selectedText || '텍스트'}${suffix}`;
-    const before = text.substring(0, start);
-    const after = text.substring(end, text.length);
-    
-    setContent(before + wrapped + after);
-    
-    setTimeout(() => {
-      textarea.focus();
-      textarea.selectionStart = start + prefix.length;
-      textarea.selectionEnd = start + prefix.length + (selectedText.length || 3);
-    }, 0);
+    const wrapped = `${prefix}텍스트${suffix}`;
+    editorRef.current?.insertText(wrapped);
   };
 
   return (
@@ -224,13 +177,13 @@ export default function MarkdownEditor({
 
       {/* 3. Textarea Editor */}
       <div className="flex-1 min-h-0 bg-gray-50 dark:bg-zinc-950 p-2">
-        <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="w-full h-full p-4 font-mono text-[14px] leading-[1.8] rounded-md border border-gray-200 dark:border-zinc-800 bg-white dark:bg-black/50 text-gray-900 dark:text-gray-100 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow custom-scrollbar shadow-inner"
-          placeholder="이곳에 본문을 작성하세요..."
-        />
+        <div className="w-full h-full bg-white dark:bg-zinc-900 rounded-md shadow-inner overflow-hidden">
+          <WysiwygEditor
+            ref={editorRef}
+            initialValue={content}
+            onChange={(md) => setContent(md)}
+          />
+        </div>
       </div>
     </div>
   );

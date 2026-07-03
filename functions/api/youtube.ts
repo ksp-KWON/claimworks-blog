@@ -55,8 +55,8 @@ export async function onRequest() {
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
         'Access-Control-Allow-Origin': '*',
-        // Edge에서 5분(300초) 캐시, 브라우저에서 1분(60초) 캐시 적용
-        'Cache-Control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400'
+        // Edge에서 1시간(3600초) 동안 캐시 적용 (stale-while-revalidate를 통해 백그라운드 갱신 허용)
+        'Cache-Control': 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400'
       }
     });
   } catch (error: any) {

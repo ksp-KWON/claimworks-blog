@@ -39,9 +39,7 @@ export default function YouTubeBriefing() {
   useEffect(() => {
     async function loadVideos() {
       try {
-        // 5분 단위로 바뀌는 타임스탬프를 쿼리에 추가하여 CDN의 긴 캐시를 강제로 우회합니다.
-        const timeBucket = Math.floor(Date.now() / (1000 * 60 * 5));
-        const res = await fetch(`/api/youtube?v=${timeBucket}`);
+        const res = await fetch('/api/youtube');
         if (!res.ok) throw new Error('API fetch failed');
         const data = await res.json();
         if (data && data.length > 0) {

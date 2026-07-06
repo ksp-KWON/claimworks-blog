@@ -1,5 +1,6 @@
 // Cloudflare Pages Function: /api/generate-ai-comment
 // 통합 AI 코멘트 모듈 백엔드 (법률센터, 금감원센터, 안심케어 공용)
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function onRequestPost(context: any) {
   try {
@@ -17,7 +18,7 @@ export async function onRequestPost(context: any) {
       return new Response(JSON.stringify({ error: 'GEMINI_API_KEY is not configured on the server.' }), { status: 500 });
     }
 
-    // 타입에 따른 맞춤형 페르소나 미세조정 (가장 콤팩트한 구조)
+    // 타입에 따른 맞춤형 페르소나 미세조정
     let contextPrompt = '';
     switch (type) {
       case 'precedent':
@@ -38,39 +39,22 @@ ${contextPrompt}
 반드시 존댓말로 작성하고, 전문 용어를 쉽게 풀어서 3~4문장 이내로 콤팩트하게 요약해.
 절대 없는 법령이나 사실을 지어내지 마(Hallucination 금지).`;
 
-    // 최신 버전에 자동 대응하기 위한 모델명 수정 (버전명 제거)
-    const model = 'gemini-flash-latest';
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    // 최신 기술 스택: 구글 공식 SDK 적용 (가장 스테이블하고 콤팩트한 구조)
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      systemInstruction: systemInstruction,
+    });
 
-    const payload = {
-      system_instruction: {
-        parts: [{ text: systemInstruction }]
-      },
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: `분석할 데이터:\n${sourceText}` }]
-        }
-      ],
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: `분석할 데이터:\n${sourceText}` }] }],
       generationConfig: {
         temperature: 0.3, // 일관성 있고 안정적인 답변 유도
         maxOutputTokens: 250,
       }
-    };
-
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'Failed to fetch from Gemini API');
-    }
-
-    const data = await response.json();
-    const comment = data.candidates?.[0]?.content?.parts?.[0]?.text || '코멘트 생성에 실패했습니다.';
+    const comment = result.response.text();
 
     return new Response(JSON.stringify({ comment }), {
       headers: {
@@ -80,6 +64,7 @@ ${contextPrompt}
     });
 
   } catch (error: any) {
+    console.error('AI Comment Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {

@@ -73,7 +73,7 @@ export default function AiCommentBox({ sourceText, type, className = '' }: AiCom
           </div>
         ) : (
           <div className="space-y-1.5">
-            <p className={error ? 'text-red-500' : ''}>{comment}</p>
+            <p className={`whitespace-pre-wrap ${error ? 'text-red-500' : ''}`}>{comment}</p>
             {!error && (
               <p className="text-[10px] text-gray-400 mt-2 block border-t border-gray-100 dark:border-gray-800 pt-2">
                 ※ 본 코멘트는 최신 AI(Gemini)가 데이터를 실시간으로 요약한 참고용 실무 팁입니다. 개별 사실관계에 따라 결과가 달라질 수 있으므로 반드시 전문가와 상담하시기 바랍니다.

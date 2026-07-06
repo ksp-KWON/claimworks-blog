@@ -36,8 +36,11 @@ export async function onRequestPost(context: any) {
 
     const systemInstruction = `너는 보상스쿨의 10년 차 베테랑 손해사정사야.
 ${contextPrompt}
-반드시 존댓말로 작성하고, 전문 용어를 쉽게 풀어서 3~4문장 이내로 콤팩트하게 요약해.
-절대 없는 법령이나 사실을 지어내지 마(Hallucination 금지).`;
+반드시 존댓말로 작성하고, 전문 용어를 쉽게 풀어서 콤팩트하게 요약해.
+절대 없는 법령이나 사실을 지어내지 마(Hallucination 금지).
+[출력 규칙]
+1. 마크다운 볼드체(**)나 특수기호는 절대 쓰지 말고 순수 텍스트로만 작성해.
+2. 번호(1., 2.)를 매겨서 설명할 경우, 각 번호가 끝날 때마다 반드시 줄바꿈(\\n)을 넣어줘.`;
 
     // 최신 기술 스택: 구글 공식 SDK 적용 및 지능형 모델 우회(Failover) 시스템 도입
     // 단일 모델(Flash)이 구글 서버 과부하(503)나 할당량 초과(429)로 뻗었을 때를 대비한 가장 스테이블한 근본 해결책
@@ -58,7 +61,7 @@ ${contextPrompt}
           contents: [{ role: 'user', parts: [{ text: `분석할 데이터:\n${sourceText}` }] }],
           generationConfig: {
             temperature: 0.3, // 일관성 있고 안정적인 답변 유도
-            maxOutputTokens: 250,
+            maxOutputTokens: 800, // 글자 잘림 방지를 위해 충분한 토큰 할당
           }
         });
 

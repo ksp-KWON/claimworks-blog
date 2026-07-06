@@ -42,7 +42,7 @@ ${contextPrompt}
     // 최신 기술 스택: 구글 공식 SDK 적용 (가장 스테이블하고 콤팩트한 구조)
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-flash-latest',
       systemInstruction: systemInstruction,
     });
 

@@ -307,7 +307,6 @@ export default function FssNewsPage() {
                     {/* 핵심 요약 가이드 (기존 요약 박스 통합 및 지저분한 프리뷰 텍스트 삭제) */}
                     <div className="bg-gray-50 dark:bg-white/2 p-4 rounded-none border border-gray-150/50 dark:border-white/2 space-y-2.5">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
-                        <span className="text-sm">📢</span>
                         {getSummaryBoxTitle(item.category)}
                       </div>
                       <ul className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium space-y-1.5 list-disc pl-4">

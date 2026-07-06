@@ -59,7 +59,7 @@ export default function AiCommentBox({ sourceText, type, className = '' }: AiCom
         {!hasStarted ? (
           <button
             onClick={fetchComment}
-            className="mt-1 px-4 py-2 bg-white dark:bg-black border border-[#8a6d3b]/40 dark:border-[#c4a86f]/40 text-[#8a6d3b] dark:text-[#c4a86f] text-xs font-bold rounded shadow-sm hover:bg-[#8a6d3b] hover:text-white dark:hover:bg-[#c4a86f] dark:hover:text-black transition-all duration-300 flex items-center gap-1.5"
+            className="mt-1 px-5 py-2.5 bg-[#8a6d3b] dark:bg-[#c4a86f] text-white dark:text-[#202124] text-xs font-bold rounded-none shadow-md hover:bg-[#6e562d] dark:hover:bg-[#a38a58] transition-colors flex items-center gap-1.5"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />

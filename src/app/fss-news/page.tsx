@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import AiCommentBox from '@/components/AiCommentBox';
 
 interface FssNewsItem {
   id: string;
@@ -316,16 +317,11 @@ export default function FssNewsPage() {
                       </ul>
                     </div>
 
-                    {/* 전문가 의견 */}
-                    <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-none border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2">
-                      <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
-                        <span className="text-sm">👨‍🏫</span>
-                        보상스쿨 손해사정사 실무 코멘트
-                      </div>
-                      <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium pl-1">
-                        {item.comment}
-                      </p>
-                    </div>
+                    {/* 실무 코멘트 (통합 AI 컴포넌트) */}
+                    <AiCommentBox 
+                      sourceText={[item.title, item.content, item.fullContent || ''].join('\n\n').slice(0, 4000)}
+                      type="fss"
+                    />
 
                     {/* 태그 */}
                     <div className="flex flex-wrap gap-1.5 pt-2">

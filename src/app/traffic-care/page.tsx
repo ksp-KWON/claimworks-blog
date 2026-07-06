@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import AiCommentBox from '@/components/AiCommentBox';
 import standardData from '../../../functions/api/taas-standard-data.json';
 
 // --- SVG Icons (이모지 대신 사용되는 고품격 전문 아이콘 세트) ---
@@ -256,20 +257,7 @@ export default function TrafficCarePage() {
     ];
   };
 
-  // 손해사정사 맞춤형 실무 코멘트
-  const getPracticeComment = (zone: AccidentZone): string => {
-    if (zone.isSafeZone) {
-      return '통계상 교통사고 다발지역으로 지정되지는 않았으나, 교통사고는 예상치 못한 곳에서 무과실 혹은 급작스러운 과실 시비 형태로 자주 발생합니다. 특히 후방 추돌이나 교차로 동시 차선 변경 시 과실 10%의 차이가 보험 합의금 수백만 원을 좌우합니다. 억울한 과실 책임을 회피하고 정당한 보상을 보장받기 위해서는 블랙박스 분석 등의 적극적인 초기 대처가 필수적입니다.';
-    }
-    const name = zone.locationName;
-    if (name.includes('보행자') || name.includes('횡단보도') || name.includes('초등학교') || name.includes('어린이')) {
-      return '보행자 및 신호등 인근 접촉사고가 잦은 구역입니다. 보행자 과실 산정 시, 횡단보도와의 거리나 보행 신호 위반 여부에 따라 과실 비율 분쟁이 치열합니다. 특히 하반신 골절이나 무릎 십자인대 파열 등 고액 후유장해가 수반되기 쉬우므로, 보험사 제시금 합의서 서명 전 손해사정사와 반드시 상의하십시오.';
-    }
-    if (name.includes('이륜차') || name.includes('오토바이') || name.includes('자전거')) {
-      return '배달 이륜차 및 자전거 충돌 사고 다발 구역입니다. 이륜차 사고는 헬멧 착용 여부에 따른 과실 상계나 보험 약관상 유상운송 면책(배달 대행 약관 위반) 주장이 주된 쟁점이 됩니다. 면책 통보를 받으셨더라도 구제할 수 있는 실무 방안이 있으니 초기 단계부터 전문가와 논의해야 합니다.';
-    }
-    return '교차로 내 신호위반 및 진로변경 꼬리물기 사고가 집중되는 위치입니다. 가해자와 피해자 차량 간의 선진입 여부, 방향지시등 점등 타이밍에 따라 과실 비율이 7:3에서 10:0까지 요동칩니다. 보험사 제시 과실을 무조건 수용하지 마시고 대법원 과실 상계 판례 요소를 정확히 대입해야 손해를 막을 수 있습니다.';
-  };
+  // 손해사정사 맞춤형 실무 코멘트 기능은 AiCommentBox 모듈로 통합되어 삭제되었습니다.
 
   // 지능형 보상 칼럼 매칭
   const getMatchedColumn = (zone: AccidentZone) => {
@@ -668,16 +656,12 @@ export default function TrafficCarePage() {
               </ul>
             </div>
 
-            {/* 👨‍🏫 손해사정사 실무 코멘트 (황색 전문가 박스 패밀리룩) */}
-            <div className="bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-none border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2 mt-1">
-              <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
-                <span className="text-sm"><IconBriefcase className="w-4 h-4" /></span>
-                보상스쿨 손해사정사 실무 코멘트
-              </div>
-              <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium pl-1">
-                {getPracticeComment(activeZone)}
-              </p>
-            </div>
+            {/* 실무 코멘트 (통합 AI 컴포넌트) */}
+            <AiCommentBox 
+              sourceText={[activeZone.locationName, ...getAiSummary(activeZone)].join('\n')}
+              type="traffic"
+              className="mt-1"
+            />
 
             {/* 액션 버튼 영역 (가로 분할 가독성 극대화) */}
             <div className="flex items-center gap-3 pt-3 border-t border-gray-55 dark:border-white/2 flex-wrap sm:flex-nowrap">

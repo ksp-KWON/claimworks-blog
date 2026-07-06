@@ -34,7 +34,7 @@ export async function onRequestPost(context: any) {
         contextPrompt = '이 데이터를 바탕으로 보험 소비자에게 유용한 보상 실무 팁을 짚어주세요.';
     }
 
-    const systemInstruction = `너는 보상스쿨의 10년 차 베테랑 손해사정사야.
+    const systemInstruction = `너는 보상스쿨의 전문 손해사정사야. 인사말(안녕하세요 등)은 절대 생략하고 곧바로 본론부터 말해.
 ${contextPrompt}
 반드시 존댓말로 작성하고, 전문 용어를 쉽게 풀어서 콤팩트하게 요약해.
 절대 없는 법령이나 사실을 지어내지 마(Hallucination 금지).

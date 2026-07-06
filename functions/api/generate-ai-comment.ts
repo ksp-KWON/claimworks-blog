@@ -39,22 +39,43 @@ ${contextPrompt}
 반드시 존댓말로 작성하고, 전문 용어를 쉽게 풀어서 3~4문장 이내로 콤팩트하게 요약해.
 절대 없는 법령이나 사실을 지어내지 마(Hallucination 금지).`;
 
-    // 최신 기술 스택: 구글 공식 SDK 적용 (가장 스테이블하고 콤팩트한 구조)
+    // 최신 기술 스택: 구글 공식 SDK 적용 및 지능형 모델 우회(Failover) 시스템 도입
+    // 단일 모델(Flash)이 구글 서버 과부하(503)나 할당량 초과(429)로 뻗었을 때를 대비한 가장 스테이블한 근본 해결책
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-flash-latest',
-      systemInstruction: systemInstruction,
-    });
+    const fallbackModels = ['gemini-flash-latest', 'gemini-pro-latest'];
+    
+    let comment = '';
+    let lastError: any = null;
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: `분석할 데이터:\n${sourceText}` }] }],
-      generationConfig: {
-        temperature: 0.3, // 일관성 있고 안정적인 답변 유도
-        maxOutputTokens: 250,
+    for (const modelName of fallbackModels) {
+      try {
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          systemInstruction: systemInstruction,
+        });
+
+        const result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: `분석할 데이터:\n${sourceText}` }] }],
+          generationConfig: {
+            temperature: 0.3, // 일관성 있고 안정적인 답변 유도
+            maxOutputTokens: 250,
+          }
+        });
+
+        comment = result.response.text();
+        if (comment) break; // 성공 시 즉시 탈출
+
+      } catch (err: any) {
+        console.error(`[Failover] ${modelName} 실패:`, err.message);
+        lastError = err;
+        // 실패 시 대기 시간 없이 즉각 다음 하위/상위 모델로 우회 (자동글쓰기 gemini-helper 로직 통합)
+        continue;
       }
-    });
+    }
 
-    const comment = result.response.text();
+    if (!comment) {
+      throw lastError || new Error('All fallback models failed.');
+    }
 
     return new Response(JSON.stringify({ comment }), {
       headers: {

@@ -42,7 +42,7 @@ ${contextPrompt}
     // 최신 기술 스택: 구글 공식 SDK 적용 및 지능형 모델 우회(Failover) 시스템 도입
     // 단일 모델(Flash)이 구글 서버 과부하(503)나 할당량 초과(429)로 뻗었을 때를 대비한 가장 스테이블한 근본 해결책
     const genAI = new GoogleGenerativeAI(apiKey);
-    const fallbackModels = ['gemini-flash-latest', 'gemini-pro-latest'];
+    const fallbackModels = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-pro-latest'];
     
     let comment = '';
     let lastError: any = null;

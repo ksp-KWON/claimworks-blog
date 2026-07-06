@@ -97,14 +97,32 @@ function parseGeneratedContent(rawOutput) {
   content = content.replace(/<calculator type=".*?" \/>/gi, '');
   content = content.replace(/\[이미지 제안:.*?\]/g, '');
   content = content.replace(/\[관련 글 추천\]/g, '');
-  
-  // H2 콜론 띄어쓰기 교정
-  content = content.replace(/^##(.*)$/gm, (match, p1) => {
-    if (p1.includes(':')) {
-      return '## ' + p1.trim().split(':').map(s => s.trim()).join(' : ');
-    }
-    return match;
-  });
+
+  // ── 제목 내 # 문자 제거 (## # Q: → ### Q:, ## # 텍스트 → ### 텍스트) ──
+  // FAQ: ## # Q : → ### Q :
+  content = content.replace(/^## #\s+Q\s*:/gm, '### Q :');
+  // 그 외 ## # 패턴 → ###
+  content = content.replace(/^## #\s+/gm, '### ');
+  // 이중 ## 패턴 제거: ## ## → ##
+  content = content.replace(/^## ## /gm, '## ');
+
+  // ── [추천 제목 2개] ~ 파일 끝 블록 자동 삭제 ──────────────────────────
+  const summaryMarkerIdx = content.indexOf('[추천 제목 2개]');
+  if (summaryMarkerIdx >= 0) {
+    let trimEnd = summaryMarkerIdx;
+    // 앞에 있는 --- 구분선과 빈줄도 같이 제거
+    const beforeMarker = content.substring(0, summaryMarkerIdx).trimEnd();
+    content = beforeMarker.endsWith('---')
+      ? beforeMarker.slice(0, -3).trimEnd()
+      : beforeMarker;
+  }
+
+  // ── H2/H3 제목의 콜론 띄어쓰기 정규화 ────────────────────────────────
+  // "## 제목:내용" → "## 제목 : 내용" (앞뒤 공백 없는 경우)
+  content = content.replace(/^(#{1,3}\s[^`\n]*?)(?<!\s):(?!\s)(?!\/\/)/gm, '$1 : ');
+  content = content.replace(/^(#{1,3}\s[^`\n]*?)(?<!\s):\s+(?!\/\/)/gm, '$1 : ');
+
+  // H2 콜론 띄어쓰기 교정 (기존 코드는 삭제하고 위로 통합)
 
   // CTA 텍스트 자연스러운 교정
   content = content.replace(/<blue>보상스쿨에 문의하세요<\/blue>를 통해/g, '전문가의 조력을 통해');

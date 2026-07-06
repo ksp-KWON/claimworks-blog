@@ -38,8 +38,8 @@ ${contextPrompt}
 반드시 존댓말로 작성하고, 전문 용어를 쉽게 풀어서 3~4문장 이내로 콤팩트하게 요약해.
 절대 없는 법령이나 사실을 지어내지 마(Hallucination 금지).`;
 
-    // 최신 버전에 자동 대응하기 위한 모델명 수정
-    const model = 'gemini-1.5-flash';
+    // 최신 버전에 자동 대응하기 위한 모델명 수정 (버전명 제거)
+    const model = 'gemini-flash-latest';
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     const payload = {

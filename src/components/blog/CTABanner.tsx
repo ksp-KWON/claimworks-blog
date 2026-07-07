@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 
 export default function CTABanner() {
@@ -19,21 +21,20 @@ export default function CTABanner() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        {/* 카드 1: 카카오톡 상담 */}
-        <a
-          href="https://open.kakao.com/o/sWeszp7"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-3 p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(242,153,0,0.2)] hover:border-[#f29900] hover:bg-gradient-to-br hover:from-yellow-50 hover:to-orange-50 dark:hover:from-yellow-900/10 dark:hover:to-orange-900/10 hover:-translate-y-1 transition-all duration-300 group"
+        {/* 카드 1: 보상스쿨 내부 실시간 채팅 */}
+        <button
+          onClick={() => (window as any).__openClaimworksChat?.()}
+          className="flex items-center gap-3 p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[#1a73e8] hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10 hover:-translate-y-1 transition-all duration-300 group text-left w-full"
+          id="cta-chat-btn"
         >
-          <div className="w-10 h-10 rounded-none bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-[#e37400]/20 dark:to-orange-900/40 border border-yellow-200 dark:border-orange-800/30 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
-            <svg className="w-5 h-5 text-[#f29900] dark:text-[#fde293]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          <div className="w-10 h-10 rounded-none bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-[#174ea6]/20 dark:to-indigo-900/40 border border-blue-200 dark:border-indigo-800/30 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
+            <svg className="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
           </div>
           <div className="min-w-0 flex-1">
-            <span className="block text-sm font-bold text-[#202124] dark:text-[#e8eaed] truncate group-hover:text-[#d93025] transition-colors">카카오톡 상담</span>
-            <span className="block text-xs text-[#5f6368] dark:text-[#9aa0a6] truncate mt-0.5">실시간 채팅상담</span>
+            <span className="block text-sm font-bold text-[#202124] dark:text-[#e8eaed] truncate group-hover:text-[#1a73e8] transition-colors">채팅 상담</span>
+            <span className="block text-xs text-[#5f6368] dark:text-[#9aa0a6] truncate mt-0.5">보상스쿨 실시간 상담</span>
           </div>
-        </a>
+        </button>
 
         {/* 카드 2: 상담신청 양식 */}
         <a

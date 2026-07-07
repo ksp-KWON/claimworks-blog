@@ -303,10 +303,11 @@ export default function TrafficCarePage() {
     return list;
   };
 
-  // 상담 신청 Kakao 링크 빌더
-  const getKakaoLink = (zone: AccidentZone) => {
-    const text = `안녕하세요 대표님, 보상스쿨 교통사고 케어센터에서 [${loadedSido} ${loadedGugun} - ${zone.locationName}] 사고 위험 지점 정보를 보고 무료 손해사정 상담을 신청합니다.`;
-    return `https://open.kakao.com/o/sWeszp7?text=${encodeURIComponent(text)}`;
+  // 채팅 상담 열기
+  const openChat = () => {
+    if (typeof window !== 'undefined' && (window as any).__openClaimworksChat) {
+      (window as any).__openClaimworksChat();
+    }
   };
 
   const filteredHospitals = getFilteredHospitals();
@@ -688,9 +689,8 @@ export default function TrafficCarePage() {
                 );
               })()}
               <a
-                href={getKakaoLink(activeZone)}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#"
+                onClick={(e) => { e.preventDefault(); openChat(); }}
                 className="flex-1 text-center py-2.5 bg-[#137333] hover:bg-[#0b6623] text-white text-xs font-bold rounded-none shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 💬 내 과실·보상 무료 상담 (카톡)

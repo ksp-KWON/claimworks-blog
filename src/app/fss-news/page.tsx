@@ -118,9 +118,10 @@ export default function FssNewsPage() {
     fetchFssData(query, activeTab);
   };
 
-  const getKakaoLink = (itemTitle: string) => {
-    const text = `안녕하세요 대표님, 보상스쿨 금감원 소비자보호센터에서 [${itemTitle}] 정보를 보고 무료 손해사정 상담을 요청합니다.`;
-    return `https://open.kakao.com/o/sWeszp7?text=${encodeURIComponent(text)}`;
+  const openChat = () => {
+    if (typeof window !== 'undefined' && (window as any).__openClaimworksChat) {
+      (window as any).__openClaimworksChat();
+    }
   };
 
   const getCategoryBadgeClass = (category: string) => {
@@ -393,14 +394,13 @@ export default function FssNewsPage() {
                           );
                         }
                       })()}
-                      <a 
-                        href={getKakaoLink(item.title)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 text-center py-2.5 bg-amber-400 hover:bg-amber-500 text-white text-xs font-bold rounded-none shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      <button 
+                        onClick={openChat}
+                        className="flex-1 text-center py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-xs font-bold rounded-none shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        id="fss-news-chat-btn"
                       >
-                        💬 내 보상 무료 검토 신청 (카톡)
-                      </a>
+                        💬 내 보상 무료 검토 신청
+                      </button>
                     </div>
                   </div>
                 ))}

@@ -9,7 +9,9 @@ import ScrollProgressBar from "@/components/ScrollProgressBar";
 import SearchBar from "@/components/SearchBar";
 import SmartStickyLayout from "@/components/SmartStickyLayout";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import ChatWidget from "@/components/ChatWidget";
 import { getSortedPostsData } from "@/lib/posts";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -198,6 +200,9 @@ export default function RootLayout({
 
         {/* 5. 모바일 전용 하단 고정 탭바 (lg 미만에서 노출) */}
         <MobileBottomNav />
+
+        {/* 6. 보상스쿨 실시간 채팅 위젯 (전 페이지 공통) */}
+        <ChatWidget />
       </body>
     </html>
   );

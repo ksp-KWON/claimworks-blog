@@ -410,15 +410,14 @@ export default function BlogPageClient() {
                     궁금하신 사항은 아래 버튼을 통해 언제든 실시간 상담을 이용해 주세요.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <a
-                      href="https://open.kakao.com/o/sWeszp7"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-white font-bold rounded-none text-sm transition-colors"
+                    <button
+                      onClick={() => (window as any).__openClaimworksChat?.()}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold rounded-none text-sm transition-colors"
+                      id="blog-empty-chat-btn-1"
                     >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-5.5 0-10 3.5-10 7.8 0 2.7 1.7 5.1 4.2 6.5l-1.1 4.1c-.1.3.2.5.4.4l4.8-3.2c.5.1 1.1.1 1.7.1 5.5 0 10-3.5 10-7.8s-4.5-7.8-10-7.8z"/></svg>
-                      카톡 실시간 상담
-                    </a>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" /></svg>
+                      실시간 상담
+                    </button>
                     <a
                       href="https://forms.gle/E9vj7iqAHeJGhJ549"
                       target="_blank"

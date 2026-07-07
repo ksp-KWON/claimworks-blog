@@ -442,12 +442,10 @@ export default function AutoCalculator() {
           </div>
 
           <div className="flex flex-col gap-2 mt-2">
-            <a href="https://open.kakao.com/o/sWeszp7" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full gap-2 py-4 bg-[#FEE500] hover:bg-[#F4DC00] text-[#000000] rounded-none font-bold text-[14px] sm:text-[15px] transition-all shadow-sm hover:shadow-md">
-              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 3C6.477 3 2 6.541 2 10.908c0 2.502 1.432 4.745 3.659 6.13-.314 1.157-1.14 4.183-1.182 4.341-.053.197.075.18.156.126.104-.07 3.324-2.222 4.606-3.084.887.24 1.821.366 2.761.366 5.523 0 10-3.541 10-7.908C22 6.541 17.523 3 12 3z"/>
-              </svg>
+            <button onClick={() => (window as any).__openClaimworksChat?.()} className="flex items-center justify-center w-full gap-2 py-4 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-none font-bold text-[14px] sm:text-[15px] transition-all shadow-sm hover:shadow-md" id="auto-calc-chat-btn">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
               보상스쿨 1:1 무료 상담 신청하기
-            </a>
+            </button>
             
             <div className="grid grid-cols-2 gap-2">
               <button onClick={() => shareResult('자동차', result.finalTotal)} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#1a73e8] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#8ab4f8] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">

@@ -13,8 +13,8 @@ type PostData = {
   category: string;
 };
 
-// 카테고리별 색상 매핑 함수
-export function getCategoryColor(category: string) {
+// 컴포넌트 내부용 헬퍼 함수
+const getCategoryColor = (category: string) => {
   const c = category || '보상가이드';
   
   if (c.includes('교통사고')) {
@@ -115,7 +115,7 @@ export function getCategoryColor(category: string) {
   };
 }
 
-export const CATEGORIES = [
+const CATEGORIES = [
   '판례·법률 해석',
   '사망·자살 보험금',
   '질병진단·실손',

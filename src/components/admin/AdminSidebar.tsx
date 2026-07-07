@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
 interface AdminSidebarProps {
   isLoading: boolean;
@@ -13,6 +13,7 @@ interface AdminSidebarProps {
   githubToken: string;
   setGithubToken: (val: string) => void;
   saveKeys: () => void;
+  width?: number;
 }
 
 export default function AdminSidebar({
@@ -27,15 +28,32 @@ export default function AdminSidebar({
   setGeminiKey,
   githubToken,
   setGithubToken,
-  saveKeys
+  saveKeys,
+  width = 320
 }: AdminSidebarProps) {
   const [tab, setTab] = useState<'posts' | 'ai' | 'auto' | 'settings'>('ai');
   const [inputText, setInputText] = useState('');
   const [aiMode, setAiMode] = useState<'manual' | 'semi-auto'>('manual');
   const [autoType, setAutoType] = useState<'all' | 'precedent' | 'trend'>('all');
+  const [sortType, setSortType] = useState<'date' | 'alpha'>('date');
+
+  const sortedPostList = useMemo(() => {
+    return [...postList].sort((a, b) => {
+      if (sortType === 'date') {
+        const dateA = a.date || a.name;
+        const dateB = b.date || b.name;
+        return dateB.localeCompare(dateA);
+      } else {
+        return a.title.localeCompare(b.title);
+      }
+    });
+  }, [postList, sortType]);
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 shrink-0 w-80">
+    <div 
+      className="flex flex-col h-full bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 shrink-0"
+      style={{ width: `${width}px` }}
+    >
       
       {/* Sidebar Tabs */}
       <div className="flex bg-gray-100 dark:bg-zinc-950 p-1 m-3 rounded-md flex-shrink-0">
@@ -123,42 +141,56 @@ export default function AdminSidebar({
         {/* Post List Tab */}
         {tab === 'posts' && (
           <div className="flex flex-col gap-2 animate-in fade-in duration-200">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-gray-500">발행된 포스팅</span>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-gray-500">발행된 포스팅</span>
+                <select
+                  value={sortType}
+                  onChange={(e) => setSortType(e.target.value as 'date' | 'alpha')}
+                  className="text-[10px] bg-transparent border-none text-gray-500 focus:ring-0 cursor-pointer outline-none font-bold p-0"
+                >
+                  <option value="date">날짜순</option>
+                  <option value="alpha">가나다순</option>
+                </select>
+              </div>
               <button onClick={onRefreshList} disabled={isLoading} className="text-[10px] text-blue-500 hover:underline">
                 새로고침
               </button>
             </div>
             
-            {postList.length === 0 ? (
+            {sortedPostList.length === 0 ? (
               <div className="text-center py-10 text-xs text-gray-400">
                 게시물이 없거나 로딩 중입니다.
               </div>
             ) : (
               <div className="flex flex-col gap-1.5">
-                {postList.map((post) => (
+                {sortedPostList.map((post) => (
                   <div key={post.sha} className="flex flex-col bg-gray-50 dark:bg-zinc-950 p-2.5 rounded-md border border-gray-100 dark:border-zinc-800 hover:border-blue-300 transition-colors group">
-                    <span className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate mb-1">
+                    <span className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate mb-1" title={post.title}>
                       {post.title}
                     </span>
-                    <span className="text-[9px] text-gray-400 mb-2 font-mono">
-                      {post.name}
-                    </span>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => onLoadPost(post.name, post.sha)}
-                        disabled={isLoading}
-                        className="flex-1 py-1 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded text-[10px] font-bold text-blue-600 hover:bg-blue-50 transition-colors"
-                      >
-                        불러오기
-                      </button>
-                      <button
-                        onClick={() => onDeletePost(post.name, post.sha)}
-                        disabled={isLoading}
-                        className="p-1 px-2 bg-white dark:bg-zinc-800 border border-red-100 dark:border-red-900/30 rounded text-[10px] font-bold text-red-500 hover:bg-red-50 transition-colors"
-                      >
-                        삭제
-                      </button>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] text-gray-400 font-mono">
+                        {post.date || post.name.replace('.md', '')}
+                      </span>
+                      <div className="flex gap-1 opacity-100 md:opacity-60 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => onLoadPost(post.name, post.sha)}
+                          disabled={isLoading}
+                          title="불러오기"
+                          className="p-1.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                        </button>
+                        <button
+                          onClick={() => onDeletePost(post.name, post.sha)}
+                          disabled={isLoading}
+                          title="삭제"
+                          className="p-1.5 bg-white dark:bg-zinc-800 border border-red-100 dark:border-red-900/30 rounded text-red-500 hover:bg-red-50 transition-colors flex items-center justify-center"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

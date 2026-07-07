@@ -73,12 +73,36 @@ export default function AdminPage() {
   const [selectedPostSha, setSelectedPostSha] = useState('');
   
   // GitHub Post List
-  const [postList, setPostList] = useState<{name: string, sha: string, title: string}[]>([]);
+  const [postList, setPostList] = useState<{name: string, sha: string, title: string, date?: string}[]>([]);
   
   // UI State
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  
+  // Resize State
+  const [sidebarWidth, setSidebarWidth] = useState(320);
+  const [isResizing, setIsResizing] = useState(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      const newWidth = Math.min(Math.max(e.clientX, 200), 800);
+      setSidebarWidth(newWidth);
+    };
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
   // 컴파일된 전체 마크다운 문자열 (미리보기 및 발행용)
   const compiledTags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(Boolean) : [];
@@ -122,13 +146,13 @@ ${content}
       const githubFiles = await res.json();
       const mdFiles = githubFiles.filter((f: any) => f.name.endsWith('.md'));
 
-      const titlesMap: Record<string, string> = {};
+      const titlesMap: Record<string, {title: string, date: string}> = {};
       try {
         const dataRes = await fetch('/api/posts');
         if (dataRes.ok) {
           const postsData = await dataRes.json();
           postsData.forEach((post: any) => {
-            titlesMap[`${post.slug}.md`] = post.title;
+            titlesMap[`${post.slug}.md`] = {title: post.title, date: post.date};
           });
         }
       } catch {}
@@ -136,7 +160,8 @@ ${content}
       const combined = mdFiles.map((file: any) => ({
         name: file.name,
         sha: file.sha,
-        title: titlesMap[file.name] || file.name.replace('.md', '')
+        title: titlesMap[file.name]?.title || file.name.replace('.md', ''),
+        date: titlesMap[file.name]?.date || ''
       }));
 
       setPostList(combined);
@@ -405,8 +430,12 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
       </header>
 
       {/* 2. Main Workspace */}
-      <div className="flex flex-1 overflow-hidden relative">
+      <div 
+        className="flex flex-1 overflow-hidden relative"
+        style={{ cursor: isResizing ? 'col-resize' : 'default', userSelect: isResizing ? 'none' : 'auto' }}
+      >
         <AdminSidebar 
+          width={sidebarWidth}
           githubToken={githubToken}
           setGithubToken={setGithubToken}
           geminiKey={geminiKey}
@@ -419,6 +448,12 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
           onRefreshList={fetchPostList}
           onRunAi={callGeminiAPI}
           onRunAuto={runAutoPublish}
+        />
+        
+        {/* Resizer */}
+        <div 
+          className="w-1 cursor-col-resize bg-transparent hover:bg-blue-400 dark:hover:bg-blue-500 active:bg-blue-500 transition-colors shrink-0 z-10"
+          onMouseDown={() => setIsResizing(true)}
         />
         
         <MarkdownEditor 

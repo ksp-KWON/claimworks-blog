@@ -245,9 +245,13 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                     <span className="text-xs font-bold text-gray-500">진단명</span>
                     <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{activeConsultation.diagnosis}</span>
                   </div>
-                  <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-gray-500">사고일자</span>
                     <span className="text-sm text-gray-800 dark:text-gray-200">{activeConsultation.accident_date}</span>
+                  </div>
+                  <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
+                    <span className="text-xs font-bold text-gray-500">사고장소</span>
+                    <span className="text-sm text-gray-800 dark:text-gray-200">{activeConsultation.accident_location || '-'}</span>
                   </div>
                   
                   <div>

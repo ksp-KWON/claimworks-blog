@@ -5,7 +5,9 @@ interface AdminSidebarProps {
   postList: any[];
   onLoadPost: (filename: string, sha: string) => void;
   onDeletePost: (filename: string, sha: string) => void;
+  onRefreshList: () => void;
   onRunAi: (mode: 'manual-preserve' | 'manual-expand' | 'semi-auto', inputText: string) => void;
+  onRunAuto: (type: 'all' | 'precedent' | 'trend') => void;
   geminiKey: string;
   setGeminiKey: (val: string) => void;
   githubToken: string;

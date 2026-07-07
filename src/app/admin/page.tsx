@@ -287,7 +287,7 @@ ${content}
     setIsLoading(false);
   };
 
-  const callGeminiAPI = async (mode: 'manual' | 'semi-auto', aiInput: string) => {
+  const callGeminiAPI = async (mode: 'manual-preserve' | 'manual-expand' | 'semi-auto', aiInput: string) => {
     if (!geminiKey) return alert('Gemini API 키가 필요합니다.');
     setIsLoading(true);
     
@@ -299,10 +299,13 @@ ${content}
     const currentDate = new Date().toISOString().split('T')[0];
     const angle = getRandomAngle();
 
-    const prompt = mode === 'manual' ? `
+    let prompt = '';
+
+    if (mode === 'manual-preserve') {
+      prompt = `
 ${getBlogRole()}
 # Objective
-제시된 유튜브 대본(원문)을 바탕으로 상세하고 방대한 분량의 초고품질 전문 칼럼을 작성하십시오.
+사용자가 입력한 대본이나 초안의 디테일과 의도를 100% 보존하며 가독성이 극대화된 블로그 포스팅 형태로 예쁘게 포장하십시오. (절대 불필요하게 살을 붙여 분량을 늘리지 마세요)
 ${getBlogLengthRulesManual()}
 # ⚖️ STRICT WRITING RULES
 ${strictRulesPrompt}
@@ -310,10 +313,25 @@ ${getBlogFrontmatter('알맞은 제목 생성', currentDate)}
 제시된 원문:
 ${aiInput}
 ${getBlogSkeleton(angle, calcTag, existingPostsList)}
-` : `
+`;
+    } else if (mode === 'manual-expand') {
+      prompt = `
 ${getBlogRole()}
 # Objective
-제시된 주제/참고내용을 바탕으로 깊이 있는 전문 칼럼을 새롭게 창작하십시오.
+사용자가 입력한 대본이나 뼈대를 바탕으로, 전문가적 지식을 대거 추가하여 아주 상세하고 방대한 분량의 초고품질 전문 칼럼으로 새롭게 창작하십시오.
+${getBlogLengthRulesSemiAuto()}
+# ⚖️ STRICT WRITING RULES
+${strictRulesPrompt}
+${getBlogFrontmatter('알맞은 제목 생성', currentDate)}
+제시된 원문/뼈대:
+${aiInput}
+${getBlogSkeleton(angle, calcTag, existingPostsList)}
+`;
+    } else { // semi-auto
+      prompt = `
+${getBlogRole()}
+# Objective
+제시된 주제/참고링크/키워드를 바탕으로 깊이 있는 전문 칼럼을 새롭게 기획하고 창작하십시오.
 ${getBlogLengthRulesSemiAuto()}
 # ⚖️ STRICT WRITING RULES
 ${strictRulesPrompt}
@@ -322,6 +340,7 @@ ${getBlogFrontmatter('매력적인 제목 생성', currentDate)}
 ${aiInput}
 ${getBlogSkeleton(angle, calcTag, existingPostsList)}
 `;
+    }
 
     const models = ['gemini-pro-latest', 'gemini-flash-latest'];
     let success = false;

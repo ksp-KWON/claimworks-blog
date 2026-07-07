@@ -5,9 +5,7 @@ interface AdminSidebarProps {
   postList: any[];
   onLoadPost: (filename: string, sha: string) => void;
   onDeletePost: (filename: string, sha: string) => void;
-  onRefreshList: () => void;
-  onRunAi: (mode: 'manual' | 'semi-auto', inputText: string) => void;
-  onRunAuto: (type: 'all' | 'precedent' | 'trend') => void;
+  onRunAi: (mode: 'manual-preserve' | 'manual-expand' | 'semi-auto', inputText: string) => void;
   geminiKey: string;
   setGeminiKey: (val: string) => void;
   githubToken: string;
@@ -33,7 +31,7 @@ export default function AdminSidebar({
 }: AdminSidebarProps) {
   const [tab, setTab] = useState<'posts' | 'ai' | 'auto' | 'settings'>('ai');
   const [inputText, setInputText] = useState('');
-  const [aiMode, setAiMode] = useState<'manual' | 'semi-auto'>('manual');
+  const [aiMode, setAiMode] = useState<'manual-preserve' | 'manual-expand' | 'semi-auto'>('manual-preserve');
   const [autoType, setAutoType] = useState<'all' | 'precedent' | 'trend'>('all');
   const [sortType, setSortType] = useState<'date' | 'alpha'>('date');
 
@@ -87,53 +85,91 @@ export default function AdminSidebar({
         
         {/* AI Tools Tab */}
         {tab === 'ai' && (
-          <div className="flex flex-col gap-4 animate-in fade-in duration-200">
+          <div className="flex flex-col gap-4 animate-in fade-in duration-200 py-2">
             <div className="flex flex-col gap-2">
-              <span className="text-[11px] font-bold text-gray-500">작업 모드</span>
-              <div className="grid grid-cols-2 gap-1">
+              <span className="text-[11px] font-bold text-gray-500 mb-1">작업 모드 선택</span>
+              <div className="flex flex-col gap-2">
+                
                 <button
-                  onClick={() => setAiMode('manual')}
-                  className={`py-1.5 text-xs font-bold rounded-md border ${
-                    aiMode === 'manual' 
-                      ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300'
-                      : 'bg-white border-gray-200 text-gray-600 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-300'
+                  onClick={() => setAiMode('manual-preserve')}
+                  className={`flex flex-col p-2.5 rounded-lg border text-left transition-all ${
+                    aiMode === 'manual-preserve' 
+                      ? 'bg-blue-50 border-blue-400 dark:bg-blue-900/30 dark:border-blue-700'
+                      : 'bg-white border-gray-200 hover:border-blue-300 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:border-zinc-600'
                   }`}
                 >
-                  초안 다듬기 (대본)
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-sm">💎</span>
+                    <span className={`text-xs font-bold ${aiMode === 'manual-preserve' ? 'text-blue-700 dark:text-blue-300' : 'text-gray-800 dark:text-gray-200'}`}>초안 다듬기 (보존형)</span>
+                  </div>
+                  <p className="text-[10px] text-gray-500 leading-tight">
+                    원문 내용을 100% 보존합니다. 내용을 부풀리지 않고, 가독성 높은 블로그 형태로 소제목과 불릿 포인트를 활용해 예쁘게 포장합니다.
+                  </p>
                 </button>
+
+                <button
+                  onClick={() => setAiMode('manual-expand')}
+                  className={`flex flex-col p-2.5 rounded-lg border text-left transition-all ${
+                    aiMode === 'manual-expand' 
+                      ? 'bg-indigo-50 border-indigo-400 dark:bg-indigo-900/30 dark:border-indigo-700'
+                      : 'bg-white border-gray-200 hover:border-indigo-300 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:border-zinc-600'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-sm">🚀</span>
+                    <span className={`text-xs font-bold ${aiMode === 'manual-expand' ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-200'}`}>초안 확장형 (창작)</span>
+                  </div>
+                  <p className="text-[10px] text-gray-500 leading-tight">
+                    대본이나 뼈대만 입력하면, AI가 관련된 전문 지식을 대거 추가하여 아주 방대하고 깊이 있는 전문 칼럼으로 새롭게 창작합니다.
+                  </p>
+                </button>
+
                 <button
                   onClick={() => setAiMode('semi-auto')}
-                  className={`py-1.5 text-xs font-bold rounded-md border ${
+                  className={`flex flex-col p-2.5 rounded-lg border text-left transition-all ${
                     aiMode === 'semi-auto' 
-                      ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300'
-                      : 'bg-white border-gray-200 text-gray-600 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-300'
+                      ? 'bg-[#03c75a]/10 border-[#03c75a] dark:bg-[#03c75a]/20 dark:border-[#03c75a]/50'
+                      : 'bg-white border-gray-200 hover:border-[#03c75a]/50 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:border-zinc-600'
                   }`}
                 >
-                  링크 요약
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-sm">🔗</span>
+                    <span className={`text-xs font-bold ${aiMode === 'semi-auto' ? 'text-[#02b351] dark:text-[#03c75a]' : 'text-gray-800 dark:text-gray-200'}`}>링크/키워드 (창작)</span>
+                  </div>
+                  <p className="text-[10px] text-gray-500 leading-tight">
+                    단순 키워드나 뉴스 링크만 제공하면, 데일리 글쓰기용 방대한 전문 칼럼을 AI가 처음부터 끝까지 자동 기획 및 창작합니다.
+                  </p>
                 </button>
+
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 flex-1">
+            <div className="flex flex-col gap-2 flex-1 mt-2">
               <span className="text-[11px] font-bold text-gray-500">
-                {aiMode === 'manual' ? '유튜브 대본 등 원문 입력' : '키워드 또는 참고 링크 입력'}
+                {aiMode === 'semi-auto' ? '키워드 또는 참고 링크 입력' : '유튜브 대본 등 원문 입력'}
               </span>
               <textarea
                 value={inputText}
                 onChange={e => setInputText(e.target.value)}
-                className="w-full h-64 p-3 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-950 text-xs resize-none focus:ring-1 focus:ring-blue-500 outline-none custom-scrollbar"
-                placeholder={aiMode === 'manual' ? "원문을 붙여넣으세요..." : "참고할 링크나 뼈대를 적어주세요..."}
+                className="w-full h-52 p-3 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-950 text-xs resize-none focus:ring-1 focus:ring-blue-500 outline-none custom-scrollbar"
+                placeholder={
+                  aiMode === 'semi-auto' 
+                    ? "참고할 링크 주소나 핵심 키워드를 적어주세요..." 
+                    : "가공할 원문 대본이나 텍스트를 이곳에 붙여넣으세요..."
+                }
               />
               <button
                 onClick={() => onRunAi(aiMode, inputText)}
                 disabled={isLoading || !inputText.trim()}
-                className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-md text-xs shadow-sm disabled:opacity-50 transition-colors"
+                className={`mt-2 w-full text-white font-bold py-3 rounded-md text-xs shadow-sm disabled:opacity-50 transition-colors flex items-center justify-center gap-2 ${
+                  aiMode === 'manual-preserve' ? 'bg-blue-600 hover:bg-blue-700' :
+                  aiMode === 'manual-expand' ? 'bg-indigo-600 hover:bg-indigo-700' :
+                  'bg-[#03c75a] hover:bg-[#02b351]'
+                }`}
               >
-                ✨ AI 글쓰기 가동
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                AI 글쓰기 시작
               </button>
-              <p className="text-[9.5px] text-gray-400 mt-1 text-center">
-                실행 시 중앙 에디터의 내용이 덮어씌워집니다.
-              </p>
             </div>
           </div>
         )}

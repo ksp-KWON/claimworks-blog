@@ -342,7 +342,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
 `;
     }
 
-    const models = ['gemini-pro-latest', 'gemini-flash-latest'];
+    const models = ['gemini-1.5-pro-latest', 'gemini-1.5-flash-latest'];
     let success = false;
     let lastError = '';
 
@@ -362,7 +362,12 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
           })
         });
         
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error('API 사용량 초과 (무료 버전은 1분에 2회까지만 가능합니다. 1분 후 다시 시도해주세요.)');
+          }
+          throw new Error(`HTTP ${response.status}`);
+        }
         const data = await response.json();
         if (data.error) throw new Error(data.error.message);
         

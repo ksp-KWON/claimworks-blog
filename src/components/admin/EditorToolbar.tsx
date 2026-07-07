@@ -34,15 +34,16 @@ export default function EditorToolbar({
 
   // Close dropdowns on click outside
   useEffect(() => {
-    const handleClickOutside = () => {
-      setIsModeOpen(false);
-      setIsBlockTypeOpen(false);
-      setIsTextColorOpen(false);
-      setIsBgColorOpen(false);
-      setIsAlignOpen(false);
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('[data-dropdown="mode"]')) setIsModeOpen(false);
+      if (!target.closest('[data-dropdown="block"]')) setIsBlockTypeOpen(false);
+      if (!target.closest('[data-dropdown="textColor"]')) setIsTextColorOpen(false);
+      if (!target.closest('[data-dropdown="bgColor"]')) setIsBgColorOpen(false);
+      if (!target.closest('[data-dropdown="align"]')) setIsAlignOpen(false);
     };
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleColorSelect = (color: string, isBg: boolean) => {
@@ -61,7 +62,7 @@ export default function EditorToolbar({
     <div className="sticky top-0 z-20 flex flex-wrap gap-1 p-2 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm items-center text-gray-700 dark:text-gray-300">
       
       {/* Mode Switcher */}
-      <div className="relative pr-2 border-r border-gray-200 dark:border-zinc-700" onClick={e => e.stopPropagation()}>
+      <div className="relative pr-2 border-r border-gray-200 dark:border-zinc-700" data-dropdown="mode">
         <button 
           onClick={() => setIsModeOpen(!isModeOpen)}
           className="flex items-center gap-1 p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded text-sm"
@@ -96,7 +97,7 @@ export default function EditorToolbar({
       </div>
 
       {/* Block Type (Heading) */}
-      <div className="relative pr-2 border-r border-gray-200 dark:border-zinc-700" onClick={e => e.stopPropagation()}>
+      <div className="relative pr-2 border-r border-gray-200 dark:border-zinc-700" data-dropdown="block">
         <button 
           onClick={() => setIsBlockTypeOpen(!isBlockTypeOpen)}
           className="flex items-center gap-1 p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded text-sm min-w-[80px]"
@@ -123,36 +124,40 @@ export default function EditorToolbar({
       </div>
 
       {/* Colors (Text, Bg) */}
-      <div className="flex gap-1 pr-2 border-r border-gray-200 dark:border-zinc-700 relative" onClick={e => e.stopPropagation()}>
-        <button onClick={() => { setIsTextColorOpen(!isTextColorOpen); setIsBgColorOpen(false); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded flex flex-col items-center justify-center w-7 h-7" title="글자 색상">
-          <span className="font-serif font-bold text-xs leading-none">A</span>
-          <div className="w-3 h-1 bg-red-500 mt-0.5"></div>
-        </button>
-        {isTextColorOpen && (
-          <div className="absolute top-full left-0 mt-1 w-52 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-xl rounded p-2 z-50">
-            <div className="text-xs font-bold mb-2">글자 색상</div>
-            <div className="grid grid-cols-8 gap-1">
-              {COLORS.map(c => (
-                <button key={c} onClick={() => { handleColorSelect(c, false); setIsTextColorOpen(false); }} className="w-5 h-5 rounded-sm border border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform" style={{ backgroundColor: c }} title={c} />
-              ))}
+      <div className="flex gap-1 pr-2 border-r border-gray-200 dark:border-zinc-700 relative">
+        <div data-dropdown="textColor">
+          <button onClick={() => { setIsTextColorOpen(!isTextColorOpen); setIsBgColorOpen(false); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded flex flex-col items-center justify-center w-7 h-7" title="글자 색상">
+            <span className="font-serif font-bold text-xs leading-none">A</span>
+            <div className="w-3 h-1 bg-red-500 mt-0.5"></div>
+          </button>
+          {isTextColorOpen && (
+            <div className="absolute top-full left-0 mt-1 w-52 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-xl rounded p-2 z-50">
+              <div className="text-xs font-bold mb-2">글자 색상</div>
+              <div className="grid grid-cols-8 gap-1">
+                {COLORS.map(c => (
+                  <button key={c} onClick={() => { handleColorSelect(c, false); setIsTextColorOpen(false); }} className="w-5 h-5 rounded-sm border border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform" style={{ backgroundColor: c }} title={c} />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <button onClick={() => { setIsBgColorOpen(!isBgColorOpen); setIsTextColorOpen(false); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded flex flex-col items-center justify-center w-7 h-7" title="배경 색상">
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-          <div className="w-3 h-1 bg-yellow-400 mt-0.5"></div>
-        </button>
-        {isBgColorOpen && (
-          <div className="absolute top-full left-0 mt-1 w-52 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-xl rounded p-2 z-50">
-            <div className="text-xs font-bold mb-2">배경 색상</div>
-            <div className="grid grid-cols-8 gap-1">
-              {COLORS.map(c => (
-                <button key={c} onClick={() => { handleColorSelect(c, true); setIsBgColorOpen(false); }} className="w-5 h-5 rounded-sm border border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform" style={{ backgroundColor: c }} title={c} />
-              ))}
+        <div data-dropdown="bgColor">
+          <button onClick={() => { setIsBgColorOpen(!isBgColorOpen); setIsTextColorOpen(false); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded flex flex-col items-center justify-center w-7 h-7" title="배경 색상">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            <div className="w-3 h-1 bg-yellow-400 mt-0.5"></div>
+          </button>
+          {isBgColorOpen && (
+            <div className="absolute top-full left-0 mt-1 w-52 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-xl rounded p-2 z-50">
+              <div className="text-xs font-bold mb-2">배경 색상</div>
+              <div className="grid grid-cols-8 gap-1">
+                {COLORS.map(c => (
+                  <button key={c} onClick={() => { handleColorSelect(c, true); setIsBgColorOpen(false); }} className="w-5 h-5 rounded-sm border border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform" style={{ backgroundColor: c }} title={c} />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Insertions (Link, Image, Video, Emoji) */}
@@ -172,7 +177,7 @@ export default function EditorToolbar({
       </div>
 
       {/* Align Dropdown */}
-      <div className="relative pr-2 border-r border-gray-200 dark:border-zinc-700" onClick={e => e.stopPropagation()}>
+      <div className="relative pr-2 border-r border-gray-200 dark:border-zinc-700" data-dropdown="align">
         <button onClick={() => setIsAlignOpen(!isAlignOpen)} className="flex items-center gap-1 p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded" title="정렬">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h10M4 18h16" /></svg>
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>

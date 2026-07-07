@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { 
   MDXEditor, 
   MDXEditorMethods,
@@ -30,6 +30,30 @@ export interface WysiwygEditorRef {
   setMarkdown: (markdown: string) => void;
   getMarkdown: () => string;
 }
+
+import { createPortal } from 'react-dom';
+
+const PortalToolbar = () => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  
+  if (!mounted) return null;
+  const portalTarget = document.getElementById('custom-toolbar-portal');
+  if (!portalTarget) return null;
+
+  return createPortal(
+    <div className="mdxeditor" style={{ background: 'transparent', border: 'none', padding: 0 }}>
+      <div className="mdxeditor-toolbar flex items-center gap-1 border-r border-gray-200 dark:border-zinc-700 pr-3 shrink-0" style={{ background: 'transparent', border: 'none', padding: 0 }}>
+        <UndoRedo />
+        <BlockTypeSelect />
+        <BoldItalicUnderlineToggles />
+        <CreateLink />
+        <InsertTable />
+      </div>
+    </div>,
+    portalTarget
+  );
+};
 
 const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initialValue, onChange }, ref) => {
   const editorRef = useRef<MDXEditorMethods>(null);
@@ -75,17 +99,7 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
           tablePlugin(),
           markdownShortcutPlugin(),
           toolbarPlugin({
-            toolbarContents: () => (
-              <div className="flex items-center gap-2 flex-wrap">
-                <UndoRedo />
-                <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1" />
-                <BlockTypeSelect />
-                <BoldItalicUnderlineToggles />
-                <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1" />
-                <CreateLink />
-                <InsertTable />
-              </div>
-            )
+            toolbarContents: () => <PortalToolbar />
           })
         ]}
       />
@@ -96,11 +110,9 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
           flex-direction: column;
         }
         .mdx-editor-wrapper .mdxeditor-toolbar {
-          flex-shrink: 0;
-          background: transparent !important;
-          border-bottom: none !important;
-          padding: 8px 24px !important;
+          display: none !important;
         }
+
         .mdx-editor-wrapper [data-lexical-editor] {
           flex: 1;
           overflow-y: auto;

@@ -35,3 +35,10 @@
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
+
+### 제6조 — 기술적 빌드 및 오류 해결 규칙 (Technical Resolution Constitution)
+- **근본 원인 해결**: 에러 발생 시 일시적인 땜방식 보수(Band-aid)가 아닌, 문제의 근본 원인을 파악하고 완벽히 해결합니다.
+- **최신성 및 안정성**: 가장 최신 기술과 최신 버전을 적용하되, 안정성(Stable)과 콤팩트함을 최우선으로 합니다.
+- **표준 코드 우선**: 프로젝트 내/외부의 표준 코드가 존재한다면 표준 코드를 무조건 우선 반영합니다.
+- **중복 제거 및 통합**: 중복 코드는 즉각 삭제하고, 통합 가능한 파트는 구조화하여 하나로 통합합니다.
+- **무결성 및 효율성**: 빌드 과정에서 절대 오류가 없어야 하며, 런타임 효율성을 반드시 확보합니다.

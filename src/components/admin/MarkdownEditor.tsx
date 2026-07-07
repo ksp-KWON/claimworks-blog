@@ -24,9 +24,23 @@ export default function MarkdownEditor({
   const [editorMode, setEditorMode] = useState<'wysiwyg' | 'markdown' | 'html'>('wysiwyg');
   const markdownTextareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const insertMarkdown = (template: string) => {
+  const getSelectedText = () => {
+    let selectedText = '텍스트';
+    if (editorMode === 'markdown' && markdownTextareaRef.current) {
+      const textarea = markdownTextareaRef.current;
+      selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd) || '텍스트';
+    } else if (editorMode === 'wysiwyg') {
+      const sel = window.getSelection();
+      if (sel && sel.toString().trim() !== '') {
+        selectedText = sel.toString();
+      }
+    }
+    return selectedText;
+  };
+
+  const insertMarkdown = (template: string, originalSelectionLength: number = 0) => {
     if (editorMode === 'wysiwyg') {
-      editorRef.current?.insertText('\n' + template);
+      editorRef.current?.insertText(template);
     } else if (editorMode === 'markdown' && markdownTextareaRef.current) {
       const textarea = markdownTextareaRef.current;
       const start = textarea.selectionStart;
@@ -34,22 +48,24 @@ export default function MarkdownEditor({
       const text = textarea.value;
       const before = text.substring(0, start);
       const after = text.substring(end, text.length);
-      setContent(before + '\n' + template + after);
+      setContent(before + template + after);
       setTimeout(() => {
-        textarea.selectionStart = textarea.selectionEnd = start + template.length + 1;
+        textarea.selectionStart = textarea.selectionEnd = start + template.length;
         textarea.focus();
       }, 0);
     }
   };
 
-  const wrapTextWithTag = (tagName: string) => {
-    const wrapped = `<${tagName}>텍스트</${tagName}>`;
-    insertMarkdown(wrapped);
+  const wrapTextWithTag = (tagName: string, attributes: string = '') => {
+    const selected = getSelectedText();
+    const wrapped = `<${tagName}${attributes}>${selected}</${tagName}>`;
+    insertMarkdown(wrapped, selected.length);
   };
 
   const wrapWithMarkdown = (prefix: string, suffix: string = '') => {
-    const wrapped = `${prefix}텍스트${suffix}`;
-    insertMarkdown(wrapped);
+    const selected = getSelectedText();
+    const wrapped = `${prefix}${selected}${suffix}`;
+    insertMarkdown(wrapped, selected.length);
   };
 
   return (

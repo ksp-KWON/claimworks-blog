@@ -59,7 +59,15 @@ export default function EditorToolbar({
   };
 
   return (
-    <div className="sticky top-0 z-20 flex flex-wrap gap-1 p-2 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm items-center text-gray-700 dark:text-gray-300">
+    <div 
+      className="sticky top-0 z-20 flex flex-wrap gap-1 p-2 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm items-center text-gray-700 dark:text-gray-300"
+      onMouseDown={e => {
+        // Prevent losing focus in the editor, unless they are clicking inside an input (if any)
+        if ((e.target as HTMLElement).tagName !== 'INPUT') {
+          e.preventDefault();
+        }
+      }}
+    >
       
       {/* Mode Switcher */}
       <div className="relative pr-2 border-r border-gray-200 dark:border-zinc-700" data-dropdown="mode">

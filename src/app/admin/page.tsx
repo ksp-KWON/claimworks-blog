@@ -12,6 +12,7 @@ const AiWritingPanel = dynamic(() => import('@/components/admin/posts/AiWritingP
 const PostListPanel = dynamic(() => import('@/components/admin/posts/PostListPanel'), { ssr: false });
 const DailyAutoPanel = dynamic(() => import('@/components/admin/posts/DailyAutoPanel'), { ssr: false });
 const SettingsPanel = dynamic(() => import('@/components/admin/posts/SettingsPanel'), { ssr: false });
+const CalendarAdminPanel = dynamic(() => import('@/components/admin/CalendarAdminPanel'), { ssr: false });
 
 import { 
   fetchPostList, 
@@ -23,7 +24,7 @@ import {
 } from '@/lib/admin-api';
 
 export default function AdminPage() {
-  const [activeApp, setActiveApp] = useState<AdminAppType>('chat-list');
+  const [activeApp, setActiveApp] = useState<AdminAppType>('calendar');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   // Editor State
@@ -284,6 +285,9 @@ export default function AdminPage() {
         {/* Dynamic Workspace based on activeApp */}
         <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-zinc-950 relative">
           
+          {/* Calendar Dashboard */}
+          {activeApp === 'calendar' && <CalendarAdminPanel />}
+
           {/* Chat */}
           {activeApp === 'chat-list' && <ChatAdminPanel />}
           {activeApp === 'chat-manage' && (

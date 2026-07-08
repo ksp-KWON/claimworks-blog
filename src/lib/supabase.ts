@@ -38,6 +38,14 @@ export interface Consultation {
   created_at: string;
 }
 
+export interface AdminCalendarEvent {
+  id: string;
+  date: string; // YYYY-MM-DD
+  title: string;
+  content?: string;
+  created_at: string;
+}
+
 // ─── 방문자용 클라이언트 싱글턴 ───────────────────────────────────────
 // Next.js HMR(Hot Module Replacement) 환경에서 "Multiple GoTrueClient instances" 경고를
 // 방지하기 위해 globalThis에 캐싱합니다. (Next.js 공식 권장 패턴)

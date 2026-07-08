@@ -62,9 +62,6 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       description: post.summary,
       images: [ogImageUrl],
     },
-    alternates: {
-      canonical: `https://claim-works.com/blog/${slug}`,
-    },
   };
 }
 

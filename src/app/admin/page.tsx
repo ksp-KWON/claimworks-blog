@@ -23,7 +23,7 @@ import {
 } from '@/lib/admin-api';
 
 export default function AdminPage() {
-  const [activeApp, setActiveApp] = useState<AdminAppType>('chat-live');
+  const [activeApp, setActiveApp] = useState<AdminAppType>('chat-list');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   // Editor State
@@ -273,7 +273,18 @@ export default function AdminPage() {
         <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-zinc-950 relative">
           
           {/* Chat */}
-          {activeApp === 'chat-live' && <ChatAdminPanel />}
+          {activeApp === 'chat-list' && <ChatAdminPanel />}
+          {activeApp === 'chat-manage' && (
+            <div className="flex-1 flex flex-col p-6 bg-gray-50 dark:bg-zinc-950 items-center justify-center text-center">
+              <div className="w-16 h-16 bg-gray-200 dark:bg-zinc-800 rounded-full flex items-center justify-center text-gray-400 dark:text-gray-500 mb-4">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">채팅 항목 관리</h3>
+              <p className="text-gray-500 text-sm">해당 기능은 다음 업데이트에 추가될 예정입니다.</p>
+            </div>
+          )}
           
           {/* Consultations */}
           {activeApp === 'consult-list' && (

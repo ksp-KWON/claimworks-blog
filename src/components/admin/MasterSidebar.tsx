@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 export type AdminAppType = 
-  | 'chat-live' 
+  | 'chat-list' | 'chat-manage' 
   | 'consult-list' | 'consult-manage' 
   | 'post-ai' | 'post-list' | 'post-daily' | 'post-settings' 
   | 'editor';
@@ -15,6 +15,7 @@ interface MasterSidebarProps {
 
 export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, toggleCollapse }: MasterSidebarProps) {
   // Accordion states
+  const [isChatExpanded, setIsChatExpanded] = useState(true);
   const [isConsultExpanded, setIsConsultExpanded] = useState(true);
   const [isPostsExpanded, setIsPostsExpanded] = useState(true);
 
@@ -50,10 +51,11 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
           <button
             onClick={() => {
               if (isCollapsed) toggleCollapse();
-              if (!isChatActive) setActiveApp('chat-live');
+              setIsChatExpanded(!isChatExpanded);
+              if (!isChatActive) setActiveApp('chat-list');
             }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
-              isChatActive
+              isChatActive && !isChatExpanded
                 ? 'bg-zinc-800 text-white font-bold' 
                 : 'hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200'
             }`}
@@ -64,7 +66,32 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
               </svg>
               {!isCollapsed && <span className="text-sm font-bold">채팅 상담</span>}
             </div>
+            {!isCollapsed && (
+              <svg className={`w-4 h-4 transition-transform duration-200 ${isChatExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
           </button>
+          {(!isCollapsed && isChatExpanded) && (
+            <div className="mt-1 ml-4 pl-4 border-l border-zinc-700 flex flex-col gap-1 py-1">
+              <button
+                onClick={() => setActiveApp('chat-list')}
+                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${
+                  activeApp === 'chat-list' ? 'bg-blue-600/20 text-blue-400 font-bold' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+                }`}
+              >
+                채팅 목록
+              </button>
+              <button
+                onClick={() => setActiveApp('chat-manage')}
+                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${
+                  activeApp === 'chat-manage' ? 'bg-blue-600/20 text-blue-400 font-bold' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+                }`}
+              >
+                항목관리
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 2. Consultation Center */}

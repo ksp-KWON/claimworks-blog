@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 interface AiWritingPanelProps {
   isLoading: boolean;
   onRunAi: (mode: 'manual-preserve' | 'manual-expand' | 'semi-auto', inputText: string) => void;
+  onOpenEditor: () => void;
 }
 
-export default function AiWritingPanel({ isLoading, onRunAi }: AiWritingPanelProps) {
+export default function AiWritingPanel({ isLoading, onRunAi, onOpenEditor }: AiWritingPanelProps) {
   const [inputText, setInputText] = useState('');
   const [aiMode, setAiMode] = useState<'manual-preserve' | 'manual-expand' | 'semi-auto'>('manual-preserve');
 
@@ -86,7 +87,15 @@ export default function AiWritingPanel({ isLoading, onRunAi }: AiWritingPanelPro
                 : "가공할 원문 대본이나 텍스트를 이곳에 붙여넣으세요..."
             }
           />
-          <div className="flex justify-end mt-2">
+          <div className="flex justify-end mt-2 gap-3">
+            <button
+              onClick={onOpenEditor}
+              className="px-6 py-3 rounded-lg text-gray-700 dark:text-gray-200 bg-gray-200 hover:bg-gray-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 font-bold shadow-sm transition-colors flex items-center gap-2"
+              title="아무 내용 없이 에디터로 바로 이동합니다"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+              빈 에디터 열기
+            </button>
             <button
               onClick={() => onRunAi(aiMode, inputText)}
               disabled={isLoading || !inputText.trim()}

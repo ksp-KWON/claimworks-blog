@@ -342,7 +342,7 @@ export default function CalendarAdminPanel() {
     const months = Array.from({ length: 12 }, (_, i) => i);
     
     return (
-      <div className="flex-1 p-6 overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-950">
+      <div className="flex-1 min-h-0 p-6 overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-950">
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {months.map(month => {
             const firstDay = new Date(year, month, 1).getDay();

@@ -267,7 +267,10 @@ export default function AdminPage() {
 
           {/* Posting Center Tools */}
           {activeApp === 'post-ai' && (
-            <AiWritingPanel isLoading={isLoading} onRunAi={handleRunAi} />
+            <AiWritingPanel isLoading={isLoading} onRunAi={handleRunAi} onOpenEditor={() => {
+              setEditorContent('');
+              setActiveApp('editor');
+            }} />
           )}
           {activeApp === 'post-list' && (
             <PostListPanel 

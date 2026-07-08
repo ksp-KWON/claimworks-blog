@@ -105,7 +105,8 @@ export default function CalendarAdminPanel() {
         setIsEditing(false);
         fetchEvents();
       } else {
-        alert('수정에 실패했습니다.');
+        console.error('Update error:', error);
+        alert(`수정에 실패했습니다: ${error.message}`);
       }
     } else {
       // Insert
@@ -118,7 +119,8 @@ export default function CalendarAdminPanel() {
         setIsEditing(false);
         fetchEvents();
       } else {
-        alert('추가에 실패했습니다.');
+        console.error('Insert error:', error);
+        alert(`추가에 실패했습니다: ${error.message}`);
       }
     }
     setIsLoading(false);

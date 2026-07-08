@@ -174,6 +174,9 @@ export default function ChatAdminPanel() {
     const { error } = await supabase.from('chat_sessions').update({ status: newStatus }).eq('id', selectedId);
     if (!error) {
       setSessions(prev => prev.map(s => s.id === selectedId ? { ...s, status: newStatus } : s));
+    } else {
+      console.error('Status update error:', error);
+      alert(`상태 변경 실패: ${error.message}`);
     }
     setIsMenuOpen(false);
   };
@@ -185,6 +188,9 @@ export default function ChatAdminPanel() {
     if (!error) {
       setSessions(prev => prev.filter(s => s.id !== selectedId));
       setSelectedId(null);
+    } else {
+      console.error('Delete error:', error);
+      alert(`삭제 실패: ${error.message}`);
     }
     setIsMenuOpen(false);
   };

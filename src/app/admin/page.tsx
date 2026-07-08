@@ -36,6 +36,12 @@ export default function AdminPage() {
   const [currentSha, setCurrentSha] = useState<string | null>(null);
   const [currentFilename, setCurrentFilename] = useState<string | null>(null);
 
+  // Auth State
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+
   // Common State
   const [postList, setPostList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,6 +53,9 @@ export default function AdminPage() {
   useEffect(() => {
     setGeminiKey(localStorage.getItem('GEMINI_API_KEY') || '');
     setGithubToken(localStorage.getItem('GITHUB_TOKEN') || '');
+    if (sessionStorage.getItem('admin_auth') === 'true') {
+      setIsLoggedIn(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -149,6 +158,65 @@ export default function AdminPage() {
     setContent(''); setCurrentSha(null); setCurrentFilename(null);
     setActiveApp('editor');
   };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordInput) return;
+    setIsVerifying(true);
+    setAuthError('');
+    try {
+      const res = await fetch('/api/verify-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: passwordInput })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        sessionStorage.setItem('admin_auth', 'true');
+        setIsLoggedIn(true);
+      } else {
+        setAuthError(data.message || '비밀번호가 일치하지 않습니다.');
+      }
+    } catch (err) {
+      setAuthError('서버 오류가 일시적으로 발생했습니다.');
+    }
+    setIsVerifying(false);
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-zinc-950 px-4 font-sans">
+        <div className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-200 dark:border-zinc-800 p-8">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black shadow-inner shadow-white/20 mx-auto mb-4 text-xl">
+            C
+          </div>
+          <h2 className="text-2xl font-black text-center text-gray-900 dark:text-white tracking-tight mb-2">ClaimWorks Admin</h2>
+          <p className="text-sm text-center text-gray-500 mb-8">보상스쿨 통합 관리자 시스템입니다.<br/>비밀번호를 입력해주세요.</p>
+          
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <input 
+                type="password" 
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                placeholder="관리자 비밀번호"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 text-sm text-gray-900 dark:text-white"
+                autoFocus
+              />
+            </div>
+            {authError && <p className="text-red-500 text-xs text-center font-bold">{authError}</p>}
+            <button 
+              type="submit" 
+              disabled={isVerifying || !passwordInput}
+              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              {isVerifying ? '확인 중...' : '로그인'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">

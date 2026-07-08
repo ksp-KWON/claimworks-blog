@@ -53,6 +53,9 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
         },
       ],
     },
+    alternates: {
+      canonical: `https://claim-works.com/blog/${slug}`,
+    },
     twitter: {
       card: 'summary_large_image',
       title: post.title,

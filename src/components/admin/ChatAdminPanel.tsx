@@ -24,7 +24,7 @@ export default function ChatAdminPanel() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'전체' | '대기' | '진행중' | '보류' | '완료' | '차단'>('전체');
   const [sortBy, setSortBy] = useState<'최근 대화순' | '오래된 대화순'>('최근 대화순');
-  const [readFilter, setReadFilter] = useState<'전체' | '안읽음'>('전체');
+  const [readFilter, setReadFilter] = useState<'전체' | '읽음' | '안읽음'>('전체');
   
   // Menu State
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -221,6 +221,7 @@ export default function ChatAdminPanel() {
 
     // 2. Read Filter
     if (readFilter === '안읽음' && (session.unread_count || 0) === 0) return false;
+    if (readFilter === '읽음' && (session.unread_count || 0) > 0) return false;
 
     // 3. Search Filter
     if (searchTerm.trim()) {
@@ -313,6 +314,7 @@ export default function ChatAdminPanel() {
               className="bg-transparent outline-none cursor-pointer hover:text-gray-900 dark:hover:text-white"
             >
               <option value="전체">읽음여부: 전체</option>
+              <option value="읽음">읽음</option>
               <option value="안읽음">안읽음</option>
             </select>
           </div>

@@ -13,6 +13,7 @@ export interface ChatSession {
   last_message_at: string;
   unread_count: number;
   customer_memo?: string;
+  status?: string;
 }
 
 export interface ChatMessage {

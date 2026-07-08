@@ -369,29 +369,69 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
 
+      {/* 말풍선 모양 플로팅 버튼 */}
       <motion.button
         id="chat-floating-btn"
         onClick={isOpen ? () => setIsOpen(false) : handleOpen}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.94 }}
-        className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-full shadow-[0_4px_20px_rgba(26,115,232,0.4)] flex items-center justify-center transition-colors focus:outline-none focus:ring-4 focus:ring-blue-300"
-        style={{ background: isOpen ? '#ea4335' : 'linear-gradient(135deg, #1a73e8 0%, #1557b0 100%)' }}
+        className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] focus:outline-none"
+        style={{ filter: 'drop-shadow(0 4px 16px rgba(26,115,232,0.45))' }}
+        aria-label="보상 상담 채팅 열기"
       >
-        <AnimatePresence mode="wait">
+        {/* 말풍선 SVG 컨테이너 */}
+        <svg
+          width="68"
+          height="76"
+          viewBox="0 0 68 76"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* 말풍선 몸통 + 꼬리 */}
+          <defs>
+            <linearGradient id="bubbleGrad" x1="0" y1="0" x2="68" y2="64" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor={isOpen ? '#ea4335' : '#1a73e8'} />
+              <stop offset="100%" stopColor={isOpen ? '#c5221f' : '#1557b0'} />
+            </linearGradient>
+            {/* 로고를 원형으로 클리핑 */}
+            <clipPath id="logoClip">
+              <rect x="6" y="4" width="56" height="56" rx="14" />
+            </clipPath>
+          </defs>
+          {/* 말풍선 배경 (둥근 사각형 + 왼쪽 하단 꼬리) */}
+          <path
+            d="M14 4 C9.6 4 6 7.6 6 12 L6 52 C6 56.4 9.6 60 14 60 L28 60 L22 72 L40 60 L54 60 C58.4 60 62 56.4 62 52 L62 12 C62 7.6 58.4 4 54 4 Z"
+            fill="url(#bubbleGrad)"
+          />
+          {/* 닫기 상태: X 아이콘 */}
           {isOpen ? (
-            <motion.svg key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }} className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-            </motion.svg>
+            <g opacity="1">
+              <line x1="24" y1="22" x2="44" y2="42" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
+              <line x1="44" y1="22" x2="24" y2="42" stroke="white" strokeWidth="3.5" strokeLinecap="round" />
+            </g>
           ) : (
-            <motion.div key="logo" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.2 }} className="flex flex-col items-center justify-center">
-              <span className="text-white font-black text-[11px] leading-tight">보상</span>
-              <span className="text-white/80 font-bold text-[8px] leading-tight">상담</span>
-            </motion.div>
+            /* 열기 상태: 로고 이미지 꽉 채움 */
+            <image
+              href="/images/logo-icon.png"
+              x="8"
+              y="5"
+              width="52"
+              height="54"
+              clipPath="url(#logoClip)"
+              preserveAspectRatio="xMidYMid meet"
+            />
           )}
-        </AnimatePresence>
+        </svg>
+
+        {/* 읽지 않은 메시지 뱃지 */}
         <AnimatePresence>
           {unreadCount > 0 && !isOpen && (
-            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className="absolute -top-1 -right-1 w-5 h-5 bg-[#ea4335] text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md">
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0 }}
+              className="absolute -top-1 -right-1 w-5 h-5 bg-[#ea4335] text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md"
+            >
               {unreadCount > 9 ? '9+' : unreadCount}
             </motion.span>
           )}

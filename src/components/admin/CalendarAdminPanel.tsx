@@ -158,7 +158,7 @@ export default function CalendarAdminPanel() {
     const padding = Array.from({ length: firstDay }, (_, i) => null);
 
     return (
-      <div className="flex-1 flex flex-col h-full bg-white dark:bg-zinc-950">
+      <div className="flex-1 flex flex-col h-full min-h-0 bg-white dark:bg-zinc-950">
         <div className="grid grid-cols-7 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
           {['일', '월', '화', '수', '목', '금', '토'].map((d, i) => (
             <div key={d} className={`py-2 text-center text-xs font-bold ${i === 0 ? 'text-red-500' : i === 6 ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'}`}>
@@ -166,7 +166,7 @@ export default function CalendarAdminPanel() {
             </div>
           ))}
         </div>
-        <div className="flex-1 grid grid-cols-7 grid-rows-5 lg:grid-rows-6 auto-rows-fr">
+        <div className="flex-1 grid grid-cols-7 grid-rows-5 lg:grid-rows-6 auto-rows-fr min-h-0">
           {padding.map((_, i) => (
             <div key={`pad-${i}`} className="border-r border-b border-gray-100 dark:border-zinc-800/50 bg-gray-50/50 dark:bg-zinc-900/20"></div>
           ))}
@@ -232,7 +232,7 @@ export default function CalendarAdminPanel() {
     });
 
     return (
-      <div className="flex-1 flex flex-col h-full bg-white dark:bg-zinc-950 overflow-x-auto">
+      <div className="flex-1 flex flex-col h-full min-h-0 bg-white dark:bg-zinc-950 overflow-x-auto">
         <div className="flex-1 flex min-w-[800px]">
           {weekDays.map((date, i) => {
             const dateStr = formatDateString(date);
@@ -289,7 +289,7 @@ export default function CalendarAdminPanel() {
     const dayNames = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
     
     return (
-      <div className="flex-1 flex flex-col p-6 bg-white dark:bg-zinc-950 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 flex flex-col min-h-0 p-6 bg-white dark:bg-zinc-950 overflow-y-auto custom-scrollbar">
         <div className="mb-6 pb-4 border-b border-gray-200 dark:border-zinc-800">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
             {currentDate.getDate()}일 <span className="text-xl text-gray-500 font-normal">{dayNames[currentDate.getDay()]}</span>
@@ -401,7 +401,7 @@ export default function CalendarAdminPanel() {
     }, {} as Record<string, AdminCalendarEvent[]>);
 
     return (
-      <div className="flex-1 p-6 overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-zinc-950">
+      <div className="flex-1 min-h-0 p-6 overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-zinc-950">
         <div className="max-w-3xl mx-auto space-y-8">
           {Object.keys(grouped).length === 0 ? (
             <div className="text-center py-20 text-gray-500">예정된 다가오는 일정이 없습니다.</div>
@@ -463,7 +463,7 @@ export default function CalendarAdminPanel() {
     <div className="flex h-full w-full bg-white dark:bg-zinc-950 rounded-lg border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
       
       {/* 캘린더 메인 영역 */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         
         {/* 상단 툴바 */}
         <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">

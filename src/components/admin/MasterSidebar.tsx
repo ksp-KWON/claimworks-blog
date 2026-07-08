@@ -26,34 +26,6 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
   const isPostActive = activeApp.startsWith('post-');
 
   return (
-import React, { useState, useEffect } from 'react';
-
-export type AdminAppType = 
-  | 'calendar'
-  | 'chat-list' | 'chat-manage' 
-  | 'consult-list' | 'consult-manage' 
-  | 'post-ai' | 'post-list' | 'post-daily' | 'post-settings' 
-  | 'editor';
-
-interface MasterSidebarProps {
-  activeApp: AdminAppType;
-  setActiveApp: (app: AdminAppType) => void;
-  isCollapsed: boolean;
-  toggleCollapse: () => void;
-  onLogout?: () => void;
-}
-
-export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, toggleCollapse, onLogout }: MasterSidebarProps) {
-  // Accordion states
-  const [isChatExpanded, setIsChatExpanded] = useState(true);
-  const [isConsultExpanded, setIsConsultExpanded] = useState(true);
-  const [isPostsExpanded, setIsPostsExpanded] = useState(true);
-
-  const isChatActive = activeApp.startsWith('chat-');
-  const isConsultActive = activeApp.startsWith('consult-');
-  const isPostActive = activeApp.startsWith('post-');
-
-  return (
     <div 
       className={`bg-zinc-900 text-zinc-300 flex flex-col transition-all duration-300 ease-in-out shrink-0 ${isCollapsed ? 'w-16' : 'w-[240px]'} border-r border-zinc-800`}
     >
@@ -64,7 +36,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
             <div className="w-7 h-7 shrink-0 rounded bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm">
               C
             </div>
-            <span className="font-bold text-white text-sm truncate">관리자페이지</span>
+            <span className="font-bold text-white text-sm truncate">ClaimWorks</span>
           </div>
         )}
         <button 
@@ -261,20 +233,8 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
                   activeApp === 'post-settings' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
                 }`}
               >
-                ⚙️ 환경설정
+                ⚙️ API 환경 설정
               </button>
-              {onLogout && (
-                <button
-                  onClick={onLogout}
-                  className="w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm text-red-400 hover:text-red-300 hover:bg-zinc-800/50"
-                  title="로그아웃"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  로그아웃
-                </button>
-              )}
             </div>
           )}
         </div>
@@ -290,6 +250,22 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
             <span className="text-sm font-bold text-white leading-tight">보상스쿨</span>
             <span className="text-xs text-zinc-500">통합 관리자</span>
           </div>
+        </div>
+      )}
+
+      {/* Logout Button */}
+      {onLogout && (
+        <div className="p-3 border-t border-zinc-800 shrink-0">
+          <button
+            onClick={onLogout}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-start gap-3 px-3'} py-2 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-zinc-800/50 transition-colors group`}
+            title="로그아웃"
+          >
+            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            {!isCollapsed && <span className="text-sm font-bold truncate">로그아웃</span>}
+          </button>
         </div>
       )}
     </div>

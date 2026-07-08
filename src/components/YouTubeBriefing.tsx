@@ -1,6 +1,4 @@
-'use client';
-
-import { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 
 export interface YouTubeVideo {
@@ -32,33 +30,43 @@ const FALLBACK_VIDEOS: YouTubeVideo[] = [
   }
 ];
 
-export default function YouTubeBriefing() {
-  const [videos, setVideos] = useState<YouTubeVideo[]>([]);
-  const [loading, setLoading] = useState(true);
+export default async function YouTubeBriefing() {
+  const channelId = 'UCvjJtHa7eS2G25Vwt4fzezA';
+  const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+  let videos: YouTubeVideo[] = [];
 
-  useEffect(() => {
-    async function loadVideos() {
-      try {
-        const res = await fetch('/api/youtube');
-        if (!res.ok) throw new Error('API fetch failed');
-        const data = await res.json();
-        if (data && data.length > 0) {
-          setVideos(data);
-        } else {
-          setVideos(FALLBACK_VIDEOS);
-        }
-      } catch (error) {
-        console.error('Failed to fetch YouTube videos:', error);
-        setVideos(FALLBACK_VIDEOS);
-      } finally {
-        setLoading(false);
-      }
+  try {
+    const res = await fetch(rssUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
+      },
+      next: { revalidate: 3600 }
+    });
+
+    if (res.ok) {
+      const xml = await res.text();
+      const entries = xml.split('<entry>').slice(1);
+      videos = entries.map(entry => {
+        const videoIdMatch = entry.match(/<yt:videoId>(.*?)<\/yt:videoId>/);
+        const titleMatch = entry.match(/<title>(.*?)<\/title>/);
+        const publishedMatch = entry.match(/<published>(.*?)<\/published>/);
+        
+        return {
+          id: videoIdMatch ? videoIdMatch[1] : '',
+          title: titleMatch ? titleMatch[1] : '',
+          published: publishedMatch ? new Date(publishedMatch[1]).toLocaleDateString('ko-KR') : ''
+        };
+      }).filter(v => v.id).slice(0, 4);
     }
-    
-    loadVideos();
-  }, []);
+  } catch (error) {
+    console.error('Failed to fetch YouTube RSS:', error);
+  }
 
-  if (!loading && videos.length === 0) return null;
+  // RSS 피드 조회 실패 또는 데이터가 비어있을 경우 폴백으로 제공
+  if (videos.length === 0) {
+    videos = FALLBACK_VIDEOS;
+  }
 
   return (
     <section className="mb-12 relative">
@@ -87,60 +95,44 @@ export default function YouTubeBriefing() {
 
       {/* 2. 비디오 리스트 레이아웃: 가로형 2단 그리드 (모바일 1단) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-        {loading ? (
-          // 스켈레톤 UI (데이터 로딩 중)
-          Array.from({ length: 4 }).map((_, idx) => (
-            <div key={`skeleton-${idx}`} className="group flex gap-3 sm:gap-4 p-2.5 sm:p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-100 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.08)] items-center animate-pulse">
-              <div className="w-32 sm:w-36 shrink-0 aspect-video rounded-none bg-gray-200 dark:bg-zinc-800"></div>
-              <div className="flex flex-col flex-1 py-0.5 pr-1 space-y-2">
-                <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-full"></div>
-                <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-3/4"></div>
-                <div className="mt-auto flex items-center justify-between pt-2">
-                  <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-1/3"></div>
+        {videos.map((video) => (
+          <a
+            key={video.id}
+            href={`https://youtu.be/${video.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex gap-3 sm:gap-4 p-2.5 sm:p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-100 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:border-[#FF0000] transition-all duration-300 items-center"
+          >
+            {/* 썸네일 */}
+            <div className="relative w-32 sm:w-36 shrink-0 aspect-video rounded-none overflow-hidden bg-gray-100 dark:bg-zinc-800">
+              <Image 
+                src={`https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`} 
+                alt={video.title} 
+                fill
+                unoptimized
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/5 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+                <div className="w-8 h-8 bg-white/95 text-[#FF0000] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300 shadow-md">
+                  <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </div>
               </div>
             </div>
-          ))
-        ) : (
-          videos.map((video) => (
-            <a
-              key={video.id}
-              href={`https://youtu.be/${video.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex gap-3 sm:gap-4 p-2.5 sm:p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-100 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:border-[#FF0000] transition-all duration-300 items-center"
-            >
-              {/* 썸네일 */}
-              <div className="relative w-32 sm:w-36 shrink-0 aspect-video rounded-none overflow-hidden bg-gray-100 dark:bg-zinc-800">
-                <Image 
-                  src={`https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`} 
-                  alt={video.title} 
-                  fill
-                  unoptimized
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/5 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                  <div className="w-8 h-8 bg-white/95 text-[#FF0000] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300 shadow-md">
-                    <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                  </div>
-                </div>
+            
+            {/* 텍스트 정보 */}
+            <div className="flex flex-col flex-1 py-0.5 pr-1">
+              <h4 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[#FF0000] transition-colors leading-snug mb-2 break-keep line-clamp-2">
+                {video.title}
+              </h4>
+              <div className="mt-auto flex items-center justify-between text-[11px] sm:text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6]">
+                <time className="flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  {video.published}
+                </time>
               </div>
-              
-              {/* 텍스트 정보 */}
-              <div className="flex flex-col flex-1 py-0.5 pr-1">
-                <h4 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[#FF0000] transition-colors leading-snug mb-2 break-keep line-clamp-2">
-                  {video.title}
-                </h4>
-                <div className="mt-auto flex items-center justify-between text-[11px] sm:text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6]">
-                  <time className="flex items-center gap-1">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    {video.published}
-                  </time>
-                </div>
-              </div>
-            </a>
-          ))
-        )}
+            </div>
+          </a>
+        ))}
       </div>
           
     </section>

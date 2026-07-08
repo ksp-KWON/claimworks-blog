@@ -470,7 +470,7 @@ export default function CalendarAdminPanel() {
           
           <div className="flex items-center gap-4 mb-4 sm:mb-0">
             {viewMode !== 'agenda' && (
-              <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
+              <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 shrink-0">
                 <button onClick={handlePrev} className="p-1.5 rounded-md text-gray-600 hover:bg-white dark:text-gray-300 dark:hover:bg-zinc-700 shadow-sm transition-colors">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                 </button>
@@ -482,31 +482,40 @@ export default function CalendarAdminPanel() {
                 </button>
               </div>
             )}
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white min-w-[140px]">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white truncate">
               {getHeaderText()}
             </h2>
           </div>
 
-          <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1">
-            {[
-              { id: 'day', label: '일' },
-              { id: 'week', label: '주' },
-              { id: 'month', label: '월' },
-              { id: 'year', label: '연도' },
-              { id: 'agenda', label: '목록' }
-            ].map(view => (
-              <button
-                key={view.id}
-                onClick={() => setViewMode(view.id as ViewMode)}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  viewMode === view.id 
-                    ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
-              >
-                {view.label}
-              </button>
-            ))}
+          <div className="flex items-center gap-4 w-full sm:w-auto overflow-x-auto custom-scrollbar pb-2 sm:pb-0">
+            <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 shrink-0">
+              {[
+                { id: 'day', label: '일' },
+                { id: 'week', label: '주' },
+                { id: 'month', label: '월' },
+                { id: 'year', label: '연도' },
+                { id: 'agenda', label: '목록' }
+              ].map(view => (
+                <button
+                  key={view.id}
+                  onClick={() => setViewMode(view.id as ViewMode)}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                    viewMode === view.id 
+                      ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm' 
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  }`}
+                >
+                  {view.label}
+                </button>
+              ))}
+            </div>
+            <button 
+              onClick={handleCreateNew}
+              className="shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-bold text-sm shadow-sm flex items-center gap-1.5"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
+              새 일정
+            </button>
           </div>
         </div>
 
@@ -518,113 +527,109 @@ export default function CalendarAdminPanel() {
         {viewMode === 'agenda' && renderAgendaView()}
       </div>
 
-      {/* 우측 사이드바 (일정 추가/수정) */}
-      <div className="w-80 shrink-0 border-l border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex flex-col hidden lg:flex">
-        <div className="p-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center">
-          <h3 className="font-bold text-gray-800 dark:text-gray-200">
-            {isEditing ? '일정 작성' : '일정 상세'}
-          </h3>
-          <button 
-            onClick={handleCreateNew}
-            className="text-xs bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-1 rounded hover:bg-blue-200 transition-colors font-bold"
-          >
-            + 새 일정
-          </button>
-        </div>
+      {/* 우측 사이드바 (일정 추가/수정) - 선택되었을 때만 렌더링 */}
+      {(selectedEvent || isEditing) && (
+        <div className="w-80 shrink-0 border-l border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex flex-col h-full animate-in slide-in-from-right-8 duration-200">
+          <div className="p-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0">
+            <h3 className="font-bold text-gray-800 dark:text-gray-200">
+              {isEditing ? '일정 작성' : '일정 상세'}
+            </h3>
+            <button 
+              onClick={() => {
+                setSelectedEvent(null);
+                setIsEditing(false);
+              }}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
 
-        <div className="p-4 flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4">
-          {!selectedDate && !selectedEvent ? (
-            <div className="text-center text-gray-400 mt-10 text-sm">
-              <svg className="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              날짜를 선택하거나<br/>새 일정을 추가하세요.
-            </div>
-          ) : (
-            <>
-              {isEditing || !selectedEvent ? (
-                // --- Edit Mode ---
-                <div className="flex flex-col gap-4 h-full">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-gray-500">날짜</label>
-                    <input 
-                      type="date" 
-                      value={selectedDate || ''}
-                      onChange={e => setSelectedDate(e.target.value)}
-                      className="w-full p-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-gray-500">제목</label>
-                    <input 
-                      type="text" 
-                      value={formTitle}
-                      onChange={e => setFormTitle(e.target.value)}
-                      placeholder="일정 제목"
-                      className="w-full p-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5 flex-1">
-                    <label className="text-xs font-bold text-gray-500">상세 내용</label>
-                    <textarea 
-                      value={formContent}
-                      onChange={e => setFormContent(e.target.value)}
-                      placeholder="내용을 입력하세요..."
-                      className="w-full p-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none flex-1 min-h-[150px] custom-scrollbar"
-                    />
-                  </div>
-                  
-                  <div className="flex gap-2 mt-auto pt-4">
-                    {selectedEvent && (
-                      <button 
-                        onClick={() => {
-                          setIsEditing(false);
-                          setFormTitle(selectedEvent.title);
-                          setFormContent(selectedEvent.content || '');
-                        }}
-                        className="flex-1 py-2 bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors font-bold text-sm"
-                      >
-                        취소
-                      </button>
-                    )}
-                    <button 
-                      onClick={handleSave}
-                      disabled={isLoading}
-                      className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-bold text-sm disabled:opacity-50"
-                    >
-                      {isLoading ? '저장 중...' : '저장'}
-                    </button>
-                  </div>
+          <div className="p-4 flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4">
+            {isEditing || !selectedEvent ? (
+              // --- Edit Mode ---
+              <div className="flex flex-col gap-4 h-full">
+                <div className="flex flex-col gap-1.5 shrink-0">
+                  <label className="text-xs font-bold text-gray-500">날짜</label>
+                  <input 
+                    type="date" 
+                    value={selectedDate || ''}
+                    onChange={e => setSelectedDate(e.target.value)}
+                    className="w-full p-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
                 </div>
-              ) : (
-                // --- View Mode ---
-                <div className="flex flex-col h-full">
-                  <div className="text-xs text-blue-600 dark:text-blue-400 font-bold mb-1">{selectedEvent.date}</div>
-                  <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{selectedEvent.title}</h4>
-                  
-                  <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg p-3 min-h-[150px] text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                    {selectedEvent.content || <span className="text-gray-400 italic">내용 없음</span>}
-                  </div>
-                  
-                  <div className="flex gap-2 mt-auto pt-6">
-                    <button 
-                      onClick={handleDelete}
-                      disabled={isLoading}
-                      className="flex-1 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-100 transition-colors font-bold text-sm disabled:opacity-50"
-                    >
-                      삭제
-                    </button>
-                    <button 
-                      onClick={() => setIsEditing(true)}
-                      className="flex-1 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 transition-colors font-bold text-sm"
-                    >
-                      수정
-                    </button>
-                  </div>
+                <div className="flex flex-col gap-1.5 shrink-0">
+                  <label className="text-xs font-bold text-gray-500">제목</label>
+                  <input 
+                    type="text" 
+                    value={formTitle}
+                    onChange={e => setFormTitle(e.target.value)}
+                    placeholder="일정 제목"
+                    className="w-full p-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
                 </div>
-              )}
-            </>
-          )}
+                <div className="flex flex-col gap-1.5 flex-1 min-h-[200px]">
+                  <label className="text-xs font-bold text-gray-500">상세 내용</label>
+                  <textarea 
+                    value={formContent}
+                    onChange={e => setFormContent(e.target.value)}
+                    placeholder="내용을 입력하세요..."
+                    className="w-full p-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none flex-1 custom-scrollbar"
+                  />
+                </div>
+                
+                <div className="flex gap-2 mt-auto pt-4 shrink-0">
+                  {selectedEvent && (
+                    <button 
+                      onClick={() => {
+                        setIsEditing(false);
+                        setFormTitle(selectedEvent.title);
+                        setFormContent(selectedEvent.content || '');
+                      }}
+                      className="flex-1 py-2 bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors font-bold text-sm"
+                    >
+                      취소
+                    </button>
+                  )}
+                  <button 
+                    onClick={handleSave}
+                    disabled={isLoading}
+                    className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-bold text-sm disabled:opacity-50"
+                  >
+                    {isLoading ? '저장 중...' : '저장'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // --- View Mode ---
+              <div className="flex flex-col h-full">
+                <div className="text-xs text-blue-600 dark:text-blue-400 font-bold mb-1 shrink-0">{selectedEvent.date}</div>
+                <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-4 shrink-0">{selectedEvent.title}</h4>
+                
+                <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg p-3 min-h-[150px] text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap flex-1 overflow-y-auto custom-scrollbar">
+                  {selectedEvent.content || <span className="text-gray-400 italic">내용 없음</span>}
+                </div>
+                
+                <div className="flex gap-2 mt-auto pt-6 shrink-0">
+                  <button 
+                    onClick={handleDelete}
+                    disabled={isLoading}
+                    className="flex-1 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-100 transition-colors font-bold text-sm disabled:opacity-50"
+                  >
+                    삭제
+                  </button>
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    className="flex-1 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 transition-colors font-bold text-sm"
+                  >
+                    수정
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
       
     </div>
   );

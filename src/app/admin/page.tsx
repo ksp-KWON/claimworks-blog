@@ -222,57 +222,8 @@ export default function AdminPage() {
   return (
     <div className="flex flex-col h-[calc(100dvh-64px)] bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
       
-      {/* 1. Top Header */}
-      <header className="h-14 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 shrink-0 shadow-sm z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black shadow-inner shadow-white/20">
-            C
-          </div>
-          <h1 className="text-lg font-black tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
-            ClaimWorks <span className="text-gray-300 dark:text-zinc-600 font-light">|</span> 통합 관리자
-          </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              sessionStorage.removeItem('admin_auth');
-              setIsLoggedIn(false);
-            }}
-            className="px-4 py-1.5 rounded-full text-sm font-bold bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50 transition-colors flex items-center gap-1.5"
-            title="로그아웃"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-            <span className="hidden sm:inline">로그아웃</span>
-          </button>
-
-          <button 
-            onClick={handleCreateBlankPost}
-            className="px-4 py-1.5 rounded-full text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors flex items-center gap-1.5"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
-            새 문서 작성
-          </button>
-          
-          <button 
-            onClick={handleSavePost}
-            disabled={isLoading || activeApp !== 'editor'}
-            className={`px-5 py-1.5 rounded-full text-sm font-bold shadow-sm flex items-center gap-1.5 transition-all
-              ${activeApp === 'editor' 
-                ? 'bg-gray-900 text-white hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100' 
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-zinc-800 dark:text-zinc-500'}`}
-          >
-            {isLoading ? (
-              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
-            )}
-            저장 및 발행
-          </button>
-        </div>
-      </header>
-
-      {/* 2. Main Workspace */}
-      <div className="flex flex-1 overflow-hidden relative">
+      {/* Main Workspace - No Global Header */}
+      <div className="flex flex-1 overflow-hidden relative h-full">
         
         {/* Master Sidebar */}
         <MasterSidebar 
@@ -280,6 +231,10 @@ export default function AdminPage() {
           setActiveApp={setActiveApp} 
           isCollapsed={isSidebarCollapsed} 
           toggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
+          onLogout={() => {
+            sessionStorage.removeItem('admin_auth');
+            setIsLoggedIn(false);
+          }}
         />
 
         {/* Dynamic Workspace based on activeApp */}
@@ -334,13 +289,43 @@ export default function AdminPage() {
             />
           )}
 
-          {/* Markdown Editor (Only visible when activeApp is 'editor') */}
+          {/* Text Editor App */}
           {activeApp === 'editor' && (
-            <div className="flex-1 flex overflow-hidden animate-in fade-in duration-300 zoom-in-95">
-              <MarkdownEditor 
-                title={title} setTitle={setTitle}
-                content={content} setContent={setContent}
-              />
+            <div className="flex flex-col h-full w-full relative">
+              {/* Editor Header */}
+              <div className="h-14 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 shrink-0 z-10 shadow-sm">
+                <h2 className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  블로그 문서 편집기
+                </h2>
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={handleCreateBlankPost}
+                    className="px-4 py-1.5 rounded-full text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors flex items-center gap-1.5"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
+                    새 문서
+                  </button>
+                  <button 
+                    onClick={handleSavePost}
+                    disabled={isLoading}
+                    className={`px-5 py-1.5 rounded-full text-sm font-bold shadow-sm flex items-center gap-1.5 transition-all bg-gray-900 text-white hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100`}
+                  >
+                    {isLoading ? (
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
+                    )}
+                    저장 및 발행
+                  </button>
+                </div>
+              </div>
+              <div className="flex-1 flex overflow-hidden">
+                <MarkdownEditor 
+                  title={title} setTitle={setTitle}
+                  content={content} setContent={setContent}
+                />
+              </div>
             </div>
           )}
 

@@ -93,7 +93,8 @@ export default function ChatWidget() {
         .from('chat_sessions')
         .insert({ 
           visitor_id: visitorId,
-          visitor_nickname: nickname
+          visitor_nickname: nickname,
+          status: '대기중'
         })
         .select('id')
         .single();

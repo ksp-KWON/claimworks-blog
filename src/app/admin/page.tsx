@@ -232,6 +232,18 @@ export default function AdminPage() {
           </h1>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              sessionStorage.removeItem('admin_auth');
+              setIsLoggedIn(false);
+            }}
+            className="px-4 py-1.5 rounded-full text-sm font-bold bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50 transition-colors flex items-center gap-1.5"
+            title="로그아웃"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+            <span className="hidden sm:inline">로그아웃</span>
+          </button>
+
           <button 
             onClick={handleCreateBlankPost}
             className="px-4 py-1.5 rounded-full text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors flex items-center gap-1.5"

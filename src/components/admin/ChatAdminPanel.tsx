@@ -391,9 +391,6 @@ export default function ChatAdminPanel() {
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                     {visitorLabel(activeSession!)}
                   </h3>
-                  <span className={`text-xs px-2 py-0.5 rounded-full border ${getStatusColor(activeSession!.status || '대기')} mt-0.5 inline-block`}>
-                    {activeSession!.status || '대기'}
-                  </span>
                 </div>
               </div>
               
@@ -401,10 +398,10 @@ export default function ChatAdminPanel() {
               <div className="relative">
                 <div className="flex items-center gap-2">
                   <button 
-                    onClick={() => changeStatus('완료')}
-                    className="text-sm font-bold bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-md transition-colors"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className={`text-sm font-bold px-3 py-1.5 rounded-md transition-colors border ${getStatusColor(activeSession!.status || '대기')}`}
                   >
-                    완료됨
+                    {activeSession!.status || '대기'}
                   </button>
                   <button 
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -418,9 +415,9 @@ export default function ChatAdminPanel() {
                   <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-gray-200 dark:border-zinc-700 py-1 z-20 overflow-hidden">
                     <button onClick={() => changeStatus('진행중')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">진행중으로 변경</button>
                     <button onClick={() => changeStatus('보류')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">보류하기</button>
-                    <button onClick={() => changeStatus('차단')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">차단하기</button>
+                    <button onClick={() => changeStatus('완료')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">완료하기</button>
                     <div className="border-t border-gray-100 dark:border-zinc-700 my-1"></div>
-                    <button onClick={deleteSession} className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400">나가기 (삭제)</button>
+                    <button onClick={deleteSession} className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400">삭제하기</button>
                   </div>
                 )}
               </div>

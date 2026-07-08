@@ -219,7 +219,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
+    <div className="flex flex-col h-[calc(100dvh-64px)] bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
       
       {/* 1. Top Header */}
       <header className="h-14 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 shrink-0 shadow-sm z-20">

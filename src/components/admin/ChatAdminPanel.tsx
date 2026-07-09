@@ -264,10 +264,10 @@ export default function ChatAdminPanel() {
   };
 
   return (
-    <div className="flex flex-1 h-full bg-white dark:bg-zinc-950 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 overflow-hidden">
+    <div className="flex flex-1 h-full gap-4">
       
       {/* 1단: 세션 목록 (좌측) */}
-      <div className="w-[320px] flex flex-col border-r border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-900/50">
+      <div className="w-[320px] flex flex-col shrink-0 bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 overflow-hidden">
         
         {/* 통일된 상단 헤더 (검색영역) */}
         <div className="h-[72px] px-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center shrink-0">
@@ -389,7 +389,7 @@ export default function ChatAdminPanel() {
       </div>
 
       {/* 2단: 대화창 (중앙) */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-zinc-950 relative">
+      <div className="flex-1 flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 overflow-hidden relative">
         {!selectedId ? (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400 dark:text-zinc-600">
             <svg className="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
@@ -502,8 +502,8 @@ export default function ChatAdminPanel() {
 
       {/* 3단: 오른쪽 패널 (항목관리 모드일 때만 표시) */}
       {selectedId && activeSession && (
-        <div className="w-[320px] bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 flex flex-col shrink-0">
-          <div className="h-[72px] px-6 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-950 flex justify-between items-center">
+        <div className="w-[320px] bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 flex flex-col shrink-0 overflow-hidden">
+          <div className="h-[72px] px-6 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center">
             <h3 className="text-sm font-bold text-gray-900 dark:text-white">📝 관리자 전용 고객 메모</h3>
             <button 
               onClick={saveMemo}

@@ -133,9 +133,6 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
           
           {(!isCollapsed && isCalendarExpanded) && (
             <div className="mt-1 ml-4 pl-4 border-l border-zinc-600/50 flex flex-col gap-1 py-1">
-              <div className="mt-1 mb-1 px-3 flex items-center text-xs font-bold text-zinc-500 uppercase">
-                내 캘린더 (라벨)
-              </div>
               
               {labels.map((label, index) => (
                 <div key={label.id} className="flex items-center justify-between px-3 py-1.5 text-sm group">

@@ -15,6 +15,10 @@ export default function CalendarAdminPanel() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<AdminCalendarEvent | null>(null);
   
+  // Linkable Data State
+  const [chatSessions, setChatSessions] = useState<{id: string; visitor_name: string; created_at: string}[]>([]);
+  const [consultations, setConsultations] = useState<{id: string; name: string; created_at: string}[]>([]);
+
   // Labels hook
   const { labels } = useCalendarLabels();
   
@@ -41,6 +45,17 @@ export default function CalendarAdminPanel() {
 
   useEffect(() => {
     fetchEvents();
+  }, []);
+
+  useEffect(() => {
+    const fetchLinkableData = async () => {
+      const { data: chats } = await supabase.from('chat_sessions').select('id, visitor_name, created_at').order('created_at', { ascending: false }).limit(50);
+      if (chats) setChatSessions(chats);
+
+      const { data: cons } = await supabase.from('consultations').select('id, name, created_at').order('created_at', { ascending: false }).limit(50);
+      if (cons) setConsultations(cons);
+    };
+    fetchLinkableData();
   }, []);
 
   useEffect(() => {
@@ -698,6 +713,56 @@ export default function CalendarAdminPanel() {
                       </option>
                     ))}
                   </select>
+                </div>
+                <div className="flex flex-col gap-1.5 shrink-0">
+                  <label className="text-xs font-bold text-gray-500">연결된 접수/채팅 (선택)</label>
+                  <div className="flex gap-2">
+                    <select
+                      value={formSourceApp === 'consultations' ? formSourceId : ''}
+                      onChange={e => {
+                        if (e.target.value) {
+                          setFormSourceApp('consultations');
+                          setFormSourceId(e.target.value);
+                          const cons = consultations.find(c => c.id === e.target.value);
+                          if (cons && !formTitle) setFormTitle(`${cons.name} 고객 접수건`);
+                        } else if (formSourceApp === 'consultations') {
+                          setFormSourceApp('');
+                          setFormSourceId('');
+                        }
+                      }}
+                      className="flex-1 p-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                    >
+                      <option value="">접수 내역 선택안함</option>
+                      {consultations.map(c => (
+                        <option key={c.id} value={c.id}>
+                          [접수] {c.name} ({new Date(c.created_at).toLocaleDateString()})
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={formSourceApp === 'chat-list' ? formSourceId : ''}
+                      onChange={e => {
+                        if (e.target.value) {
+                          setFormSourceApp('chat-list');
+                          setFormSourceId(e.target.value);
+                          const chat = chatSessions.find(c => c.id === e.target.value);
+                          if (chat && !formTitle) setFormTitle(`${chat.visitor_name} 고객 채팅건`);
+                        } else if (formSourceApp === 'chat-list') {
+                          setFormSourceApp('');
+                          setFormSourceId('');
+                        }
+                      }}
+                      className="flex-1 p-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                    >
+                      <option value="">채팅 내역 선택안함</option>
+                      {chatSessions.map(c => (
+                        <option key={c.id} value={c.id}>
+                          [채팅] {c.visitor_name} ({new Date(c.created_at).toLocaleDateString()})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div className="flex flex-col gap-1.5 flex-1 min-h-[200px]">
                   <div className="flex justify-between items-center">

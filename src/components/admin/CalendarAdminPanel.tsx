@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase, AdminCalendarEvent } from '@/lib/supabase';
+import { useCalendarLabels } from './useCalendarLabels';
 
 type ViewMode = 'day' | 'week' | 'month' | 'year' | 'agenda';
 
@@ -9,13 +10,19 @@ export default function CalendarAdminPanel() {
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<AdminCalendarEvent[]>([]);
+  const [holidays, setHolidays] = useState<{date: string; localName: string}[]>([]);
+  
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<AdminCalendarEvent | null>(null);
+  
+  // Labels hook
+  const { labels } = useCalendarLabels();
   
   // Form state
   const [isEditing, setIsEditing] = useState(false);
   const [formTitle, setFormTitle] = useState('');
   const [formContent, setFormContent] = useState('');
+  const [formLabelId, setFormLabelId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchEvents = async () => {
@@ -33,6 +40,41 @@ export default function CalendarAdminPanel() {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      try {
+        const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${currentDate.getFullYear()}/KR`);
+        if (res.ok) {
+          const data = await res.json();
+          setHolidays(data.map((h: any) => ({ date: h.date, localName: h.localName })));
+        }
+      } catch (e) {
+        console.error('Failed to fetch holidays', e);
+      }
+    };
+    fetchHolidays();
+  }, [currentDate.getFullYear()]);
+
+  const parseContent = (content?: string) => {
+    if (!content) return { text: '', labelId: '' };
+    try {
+      const parsed = JSON.parse(content);
+      if (parsed.text !== undefined) return parsed as { text: string; labelId: string };
+      return { text: content, labelId: '' };
+    } catch {
+      return { text: content, labelId: '' };
+    }
+  };
+
+  const getFilteredEvents = () => {
+    return events.filter(ev => {
+      const { labelId } = parseContent(ev.content);
+      if (!labelId) return true; // No label -> always show
+      const label = labels.find(l => l.id === labelId);
+      return label ? label.active : true;
+    });
+  };
 
   const formatDateString = (d: Date) => {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -66,6 +108,7 @@ export default function CalendarAdminPanel() {
     setIsEditing(true);
     setFormTitle('');
     setFormContent('');
+    setFormLabelId('');
   };
 
   const handleEventClick = (e: React.MouseEvent, event: AdminCalendarEvent) => {
@@ -74,7 +117,9 @@ export default function CalendarAdminPanel() {
     setSelectedEvent(event);
     setIsEditing(false);
     setFormTitle(event.title);
-    setFormContent(event.content || '');
+    const { text, labelId } = parseContent(event.content);
+    setFormContent(text);
+    setFormLabelId(labelId);
   };
 
   const handleCreateNew = () => {
@@ -85,6 +130,7 @@ export default function CalendarAdminPanel() {
     setIsEditing(true);
     setFormTitle('');
     setFormContent('');
+    setFormLabelId('');
   };
 
   const handleSave = async () => {
@@ -94,10 +140,12 @@ export default function CalendarAdminPanel() {
     }
     setIsLoading(true);
     
+    const contentToSave = JSON.stringify({ text: formContent, labelId: formLabelId });
+    
     if (selectedEvent) {
       const { error } = await supabase
         .from('admin_calendar_events')
-        .update({ title: formTitle, content: formContent })
+        .update({ title: formTitle, content: contentToSave })
         .eq('id', selectedEvent.id);
         
       if (!error) {
@@ -110,7 +158,7 @@ export default function CalendarAdminPanel() {
     } else {
       const { error } = await supabase
         .from('admin_calendar_events')
-        .insert([{ date: selectedDate, title: formTitle, content: formContent }]);
+        .insert([{ date: selectedDate, title: formTitle, content: contentToSave }]);
         
       if (!error) {
         setIsEditing(false);
@@ -137,6 +185,7 @@ export default function CalendarAdminPanel() {
       setSelectedEvent(null);
       setFormTitle('');
       setFormContent('');
+      setFormLabelId('');
       fetchEvents();
     } else {
       console.error('Delete error:', error);
@@ -172,8 +221,9 @@ export default function CalendarAdminPanel() {
           ))}
           {days.map(d => {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-            const dayEvents = events.filter(e => e.date === dateStr);
+            const dayEvents = getFilteredEvents().filter(e => e.date === dateStr);
             const isToday = dateStr === formatDateString(new Date());
+            const holiday = holidays.find(h => h.date === dateStr);
             const isSelected = dateStr === selectedDate;
             const weekDay = new Date(year, month, d).getDay();
             
@@ -188,26 +238,38 @@ export default function CalendarAdminPanel() {
                 <div className="flex justify-between items-start mb-1 px-1">
                   <span className={`text-sm font-medium w-6 h-6 flex items-center justify-center rounded-full
                     ${isToday ? 'bg-blue-500 text-white' : 
-                      weekDay === 0 ? 'text-red-500' : 
+                      (weekDay === 0 || holiday) ? 'text-red-500' : 
                       weekDay === 6 ? 'text-blue-500' : 'text-gray-700 dark:text-gray-300'}
                   `}>
                     {d}
                   </span>
                 </div>
                 <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1">
-                  {dayEvents.map(ev => (
-                    <div 
-                      key={ev.id} 
-                      onClick={(e) => handleEventClick(e, ev)}
-                      className={`text-xs px-1.5 py-0.5 rounded truncate border ${
-                        selectedEvent?.id === ev.id 
-                          ? 'bg-blue-500 text-white border-blue-600' 
-                          : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700'
-                      }`}
-                    >
-                      {ev.title}
+                  {holiday && (
+                    <div className="text-xs px-1.5 py-0.5 rounded truncate bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 font-bold">
+                      {holiday.localName}
                     </div>
-                  ))}
+                  )}
+                  {dayEvents.map(ev => {
+                    const { labelId } = parseContent(ev.content);
+                    const label = labels.find(l => l.id === labelId);
+                    const labelColor = label ? label.color : '#3b82f6';
+                    
+                    return (
+                      <div 
+                        key={ev.id} 
+                        onClick={(e) => handleEventClick(e, ev)}
+                        className={`text-xs px-1.5 py-0.5 rounded truncate border text-white ${
+                          selectedEvent?.id === ev.id 
+                            ? 'ring-2 ring-black dark:ring-white opacity-100' 
+                            : 'opacity-90 hover:opacity-100'
+                        }`}
+                        style={{ backgroundColor: labelColor, borderColor: labelColor }}
+                      >
+                        {ev.title}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -236,8 +298,9 @@ export default function CalendarAdminPanel() {
         <div className="flex-1 flex min-w-[800px]">
           {weekDays.map((date, i) => {
             const dateStr = formatDateString(date);
-            const dayEvents = events.filter(e => e.date === dateStr);
+            const dayEvents = getFilteredEvents().filter(e => e.date === dateStr);
             const isToday = dateStr === formatDateString(new Date());
+            const holiday = holidays.find(h => h.date === dateStr);
             const isSelected = dateStr === selectedDate;
             const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
             
@@ -254,25 +317,32 @@ export default function CalendarAdminPanel() {
                   `}>
                     {date.getDate()}
                   </div>
+                  {holiday && <div className="text-[10px] font-bold text-red-500 mt-1 truncate">{holiday.localName}</div>}
                 </div>
                 <div 
-                  className="flex-1 p-2 space-y-2 overflow-y-auto custom-scrollbar cursor-pointer hover:bg-gray-50/50 dark:hover:bg-zinc-900/30"
+                  className="flex-1 overflow-y-auto custom-scrollbar p-1 space-y-1"
                   onClick={() => handleDateClick(dateStr)}
                 >
-                  {dayEvents.map(ev => (
-                    <div 
-                      key={ev.id} 
-                      onClick={(e) => handleEventClick(e, ev)}
-                      className={`p-2 rounded-lg border text-sm shadow-sm ${
-                        selectedEvent?.id === ev.id 
-                          ? 'bg-blue-500 text-white border-blue-600' 
-                          : 'bg-white dark:bg-zinc-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-zinc-700 hover:border-blue-300'
-                      }`}
-                    >
-                      <div className="font-bold mb-1">{ev.title}</div>
-                      {ev.content && <div className="text-xs opacity-80 line-clamp-2">{ev.content}</div>}
-                    </div>
-                  ))}
+                  {dayEvents.map(ev => {
+                    const { labelId } = parseContent(ev.content);
+                    const label = labels.find(l => l.id === labelId);
+                    const labelColor = label ? label.color : '#3b82f6';
+                    
+                    return (
+                      <div 
+                        key={ev.id} 
+                        onClick={(e) => handleEventClick(e, ev)}
+                        className={`text-xs px-2 py-1.5 rounded border text-white ${
+                          selectedEvent?.id === ev.id 
+                            ? 'ring-2 ring-black dark:ring-white opacity-100' 
+                            : 'opacity-90 hover:opacity-100'
+                        }`}
+                        style={{ backgroundColor: labelColor, borderColor: labelColor }}
+                      >
+                        <div className="font-bold truncate">{ev.title}</div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -285,51 +355,57 @@ export default function CalendarAdminPanel() {
   // 3. Day View
   const renderDayView = () => {
     const dateStr = formatDateString(currentDate);
-    const dayEvents = events.filter(e => e.date === dateStr);
-    const dayNames = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    const dayEvents = getFilteredEvents().filter(e => e.date === dateStr);
+    const isToday = dateStr === formatDateString(new Date());
+    const holiday = holidays.find(h => h.date === dateStr);
+    const dayName = ['일', '월', '화', '수', '목', '금', '토'][currentDate.getDay()];
     
     return (
-      <div className="flex-1 flex flex-col min-h-0 p-6 bg-white dark:bg-zinc-950 overflow-y-auto custom-scrollbar">
-        <div className="mb-6 pb-4 border-b border-gray-200 dark:border-zinc-800">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {currentDate.getDate()}일 <span className="text-xl text-gray-500 font-normal">{dayNames[currentDate.getDay()]}</span>
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">{currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월</p>
+      <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-950">
+        <div className="p-4 border-b border-gray-200 dark:border-zinc-800 text-center bg-gray-50 dark:bg-zinc-900">
+          <div className={`text-sm font-bold mb-1 ${currentDate.getDay() === 0 ? 'text-red-500' : currentDate.getDay() === 6 ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'}`}>
+            {dayName}요일
+          </div>
+          <div className={`text-3xl font-black ${isToday ? 'text-blue-500' : 'text-gray-800 dark:text-gray-100'}`}>
+            {currentDate.getDate()}
+          </div>
+          {holiday && (
+            <div className="mt-2 text-sm font-bold text-red-500">
+              {holiday.localName}
+            </div>
+          )}
         </div>
         
-        <div className="flex-1">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2">
           {dayEvents.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-40 text-gray-400">
-              <svg className="w-12 h-12 mb-3 text-gray-200 dark:text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              <p>이 날짜에 등록된 일정이 없습니다.</p>
+              <p>일정이 없습니다.</p>
               <button onClick={() => handleDateClick(dateStr)} className="mt-4 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 text-sm font-bold">
                 + 새 일정 추가하기
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {dayEvents.map(ev => (
+            dayEvents.map(ev => {
+              const { text, labelId } = parseContent(ev.content);
+              const label = labels.find(l => l.id === labelId);
+              const labelColor = label ? label.color : '#3b82f6';
+              
+              return (
                 <div 
                   key={ev.id} 
                   onClick={(e) => handleEventClick(e, ev)}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all hover:shadow-md ${
+                  className={`p-3 rounded-lg border text-white ${
                     selectedEvent?.id === ev.id 
-                      ? 'bg-blue-500 text-white border-blue-600 shadow-lg scale-[1.02]' 
-                      : 'bg-white dark:bg-zinc-900 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-zinc-800 hover:border-blue-300'
+                      ? 'ring-2 ring-black dark:ring-white opacity-100' 
+                      : 'opacity-90 hover:opacity-100'
                   }`}
+                  style={{ backgroundColor: labelColor, borderColor: labelColor }}
                 >
-                  <div className="font-bold text-lg mb-2">{ev.title}</div>
-                  {ev.content && <div className="text-sm opacity-80 whitespace-pre-wrap">{ev.content}</div>}
+                  <div className="font-bold text-base mb-1">{ev.title}</div>
+                  {text && <div className="text-sm opacity-90 line-clamp-2">{text}</div>}
                 </div>
-              ))}
-              <div 
-                onClick={() => handleDateClick(dateStr)}
-                className="p-4 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900/50 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-500 transition-colors min-h-[120px]"
-              >
-                <span className="text-2xl mb-1">+</span>
-                <span className="text-sm font-bold">일정 추가</span>
-              </div>
-            </div>
+              );
+            })
           )}
         </div>
       </div>
@@ -389,51 +465,47 @@ export default function CalendarAdminPanel() {
 
   // 5. Agenda View
   const renderAgendaView = () => {
-    // Only show events from today onwards, sorted by date
-    const todayStr = formatDateString(new Date());
-    const upcoming = events.filter(e => e.date >= todayStr).sort((a, b) => a.date.localeCompare(b.date));
-    
-    // Group by date
-    const grouped = upcoming.reduce((acc, ev) => {
-      if (!acc[ev.date]) acc[ev.date] = [];
-      acc[ev.date].push(ev);
-      return acc;
-    }, {} as Record<string, AdminCalendarEvent[]>);
+    const upcomingEvents = getFilteredEvents()
+      .filter(e => e.date >= formatDateString(currentDate))
+      .slice(0, 50);
 
     return (
-      <div className="flex-1 min-h-0 p-6 overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-zinc-950">
-        <div className="max-w-3xl mx-auto space-y-8">
-          {Object.keys(grouped).length === 0 ? (
-            <div className="text-center py-20 text-gray-500">예정된 다가오는 일정이 없습니다.</div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-gray-50 dark:bg-zinc-950">
+        <div className="max-w-3xl mx-auto space-y-4">
+          {upcomingEvents.length === 0 ? (
+            <div className="text-center py-20 text-gray-500 dark:text-gray-400">
+              예정된 일정이 없습니다.
+            </div>
           ) : (
-            Object.keys(grouped).map(dateStr => {
-              const d = new Date(dateStr);
-              const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-              const isToday = dateStr === todayStr;
+            upcomingEvents.map(ev => {
+              const { text, labelId } = parseContent(ev.content);
+              const label = labels.find(l => l.id === labelId);
               
               return (
-                <div key={dateStr} className="flex gap-6">
-                  <div className="w-24 shrink-0 text-right">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{d.getMonth() + 1}월</div>
-                    <div className={`text-3xl font-light ${isToday ? 'text-blue-500 font-bold' : 'text-gray-900 dark:text-white'}`}>{d.getDate()}</div>
-                    <div className="text-xs text-gray-400 mt-1">{dayNames[d.getDay()]}요일</div>
+                <div 
+                  key={ev.id}
+                  onClick={(e) => handleEventClick(e, ev)}
+                  className={`flex gap-4 p-4 rounded-xl border bg-white dark:bg-zinc-900 cursor-pointer transition-shadow hover:shadow-md ${
+                    selectedEvent?.id === ev.id ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-200 dark:border-zinc-800'
+                  }`}
+                >
+                  <div className="w-24 shrink-0 flex flex-col items-center justify-center text-center border-r border-gray-100 dark:border-zinc-800 pr-4">
+                    <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{ev.date.substring(0, 7)}</span>
+                    <span className="text-2xl font-black text-gray-800 dark:text-gray-100">{ev.date.substring(8, 10)}</span>
                   </div>
-                  <div className="flex-1 space-y-3 pt-1">
-                    {grouped[dateStr].map(ev => (
-                      <div 
-                        key={ev.id}
-                        onClick={(e) => {
-                          setCurrentDate(new Date(ev.date));
-                          handleEventClick(e, ev);
-                        }}
-                        className={`p-4 rounded-xl border bg-white dark:bg-zinc-900 shadow-sm cursor-pointer hover:border-blue-300 transition-colors ${
-                          selectedEvent?.id === ev.id ? 'ring-2 ring-blue-500 border-blue-500' : 'border-gray-200 dark:border-zinc-800'
-                        }`}
-                      >
-                        <div className="font-bold text-gray-900 dark:text-white">{ev.title}</div>
-                        {ev.content && <div className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{ev.content}</div>}
-                      </div>
-                    ))}
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                    <div className="flex items-center gap-2 mb-1">
+                      {label && (
+                        <span 
+                          className="px-2 py-0.5 rounded text-[10px] font-bold text-white"
+                          style={{ backgroundColor: label.color }}
+                        >
+                          {label.name}
+                        </span>
+                      )}
+                      <h4 className="font-bold text-lg text-gray-900 dark:text-white truncate">{ev.title}</h4>
+                    </div>
+                    {text && <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{text}</p>}
                   </div>
                 </div>
               );
@@ -568,6 +640,21 @@ export default function CalendarAdminPanel() {
                     className="w-full p-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
+                <div className="flex flex-col gap-1.5 shrink-0">
+                  <label className="text-xs font-bold text-gray-500">라벨</label>
+                  <select
+                    value={formLabelId}
+                    onChange={e => setFormLabelId(e.target.value)}
+                    className="w-full p-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  >
+                    <option value="">라벨 없음</option>
+                    {labels.map(label => (
+                      <option key={label.id} value={label.id}>
+                        {label.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div className="flex flex-col gap-1.5 flex-1 min-h-[200px]">
                   <label className="text-xs font-bold text-gray-500">상세 내용</label>
                   <textarea 
@@ -584,7 +671,9 @@ export default function CalendarAdminPanel() {
                       onClick={() => {
                         setIsEditing(false);
                         setFormTitle(selectedEvent.title);
-                        setFormContent(selectedEvent.content || '');
+                        const { text, labelId } = parseContent(selectedEvent.content);
+                        setFormContent(text);
+                        setFormLabelId(labelId);
                       }}
                       className="flex-1 py-2 bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors font-bold text-sm"
                     >
@@ -603,11 +692,29 @@ export default function CalendarAdminPanel() {
             ) : (
               // --- View Mode ---
               <div className="flex flex-col h-full">
-                <div className="text-xs text-blue-600 dark:text-blue-400 font-bold mb-1 shrink-0">{selectedEvent.date}</div>
-                <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-4 shrink-0">{selectedEvent.title}</h4>
+                <div className="flex justify-between items-start mb-4 shrink-0">
+                  <div>
+                    <div className="text-xs text-blue-600 dark:text-blue-400 font-bold mb-1">{selectedEvent.date}</div>
+                    <div className="flex items-center gap-2">
+                      {(() => {
+                        const { labelId } = parseContent(selectedEvent.content);
+                        const label = labels.find(l => l.id === labelId);
+                        return label ? (
+                          <span 
+                            className="px-2 py-0.5 rounded text-[10px] font-bold text-white shrink-0"
+                            style={{ backgroundColor: label.color }}
+                          >
+                            {label.name}
+                          </span>
+                        ) : null;
+                      })()}
+                      <h4 className="text-xl font-bold text-gray-900 dark:text-white">{selectedEvent.title}</h4>
+                    </div>
+                  </div>
+                </div>
                 
                 <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg p-3 min-h-[150px] text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap flex-1 overflow-y-auto custom-scrollbar">
-                  {selectedEvent.content || <span className="text-gray-400 italic">내용 없음</span>}
+                  {parseContent(selectedEvent.content).text || <span className="text-gray-400 italic">내용 없음</span>}
                 </div>
                 
                 <div className="flex gap-2 mt-auto pt-6 shrink-0">

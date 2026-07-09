@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useCalendarLabels } from './useCalendarLabels';
 
 export type AdminAppType = 
   | 'calendar'
@@ -17,14 +18,34 @@ interface MasterSidebarProps {
 
 export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, toggleCollapse, onLogout }: MasterSidebarProps) {
   // Accordion states
+  const [isCalendarExpanded, setIsCalendarExpanded] = useState(true);
   const [isChatExpanded, setIsChatExpanded] = useState(true);
   const [isConsultExpanded, setIsConsultExpanded] = useState(true);
   const [isPostsExpanded, setIsPostsExpanded] = useState(true);
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
 
+  // Labels hook
+  const { labels, toggleLabelActive, addLabel, deleteLabel } = useCalendarLabels();
+
   const isChatActive = activeApp.startsWith('chat-');
   const isConsultActive = activeApp.startsWith('consult-');
   const isPostActive = activeApp.startsWith('post-') || activeApp === 'editor';
+
+  const handleAddLabel = () => {
+    const name = window.prompt('새 라벨 이름을 입력하세요:');
+    if (!name || !name.trim()) return;
+    // Basic color selection
+    const colors = ['#4285f4', '#fbbc04', '#ea4335', '#34a853', '#8e24aa', '#f06292', '#00acc1'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    addLabel(name.trim(), randomColor);
+  };
+
+  const handleDeleteLabel = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (window.confirm('이 라벨을 삭제하시겠습니까? (기존 일정의 라벨은 유지되지만 필터링은 불가능해집니다)')) {
+      deleteLabel(id);
+    }
+  };
 
   return (
     <div 
@@ -50,12 +71,16 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
           </button>
         </div>
 
-        {/* 0. Calendar */}
+        {/* 0. Calendar (상담일정) */}
         <div className="px-3">
           <button
-            onClick={() => setActiveApp('calendar')}
-            className={`w-full flex items-center px-3 py-2.5 rounded-lg transition-colors ${
-              activeApp === 'calendar' 
+            onClick={() => {
+              if (isCollapsed) toggleCollapse();
+              setIsCalendarExpanded(!isCalendarExpanded);
+              if (activeApp !== 'calendar') setActiveApp('calendar');
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
+              activeApp === 'calendar' && !isCalendarExpanded
                 ? 'bg-zinc-800 text-white font-bold' 
                 : 'hover:bg-zinc-800/50 text-zinc-300 hover:text-white'
             }`}
@@ -64,10 +89,65 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
               <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              {!isCollapsed && <span className="text-sm font-bold">업무일정</span>}
+              {!isCollapsed && <span className="text-sm font-bold">상담일정</span>}
             </div>
+            {!isCollapsed && (
+              <svg className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${isCalendarExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
           </button>
+          
+          {(!isCollapsed && isCalendarExpanded) && (
+            <div className="mt-1 ml-4 pl-4 border-l border-zinc-600/50 flex flex-col gap-1 py-1">
+              <button
+                onClick={() => setActiveApp('calendar')}
+                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${
+                  activeApp === 'calendar' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                }`}
+              >
+                캘린더 보기
+              </button>
+              
+              <div className="mt-2 mb-1 px-3 flex items-center justify-between text-xs font-bold text-zinc-500 uppercase">
+                내 캘린더 (라벨)
+                <button 
+                  onClick={handleAddLabel}
+                  className="hover:text-white text-lg leading-none"
+                  title="라벨 추가"
+                >
+                  +
+                </button>
+              </div>
+              
+              {labels.map(label => (
+                <div key={label.id} className="flex items-center justify-between px-3 py-1.5 text-sm group">
+                  <label className="flex items-center gap-2 cursor-pointer flex-1 truncate text-zinc-300 hover:text-white">
+                    <input 
+                      type="checkbox"
+                      checked={label.active}
+                      onChange={() => toggleLabelActive(label.id)}
+                      className="w-3.5 h-3.5 rounded-sm bg-transparent border-2 appearance-none cursor-pointer flex items-center justify-center after:content-[''] after:w-2 after:h-2 after:rounded-sm after:scale-0 checked:after:scale-100 after:transition-transform"
+                      style={{ 
+                        borderColor: label.color, 
+                        ...(label.active ? { '--tw-bg-opacity': 1, backgroundColor: label.color } : {}) 
+                      } as any}
+                    />
+                    <span className="truncate">{label.name}</span>
+                  </label>
+                  <button 
+                    onClick={(e) => handleDeleteLabel(e, label.id)}
+                    className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 transition-opacity"
+                    title="삭제"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+
 
         {/* 1. Chat Center */}
         <div className="px-3">

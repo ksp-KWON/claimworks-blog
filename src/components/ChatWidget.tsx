@@ -239,24 +239,24 @@ export default function ChatWidget() {
             id="claimworks-chat-window"
           >
             {/* 헤더 */}
-            <div className="flex items-center gap-3 px-4 py-3.5 shrink-0 bg-white dark:bg-[#202124] border-b border-gray-100 dark:border-white/10 rounded-t-2xl relative z-10">
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shrink-0 border border-gray-200 dark:border-zinc-700 overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)] relative">
-                <img src="/logo.png" alt="보상스쿨" className="w-6 h-6 object-contain" />
+            <div className="flex items-center gap-3 px-4 py-3 shrink-0 bg-gradient-to-r from-[#1a73e8] to-[#1557b0]">
+              <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center shrink-0 border border-white/30">
+                <span className="text-white font-black text-[13px]">보상</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-gray-900 dark:text-white font-extrabold text-[15px] leading-tight tracking-tight">보상스쿨 손해사정사</p>
-                <p className="text-gray-500 dark:text-gray-400 text-[11px] mt-0.5 flex items-center gap-1.5 font-medium">
-                  <span className={`inline-block w-1.5 h-1.5 rounded-full shadow-sm ${status === 'connected' ? 'bg-[#03c75a]' : status === 'error' ? 'bg-red-500' : 'bg-amber-400 animate-pulse'}`} />
-                  {status === 'connected' ? '온라인 (상담 가능)' : 
+                <p className="text-white font-bold text-sm leading-tight">보상스쿨 손해사정사</p>
+                <p className="text-blue-100 text-[11px] mt-0.5 flex items-center gap-1">
+                  <span className={`inline-block w-1.5 h-1.5 rounded-full ${status === 'connected' ? 'bg-green-300' : status === 'error' ? 'bg-red-300' : 'bg-yellow-300 animate-pulse'}`} />
+                  {status === 'connected' ? '연결됨' : 
                    status === 'need_nickname' ? '준비 완료' :
                    status === 'error' ? '연결 오류' : '연결 중...'}
                 </p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-8 h-8 rounded-full bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 flex items-center justify-center transition-colors border border-transparent hover:border-gray-200 dark:hover:border-white/10"
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
               >
-                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -403,7 +403,9 @@ export default function ChatWidget() {
             }}
             aria-label="보상 상담 채팅 열기"
           >
-            <img key="chat" src="/logo.png" alt="보상스쿨 채팅" className="w-8 h-8 object-contain" />
+            <motion.svg key="chat" className="w-7 h-7 text-[#1a73e8]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3C6.48 3 2 6.58 2 11C2 13.56 3.42 15.86 5.6 17.26C5.4 18.06 4.8 19.86 4.8 19.86C4.8 19.86 6.8 19.56 8.6 18.36C9.6 18.76 10.8 19 12 19C17.52 19 22 15.42 22 11C22 6.58 17.52 3 12 3Z"/>
+            </motion.svg>
 
             {/* 읽지 않은 메시지 뱃지 */}
             <AnimatePresence>
@@ -420,23 +422,9 @@ export default function ChatWidget() {
               )}
             </AnimatePresence>
 
-            {/* 은은한 글로우(디머) 효과 */}
+            {/* 전체 3D 테두리 빨간색 반짝임 효과 */}
             {unreadCount === 0 && (
-              <motion.div 
-                className="absolute inset-0 rounded-full pointer-events-none"
-                animate={{ 
-                  boxShadow: [
-                    '0 0 0px 0px rgba(26,115,232,0)', 
-                    '0 0 25px 8px rgba(26,115,232,0.4)', 
-                    '0 0 0px 0px rgba(26,115,232,0)'
-                  ] 
-                }}
-                transition={{ 
-                  duration: 4, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                }}
-              />
+              <div className="absolute inset-0 rounded-full border-2 border-red-500 animate-ping opacity-60 pointer-events-none"></div>
             )}
           </motion.button>
         )}

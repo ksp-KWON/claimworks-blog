@@ -30,23 +30,26 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
     <div 
       className={`relative bg-[#344253] text-zinc-300 flex flex-col transition-all duration-300 ease-in-out shrink-0 ${isCollapsed ? 'w-16' : 'w-[240px]'} border-r border-zinc-700/50`}
     >
-      {/* Side Tab Toggle Button */}
-      <button 
-        onClick={toggleCollapse}
-        className="absolute -right-[27px] top-12 w-7 h-14 bg-white border border-l-0 border-gray-200 rounded-r-lg flex items-center justify-center text-gray-500 hover:text-gray-700 shadow-[2px_0_8px_rgba(0,0,0,0.05)] z-[250] focus:outline-none"
-        title={isCollapsed ? "메뉴 펼치기" : "메뉴 접기"}
-      >
-        <svg 
-          className={`w-5 h-5 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`} 
-          fill="none" stroke="currentColor" viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-
       {/* Menu Items */}
       <div className="flex-1 overflow-y-auto py-6 custom-scrollbar space-y-2">
         
+        {/* Top Header Toggle */}
+        <div className="px-3 pb-2 mb-2 border-b border-zinc-600/50">
+          <button
+            onClick={toggleCollapse}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} px-3 py-2.5 rounded-lg transition-colors hover:bg-zinc-800/50 text-zinc-300 hover:text-white group`}
+            title={isCollapsed ? "메뉴 펼치기" : "메뉴 접기"}
+          >
+            {!isCollapsed && <span className="text-base font-bold text-white">관리자페이지</span>}
+            <svg 
+              className={`w-4 h-4 text-zinc-400 transition-transform duration-300 group-hover:text-white ${isCollapsed ? 'rotate-180' : ''}`} 
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        </div>
+
         {/* 0. Calendar */}
         <div className="px-3">
           <button
@@ -61,7 +64,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
               <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              {!isCollapsed && <span className="text-sm font-bold">대시보드(일정)</span>}
+              {!isCollapsed && <span className="text-sm font-bold">업무일정</span>}
             </div>
           </button>
         </div>

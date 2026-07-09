@@ -16,9 +16,18 @@ export default function ChatAdminPanel() {
   const [isSending, setIsSending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Memo State
+  // Memo & Form State
   const [memoText, setMemoText] = useState('');
   const [isSavingMemo, setIsSavingMemo] = useState(false);
+  const [rightPanelMode, setRightPanelMode] = useState<'memo' | 'form'>('memo');
+  const [formData, setFormData] = useState({
+    category: '근로재해',
+    diagnosis: '',
+    date: '',
+    location: '',
+    details: '',
+    inquiries: ''
+  });
 
   // Filters & Sorting State
   const [searchTerm, setSearchTerm] = useState('');
@@ -82,7 +91,21 @@ export default function ChatAdminPanel() {
     // Load Memo for selected session
     const activeSession = sessions.find(s => s.id === selectedId);
     if (activeSession) {
-      setMemoText(activeSession.customer_memo || '');
+      const memo = activeSession.customer_memo || '';
+      try {
+        if (memo.trim().startsWith('{') && memo.includes('"category"')) {
+          setFormData(JSON.parse(memo));
+          setMemoText('');
+          setRightPanelMode('form');
+        } else {
+          setMemoText(memo);
+          setRightPanelMode('memo');
+          setFormData({ category: '근로재해', diagnosis: '', date: '', location: '', details: '', inquiries: '' });
+        }
+      } catch (e) {
+        setMemoText(memo);
+        setRightPanelMode('memo');
+      }
     }
   }, [selectedId, loadMessages]);
 
@@ -167,13 +190,15 @@ export default function ChatAdminPanel() {
   const saveMemo = async () => {
     if (!selectedId) return;
     setIsSavingMemo(true);
+    const contentToSave = rightPanelMode === 'form' ? JSON.stringify(formData) : memoText;
     const { error } = await supabase
       .from('chat_sessions')
-      .update({ customer_memo: memoText })
+      .update({ customer_memo: contentToSave })
       .eq('id', selectedId);
     setIsSavingMemo(false);
     if (!error) {
-      setSessions(prev => prev.map(s => s.id === selectedId ? { ...s, customer_memo: memoText } : s));
+      setSessions(prev => prev.map(s => s.id === selectedId ? { ...s, customer_memo: contentToSave } : s));
+      alert('저장되었습니다.');
     }
   };
 
@@ -464,7 +489,8 @@ export default function ChatAdminPanel() {
         <div className="w-[320px] bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 flex flex-col shrink-0">
           <div className="px-3 py-3 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-950 flex gap-1.5 justify-between items-center w-full">
             <button 
-              className="flex-1 text-[11px] bg-white hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 py-1.5 rounded-md transition-colors border border-gray-200 dark:border-zinc-700 font-bold whitespace-nowrap"
+              onClick={() => setRightPanelMode('memo')}
+              className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold whitespace-nowrap ${rightPanelMode === 'memo' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-white hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'}`}
             >
               수정
             </button>
@@ -476,14 +502,23 @@ export default function ChatAdminPanel() {
               {isSavingMemo ? '저장중' : '저장'}
             </button>
             <button 
-              className="flex-1 text-[11px] bg-white hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 py-1.5 rounded-md transition-colors border border-gray-200 dark:border-zinc-700 font-bold whitespace-nowrap"
+              onClick={() => setRightPanelMode('form')}
+              className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold whitespace-nowrap ${rightPanelMode === 'form' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-white hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'}`}
             >
               상담양식
             </button>
             <button
               onClick={() => {
                 const title = `[채팅] ${visitorLabel(activeSession)}`;
-                const contentText = `최근 대화내용:\n${activeSession.last_content || '내용 없음'}\n\n고객 메모:\n${memoText}`;
+                
+                let parsedContent = '';
+                if (rightPanelMode === 'form') {
+                  parsedContent = `[상담양식]\n사고 분류: ${formData.category}\n진단명: ${formData.diagnosis}\n사고일자: ${formData.date}\n사고장소: ${formData.location}\n사고경위: ${formData.details}\n추가문의: ${formData.inquiries}`;
+                } else {
+                  parsedContent = `고객 메모:\n${memoText}`;
+                }
+                
+                const contentText = `최근 대화내용:\n${activeSession.last_content || '내용 없음'}\n\n${parsedContent}`;
                 const payload = { title, text: contentText, sourceApp: 'chat-list', sourceId: activeSession.id };
                 sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
                 window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
@@ -493,13 +528,100 @@ export default function ChatAdminPanel() {
               📅 캘린더보내기
             </button>
           </div>
-          <div className="p-4 flex flex-col overflow-y-auto custom-scrollbar flex-1 bg-yellow-50/30 dark:bg-yellow-900/5">
-            <textarea
-              value={memoText}
-              onChange={e => setMemoText(e.target.value)}
-              placeholder="이 고객과의 상담에서 기억해야 할 내용을 자유롭게 메모하세요. (고객에게는 보이지 않습니다)"
-              className="flex-1 w-full bg-transparent border-none p-2 text-sm text-gray-800 dark:text-gray-200 resize-none outline-none custom-scrollbar leading-relaxed"
-            />
+          
+          <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/50 dark:bg-zinc-950/50 relative">
+            {rightPanelMode === 'memo' ? (
+              <div className="h-full flex flex-col p-4">
+                <textarea
+                  value={memoText}
+                  onChange={e => setMemoText(e.target.value)}
+                  placeholder="이 고객과의 상담에서 기억해야 할 내용을 자유롭게 메모하세요. (고객에게는 보이지 않습니다)"
+                  className="flex-1 w-full bg-transparent border-none text-sm text-gray-800 dark:text-gray-200 resize-none outline-none custom-scrollbar leading-relaxed"
+                />
+              </div>
+            ) : (
+              <div className="p-5 flex flex-col gap-6 text-sm text-gray-700 dark:text-gray-200">
+                
+                <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
+                  <span className="font-bold text-gray-800 dark:text-gray-100">사고 분류</span>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                    className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-bold px-3 py-1.5 rounded-full text-xs outline-none border border-blue-100 dark:border-blue-800 appearance-none text-center"
+                  >
+                    <option value="교통사고">교통사고</option>
+                    <option value="근로재해">근로재해</option>
+                    <option value="배상책임">배상책임</option>
+                    <option value="기타상해">기타상해</option>
+                    <option value="질병">질병</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
+                  <span className="font-bold text-gray-800 dark:text-gray-100 whitespace-nowrap">진단명</span>
+                  <input
+                    type="text"
+                    value={formData.diagnosis}
+                    onChange={(e) => setFormData({...formData, diagnosis: e.target.value})}
+                    placeholder="입력..."
+                    className="bg-transparent border-none text-right font-bold text-gray-900 dark:text-white outline-none w-full ml-4 placeholder:text-gray-300"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
+                  <span className="font-bold text-gray-800 dark:text-gray-100 whitespace-nowrap">사고일자</span>
+                  <input
+                    type="text"
+                    value={formData.date}
+                    onChange={(e) => setFormData({...formData, date: e.target.value})}
+                    placeholder="YYYY-MM-DD"
+                    className="bg-transparent border-none text-right font-bold text-gray-900 dark:text-white outline-none w-full ml-4 placeholder:text-gray-300"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
+                  <span className="font-bold text-gray-800 dark:text-gray-100 whitespace-nowrap">사고장소</span>
+                  <input
+                    type="text"
+                    value={formData.location}
+                    onChange={(e) => setFormData({...formData, location: e.target.value})}
+                    placeholder="입력..."
+                    className="bg-transparent border-none text-right font-bold text-gray-900 dark:text-white outline-none w-full ml-4 placeholder:text-gray-300"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <span className="font-bold text-gray-800 dark:text-gray-100">사고 경위 및 내용</span>
+                  <textarea
+                    value={formData.details}
+                    onChange={(e) => setFormData({...formData, details: e.target.value})}
+                    onInput={(e) => {
+                      const t = e.target as HTMLTextAreaElement;
+                      t.style.height = 'auto';
+                      t.style.height = `${t.scrollHeight}px`;
+                    }}
+                    placeholder="상세 내용 입력..."
+                    className="w-full bg-gray-50/50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg p-3 text-sm text-gray-900 dark:text-white outline-none resize-none overflow-hidden min-h-[60px]"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2 pb-6">
+                  <span className="font-bold text-gray-800 dark:text-gray-100">추가 문의사항</span>
+                  <textarea
+                    value={formData.inquiries}
+                    onChange={(e) => setFormData({...formData, inquiries: e.target.value})}
+                    onInput={(e) => {
+                      const t = e.target as HTMLTextAreaElement;
+                      t.style.height = 'auto';
+                      t.style.height = `${t.scrollHeight}px`;
+                    }}
+                    placeholder="문의사항 입력..."
+                    className="w-full bg-blue-50/30 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/50 rounded-lg p-3 text-sm text-gray-900 dark:text-white outline-none resize-none overflow-hidden min-h-[60px]"
+                  />
+                </div>
+
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -215,7 +215,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
 `;
   }
 
-  const models = ['gemini-1.5-pro-latest', 'gemini-1.5-flash-latest'];
+  const models = ['gemini-1.5-pro', 'gemini-1.5-flash'];
   let lastError = '';
 
   for (const model of models) {

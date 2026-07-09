@@ -79,11 +79,16 @@ export function useCalendarLabels() {
     saveLabels(newLabels);
   };
 
+  const reorderLabels = (newOrder: CalendarLabel[]) => {
+    saveLabels(newOrder);
+  };
+
   return {
     labels,
     addLabel,
     toggleLabelActive,
     deleteLabel,
-    updateLabel
+    updateLabel,
+    reorderLabels
   };
 }

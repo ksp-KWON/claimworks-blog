@@ -25,7 +25,40 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
 
   // Labels hook
-  const { labels, toggleLabelActive, addLabel, deleteLabel } = useCalendarLabels();
+  const { labels, toggleLabelActive, addLabel, deleteLabel, updateLabel, reorderLabels } = useCalendarLabels();
+
+  // Label Edit State
+  const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
+  const [editLabelName, setEditLabelName] = useState('');
+  const [editLabelColor, setEditLabelColor] = useState('');
+
+  const startEditLabel = (e: React.MouseEvent, label: any) => {
+    e.stopPropagation();
+    setEditingLabelId(label.id);
+    setEditLabelName(label.name);
+    setEditLabelColor(label.color);
+  };
+
+  const saveEditLabel = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (editingLabelId && editLabelName.trim()) {
+      updateLabel(editingLabelId, editLabelName.trim(), editLabelColor);
+      setEditingLabelId(null);
+    }
+  };
+
+  const moveLabel = (e: React.MouseEvent, index: number, direction: 'up' | 'down') => {
+    e.stopPropagation();
+    if (direction === 'up' && index > 0) {
+      const newLabels = [...labels];
+      [newLabels[index - 1], newLabels[index]] = [newLabels[index], newLabels[index - 1]];
+      reorderLabels(newLabels);
+    } else if (direction === 'down' && index < labels.length - 1) {
+      const newLabels = [...labels];
+      [newLabels[index + 1], newLabels[index]] = [newLabels[index], newLabels[index + 1]];
+      reorderLabels(newLabels);
+    }
+  };
 
   const isChatActive = activeApp.startsWith('chat-');
   const isConsultActive = activeApp.startsWith('consult-');
@@ -120,28 +153,57 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
                 </button>
               </div>
               
-              {labels.map(label => (
+              {labels.map((label, index) => (
                 <div key={label.id} className="flex items-center justify-between px-3 py-1.5 text-sm group">
-                  <label className="flex items-center gap-2 cursor-pointer flex-1 truncate text-zinc-300 hover:text-white">
-                    <input 
-                      type="checkbox"
-                      checked={label.active}
-                      onChange={() => toggleLabelActive(label.id)}
-                      className="w-3.5 h-3.5 rounded-sm bg-transparent border-2 appearance-none cursor-pointer flex items-center justify-center after:content-[''] after:w-2 after:h-2 after:rounded-sm after:scale-0 checked:after:scale-100 after:transition-transform"
-                      style={{ 
-                        borderColor: label.color, 
-                        ...(label.active ? { '--tw-bg-opacity': 1, backgroundColor: label.color } : {}) 
-                      } as any}
-                    />
-                    <span className="truncate">{label.name}</span>
-                  </label>
-                  <button 
-                    onClick={(e) => handleDeleteLabel(e, label.id)}
-                    className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 transition-opacity"
-                    title="삭제"
-                  >
-                    ×
-                  </button>
+                  {editingLabelId === label.id ? (
+                    <div className="flex items-center gap-2 flex-1 w-full mr-2">
+                      <input 
+                        type="color" 
+                        value={editLabelColor}
+                        onChange={(e) => setEditLabelColor(e.target.value)}
+                        className="w-5 h-5 rounded cursor-pointer shrink-0 border-0 p-0"
+                      />
+                      <input 
+                        type="text"
+                        value={editLabelName}
+                        onChange={(e) => setEditLabelName(e.target.value)}
+                        className="flex-1 bg-zinc-800 text-white px-1.5 py-0.5 rounded text-xs outline-none focus:ring-1 focus:ring-blue-500 w-full min-w-0"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') saveEditLabel(e as any);
+                          if (e.key === 'Escape') setEditingLabelId(null);
+                        }}
+                      />
+                      <button onClick={saveEditLabel} className="text-green-400 hover:text-green-300 text-xs shrink-0">✓</button>
+                      <button onClick={() => setEditingLabelId(null)} className="text-zinc-500 hover:text-zinc-300 text-xs shrink-0">✕</button>
+                    </div>
+                  ) : (
+                    <>
+                      <label className="flex items-center gap-2 cursor-pointer flex-1 truncate text-zinc-300 hover:text-white">
+                        <input 
+                          type="checkbox"
+                          checked={label.active}
+                          onChange={() => toggleLabelActive(label.id)}
+                          className="w-3.5 h-3.5 rounded-sm bg-transparent border-2 appearance-none cursor-pointer flex items-center justify-center after:content-[''] after:w-2 after:h-2 after:rounded-sm after:scale-0 checked:after:scale-100 after:transition-transform shrink-0"
+                          style={{ 
+                            borderColor: label.color, 
+                            ...(label.active ? { '--tw-bg-opacity': 1, backgroundColor: label.color } : {}) 
+                          } as any}
+                        />
+                        <span className="truncate">{label.name}</span>
+                      </label>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                        {index > 0 && (
+                          <button onClick={(e) => moveLabel(e, index, 'up')} className="text-zinc-500 hover:text-white" title="위로">↑</button>
+                        )}
+                        {index < labels.length - 1 && (
+                          <button onClick={(e) => moveLabel(e, index, 'down')} className="text-zinc-500 hover:text-white" title="아래로">↓</button>
+                        )}
+                        <button onClick={(e) => startEditLabel(e, label)} className="text-zinc-500 hover:text-blue-400 ml-1" title="수정">✎</button>
+                        <button onClick={(e) => handleDeleteLabel(e, label.id)} className="text-zinc-500 hover:text-red-400" title="삭제">×</button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

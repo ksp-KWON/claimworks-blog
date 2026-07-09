@@ -240,8 +240,8 @@ export default function ChatWidget() {
           >
             {/* 헤더 */}
             <div className="flex items-center gap-3 px-4 py-3 shrink-0 bg-gradient-to-r from-[#1a73e8] to-[#1557b0]">
-              <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center shrink-0 border border-white/30">
-                <span className="text-white font-black text-[13px]">보상</span>
+              <div className="h-9 bg-white rounded flex items-center justify-center shrink-0 border border-white/30 px-1.5">
+                <img src="/logo_tv.png" alt="보상스쿨" className="h-5 w-auto object-contain" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white font-bold text-sm leading-tight">보상스쿨 손해사정사</p>
@@ -422,9 +422,23 @@ export default function ChatWidget() {
               )}
             </AnimatePresence>
 
-            {/* 전체 3D 테두리 빨간색 반짝임 효과 */}
+            {/* 은은한 글로우(디머) 효과 */}
             {unreadCount === 0 && (
-              <div className="absolute inset-0 rounded-full border-2 border-red-500 animate-ping opacity-60 pointer-events-none"></div>
+              <motion.div 
+                className="absolute inset-0 rounded-full pointer-events-none"
+                animate={{ 
+                  boxShadow: [
+                    '0 0 0px 0px rgba(26,115,232,0)', 
+                    '0 0 25px 8px rgba(26,115,232,0.4)', 
+                    '0 0 0px 0px rgba(26,115,232,0)'
+                  ] 
+                }}
+                transition={{ 
+                  duration: 4, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+              />
             )}
           </motion.button>
         )}

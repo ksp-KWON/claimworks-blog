@@ -16,12 +16,12 @@ export default function AuthorBioCard() {
 
         <div className="flex items-start gap-4">
           {/* 아바타 */}
-          <div className="h-16 w-32 rounded-none bg-white flex items-center justify-center shrink-0 shadow-sm border border-gray-200 p-2">
+          <div className="w-16 h-16 rounded-none bg-white flex items-center justify-center shrink-0 shadow-sm border border-gray-200 p-1">
             <Image
-              src="/logo_tv.png"
+              src="/images/author-bio-logo.png"
               alt="보상스쿨TV 로고"
-              width={120}
-              height={50}
+              width={64}
+              height={64}
               className="w-full h-full object-contain"
             />
           </div>

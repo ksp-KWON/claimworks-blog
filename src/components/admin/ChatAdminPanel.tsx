@@ -56,6 +56,14 @@ export default function ChatAdminPanel() {
     return () => { supabase.removeChannel(channel); };
   }, [loadSessions]);
 
+  useEffect(() => {
+    const pendingId = sessionStorage.getItem('pending_select_id');
+    if (pendingId) {
+      setSelectedId(pendingId);
+      sessionStorage.removeItem('pending_select_id');
+    }
+  }, []);
+
   const loadMessages = useCallback(async (sid: string) => {
     const { data } = await supabase
       .from('chat_messages')

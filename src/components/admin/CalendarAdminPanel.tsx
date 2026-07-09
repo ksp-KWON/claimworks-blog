@@ -770,12 +770,15 @@ export default function CalendarAdminPanel() {
                 </div>
                 
                 {(() => {
-                  const { sourceApp } = parseContent(selectedEvent.content);
+                  const { sourceApp, sourceId } = parseContent(selectedEvent.content);
                   if (!sourceApp) return null;
                   
                   return (
                     <button
                       onClick={() => {
+                        if (sourceId) {
+                          sessionStorage.setItem('pending_select_id', sourceId);
+                        }
                         window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: sourceApp } }));
                       }}
                       className="mt-4 w-full py-2 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400 font-bold rounded-lg hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2 text-sm border border-indigo-200 dark:border-indigo-800"

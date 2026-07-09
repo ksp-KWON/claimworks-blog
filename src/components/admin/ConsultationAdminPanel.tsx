@@ -37,6 +37,15 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     };
   }, []);
 
+  useEffect(() => {
+    const pendingId = sessionStorage.getItem('pending_select_id');
+    if (pendingId) {
+      setSelectedId(pendingId);
+      setIsSplitView(true);
+      sessionStorage.removeItem('pending_select_id');
+    }
+  }, []);
+
   const fetchConsultations = async () => {
     setIsLoading(true);
     const { data, error } = await supabase

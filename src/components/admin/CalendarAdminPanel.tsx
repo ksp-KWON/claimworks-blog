@@ -16,8 +16,8 @@ export default function CalendarAdminPanel() {
   const [selectedEvent, setSelectedEvent] = useState<AdminCalendarEvent | null>(null);
   
   // Linkable Data State
-  const [chatSessions, setChatSessions] = useState<{id: string; visitor_name: string; created_at: string}[]>([]);
-  const [consultations, setConsultations] = useState<{id: string; name: string; created_at: string}[]>([]);
+  const [chatSessions, setChatSessions] = useState<{id: string; visitor_name: string; created_at: string; last_message_at: string}[]>([]);
+  const [consultations, setConsultations] = useState<any[]>([]);
 
   // Labels hook
   const { labels } = useCalendarLabels();
@@ -49,10 +49,10 @@ export default function CalendarAdminPanel() {
 
   useEffect(() => {
     const fetchLinkableData = async () => {
-      const { data: chats } = await supabase.from('chat_sessions').select('id, visitor_name, created_at').order('created_at', { ascending: false }).limit(50);
+      const { data: chats } = await supabase.from('chat_sessions').select('id, visitor_name, created_at, last_message_at').order('last_message_at', { ascending: false }).limit(50);
       if (chats) setChatSessions(chats);
 
-      const { data: cons } = await supabase.from('consultations').select('id, name, created_at').order('created_at', { ascending: false }).limit(50);
+      const { data: cons } = await supabase.from('consultations').select('*').order('created_at', { ascending: false }).limit(50);
       if (cons) setConsultations(cons);
     };
     fetchLinkableData();
@@ -724,7 +724,12 @@ export default function CalendarAdminPanel() {
                           setFormSourceApp('consultations');
                           setFormSourceId(e.target.value);
                           const cons = consultations.find(c => c.id === e.target.value);
-                          if (cons && !formTitle) setFormTitle(`${cons.name} 고객 접수건`);
+                          if (cons) {
+                            if (!formTitle) setFormTitle(`${cons.name} 고객 접수건`);
+                            if (!formContent) {
+                              setFormContent(`이름: ${cons.name}\n연락처: ${cons.phone || ''}\n사고일자: ${cons.accident_date || ''}\n진단명: ${cons.diagnosis || ''}\n\n[상담내용]\n${cons.inquiry || ''}`);
+                            }
+                          }
                         } else if (formSourceApp === 'consultations') {
                           setFormSourceApp('');
                           setFormSourceId('');
@@ -758,7 +763,7 @@ export default function CalendarAdminPanel() {
                       <option value="">채팅 내역 선택안함</option>
                       {chatSessions.map(c => (
                         <option key={c.id} value={c.id}>
-                          [채팅] {c.visitor_name} ({new Date(c.created_at).toLocaleDateString()})
+                          [채팅] {c.visitor_name} ({new Date(c.last_message_at || c.created_at).toLocaleDateString()})
                         </option>
                       ))}
                     </select>

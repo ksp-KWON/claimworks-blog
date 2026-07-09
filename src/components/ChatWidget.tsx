@@ -158,6 +158,15 @@ export default function ChatWidget() {
 
     return () => { supabase.removeChannel(channel); };
   }, [sessionId, isOpen]);
+  // ─── URL 파라미터 확인 후 자동 오픈 ─────────────────────────────
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('chat') === 'open' || window.location.hash === '#chat') {
+        setIsOpen(true);
+      }
+    }
+  }, []);
 
   // ─── 메시지 전송 ───────────────────────────────────────────────
   const sendMessage = useCallback(async () => {

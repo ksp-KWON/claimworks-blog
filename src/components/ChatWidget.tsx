@@ -163,7 +163,7 @@ export default function ChatWidget() {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('chat') === 'open' || window.location.hash === '#chat') {
-        setIsOpen(true);
+        setTimeout(() => setIsOpen(true), 300);
       }
     }
   }, []);

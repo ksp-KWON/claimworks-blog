@@ -102,19 +102,21 @@ export default function ConsultationPage() {
 
         <div className="p-6 sm:p-10 space-y-8 flex-1">
           {/* 헤더 섹션 */}
-          <div className="text-center space-y-4 pb-4">
-            <div className="flex justify-center items-center mb-6">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 pb-4 text-center md:text-left">
+            <div className="shrink-0">
               <div className="bg-white px-6 py-4 shadow-sm border border-gray-100 dark:border-white/10">
-                <img src="/logo.png" alt="보상스쿨 로고" className="h-9 sm:h-11 object-contain" />
+                <img src="/logo.png" alt="보상스쿨 로고" className="h-12 sm:h-14 object-contain" />
               </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
-              <span className="bg-gradient-to-r from-[var(--google-blue)] to-[#174ea6] bg-clip-text text-transparent">전문가 무료 상담 신청</span>
-            </h1>
-            <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-lg mx-auto leading-relaxed font-medium mt-3">
-              보험사의 억울한 거절과 삭감 주장, 보상스쿨과 함께라면 방어할 수 있습니다.<br className="hidden sm:block"/>
-              아래 양식을 작성해 주시면 가장 빠르고 정확한 상담이 가능합니다.
-            </p>
+            <div className="space-y-3">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
+                보상스쿨 <span className="text-[var(--google-blue)]">무료 상담 신청</span>
+              </h1>
+              <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed font-medium mt-3">
+                보험사의 억울한 거절과 삭감 주장, 보상스쿨과 함께라면 방어할 수 있습니다.<br className="hidden md:block"/>
+                아래 양식을 작성해 주시면 가장 빠르고 정확한 상담이 가능합니다.
+              </p>
+            </div>
           </div>
 
           {/* 폼 영역 */}

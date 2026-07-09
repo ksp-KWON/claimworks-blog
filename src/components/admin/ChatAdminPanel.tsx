@@ -399,23 +399,21 @@ export default function ChatAdminPanel() {
           </div>
         ) : (
           <>
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-sm z-10">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    {visitorLabel(activeSession)}
-                  </h3>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    최초 접속일: {new Date(activeSession.created_at).toLocaleString('ko-KR')}
-                  </p>
-                </div>
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-sm z-10 flex-wrap gap-3">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                  {visitorLabel(activeSession)}
+                </h3>
+                <p className="text-xs text-gray-500 font-medium hidden sm:block">
+                  최초 접속일: {new Date(activeSession.created_at).toLocaleString('ko-KR')}
+                </p>
               </div>
               
               {/* 상단 액션 메뉴 */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <p className="text-xs text-gray-500 font-medium sm:hidden">
+                  {new Date(activeSession.created_at).toLocaleDateString('ko-KR')}
+                </p>
                 <button
                   onClick={() => {
                     const title = `[채팅] ${visitorLabel(activeSession)}`;
@@ -424,25 +422,20 @@ export default function ChatAdminPanel() {
                     sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
                     window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
                   }}
-                  className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 font-bold dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400"
+                  className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-2 sm:px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 font-bold dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400 whitespace-nowrap"
                 >
-                  📅 캘린더 보내기
+                  📅 <span className="hidden sm:inline">캘린더 보내기</span>
                 </button>
 
-                <div className="w-px h-6 bg-gray-200 dark:bg-zinc-700"></div>
+                <div className="w-px h-5 bg-gray-200 dark:bg-zinc-700 mx-1"></div>
 
-                <div className="relative flex items-center gap-1">
+                <div className="relative">
                   <button 
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className={`text-sm font-bold px-3 py-1.5 rounded-md transition-colors border ${getStatusColor(activeSession!.status || '대기')}`}
+                    className={`text-sm font-bold px-3 py-1.5 rounded-md transition-colors border flex items-center gap-1 ${getStatusColor(activeSession!.status || '대기')}`}
                   >
                     {activeSession!.status || '대기'}
-                  </button>
-                  <button 
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
-                  >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>
+                    <span className="text-[10px] opacity-60">▼</span>
                   </button>
 
                 {isMenuOpen && (

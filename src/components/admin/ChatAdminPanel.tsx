@@ -408,12 +408,30 @@ export default function ChatAdminPanel() {
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                     {visitorLabel(activeSession)}
                   </h3>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    최초 접속일: {new Date(activeSession.created_at).toLocaleString('ko-KR')}
+                  </p>
                 </div>
               </div>
               
               {/* 상단 액션 메뉴 */}
-              <div className="relative">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    const title = `[채팅] ${visitorLabel(activeSession)}`;
+                    const contentText = `최근 대화내용:\n${activeSession.last_content || '내용 없음'}\n\n고객 메모:\n${memoText}`;
+                    const payload = { title, text: contentText, sourceApp: 'chat-list', sourceId: activeSession.id };
+                    sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
+                    window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
+                  }}
+                  className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 font-bold dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400"
+                >
+                  📅 캘린더 보내기
+                </button>
+
+                <div className="w-px h-6 bg-gray-200 dark:bg-zinc-700"></div>
+
+                <div className="relative flex items-center gap-1">
                   <button 
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className={`text-sm font-bold px-3 py-1.5 rounded-md transition-colors border ${getStatusColor(activeSession!.status || '대기')}`}
@@ -426,7 +444,6 @@ export default function ChatAdminPanel() {
                   >
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>
                   </button>
-                </div>
 
                 {isMenuOpen && (
                   <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-gray-200 dark:border-zinc-700 py-1 z-20 overflow-hidden">
@@ -490,59 +507,23 @@ export default function ChatAdminPanel() {
       {/* 3단: 오른쪽 패널 (항목관리 모드일 때만 표시) */}
       {selectedId && activeSession && (
         <div className="w-[320px] bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 flex flex-col shrink-0">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-950">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-white">고객 정보</h3>
-          </div>
-          <div className="p-4 flex flex-col gap-6 overflow-y-auto custom-scrollbar flex-1">
-            
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-gray-500">닉네임/ID</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">{visitorLabel(activeSession)}</span>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-gray-500">최초 접속일</span>
-              <span className="text-sm text-gray-800 dark:text-gray-200">{new Date(activeSession.created_at).toLocaleString('ko-KR')}</span>
-            </div>
-            
-            <button
-              onClick={() => {
-                const title = `[채팅] ${visitorLabel(activeSession)}`;
-                const contentText = `최근 대화내용:\n${activeSession.last_content || '내용 없음'}\n\n고객 메모:\n${memoText}`;
-                const payload = {
-                  title,
-                  text: contentText,
-                  sourceApp: 'chat-list',
-                  sourceId: activeSession.id
-                };
-                sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
-                window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
-              }}
-              className="w-full py-2 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 text-sm border border-blue-200 dark:border-blue-800"
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-950 flex justify-between items-center">
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white">📝 관리자 전용 고객 메모</h3>
+            <button 
+              onClick={saveMemo}
+              disabled={isSavingMemo}
+              className="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-md transition-colors border border-gray-200 dark:border-zinc-700 font-bold"
             >
-              📅 캘린더 일정으로 보내기
+              {isSavingMemo ? '저장 중...' : '메모 저장'}
             </button>
-
-            <hr className="border-gray-200 dark:border-zinc-800" />
-
-            <div className="flex flex-col gap-2 flex-1">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-gray-700 dark:text-gray-300">📝 관리자 전용 고객 메모</span>
-                <button 
-                  onClick={saveMemo}
-                  disabled={isSavingMemo}
-                  className="text-[10px] bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded transition-colors border border-gray-200 dark:border-zinc-700"
-                >
-                  {isSavingMemo ? '저장 중...' : '저장'}
-                </button>
-              </div>
-              <textarea
-                value={memoText}
-                onChange={e => setMemoText(e.target.value)}
-                placeholder="이 고객과의 상담에서 기억해야 할 내용을 자유롭게 메모하세요. (고객에게는 보이지 않습니다)"
-                className="flex-1 min-h-[200px] w-full bg-yellow-50/50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-700/50 rounded-lg p-3 text-sm text-gray-800 dark:text-gray-200 resize-none outline-none focus:border-yellow-400 transition-colors custom-scrollbar"
-              />
-            </div>
+          </div>
+          <div className="p-4 flex flex-col overflow-y-auto custom-scrollbar flex-1 bg-yellow-50/30 dark:bg-yellow-900/5">
+            <textarea
+              value={memoText}
+              onChange={e => setMemoText(e.target.value)}
+              placeholder="이 고객과의 상담에서 기억해야 할 내용을 자유롭게 메모하세요. (고객에게는 보이지 않습니다)"
+              className="flex-1 w-full bg-transparent border-none p-2 text-sm text-gray-800 dark:text-gray-200 resize-none outline-none custom-scrollbar leading-relaxed"
+            />
           </div>
         </div>
       )}

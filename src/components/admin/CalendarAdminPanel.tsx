@@ -187,7 +187,7 @@ export default function CalendarAdminPanel() {
     if (selectedEvent) {
       const { error } = await supabase
         .from('admin_calendar_events')
-        .update({ title: formTitle, content: contentToSave })
+        .update({ date: selectedDate, title: formTitle, content: contentToSave })
         .eq('id', selectedEvent.id);
         
       if (!error) {

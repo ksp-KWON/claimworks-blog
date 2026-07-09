@@ -407,9 +407,9 @@ export default function ChatWidget() {
               <path d="M12 3C6.48 3 2 6.58 2 11C2 13.56 3.42 15.86 5.6 17.26C5.4 18.06 4.8 19.86 4.8 19.86C4.8 19.86 6.8 19.56 8.6 18.36C9.6 18.76 10.8 19 12 19C17.52 19 22 15.42 22 11C22 6.58 17.52 3 12 3Z"/>
             </motion.svg>
 
-            {/* 읽지 않은 메시지 뱃지 또는 라이브 알림 점 */}
+            {/* 읽지 않은 메시지 뱃지 */}
             <AnimatePresence>
-              {unreadCount > 0 ? (
+              {unreadCount > 0 && (
                 <motion.span
                   key="unread-badge"
                   initial={{ scale: 0 }}
@@ -419,19 +419,13 @@ export default function ChatWidget() {
                 >
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </motion.span>
-              ) : (
-                <motion.span
-                  key="ping-dot"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  className="absolute -top-0.5 -right-0.5 flex h-3 w-3"
-                >
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white"></span>
-                </motion.span>
               )}
             </AnimatePresence>
+
+            {/* 전체 3D 테두리 빨간색 반짝임 효과 */}
+            {unreadCount === 0 && (
+              <div className="absolute inset-0 rounded-full border-2 border-red-500 animate-ping opacity-60 pointer-events-none"></div>
+            )}
           </motion.button>
         )}
       </AnimatePresence>

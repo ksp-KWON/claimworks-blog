@@ -215,8 +215,8 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
 `;
   }
 
-  // 구글 최신 문서 기준: 항상 최신 버전으로 자동 라우팅되는 공식 Alias 사용
-  const models = ['gemini-pro-latest', 'gemini-flash-latest'];
+  // 구글 최신 문서 기준: 1순위(Pro) -> 2순위(Flash) -> 3순위(Flash-Lite) 순서로 자동 대체(Fallback)
+  const models = ['gemini-pro-latest', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
   let lastError = '';
 
   for (const model of models) {

@@ -269,25 +269,27 @@ export default function ChatAdminPanel() {
       {/* 1단: 세션 목록 (좌측) */}
       <div className="w-[320px] flex flex-col border-r border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-900/50">
         
-        {/* 검색 및 상단 탭 */}
-        <div className="flex flex-col border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-          <div className="p-3">
-            <div className="relative">
-              <input 
-                type="text" 
-                placeholder="대화내용, 닉네임 검색" 
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-8 py-2 bg-gray-100 dark:bg-zinc-800 border-transparent rounded-lg text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
-              />
-              <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              {searchTerm && (
-                <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
-                </button>
-              )}
-            </div>
+        {/* 통일된 상단 헤더 (검색영역) */}
+        <div className="h-[72px] px-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center shrink-0">
+          <div className="relative w-full">
+            <input 
+              type="text" 
+              placeholder="대화내용, 닉네임 검색" 
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-8 py-2 bg-gray-100 dark:bg-zinc-800 border-transparent rounded-lg text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+            />
+            <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            {searchTerm && (
+              <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
+              </button>
+            )}
           </div>
+        </div>
+        
+        {/* 상태 탭 */}
+        <div className="flex flex-col border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
           
           <div className="flex px-2 pb-0 overflow-x-auto custom-scrollbar">
             {['전체', '대기', '진행중', '보류', '완료'].map((tab) => {
@@ -399,7 +401,7 @@ export default function ChatAdminPanel() {
           </div>
         ) : (
           <>
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-sm z-10 flex-wrap gap-3">
+            <div className="h-[72px] px-6 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-sm z-10 flex-wrap gap-3">
               <div className="flex items-center gap-4">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                   {visitorLabel(activeSession)}
@@ -501,7 +503,7 @@ export default function ChatAdminPanel() {
       {/* 3단: 오른쪽 패널 (항목관리 모드일 때만 표시) */}
       {selectedId && activeSession && (
         <div className="w-[320px] bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 flex flex-col shrink-0">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-950 flex justify-between items-center">
+          <div className="h-[72px] px-6 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-950 flex justify-between items-center">
             <h3 className="text-sm font-bold text-gray-900 dark:text-white">📝 관리자 전용 고객 메모</h3>
             <button 
               onClick={saveMemo}

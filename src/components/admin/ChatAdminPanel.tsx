@@ -401,21 +401,18 @@ export default function ChatAdminPanel() {
           </div>
         ) : (
           <>
-            <div className="h-[72px] px-6 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center z-10 flex-wrap gap-3">
-              <div className="flex items-center gap-4">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                  {visitorLabel(activeSession)}
-                </h3>
-                <p className="text-xs text-gray-500 font-medium hidden sm:block">
-                  최초 접속일: {new Date(activeSession.created_at).toLocaleString('ko-KR')}
-                </p>
-              </div>
+            <div className="h-[72px] px-6 shrink-0 bg-white dark:bg-zinc-900 flex items-center gap-4 z-10 overflow-x-auto whitespace-nowrap border-b border-gray-100 dark:border-white/5 custom-scrollbar">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white shrink-0">
+                {visitorLabel(activeSession)}
+              </h3>
               
-              {/* 상단 액션 메뉴 */}
-              <div className="flex items-center gap-2 sm:gap-3">
-                <p className="text-xs text-gray-500 font-medium sm:hidden">
-                  {new Date(activeSession.created_at).toLocaleDateString('ko-KR')}
-                </p>
+              <div className="w-px h-4 bg-gray-200 dark:bg-zinc-700 mx-1 shrink-0"></div>
+
+              <p className="text-xs text-gray-500 font-medium shrink-0">
+                최초 접속일: {new Date(activeSession.created_at).toLocaleString('ko-KR')}
+              </p>
+              
+              <div className="ml-auto flex items-center gap-3 shrink-0">
                 <button
                   onClick={() => {
                     const title = `[채팅] ${visitorLabel(activeSession)}`;
@@ -424,12 +421,10 @@ export default function ChatAdminPanel() {
                     sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
                     window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
                   }}
-                  className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-2 sm:px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 font-bold dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400 whitespace-nowrap"
+                  className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5 font-bold dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400 whitespace-nowrap"
                 >
-                  📅 <span className="hidden sm:inline">캘린더 보내기</span>
+                  📅 캘린더 보내기
                 </button>
-
-                <div className="w-px h-5 bg-gray-200 dark:bg-zinc-700 mx-1"></div>
 
                 <div className="relative">
                   <button 
@@ -440,18 +435,18 @@ export default function ChatAdminPanel() {
                     <span className="text-[10px] opacity-60">▼</span>
                   </button>
 
-                {isMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-gray-200 dark:border-zinc-700 py-1 z-20 overflow-hidden">
-                    <button onClick={() => changeStatus('진행중')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">진행중으로 변경</button>
-                    <button onClick={() => changeStatus('보류')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">보류하기</button>
-                    <button onClick={() => changeStatus('완료')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">완료하기</button>
-                    <div className="border-t border-gray-100 dark:border-zinc-700 my-1"></div>
-                    <button onClick={deleteSession} className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400">삭제하기</button>
-                  </div>
-                )}
+                  {isMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-gray-200 dark:border-zinc-700 py-1 z-20 overflow-hidden">
+                      <button onClick={() => changeStatus('진행중')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">진행중으로 변경</button>
+                      <button onClick={() => changeStatus('보류')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">보류하기</button>
+                      <button onClick={() => changeStatus('완료')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">완료하기</button>
+                      <div className="border-t border-gray-100 dark:border-zinc-700 my-1"></div>
+                      <button onClick={deleteSession} className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400">삭제하기</button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
             
             <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-zinc-950/50 custom-scrollbar" onClick={() => setIsMenuOpen(false)}>
               {messages.map((msg) => {

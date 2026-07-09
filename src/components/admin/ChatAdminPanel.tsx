@@ -388,7 +388,16 @@ export default function ChatAdminPanel() {
 
       {/* 2단: 대화창 (중앙) */}
       <div className="flex-1 flex flex-col bg-white dark:bg-zinc-950 relative">
-        {selectedId ? (
+        {!selectedId ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-gray-400 dark:text-zinc-600">
+            <svg className="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+            <p className="font-medium">대화방을 선택해주세요</p>
+          </div>
+        ) : !activeSession ? (
+          <div className="flex-1 flex items-center justify-center text-gray-500">
+            데이터를 불러오는 중입니다...
+          </div>
+        ) : (
           <>
             <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-sm z-10">
               <div className="flex items-center gap-3">
@@ -397,7 +406,7 @@ export default function ChatAdminPanel() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    {visitorLabel(activeSession!)}
+                    {visitorLabel(activeSession)}
                   </h3>
                 </div>
               </div>
@@ -475,18 +484,13 @@ export default function ChatAdminPanel() {
               </div>
             </div>
           </>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
-            <svg className="w-16 h-16 mb-4 text-gray-200 dark:text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-            <p>좌측에서 대화를 선택해주세요.</p>
-          </div>
         )}
       </div>
 
-      {/* 3단: 고객 정보 및 메모장 (우측) */}
-      {selectedId && activeSession && (
-        <div className="w-[300px] border-l border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col shrink-0">
-          <div className="px-4 py-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950">
+      {/* 3단: 오른쪽 패널 (항목관리 모드일 때만 표시) */}
+      {selectedId && activeSession && activeApp === 'chat-manage' && (
+        <div className="w-[320px] bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 flex flex-col shrink-0">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-950">
             <h3 className="text-sm font-bold text-gray-900 dark:text-white">고객 정보</h3>
           </div>
           <div className="p-4 flex flex-col gap-6 overflow-y-auto custom-scrollbar flex-1">

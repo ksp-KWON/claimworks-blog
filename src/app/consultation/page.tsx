@@ -105,7 +105,7 @@ export default function ConsultationPage() {
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 pb-4 text-center md:text-left">
             <div className="shrink-0">
               <div className="bg-white px-6 py-4 shadow-sm border border-gray-100 dark:border-white/10">
-                <img src="/logo.png" alt="보상스쿨 로고" className="h-12 sm:h-14 object-contain" />
+                <img src="/logo_tv.png" alt="보상스쿨 로고" className="h-14 sm:h-16 object-contain" />
               </div>
             </div>
             <div className="space-y-3">

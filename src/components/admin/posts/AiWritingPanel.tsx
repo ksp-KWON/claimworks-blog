@@ -73,7 +73,7 @@ export default function AiWritingPanel({ isLoading, onRunAi, onOpenEditor }: AiW
           </button>
         </div>
 
-        <div className="flex flex-col gap-3 bg-white dark:bg-zinc-900 p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)]">
+        <div className="flex flex-col gap-3 bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm">
           <label className="text-sm font-bold text-gray-700 dark:text-gray-300">
             {aiMode === 'semi-auto' ? '키워드 또는 참고 링크 입력' : '유튜브 대본 등 원문 입력'}
           </label>

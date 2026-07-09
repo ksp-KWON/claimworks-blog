@@ -264,32 +264,30 @@ export default function ChatAdminPanel() {
   };
 
   return (
-    <div className="flex flex-1 h-full gap-6">
+    <div className="flex flex-1 h-full bg-white dark:bg-zinc-950 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 overflow-hidden">
       
       {/* 1단: 세션 목록 (좌측) */}
-      <div className="w-[320px] flex flex-col shrink-0 bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] overflow-hidden">
+      <div className="w-[320px] flex flex-col border-r border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-900/50">
         
-        {/* 통일된 상단 헤더 (검색영역) */}
-        <div className="h-[72px] px-4 bg-white dark:bg-zinc-900 flex items-center shrink-0">
-          <div className="relative w-full">
-            <input 
-              type="text" 
-              placeholder="대화내용, 닉네임 검색" 
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 bg-gray-100 dark:bg-zinc-800 border-transparent rounded-lg text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
-            />
-            <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            {searchTerm && (
-              <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
-              </button>
-            )}
+        {/* 검색 및 상단 탭 */}
+        <div className="flex flex-col border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+          <div className="p-3">
+            <div className="relative">
+              <input 
+                type="text" 
+                placeholder="대화내용, 닉네임 검색" 
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 bg-gray-100 dark:bg-zinc-800 border-transparent rounded-lg text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+              />
+              <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              {searchTerm && (
+                <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-        
-        {/* 상태 탭 */}
-        <div className="flex flex-col bg-white dark:bg-zinc-900 shrink-0">
           
           <div className="flex px-2 pb-0 overflow-x-auto custom-scrollbar">
             {['전체', '대기', '진행중', '보류', '완료'].map((tab) => {
@@ -312,7 +310,7 @@ export default function ChatAdminPanel() {
         </div>
 
         {/* 필터 및 정렬 컨트롤 */}
-        <div className="flex items-center justify-between px-4 py-2 bg-gray-50/50 dark:bg-zinc-900/50 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-zinc-900/50 border-b border-gray-200 dark:border-zinc-800 text-xs text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-1">
             <select 
               value={sortBy} 
@@ -389,7 +387,7 @@ export default function ChatAdminPanel() {
       </div>
 
       {/* 2단: 대화창 (중앙) */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] overflow-hidden relative">
+      <div className="flex-1 flex flex-col bg-white dark:bg-zinc-950 relative">
         {!selectedId ? (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400 dark:text-zinc-600">
             <svg className="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
@@ -401,18 +399,23 @@ export default function ChatAdminPanel() {
           </div>
         ) : (
           <>
-            <div className="h-[72px] px-6 shrink-0 bg-white dark:bg-zinc-900 flex items-center gap-4 z-10 overflow-x-auto whitespace-nowrap border-b border-gray-100 dark:border-white/5 custom-scrollbar">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white shrink-0">
-                {visitorLabel(activeSession)}
-              </h3>
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-sm z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    {visitorLabel(activeSession)}
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    최초 접속일: {new Date(activeSession.created_at).toLocaleString('ko-KR')}
+                  </p>
+                </div>
+              </div>
               
-              <div className="w-px h-4 bg-gray-200 dark:bg-zinc-700 mx-1 shrink-0"></div>
-
-              <p className="text-xs text-gray-500 font-medium shrink-0">
-                최초 접속일: {new Date(activeSession.created_at).toLocaleString('ko-KR')}
-              </p>
-              
-              <div className="ml-auto flex items-center gap-3 shrink-0">
+              {/* 상단 액션 메뉴 */}
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
                     const title = `[채팅] ${visitorLabel(activeSession)}`;
@@ -421,32 +424,39 @@ export default function ChatAdminPanel() {
                     sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
                     window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
                   }}
-                  className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5 font-bold dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400 whitespace-nowrap"
+                  className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 font-bold dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400"
                 >
                   📅 캘린더 보내기
                 </button>
 
-                <div className="relative">
+                <div className="w-px h-6 bg-gray-200 dark:bg-zinc-700"></div>
+
+                <div className="relative flex items-center gap-1">
                   <button 
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className={`text-sm font-bold px-3 py-1.5 rounded-md transition-colors border flex items-center gap-1 ${getStatusColor(activeSession!.status || '대기')}`}
+                    className={`text-sm font-bold px-3 py-1.5 rounded-md transition-colors border ${getStatusColor(activeSession!.status || '대기')}`}
                   >
                     {activeSession!.status || '대기'}
-                    <span className="text-[10px] opacity-60">▼</span>
+                  </button>
+                  <button 
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>
                   </button>
 
-                  {isMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-gray-200 dark:border-zinc-700 py-1 z-20 overflow-hidden">
-                      <button onClick={() => changeStatus('진행중')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">진행중으로 변경</button>
-                      <button onClick={() => changeStatus('보류')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">보류하기</button>
-                      <button onClick={() => changeStatus('완료')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">완료하기</button>
-                      <div className="border-t border-gray-100 dark:border-zinc-700 my-1"></div>
-                      <button onClick={deleteSession} className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400">삭제하기</button>
-                    </div>
-                  )}
-                </div>
+                {isMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-gray-200 dark:border-zinc-700 py-1 z-20 overflow-hidden">
+                    <button onClick={() => changeStatus('진행중')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">진행중으로 변경</button>
+                    <button onClick={() => changeStatus('보류')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">보류하기</button>
+                    <button onClick={() => changeStatus('완료')} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200">완료하기</button>
+                    <div className="border-t border-gray-100 dark:border-zinc-700 my-1"></div>
+                    <button onClick={deleteSession} className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400">삭제하기</button>
+                  </div>
+                )}
               </div>
             </div>
+          </div>
             
             <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-zinc-950/50 custom-scrollbar" onClick={() => setIsMenuOpen(false)}>
               {messages.map((msg) => {
@@ -469,7 +479,7 @@ export default function ChatAdminPanel() {
               <div ref={messagesEndRef} />
             </div>
             
-            <div className="p-4 bg-white dark:bg-zinc-900 shrink-0">
+            <div className="p-4 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 shrink-0">
               <div className="flex gap-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl p-2 focus-within:border-[#03c75a] focus-within:ring-1 focus-within:ring-[#03c75a] transition-all">
                 <textarea
                   ref={inputRef}
@@ -497,12 +507,9 @@ export default function ChatAdminPanel() {
 
       {/* 3단: 오른쪽 패널 (항목관리 모드일 때만 표시) */}
       {selectedId && activeSession && (
-        <div className="w-[320px] bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] flex flex-col shrink-0 overflow-hidden">
-          <div className="h-[72px] px-6 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center">
-            <div className="flex items-center">
-              <div className="w-1.5 h-5 rounded-full bg-red-500 mr-3" />
-              <h3 className="text-[15px] font-bold text-gray-900 dark:text-white">관리자 전용 고객 메모</h3>
-            </div>
+        <div className="w-[320px] bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 flex flex-col shrink-0">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-950 flex justify-between items-center">
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white">📝 관리자 전용 고객 메모</h3>
             <button 
               onClick={saveMemo}
               disabled={isSavingMemo}

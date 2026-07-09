@@ -591,7 +591,7 @@ export default function CalendarAdminPanel() {
   };
 
   return (
-    <div className="flex h-full w-full bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] overflow-hidden">
+    <div className="flex h-full w-full bg-white dark:bg-zinc-950 rounded-lg border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
       
       {/* 캘린더 메인 영역 */}
       <div className="flex-1 flex flex-col min-w-0 min-h-0">

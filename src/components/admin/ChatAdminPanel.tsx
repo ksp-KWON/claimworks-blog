@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { ChatSession, ChatMessage } from '@/lib/supabase';
+import ConsultationDetailCard from './ConsultationDetailCard';
 
 interface SessionWithMeta extends ChatSession {
   last_content?: string;
@@ -540,86 +541,12 @@ export default function ChatAdminPanel() {
                 />
               </div>
             ) : (
-              <div className="p-5 flex flex-col gap-6 text-sm text-gray-700 dark:text-gray-200">
-                
-                <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
-                  <span className="font-bold text-gray-800 dark:text-gray-100">사고 분류</span>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-bold px-3 py-1.5 rounded-full text-xs outline-none border border-blue-100 dark:border-blue-800 appearance-none text-center"
-                  >
-                    <option value="교통사고">교통사고</option>
-                    <option value="근로재해">근로재해</option>
-                    <option value="배상책임">배상책임</option>
-                    <option value="기타상해">기타상해</option>
-                    <option value="질병">질병</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
-                  <span className="font-bold text-gray-800 dark:text-gray-100 whitespace-nowrap">진단명</span>
-                  <input
-                    type="text"
-                    value={formData.diagnosis}
-                    onChange={(e) => setFormData({...formData, diagnosis: e.target.value})}
-                    placeholder="입력..."
-                    className="bg-transparent border-none text-right font-bold text-gray-900 dark:text-white outline-none w-full ml-4 placeholder:text-gray-300"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
-                  <span className="font-bold text-gray-800 dark:text-gray-100 whitespace-nowrap">사고일자</span>
-                  <input
-                    type="text"
-                    value={formData.date}
-                    onChange={(e) => setFormData({...formData, date: e.target.value})}
-                    placeholder="YYYY-MM-DD"
-                    className="bg-transparent border-none text-right font-bold text-gray-900 dark:text-white outline-none w-full ml-4 placeholder:text-gray-300"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
-                  <span className="font-bold text-gray-800 dark:text-gray-100 whitespace-nowrap">사고장소</span>
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => setFormData({...formData, location: e.target.value})}
-                    placeholder="입력..."
-                    className="bg-transparent border-none text-right font-bold text-gray-900 dark:text-white outline-none w-full ml-4 placeholder:text-gray-300"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <span className="font-bold text-gray-800 dark:text-gray-100">사고 경위 및 내용</span>
-                  <textarea
-                    value={formData.details}
-                    onChange={(e) => setFormData({...formData, details: e.target.value})}
-                    onInput={(e) => {
-                      const t = e.target as HTMLTextAreaElement;
-                      t.style.height = 'auto';
-                      t.style.height = `${t.scrollHeight}px`;
-                    }}
-                    placeholder="상세 내용 입력..."
-                    className="w-full bg-gray-50/50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg p-3 text-sm text-gray-900 dark:text-white outline-none resize-none overflow-hidden min-h-[60px]"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2 pb-6">
-                  <span className="font-bold text-gray-800 dark:text-gray-100">추가 문의사항</span>
-                  <textarea
-                    value={formData.inquiries}
-                    onChange={(e) => setFormData({...formData, inquiries: e.target.value})}
-                    onInput={(e) => {
-                      const t = e.target as HTMLTextAreaElement;
-                      t.style.height = 'auto';
-                      t.style.height = `${t.scrollHeight}px`;
-                    }}
-                    placeholder="문의사항 입력..."
-                    className="w-full bg-blue-50/30 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/50 rounded-lg p-3 text-sm text-gray-900 dark:text-white outline-none resize-none overflow-hidden min-h-[60px]"
-                  />
-                </div>
-
+              <div className="p-5 overflow-y-auto custom-scrollbar">
+                <ConsultationDetailCard 
+                  data={formData} 
+                  onChange={setFormData} 
+                  readOnly={false} 
+                />
               </div>
             )}
           </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Consultation } from '@/lib/supabase';
+import ConsultationDetailCard from './ConsultationDetailCard';
 
 interface ConsultationAdminPanelProps {
   isSplitView: boolean;
@@ -242,43 +243,17 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   </div>
                 </div>
 
-                {/* Accident Detail Card */}
-                <div className="bg-white dark:bg-zinc-900 p-5 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-500">사고 분류</span>
-                    <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-xs font-bold rounded-full border border-indigo-200 dark:border-indigo-800">
-                      {activeConsultation.accident_type}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-500">진단명</span>
-                    <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{activeConsultation.diagnosis}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-500">사고일자</span>
-                    <span className="text-sm text-gray-800 dark:text-gray-200">{activeConsultation.accident_date}</span>
-                  </div>
-                  <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
-                    <span className="text-xs font-bold text-gray-500">사고장소</span>
-                    <span className="text-sm text-gray-800 dark:text-gray-200">{activeConsultation.accident_location || '-'}</span>
-                  </div>
-                  
-                  <div>
-                    <span className="block text-xs font-bold text-gray-500 mb-2">사고 경위 및 내용</span>
-                    <p className="text-sm text-gray-800 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-zinc-950 p-3 rounded-lg border border-gray-100 dark:border-zinc-800 whitespace-pre-wrap">
-                      {activeConsultation.content}
-                    </p>
-                  </div>
-
-                  {activeConsultation.inquiry && (
-                    <div>
-                      <span className="block text-xs font-bold text-gray-500 mb-2">추가 문의사항</span>
-                      <p className="text-sm text-indigo-800 dark:text-indigo-300 leading-relaxed bg-indigo-50/50 dark:bg-indigo-900/10 p-3 rounded-lg border border-indigo-100 dark:border-indigo-900/30 whitespace-pre-wrap">
-                        {activeConsultation.inquiry}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                <ConsultationDetailCard 
+                  data={{
+                    category: activeConsultation.accident_type,
+                    diagnosis: activeConsultation.diagnosis,
+                    date: activeConsultation.accident_date,
+                    location: activeConsultation.accident_location || '',
+                    details: activeConsultation.content,
+                    inquiries: activeConsultation.inquiry || ''
+                  }} 
+                  readOnly={true} 
+                />
 
                 <button
                   onClick={() => {

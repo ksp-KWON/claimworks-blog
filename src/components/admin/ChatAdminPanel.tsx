@@ -456,6 +456,7 @@ export default function ChatAdminPanel() {
                 )}
               </div>
             </div>
+          </div>
             
             <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-zinc-950/50 custom-scrollbar" onClick={() => setIsMenuOpen(false)}>
               {messages.map((msg) => {

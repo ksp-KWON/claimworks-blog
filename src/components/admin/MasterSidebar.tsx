@@ -82,13 +82,13 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
 
   return (
     <div 
-      className={`relative bg-transparent flex flex-col transition-all duration-300 ease-in-out shrink-0 ${isCollapsed ? 'w-20' : 'w-[260px]'}`}
+      className={`relative bg-white dark:bg-[#202124] rounded-none shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] p-4 flex flex-col transition-all duration-300 ease-in-out shrink-0 ${isCollapsed ? 'w-20' : 'w-[280px]'}`}
     >
       {/* Menu Items */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-3 pb-6">
+      <div className="flex-1 flex flex-col gap-2">
         
         {/* Top Header Toggle */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden shrink-0">
+        <div className="bg-transparent rounded-none overflow-hidden shrink-0">
           <button
             onClick={toggleCollapse}
             className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} px-4 py-3.5 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white group`}
@@ -105,7 +105,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
         </div>
 
         {/* 0. Calendar (상담일정) */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden shrink-0">
+        <div className="bg-transparent rounded-none overflow-hidden shrink-0">
           <button
             onClick={() => {
               if (isCollapsed) toggleCollapse();
@@ -210,7 +210,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
         </div>
 
         {/* 1. Chat Center */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden shrink-0">
+        <div className="bg-transparent rounded-none overflow-hidden shrink-0">
           <button
             onClick={() => {
               if (isCollapsed) toggleCollapse();
@@ -269,7 +269,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
         </div>
 
         {/* 2. Consultation Center */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden shrink-0">
+        <div className="bg-transparent rounded-none overflow-hidden shrink-0">
           <button
             onClick={() => {
               if (isCollapsed) toggleCollapse();
@@ -328,7 +328,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
         </div>
 
         {/* 3. Posts Center */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden shrink-0">
+        <div className="bg-transparent rounded-none overflow-hidden shrink-0">
           <button
             onClick={() => {
               if (isCollapsed) toggleCollapse();
@@ -403,7 +403,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
         </div>
 
         {/* 4. Settings (Accordion) */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden shrink-0">
+        <div className="bg-transparent rounded-none overflow-hidden shrink-0">
           <button
             onClick={() => {
               if (isCollapsed) toggleCollapse();

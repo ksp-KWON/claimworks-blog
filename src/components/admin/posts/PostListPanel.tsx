@@ -31,7 +31,7 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
       <div className="max-w-6xl mx-auto w-full flex flex-col h-full space-y-6">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm shrink-0">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-4 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] shrink-0">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               📂 기존 글 관리
@@ -72,7 +72,7 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
         </div>
 
         {/* List */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm">
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] rounded-none">
           {sortedAndFilteredList.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-400">
               <svg className="w-16 h-16 mb-4 text-gray-200 dark:text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>

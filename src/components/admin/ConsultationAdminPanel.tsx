@@ -110,7 +110,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
   }
 
   return (
-    <div className="flex flex-1 h-full bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden">
+    <div className="flex flex-1 h-full bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] overflow-hidden">
       
       {/* List Panel */}
       <div className={`flex flex-col bg-white dark:bg-zinc-900 overflow-hidden ${isSplitView ? 'flex-1 border-r border-gray-100 dark:border-zinc-800' : 'flex-1'}`}>

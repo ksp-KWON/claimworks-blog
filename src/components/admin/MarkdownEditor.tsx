@@ -82,7 +82,7 @@ export default function MarkdownEditor({
 
       {/* Editor Canvas (A4 Paper Style) */}
       <div className="flex-1 py-10 px-4 md:px-0 pb-32">
-        <div className="max-w-[850px] mx-auto bg-white dark:bg-zinc-900 min-h-[1000px] shadow-sm border border-gray-100 dark:border-zinc-800 rounded-xl overflow-hidden flex flex-col">
+        <div className="max-w-[850px] mx-auto bg-white dark:bg-zinc-900 min-h-[1000px] shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-gray-100 dark:border-zinc-800 rounded-none overflow-hidden flex flex-col">
           
           {/* Document Title Input */}
           <div className="px-10 pt-16 pb-4">

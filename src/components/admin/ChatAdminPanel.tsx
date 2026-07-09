@@ -267,7 +267,7 @@ export default function ChatAdminPanel() {
     <div className="flex flex-1 h-full gap-6">
       
       {/* 1단: 세션 목록 (좌측) */}
-      <div className="w-[320px] flex flex-col shrink-0 bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden">
+      <div className="w-[320px] flex flex-col shrink-0 bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] overflow-hidden">
         
         {/* 통일된 상단 헤더 (검색영역) */}
         <div className="h-[72px] px-4 bg-white dark:bg-zinc-900 flex items-center shrink-0">
@@ -389,7 +389,7 @@ export default function ChatAdminPanel() {
       </div>
 
       {/* 2단: 대화창 (중앙) */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden relative">
+      <div className="flex-1 flex flex-col bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] overflow-hidden relative">
         {!selectedId ? (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400 dark:text-zinc-600">
             <svg className="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
@@ -502,7 +502,7 @@ export default function ChatAdminPanel() {
 
       {/* 3단: 오른쪽 패널 (항목관리 모드일 때만 표시) */}
       {selectedId && activeSession && (
-        <div className="w-[320px] bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex flex-col shrink-0 overflow-hidden">
+        <div className="w-[320px] bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] flex flex-col shrink-0 overflow-hidden">
           <div className="h-[72px] px-6 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center">
             <div className="flex items-center">
               <div className="w-1.5 h-5 rounded-full bg-red-500 mr-3" />

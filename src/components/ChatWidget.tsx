@@ -240,8 +240,8 @@ export default function ChatWidget() {
           >
             {/* 헤더 */}
             <div className="flex items-center gap-3 px-4 py-3 shrink-0 bg-gradient-to-r from-[#1a73e8] to-[#1557b0]">
-              <div className="h-9 bg-white rounded flex items-center justify-center shrink-0 border border-white/30 px-1.5">
-                <img src="/logo_tv.png" alt="보상스쿨" className="h-5 w-auto object-contain" />
+              <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center shrink-0 border border-white/30 overflow-hidden shadow-sm">
+                <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white font-bold text-sm leading-tight">보상스쿨 손해사정사</p>

@@ -231,7 +231,7 @@ export default function AdminPage() {
     <div className="flex flex-col h-[calc(100dvh-64px)] bg-[#f4f6f8] dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
       
       {/* Main Workspace - No Global Header */}
-      <div className="flex flex-1 overflow-hidden relative h-full p-4 gap-4">
+      <div className="flex flex-1 overflow-hidden relative h-full p-6 gap-6">
         
         {/* Master Sidebar */}
         <MasterSidebar 

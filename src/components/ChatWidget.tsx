@@ -244,10 +244,10 @@ export default function ChatWidget() {
                 <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-bold text-sm leading-tight">보상스쿨 손해사정사</p>
-                <p className="text-blue-100 text-[11px] mt-0.5 flex items-center gap-1">
-                  <span className={`inline-block w-1.5 h-1.5 rounded-full ${status === 'connected' ? 'bg-green-300' : status === 'error' ? 'bg-red-300' : 'bg-yellow-300 animate-pulse'}`} />
-                  {status === 'connected' ? '연결됨' : 
+                <p className="text-white font-extrabold text-[15px] leading-tight tracking-tight">보상스쿨 손해사정사</p>
+                <p className="text-blue-100 text-[11px] mt-0.5 flex items-center gap-1.5 font-medium">
+                  <span className={`inline-block w-1.5 h-1.5 rounded-full ${status === 'connected' ? 'bg-[#03c75a]' : status === 'error' ? 'bg-red-500' : 'bg-amber-400 animate-pulse'}`} />
+                  {status === 'connected' ? '온라인 (상담 가능)' : 
                    status === 'need_nickname' ? '준비 완료' :
                    status === 'error' ? '연결 오류' : '연결 중...'}
                 </p>

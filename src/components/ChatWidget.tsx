@@ -384,42 +384,45 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* 기존 카카오톡 스타일(원형) 플로팅 버튼 */}
-      <motion.button
-        id="chat-floating-btn"
-        onClick={isOpen ? () => setIsOpen(false) : handleOpen}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.94 }}
-        className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-full shadow-[0_4px_20px_rgba(26,115,232,0.4)] flex items-center justify-center transition-colors focus:outline-none focus:ring-4 focus:ring-blue-300"
-        style={{ background: isOpen ? '#ea4335' : '#FEE500' }}
-        aria-label="보상 상담 채팅 열기"
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.svg key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }} className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-            </motion.svg>
-          ) : (
-            <motion.svg key="chat" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.2 }} className="w-7 h-7 text-[#3C1E1E]" viewBox="0 0 24 24" fill="currentColor">
+      {/* 3D 스타일(원형) 플로팅 버튼 */}
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.button
+            key="chat-floating-btn"
+            id="chat-floating-btn"
+            onClick={handleOpen}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.94 }}
+            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-4 focus:ring-blue-300 bg-white"
+            style={{ 
+              boxShadow: '0 8px 30px rgba(26,115,232,0.25), inset 0 -3px 6px rgba(0,0,0,0.06), inset 0 3px 6px rgba(255,255,255,1)',
+              border: '1px solid rgba(229,231,235,0.5)'
+            }}
+            aria-label="보상 상담 채팅 열기"
+          >
+            <motion.svg key="chat" className="w-7 h-7 text-[#1a73e8]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 3C6.48 3 2 6.58 2 11C2 13.56 3.42 15.86 5.6 17.26C5.4 18.06 4.8 19.86 4.8 19.86C4.8 19.86 6.8 19.56 8.6 18.36C9.6 18.76 10.8 19 12 19C17.52 19 22 15.42 22 11C22 6.58 17.52 3 12 3Z"/>
             </motion.svg>
-          )}
-        </AnimatePresence>
 
-        {/* 읽지 않은 메시지 뱃지 */}
-        <AnimatePresence>
-          {unreadCount > 0 && !isOpen && (
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
-              className="absolute -top-1 -right-1 w-5 h-5 bg-[#ea4335] text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md"
-            >
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </motion.span>
-          )}
-        </AnimatePresence>
-      </motion.button>
+            {/* 읽지 않은 메시지 뱃지 */}
+            <AnimatePresence>
+              {unreadCount > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-[#ea4335] text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md"
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        )}
+      </AnimatePresence>
     </>
   );
 }

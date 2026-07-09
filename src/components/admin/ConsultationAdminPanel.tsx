@@ -41,7 +41,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     const pendingId = sessionStorage.getItem('pending_select_id');
     if (pendingId) {
       setSelectedId(pendingId);
-      setIsSplitView(true);
+      onNavigateToManage();
       sessionStorage.removeItem('pending_select_id');
     }
   }, []);

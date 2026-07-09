@@ -18,7 +18,7 @@ export const contentType = 'image/png';
 export default async function Image() {
   let logoBase64 = '';
   try {
-    const logoPath = path.join(process.cwd(), 'public/logo.png');
+    const logoPath = path.join(process.cwd(), 'public/logo_tv.png');
     const logoBuffer = fs.readFileSync(logoPath);
     logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
   } catch (error) {

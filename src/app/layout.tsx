@@ -121,8 +121,8 @@ export default function RootLayout({
             <div className="flex items-center min-w-0 flex-1 mr-1 sm:mr-2">
               <div className="font-sans font-extrabold text-lg sm:text-xl min-w-0 tracking-tight">
                 <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden">
-                  <div className="relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-white dark:bg-[#202124] rounded-none border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.7)] group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.2)] dark:group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.9)] group-hover:border-gray-400 dark:group-hover:border-gray-500 group-hover:scale-105 transition-all duration-300 p-1.5 z-10">
-                    <img src="/images/logo-icon.png" alt="보상스쿨 TV" className="w-full h-full object-contain drop-shadow-sm transition-all duration-300" />
+                  <div className="relative flex items-center justify-center h-10 sm:h-11 shrink-0 bg-white dark:bg-[#202124] rounded-none border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.7)] group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.2)] dark:group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.9)] group-hover:border-gray-400 dark:group-hover:border-gray-500 group-hover:scale-105 transition-all duration-300 p-2 sm:p-2.5 z-10">
+                    <img src="/logo_tv.png" alt="보상스쿨 TV" className="h-full w-auto object-contain drop-shadow-sm transition-all duration-300" />
                   </div>
                   <span className="hidden sm:inline font-extrabold text-[#3c4043] dark:text-[#e8eaed] group-hover:opacity-80 transition-opacity truncate tracking-tight">
                     보상스쿨 헬스케어 &amp; 손해사정 보상가이드

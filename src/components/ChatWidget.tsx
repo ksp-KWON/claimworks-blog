@@ -422,9 +422,23 @@ export default function ChatWidget() {
               )}
             </AnimatePresence>
 
-            {/* 전체 3D 테두리 빨간색 반짝임 효과 */}
+            {/* 은은한 글로우(디머) 효과 */}
             {unreadCount === 0 && (
-              <div className="absolute inset-0 rounded-full border-2 border-red-500 animate-ping opacity-60 pointer-events-none"></div>
+              <motion.div 
+                className="absolute inset-0 rounded-full pointer-events-none"
+                animate={{ 
+                  boxShadow: [
+                    '0 0 0px 0px rgba(26,115,232,0)', 
+                    '0 0 25px 8px rgba(26,115,232,0.4)', 
+                    '0 0 0px 0px rgba(26,115,232,0)'
+                  ] 
+                }}
+                transition={{ 
+                  duration: 4, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+              />
             )}
           </motion.button>
         )}

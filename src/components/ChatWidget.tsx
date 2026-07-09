@@ -240,8 +240,8 @@ export default function ChatWidget() {
           >
             {/* 헤더 */}
             <div className="flex items-center gap-3 px-4 py-3 shrink-0 bg-gradient-to-r from-[#1a73e8] to-[#1557b0]">
-              <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center shrink-0 border border-white/30">
-                <span className="text-white font-black text-[13px]">보상</span>
+              <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center shrink-0 border border-white/30 overflow-hidden">
+                <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white font-bold text-sm leading-tight">보상스쿨 손해사정사</p>
@@ -298,8 +298,8 @@ export default function ChatWidget() {
                 <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50 dark:bg-[#292a2d]" style={{ scrollbarWidth: 'thin' }}>
                   {/* 자동 인사말 */}
                   <div className="flex items-end gap-2">
-                    <div className="w-7 h-7 rounded-full bg-[#1a73e8] flex items-center justify-center shrink-0">
-                      <span className="text-white text-[9px] font-black">보상</span>
+                    <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden">
+                      <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-cover" />
                     </div>
                     <div className="max-w-[75%]">
                       <div className="bg-white dark:bg-[#3c3d40] rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm border border-gray-100 dark:border-white/5">
@@ -331,8 +331,8 @@ export default function ChatWidget() {
                     return (
                       <div key={msg.id} className={`flex items-end gap-2 ${isVisitor ? 'flex-row-reverse' : 'flex-row'}`}>
                         {!isVisitor && (
-                          <div className="w-7 h-7 rounded-full bg-[#1a73e8] flex items-center justify-center shrink-0">
-                            <span className="text-white text-[9px] font-black">보상</span>
+                          <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden">
+                            <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-cover" />
                           </div>
                         )}
                         <div className={`max-w-[75%] flex flex-col ${isVisitor ? 'items-end' : 'items-start'}`}>
@@ -396,7 +396,7 @@ export default function ChatWidget() {
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.94 }}
-            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-4 focus:ring-blue-300 bg-white"
+            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-4 focus:ring-blue-300 bg-blue-50"
             style={{ 
               boxShadow: '0 8px 30px rgba(26,115,232,0.25), inset 0 -3px 6px rgba(0,0,0,0.06), inset 0 3px 6px rgba(255,255,255,1)',
               border: '1px solid rgba(229,231,235,0.5)'

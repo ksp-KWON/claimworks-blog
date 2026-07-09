@@ -403,9 +403,7 @@ export default function ChatWidget() {
             }}
             aria-label="보상 상담 채팅 열기"
           >
-            <motion.svg key="chat" className="w-7 h-7 text-[#1a73e8]" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 3C6.48 3 2 6.58 2 11C2 13.56 3.42 15.86 5.6 17.26C5.4 18.06 4.8 19.86 4.8 19.86C4.8 19.86 6.8 19.56 8.6 18.36C9.6 18.76 10.8 19 12 19C17.52 19 22 15.42 22 11C22 6.58 17.52 3 12 3Z"/>
-            </motion.svg>
+            <img key="chat" src="/logo.png" alt="보상스쿨 채팅" className="w-8 h-8 object-contain" />
 
             {/* 읽지 않은 메시지 뱃지 */}
             <AnimatePresence>

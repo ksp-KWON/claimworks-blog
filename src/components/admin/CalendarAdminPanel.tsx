@@ -23,6 +23,8 @@ export default function CalendarAdminPanel() {
   const [formTitle, setFormTitle] = useState('');
   const [formContent, setFormContent] = useState('');
   const [formLabelId, setFormLabelId] = useState('');
+  const [formSourceApp, setFormSourceApp] = useState('');
+  const [formSourceId, setFormSourceId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchEvents = async () => {
@@ -56,14 +58,43 @@ export default function CalendarAdminPanel() {
     fetchHolidays();
   }, [currentDate.getFullYear()]);
 
+  useEffect(() => {
+    const pendingStr = sessionStorage.getItem('pending_calendar_event');
+    if (pendingStr && labels.length > 0) {
+      sessionStorage.removeItem('pending_calendar_event');
+      try {
+        const parsed = JSON.parse(pendingStr);
+        let targetLabelId = '';
+        if (parsed.sourceApp === 'chat-list') {
+          const chatLabel = labels.find(l => l.name.includes('채팅'));
+          if (chatLabel) targetLabelId = chatLabel.id;
+        } else if (parsed.sourceApp === 'consultations') {
+          const consultLabel = labels.find(l => l.name.includes('예약') || l.name.includes('접수'));
+          if (consultLabel) targetLabelId = consultLabel.id;
+        }
+        
+        setSelectedDate(formatDateString(new Date()));
+        setSelectedEvent(null);
+        setIsEditing(true);
+        setFormTitle(parsed.title || '');
+        setFormContent(parsed.text || '');
+        setFormLabelId(targetLabelId);
+        setFormSourceApp(parsed.sourceApp || '');
+        setFormSourceId(parsed.sourceId || '');
+      } catch (e) {
+        console.error('Failed to parse pending event', e);
+      }
+    }
+  }, [labels]);
+
   const parseContent = (content?: string) => {
-    if (!content) return { text: '', labelId: '' };
+    if (!content) return { text: '', labelId: '', sourceApp: '', sourceId: '' };
     try {
       const parsed = JSON.parse(content);
-      if (parsed.text !== undefined) return parsed as { text: string; labelId: string };
-      return { text: content, labelId: '' };
+      if (parsed.text !== undefined) return parsed as { text: string; labelId: string; sourceApp?: string; sourceId?: string };
+      return { text: content, labelId: '', sourceApp: '', sourceId: '' };
     } catch {
-      return { text: content, labelId: '' };
+      return { text: content, labelId: '', sourceApp: '', sourceId: '' };
     }
   };
 
@@ -109,6 +140,8 @@ export default function CalendarAdminPanel() {
     setFormTitle('');
     setFormContent('');
     setFormLabelId('');
+    setFormSourceApp('');
+    setFormSourceId('');
   };
 
   const handleEventClick = (e: React.MouseEvent, event: AdminCalendarEvent) => {
@@ -117,9 +150,11 @@ export default function CalendarAdminPanel() {
     setSelectedEvent(event);
     setIsEditing(false);
     setFormTitle(event.title);
-    const { text, labelId } = parseContent(event.content);
+    const { text, labelId, sourceApp, sourceId } = parseContent(event.content);
     setFormContent(text);
     setFormLabelId(labelId);
+    setFormSourceApp(sourceApp || '');
+    setFormSourceId(sourceId || '');
   };
 
   const handleCreateNew = () => {
@@ -131,6 +166,8 @@ export default function CalendarAdminPanel() {
     setFormTitle('');
     setFormContent('');
     setFormLabelId('');
+    setFormSourceApp('');
+    setFormSourceId('');
   };
 
   const handleSave = async () => {
@@ -140,7 +177,12 @@ export default function CalendarAdminPanel() {
     }
     setIsLoading(true);
     
-    const contentToSave = JSON.stringify({ text: formContent, labelId: formLabelId });
+    const contentToSave = JSON.stringify({ 
+      text: formContent, 
+      labelId: formLabelId,
+      sourceApp: formSourceApp,
+      sourceId: formSourceId
+    });
     
     if (selectedEvent) {
       const { error } = await supabase
@@ -186,6 +228,8 @@ export default function CalendarAdminPanel() {
       setFormTitle('');
       setFormContent('');
       setFormLabelId('');
+      setFormSourceApp('');
+      setFormSourceId('');
       fetchEvents();
     } else {
       console.error('Delete error:', error);
@@ -656,7 +700,15 @@ export default function CalendarAdminPanel() {
                   </select>
                 </div>
                 <div className="flex flex-col gap-1.5 flex-1 min-h-[200px]">
-                  <label className="text-xs font-bold text-gray-500">상세 내용</label>
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold text-gray-500">상세 내용</label>
+                    <button 
+                      onClick={() => setFormContent(prev => prev + (prev ? '\n\n' : '') + '이름: \n연락처: \n사고일자: \n진단명: \n\n[상담내용]\n- ')}
+                      className="text-[10px] bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-1 rounded font-bold transition-colors"
+                    >
+                      📝 상담 질문표 양식 삽입
+                    </button>
+                  </div>
                   <textarea 
                     value={formContent}
                     onChange={e => setFormContent(e.target.value)}
@@ -716,6 +768,22 @@ export default function CalendarAdminPanel() {
                 <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg p-3 min-h-[150px] text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap flex-1 overflow-y-auto custom-scrollbar">
                   {parseContent(selectedEvent.content).text || <span className="text-gray-400 italic">내용 없음</span>}
                 </div>
+                
+                {(() => {
+                  const { sourceApp } = parseContent(selectedEvent.content);
+                  if (!sourceApp) return null;
+                  
+                  return (
+                    <button
+                      onClick={() => {
+                        window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: sourceApp } }));
+                      }}
+                      className="mt-4 w-full py-2 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400 font-bold rounded-lg hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2 text-sm border border-indigo-200 dark:border-indigo-800"
+                    >
+                      🔗 {sourceApp === 'chat-list' ? '원본 채팅 보기' : '원본 예약접수 보기'}
+                    </button>
+                  );
+                })()}
                 
                 <div className="flex gap-2 mt-auto pt-6 shrink-0">
                   <button 

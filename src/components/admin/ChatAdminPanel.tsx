@@ -492,6 +492,24 @@ export default function ChatAdminPanel() {
               <span className="text-xs text-gray-500">최초 접속일</span>
               <span className="text-sm text-gray-800 dark:text-gray-200">{new Date(activeSession.created_at).toLocaleString('ko-KR')}</span>
             </div>
+            
+            <button
+              onClick={() => {
+                const title = `[채팅] ${visitorLabel(activeSession)}`;
+                const contentText = `최근 대화내용:\n${activeSession.last_content || '내용 없음'}\n\n고객 메모:\n${memoText}`;
+                const payload = {
+                  title,
+                  text: contentText,
+                  sourceApp: 'chat-list',
+                  sourceId: activeSession.id
+                };
+                sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
+                window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
+              }}
+              className="w-full py-2 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 text-sm border border-blue-200 dark:border-blue-800"
+            >
+              📅 캘린더 일정으로 보내기
+            </button>
 
             <hr className="border-gray-200 dark:border-zinc-800" />
 

@@ -271,6 +271,24 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   )}
                 </div>
 
+                <button
+                  onClick={() => {
+                    const title = `[예약접수] ${activeConsultation.name}`;
+                    const contentText = `연락처: ${activeConsultation.phone}\n사고유형: ${activeConsultation.accident_type}\n사고일자: ${activeConsultation.accident_date}\n진단명: ${activeConsultation.diagnosis}\n\n내용:\n${activeConsultation.content}\n\n문의사항:\n${activeConsultation.inquiry || '-'}`;
+                    const payload = {
+                      title,
+                      text: contentText,
+                      sourceApp: 'consultations',
+                      sourceId: activeConsultation.id
+                    };
+                    sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
+                    window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
+                  }}
+                  className="w-full mt-2 py-2 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 text-sm border border-blue-200 dark:border-blue-800"
+                >
+                  📅 캘린더 일정으로 보내기
+                </button>
+
               </div>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-gray-400">

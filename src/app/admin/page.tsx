@@ -57,6 +57,14 @@ export default function AdminPage() {
     if (sessionStorage.getItem('admin_auth') === 'true') {
       setIsLoggedIn(true);
     }
+
+    const handleNavigate = (e: any) => {
+      if (e.detail && e.detail.app) {
+        setActiveApp(e.detail.app);
+      }
+    };
+    window.addEventListener('navigate-admin-app', handleNavigate);
+    return () => window.removeEventListener('navigate-admin-app', handleNavigate);
   }, []);
 
   useEffect(() => {

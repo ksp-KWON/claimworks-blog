@@ -133,24 +133,8 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
           
           {(!isCollapsed && isCalendarExpanded) && (
             <div className="mt-1 ml-4 pl-4 border-l border-zinc-600/50 flex flex-col gap-1 py-1">
-              <button
-                onClick={() => setActiveApp('calendar')}
-                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${
-                  activeApp === 'calendar' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                }`}
-              >
-                캘린더 보기
-              </button>
-              
-              <div className="mt-2 mb-1 px-3 flex items-center justify-between text-xs font-bold text-zinc-500 uppercase">
+              <div className="mt-1 mb-1 px-3 flex items-center text-xs font-bold text-zinc-500 uppercase">
                 내 캘린더 (라벨)
-                <button 
-                  onClick={handleAddLabel}
-                  className="hover:text-white text-lg leading-none"
-                  title="라벨 추가"
-                >
-                  +
-                </button>
               </div>
               
               {labels.map((label, index) => (
@@ -206,6 +190,15 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
                   )}
                 </div>
               ))}
+              <button 
+                onClick={handleAddLabel}
+                className="flex items-center gap-2 px-3 py-2 mt-1 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-colors group"
+              >
+                <div className="w-4 h-4 rounded-full border border-dashed border-zinc-400 flex items-center justify-center group-hover:border-white transition-colors">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                </div>
+                <span className="text-xs font-medium">새 라벨 추가</span>
+              </button>
             </div>
           )}
         </div>

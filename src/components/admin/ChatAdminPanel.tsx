@@ -488,7 +488,7 @@ export default function ChatAdminPanel() {
       </div>
 
       {/* 3단: 오른쪽 패널 (항목관리 모드일 때만 표시) */}
-      {selectedId && activeSession && activeApp === 'chat-manage' && (
+      {selectedId && activeSession && (
         <div className="w-[320px] bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 flex flex-col shrink-0">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-950">
             <h3 className="text-sm font-bold text-gray-900 dark:text-white">고객 정보</h3>

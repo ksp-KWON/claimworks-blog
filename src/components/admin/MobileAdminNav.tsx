@@ -15,6 +15,7 @@ interface MobileAdminNavProps {
 
 export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: MobileAdminNavProps) {
   const [openModal, setOpenModal] = useState<ModalType>('none');
+  const [isViewExpanded, setIsViewExpanded] = useState(false);
   const unreadChatCount = useUnreadChatCount();
   const { labels, toggleLabelActive } = useCalendarLabels();
 
@@ -33,7 +34,10 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
     };
   }, [openModal]);
 
-  const closeModals = () => setOpenModal('none');
+  const closeModals = () => {
+    setOpenModal('none');
+    setIsViewExpanded(false);
+  };
 
   const handleNavClick = (id: 'calendar' | 'chat' | 'consult' | 'posts' | 'settings') => {
     if (id === 'chat') {
@@ -121,57 +125,121 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
           onClick={closeModals}
         >
           <div 
-            className="w-full bg-[#1e2733] border-t border-zinc-700/50 rounded-t-2xl max-h-[80vh] overflow-y-auto pb-20 shadow-2xl animate-slide-up-modal relative"
+            className="w-full bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 rounded-t-2xl max-h-[85vh] overflow-y-auto pb-24 shadow-2xl animate-slide-up-modal relative"
             onClick={(e) => e.stopPropagation()}
           >
             {/* 드래그 핸들 (시각적) */}
             <div className="w-full flex justify-center pt-3 pb-2" onClick={closeModals}>
-              <div className="w-12 h-1.5 bg-zinc-600 rounded-full"></div>
+              <div className="w-12 h-1.5 bg-gray-300 dark:bg-zinc-600 rounded-full"></div>
             </div>
 
             {openModal === 'calendar' && (
-              <div className="p-4 space-y-3">
-                <h3 className="text-lg font-bold text-white mb-4">상담 일정</h3>
-                <button onClick={() => { 
-                  setActiveApp('calendar'); 
-                  closeModals();
-                  setTimeout(() => {
-                    window.dispatchEvent(new Event('open-label-manager'));
-                  }, 100);
-                }} className="w-full flex items-center p-4 bg-[#2a3644] rounded-xl hover:bg-[#344253] text-left">
-                  <span className="text-[20px] mr-3">🏷️</span>
-                  <span className="text-base text-white font-bold">라벨 관리</span>
-                </button>
+              <div className="p-4 space-y-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white px-1">상담 일정</h3>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <button onClick={() => { 
+                    setActiveApp('calendar'); 
+                    closeModals();
+                    setTimeout(() => window.dispatchEvent(new Event('open-new-event')), 100);
+                  }} className="flex flex-col items-center justify-center p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/50 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
+                    <svg className="w-6 h-6 text-blue-600 dark:text-blue-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                    <span className="text-sm text-blue-700 dark:text-blue-300 font-bold">새 일정 추가</span>
+                  </button>
+                  
+                  <div className="relative">
+                    <button onClick={() => setIsViewExpanded(!isViewExpanded)} className="w-full h-full flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 transition-colors">
+                      <svg className="w-6 h-6 text-gray-600 dark:text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-gray-700 dark:text-gray-300 font-bold">뷰 변경</span>
+                        <svg className={`w-4 h-4 text-gray-500 transition-transform ${isViewExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                      </div>
+                    </button>
+                    {isViewExpanded && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-lg z-50 overflow-hidden flex flex-col">
+                        {[
+                          { id: 'day', label: '일' },
+                          { id: 'week', label: '주' },
+                          { id: 'month', label: '월' },
+                          { id: 'year', label: '연도' },
+                          { id: 'agenda', label: '일정' }
+                        ].map(view => (
+                          <button
+                            key={view.id}
+                            onClick={() => {
+                              window.dispatchEvent(new CustomEvent('change-view-mode', { detail: { viewMode: view.id } }));
+                              setIsViewExpanded(false);
+                              closeModals();
+                            }}
+                            className="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-700 font-medium border-b border-gray-100 dark:border-zinc-700/50 last:border-0"
+                          >
+                            {view.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <h4 className="text-sm font-bold text-gray-500 dark:text-gray-400 mb-3 px-1">내 캘린더 (라벨)</h4>
+                  <div className="bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl p-2 space-y-1">
+                    {labels.map((label) => (
+                      <label key={label.id} className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded-lg cursor-pointer transition-colors">
+                        <input 
+                          type="checkbox"
+                          checked={label.active}
+                          onChange={() => toggleLabelActive(label.id)}
+                          className="w-4 h-4 rounded-sm bg-transparent border-2 appearance-none cursor-pointer flex items-center justify-center after:content-[''] after:w-2.5 after:h-2.5 after:rounded-sm after:scale-0 checked:after:scale-100 after:transition-transform shrink-0"
+                          style={{ 
+                            borderColor: label.color, 
+                            ...(label.active ? { '--tw-bg-opacity': 1, backgroundColor: label.color } : {}) 
+                          } as any}
+                        />
+                        <span className="text-sm text-gray-800 dark:text-gray-200 font-medium flex-1 truncate">{label.name}</span>
+                      </label>
+                    ))}
+                    
+                    <button onClick={() => { 
+                      setActiveApp('calendar'); 
+                      closeModals();
+                      setTimeout(() => window.dispatchEvent(new Event('open-label-manager')), 100);
+                    }} className="w-full flex items-center justify-center gap-2 mt-2 px-3 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-lg transition-colors">
+                      <span className="text-lg">🏷️</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300 font-bold">라벨 추가 / 관리</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 
             {openModal === 'posts' && (
               <div className="p-4 space-y-3">
-                <h3 className="text-lg font-bold text-white mb-4">포스팅 센터</h3>
-                <button onClick={() => { setActiveApp('post-ai'); closeModals(); }} className="w-full flex items-center p-4 bg-[#2a3644] rounded-xl hover:bg-[#344253] text-left">
-                  <span className="text-base text-white font-bold">AI 글쓰기</span>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white px-1 mb-4">포스팅 센터</h3>
+                <button onClick={() => { setActiveApp('post-ai'); closeModals(); }} className="w-full flex items-center p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
+                  <span className="text-base text-gray-900 dark:text-white font-bold">AI 글쓰기</span>
                 </button>
-                <button onClick={() => { setActiveApp('editor'); closeModals(); }} className="w-full flex items-center p-4 bg-[#2a3644] rounded-xl hover:bg-[#344253] text-left">
-                  <span className="text-base text-white font-bold">글쓰기 에디터</span>
+                <button onClick={() => { setActiveApp('editor'); closeModals(); }} className="w-full flex items-center p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
+                  <span className="text-base text-gray-900 dark:text-white font-bold">글쓰기 에디터</span>
                 </button>
-                <button onClick={() => { setActiveApp('post-list'); closeModals(); }} className="w-full flex items-center p-4 bg-[#2a3644] rounded-xl hover:bg-[#344253] text-left">
-                  <span className="text-base text-white font-bold">기존 글 관리</span>
+                <button onClick={() => { setActiveApp('post-list'); closeModals(); }} className="w-full flex items-center p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
+                  <span className="text-base text-gray-900 dark:text-white font-bold">기존 글 관리</span>
                 </button>
-                <button onClick={() => { setActiveApp('post-daily'); closeModals(); }} className="w-full flex items-center p-4 bg-[#2a3644] rounded-xl hover:bg-[#344253] text-left">
-                  <span className="text-base text-white font-bold">데일리 자동화</span>
+                <button onClick={() => { setActiveApp('post-daily'); closeModals(); }} className="w-full flex items-center p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
+                  <span className="text-base text-gray-900 dark:text-white font-bold">데일리 자동화</span>
                 </button>
               </div>
             )}
 
             {openModal === 'settings' && (
               <div className="p-4 space-y-3">
-                <h3 className="text-lg font-bold text-white mb-4">환경설정</h3>
-                <button onClick={() => { setActiveApp('post-settings'); closeModals(); }} className="w-full flex items-center p-4 bg-[#2a3644] rounded-xl hover:bg-[#344253] text-left">
-                  <span className="text-base text-white font-bold">API 입력</span>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white px-1 mb-4">환경설정</h3>
+                <button onClick={() => { setActiveApp('post-settings'); closeModals(); }} className="w-full flex items-center p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
+                  <span className="text-base text-gray-900 dark:text-white font-bold">API 설정</span>
                 </button>
                 {onLogout && (
-                  <button onClick={() => { onLogout(); closeModals(); }} className="w-full flex items-center p-4 bg-red-500/10 rounded-xl hover:bg-red-500/20 text-left">
-                    <span className="text-base text-red-500 font-bold">로그아웃</span>
+                  <button onClick={() => { onLogout(); closeModals(); }} className="w-full flex items-center p-4 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-left transition-colors">
+                    <span className="text-base text-red-600 dark:text-red-400 font-bold">로그아웃</span>
                   </button>
                 )}
               </div>

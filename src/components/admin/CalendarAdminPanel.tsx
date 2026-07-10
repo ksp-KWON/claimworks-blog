@@ -69,15 +69,40 @@ export default function CalendarAdminPanel() {
     };
     fetchLinkableData();
 
-    // Listen for custom event from MobileAdminNav
+    // Listen for custom events from MobileAdminNav
     const handleOpenLabelManager = () => {
       setIsLabelManagerOpen(true);
       setIsEditing(false);
       setSelectedEvent(null);
     };
+    
+    const handleOpenNewEvent = () => {
+      setSelectedDate(formatDateString(new Date()));
+      setIsEditing(true);
+      setFormTitle('');
+      setFormContent('');
+      setFormLabelId('');
+      setFormSourceApp('');
+      setFormSourceId('');
+      setSelectedEvent(null);
+      setIsLabelManagerOpen(false);
+    };
+
+    const handleChangeViewMode = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail && customEvent.detail.viewMode) {
+        setViewMode(customEvent.detail.viewMode);
+      }
+    };
+
     window.addEventListener('open-label-manager', handleOpenLabelManager);
+    window.addEventListener('open-new-event', handleOpenNewEvent);
+    window.addEventListener('change-view-mode', handleChangeViewMode);
+    
     return () => {
       window.removeEventListener('open-label-manager', handleOpenLabelManager);
+      window.removeEventListener('open-new-event', handleOpenNewEvent);
+      window.removeEventListener('change-view-mode', handleChangeViewMode);
     };
   }, []);
 

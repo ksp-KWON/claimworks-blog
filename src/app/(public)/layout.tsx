@@ -1,28 +1,29 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import ThemeToggle from '@/components/ThemeToggle';
 import SearchBar from '@/components/SearchBar';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import ChatWidget from '@/components/ChatWidget';
 import ScrollProgressBar from '@/components/ScrollProgressBar';
 import SmartStickyLayout from '@/components/SmartStickyLayout';
+import SidebarContent from '@/components/SidebarContent';
+import { getSortedPostsData } from '@/lib/posts';
 
 /**
- * 방문자용 공개 레이아웃.
- * - /admin 경로에서는 헤더/푸터/MobileBottomNav 모두 렌더링하지 않음
- * - 사이드바 데이터는 SmartStickyLayout에서 직접 처리
+ * 방문자용 공개 레이아웃. (서버 컴포넌트)
  */
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isAdmin = pathname === '/admin' || pathname?.startsWith('/admin/');
-
-  // 관리자 페이지 → 공개 레이아웃 UI 전혀 없이 순수하게 children만
-  if (isAdmin) {
-    return <>{children}</>;
+  // 서버에서 태그 목록 계산 → SidebarContent에 정적 주입 (클라이언트 API 호출 불필요)
+  const posts = getSortedPostsData(false);
+  const tagCounts: Record<string, number> = {};
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+    }
   }
+  const sortedTags = Object.entries(tagCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([tag]) => tag);
 
   return (
     <>
@@ -83,7 +84,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       {/* 본문 + 사이드바 */}
       <SmartStickyLayout
         mainContent={children}
-        sidebarContent={null}
+        sidebarContent={<SidebarContent tags={sortedTags} />}
       />
 
       {/* 푸터 */}

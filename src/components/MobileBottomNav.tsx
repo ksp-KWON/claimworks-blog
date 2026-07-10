@@ -9,11 +9,9 @@ type ModalType = 'none' | 'home' | 'partner' | 'calculator' | 'hospital' | 'cons
 export default function MobileBottomNav() {
   const pathname = usePathname();
   const [openModal, setOpenModal] = useState<ModalType>('none');
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   const closeModals = () => setOpenModal('none');
-
-  // 관리자 페이지에서는 절대 렌더링하지 않음
-  if (pathname === '/admin' || pathname?.startsWith('/admin/')) return null;
 
   // 모달 활성화 시 배경 스크롤 방지
   useEffect(() => {

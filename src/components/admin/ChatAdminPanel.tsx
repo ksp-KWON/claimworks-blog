@@ -486,6 +486,8 @@ export default function ChatAdminPanel() {
             </div>
           </>
         )}
+      </div>
+
       {/* 메모 사이드 패널 (Drawer) */}
       {showMemoPanel && selectedId && activeSession && (
         <>

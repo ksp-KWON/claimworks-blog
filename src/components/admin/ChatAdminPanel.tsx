@@ -489,51 +489,53 @@ export default function ChatAdminPanel() {
 
       {/* 공통 팝업 상담신청양식 (모달) */}
       {showMemoModal && selectedId && activeSession && (
-        <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowMemoModal(false)}>
-          <div className="w-full max-w-lg max-h-[90vh] bg-white dark:bg-zinc-900 rounded-2xl flex flex-col shadow-2xl animate-fade-in-up" onClick={e => e.stopPropagation()}>
-            <div className="px-4 py-4 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center shrink-0">
-              <h3 className="font-bold text-gray-900 dark:text-white">상담신청양식</h3>
-              <button onClick={() => setShowMemoModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
+        <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 md:p-6" onClick={() => setShowMemoModal(false)}>
+          <div className="w-full max-w-3xl h-full max-h-[90vh] bg-white dark:bg-zinc-900 rounded-2xl flex flex-col shadow-2xl animate-fade-in-up overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="px-4 py-3 border-b border-gray-100 dark:border-zinc-800 flex flex-wrap gap-2 justify-between items-center shrink-0 bg-gray-50 dark:bg-zinc-950">
+              <h3 className="font-bold text-gray-900 dark:text-white mr-auto flex items-center gap-2">
+                <span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>
+                기본 정보 및 사고 내용 입력
+              </h3>
+              <div className="flex items-center gap-1.5">
+                <button 
+                  onClick={() => setIsEditMode(!isEditMode)}
+                  className={`text-xs px-3 py-1.5 rounded transition-colors border font-bold ${isEditMode ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 dark:bg-zinc-800 dark:text-gray-300 dark:border-zinc-700 dark:hover:bg-zinc-700'}`}
+                >
+                  {isEditMode ? '입력취소' : '수정'}
+                </button>
+                <button 
+                  onClick={saveMemo}
+                  disabled={isSavingMemo || !isEditMode}
+                  className={`text-xs px-3 py-1.5 rounded transition-colors border font-bold ${!isEditMode ? 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 border-gray-200 dark:bg-zinc-800 dark:text-gray-500 dark:border-zinc-700' : 'bg-blue-600 hover:bg-blue-700 text-white border-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400'}`}
+                >
+                  {isSavingMemo ? '저장중...' : '저장'}
+                </button>
+                <button
+                  onClick={() => {
+                    const title = `[채팅] ${visitorLabel(activeSession)}`;
+                    const insText = formData.insurances.map(i => `- ${i.type}: ${i.company} (${i.year} / ${i.amount})`).join('\n');
+                    const parsedContent = `[상담양식]\n사고 분류: ${formData.category}\n진단명: ${formData.diagnosis}\n사고일자: ${formData.date}\n사고장소: ${formData.location}\n사고경위: ${formData.details}\n치료경위: ${formData.treatmentHistory}\n가입보험:\n${insText || '없음'}\n추가문의: ${formData.inquiries}`;
+                    const contentText = `최근 대화내용:\n${activeSession.last_content || '내용 없음'}\n\n${parsedContent}`;
+                    const payload = { title, text: contentText, sourceApp: 'chat-list', sourceId: activeSession.id };
+                    sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
+                    window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
+                  }}
+                  className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 px-3 py-1.5 rounded transition-colors font-bold whitespace-nowrap dark:bg-zinc-800 dark:border-zinc-600 dark:text-gray-300 dark:hover:bg-zinc-700"
+                >
+                  캘린더보내기
+                </button>
+                <button onClick={() => setShowMemoModal(false)} className="text-xs bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-900/50 px-3 py-1.5 rounded font-bold ml-1">
+                  닫기
+                </button>
+              </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-gray-50/50 dark:bg-zinc-950/50">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-white dark:bg-zinc-950">
               <ConsultationDetailCard 
                 data={formData} 
                 onChange={setFormData} 
                 readOnly={!isEditMode} 
               />
-            </div>
-            
-            <div className="px-4 py-3 border-t border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950 shrink-0 rounded-b-2xl flex gap-2">
-              <button 
-                onClick={() => setIsEditMode(!isEditMode)}
-                className={`flex-1 text-xs py-2 rounded-lg transition-colors border font-bold ${isEditMode ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 dark:bg-zinc-800 dark:text-gray-300 dark:border-zinc-700 dark:hover:bg-zinc-700'}`}
-              >
-                {isEditMode ? '입력취소' : '수정하기'}
-              </button>
-              <button 
-                onClick={saveMemo}
-                disabled={isSavingMemo || !isEditMode}
-                className={`flex-1 text-xs py-2 rounded-lg transition-colors border font-bold ${!isEditMode ? 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 border-gray-200 dark:bg-zinc-800 dark:text-gray-500 dark:border-zinc-700' : 'bg-blue-600 hover:bg-blue-700 text-white border-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400'}`}
-              >
-                {isSavingMemo ? '저장중...' : '저장'}
-              </button>
-              <button
-                onClick={() => {
-                  const title = `[채팅] ${visitorLabel(activeSession)}`;
-                  const insText = formData.insurances.map(i => `- ${i.type}: ${i.company} (${i.year} / ${i.amount})`).join('\n');
-                  const parsedContent = `[상담양식]\n사고 분류: ${formData.category}\n진단명: ${formData.diagnosis}\n사고일자: ${formData.date}\n사고장소: ${formData.location}\n사고경위: ${formData.details}\n치료경위: ${formData.treatmentHistory}\n가입보험:\n${insText || '없음'}\n추가문의: ${formData.inquiries}`;
-                  const contentText = `최근 대화내용:\n${activeSession.last_content || '내용 없음'}\n\n${parsedContent}`;
-                  const payload = { title, text: contentText, sourceApp: 'chat-list', sourceId: activeSession.id };
-                  sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
-                  window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
-                }}
-                className="flex-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 py-2 rounded-lg transition-colors font-bold whitespace-nowrap dark:bg-zinc-800 dark:border-zinc-600 dark:text-gray-300 dark:hover:bg-zinc-700"
-              >
-                📅 캘린더보내기
-              </button>
             </div>
           </div>
         </div>

@@ -17,10 +17,7 @@ interface MasterSidebarProps {
 }
 
 export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, toggleCollapse, onLogout }: MasterSidebarProps) {
-  // Accordion states
-  const [isCalendarExpanded, setIsCalendarExpanded] = useState(true);
-  const [isPostsExpanded, setIsPostsExpanded] = useState(true);
-  const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
+  // Accordion states removed as per request
 
   // Labels hook
   const { labels, toggleLabelActive } = useCalendarLabels();
@@ -58,11 +55,10 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
           <button
             onClick={() => {
               if (isCollapsed) toggleCollapse();
-              setIsCalendarExpanded(!isCalendarExpanded);
               if (activeApp !== 'calendar') setActiveApp('calendar');
             }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
-              activeApp === 'calendar' && !isCalendarExpanded
+              activeApp === 'calendar'
                 ? 'bg-zinc-800 text-white font-bold' 
                 : 'hover:bg-zinc-800/50 text-zinc-300 hover:text-white'
             }`}
@@ -73,35 +69,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
               </svg>
               {!isCollapsed && <span className="text-sm font-bold">상담일정</span>}
             </div>
-            {!isCollapsed && (
-              <svg className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${isCalendarExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            )}
           </button>
-          
-          {(!isCollapsed && isCalendarExpanded) && (
-            <div className="mt-1 ml-4 pl-4 border-l border-zinc-600/50 flex flex-col gap-1 py-1">
-              
-              {labels.map((label) => (
-                <div key={label.id} className="flex items-center justify-between px-3 py-1.5 text-sm group">
-                  <label className="flex items-center gap-2 cursor-pointer flex-1 truncate text-zinc-300 hover:text-white">
-                    <input 
-                      type="checkbox"
-                      checked={label.active}
-                      onChange={() => toggleLabelActive(label.id)}
-                      className="w-3.5 h-3.5 rounded-sm bg-transparent border-2 appearance-none cursor-pointer flex items-center justify-center after:content-[''] after:w-2 after:h-2 after:rounded-sm after:scale-0 checked:after:scale-100 after:transition-transform shrink-0"
-                      style={{ 
-                        borderColor: label.color, 
-                        ...(label.active ? { '--tw-bg-opacity': 1, backgroundColor: label.color } : {}) 
-                      } as any}
-                    />
-                    <span className="truncate">{label.name}</span>
-                  </label>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
 
@@ -154,11 +122,10 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
           <button
             onClick={() => {
               if (isCollapsed) toggleCollapse();
-              setIsPostsExpanded(!isPostsExpanded);
               if (!isPostActive) setActiveApp('post-ai');
             }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
-              isPostActive && !isPostsExpanded
+              isPostActive
                 ? 'bg-zinc-800 text-white font-bold' 
                 : 'hover:bg-zinc-800/50 text-zinc-300 hover:text-white'
             }`}
@@ -169,13 +136,8 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
               </svg>
               {!isCollapsed && <span className="text-sm font-bold">포스팅 센터</span>}
             </div>
-            {!isCollapsed && (
-              <svg className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${isPostsExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            )}
           </button>
-          {(!isCollapsed && isPostsExpanded) && (
+          {!isCollapsed && (
             <div className="mt-1 ml-4 pl-4 border-l border-zinc-600/50 flex flex-col gap-1 py-1">
               <button
                 onClick={() => setActiveApp('post-ai')}
@@ -213,15 +175,15 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
           )}
         </div>
 
-        {/* 4. Settings (Accordion) */}
+        {/* 4. Settings (Accordion removed) */}
         <div className="px-3">
           <button
             onClick={() => {
               if (isCollapsed) toggleCollapse();
-              setIsSettingsExpanded(!isSettingsExpanded);
+              if (activeApp !== 'post-settings') setActiveApp('post-settings');
             }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
-              (activeApp === 'post-settings') && !isSettingsExpanded
+              (activeApp === 'post-settings')
                 ? 'bg-zinc-800 text-white font-bold' 
                 : 'hover:bg-zinc-800/50 text-zinc-300 hover:text-white'
             }`}
@@ -233,13 +195,8 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
               </svg>
               {!isCollapsed && <span className="text-sm font-bold">환경설정</span>}
             </div>
-            {!isCollapsed && (
-              <svg className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${isSettingsExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            )}
           </button>
-          {(!isCollapsed && isSettingsExpanded) && (
+          {!isCollapsed && (
             <div className="mt-1 ml-4 pl-4 border-l border-zinc-600/50 flex flex-col gap-1 py-1">
               <button
                 onClick={() => setActiveApp('post-settings')}
@@ -247,12 +204,12 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
                   activeApp === 'post-settings' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
                 }`}
               >
-                API 입력
+                API 키 / 설정
               </button>
               {onLogout && (
                 <button
                   onClick={onLogout}
-                  className="w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm text-zinc-400 hover:text-red-400 hover:bg-zinc-800/50"
+                  className="w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10"
                 >
                   로그아웃
                 </button>

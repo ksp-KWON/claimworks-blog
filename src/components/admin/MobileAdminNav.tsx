@@ -36,7 +36,10 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
   const closeModals = () => setOpenModal('none');
 
   const handleNavClick = (id: 'calendar' | 'chat' | 'consult' | 'posts' | 'settings') => {
-    if (id === 'chat') {
+    if (id === 'calendar') {
+      setActiveApp('calendar');
+      closeModals();
+    } else if (id === 'chat') {
       setActiveApp('chat-list');
       closeModals();
     } else if (id === 'consult') {
@@ -56,11 +59,11 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
       id: 'calendar',
       label: '상담일정',
       icon: (
-        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={activeApp === 'calendar' || openModal === 'calendar' ? "2" : "1.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={activeApp === 'calendar' ? "2" : "1.5"} strokeLinecap="round" strokeLinejoin="round">
           <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
         </svg>
       ),
-      isActive: activeApp === 'calendar' || openModal === 'calendar'
+      isActive: activeApp === 'calendar'
     },
     {
       id: 'chat',
@@ -128,33 +131,6 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
             <div className="w-full flex justify-center pt-3 pb-2" onClick={closeModals}>
               <div className="w-12 h-1.5 bg-zinc-600 rounded-full"></div>
             </div>
-
-            {openModal === 'calendar' && (
-              <div className="p-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-white">상담일정</h3>
-                  <button onClick={() => { setActiveApp('calendar'); closeModals(); }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold">캘린더 열기</button>
-                </div>
-                <div className="bg-[#2a3644] rounded-xl p-4 space-y-3">
-                  <h4 className="text-sm font-bold text-zinc-400 mb-2">라벨 관리</h4>
-                  {labels.map((label) => (
-                    <label key={label.id} className="flex items-center gap-3 cursor-pointer">
-                      <input 
-                        type="checkbox"
-                        checked={label.active}
-                        onChange={() => toggleLabelActive(label.id)}
-                        className="w-5 h-5 rounded bg-transparent border-2 appearance-none cursor-pointer flex items-center justify-center after:content-[''] after:w-3 after:h-3 after:rounded-sm after:scale-0 checked:after:scale-100 after:transition-transform shrink-0"
-                        style={{ 
-                          borderColor: label.color, 
-                          ...(label.active ? { '--tw-bg-opacity': 1, backgroundColor: label.color } : {}) 
-                        } as any}
-                      />
-                      <span className="text-base text-zinc-200 flex-1">{label.name}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {openModal === 'posts' && (
               <div className="p-4 space-y-3">

@@ -18,9 +18,8 @@ export default function ChatAdminPanel() {
   const [isLoading, setIsLoading] = useState(true);
   
   // Memo & Form State
-  const [memoText, setMemoText] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
   const [isSavingMemo, setIsSavingMemo] = useState(false);
-  const [rightPanelMode, setRightPanelMode] = useState<'memo' | 'form'>('memo');
   const [formData, setFormData] = useState({
     category: '근로재해',
     diagnosis: '',
@@ -103,17 +102,15 @@ export default function ChatAdminPanel() {
       try {
         if (memo.trim().startsWith('{') && memo.includes('"category"')) {
           setFormData(JSON.parse(memo));
-          setMemoText('');
-          setRightPanelMode('form');
         } else {
-          setMemoText(memo);
+          // 구버전 텍스트 메모가 있으면 '추가문의' 칸으로 마이그레이션
           setFormData({ 
             category: '근로재해', 
             diagnosis: '', 
             date: '', 
             location: '', 
             details: '', 
-            inquiries: '',
+            inquiries: memo,
             insurances: [] as any[],
             treatmentHistory: '',
             hospitalization: false,
@@ -121,12 +118,11 @@ export default function ChatAdminPanel() {
             surgery: false,
             test: false
           });
-          setRightPanelMode('memo');
         }
       } catch (e) {
-        setMemoText(memo);
-        setRightPanelMode('memo');
+        setFormData(prev => ({ ...prev, inquiries: memo }));
       }
+      setIsEditMode(false); // 로드 시 기본은 보기 모드
     }
   }, [selectedId, loadMessages]);
 
@@ -211,7 +207,7 @@ export default function ChatAdminPanel() {
   const saveMemo = async () => {
     if (!selectedId) return;
     setIsSavingMemo(true);
-    const contentToSave = rightPanelMode === 'form' ? JSON.stringify(formData) : memoText;
+    const contentToSave = JSON.stringify(formData);
     const { error } = await supabase
       .from('chat_sessions')
       .update({ customer_memo: contentToSave })
@@ -219,7 +215,8 @@ export default function ChatAdminPanel() {
     setIsSavingMemo(false);
     if (!error) {
       setSessions(prev => prev.map(s => s.id === selectedId ? { ...s, customer_memo: contentToSave } : s));
-      alert('저장되었습니다.');
+      setIsEditMode(false); // 저장 완료 시 보기 모드로 전환
+      alert('상담 내역이 저장되었습니다.');
     }
   };
 
@@ -496,77 +493,53 @@ export default function ChatAdminPanel() {
         <div className="hidden md:flex w-[320px] bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 flex-col shrink-0">
           <div className="px-3 py-3 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-950 flex gap-1.5 justify-between items-center w-full">
             <button 
-              onClick={() => setRightPanelMode('memo')}
-              className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold whitespace-nowrap ${rightPanelMode === 'memo' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-white hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'}`}
+              onClick={() => setIsEditMode(!isEditMode)}
+              className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold whitespace-nowrap ${isEditMode ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-white hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'}`}
             >
-              수정
+              {isEditMode ? '입력취소' : '수정하기'}
             </button>
             <button 
               onClick={saveMemo}
-              disabled={isSavingMemo}
-              className="flex-1 text-[11px] bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 py-1.5 rounded-md transition-colors border border-gray-200 dark:border-zinc-700 font-bold whitespace-nowrap"
+              disabled={isSavingMemo || !isEditMode}
+              className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold whitespace-nowrap ${!isEditMode ? 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 border-gray-200 dark:bg-zinc-800 dark:text-gray-500 dark:border-zinc-700' : 'bg-blue-600 hover:bg-blue-700 text-white border-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500'}`}
             >
               {isSavingMemo ? '저장중' : '저장'}
-            </button>
-            <button 
-              onClick={() => setRightPanelMode('form')}
-              className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold whitespace-nowrap ${rightPanelMode === 'form' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-white hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'}`}
-            >
-              상담양식
             </button>
             <button
               onClick={() => {
                 const title = `[채팅] ${visitorLabel(activeSession)}`;
                 
-                let parsedContent = '';
-                if (rightPanelMode === 'form') {
-                  const insText = formData.insurances.map(i => `- ${i.type}: ${i.company} (${i.year} / ${i.amount})`).join('\n');
-                  const checkText = [
-                    formData.hospitalization && '입원', 
-                    formData.outpatient && '통원', 
-                    formData.surgery && '수술', 
-                    formData.test && '검사'
-                  ].filter(Boolean).join(', ');
-                  
-                  parsedContent = `[상담양식]\n사고 분류: ${formData.category}\n진단명: ${formData.diagnosis}\n사고일자: ${formData.date}\n사고장소: ${formData.location}\n사고경위: ${formData.details}\n치료경위: ${formData.treatmentHistory}\n진료항목: ${checkText || '없음'}\n가입보험:\n${insText || '없음'}\n추가문의: ${formData.inquiries}`;
-                } else {
-                  parsedContent = `고객 메모:\n${memoText}`;
-                }
+                const insText = formData.insurances.map(i => `- ${i.type}: ${i.company} (${i.year} / ${i.amount})`).join('\n');
+                const checkText = [
+                  formData.hospitalization && '입원', 
+                  formData.outpatient && '통원', 
+                  formData.surgery && '수술', 
+                  formData.test && '검사'
+                ].filter(Boolean).join(', ');
+                
+                const parsedContent = `[상담양식]\n사고 분류: ${formData.category}\n진단명: ${formData.diagnosis}\n사고일자: ${formData.date}\n사고장소: ${formData.location}\n사고경위: ${formData.details}\n치료경위: ${formData.treatmentHistory}\n진료항목: ${checkText || '없음'}\n가입보험:\n${insText || '없음'}\n추가문의: ${formData.inquiries}`;
                 
                 const contentText = `최근 대화내용:\n${activeSession.last_content || '내용 없음'}\n\n${parsedContent}`;
                 const payload = { title, text: contentText, sourceApp: 'chat-list', sourceId: activeSession.id };
                 sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
                 window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
               }}
-              className="flex-1 text-[11px] bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 py-1.5 rounded-md transition-colors font-bold whitespace-nowrap dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400"
+              className="flex-1 text-[11px] bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 py-1.5 rounded-md transition-colors font-bold whitespace-nowrap dark:bg-zinc-800 dark:border-zinc-600 dark:text-gray-300 dark:hover:bg-zinc-700"
             >
               📅 캘린더보내기
             </button>
           </div>
           
-          <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/50 dark:bg-zinc-950/50 relative">
-            {rightPanelMode === 'memo' ? (
-              <div className="h-full flex flex-col p-4">
-                <textarea
-                  value={memoText}
-                  onChange={e => setMemoText(e.target.value)}
-                  placeholder="이 고객과의 상담에서 기억해야 할 내용을 자유롭게 메모하세요. (고객에게는 보이지 않습니다)"
-                  className="flex-1 w-full bg-transparent border-none text-sm text-gray-800 dark:text-gray-200 resize-none outline-none custom-scrollbar leading-relaxed"
-                />
-              </div>
-            ) : (
-              <div className="p-5 overflow-y-auto custom-scrollbar">
-                <ConsultationDetailCard 
-                  data={formData} 
-                  onChange={setFormData} 
-                  readOnly={false} 
-                />
-              </div>
-            )}
+          <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/50 dark:bg-zinc-950/50 relative p-5">
+            <ConsultationDetailCard 
+              data={formData} 
+              onChange={setFormData} 
+              readOnly={!isEditMode} 
+            />
           </div>
         </div>
 
-        {/* 모바일용 팝업 메모창 */}
+        {/* 모바일용 팝업 상담내역창 */}
         {showMobileMemo && (
           <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm md:hidden flex items-end justify-center" onClick={() => setShowMobileMemo(false)}>
             <div className="w-full h-[85vh] bg-[#1e2733] rounded-t-2xl flex flex-col animate-slide-up-modal" onClick={e => e.stopPropagation()}>
@@ -576,39 +549,28 @@ export default function ChatAdminPanel() {
               <div className="flex-1 overflow-hidden flex flex-col">
                 <div className="px-3 py-3 border-b border-zinc-700 bg-[#2a3644] flex gap-1.5 justify-between items-center shrink-0">
                   <button 
-                    onClick={() => setRightPanelMode('memo')}
-                    className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold ${rightPanelMode === 'memo' ? 'bg-blue-900/50 text-blue-400 border-blue-700' : 'bg-[#1e2733] text-gray-300 border-zinc-700'}`}
+                    onClick={() => setIsEditMode(!isEditMode)}
+                    className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold ${isEditMode ? 'bg-blue-900/50 text-blue-400 border-blue-700' : 'bg-[#1e2733] text-gray-300 border-zinc-700'}`}
                   >
-                    수정
+                    {isEditMode ? '입력취소' : '수정하기'}
                   </button>
                   <button 
                     onClick={saveMemo}
-                    disabled={isSavingMemo}
-                    className="flex-1 text-[11px] bg-zinc-700 text-gray-200 py-1.5 rounded-md transition-colors border border-zinc-600 font-bold"
+                    disabled={isSavingMemo || !isEditMode}
+                    className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold ${!isEditMode ? 'opacity-50 bg-zinc-800 text-gray-500 border-zinc-700' : 'bg-blue-600 text-white border-blue-500'}`}
                   >
                     {isSavingMemo ? '저장중' : '저장'}
-                  </button>
-                  <button 
-                    onClick={() => setRightPanelMode('form')}
-                    className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold ${rightPanelMode === 'form' ? 'bg-blue-900/50 text-blue-400 border-blue-700' : 'bg-[#1e2733] text-gray-300 border-zinc-700'}`}
-                  >
-                    상담양식
                   </button>
                   <button onClick={() => setShowMobileMemo(false)} className="flex-1 text-[11px] bg-red-500/20 text-red-400 border border-red-500/30 py-1.5 rounded-md font-bold">
                     닫기
                   </button>
                 </div>
-                <div className="flex-1 overflow-y-auto custom-scrollbar relative p-3 text-white">
-                  {rightPanelMode === 'memo' ? (
-                    <textarea
-                      value={memoText}
-                      onChange={e => setMemoText(e.target.value)}
-                      placeholder="이 고객과의 상담에서 기억해야 할 내용을 자유롭게 메모하세요. (고객에게는 보이지 않습니다)"
-                      className="w-full h-full min-h-[300px] bg-transparent border-none text-sm text-gray-200 resize-none outline-none custom-scrollbar leading-relaxed p-2"
-                    />
-                  ) : (
-                    <ConsultationDetailCard data={formData} onChange={setFormData} readOnly={false} />
-                  )}
+                <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#1e2733] p-4">
+                  <ConsultationDetailCard 
+                    data={formData} 
+                    onChange={setFormData} 
+                    readOnly={!isEditMode} 
+                  />
                 </div>
               </div>
             </div>

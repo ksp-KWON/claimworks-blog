@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AiCommentBox from '@/components/AiCommentBox';
-import standardData from '../../../functions/api/taas-standard-data.json';
+import standardData from '../../../../functions/api/taas-standard-data.json';
 
 // --- SVG Icons (이모지 대신 사용되는 고품격 전문 아이콘 세트) ---
 function IconShield({ className = 'w-4.5 h-4.5' }: { className?: string }) {

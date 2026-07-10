@@ -1,33 +1,35 @@
-﻿'use client';
-
 import React from 'react';
-import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
 import SearchBar from '@/components/SearchBar';
-import Link from 'next/link';
 import SmartStickyLayout from '@/components/SmartStickyLayout';
 import SidebarContent from '@/components/SidebarContent';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import ChatWidget from '@/components/ChatWidget';
+import ScrollProgressBar from '@/components/ScrollProgressBar';
+import { getSortedPostsData } from '@/lib/posts';
 
-interface PublicLayoutWrapperProps {
-  children: React.ReactNode;
-  sortedTags: string[];
-}
-
-export default function PublicLayoutWrapper({ children, sortedTags }: PublicLayoutWrapperProps) {
-  const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin');
-
-  if (isAdmin) {
-    return <>{children}</>;
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
+  // 서버에서 태그 목록 계산 → SidebarContent에 정적 주입 (클라이언트 API 호출 불필요)
+  const posts = getSortedPostsData(false);
+  const tagCounts: Record<string, number> = {};
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+    }
   }
+  const sortedTags = Object.entries(tagCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([tag]) => tag);
 
   return (
     <>
+      <ScrollProgressBar />
+      
       {/* 1. 프리미엄 패밀리룩 App Bar (White/Dark Glassmorphism + Sharp Edges) */}
       <header className="sticky top-0 z-50 w-full h-[64px] border-b border-gray-200/70 dark:border-white/10 bg-white/85 dark:bg-[#121212]/85 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-colors">
         <div className="mx-auto flex h-full w-[92vw] xl:w-[85vw] max-w-7xl items-center justify-between px-2 sm:px-5">
+
           {/* 로고/제목 영역 */}
           <div className="flex items-center min-w-0 flex-1 mr-1 sm:mr-2">
             <div className="font-sans font-extrabold text-lg sm:text-xl min-w-0 tracking-tight">
@@ -39,7 +41,7 @@ export default function PublicLayoutWrapper({ children, sortedTags }: PublicLayo
                   보상스쿨 헬스케어 &amp; 손해사정 보상가이드
                 </span>
                 <span className="sm:hidden font-extrabold text-[15px] text-[#3c4043] dark:text-[#e8eaed] truncate tracking-tight">
-                  보상스쿨's 보상가이드
+                  보상스쿨&apos;s 보상가이드
                 </span>
                 <span className="hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-sm bg-gray-100 dark:bg-gray-800 text-[9px] font-black text-gray-500 dark:text-gray-400 tracking-widest uppercase border border-gray-200 dark:border-gray-700">
                   Integrated Hub
@@ -50,7 +52,11 @@ export default function PublicLayoutWrapper({ children, sortedTags }: PublicLayo
 
           {/* 우측 메뉴 영역 */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            
+            {/* 검색아이콘 */}
             <SearchBar />
+            
+            {/* 데스크탑 네비게이션 */}
             <nav className="hidden md:flex items-center space-x-1 sm:space-x-1.5">
               <Link href="/" className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 text-[#3c4043] dark:text-[#e8eaed] hover:bg-gradient-to-br hover:from-red-50/50 hover:to-blue-50/50 dark:hover:from-red-900/20 dark:hover:to-blue-900/20 hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:shadow-sm transition-all duration-200 flex items-center justify-center group" aria-label="홈" title="홈">
                 <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
@@ -69,7 +75,9 @@ export default function PublicLayoutWrapper({ children, sortedTags }: PublicLayo
                 </svg>
               </Link>
             </nav>
+
             <div className="flex items-center gap-0.5 sm:gap-1">
+              {/* 테마 변경 아이콘 */}
               <ThemeToggle />
             </div>
           </div>

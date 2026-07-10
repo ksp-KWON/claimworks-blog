@@ -57,20 +57,18 @@ export default function ChatAdminPanel() {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const touchStartX = useRef(0);
 
+  // Mobile Memo Swipe Down
+  const [memoSwipeOffset, setMemoSwipeOffset] = useState(0);
+  const memoTouchStartY = useRef(0);
+
   // Drag & Drop File
   const [isDraggingFile, setIsDraggingFile] = useState(false);
 
   // Mobile Action Menu
   const [showMobileActionMenu, setShowMobileActionMenu] = useState(false);
 
-  // Quick Replies
-  const QUICK_REPLIES = [
-    '안녕하세요, 노무법인입니다.',
-    '자세한 상담을 위해 연락처를 남겨주세요.',
-    '관련 서류를 사진으로 찍어 보내주세요.',
-    '검토 후 다시 연락드리겠습니다.',
-    '더 궁금하신 점이 있으신가요?'
-  ];
+  // Status Dropdown
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -222,6 +220,12 @@ export default function ChatAdminPanel() {
       setIsSending(false);
       inputRef.current?.focus();
     }
+  };
+
+  const changeStatus = async (newStatus: string) => {
+    if (!selectedId) return;
+    await supabase.from('chat_sessions').update({ status: newStatus }).eq('id', selectedId);
+    setShowStatusDropdown(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -560,11 +564,39 @@ export default function ChatAdminPanel() {
                 <button onClick={() => setSelectedId(null)} className="md:hidden p-1 -ml-1 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                 </button>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 md:gap-3">
                   <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                     {visitorLabel(activeSession)}
                   </h3>
-                  <span className="text-[10px] md:text-xs text-gray-400 font-medium">
+                  
+                  {/* 상태 변경 드롭다운 */}
+                  <div className="relative">
+                    <button 
+                      onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                      className={`flex items-center gap-1 text-[10px] md:text-xs px-2 py-1 rounded border ${getStatusColor(activeSession.status || '대기')} hover:opacity-80 transition-opacity`}
+                    >
+                      {activeSession.status || '대기'}
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+                    {showStatusDropdown && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setShowStatusDropdown(false)} />
+                        <div className="absolute top-full left-0 mt-1 w-28 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-xl z-50 overflow-hidden flex flex-col py-1">
+                          {['대기', '진행중', '보류', '완료', '차단'].map(s => (
+                            <button
+                              key={s}
+                              onClick={() => changeStatus(s)}
+                              className={`text-left px-3 py-2 text-xs font-medium hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors ${s === (activeSession.status || '대기') ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20' : 'text-gray-700 dark:text-gray-300'}`}
+                            >
+                              {s}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <span className="hidden md:inline text-xs text-gray-400 font-medium ml-1">
                     최초 접속일: {new Date(activeSession.created_at).toLocaleString('ko-KR')}
                   </span>
                 </div>
@@ -616,18 +648,6 @@ export default function ChatAdminPanel() {
             </div>
             
             <div className="p-2 sm:p-4 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 shrink-0">
-              {/* Quick Replies */}
-              <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-2 mb-2">
-                {QUICK_REPLIES.map((reply, idx) => (
-                  <button 
-                    key={idx}
-                    onClick={() => setReplyText(prev => prev + (prev ? ' ' : '') + reply)}
-                    className="shrink-0 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 rounded-full text-xs transition-colors"
-                  >
-                    {reply}
-                  </button>
-                ))}
-              </div>
               
               <div className="flex items-end gap-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl p-2 focus-within:border-[#03c75a] focus-within:ring-1 focus-within:ring-[#03c75a] transition-all relative">
                 {showMobileActionMenu && (
@@ -657,17 +677,6 @@ export default function ChatAdminPanel() {
                     >
                       <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                       사진 전송
-                    </button>
-                    <div className="h-px bg-gray-100 dark:bg-zinc-700 w-full my-1"></div>
-                    <button 
-                      onClick={() => {
-                        setShowMobileActionMenu(false);
-                        alert('자주 쓰는 답변 위쪽 칩을 눌러주세요.');
-                      }}
-                      className="flex items-center gap-2 p-3 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-xl transition-colors"
-                    >
-                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
-                      자주 쓰는 답변
                     </button>
                   </div>
                 )}
@@ -717,11 +726,30 @@ export default function ChatAdminPanel() {
           <div className="fixed inset-0 bg-black/50 z-[40] md:hidden" onClick={() => setShowMemoPanel(false)} />
           
           <div 
-            style={{ width: typeof window !== 'undefined' && window.innerWidth >= 768 ? rightWidth : '100%' }}
-            className="fixed md:relative bottom-0 left-0 right-0 md:inset-auto h-[85vh] md:h-auto bg-white dark:bg-zinc-900 shadow-2xl md:shadow-none flex flex-col shrink-0 transform transition-transform duration-300 z-[50] md:z-auto border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800 rounded-t-2xl md:rounded-none"
+            style={{ 
+              width: typeof window !== 'undefined' && window.innerWidth >= 768 ? rightWidth : '100%',
+              transform: memoSwipeOffset > 0 ? `translateY(${memoSwipeOffset}px)` : 'translateY(0)',
+              transition: memoSwipeOffset > 0 ? 'none' : 'transform 0.3s ease-out'
+            }}
+            className="fixed md:relative bottom-0 left-0 right-0 md:inset-auto h-[60vh] md:h-auto bg-white dark:bg-zinc-900 shadow-2xl md:shadow-none flex flex-col shrink-0 z-[50] md:z-auto border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800 rounded-t-3xl md:rounded-none"
           >
             {/* Header (Drag handle on mobile) */}
-            <div className="h-14 flex flex-col md:flex-row items-center justify-between px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 shrink-0 shadow-sm bg-white dark:bg-zinc-900 rounded-t-2xl md:rounded-none relative">
+            <div 
+              className="h-14 flex flex-col md:flex-row items-center justify-between px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 shrink-0 shadow-sm bg-white dark:bg-zinc-900 rounded-t-3xl md:rounded-none relative cursor-grab active:cursor-grabbing md:cursor-auto"
+              onTouchStart={(e) => {
+                memoTouchStartY.current = e.touches[0].clientY;
+              }}
+              onTouchMove={(e) => {
+                const diff = e.touches[0].clientY - memoTouchStartY.current;
+                if (diff > 0) setMemoSwipeOffset(diff); // Only allow swiping down
+              }}
+              onTouchEnd={() => {
+                if (memoSwipeOffset > 100) {
+                  setShowMemoPanel(false);
+                }
+                setMemoSwipeOffset(0);
+              }}
+            >
               <div className="md:hidden w-12 h-1.5 bg-gray-300 dark:bg-zinc-700 rounded-full absolute top-2 left-1/2 -translate-x-1/2"></div>
               <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 mt-3 md:mt-0">
                 <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>

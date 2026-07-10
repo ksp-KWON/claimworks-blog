@@ -276,7 +276,10 @@ export default function CalendarAdminPanel() {
             </div>
           ))}
         </div>
-        <div className="flex-1 grid grid-cols-7 grid-rows-5 lg:grid-rows-6 auto-rows-fr min-h-0">
+        <div 
+          className="flex-1 grid grid-cols-7 auto-rows-fr min-h-0"
+          style={{ gridTemplateRows: `repeat(${Math.ceil((padding.length + days.length) / 7)}, minmax(0, 1fr))` }}
+        >
           {padding.map((_, i) => (
             <div key={`pad-${i}`} className="border-r border-b border-gray-100 dark:border-zinc-800/50 bg-gray-50/50 dark:bg-zinc-900/20"></div>
           ))}
@@ -356,7 +359,7 @@ export default function CalendarAdminPanel() {
 
     return (
       <div className="flex-1 flex flex-col h-full min-h-0 bg-white dark:bg-zinc-950 overflow-x-auto">
-        <div className="flex-1 flex min-w-[800px]">
+        <div className="flex-1 flex min-w-0">
           {weekDays.map((date, i) => {
             const dateStr = formatDateString(date);
             const dayEvents = getFilteredEvents().filter(e => e.date === dateStr);
@@ -480,7 +483,7 @@ export default function CalendarAdminPanel() {
     
     return (
       <div className="flex-1 min-h-0 p-1.5 sm:p-3 overflow-hidden bg-white dark:bg-zinc-950 flex flex-col">
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1 lg:gap-3 flex-1 min-h-0">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1 lg:gap-3 flex-1 min-h-0 auto-rows-fr">
           {months.map(month => {
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -593,7 +596,7 @@ export default function CalendarAdminPanel() {
   };
 
   return (
-    <div className="flex h-full w-full bg-white dark:bg-zinc-950 rounded-lg border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+    <div className="flex flex-1 h-full w-full bg-white dark:bg-zinc-950 rounded-lg border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden min-h-0">
       
       {/* 캘린더 메인 영역 */}
       <div className="flex-1 flex flex-col min-w-0 min-h-0">

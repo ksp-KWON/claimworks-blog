@@ -222,32 +222,6 @@ export default function ChatAdminPanel() {
     }
   };
 
-  const changeStatus = async (newStatus: string) => {
-    if (!selectedId) return;
-    const { error } = await supabase.from('chat_sessions').update({ status: newStatus }).eq('id', selectedId);
-    if (!error) {
-      setSessions(prev => prev.map(s => s.id === selectedId ? { ...s, status: newStatus } : s));
-    } else {
-      console.error('Status update error:', error);
-      alert(`상태 변경 실패: ${error.message}`);
-    }
-    setIsMenuOpen(false);
-  };
-
-  const deleteSession = async () => {
-    if (!selectedId) return;
-    if (!window.confirm('정말 이 채팅방을 나가고 삭제하시겠습니까? (이 작업은 되돌릴 수 없습니다)')) return;
-    const { error } = await supabase.from('chat_sessions').delete().eq('id', selectedId);
-    if (!error) {
-      setSessions(prev => prev.filter(s => s.id !== selectedId));
-      setSelectedId(null);
-    } else {
-      console.error('Delete error:', error);
-      alert(`삭제 실패: ${error.message}`);
-    }
-    setIsMenuOpen(false);
-  };
-
   const formatTime = (iso: string) => {
     const d = new Date(iso);
     const now = new Date();

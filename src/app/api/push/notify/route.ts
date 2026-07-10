@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import webpush from 'web-push';
 import { createClient } from '@supabase/supabase-js';
 
@@ -7,13 +7,22 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-webpush.setVapidDetails(
-  'mailto:ksp.claimworks@gmail.com',
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
-
 export async function POST(request: Request) {
+  // VAPID 키를 함수 내부에서 초기화 (빌드 시가 아닌 런타임에만 실행)
+  const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY;
+
+  if (!vapidPublicKey || !vapidPrivateKey) {
+    console.error('VAPID keys not configured');
+    return NextResponse.json({ error: 'Push notifications not configured' }, { status: 503 });
+  }
+
+  webpush.setVapidDetails(
+    'mailto:ksp.claimworks@gmail.com',
+    vapidPublicKey,
+    vapidPrivateKey
+  );
+
   try {
     const payload = await request.json();
     const notificationPayload = JSON.stringify({
@@ -42,8 +51,6 @@ export async function POST(request: Request) {
 
       return webpush.sendNotification(pushSubscription, notificationPayload).catch(async (err) => {
         if (err.statusCode === 404 || err.statusCode === 410) {
-          // Subscription has expired or is no longer valid
-          console.log('Subscription has expired or is no longer valid:', err);
           await supabaseAdmin.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
         } else {
           console.error('Error sending push notification:', err);
@@ -52,10 +59,9 @@ export async function POST(request: Request) {
     });
 
     await Promise.all(promises);
-
-    return NextResponse.json({ success: true, count: subscriptions.length });
-  } catch (err) {
-    console.error('Push notify error:', err);
+    return NextResponse.json({ success: true, sent: subscriptions.length });
+  } catch (error) {
+    console.error('Error in push notify:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

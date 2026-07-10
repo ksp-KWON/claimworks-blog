@@ -45,6 +45,33 @@ export default function ChatAdminPanel() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showMemoPanel, setShowMemoPanel] = useState(false);
 
+  // --- New UX States ---
+  // Resizing
+  const [leftWidth, setLeftWidth] = useState(320);
+  const [rightWidth, setRightWidth] = useState(400);
+  const leftResizerRef = useRef<HTMLDivElement>(null);
+  const rightResizerRef = useRef<HTMLDivElement>(null);
+
+  // Swipe Action (Mobile)
+  const [swipeSessionId, setSwipeSessionId] = useState<string | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const touchStartX = useRef(0);
+
+  // Drag & Drop File
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
+
+  // Mobile Action Menu
+  const [showMobileActionMenu, setShowMobileActionMenu] = useState(false);
+
+  // Quick Replies
+  const QUICK_REPLIES = [
+    '안녕하세요, 노무법인입니다.',
+    '자세한 상담을 위해 연락처를 남겨주세요.',
+    '관련 서류를 사진으로 찍어 보내주세요.',
+    '검토 후 다시 연락드리겠습니다.',
+    '더 궁금하신 점이 있으신가요?'
+  ];
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -204,6 +231,74 @@ export default function ChatAdminPanel() {
     }
   };
 
+  // --- UX Handlers ---
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!selectedId || activeSession?.status === '차단') return;
+    setIsDraggingFile(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingFile(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingFile(false);
+    if (!selectedId || activeSession?.status === '차단') return;
+
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+
+    // Mock upload by sending a message
+    setIsSending(true);
+    try {
+      await supabase.from('chat_messages').insert({
+        session_id: selectedId,
+        sender: 'admin',
+        content: `[첨부파일: ${file.name}]`,
+      });
+      // Admin response changes status to 진행중
+      const currentSession = sessions.find(s => s.id === selectedId);
+      const updates: any = { last_message_at: new Date().toISOString() };
+      if (currentSession && (!currentSession.status || currentSession.status === '대기')) {
+        updates.status = '진행중';
+      }
+      await supabase.from('chat_sessions').update(updates).eq('id', selectedId);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  // Resizing handlers
+  const startResizingLeft = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      setLeftWidth(Math.max(250, Math.min(500, moveEvent.clientX)));
+    };
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const startResizingRight = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      setRightWidth(Math.max(300, Math.min(800, window.innerWidth - moveEvent.clientX)));
+    };
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+  // -------------------
+
   const saveMemo = async () => {
     if (!selectedId) return;
     setIsSavingMemo(true);
@@ -284,7 +379,10 @@ export default function ChatAdminPanel() {
     <div className="flex flex-1 h-full bg-white dark:bg-zinc-950 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 overflow-hidden relative">
       
       {/* 1단: 세션 목록 (좌측) */}
-      <div className={`w-full md:w-[320px] flex-col border-r border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-900/50 absolute md:relative inset-0 z-10 md:z-auto transition-transform ${selectedId ? 'hidden md:flex' : 'flex'}`}>
+      <div 
+        style={{ width: typeof window !== 'undefined' && window.innerWidth >= 768 ? leftWidth : '100%' }}
+        className={`flex-col border-r border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-900/50 absolute md:relative inset-0 z-10 md:z-auto transition-transform ${selectedId ? 'hidden md:flex' : 'flex'}`}
+      >
         
         {/* 검색 및 상단 탭 */}
         {/* 검색 및 상단 탭 */}
@@ -366,43 +464,83 @@ export default function ChatAdminPanel() {
                 const status = session.status || '대기';
                 
                 return (
-                  <button
-                    key={session.id}
-                    onClick={() => setSelectedId(session.id)}
-                    className={`w-full text-left p-3 rounded-lg transition-all ${
-                      isSelected
-                        ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
-                        : 'bg-transparent border border-transparent hover:bg-white dark:hover:bg-zinc-800'
-                    }`}
-                  >
-                    <div className="flex justify-between items-center mb-1.5">
-                      <div className="flex items-center gap-2 overflow-hidden">
-                        <span className={`text-sm font-bold truncate ${hasUnread ? 'text-blue-700 dark:text-blue-400' : 'text-gray-800 dark:text-gray-200'}`}>
-                          {visitorLabel(session)}
-                        </span>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded border ${getStatusColor(status)} shrink-0`}>
-                          {status}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                        {hasUnread && (
-                          <span className="w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                            {session.unread_count}
-                          </span>
-                        )}
-                        <span className="text-[10px] text-gray-400">{formatTime(session.last_message_at)}</span>
-                      </div>
+                  <div key={session.id} className="relative w-full overflow-hidden mb-1 rounded-lg">
+                    {/* Action Backgrounds (Mobile Swipe) */}
+                    <div className="absolute inset-0 flex justify-between items-center px-4 rounded-lg bg-gray-100 dark:bg-zinc-800 md:hidden">
+                      <span className="text-sm font-bold text-green-500">완료</span>
+                      <span className="text-sm font-bold text-orange-500">보류</span>
                     </div>
-                    {session.last_content && (
-                      <p className="text-xs text-gray-500 truncate">{session.last_content}</p>
-                    )}
-                  </button>
+
+                    {/* Draggable Row */}
+                    <div
+                      onTouchStart={(e) => {
+                        touchStartX.current = e.touches[0].clientX;
+                        setSwipeSessionId(session.id);
+                        setSwipeOffset(0);
+                      }}
+                      onTouchMove={(e) => {
+                        if (swipeSessionId !== session.id) return;
+                        const diff = e.touches[0].clientX - touchStartX.current;
+                        setSwipeOffset(Math.max(-100, Math.min(100, diff)));
+                      }}
+                      onTouchEnd={async () => {
+                        if (swipeSessionId !== session.id) return;
+                        if (swipeOffset > 60) {
+                          // Swipe Right -> 완료
+                          await supabase.from('chat_sessions').update({ status: '완료' }).eq('id', session.id);
+                        } else if (swipeOffset < -60) {
+                          // Swipe Left -> 보류
+                          await supabase.from('chat_sessions').update({ status: '보류' }).eq('id', session.id);
+                        }
+                        setSwipeOffset(0);
+                        setSwipeSessionId(null);
+                      }}
+                      onClick={() => setSelectedId(session.id)}
+                      style={{
+                        transform: swipeSessionId === session.id ? `translateX(${swipeOffset}px)` : 'translateX(0)',
+                        transition: swipeSessionId === session.id ? 'none' : 'transform 0.2s ease-out'
+                      }}
+                      className={`relative z-10 w-full text-left p-3 rounded-lg cursor-pointer shadow-sm ${
+                        isSelected
+                          ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800'
+                          : 'bg-white dark:bg-zinc-900 border-2 border-transparent hover:bg-gray-50 dark:hover:bg-zinc-800'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center mb-1.5 pointer-events-none">
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <span className={`text-sm font-bold truncate ${hasUnread ? 'text-blue-700 dark:text-blue-400' : 'text-gray-800 dark:text-gray-200'}`}>
+                            {visitorLabel(session)}
+                          </span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded border ${getStatusColor(status)} shrink-0`}>
+                            {status}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                          {hasUnread && (
+                            <span className="w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                              {session.unread_count}
+                            </span>
+                          )}
+                          <span className="text-[10px] text-gray-400">{formatTime(session.last_message_at)}</span>
+                        </div>
+                      </div>
+                      {session.last_content && (
+                        <p className="text-xs text-gray-500 truncate pointer-events-none">{session.last_content}</p>
+                      )}
+                    </div>
+                  </div>
                 );
               })}
             </div>
           )}
         </div>
       </div>
+
+      {/* Resizer Left (Desktop) */}
+      <div 
+        className="hidden md:block w-1 cursor-col-resize hover:bg-blue-400 active:bg-blue-500 bg-gray-200 dark:bg-zinc-800 transition-colors z-20 shrink-0"
+        onMouseDown={startResizingLeft}
+      />
 
       {/* 2단: 대화창 (중앙) */}
       <div className={`flex-1 flex-col bg-white dark:bg-zinc-950 relative ${selectedId ? 'flex' : 'hidden md:flex'}`}>
@@ -442,7 +580,21 @@ export default function ChatAdminPanel() {
               </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-zinc-950/50 custom-scrollbar" onClick={() => setIsMenuOpen(false)}>
+            <div 
+              className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-zinc-950/50 custom-scrollbar relative" 
+              onClick={() => setIsMenuOpen(false)}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              {isDraggingFile && (
+                <div className="absolute inset-0 z-20 bg-blue-500/10 dark:bg-blue-500/20 border-2 border-dashed border-blue-500 rounded-lg m-4 flex flex-col items-center justify-center pointer-events-none">
+                  <div className="bg-white dark:bg-zinc-800 p-4 rounded-full shadow-lg text-blue-500 mb-2">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                  </div>
+                  <p className="font-bold text-blue-600 dark:text-blue-400">파일을 여기에 놓아 전송하세요</p>
+                </div>
+              )}
               {messages.map((msg) => {
                 const isVisitor = msg.sender === 'visitor';
                 return (
@@ -463,25 +615,86 @@ export default function ChatAdminPanel() {
               <div ref={messagesEndRef} />
             </div>
             
-            <div className="p-4 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 shrink-0">
-              <div className="flex gap-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl p-2 focus-within:border-[#03c75a] focus-within:ring-1 focus-within:ring-[#03c75a] transition-all">
+            <div className="p-2 sm:p-4 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 shrink-0">
+              {/* Quick Replies */}
+              <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-2 mb-2">
+                {QUICK_REPLIES.map((reply, idx) => (
+                  <button 
+                    key={idx}
+                    onClick={() => setReplyText(prev => prev + (prev ? ' ' : '') + reply)}
+                    className="shrink-0 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 rounded-full text-xs transition-colors"
+                  >
+                    {reply}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="flex items-end gap-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl p-2 focus-within:border-[#03c75a] focus-within:ring-1 focus-within:ring-[#03c75a] transition-all relative">
+                {showMobileActionMenu && (
+                  <div className="md:hidden absolute bottom-[calc(100%+10px)] left-0 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-xl rounded-2xl p-2 flex flex-col gap-1 w-40 z-50">
+                    <button 
+                      onClick={() => {
+                        setShowMobileActionMenu(false);
+                        const fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.onchange = async (e: any) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setIsSending(true);
+                          try {
+                            await supabase.from('chat_messages').insert({
+                              session_id: selectedId!,
+                              sender: 'admin',
+                              content: `[첨부파일: ${file.name}]`,
+                            });
+                          } finally {
+                            setIsSending(false);
+                          }
+                        };
+                        fileInput.click();
+                      }}
+                      className="flex items-center gap-2 p-3 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-xl transition-colors"
+                    >
+                      <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      사진 전송
+                    </button>
+                    <div className="h-px bg-gray-100 dark:bg-zinc-700 w-full my-1"></div>
+                    <button 
+                      onClick={() => {
+                        setShowMobileActionMenu(false);
+                        alert('자주 쓰는 답변 위쪽 칩을 눌러주세요.');
+                      }}
+                      className="flex items-center gap-2 p-3 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-xl transition-colors"
+                    >
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                      자주 쓰는 답변
+                    </button>
+                  </div>
+                )}
+                <button 
+                  onClick={() => setShowMobileActionMenu(!showMobileActionMenu)}
+                  className={`md:hidden p-2 transition-colors shrink-0 rounded-full ${showMobileActionMenu ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-blue-500'}`}
+                >
+                  <svg className={`w-6 h-6 transition-transform duration-200 ${showMobileActionMenu ? 'rotate-45' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                </button>
                 <textarea
                   ref={inputRef}
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={activeSession?.status === '차단' ? "차단된 대화입니다." : "메시지를 입력하세요... (Enter로 전송, Shift+Enter로 줄바꿈)"}
+                  placeholder={activeSession?.status === '차단' ? "차단된 대화입니다." : "메시지를 입력하세요... (Enter 전송)"}
                   disabled={activeSession?.status === '차단'}
-                  rows={3}
+                  rows={2}
                   className="flex-1 text-sm p-2 bg-transparent resize-none outline-none custom-scrollbar disabled:opacity-50"
                 />
                 <button
                   onClick={sendReply}
                   disabled={!replyText.trim() || isSending || activeSession?.status === '차단'}
-                  className="self-end px-5 py-3 bg-[#03c75a] hover:bg-[#02b351] disabled:bg-gray-300 dark:disabled:bg-zinc-700 text-white font-bold rounded-lg transition-colors flex items-center gap-1 shadow-sm"
+                  className="shrink-0 mb-0.5 px-4 py-2 sm:px-5 sm:py-3 bg-[#03c75a] hover:bg-[#02b351] disabled:bg-gray-300 dark:disabled:bg-zinc-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm h-10 sm:h-auto"
                 >
-                  <span>전송</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                  <span className="hidden sm:inline">전송</span>
+                  <svg className="w-4 h-4 sm:hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" /></svg>
+                  <svg className="w-4 h-4 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                 </button>
               </div>
             </div>
@@ -489,16 +702,28 @@ export default function ChatAdminPanel() {
         )}
       </div>
 
-      {/* 메모 사이드 패널 (Drawer) */}
+      {/* Resizer Right (Desktop) */}
+      {showMemoPanel && selectedId && activeSession && (
+        <div 
+          className="hidden md:block w-1 cursor-col-resize hover:bg-blue-400 active:bg-blue-500 bg-gray-200 dark:bg-zinc-800 transition-colors z-20 shrink-0"
+          onMouseDown={startResizingRight}
+        />
+      )}
+
+      {/* 메모 패널 (Desktop Right Drawer / Mobile Bottom Sheet) */}
       {showMemoPanel && selectedId && activeSession && (
         <>
           {/* 모바일 딤 배경 */}
-          <div className="fixed inset-0 bg-black/20 z-[40] sm:hidden" onClick={() => setShowMemoPanel(false)} />
+          <div className="fixed inset-0 bg-black/50 z-[40] md:hidden" onClick={() => setShowMemoPanel(false)} />
           
-          <div className="absolute inset-y-0 right-0 md:relative w-full md:w-1/2 bg-white dark:bg-zinc-900 shadow-2xl md:shadow-none flex flex-col shrink-0 transform transition-transform duration-300 z-[50] md:z-auto border-l border-gray-200 dark:border-zinc-800">
-            {/* Header */}
-            <div className="h-14 flex items-center justify-between px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 shrink-0 shadow-sm bg-white dark:bg-zinc-900">
-              <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <div 
+            style={{ width: typeof window !== 'undefined' && window.innerWidth >= 768 ? rightWidth : '100%' }}
+            className="fixed md:relative bottom-0 left-0 right-0 md:inset-auto h-[85vh] md:h-auto bg-white dark:bg-zinc-900 shadow-2xl md:shadow-none flex flex-col shrink-0 transform transition-transform duration-300 z-[50] md:z-auto border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800 rounded-t-2xl md:rounded-none"
+          >
+            {/* Header (Drag handle on mobile) */}
+            <div className="h-14 flex flex-col md:flex-row items-center justify-between px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 shrink-0 shadow-sm bg-white dark:bg-zinc-900 rounded-t-2xl md:rounded-none relative">
+              <div className="md:hidden w-12 h-1.5 bg-gray-300 dark:bg-zinc-700 rounded-full absolute top-2 left-1/2 -translate-x-1/2"></div>
+              <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 mt-3 md:mt-0">
                 <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                 메모
               </h3>

@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import PublicLayoutWrapper from "@/components/PublicLayoutWrapper";
+import ScrollProgressBar from "@/components/ScrollProgressBar";
 import { getSortedPostsData } from "@/lib/posts";
 
 

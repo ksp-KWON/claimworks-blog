@@ -62,7 +62,7 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
     <div className="bg-white dark:bg-zinc-900 p-5 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm space-y-4">
       {/* 사고 분류 */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-gray-500">사고 분류</span>
+        <span className="text-xs font-bold text-gray-500 shrink-0 whitespace-nowrap mr-4">사고 분류</span>
         {readOnly ? (
           <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-xs font-bold rounded-full border border-indigo-200 dark:border-indigo-800">
             {data.category}
@@ -84,7 +84,7 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
       
       {/* 진단명 */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-gray-500">진단명</span>
+        <span className="text-xs font-bold text-gray-500 shrink-0 whitespace-nowrap mr-4">진단명</span>
         {readOnly ? (
           <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{data.diagnosis}</span>
         ) : (
@@ -100,7 +100,7 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
       
       {/* 사고일자 */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-gray-500">사고일자</span>
+        <span className="text-xs font-bold text-gray-500 shrink-0 whitespace-nowrap mr-4">사고일자</span>
         {readOnly ? (
           <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{data.date}</span>
         ) : (
@@ -116,7 +116,7 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
       
       {/* 사고장소 */}
       <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
-        <span className="text-xs font-bold text-gray-500">사고장소</span>
+        <span className="text-xs font-bold text-gray-500 shrink-0 whitespace-nowrap mr-4">사고장소</span>
         {readOnly ? (
           <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{data.location || '-'}</span>
         ) : (
@@ -132,7 +132,7 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
       
       {/* 사고 경위 및 내용 */}
       <div>
-        <span className="block text-xs font-bold text-gray-500 mb-2">사고 경위 및 내용</span>
+        <span className="block text-xs font-bold text-gray-500 mb-2 shrink-0 whitespace-nowrap">사고 경위 및 내용</span>
         {readOnly ? (
           <p className="text-sm text-gray-800 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-zinc-950 p-3 rounded-lg border border-gray-100 dark:border-zinc-800 whitespace-pre-wrap">
             {data.details}
@@ -151,7 +151,7 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
       {/* 치료 경위 및 내용 */}
       {(readOnly && data.treatmentHistory) || !readOnly ? (
         <div>
-          <span className="block text-xs font-bold text-gray-500 mb-2">치료 경위 및 내용</span>
+          <span className="block text-xs font-bold text-gray-500 mb-2 shrink-0 whitespace-nowrap">치료 경위 및 내용</span>
           {readOnly ? (
             <p className="text-sm text-gray-800 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-zinc-950 p-3 rounded-lg border border-gray-100 dark:border-zinc-800 whitespace-pre-wrap">
               {data.treatmentHistory}
@@ -165,38 +165,6 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
               className="w-full text-sm text-gray-800 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-zinc-950 p-3 rounded-lg border border-gray-100 dark:border-zinc-800 outline-none resize-none overflow-hidden min-h-[60px]"
             />
           )}
-        </div>
-      ) : null}
-
-      {/* 진료 항목 체크박스 */}
-      {(readOnly && (data.hospitalization || data.outpatient || data.surgery || data.test)) || !readOnly ? (
-        <div>
-          <span className="block text-xs font-bold text-gray-500 mb-2">진료 항목</span>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: 'hospitalization', label: '입원' },
-              { id: 'outpatient', label: '통원' },
-              { id: 'surgery', label: '수술' },
-              { id: 'test', label: '검사' }
-            ].map(item => {
-              const isChecked = data[item.id as keyof ConsultationData] as boolean;
-              if (readOnly && !isChecked) return null;
-              
-              return (
-                <label key={item.id} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-colors ${readOnly ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400' : isChecked ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400 cursor-pointer' : 'bg-white border-gray-200 text-gray-500 dark:bg-zinc-900 dark:border-zinc-700 dark:text-gray-400 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800'}`}>
-                  {!readOnly && (
-                    <input 
-                      type="checkbox" 
-                      className="hidden" 
-                      checked={isChecked} 
-                      onChange={(e) => updateField(item.id as keyof ConsultationData, e.target.checked)} 
-                    />
-                  )}
-                  {item.label}
-                </label>
-              );
-            })}
-          </div>
         </div>
       ) : null}
 
@@ -223,14 +191,11 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
                 
                 {readOnly ? (
                   <>
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 text-[10px] font-bold rounded">{ins.type}</span>
-                      <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{ins.company}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-                      <span>가입년도: {ins.year || '-'}</span>
-                      <span>|</span>
-                      <span>가입금액: {ins.amount || '-'}</span>
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 text-[10px] font-bold rounded shrink-0">{ins.type}</span>
+                        <span className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">{ins.year || '-'}년도 가입, {ins.company || '-'} {ins.amount || '-'}</span>
+                      </div>
                     </div>
                   </>
                 ) : (

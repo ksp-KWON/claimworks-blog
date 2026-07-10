@@ -1,32 +1,34 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import ThemeToggle from '@/components/ThemeToggle';
 import SearchBar from '@/components/SearchBar';
-import SmartStickyLayout from '@/components/SmartStickyLayout';
-import SidebarContent from '@/components/SidebarContent';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import ChatWidget from '@/components/ChatWidget';
 import ScrollProgressBar from '@/components/ScrollProgressBar';
-import { getSortedPostsData } from '@/lib/posts';
+import SmartStickyLayout from '@/components/SmartStickyLayout';
 
+/**
+ * 방문자용 공개 레이아웃.
+ * - /admin 경로에서는 헤더/푸터/MobileBottomNav 모두 렌더링하지 않음
+ * - 사이드바 데이터는 SmartStickyLayout에서 직접 처리
+ */
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
-  // 서버에서 태그 목록 계산 → SidebarContent에 정적 주입 (클라이언트 API 호출 불필요)
-  const posts = getSortedPostsData(false);
-  const tagCounts: Record<string, number> = {};
-  for (const post of posts) {
-    for (const tag of post.tags) {
-      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-    }
+  const pathname = usePathname();
+  const isAdmin = pathname === '/admin' || pathname?.startsWith('/admin/');
+
+  // 관리자 페이지 → 공개 레이아웃 UI 전혀 없이 순수하게 children만
+  if (isAdmin) {
+    return <>{children}</>;
   }
-  const sortedTags = Object.entries(tagCounts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([tag]) => tag);
 
   return (
     <>
       <ScrollProgressBar />
-      
-      {/* 1. 프리미엄 패밀리룩 App Bar (White/Dark Glassmorphism + Sharp Edges) */}
+
+      {/* 헤더 */}
       <header className="sticky top-0 z-50 w-full h-[64px] border-b border-gray-200/70 dark:border-white/10 bg-white/85 dark:bg-[#121212]/85 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-colors">
         <div className="mx-auto flex h-full w-[92vw] xl:w-[85vw] max-w-7xl items-center justify-between px-2 sm:px-5">
 
@@ -50,13 +52,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </div>
           </div>
 
-          {/* 우측 메뉴 영역 */}
+          {/* 우측 메뉴 */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            
-            {/* 검색아이콘 */}
             <SearchBar />
-            
-            {/* 데스크탑 네비게이션 */}
             <nav className="hidden md:flex items-center space-x-1 sm:space-x-1.5">
               <Link href="/" className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 text-[#3c4043] dark:text-[#e8eaed] hover:bg-gradient-to-br hover:from-red-50/50 hover:to-blue-50/50 dark:hover:from-red-900/20 dark:hover:to-blue-900/20 hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:shadow-sm transition-all duration-200 flex items-center justify-center group" aria-label="홈" title="홈">
                 <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
@@ -75,27 +73,25 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 </svg>
               </Link>
             </nav>
-
             <div className="flex items-center gap-0.5 sm:gap-1">
-              {/* 테마 변경 아이콘 */}
               <ThemeToggle />
             </div>
           </div>
         </div>
       </header>
 
-      {/* 3. 티스토리 2단 레이아웃 본문 75% : 사이드바 25% 구조 */}
+      {/* 본문 + 사이드바 */}
       <SmartStickyLayout
         mainContent={children}
-        sidebarContent={<SidebarContent tags={sortedTags} />}
+        sidebarContent={null}
       />
 
-      {/* 4. 구글 표면 색상 푸터 */}
+      {/* 푸터 */}
       <footer className="mt-auto w-full bg-[var(--google-surface-variant)] dark:bg-[#303134] text-[#5f6368] dark:text-[#9aa0a6] border-t border-[var(--google-border)]">
         <div className="mx-auto flex flex-col md:flex-row h-auto md:h-[70px] w-[92vw] xl:w-[85vw] max-w-7xl items-center justify-between px-2 sm:px-5 py-5 md:py-0 text-[11px] font-bold gap-3">
           <p className="copyright text-center md:text-left flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            © {new Date().getFullYear()} 보상스쿨 헬스케어 & 손해사정 보상가이드. All rights reserved.
+            © {new Date().getFullYear()} 보상스쿨 헬스케어 &amp; 손해사정 보상가이드. All rights reserved.
           </p>
           <p className="iagree text-center md:text-right flex items-center gap-2">
             <Link href="/about" className="hover:text-[var(--google-blue)] cursor-pointer transition-colors">플랫폼 소개</Link>
@@ -111,10 +107,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         </div>
       </footer>
 
-      {/* 5. 모바일 전용 하단 고정 탭바 (lg 미만에서 노출) */}
+      {/* 모바일 방문자 하단 탭바 */}
       <MobileBottomNav />
 
-      {/* 6. 보상스쿨 실시간 채팅 위젯 (전 페이지 공통) */}
+      {/* 채팅 위젯 */}
       <ChatWidget />
     </>
   );

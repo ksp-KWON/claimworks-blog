@@ -213,7 +213,7 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
             )}
           </div>
           <div className="space-y-2">
-            {data.insurances?.map((ins, index) => (
+            {data.insurances?.map((ins) => (
               <div key={ins.id} className="flex flex-col gap-2 p-3 bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 rounded-lg relative group">
                 {!readOnly && (
                   <button onClick={() => removeInsurance(ins.id)} className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors">
@@ -274,7 +274,7 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
             ))}
             {!readOnly && data.insurances?.length === 0 && (
               <div className="text-center p-3 text-xs text-gray-400 bg-gray-50 border border-dashed border-gray-200 dark:bg-zinc-900/50 dark:border-zinc-800 rounded-lg">
-                등록된 보험 정보가 없습니다. 우측 상단 '추가' 버튼을 눌러주세요.
+                등록된 보험 정보가 없습니다. 우측 상단 &apos;추가&apos; 버튼을 눌러주세요.
               </div>
             )}
           </div>

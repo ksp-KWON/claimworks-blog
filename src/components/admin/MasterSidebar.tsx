@@ -19,7 +19,6 @@ interface MasterSidebarProps {
 export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, toggleCollapse, onLogout }: MasterSidebarProps) {
   // Accordion states
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(true);
-  const [isChatExpanded, setIsChatExpanded] = useState(true);
   const [isPostsExpanded, setIsPostsExpanded] = useState(true);
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
 

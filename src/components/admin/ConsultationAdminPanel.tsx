@@ -14,8 +14,22 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
   const [selectedId, setSelectedId] = useState<string | null>(null);
   
   // Memo state
+  // Memo state
   const [memoText, setMemoText] = useState('');
-  const [isSavingMemo, setIsSavingMemo] = useState(false);
+  async function fetchConsultations() {
+    setIsLoading(true);
+    const { data, error } = await supabase
+      .from('consultations')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching consultations:', error);
+    } else {
+      setConsultations(data || []);
+    }
+    setIsLoading(false);
+  }
 
   useEffect(() => {
     fetchConsultations();
@@ -45,29 +59,13 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
       onNavigateToManage();
       sessionStorage.removeItem('pending_select_id');
     }
-  }, []);
+  }, [onNavigateToManage]);
 
-  const fetchConsultations = async () => {
-    setIsLoading(true);
-    const { data, error } = await supabase
-      .from('consultations')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching consultations:', error);
-    } else {
-      setConsultations(data || []);
-    }
-    setIsLoading(false);
-  };
+
 
   useEffect(() => {
-    if (selectedId) {
-      const active = consultations.find(c => c.id === selectedId);
-      // Wait, we don't have a customer_memo field in consultations table right now!
-      // I should use inquiry as a memo or add customer_memo. The user said: "항목관리 (채팅영역 우측의 고객정보 나오게 만들어줘)". So we should probably just use the right panel to show details.
-    }
+    // Wait, we don't have a customer_memo field in consultations table right now!
+    // I should use inquiry as a memo or add customer_memo. The user said: "항목관리 (채팅영역 우측의 고객정보 나오게 만들어줘)". So we should probably just use the right panel to show details.
   }, [selectedId, consultations]);
 
   const updateStatus = async (id: string, newStatus: string) => {

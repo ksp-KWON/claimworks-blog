@@ -53,10 +53,10 @@ export interface AdminCalendarEvent {
 const GLOBAL_KEY = '__supabase_client__';
 
 type GlobalWithSupabase = typeof globalThis & {
-  [GLOBAL_KEY]?: SupabaseClient; // eslint-disable-line @typescript-eslint/no-explicit-any
+  [GLOBAL_KEY]?: SupabaseClient;
 };
 
-function getSupabaseClient(): SupabaseClient { // eslint-disable-line @typescript-eslint/no-explicit-any
+function getSupabaseClient(): SupabaseClient {
   const g = globalThis as GlobalWithSupabase;
   if (!g[GLOBAL_KEY]) {
     g[GLOBAL_KEY] = createClient(supabaseUrl, supabaseAnonKey, {
@@ -77,7 +77,7 @@ export const supabase = getSupabaseClient();
 
 // ─── 서버 전용 관리자 클라이언트 ────────────────────────────────────
 // ⚠️ 반드시 API Route / Server Action 에서만 사용하세요.
-export function createServerSupabaseClient(): SupabaseClient { // eslint-disable-line @typescript-eslint/no-explicit-any
+export function createServerSupabaseClient(): SupabaseClient {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
   return createClient(supabaseUrl, serviceRoleKey, {
     auth: {

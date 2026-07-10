@@ -43,7 +43,6 @@ export default function ChatAdminPanel() {
   const [readFilter, setReadFilter] = useState<'전체' | '읽음' | '안읽음'>('전체');
   
   // Menu State
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showMobileMemo, setShowMobileMemo] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);

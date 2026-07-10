@@ -13,6 +13,13 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-unused-vars": "warn"
     }
   },
+  {
+    settings: {
+      react: {
+        version: "19.0.0" // Fixes contextOrFilename.getFilename crash in ESLint 9+
+      }
+    }
+  },
   // Override default ignores of eslint-config-next.
   // Override default ignores of eslint-config-next.
   globalIgnores([

@@ -38,7 +38,7 @@ export default function MarkdownEditor({
     return selectedText;
   };
 
-  const insertMarkdown = (template: string, originalSelectionLength: number = 0) => {
+  const insertMarkdown = (template: string) => {
     if (editorMode === 'wysiwyg') {
       editorRef.current?.insertText(template);
     } else if (editorMode === 'markdown' && markdownTextareaRef.current) {
@@ -59,13 +59,13 @@ export default function MarkdownEditor({
   const wrapTextWithTag = (tagName: string, attributes: string = '') => {
     const selected = getSelectedText();
     const wrapped = `<${tagName}${attributes}>${selected}</${tagName}>`;
-    insertMarkdown(wrapped, selected.length);
+    insertMarkdown(wrapped);
   };
 
   const wrapWithMarkdown = (prefix: string, suffix: string = '') => {
     const selected = getSelectedText();
     const wrapped = `${prefix}${selected}${suffix}`;
-    insertMarkdown(wrapped, selected.length);
+    insertMarkdown(wrapped);
   };
 
   return (

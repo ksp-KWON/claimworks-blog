@@ -243,7 +243,7 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
       const data = await response.json();
       if (data.error) throw new Error(data.error.message);
       
-      let text = data.candidates[0].content.parts[0].text;
+      const text = data.candidates[0].content.parts[0].text;
       return cleanAnalysisBlock(text);
     } catch (error: any) {
       lastError = error.message;

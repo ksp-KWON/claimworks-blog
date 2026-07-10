@@ -15,12 +15,6 @@ const nextConfig: NextConfig = {
   pageExtensions: isDev
     ? ['tsx', 'ts', 'jsx', 'js', 'dev.ts', 'dev.tsx']
     : ['tsx', 'ts', 'jsx', 'js'],
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
 };
 
 // 정적 빌드(export) 모드 시 rewrites를 선언하면 경고가 발생하므로, 개발 환경에서만 조건부 할당합니다.

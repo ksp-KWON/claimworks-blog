@@ -28,11 +28,7 @@ export default function SettingsPanel({ geminiKey, setGeminiKey, githubToken, se
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
 
-  useEffect(() => {
-    checkSubscription();
-  }, []);
-
-  const checkSubscription = async () => {
+  async function checkSubscription() {
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       const registration = await navigator.serviceWorker.getRegistration();
       if (registration) {
@@ -40,7 +36,13 @@ export default function SettingsPanel({ geminiKey, setGeminiKey, githubToken, se
         setIsSubscribed(!!subscription);
       }
     }
-  };
+  }
+
+  useEffect(() => {
+    checkSubscription();
+  }, []);
+
+
 
   const subscribeUser = async () => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {

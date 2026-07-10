@@ -73,6 +73,10 @@ export default function CalendarAdminPanel() {
     fetchHolidays();
   }, [currentDate.getFullYear()]);
 
+  const formatDateString = (d: Date) => {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
   useEffect(() => {
     const pendingStr = sessionStorage.getItem('pending_calendar_event');
     if (pendingStr && labels.length > 0) {
@@ -122,9 +126,7 @@ export default function CalendarAdminPanel() {
     });
   };
 
-  const formatDateString = (d: Date) => {
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  };
+
 
   const handlePrev = () => {
     const d = new Date(currentDate);

@@ -69,7 +69,7 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
   const textareaClass = "w-full text-sm text-gray-800 dark:text-gray-200 leading-relaxed bg-white dark:bg-zinc-900 p-3 rounded-lg border border-gray-200 dark:border-zinc-700 outline-none focus:border-blue-500 transition-colors resize-none overflow-hidden min-h-[80px] placeholder:text-gray-400";
 
   return (
-    <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm space-y-6">
+    <div className="space-y-6 w-full">
       
       {/* 사고원인 */}
       <div>

@@ -266,11 +266,8 @@ export default function AdminPage() {
           )}
           
           {/* Consultations */}
-          {activeApp === 'consult-list' && (
-            <ConsultationAdminPanel isSplitView={false} onNavigateToManage={() => setActiveApp('consult-manage')} />
-          )}
           {activeApp === 'consult-manage' && (
-            <ConsultationAdminPanel isSplitView={true} onNavigateToManage={() => setActiveApp('consult-manage')} />
+            <ConsultationAdminPanel isSplitView={true} onNavigateToManage={() => {}} />
           )}
 
           {/* Posting Center Tools */}

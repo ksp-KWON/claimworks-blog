@@ -20,7 +20,6 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
   // Accordion states
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(true);
   const [isChatExpanded, setIsChatExpanded] = useState(true);
-  const [isConsultExpanded, setIsConsultExpanded] = useState(true);
   const [isPostsExpanded, setIsPostsExpanded] = useState(true);
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
 
@@ -228,11 +227,10 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
           <button
             onClick={() => {
               if (isCollapsed) toggleCollapse();
-              setIsConsultExpanded(!isConsultExpanded);
-              if (!isConsultActive) setActiveApp('consult-list');
+              setActiveApp('consult-manage');
             }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
-              isConsultActive && !isConsultExpanded
+              isConsultActive
                 ? 'bg-zinc-800 text-white font-bold' 
                 : 'hover:bg-zinc-800/50 text-zinc-300 hover:text-white'
             }`}
@@ -243,32 +241,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
               </svg>
               {!isCollapsed && <span className="text-sm font-bold">예약 상담</span>}
             </div>
-            {!isCollapsed && (
-              <svg className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${isConsultExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            )}
           </button>
-          {(!isCollapsed && isConsultExpanded) && (
-            <div className="mt-1 ml-4 pl-4 border-l border-zinc-600/50 flex flex-col gap-1 py-1">
-              <button
-                onClick={() => setActiveApp('consult-list')}
-                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${
-                  activeApp === 'consult-list' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                }`}
-              >
-                접수 목록
-              </button>
-              <button
-                onClick={() => setActiveApp('consult-manage')}
-                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${
-                  activeApp === 'consult-manage' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                }`}
-              >
-                항목 관리
-              </button>
-            </div>
-          )}
         </div>
 
         {/* 3. Posts Center */}

@@ -250,7 +250,13 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                     date: activeConsultation.accident_date,
                     location: activeConsultation.accident_location || '',
                     details: activeConsultation.content,
-                    inquiries: activeConsultation.inquiry || ''
+                    inquiries: activeConsultation.inquiry || '',
+                    insurances: [],
+                    treatmentHistory: '',
+                    hospitalization: false,
+                    outpatient: false,
+                    surgery: false,
+                    test: false,
                   }} 
                   readOnly={true} 
                 />

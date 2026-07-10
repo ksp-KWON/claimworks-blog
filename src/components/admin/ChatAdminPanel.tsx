@@ -27,7 +27,13 @@ export default function ChatAdminPanel() {
     date: '',
     location: '',
     details: '',
-    inquiries: ''
+    inquiries: '',
+    insurances: [] as any[],
+    treatmentHistory: '',
+    hospitalization: false,
+    outpatient: false,
+    surgery: false,
+    test: false,
   });
 
   // Filters & Sorting State
@@ -100,8 +106,21 @@ export default function ChatAdminPanel() {
           setRightPanelMode('form');
         } else {
           setMemoText(memo);
+          setFormData({ 
+            category: '근로재해', 
+            diagnosis: '', 
+            date: '', 
+            location: '', 
+            details: '', 
+            inquiries: '',
+            insurances: [] as any[],
+            treatmentHistory: '',
+            hospitalization: false,
+            outpatient: false,
+            surgery: false,
+            test: false
+          });
           setRightPanelMode('memo');
-          setFormData({ category: '근로재해', diagnosis: '', date: '', location: '', details: '', inquiries: '' });
         }
       } catch (e) {
         setMemoText(memo);
@@ -514,7 +533,15 @@ export default function ChatAdminPanel() {
                 
                 let parsedContent = '';
                 if (rightPanelMode === 'form') {
-                  parsedContent = `[상담양식]\n사고 분류: ${formData.category}\n진단명: ${formData.diagnosis}\n사고일자: ${formData.date}\n사고장소: ${formData.location}\n사고경위: ${formData.details}\n추가문의: ${formData.inquiries}`;
+                  const insText = formData.insurances.map(i => `- ${i.type}: ${i.company} (${i.year} / ${i.amount})`).join('\n');
+                  const checkText = [
+                    formData.hospitalization && '입원', 
+                    formData.outpatient && '통원', 
+                    formData.surgery && '수술', 
+                    formData.test && '검사'
+                  ].filter(Boolean).join(', ');
+                  
+                  parsedContent = `[상담양식]\n사고 분류: ${formData.category}\n진단명: ${formData.diagnosis}\n사고일자: ${formData.date}\n사고장소: ${formData.location}\n사고경위: ${formData.details}\n치료경위: ${formData.treatmentHistory}\n진료항목: ${checkText || '없음'}\n가입보험:\n${insText || '없음'}\n추가문의: ${formData.inquiries}`;
                 } else {
                   parsedContent = `고객 메모:\n${memoText}`;
                 }

@@ -44,6 +44,7 @@ export default function ChatAdminPanel() {
   
   // Menu State
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showMobileMemo, setShowMobileMemo] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -309,10 +310,10 @@ export default function ChatAdminPanel() {
   };
 
   return (
-    <div className="flex flex-1 h-full bg-white dark:bg-zinc-950 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 overflow-hidden">
+    <div className="flex flex-1 h-full bg-white dark:bg-zinc-950 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 overflow-hidden relative">
       
       {/* 1단: 세션 목록 (좌측) */}
-      <div className="w-[320px] flex flex-col border-r border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-900/50">
+      <div className={`w-full md:w-[320px] flex-col border-r border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-900/50 absolute md:relative inset-0 z-10 md:z-auto transition-transform ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         
         {/* 검색 및 상단 탭 */}
         <div className="flex flex-col border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
@@ -432,7 +433,7 @@ export default function ChatAdminPanel() {
       </div>
 
       {/* 2단: 대화창 (중앙) */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-zinc-950 relative">
+      <div className={`flex-1 flex-col bg-white dark:bg-zinc-950 relative ${selectedId ? 'flex' : 'hidden md:flex'}`}>
         {!selectedId ? (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400 dark:text-zinc-600">
             <svg className="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
@@ -444,16 +445,27 @@ export default function ChatAdminPanel() {
           </div>
         ) : (
           <>
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-sm z-10">
-              <div className="flex items-center gap-3">
+            <div className="px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-sm z-10">
+              <div className="flex items-center gap-2 md:gap-3">
+                <button onClick={() => setSelectedId(null)} className="md:hidden p-1 -ml-1 text-gray-500 hover:text-gray-900 dark:hover:text-white">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                </button>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                     {visitorLabel(activeSession)}
                   </h3>
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-[10px] md:text-xs text-gray-400 mt-0.5">
                     최초 접속일: {new Date(activeSession.created_at).toLocaleString('ko-KR')}
                   </p>
                 </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setShowMobileMemo(true)}
+                  className="md:hidden px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold border border-blue-200 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400"
+                >
+                  고객메모
+                </button>
               </div>
             </div>
             
@@ -506,7 +518,8 @@ export default function ChatAdminPanel() {
 
       {/* 3단: 오른쪽 패널 (항목관리 모드일 때만 표시) */}
       {selectedId && activeSession && (
-        <div className="w-[320px] bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 flex flex-col shrink-0">
+        <>
+        <div className="hidden md:flex w-[320px] bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 flex-col shrink-0">
           <div className="px-3 py-3 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-950 flex gap-1.5 justify-between items-center w-full">
             <button 
               onClick={() => setRightPanelMode('memo')}
@@ -578,6 +591,56 @@ export default function ChatAdminPanel() {
             )}
           </div>
         </div>
+
+        {/* 모바일용 팝업 메모창 */}
+        {showMobileMemo && (
+          <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm md:hidden flex items-end justify-center" onClick={() => setShowMobileMemo(false)}>
+            <div className="w-full h-[85vh] bg-[#1e2733] rounded-t-2xl flex flex-col animate-slide-up-modal" onClick={e => e.stopPropagation()}>
+              <div className="w-full flex justify-center pt-3 pb-2" onClick={() => setShowMobileMemo(false)}>
+                <div className="w-12 h-1.5 bg-zinc-600 rounded-full"></div>
+              </div>
+              <div className="flex-1 overflow-hidden flex flex-col">
+                <div className="px-3 py-3 border-b border-zinc-700 bg-[#2a3644] flex gap-1.5 justify-between items-center shrink-0">
+                  <button 
+                    onClick={() => setRightPanelMode('memo')}
+                    className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold ${rightPanelMode === 'memo' ? 'bg-blue-900/50 text-blue-400 border-blue-700' : 'bg-[#1e2733] text-gray-300 border-zinc-700'}`}
+                  >
+                    수정
+                  </button>
+                  <button 
+                    onClick={saveMemo}
+                    disabled={isSavingMemo}
+                    className="flex-1 text-[11px] bg-zinc-700 text-gray-200 py-1.5 rounded-md transition-colors border border-zinc-600 font-bold"
+                  >
+                    {isSavingMemo ? '저장중' : '저장'}
+                  </button>
+                  <button 
+                    onClick={() => setRightPanelMode('form')}
+                    className={`flex-1 text-[11px] py-1.5 rounded-md transition-colors border font-bold ${rightPanelMode === 'form' ? 'bg-blue-900/50 text-blue-400 border-blue-700' : 'bg-[#1e2733] text-gray-300 border-zinc-700'}`}
+                  >
+                    상담양식
+                  </button>
+                  <button onClick={() => setShowMobileMemo(false)} className="flex-1 text-[11px] bg-red-500/20 text-red-400 border border-red-500/30 py-1.5 rounded-md font-bold">
+                    닫기
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto custom-scrollbar relative p-3 text-white">
+                  {rightPanelMode === 'memo' ? (
+                    <textarea
+                      value={memoText}
+                      onChange={e => setMemoText(e.target.value)}
+                      placeholder="이 고객과의 상담에서 기억해야 할 내용을 자유롭게 메모하세요. (고객에게는 보이지 않습니다)"
+                      className="w-full h-full min-h-[300px] bg-transparent border-none text-sm text-gray-200 resize-none outline-none custom-scrollbar leading-relaxed p-2"
+                    />
+                  ) : (
+                    <ConsultationDetailCard data={formData} onChange={setFormData} readOnly={false} />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        </>
       )}
     </div>
   );

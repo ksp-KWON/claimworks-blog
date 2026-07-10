@@ -111,11 +111,11 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
   }
 
   return (
-    <div className="flex flex-1 h-full bg-white dark:bg-zinc-950 overflow-hidden">
+    <div className="flex flex-1 h-full bg-white dark:bg-zinc-950 overflow-hidden relative">
       
       {/* List Panel */}
-      <div className={`flex flex-col bg-white dark:bg-zinc-900 overflow-hidden ${isSplitView ? 'flex-1 border-r border-gray-200 dark:border-zinc-800' : 'flex-1'}`}>
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950 flex justify-between items-center shrink-0">
+      <div className={`flex flex-col bg-white dark:bg-zinc-900 overflow-hidden absolute md:relative inset-0 z-10 md:z-auto transition-transform ${isSplitView ? 'flex-1 border-r border-gray-200 dark:border-zinc-800' : 'flex-1'} ${selectedId && isSplitView ? 'hidden md:flex' : 'flex'}`}>
+        <div className="px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950 flex justify-between items-center shrink-0">
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">예약상담 접수함</h2>
             <p className="text-xs text-gray-500 mt-1">홈페이지를 통해 접수된 고객 상담 요청 내역입니다.</p>
@@ -210,8 +210,11 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
 
       {/* Details Panel (항목 관리) */}
       {isSplitView && (
-        <div className="w-[400px] bg-gray-50 dark:bg-zinc-950 flex flex-col shrink-0">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
+        <div className={`w-full md:w-[400px] bg-gray-50 dark:bg-zinc-950 flex-col shrink-0 absolute md:relative inset-0 z-20 md:z-auto ${selectedId ? 'flex' : 'hidden md:flex'}`}>
+          <div className="px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 flex items-center gap-2">
+            <button onClick={() => setSelectedId(null)} className="md:hidden p-1 -ml-1 text-gray-500 hover:text-gray-900 dark:hover:text-white">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
             <h3 className="text-sm font-bold text-gray-900 dark:text-white">접수 항목 상세정보</h3>
           </div>
           

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import MasterSidebar, { AdminAppType } from '@/components/admin/MasterSidebar';
+import MobileAdminNav from '@/components/admin/MobileAdminNav';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import dynamic from 'next/dynamic';
 
@@ -228,12 +229,13 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-64px)] bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
+    <div className="flex flex-col h-[calc(100dvh)] md:h-[calc(100dvh-64px)] bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
       
       {/* Main Workspace - No Global Header */}
-      <div className="flex flex-1 overflow-hidden relative h-full">
+      <div className="flex flex-1 overflow-hidden relative h-full pb-[64px] md:pb-0">
         
-        {/* Master Sidebar */}
+        {/* Master Sidebar (Desktop Only) */}
+        <div className="hidden md:flex h-full border-r border-zinc-700/50">
         <MasterSidebar 
           activeApp={activeApp} 
           setActiveApp={setActiveApp} 
@@ -244,6 +246,7 @@ export default function AdminPage() {
             setIsLoggedIn(false);
           }}
         />
+        </div>
 
         {/* Dynamic Workspace based on activeApp */}
         <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-zinc-950 relative">
@@ -339,6 +342,16 @@ export default function AdminPage() {
 
         </div>
       </div>
+      
+      {/* Mobile Admin Nav (Mobile Only) */}
+      <MobileAdminNav 
+        activeApp={activeApp} 
+        setActiveApp={setActiveApp} 
+        onLogout={() => {
+          sessionStorage.removeItem('admin_auth');
+          setIsLoggedIn(false);
+        }}
+      />
     </div>
   );
 }

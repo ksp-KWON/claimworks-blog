@@ -228,11 +228,6 @@ export default function ChatWidget() {
     }
   };
 
-  const pathname = usePathname();
-  if (pathname?.startsWith('/admin')) {
-    return null;
-  }
-
   const formatTime = (iso: string) =>
     new Date(iso).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
 

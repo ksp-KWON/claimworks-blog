@@ -746,7 +746,7 @@ export default function CalendarAdminPanel() {
             </div>
 
             {/* View Mode Dropdown */}
-            <div className="relative">
+            <div className="relative hidden md:block">
               <button 
                 onClick={() => setIsViewDropdownOpen(!isViewDropdownOpen)}
                 className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg border border-gray-300 dark:border-zinc-700 transition-colors"
@@ -791,6 +791,14 @@ export default function CalendarAdminPanel() {
         {viewMode === 'day' && renderDayView()}
         {viewMode === 'year' && renderYearView()}
         {viewMode === 'agenda' && renderAgendaView()}
+
+        {/* Mobile FAB (Floating Action Button) */}
+        <button 
+          onClick={handleCreateNew}
+          className="md:hidden fixed right-4 bottom-20 z-40 w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-[0_4px_12px_rgba(37,99,235,0.4)] active:scale-95 transition-transform"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+        </button>
       </div>
 
       {/* 우측 사이드바 (일정 추가/수정 또는 라벨 관리) */}

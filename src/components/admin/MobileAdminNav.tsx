@@ -256,8 +256,9 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
                             <span className="text-sm text-gray-800 dark:text-gray-200 font-medium flex-1 truncate">{label.name}</span>
                           </label>
                           <div className="flex items-center gap-1 shrink-0">
-                            {index > 0 && <button onClick={(e) => moveLabel(e, index, 'up')} className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">↑</button>}
-                            {index < labels.length - 1 && <button onClick={(e) => moveLabel(e, index, 'down')} className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">↓</button>}
+                            {/* Hide move buttons on mobile to save space and reduce clutter */}
+                            {/* {index > 0 && <button onClick={(e) => moveLabel(e, index, 'up')} className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">↑</button>} */}
+                            {/* {index < labels.length - 1 && <button onClick={(e) => moveLabel(e, index, 'down')} className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">↓</button>} */}
                             <button onClick={(e) => startEditLabel(e, label)} className="p-1.5 text-blue-400 hover:text-blue-500">✎</button>
                             <button onClick={(e) => { e.stopPropagation(); if (confirm('라벨을 삭제하시겠습니까?')) deleteLabel(label.id); }} className="p-1.5 text-red-400 hover:text-red-500">×</button>
                           </div>

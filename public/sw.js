@@ -7,7 +7,7 @@
         icon: '/logo_tv.png',
         badge: '/logo_tv.png',
         data: {
-          url: data.url || '/admin',
+          url: data.url || '/manager',
         },
       };
       event.waitUntil(self.registration.showNotification(data.title, options));

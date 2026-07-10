@@ -202,7 +202,7 @@ export default function ChatWidget() {
         body: JSON.stringify({
           title: '새로운 채팅 메시지',
           body: text.length > 20 ? text.substring(0, 20) + '...' : text,
-          url: '/admin'
+          url: '/manager'
         }),
         headers: { 'Content-Type': 'application/json' }
       }).catch(() => {});

@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const notificationPayload = JSON.stringify({
       title: payload.title || '새로운 알림',
       body: payload.body || '내용이 없습니다.',
-      url: payload.url || '/admin',
+      url: payload.url || '/manager',
     });
 
     const { data: subscriptions, error } = await supabaseAdmin

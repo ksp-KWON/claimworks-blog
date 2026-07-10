@@ -494,7 +494,7 @@ export default function ChatAdminPanel() {
           {/* 모바일 딤 배경 */}
           <div className="fixed inset-0 bg-black/20 z-[40] sm:hidden" onClick={() => setShowMemoPanel(false)} />
           
-          <div className="absolute inset-y-0 right-0 w-full sm:w-[450px] bg-white dark:bg-zinc-900 shadow-2xl flex flex-col transform transition-transform duration-300 z-[50] border-l border-gray-200 dark:border-zinc-800">
+          <div className="absolute inset-y-0 right-0 md:relative w-full md:w-1/2 bg-white dark:bg-zinc-900 shadow-2xl md:shadow-none flex flex-col shrink-0 transform transition-transform duration-300 z-[50] md:z-auto border-l border-gray-200 dark:border-zinc-800">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-800 shrink-0">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">메모</h3>

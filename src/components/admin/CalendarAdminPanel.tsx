@@ -665,7 +665,7 @@ export default function CalendarAdminPanel() {
 
       {/* 우측 사이드바 (일정 추가/수정) - 선택되었을 때만 렌더링 */}
       {(selectedEvent || isEditing) && (
-        <div className="w-80 shrink-0 border-l border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex flex-col h-full animate-in slide-in-from-right-8 duration-200">
+        <div className="w-full md:w-1/2 shrink-0 border-l border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex flex-col h-full animate-in slide-in-from-right-8 duration-200">
           <div className="p-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0">
             <h3 className="font-bold text-gray-800 dark:text-gray-200">
               {isEditing ? '일정 작성' : '일정 상세'}

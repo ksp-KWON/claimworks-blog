@@ -39,6 +39,9 @@ export default function CalendarAdminPanel() {
   const [formSourceApp, setFormSourceApp] = useState('');
   const [formSourceId, setFormSourceId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isViewDropdownOpen, setIsViewDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const fetchEvents = async () => {
     const { data, error } = await supabase
@@ -65,6 +68,17 @@ export default function CalendarAdminPanel() {
       if (cons) setConsultations(cons);
     };
     fetchLinkableData();
+
+    // Listen for custom event from MobileAdminNav
+    const handleOpenLabelManager = () => {
+      setIsLabelManagerOpen(true);
+      setIsEditing(false);
+      setSelectedEvent(null);
+    };
+    window.addEventListener('open-label-manager', handleOpenLabelManager);
+    return () => {
+      window.removeEventListener('open-label-manager', handleOpenLabelManager);
+    };
   }, []);
 
   useEffect(() => {
@@ -128,10 +142,23 @@ export default function CalendarAdminPanel() {
 
   const getFilteredEvents = () => {
     return events.filter(ev => {
-      const { labelId } = parseContent(ev.content);
-      if (!labelId) return true; // No label -> always show
-      const label = labels.find(l => l.id === labelId);
-      return label ? label.active : true;
+      const { labelId, text } = parseContent(ev.content);
+      
+      // Label filter
+      let labelMatch = true;
+      if (labelId) {
+        const label = labels.find(l => l.id === labelId);
+        if (label) labelMatch = label.active;
+      }
+      
+      // Search filter
+      let searchMatch = true;
+      if (searchQuery.trim() !== '') {
+        const q = searchQuery.toLowerCase();
+        searchMatch = ev.title.toLowerCase().includes(q) || text.toLowerCase().includes(q);
+      }
+      
+      return labelMatch && searchMatch;
     });
   };
 
@@ -642,67 +669,94 @@ export default function CalendarAdminPanel() {
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
         
         {/* 상단 툴바 */}
-        <div className="h-14 shrink-0 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-4 sm:px-6 shadow-sm z-10 w-full overflow-x-auto custom-scrollbar">
+        <div className="h-14 shrink-0 bg-white/90 dark:bg-[#121212]/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/10 flex items-center justify-between px-3 sm:px-4 z-20 w-full relative">
           
+          {/* Left: 오늘, <, >, Date */}
           <div className="flex items-center gap-4 shrink-0">
             {viewMode !== 'agenda' && (
-              <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 rounded-md p-0.5 shrink-0">
-                <button onClick={handlePrev} className="p-1 rounded text-gray-600 hover:bg-white dark:text-gray-300 dark:hover:bg-zinc-700 shadow-sm transition-colors">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                </button>
-                <button onClick={handleToday} className="px-2.5 py-1 text-xs font-bold text-gray-700 hover:bg-white dark:text-gray-200 dark:hover:bg-zinc-700 rounded shadow-sm transition-colors">
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                <button onClick={handleToday} className="px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full border border-gray-300 dark:border-zinc-700 transition-colors">
                   오늘
                 </button>
-                <button onClick={handleNext} className="p-1 rounded text-gray-600 hover:bg-white dark:text-gray-300 dark:hover:bg-zinc-700 shadow-sm transition-colors">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-                </button>
+                <div className="flex items-center gap-0.5 sm:gap-1 text-gray-600 dark:text-gray-400">
+                  <button onClick={handlePrev} className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+                  <button onClick={handleNext} className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                  </button>
+                </div>
               </div>
             )}
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white truncate">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate ml-1">
               {getHeaderText()}
             </h2>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0 ml-4">
-            <div className="hidden sm:flex bg-gray-100 dark:bg-zinc-800 rounded-md p-0.5 shrink-0">
-              {[
-                { id: 'day', label: '일' },
-                { id: 'week', label: '주' },
-                { id: 'month', label: '월' },
-                { id: 'year', label: '연도' },
-                { id: 'agenda', label: '목록' }
-              ].map(view => (
-                <button
-                  key={view.id}
-                  onClick={() => setViewMode(view.id as ViewMode)}
-                  className={`px-2.5 py-1 text-xs font-bold rounded transition-colors ${
-                    viewMode === view.id 
-                      ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm' 
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                  }`}
-                >
-                  {view.label}
+          {/* Right: Search, View Mode Dropdown */}
+          <div className="flex items-center gap-2 shrink-0 ml-4 relative">
+            
+            {/* Search Toggle */}
+            <div className="relative flex items-center">
+              {isSearchOpen ? (
+                <div className="flex items-center bg-gray-100 dark:bg-zinc-800 rounded-lg px-3 py-1.5 w-40 sm:w-64 border border-gray-200 dark:border-zinc-700 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
+                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  <input 
+                    type="text" 
+                    placeholder="검색" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-transparent border-none outline-none text-gray-900 dark:text-white text-sm w-full placeholder-gray-500 dark:placeholder-gray-400"
+                    autoFocus
+                  />
+                  <button onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 ml-2 shrink-0">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+              ) : (
+                <button onClick={() => setIsSearchOpen(true)} className="p-1.5 sm:p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-700 dark:text-gray-200 transition-colors">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </button>
-              ))}
+              )}
             </div>
-            <button 
-              onClick={() => {
-                setIsLabelManagerOpen(true);
-                setIsEditing(false);
-                setSelectedEvent(null);
-              }}
-              className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 rounded-full transition-colors font-bold text-xs shadow-sm flex items-center gap-1.5 shrink-0"
-            >
-              <span className="text-[14px]">🏷️</span>
-              라벨 관리
-            </button>
-            <button 
-              onClick={handleCreateNew}
-              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors font-bold text-xs shadow-sm flex items-center gap-1.5 shrink-0"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
-              새 일정
-            </button>
+
+            {/* View Mode Dropdown */}
+            <div className="relative">
+              <button 
+                onClick={() => setIsViewDropdownOpen(!isViewDropdownOpen)}
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg border border-gray-300 dark:border-zinc-700 transition-colors"
+              >
+                <span>
+                  {{ day: '일', week: '주', month: '월', year: '연도', agenda: '일정' }[viewMode]}
+                </span>
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              
+              {isViewDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsViewDropdownOpen(false)}></div>
+                  <div className="absolute right-0 mt-2 w-32 sm:w-40 bg-white dark:bg-[#28292c] border border-gray-200 dark:border-[#3c4043] rounded-lg shadow-xl z-50 py-2">
+                    {[
+                      { id: 'day', label: '일', key: 'D' },
+                      { id: 'week', label: '주', key: 'W' },
+                      { id: 'month', label: '월', key: 'M' },
+                      { id: 'year', label: '연도', key: 'Y' },
+                      { id: 'agenda', label: '일정', key: 'A' }
+                    ].map(view => (
+                      <button
+                        key={view.id}
+                        onClick={() => { setViewMode(view.id as ViewMode); setIsViewDropdownOpen(false); }}
+                        className={`w-full flex items-center justify-between px-4 py-2 text-sm text-left hover:bg-gray-50 dark:hover:bg-[#3c4043] transition-colors ${viewMode === view.id ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-[#303134] font-bold' : 'text-gray-700 dark:text-[#e8eaed]'}`}
+                      >
+                        <span>{view.label}</span>
+                        <span className="text-gray-400 dark:text-[#9aa0a6] text-[10px] sm:text-xs font-bold">{view.key}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
           </div>
         </div>
 

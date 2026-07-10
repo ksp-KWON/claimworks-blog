@@ -36,10 +36,7 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
   const closeModals = () => setOpenModal('none');
 
   const handleNavClick = (id: 'calendar' | 'chat' | 'consult' | 'posts' | 'settings') => {
-    if (id === 'calendar') {
-      setActiveApp('calendar');
-      closeModals();
-    } else if (id === 'chat') {
+    if (id === 'chat') {
       setActiveApp('chat-list');
       closeModals();
     } else if (id === 'consult') {
@@ -131,6 +128,22 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
             <div className="w-full flex justify-center pt-3 pb-2" onClick={closeModals}>
               <div className="w-12 h-1.5 bg-zinc-600 rounded-full"></div>
             </div>
+
+            {openModal === 'calendar' && (
+              <div className="p-4 space-y-3">
+                <h3 className="text-lg font-bold text-white mb-4">상담 일정</h3>
+                <button onClick={() => { 
+                  setActiveApp('calendar'); 
+                  closeModals();
+                  setTimeout(() => {
+                    window.dispatchEvent(new Event('open-label-manager'));
+                  }, 100);
+                }} className="w-full flex items-center p-4 bg-[#2a3644] rounded-xl hover:bg-[#344253] text-left">
+                  <span className="text-[20px] mr-3">🏷️</span>
+                  <span className="text-base text-white font-bold">라벨 관리</span>
+                </button>
+              </div>
+            )}
 
             {openModal === 'posts' && (
               <div className="p-4 space-y-3">

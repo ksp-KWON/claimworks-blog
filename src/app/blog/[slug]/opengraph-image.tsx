@@ -43,9 +43,9 @@ export default async function Image() {
             src={logoBase64}
             alt="보상스쿨"
             style={{
-              width: '540px',
-              height: '540px',
-              borderRadius: '270px',
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
             }}
           />
         ) : (

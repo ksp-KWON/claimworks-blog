@@ -35,15 +35,15 @@ export default async function Image() {
         }}
       >
         {logoBase64 ? (
-          <img
-            src={logoBase64}
-            alt="보상스쿨"
-            style={{
-              width: '540px',
-              height: '540px',
-              borderRadius: '270px',
-            }}
-          />
+            <img
+              src={logoBase64}
+              alt="보상스쿨"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+              }}
+            />
         ) : (
           <div
             style={{

@@ -9,19 +9,17 @@ export default function DailyAutoPanel({ isLoading, onRunAuto }: DailyAutoPanelP
   const [autoType, setAutoType] = useState<'all' | 'precedent' | 'trend'>('all');
 
   return (
-    <div className="flex-1 flex flex-col p-6 bg-gray-50 dark:bg-zinc-950 overflow-hidden">
-      <div className="max-w-4xl mx-auto w-full flex flex-col h-full space-y-6">
-        
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm shrink-0">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              🤖 데일리 자동화 엔진
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">구글 트렌드 및 최신 이슈를 기반으로 AI가 스스로 포스팅을 기획하고 자동 발행합니다.</p>
-          </div>
+    <div className="flex-1 flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden relative">
+      <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0 shadow-sm z-10 w-full overflow-x-auto">
+        <div className="flex items-center gap-3 shrink-0">
+          <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            🤖 데일리 자동화 엔진
+          </h2>
+          <span className="text-[10px] md:text-xs text-gray-400 font-medium hidden sm:inline">구글 트렌드 및 최신 이슈를 기반으로 AI가 스스로 포스팅을 기획하고 자동 발행합니다.</span>
         </div>
-
+      </div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6">
+        <div className="max-w-4xl mx-auto w-full flex flex-col h-full space-y-6">
         {/* Content */}
         <div className="flex-1 overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-sm rounded-2xl p-8">
           <div className="max-w-3xl mx-auto flex flex-col h-full justify-center">
@@ -80,6 +78,7 @@ export default function DailyAutoPanel({ isLoading, onRunAuto }: DailyAutoPanelP
               </p>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

@@ -113,13 +113,13 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
       
       {/* List Panel */}
       <div className={`flex flex-col bg-white dark:bg-zinc-900 overflow-hidden absolute md:relative inset-0 z-10 md:z-auto transition-transform ${isSplitView ? 'flex-1 border-r border-gray-200 dark:border-zinc-800' : 'flex-1'} ${selectedId && isSplitView ? 'hidden md:flex' : 'flex'}`}>
-        <div className="px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950 flex justify-between items-center shrink-0">
-          <div>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">예약상담 접수함</h2>
-            <p className="text-xs text-gray-500 mt-1">홈페이지를 통해 접수된 고객 상담 요청 내역입니다.</p>
+        <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0 shadow-sm z-10 w-full">
+          <div className="flex items-center gap-3">
+            <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white">예약상담 접수함</h2>
+            <span className="text-[10px] md:text-xs text-gray-400 font-medium hidden sm:inline">홈페이지를 통해 접수된 고객 상담 요청 내역입니다.</span>
           </div>
-          <div className="flex gap-2">
-            <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">
+          <div className="flex gap-2 shrink-0">
+            <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-full border border-blue-100 dark:border-blue-800">
               총 {consultations.length}건
             </span>
           </div>
@@ -208,12 +208,15 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
 
       {/* Details Panel (항목 관리) */}
       {isSplitView && (
-        <div className={`w-full md:w-[400px] bg-gray-50 dark:bg-zinc-950 flex-col shrink-0 absolute md:relative inset-0 z-20 md:z-auto ${selectedId ? 'flex' : 'hidden md:flex'}`}>
-          <div className="px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 flex items-center gap-2">
-            <button onClick={() => setSelectedId(null)} className="md:hidden p-1 -ml-1 text-gray-500 hover:text-gray-900 dark:hover:text-white">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+        <div className={`w-full md:w-1/2 bg-gray-50 dark:bg-zinc-950 flex-col shrink-0 absolute md:relative inset-0 z-20 md:z-auto border-l border-gray-200 dark:border-zinc-800 ${selectedId ? 'flex' : 'hidden md:flex'}`}>
+          <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 flex items-center gap-3 shadow-sm z-10 w-full">
+            <button onClick={() => setSelectedId(null)} className="md:hidden p-1 -ml-1 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
             </button>
-            <h3 className="text-sm font-bold text-gray-900 dark:text-white">접수 항목 상세정보</h3>
+            <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+              접수 항목 상세정보
+            </h3>
           </div>
           
           <div className="flex-1 overflow-y-auto custom-scrollbar p-6">

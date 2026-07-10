@@ -602,29 +602,29 @@ export default function CalendarAdminPanel() {
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
         
         {/* 상단 툴바 */}
-        <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+        <div className="h-14 shrink-0 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-4 sm:px-6 shadow-sm z-10 w-full overflow-x-auto custom-scrollbar">
           
-          <div className="flex items-center gap-4 mb-4 sm:mb-0">
+          <div className="flex items-center gap-4 shrink-0">
             {viewMode !== 'agenda' && (
-              <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 shrink-0">
-                <button onClick={handlePrev} className="p-1.5 rounded-md text-gray-600 hover:bg-white dark:text-gray-300 dark:hover:bg-zinc-700 shadow-sm transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+              <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 rounded-md p-0.5 shrink-0">
+                <button onClick={handlePrev} className="p-1 rounded text-gray-600 hover:bg-white dark:text-gray-300 dark:hover:bg-zinc-700 shadow-sm transition-colors">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                 </button>
-                <button onClick={handleToday} className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-white dark:text-gray-200 dark:hover:bg-zinc-700 rounded-md shadow-sm transition-colors">
+                <button onClick={handleToday} className="px-2.5 py-1 text-xs font-bold text-gray-700 hover:bg-white dark:text-gray-200 dark:hover:bg-zinc-700 rounded shadow-sm transition-colors">
                   오늘
                 </button>
-                <button onClick={handleNext} className="p-1.5 rounded-md text-gray-600 hover:bg-white dark:text-gray-300 dark:hover:bg-zinc-700 shadow-sm transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                <button onClick={handleNext} className="p-1 rounded text-gray-600 hover:bg-white dark:text-gray-300 dark:hover:bg-zinc-700 shadow-sm transition-colors">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
               </div>
             )}
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white truncate">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white truncate">
               {getHeaderText()}
             </h2>
           </div>
 
-          <div className="flex items-center gap-4 w-full sm:w-auto overflow-x-auto custom-scrollbar pb-2 sm:pb-0">
-            <div className="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 shrink-0">
+          <div className="flex items-center gap-3 shrink-0 ml-4">
+            <div className="hidden sm:flex bg-gray-100 dark:bg-zinc-800 rounded-md p-0.5 shrink-0">
               {[
                 { id: 'day', label: '일' },
                 { id: 'week', label: '주' },
@@ -635,7 +635,7 @@ export default function CalendarAdminPanel() {
                 <button
                   key={view.id}
                   onClick={() => setViewMode(view.id as ViewMode)}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  className={`px-2.5 py-1 text-xs font-bold rounded transition-colors ${
                     viewMode === view.id 
                       ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm' 
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
@@ -647,7 +647,7 @@ export default function CalendarAdminPanel() {
             </div>
             <button 
               onClick={handleCreateNew}
-              className="shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-bold text-sm shadow-sm flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors font-bold text-xs shadow-sm flex items-center gap-1.5 shrink-0"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
               새 일정

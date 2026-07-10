@@ -84,18 +84,17 @@ export default function SettingsPanel({ geminiKey, setGeminiKey, githubToken, se
   };
 
   return (
-    <div className="flex-1 flex flex-col p-6 bg-gray-50 dark:bg-zinc-950 overflow-hidden">
-      <div className="max-w-4xl mx-auto w-full flex flex-col h-full space-y-6">
-        
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm shrink-0">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              ⚙️ API 환경 설정
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">안전한 AI 연동 및 데이터 관리를 위한 자격 증명 설정입니다.</p>
-          </div>
+    <div className="flex-1 flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden relative">
+      <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0 shadow-sm z-10 w-full overflow-x-auto">
+        <div className="flex items-center gap-3 shrink-0">
+          <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            ⚙️ API 환경 설정
+          </h2>
+          <span className="text-[10px] md:text-xs text-gray-400 font-medium hidden sm:inline">안전한 AI 연동 및 데이터 관리를 위한 자격 증명 설정입니다.</span>
         </div>
+      </div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6">
+        <div className="max-w-4xl mx-auto w-full flex flex-col h-full space-y-6">
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-sm rounded-2xl p-8">
@@ -193,6 +192,7 @@ export default function SettingsPanel({ geminiKey, setGeminiKey, githubToken, se
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

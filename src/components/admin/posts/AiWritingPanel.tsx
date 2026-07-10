@@ -11,14 +11,17 @@ export default function AiWritingPanel({ isLoading, onRunAi, onOpenEditor }: AiW
   const [aiMode, setAiMode] = useState<'manual-preserve' | 'manual-expand' | 'semi-auto'>('manual-preserve');
 
   return (
-    <div className="flex-1 flex flex-col p-6 bg-gray-50 dark:bg-zinc-950 overflow-y-auto custom-scrollbar">
-      <div className="max-w-4xl mx-auto w-full space-y-6">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+    <div className="flex-1 flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden relative">
+      <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0 shadow-sm z-10 w-full">
+        <div className="flex items-center gap-3">
+          <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             ✨ AI 글쓰기
           </h2>
-          <p className="text-sm text-gray-500 mt-1">원문을 입력하고 원하는 스타일의 블로그 포스팅으로 변환하세요.</p>
+          <span className="text-[10px] md:text-xs text-gray-400 font-medium hidden sm:inline">원문을 입력하고 원하는 스타일의 블로그 포스팅으로 변환하세요.</span>
         </div>
+      </div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+        <div className="max-w-4xl mx-auto w-full space-y-6">
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button
@@ -118,6 +121,7 @@ export default function AiWritingPanel({ isLoading, onRunAi, onOpenEditor }: AiW
               )}
             </button>
           </div>
+        </div>
         </div>
       </div>
     </div>

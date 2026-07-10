@@ -287,9 +287,10 @@ export default function ChatAdminPanel() {
       <div className={`w-full md:w-[320px] flex-col border-r border-gray-200 dark:border-zinc-800 shrink-0 bg-gray-50 dark:bg-zinc-900/50 absolute md:relative inset-0 z-10 md:z-auto transition-transform ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         
         {/* 검색 및 상단 탭 */}
+        {/* 검색 및 상단 탭 */}
         <div className="flex flex-col border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-          <div className="p-3">
-            <div className="relative">
+          <div className="h-14 px-4 flex items-center shrink-0 border-b border-gray-100 dark:border-zinc-800/50">
+            <div className="relative w-full">
               <input 
                 type="text" 
                 placeholder="대화내용, 닉네임 검색" 
@@ -416,26 +417,26 @@ export default function ChatAdminPanel() {
           </div>
         ) : (
           <>
-            <div className="px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-sm z-10">
+            <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-sm z-10 w-full">
               <div className="flex items-center gap-2 md:gap-3">
-                <button onClick={() => setSelectedId(null)} className="md:hidden p-1 -ml-1 text-gray-500 hover:text-gray-900 dark:hover:text-white">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                <button onClick={() => setSelectedId(null)} className="md:hidden p-1 -ml-1 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                 </button>
-                <div>
+                <div className="flex items-center gap-3">
                   <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                     {visitorLabel(activeSession)}
                   </h3>
-                  <p className="text-[10px] md:text-xs text-gray-400 mt-0.5">
+                  <span className="text-[10px] md:text-xs text-gray-400 font-medium">
                     최초 접속일: {new Date(activeSession.created_at).toLocaleString('ko-KR')}
-                  </p>
+                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button 
                   onClick={() => setShowMemoPanel(!showMemoPanel)}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center gap-1.5 ${showMemoPanel ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 dark:bg-zinc-800 dark:text-gray-300 dark:border-zinc-700 dark:hover:bg-zinc-700'}`}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5 ${showMemoPanel ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                   메모
                 </button>
               </div>
@@ -496,9 +497,12 @@ export default function ChatAdminPanel() {
           
           <div className="absolute inset-y-0 right-0 md:relative w-full md:w-1/2 bg-white dark:bg-zinc-900 shadow-2xl md:shadow-none flex flex-col shrink-0 transform transition-transform duration-300 z-[50] md:z-auto border-l border-gray-200 dark:border-zinc-800">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-800 shrink-0">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">메모</h3>
-              <button onClick={() => setShowMemoPanel(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+            <div className="h-14 flex items-center justify-between px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 shrink-0 shadow-sm bg-white dark:bg-zinc-900">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                메모
+              </h3>
+              <button onClick={() => setShowMemoPanel(false)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>

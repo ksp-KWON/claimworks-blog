@@ -5,6 +5,7 @@ import MasterSidebar, { AdminAppType } from '@/components/admin/MasterSidebar';
 import MobileAdminNav from '@/components/admin/MobileAdminNav';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import dynamic from 'next/dynamic';
+import AdminNotificationProvider from '@/components/admin/AdminNotificationProvider';
 
 const ChatAdminPanel = dynamic(() => import('@/components/admin/ChatAdminPanel'), { ssr: false });
 const ConsultationAdminPanel = dynamic(() => import('@/components/admin/ConsultationAdminPanel'), { ssr: false });
@@ -229,7 +230,8 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh)] md:h-[calc(100dvh-64px)] bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
+    <AdminNotificationProvider>
+      <div className="flex flex-col h-[calc(100dvh)] md:h-[calc(100dvh-64px)] bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
       
       {/* Main Workspace - No Global Header */}
       <div className="flex flex-1 overflow-hidden relative h-full pb-[64px] md:pb-0">
@@ -353,5 +355,6 @@ export default function AdminPage() {
         }}
       />
     </div>
+    </AdminNotificationProvider>
   );
 }

@@ -195,6 +195,17 @@ export default function ChatWidget() {
         .from('chat_sessions')
         .update({ last_message_at: now, unread_count: 0 })
         .eq('id', sid);
+
+      // 푸시 알림 전송 (에러 무시)
+      fetch('/api/push/notify', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: '새로운 채팅 메시지',
+          body: text.length > 20 ? text.substring(0, 20) + '...' : text,
+          url: '/admin'
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      }).catch(() => {});
     } catch (err) {
       console.error('[ChatWidget] 메시지 전송 실패:', err);
       setInputText(text); // 실패 시 입력 복원

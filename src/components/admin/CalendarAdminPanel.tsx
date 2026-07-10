@@ -20,7 +20,16 @@ export default function CalendarAdminPanel() {
   const [consultations, setConsultations] = useState<any[]>([]);
 
   // Labels hook
-  const { labels } = useCalendarLabels();
+  const { labels, toggleLabelActive, addLabel, deleteLabel, updateLabel, reorderLabels } = useCalendarLabels();
+  
+  // Label Manager State
+  const [isLabelManagerOpen, setIsLabelManagerOpen] = useState(false);
+  const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
+  const [editLabelName, setEditLabelName] = useState('');
+  const [editLabelColor, setEditLabelColor] = useState('');
+  
+  const [newLabelName, setNewLabelName] = useState('');
+  const [newLabelColor, setNewLabelColor] = useState('#4285f4');
   
   // Form state
   const [isEditing, setIsEditing] = useState(false);
@@ -159,6 +168,7 @@ export default function CalendarAdminPanel() {
     setFormLabelId('');
     setFormSourceApp('');
     setFormSourceId('');
+    setIsLabelManagerOpen(false);
   };
 
   const handleEventClick = (e: React.MouseEvent, event: AdminCalendarEvent) => {
@@ -172,6 +182,7 @@ export default function CalendarAdminPanel() {
     setFormLabelId(labelId);
     setFormSourceApp(sourceApp || '');
     setFormSourceId(sourceId || '');
+    setIsLabelManagerOpen(false);
   };
 
   const handleCreateNew = () => {
@@ -185,6 +196,35 @@ export default function CalendarAdminPanel() {
     setFormLabelId('');
     setFormSourceApp('');
     setFormSourceId('');
+    setIsLabelManagerOpen(false);
+  };
+
+  const handleAddLabel = () => {
+    if (!newLabelName.trim()) return;
+    addLabel(newLabelName.trim(), newLabelColor);
+    setNewLabelName('');
+    // Pick next random color
+    const colors = ['#4285f4', '#fbbc04', '#ea4335', '#34a853', '#8e24aa', '#f06292', '#00acc1'];
+    setNewLabelColor(colors[Math.floor(Math.random() * colors.length)]);
+  };
+
+  const saveEditLabel = () => {
+    if (editingLabelId && editLabelName.trim()) {
+      updateLabel(editingLabelId, editLabelName.trim(), editLabelColor);
+      setEditingLabelId(null);
+    }
+  };
+
+  const moveLabel = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index > 0) {
+      const newLabels = [...labels];
+      [newLabels[index - 1], newLabels[index]] = [newLabels[index], newLabels[index - 1]];
+      reorderLabels(newLabels);
+    } else if (direction === 'down' && index < labels.length - 1) {
+      const newLabels = [...labels];
+      [newLabels[index + 1], newLabels[index]] = [newLabels[index], newLabels[index + 1]];
+      reorderLabels(newLabels);
+    }
   };
 
   const handleSave = async () => {
@@ -646,6 +686,17 @@ export default function CalendarAdminPanel() {
               ))}
             </div>
             <button 
+              onClick={() => {
+                setIsLabelManagerOpen(true);
+                setIsEditing(false);
+                setSelectedEvent(null);
+              }}
+              className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 rounded-full transition-colors font-bold text-xs shadow-sm flex items-center gap-1.5 shrink-0"
+            >
+              <span className="text-[14px]">🏷️</span>
+              라벨 관리
+            </button>
+            <button 
               onClick={handleCreateNew}
               className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors font-bold text-xs shadow-sm flex items-center gap-1.5 shrink-0"
             >
@@ -663,17 +714,18 @@ export default function CalendarAdminPanel() {
         {viewMode === 'agenda' && renderAgendaView()}
       </div>
 
-      {/* 우측 사이드바 (일정 추가/수정) - 선택되었을 때만 렌더링 */}
-      {(selectedEvent || isEditing) && (
+      {/* 우측 사이드바 (일정 추가/수정 또는 라벨 관리) */}
+      {(selectedEvent || isEditing || isLabelManagerOpen) && (
         <div className="w-full md:w-1/2 shrink-0 border-l border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex flex-col h-full animate-in slide-in-from-right-8 duration-200">
-          <div className="p-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0">
+          <div className="p-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0 shadow-sm z-10">
             <h3 className="font-bold text-gray-800 dark:text-gray-200">
-              {isEditing ? '일정 작성' : '일정 상세'}
+              {isLabelManagerOpen ? '라벨 관리' : (isEditing ? '일정 작성' : '일정 상세')}
             </h3>
             <button 
               onClick={() => {
                 setSelectedEvent(null);
                 setIsEditing(false);
+                setIsLabelManagerOpen(false);
               }}
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
@@ -682,7 +734,99 @@ export default function CalendarAdminPanel() {
           </div>
 
           <div className="p-4 flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4">
-            {isEditing || !selectedEvent ? (
+            {isLabelManagerOpen ? (
+              // --- Label Manager UI ---
+              <div className="flex flex-col gap-6 h-full">
+                {/* 새 라벨 추가 */}
+                <div className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl p-4 shadow-sm">
+                  <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3">새 라벨 추가</h4>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="color" 
+                      value={newLabelColor}
+                      onChange={(e) => setNewLabelColor(e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer shrink-0 border-0 p-0"
+                    />
+                    <input 
+                      type="text" 
+                      value={newLabelName}
+                      onChange={(e) => setNewLabelName(e.target.value)}
+                      placeholder="라벨 이름 입력"
+                      className="flex-1 p-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-900 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddLabel()}
+                    />
+                    <button 
+                      onClick={handleAddLabel}
+                      disabled={!newLabelName.trim()}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg transition-colors font-bold text-sm shrink-0"
+                    >
+                      추가
+                    </button>
+                  </div>
+                </div>
+
+                {/* 라벨 목록 */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-sm">
+                  <div className="sticky top-0 bg-gray-50 dark:bg-zinc-900/90 backdrop-blur border-b border-gray-200 dark:border-zinc-700 p-3 z-10">
+                    <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200">기존 라벨 목록</h4>
+                  </div>
+                  <div className="flex flex-col divide-y divide-gray-100 dark:divide-zinc-700/50">
+                    {labels.length === 0 ? (
+                      <div className="p-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+                        등록된 라벨이 없습니다.
+                      </div>
+                    ) : (
+                      labels.map((label, index) => (
+                        <div key={label.id} className="flex items-center justify-between p-3 group hover:bg-gray-50 dark:hover:bg-zinc-700/30 transition-colors">
+                          {editingLabelId === label.id ? (
+                            <div className="flex items-center gap-2 flex-1 w-full mr-2">
+                              <input 
+                                type="color" 
+                                value={editLabelColor}
+                                onChange={(e) => setEditLabelColor(e.target.value)}
+                                className="w-6 h-6 rounded cursor-pointer shrink-0 border-0 p-0"
+                              />
+                              <input 
+                                type="text"
+                                value={editLabelName}
+                                onChange={(e) => setEditLabelName(e.target.value)}
+                                className="flex-1 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-white px-2 py-1 rounded text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                autoFocus
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveEditLabel();
+                                  if (e.key === 'Escape') setEditingLabelId(null);
+                                }}
+                              />
+                              <button onClick={saveEditLabel} className="px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-bold shrink-0 shadow-sm transition-colors">저장</button>
+                              <button onClick={() => setEditingLabelId(null)} className="px-2 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-gray-700 dark:text-gray-300 rounded text-xs font-bold shrink-0 transition-colors">취소</button>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-3">
+                                <span className="w-4 h-4 rounded-full shadow-sm border border-black/10 dark:border-white/10" style={{ backgroundColor: label.color }}></span>
+                                <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{label.name}</span>
+                              </div>
+                              <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                <div className="flex flex-col mr-2">
+                                  <button onClick={() => moveLabel(index, 'up')} disabled={index === 0} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-30 disabled:hover:text-gray-400" title="위로"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 15l7-7 7 7" /></svg></button>
+                                  <button onClick={() => moveLabel(index, 'down')} disabled={index === labels.length - 1} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-30 disabled:hover:text-gray-400" title="아래로"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg></button>
+                                </div>
+                                <button onClick={() => { setEditingLabelId(label.id); setEditLabelName(label.name); setEditLabelColor(label.color); }} className="p-1.5 text-gray-500 hover:text-blue-500 bg-gray-100 hover:bg-blue-50 dark:bg-zinc-700 dark:hover:bg-zinc-600 rounded transition-colors" title="수정">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                </button>
+                                <button onClick={() => { if(window.confirm('이 라벨을 삭제하시겠습니까?')) deleteLabel(label.id); }} className="p-1.5 text-gray-500 hover:text-red-500 bg-gray-100 hover:bg-red-50 dark:bg-zinc-700 dark:hover:bg-zinc-600 rounded transition-colors" title="삭제">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : isEditing || !selectedEvent ? (
               // --- Edit Mode ---
               <div className="flex flex-col gap-4 h-full">
                 <div className="flex flex-col gap-1.5 shrink-0">

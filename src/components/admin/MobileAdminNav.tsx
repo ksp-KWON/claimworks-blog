@@ -17,7 +17,15 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
   const [openModal, setOpenModal] = useState<ModalType>('none');
   const [isViewExpanded, setIsViewExpanded] = useState(false);
   const unreadChatCount = useUnreadChatCount();
-  const { labels, toggleLabelActive } = useCalendarLabels();
+  const { labels, toggleLabelActive, addLabel, updateLabel, deleteLabel, reorderLabels } = useCalendarLabels();
+
+  // Label Management State
+  const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
+  const [editLabelName, setEditLabelName] = useState('');
+  const [editLabelColor, setEditLabelColor] = useState('');
+  const [isAddingLabel, setIsAddingLabel] = useState(false);
+
+  const PRESET_COLORS = ['#4285f4', '#fbbc04', '#ea4335', '#34a853', '#8e24aa', '#f06292', '#00acc1', '#795548', '#607d8b'];
 
   // 모달 활성화 시 배경 스크롤 방지
   useEffect(() => {
@@ -34,9 +42,58 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
     };
   }, [openModal]);
 
+  useEffect(() => {
+    if (openModal === 'none') {
+      setIsViewExpanded(false);
+      setIsAddingLabel(false);
+      setEditingLabelId(null);
+    }
+  }, [openModal]);
+
   const closeModals = () => {
     setOpenModal('none');
     setIsViewExpanded(false);
+    setIsAddingLabel(false);
+    setEditingLabelId(null);
+  };
+
+  const startEditLabel = (e: React.MouseEvent, label: any) => {
+    e.stopPropagation();
+    setEditingLabelId(label.id);
+    setEditLabelName(label.name);
+    setEditLabelColor(label.color);
+    setIsAddingLabel(false);
+  };
+
+  const saveEditLabel = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (editingLabelId && editLabelName.trim()) {
+      updateLabel(editingLabelId, editLabelName.trim(), editLabelColor);
+      setEditingLabelId(null);
+    }
+  };
+
+  const saveAddLabel = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (editLabelName.trim() && editLabelColor) {
+      addLabel(editLabelName.trim(), editLabelColor);
+      setIsAddingLabel(false);
+      setEditLabelName('');
+      setEditLabelColor('');
+    }
+  };
+
+  const moveLabel = (e: React.MouseEvent, index: number, direction: 'up' | 'down') => {
+    e.stopPropagation();
+    if (direction === 'up' && index > 0) {
+      const newLabels = [...labels];
+      [newLabels[index - 1], newLabels[index]] = [newLabels[index], newLabels[index - 1]];
+      reorderLabels(newLabels);
+    } else if (direction === 'down' && index < labels.length - 1) {
+      const newLabels = [...labels];
+      [newLabels[index + 1], newLabels[index]] = [newLabels[index], newLabels[index + 1]];
+      reorderLabels(newLabels);
+    }
   };
 
   const handleNavClick = (id: 'calendar' | 'chat' | 'consult' | 'posts' | 'settings') => {
@@ -135,8 +192,6 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
 
             {openModal === 'calendar' && (
               <div className="p-4 space-y-4">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white px-1">상담 일정</h3>
-                
                 <div className="grid grid-cols-2 gap-3">
                   <button onClick={() => { 
                     setActiveApp('calendar'); 
@@ -184,30 +239,86 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
                 <div className="mt-6">
                   <h4 className="text-sm font-bold text-gray-500 dark:text-gray-400 mb-3 px-1">내 캘린더 (라벨)</h4>
                   <div className="bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl p-2 space-y-1">
-                    {labels.map((label) => (
-                      <label key={label.id} className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded-lg cursor-pointer transition-colors">
-                        <input 
-                          type="checkbox"
-                          checked={label.active}
-                          onChange={() => toggleLabelActive(label.id)}
-                          className="w-4 h-4 rounded-sm bg-transparent border-2 appearance-none cursor-pointer flex items-center justify-center after:content-[''] after:w-2.5 after:h-2.5 after:rounded-sm after:scale-0 checked:after:scale-100 after:transition-transform shrink-0"
-                          style={{ 
-                            borderColor: label.color, 
-                            ...(label.active ? { '--tw-bg-opacity': 1, backgroundColor: label.color } : {}) 
-                          } as any}
-                        />
-                        <span className="text-sm text-gray-800 dark:text-gray-200 font-medium flex-1 truncate">{label.name}</span>
-                      </label>
+                    {labels.map((label, index) => (
+                      <div key={label.id} className="flex flex-col">
+                        <div className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded-lg transition-colors group">
+                          <label className="flex items-center gap-3 cursor-pointer flex-1 min-w-0">
+                            <input 
+                              type="checkbox"
+                              checked={label.active}
+                              onChange={() => toggleLabelActive(label.id)}
+                              className="w-4 h-4 rounded-sm bg-transparent border-2 appearance-none cursor-pointer flex items-center justify-center after:content-[''] after:w-2.5 after:h-2.5 after:rounded-sm after:scale-0 checked:after:scale-100 after:transition-transform shrink-0"
+                              style={{ 
+                                borderColor: label.color, 
+                                ...(label.active ? { '--tw-bg-opacity': 1, backgroundColor: label.color } : {}) 
+                              } as any}
+                            />
+                            <span className="text-sm text-gray-800 dark:text-gray-200 font-medium flex-1 truncate">{label.name}</span>
+                          </label>
+                          <div className="flex items-center gap-1 shrink-0">
+                            {index > 0 && <button onClick={(e) => moveLabel(e, index, 'up')} className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">↑</button>}
+                            {index < labels.length - 1 && <button onClick={(e) => moveLabel(e, index, 'down')} className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">↓</button>}
+                            <button onClick={(e) => startEditLabel(e, label)} className="p-1.5 text-blue-400 hover:text-blue-500">✎</button>
+                            <button onClick={(e) => { e.stopPropagation(); if (confirm('라벨을 삭제하시겠습니까?')) deleteLabel(label.id); }} className="p-1.5 text-red-400 hover:text-red-500">×</button>
+                          </div>
+                        </div>
+
+                        {/* 수정 아코디언 폼 */}
+                        {editingLabelId === label.id && (
+                          <div className="mt-1 mb-2 p-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg ml-8 animate-slide-down">
+                            <input 
+                              type="text" 
+                              value={editLabelName} 
+                              onChange={(e) => setEditLabelName(e.target.value)}
+                              placeholder="라벨 이름"
+                              className="w-full bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500 mb-3"
+                            />
+                            <div className="flex gap-2 flex-wrap mb-3">
+                              {PRESET_COLORS.map(c => (
+                                <button key={c} onClick={(e) => { e.stopPropagation(); setEditLabelColor(c); }} className={`w-6 h-6 rounded-full border-2 ${editLabelColor === c ? 'border-gray-900 dark:border-white' : 'border-transparent'}`} style={{ backgroundColor: c }} />
+                              ))}
+                            </div>
+                            <div className="flex justify-end gap-2">
+                              <button onClick={(e) => { e.stopPropagation(); setEditingLabelId(null); }} className="px-3 py-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 rounded hover:bg-gray-200 dark:hover:bg-zinc-700">취소</button>
+                              <button onClick={saveEditLabel} className="px-3 py-1.5 text-xs font-bold text-white bg-blue-500 rounded hover:bg-blue-600">저장</button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ))}
                     
-                    <button onClick={() => { 
-                      setActiveApp('calendar'); 
-                      closeModals();
-                      setTimeout(() => window.dispatchEvent(new Event('open-label-manager')), 100);
-                    }} className="w-full flex items-center justify-center gap-2 mt-2 px-3 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-lg transition-colors">
-                      <span className="text-lg">🏷️</span>
-                      <span className="text-sm text-gray-700 dark:text-gray-300 font-bold">라벨 추가 / 관리</span>
-                    </button>
+                    {!isAddingLabel ? (
+                      <button onClick={(e) => { 
+                        e.stopPropagation(); 
+                        setIsAddingLabel(true); 
+                        setEditingLabelId(null);
+                        setEditLabelName('');
+                        setEditLabelColor(PRESET_COLORS[0]);
+                      }} className="w-full flex items-center justify-center gap-2 mt-2 px-3 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-lg transition-colors border-dashed">
+                        <span className="text-gray-400 font-bold text-lg">+</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 font-bold">새 라벨 추가</span>
+                      </button>
+                    ) : (
+                      <div className="mt-2 p-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg animate-slide-down">
+                        <input 
+                          type="text" 
+                          value={editLabelName} 
+                          onChange={(e) => setEditLabelName(e.target.value)}
+                          placeholder="새 라벨 이름 입력..."
+                          className="w-full bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500 mb-3"
+                          autoFocus
+                        />
+                        <div className="flex gap-2 flex-wrap mb-3">
+                          {PRESET_COLORS.map(c => (
+                            <button key={c} onClick={(e) => { e.stopPropagation(); setEditLabelColor(c); }} className={`w-6 h-6 rounded-full border-2 ${editLabelColor === c ? 'border-gray-900 dark:border-white' : 'border-transparent'}`} style={{ backgroundColor: c }} />
+                          ))}
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <button onClick={(e) => { e.stopPropagation(); setIsAddingLabel(false); }} className="px-3 py-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 rounded hover:bg-gray-200 dark:hover:bg-zinc-700">취소</button>
+                          <button onClick={saveAddLabel} className="px-3 py-1.5 text-xs font-bold text-white bg-blue-500 rounded hover:bg-blue-600">추가</button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

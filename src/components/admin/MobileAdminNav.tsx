@@ -97,7 +97,15 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
   };
 
   const handleNavClick = (id: 'calendar' | 'chat' | 'consult' | 'posts' | 'settings') => {
-    if (id === 'chat') {
+    if (id === 'calendar') {
+      if (activeApp === 'calendar') {
+        if (openModal === 'calendar') closeModals();
+        else setOpenModal('calendar');
+      } else {
+        setActiveApp('calendar');
+        closeModals();
+      }
+    } else if (id === 'chat') {
       setActiveApp('chat-list');
       closeModals();
     } else if (id === 'consult') {
@@ -178,7 +186,7 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
       {/* 팝업 모달 오버레이 (바텀시트 느낌) */}
       {openModal !== 'none' && (
         <div 
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden flex items-end justify-center"
+          className="fixed inset-0 z-40 bg-black/50 transition-opacity md:hidden flex items-end justify-center"
           onClick={closeModals}
         >
           <div 

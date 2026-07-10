@@ -428,9 +428,9 @@ export default function ChatWidget() {
                 className="absolute inset-0 rounded-full pointer-events-none"
                 animate={{ 
                   boxShadow: [
-                    '0 0 0px 0px rgba(26,115,232,0)', 
-                    '0 0 25px 8px rgba(26,115,232,0.4)', 
-                    '0 0 0px 0px rgba(26,115,232,0)'
+                    '0 0 0px 0px rgba(239,68,68,0)', 
+                    '0 0 25px 8px rgba(239,68,68,0.4)', 
+                    '0 0 0px 0px rgba(239,68,68,0)'
                   ] 
                 }}
                 transition={{ 

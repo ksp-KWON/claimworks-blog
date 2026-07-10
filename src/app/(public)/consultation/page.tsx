@@ -52,7 +52,7 @@ export default function ConsultationPage() {
         body: JSON.stringify({
           title: '새로운 상담 접수',
           body: `${formData.name}님의 상담이 접수되었습니다.`,
-          url: '/manager'
+          url: '/admin'
         }),
         headers: { 'Content-Type': 'application/json' }
       }).catch(console.error);

@@ -13,7 +13,7 @@ export default function SmartStickyLayout({ mainContent, sidebarContent }: Props
 
   useEffect(() => {
     // 관리자 페이지 진입 시 body에 hide-footer 클래스 추가
-    if (pathname === '/manager' || pathname?.startsWith('/manager/')) {
+    if (pathname === '/admin' || pathname?.startsWith('/admin/')) {
       document.body.classList.add('hide-footer');
     } else {
       document.body.classList.remove('hide-footer');
@@ -24,8 +24,8 @@ export default function SmartStickyLayout({ mainContent, sidebarContent }: Props
     };
   }, [pathname]);
 
-  // 관리자 페이지(/manager)일 경우, 사이드바 레이아웃을 씌우지 않고 본문만 전체 너비로 렌더링합니다.
-  if (pathname === '/manager' || pathname?.startsWith('/manager/')) {
+  // 관리자 페이지(/admin)일 경우, 사이드바 레이아웃을 씌우지 않고 본문만 전체 너비로 렌더링합니다.
+  if (pathname === '/admin' || pathname?.startsWith('/admin/')) {
     return <>{mainContent}</>;
   }
 

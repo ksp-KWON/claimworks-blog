@@ -11,7 +11,7 @@
 */
 /
   Cache-Control: public, max-age=0, must-revalidate
-/manager
+/admin
   Cache-Control: public, max-age=0, must-revalidate
 
 # 정적 에셋(CSS, JS, 이미지, 폰트)들은 고유 해시값(_next/static/...)을 가지므로 1년 동안 강력하게 캐싱해 속도를 최적화(Core Web Vitals 성능 향상)

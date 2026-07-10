@@ -7,6 +7,15 @@ export default function AdminNotificationProvider({ children }: { children: Reac
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isAudioInitialized, setIsAudioInitialized] = useState(false);
 
+  const playAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(e => {
+        console.warn('Audio play failed, possibly due to browser autoplay policy:', e);
+      });
+    }
+  };
+
   useEffect(() => {
     const audio = new Audio('/notification.ogg');
     audio.preload = 'auto';
@@ -38,14 +47,7 @@ export default function AdminNotificationProvider({ children }: { children: Reac
     };
   }, []);
 
-  const playAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(e => {
-        console.warn('Audio play failed, possibly due to browser autoplay policy:', e);
-      });
-    }
-  };
+
 
   // Browser requires user interaction to play audio. 
   // We capture the first click anywhere in the admin panel to initialize audio.

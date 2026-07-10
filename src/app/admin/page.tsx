@@ -65,6 +65,13 @@ export default function AdminPage() {
     return () => window.removeEventListener('navigate-admin-app', handleNavigate);
   }, []);
 
+  const handleFetchList = async () => {
+    setIsLoading(true);
+    const list = await fetchPostList(githubToken);
+    if (list) setPostList(list);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
     if (githubToken && activeApp === 'post-list' && postList.length === 0) {
       handleFetchList();
@@ -78,12 +85,7 @@ export default function AdminPage() {
     if (activeApp === 'post-settings') setActiveApp('post-ai');
   };
 
-  const handleFetchList = async () => {
-    setIsLoading(true);
-    const list = await fetchPostList(githubToken);
-    if (list) setPostList(list);
-    setIsLoading(false);
-  };
+
 
   const handleLoadPost = async (filename: string, sha: string) => {
     setIsLoading(true);

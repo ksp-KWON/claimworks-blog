@@ -479,8 +479,8 @@ export default function CalendarAdminPanel() {
     const months = Array.from({ length: 12 }, (_, i) => i);
     
     return (
-      <div className="flex-1 min-h-0 p-3 overflow-hidden bg-white dark:bg-zinc-950 flex flex-col">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-3 flex-1 min-h-0">
+      <div className="flex-1 min-h-0 p-1.5 sm:p-3 overflow-hidden bg-white dark:bg-zinc-950 flex flex-col">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1 lg:gap-3 flex-1 min-h-0">
           {months.map(month => {
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -488,12 +488,12 @@ export default function CalendarAdminPanel() {
             const padding = Array.from({ length: firstDay }, (_, i) => null);
             
             return (
-              <div key={month} className="border border-gray-200 dark:border-zinc-800 rounded-lg p-2 bg-white dark:bg-zinc-900 shadow-sm flex flex-col justify-center min-h-0">
-                <div className="text-center font-bold text-sm mb-1 text-gray-800 dark:text-gray-200">{month + 1}월</div>
-                <div className="grid grid-cols-7 gap-0 text-center text-[9px] text-gray-400 mb-1">
+              <div key={month} className="border border-gray-200 dark:border-zinc-800 rounded-lg p-1 sm:p-2 bg-white dark:bg-zinc-900 shadow-sm flex flex-col justify-center min-h-0">
+                <div className="text-center font-bold text-[10px] sm:text-sm mb-0.5 sm:mb-1 text-gray-800 dark:text-gray-200">{month + 1}월</div>
+                <div className="grid grid-cols-7 gap-0 text-center text-[7px] sm:text-[9px] text-gray-400 mb-0.5 sm:mb-1">
                   <div className="text-red-400">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div className="text-blue-400">토</div>
                 </div>
-                <div className="grid grid-cols-7 gap-0.5 text-center text-xs">
+                <div className="grid grid-cols-7 gap-0 text-center text-[8px] sm:text-xs">
                   {padding.map((_, i) => <div key={`p-${i}`} />)}
                   {days.map(d => {
                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -506,12 +506,12 @@ export default function CalendarAdminPanel() {
                           setCurrentDate(new Date(year, month, d));
                           setViewMode('day');
                         }}
-                        className={`w-5 h-5 lg:w-6 lg:h-6 text-[10px] lg:text-xs mx-auto flex items-center justify-center rounded-full cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800 relative
+                        className={`w-3.5 h-3.5 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-[8px] lg:text-xs mx-auto flex items-center justify-center rounded-full cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800 relative
                           ${isToday ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-700 dark:text-gray-300'}
                         `}
                       >
                         {d}
-                        {hasEvent && <div className="absolute bottom-0.5 w-1 h-1 bg-blue-500 rounded-full"></div>}
+                        {hasEvent && <div className="absolute bottom-0 w-0.5 h-0.5 sm:w-1 sm:h-1 bg-blue-500 rounded-full"></div>}
                       </div>
                     );
                   })}

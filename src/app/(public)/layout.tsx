@@ -104,9 +104,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <span className="w-1 h-1 rounded-full bg-[#dadce0] dark:bg-[#5f6368]"></span>
             <Link href="/privacy" className="hover:text-[var(--google-blue)] cursor-pointer transition-colors">개인정보처리방침</Link>
             <span className="w-1 h-1 rounded-full bg-[#dadce0] dark:bg-[#5f6368]"></span>
-            <Link href="/admin" className="hover:text-[var(--google-blue)] cursor-pointer transition-colors text-gray-300 dark:text-zinc-700" title="Admin">
+            <a href="/admin" className="hover:text-[var(--google-blue)] cursor-pointer transition-colors text-gray-300 dark:text-zinc-700" title="Admin">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            </Link>
+            </a>
           </p>
         </div>
       </footer>

@@ -492,11 +492,11 @@ export default function CalendarAdminPanel() {
             
             return (
               <div key={month} className="border border-gray-200 dark:border-zinc-800 rounded-lg p-1 sm:p-2 bg-white dark:bg-zinc-900 shadow-sm flex flex-col justify-center min-h-0">
-                <div className="text-center font-bold text-[clamp(10px,3.5vw,14px)] sm:text-sm mb-0.5 sm:mb-1 text-gray-800 dark:text-gray-200">{month + 1}월</div>
-                <div className="grid grid-cols-7 gap-0 text-center text-[clamp(7px,2vw,10px)] sm:text-[9px] text-gray-400 mb-0.5 sm:mb-1">
+                <div className="text-center font-bold text-[3.5vw] sm:text-sm mb-0.5 sm:mb-1 text-gray-800 dark:text-gray-200">{month + 1}월</div>
+                <div className="grid grid-cols-7 gap-0 text-center text-[2vw] sm:text-[9px] text-gray-400 mb-0.5 sm:mb-1">
                   <div className="text-red-400">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div className="text-blue-400">토</div>
                 </div>
-                <div className="grid grid-cols-7 gap-0 text-center text-[clamp(8px,2.5vw,12px)] sm:text-xs">
+                <div className="grid grid-cols-7 gap-0 text-center text-[2.5vw] sm:text-xs">
                   {padding.map((_, i) => <div key={`p-${i}`} />)}
                   {days.map(d => {
                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -509,7 +509,7 @@ export default function CalendarAdminPanel() {
                           setCurrentDate(new Date(year, month, d));
                           setViewMode('day');
                         }}
-                        className={`w-[clamp(14px,4vw,20px)] h-[clamp(14px,4vw,20px)] sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-[clamp(8px,2.5vw,12px)] sm:text-xs mx-auto flex items-center justify-center rounded-full cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800 relative
+                        className={`w-[4vw] h-[4vw] sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-[2.5vw] lg:text-xs mx-auto flex items-center justify-center rounded-full cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800 relative
                           ${isToday ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-700 dark:text-gray-300'}
                         `}
                       >

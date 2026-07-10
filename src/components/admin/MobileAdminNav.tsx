@@ -16,7 +16,7 @@ interface MobileAdminNavProps {
 export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: MobileAdminNavProps) {
   const [openModal, setOpenModal] = useState<ModalType>('none');
   const unreadChatCount = useUnreadChatCount();
-  const { labels, toggleLabelActive, addLabel, deleteLabel, updateLabel, reorderLabels } = useCalendarLabels();
+  const { labels, toggleLabelActive } = useCalendarLabels();
 
   // 모달 활성화 시 배경 스크롤 방지
   useEffect(() => {

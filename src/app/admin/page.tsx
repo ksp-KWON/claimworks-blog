@@ -30,14 +30,10 @@ export default function AdminPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   // Editor State
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [date, setDate] = useState('');
-  const [category, setCategory] = useState('');
-  const [tags, setTags] = useState('');
-  const [content, setContent] = useState('');
-  const [currentSha, setCurrentSha] = useState<string | null>(null);
-  const [currentFilename, setCurrentFilename] = useState<string | null>(null);
+  const [postMeta, setPostMeta] = useState({
+    title: '', summary: '', date: '', category: '', tags: '',
+    content: '', currentSha: null as string | null, currentFilename: null as string | null
+  });
 
   // Auth State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -93,14 +89,16 @@ export default function AdminPage() {
     setIsLoading(true);
     const postData = await loadPost(githubToken, filename);
     if (postData) {
-      setTitle(postData.title);
-      setSummary(postData.summary);
-      setDate(postData.date);
-      setCategory(postData.category);
-      setTags(postData.tags);
-      setContent(postData.content);
-      setCurrentSha(sha);
-      setCurrentFilename(filename);
+      setPostMeta({
+        title: postData.title,
+        summary: postData.summary,
+        date: postData.date,
+        category: postData.category,
+        tags: postData.tags,
+        content: postData.content,
+        currentSha: sha,
+        currentFilename: filename
+      });
       // Switch to editor
       setActiveApp('editor');
     }
@@ -108,14 +106,12 @@ export default function AdminPage() {
   };
 
   const handleSavePost = async () => {
-    if (!title || !content) {
+    if (!postMeta.title || !postMeta.content) {
       alert('제목과 내용을 입력하세요.');
       return;
     }
     setIsLoading(true);
-    const success = await savePost(githubToken, {
-      title, summary, date, category, tags, content, currentFilename, currentSha
-    });
+    const success = await savePost(githubToken, postMeta);
     if (success) {
       alert('포스팅이 성공적으로 저장/수정 되었습니다.');
       handleFetchList();
@@ -129,7 +125,7 @@ export default function AdminPage() {
     const success = await deletePost(githubToken, filename, sha);
     if (success) {
       alert('삭제 완료');
-      if (currentFilename === filename) handleCreateBlankPost();
+      if (postMeta.currentFilename === filename) handleCreateBlankPost();
       handleFetchList();
     }
     setIsLoading(false);
@@ -143,11 +139,10 @@ export default function AdminPage() {
       const generated = await callGeminiAPI(geminiKey, inputText, mode);
       if (generated) {
         // 기존 작성 내용을 유지하면서 내용 추가
-        if (content) {
-          setContent(content + '\n\n' + generated);
-        } else {
-          setContent(generated);
-        }
+        setPostMeta(prev => ({
+          ...prev,
+          content: prev.content ? prev.content + '\n\n' + generated : generated
+        }));
         // Switch to editor
         setActiveApp('editor');
       }
@@ -165,8 +160,10 @@ export default function AdminPage() {
   };
 
   const handleCreateBlankPost = () => {
-    setTitle(''); setSummary(''); setDate(''); setCategory(''); setTags('');
-    setContent(''); setCurrentSha(null); setCurrentFilename(null);
+    setPostMeta({
+      title: '', summary: '', date: '', category: '', tags: '',
+      content: '', currentSha: null, currentFilename: null
+    });
     setActiveApp('editor');
   };
 
@@ -278,8 +275,8 @@ export default function AdminPage() {
           {/* Posting Center Tools */}
           {activeApp === 'post-ai' && (
             <AiWritingPanel isLoading={isLoading} onRunAi={handleRunAi} onOpenEditor={() => {
-              setContent('');
-              setActiveApp('editor');
+              if (!postMeta.currentFilename) handleCreateBlankPost();
+              else setActiveApp('editor');
             }} />
           )}
           {activeApp === 'post-list' && (
@@ -335,8 +332,8 @@ export default function AdminPage() {
               </div>
               <div className="flex-1 flex overflow-hidden">
                 <MarkdownEditor 
-                  title={title} setTitle={setTitle}
-                  content={content} setContent={setContent}
+                  title={postMeta.title} setTitle={(t: string) => setPostMeta(prev => ({ ...prev, title: t }))}
+                  content={postMeta.content} setContent={(c: any) => setPostMeta(prev => ({ ...prev, content: typeof c === 'function' ? c(prev.content) : c }))}
                 />
               </div>
             </div>

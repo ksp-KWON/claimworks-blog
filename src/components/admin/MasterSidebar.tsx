@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
-import { useCalendarLabels } from './useCalendarLabels';
 
 export type AdminAppType = 
-  | 'calendar'
-  | 'chat-list' | 'chat-manage' 
-  | 'consult-list' | 'consult-manage' 
   | 'post-ai' | 'post-list' | 'post-daily' | 'post-settings' 
   | 'editor';
 
@@ -18,62 +14,9 @@ interface MasterSidebarProps {
 
 export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, toggleCollapse, onLogout }: MasterSidebarProps) {
   // Accordion states
-  const [isCalendarExpanded, setIsCalendarExpanded] = useState(true);
   const [isPostsExpanded, setIsPostsExpanded] = useState(true);
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
 
-  // Labels hook
-  const { labels, toggleLabelActive, addLabel, updateLabel, deleteLabel, reorderLabels } = useCalendarLabels();
-
-  // Label Management State
-  const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
-  const [editLabelName, setEditLabelName] = useState('');
-  const [editLabelColor, setEditLabelColor] = useState('');
-  const [isAddingLabel, setIsAddingLabel] = useState(false);
-
-  const PRESET_COLORS = ['#4285f4', '#fbbc04', '#ea4335', '#34a853', '#8e24aa', '#f06292', '#00acc1', '#795548', '#607d8b'];
-
-  const startEditLabel = (e: React.MouseEvent, label: any) => {
-    e.stopPropagation();
-    setEditingLabelId(label.id);
-    setEditLabelName(label.name);
-    setEditLabelColor(label.color);
-    setIsAddingLabel(false);
-  };
-
-  const saveEditLabel = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (editingLabelId && editLabelName.trim()) {
-      updateLabel(editingLabelId, editLabelName.trim(), editLabelColor);
-      setEditingLabelId(null);
-    }
-  };
-
-  const saveAddLabel = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (editLabelName.trim() && editLabelColor) {
-      addLabel(editLabelName.trim(), editLabelColor);
-      setIsAddingLabel(false);
-      setEditLabelName('');
-      setEditLabelColor('');
-    }
-  };
-
-  const moveLabel = (e: React.MouseEvent, index: number, direction: 'up' | 'down') => {
-    e.stopPropagation();
-    if (direction === 'up' && index > 0) {
-      const newLabels = [...labels];
-      [newLabels[index - 1], newLabels[index]] = [newLabels[index], newLabels[index - 1]];
-      reorderLabels(newLabels);
-    } else if (direction === 'down' && index < labels.length - 1) {
-      const newLabels = [...labels];
-      [newLabels[index + 1], newLabels[index]] = [newLabels[index], newLabels[index + 1]];
-      reorderLabels(newLabels);
-    }
-  };
-
-  const isChatActive = activeApp.startsWith('chat-');
-  const isConsultActive = activeApp.startsWith('consult-');
   const isPostActive = activeApp.startsWith('post-') || activeApp === 'editor';
 
   return (
@@ -100,166 +43,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
           </button>
         </div>
 
-        {/* 0. Calendar (상담일정) */}
-        <div className="px-3">
-          <button
-            onClick={() => {
-              if (isCollapsed) toggleCollapse();
-              setIsCalendarExpanded(!isCalendarExpanded);
-              if (activeApp !== 'calendar') setActiveApp('calendar');
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
-              activeApp === 'calendar' && !isCalendarExpanded
-                ? 'bg-zinc-800 text-white font-bold' 
-                : 'hover:bg-zinc-800/50 text-zinc-300 hover:text-white'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              {!isCollapsed && <span className="text-sm font-bold">상담일정</span>}
-            </div>
-            {!isCollapsed && (
-              <svg className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${isCalendarExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            )}
-          </button>
-          
-          {(!isCollapsed && isCalendarExpanded) && (
-            <div className="mt-1 ml-4 pl-4 border-l border-zinc-600/50 flex flex-col gap-1 py-1">
-              
-              {labels.map((label, index) => (
-                <div key={label.id} className="flex flex-col">
-                  <div className="flex items-center justify-between px-3 py-1.5 text-sm group">
-                    <label className="flex items-center gap-2 cursor-pointer flex-1 truncate text-zinc-300 hover:text-white min-w-0">
-                      <input 
-                        type="checkbox"
-                        checked={label.active}
-                        onChange={() => toggleLabelActive(label.id)}
-                        className="w-3.5 h-3.5 rounded-sm bg-transparent border-2 appearance-none cursor-pointer flex items-center justify-center after:content-[''] after:w-2 after:h-2 after:rounded-sm after:scale-0 checked:after:scale-100 after:transition-transform shrink-0"
-                        style={{ 
-                          borderColor: label.color, 
-                          ...(label.active ? { '--tw-bg-opacity': 1, backgroundColor: label.color } : {}) 
-                        } as any}
-                      />
-                      <span className="truncate">{label.name}</span>
-                    </label>
-                    <div className="hidden group-hover:flex items-center gap-1 shrink-0 bg-[#344253] pl-1">
-                      {index > 0 && <button onClick={(e) => moveLabel(e, index, 'up')} className="text-zinc-500 hover:text-zinc-300" title="위로">↑</button>}
-                      {index < labels.length - 1 && <button onClick={(e) => moveLabel(e, index, 'down')} className="text-zinc-500 hover:text-zinc-300" title="아래로">↓</button>}
-                      <button onClick={(e) => startEditLabel(e, label)} className="text-zinc-500 hover:text-zinc-300 ml-1" title="수정">✎</button>
-                      <button onClick={(e) => { e.stopPropagation(); if (confirm('라벨을 삭제하시겠습니까?')) deleteLabel(label.id); }} className="text-red-400/70 hover:text-red-400 ml-1" title="삭제">×</button>
-                    </div>
-                  </div>
-
-                  {/* 수정 아코디언 폼 */}
-                  {editingLabelId === label.id && (
-                    <div className="mt-1 mb-2 p-2 bg-zinc-800/80 border border-zinc-700/50 rounded-md ml-3 animate-slide-down">
-                      <input 
-                        type="text" 
-                        value={editLabelName} 
-                        onChange={(e) => setEditLabelName(e.target.value)}
-                        placeholder="라벨 이름"
-                        className="w-full bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs text-white outline-none focus:border-blue-500 mb-2"
-                      />
-                      <div className="flex gap-1.5 flex-wrap mb-2">
-                        {PRESET_COLORS.map(c => (
-                          <button key={c} onClick={(e) => { e.stopPropagation(); setEditLabelColor(c); }} className={`w-4 h-4 rounded-full border ${editLabelColor === c ? 'border-white' : 'border-transparent'}`} style={{ backgroundColor: c }} />
-                        ))}
-                      </div>
-                      <div className="flex justify-end gap-1">
-                        <button onClick={(e) => { e.stopPropagation(); setEditingLabelId(null); }} className="px-2 py-1 text-[10px] text-zinc-400 hover:text-zinc-200 bg-zinc-700/50 hover:bg-zinc-700 rounded">취소</button>
-                        <button onClick={saveEditLabel} className="px-2 py-1 text-[10px] text-white bg-blue-500/80 hover:bg-blue-500 rounded">저장</button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-              
-              {!isAddingLabel ? (
-                <button onClick={(e) => {
-                  e.stopPropagation();
-                  setIsAddingLabel(true);
-                  setEditingLabelId(null);
-                  setEditLabelName('');
-                  setEditLabelColor(PRESET_COLORS[0]);
-                }} className="flex items-center gap-2 px-3 py-1.5 mt-1 text-xs text-zinc-500 hover:text-zinc-300 transition-colors w-full text-left">
-                  <span className="text-lg leading-none">+</span>
-                  <span>새 라벨 추가</span>
-                </button>
-              ) : (
-                <div className="mt-2 p-2 bg-zinc-800/80 border border-zinc-700/50 rounded-md ml-3 animate-slide-down">
-                  <input 
-                    type="text" 
-                    value={editLabelName} 
-                    onChange={(e) => setEditLabelName(e.target.value)}
-                    placeholder="라벨 이름 입력"
-                    className="w-full bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs text-white outline-none focus:border-blue-500 mb-2"
-                    autoFocus
-                  />
-                  <div className="flex gap-1.5 flex-wrap mb-2">
-                    {PRESET_COLORS.map(c => (
-                      <button key={c} onClick={(e) => { e.stopPropagation(); setEditLabelColor(c); }} className={`w-4 h-4 rounded-full border ${editLabelColor === c ? 'border-white' : 'border-transparent'}`} style={{ backgroundColor: c }} />
-                    ))}
-                  </div>
-                  <div className="flex justify-end gap-1">
-                    <button onClick={(e) => { e.stopPropagation(); setIsAddingLabel(false); }} className="px-2 py-1 text-[10px] text-zinc-400 hover:text-zinc-200 bg-zinc-700/50 hover:bg-zinc-700 rounded">취소</button>
-                    <button onClick={saveAddLabel} className="px-2 py-1 text-[10px] text-white bg-blue-500/80 hover:bg-blue-500 rounded">추가</button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-
-        {/* 1. Chat Center */}
-        <div className="px-3">
-          <button
-            onClick={() => {
-              if (isCollapsed) toggleCollapse();
-              setActiveApp('chat-list');
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
-              isChatActive
-                ? 'bg-zinc-800 text-white font-bold' 
-                : 'hover:bg-zinc-800/50 text-zinc-300 hover:text-white'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              {!isCollapsed && <span className="text-sm font-bold">채팅 상담</span>}
-            </div>
-          </button>
-        </div>
-
-        {/* 2. Consultation Center */}
-        <div className="px-3">
-          <button
-            onClick={() => {
-              if (isCollapsed) toggleCollapse();
-              setActiveApp('consult-manage');
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
-              isConsultActive
-                ? 'bg-zinc-800 text-white font-bold' 
-                : 'hover:bg-zinc-800/50 text-zinc-300 hover:text-white'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-              {!isCollapsed && <span className="text-sm font-bold">예약 상담</span>}
-            </div>
-          </button>
-        </div>
-
-        {/* 3. Posts Center */}
+        {/* 1. Posts Center */}
         <div className="px-3">
           <button
             onClick={() => {
@@ -323,7 +107,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
           )}
         </div>
 
-        {/* 4. Settings (Accordion) */}
+        {/* 2. Settings (Accordion) */}
         <div className="px-3">
           <button
             onClick={() => {

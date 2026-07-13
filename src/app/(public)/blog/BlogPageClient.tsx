@@ -411,7 +411,7 @@ export default function BlogPageClient() {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
-                      onClick={() => (window as any).__openClaimworksChat?.()}
+                      onClick={() => window.open('https://open.kakao.com/o/sWeszp7', '_blank', 'noopener,noreferrer')}
                       className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold rounded-none text-sm transition-colors"
                       id="blog-empty-chat-btn-1"
                     >

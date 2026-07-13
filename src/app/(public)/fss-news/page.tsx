@@ -119,8 +119,8 @@ export default function FssNewsPage() {
   };
 
   const openChat = () => {
-    if (typeof window !== 'undefined' && (window as any).__openClaimworksChat) {
-      (window as any).__openClaimworksChat();
+    if (typeof window !== 'undefined') {
+      window.open('https://open.kakao.com/o/sWeszp7', '_blank', 'noopener,noreferrer');
     }
   };
 

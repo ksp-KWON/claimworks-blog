@@ -22,9 +22,11 @@ export default function CTABanner() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {/* 카드 1: 보상스쿨 내부 실시간 채팅 */}
-        <button
-          onClick={() => (window as any).__openClaimworksChat?.()}
-          className="flex items-center gap-3 p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[#1a73e8] hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10 hover:-translate-y-1 transition-all duration-300 group text-left w-full"
+        <a
+          href="https://open.kakao.com/o/sWeszp7"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[#1a73e8] hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10 hover:-translate-y-1 transition-all duration-300 group text-left w-full block"
           id="cta-chat-btn"
         >
           <div className="w-10 h-10 rounded-none bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-[#174ea6]/20 dark:to-indigo-900/40 border border-blue-200 dark:border-indigo-800/30 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
@@ -34,7 +36,7 @@ export default function CTABanner() {
             <span className="block text-sm font-bold text-[#202124] dark:text-[#e8eaed] truncate group-hover:text-[#1a73e8] transition-colors">채팅 상담</span>
             <span className="block text-xs text-[#5f6368] dark:text-[#9aa0a6] truncate mt-0.5">보상스쿨 실시간 상담</span>
           </div>
-        </button>
+        </a>
 
         {/* 카드 2: 상담신청 양식 */}
         <Link

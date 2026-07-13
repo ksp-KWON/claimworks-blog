@@ -61,12 +61,6 @@ export default function ChatAdminPanel() {
   const [memoSwipeOffset, setMemoSwipeOffset] = useState(0);
   const memoTouchStartY = useRef(0);
 
-  // Drag & Drop File
-  const [isDraggingFile, setIsDraggingFile] = useState(false);
-
-  // Mobile Action Menu
-  const [showMobileActionMenu, setShowMobileActionMenu] = useState(false);
-
   // Status Dropdown
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
@@ -236,44 +230,6 @@ export default function ChatAdminPanel() {
   };
 
   // --- UX Handlers ---
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (!selectedId || activeSession?.status === '차단') return;
-    setIsDraggingFile(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDraggingFile(false);
-  };
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDraggingFile(false);
-    if (!selectedId || activeSession?.status === '차단') return;
-
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
-
-    // Mock upload by sending a message
-    setIsSending(true);
-    try {
-      await supabase.from('chat_messages').insert({
-        session_id: selectedId,
-        sender: 'admin',
-        content: `[첨부파일: ${file.name}]`,
-      });
-      // Admin response changes status to 진행중
-      const currentSession = sessions.find(s => s.id === selectedId);
-      const updates: any = { last_message_at: new Date().toISOString() };
-      if (currentSession && (!currentSession.status || currentSession.status === '대기')) {
-        updates.status = '진행중';
-      }
-      await supabase.from('chat_sessions').update(updates).eq('id', selectedId);
-    } finally {
-      setIsSending(false);
-    }
-  };
 
   // Resizing handlers
   const startResizingLeft = (e: React.MouseEvent) => {
@@ -615,18 +571,7 @@ export default function ChatAdminPanel() {
             <div 
               className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-zinc-950/50 custom-scrollbar relative" 
               onClick={() => setIsMenuOpen(false)}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
             >
-              {isDraggingFile && (
-                <div className="absolute inset-0 z-20 bg-blue-500/10 dark:bg-blue-500/20 border-2 border-dashed border-blue-500 rounded-lg m-4 flex flex-col items-center justify-center pointer-events-none">
-                  <div className="bg-white dark:bg-zinc-800 p-4 rounded-full shadow-lg text-blue-500 mb-2">
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                  </div>
-                  <p className="font-bold text-blue-600 dark:text-blue-400">파일을 여기에 놓아 전송하세요</p>
-                </div>
-              )}
               {messages.map((msg) => {
                 const isVisitor = msg.sender === 'visitor';
                 return (
@@ -649,43 +594,7 @@ export default function ChatAdminPanel() {
             
             <div className="p-2 sm:p-4 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 shrink-0">
               
-              <div className="flex items-end gap-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl p-2 focus-within:border-[#03c75a] focus-within:ring-1 focus-within:ring-[#03c75a] transition-all relative">
-                {showMobileActionMenu && (
-                  <div className="md:hidden absolute bottom-[calc(100%+10px)] left-0 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-xl rounded-2xl p-2 flex flex-col gap-1 w-40 z-50">
-                    <button 
-                      onClick={() => {
-                        setShowMobileActionMenu(false);
-                        const fileInput = document.createElement('input');
-                        fileInput.type = 'file';
-                        fileInput.onchange = async (e: any) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          setIsSending(true);
-                          try {
-                            await supabase.from('chat_messages').insert({
-                              session_id: selectedId!,
-                              sender: 'admin',
-                              content: `[첨부파일: ${file.name}]`,
-                            });
-                          } finally {
-                            setIsSending(false);
-                          }
-                        };
-                        fileInput.click();
-                      }}
-                      className="flex items-center gap-2 p-3 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-xl transition-colors"
-                    >
-                      <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                      사진 전송
-                    </button>
-                  </div>
-                )}
-                <button 
-                  onClick={() => setShowMobileActionMenu(!showMobileActionMenu)}
-                  className={`md:hidden p-2 transition-colors shrink-0 rounded-full ${showMobileActionMenu ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-blue-500'}`}
-                >
-                  <svg className={`w-6 h-6 transition-transform duration-200 ${showMobileActionMenu ? 'rotate-45' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-                </button>
+              <div className="flex items-end gap-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl p-2 focus-within:border-[#03c75a] focus-within:ring-1 focus-within:ring-[#03c75a] transition-all">
                 <textarea
                   ref={inputRef}
                   value={replyText}

@@ -108,3 +108,27 @@ export const REGIONS_DATA = [
 
 export const KAKAO_OPEN_CHAT_URL = 'https://open.kakao.com/o/sWeszp7';
 export const GOOGLE_FORM_URL = 'https://forms.gle/E9vj7iqAHeJGhJ549';
+
+export const getCategoryTheme = (category: string) => {
+  const c = category || '보상가이드';
+  
+  if (c.includes('교통사고')) return { color: 'red' as const, icon: '🚗' };
+  if (c.includes('사망') || c.includes('자살')) return { color: 'rose' as const, icon: '⚖️' };
+  if (c.includes('질병진단') || c.includes('실손') || c.includes('의료비')) return { color: 'blue' as const, icon: '🏥' };
+  if (c.includes('배상책임') || c.includes('의료')) return { color: 'green' as const, icon: '🛡️' };
+  if (c.includes('근재') || c.includes('산재')) return { color: 'teal' as const, icon: '👷' };
+  if (c.includes('장해평가') || c.includes('면책') || c.includes('후유장해')) return { color: 'purple' as const, icon: '♿' };
+  if (c.includes('판례') || c.includes('법률')) return { color: 'indigo' as const, icon: '📖' };
+  return { color: 'yellow' as const, icon: '💡' };
+}
+
+export const CATEGORIES = [
+  '판례·법률 해석',
+  '사망·자살 보험금',
+  '질병진단·실손',
+  '교통사고 보상',
+  '배상책임·의료',
+  '근재·산재 사고',
+  '장해평가·면책',
+  '보상가이드'
+];

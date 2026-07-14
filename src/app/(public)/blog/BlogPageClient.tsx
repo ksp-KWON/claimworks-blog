@@ -14,19 +14,10 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import HospitalSitemap from '@/components/HospitalSitemap';
-import { REGIONS_DATA, KAKAO_OPEN_CHAT_URL, GOOGLE_FORM_URL } from '@/lib/constants';;
+import PostCard from '@/components/ui/PostCard';
+import { REGIONS_DATA, KAKAO_OPEN_CHAT_URL, GOOGLE_FORM_URL } from '@/lib/constants';
+import { PostData as Post } from '@/lib/posts';
 import standardData from '../../../../functions/api/taas-standard-data.json';
-
-// 포스트 타입 (lib/posts에서 읽어온 데이터 형태)
-interface Post {
-  slug: string;
-  title: string;
-  date: string;
-  summary: string;
-  category: string;
-  tags: string[];
-  specialtyCategory?: string;
-}
 
 // HIRA 데이터 타입
 interface SpecialtyData {
@@ -674,54 +665,7 @@ export default function BlogPageClient() {
       ) : (
         <div className="space-y-4">
           {displayPosts.map((post) => (
-            <article
-              key={post.slug}
-              className="bg-white dark:bg-[#202124] p-4 sm:p-6 rounded-none sm:rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:border-[var(--google-blue)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex flex-wrap items-center gap-3 text-xs mb-3">
-                  <span className="px-2.5 py-1 font-bold rounded-none bg-[var(--google-surface-variant)] text-[#5f6368] dark:bg-[#303134] dark:text-[#9aa0a6] border border-transparent">
-                    {post.category}
-                  </span>
-                  <time className="text-[#5f6368] dark:text-[#9aa0a6] font-medium flex items-center gap-1">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    {post.date}
-                  </time>
-                </div>
-                <div className="relative w-full overflow-hidden mb-2">
-                  <h2 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] hover:text-[var(--google-blue)] transition-colors line-clamp-2 leading-snug">
-                    <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                  </h2>
-                </div>
-                <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] line-clamp-2 leading-relaxed font-normal">
-                  {post.summary}
-                </p>
-              </div>
-              <div className="mt-4 pt-4 border-t border-[var(--google-border)] flex items-center justify-between gap-2">
-                <div className="flex flex-wrap gap-1.5">
-                  {(post.tags || []).map((tag) => (
-                    <Link
-                      key={tag}
-                      href={`/blog?tag=${encodeURIComponent(tag)}`}
-                      className={`text-xs font-bold px-2 py-0.5 rounded-none border transition-colors ${
-                        tagFilter === tag
-                          ? 'bg-[var(--google-blue)] text-white border-[var(--google-blue)]'
-                          : 'text-[#5f6368] dark:text-[#9aa0a6] bg-[var(--google-surface-variant)] dark:bg-[#303134] border-transparent hover:border-[var(--google-blue)] hover:text-[var(--google-blue)]'
-                      }`}
-                    >
-                      #{tag}
-                    </Link>
-                  ))}
-                </div>
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="shrink-0 text-sm font-bold text-[var(--google-blue)] hover:underline transition-colors flex items-center gap-1"
-                >
-                  자세히 보기
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                </Link>
-              </div>
-            </article>
+            <PostCard key={post.slug} post={post as any} variant="list" />
           ))}
         </div>
       )}

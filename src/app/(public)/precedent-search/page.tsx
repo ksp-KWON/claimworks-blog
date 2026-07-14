@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AiCommentBox from '@/components/AiCommentBox';
+import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
 interface Precedent {
   id: string;
   title: string;
@@ -289,7 +290,7 @@ export default function PrecedentSearchPage() {
 
   const openChatWithContext = (prec: Precedent) => {
     if (typeof window !== 'undefined') {
-      window.open('https://open.kakao.com/o/sWeszp7', '_blank', 'noopener,noreferrer');
+      window.open(KAKAO_OPEN_CHAT_URL, '_blank', 'noopener,noreferrer');
     }
   };
 

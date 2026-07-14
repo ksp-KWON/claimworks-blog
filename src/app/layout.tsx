@@ -47,20 +47,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-300 overflow-x-clip">
-        {/* 카카오 SDK */}
-        <Script 
-          src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" 
-          strategy="afterInteractive"
-        />
-        <Script id="kakao-init" strategy="afterInteractive">
-          {`
-            (function() {
-              var K = window.Kakao;
-              if (K && !K.isInitialized()) { K.init('c60e479ca3c78009474b748414de3a1b'); }
-            })();
-          `}
-        </Script>
-        
+
         {children}
       </body>
     </html>

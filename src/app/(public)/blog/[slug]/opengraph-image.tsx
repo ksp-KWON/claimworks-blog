@@ -1,7 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { getSortedPostsData } from '@/lib/posts';
-import fs from 'fs';
-import path from 'path';
+import { getSortedPostsData, getPostData } from '@/lib/posts';
 
 export function generateStaticParams() {
   const posts = getSortedPostsData(false);
@@ -15,15 +13,10 @@ export const size = {
 };
 export const contentType = 'image/png';
 
-export default async function Image() {
-  let logoBase64 = '';
-  try {
-    const logoPath = path.join(process.cwd(), 'public/logo_tv.png');
-    const logoBuffer = fs.readFileSync(logoPath);
-    logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
-  } catch (error) {
-    console.error('Error reading logo file for blog OG image:', error);
-  }
+export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = getPostData(slug);
+  const title = post?.title || '보상스쿨 헬스케어 & 손해사정 보상가이드';
 
   return new ImageResponse(
     (
@@ -35,36 +28,74 @@ export default async function Image() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#ffffff',
+          backgroundColor: '#1a73e8',
+          backgroundImage: 'linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%)',
+          padding: '80px',
         }}
       >
-        {logoBase64 ? (
-          <img
-            src={logoBase64}
-            alt="보상스쿨"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-            }}
-          />
-        ) : (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            width: '100%',
+            height: '100%',
+            borderRadius: '40px',
+            padding: '60px',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+          }}
+        >
           <div
             style={{
-              width: '540px',
-              height: '540px',
+              fontSize: '32px',
+              fontWeight: 'bold',
+              color: '#1a73e8',
+              marginBottom: '40px',
+              letterSpacing: '-0.02em',
+              textTransform: 'uppercase',
+            }}
+          >
+            보상스쿨 전문가 칼럼
+          </div>
+          <div
+            style={{
+              fontSize: '64px',
+              fontWeight: '900',
+              color: '#111827',
+              textAlign: 'center',
+              lineHeight: 1.3,
+              wordBreak: 'keep-all',
+              letterSpacing: '-0.02em',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#f1f5f9',
-              borderRadius: '270px',
+              flex: 1,
             }}
           >
-            <svg width="240" height="240" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="1.5">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
+            {title}
           </div>
-        )}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '20px',
+              marginTop: '40px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '24px',
+                color: '#4b5563',
+                fontWeight: '600',
+              }}
+            >
+              claim-works.com
+            </div>
+          </div>
+        </div>
       </div>
     ),
     {
@@ -72,4 +103,3 @@ export default async function Image() {
     }
   );
 }
-

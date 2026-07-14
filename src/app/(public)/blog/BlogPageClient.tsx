@@ -14,7 +14,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import HospitalSitemap from '@/components/HospitalSitemap';
-import { REGIONS_DATA } from '@/lib/constants';
+import { REGIONS_DATA, KAKAO_OPEN_CHAT_URL, GOOGLE_FORM_URL } from '@/lib/constants';;
 import standardData from '../../../../functions/api/taas-standard-data.json';
 
 // 포스트 타입 (lib/posts에서 읽어온 데이터 형태)
@@ -411,7 +411,7 @@ export default function BlogPageClient() {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
-                      onClick={() => window.open('https://open.kakao.com/o/sWeszp7', '_blank', 'noopener,noreferrer')}
+                      onClick={() => window.open(KAKAO_OPEN_CHAT_URL, '_blank', 'noopener,noreferrer')}
                       className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold rounded-none text-sm transition-colors"
                       id="blog-empty-chat-btn-1"
                     >
@@ -419,7 +419,7 @@ export default function BlogPageClient() {
                       실시간 상담
                     </button>
                     <a
-                      href="https://forms.gle/E9vj7iqAHeJGhJ549" target="_blank" rel="noopener noreferrer"
+                      href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[var(--google-blue)] hover:bg-[#1557b0] text-white font-bold rounded-none text-sm transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -443,7 +443,7 @@ export default function BlogPageClient() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
-                href="https://open.kakao.com/o/sWeszp7"
+                href={KAKAO_OPEN_CHAT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-white font-bold rounded-none text-sm transition-colors"
@@ -452,7 +452,7 @@ export default function BlogPageClient() {
                 카톡 실시간 상담
               </a>
               <a
-                href="https://forms.gle/E9vj7iqAHeJGhJ549" target="_blank" rel="noopener noreferrer"
+                href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[var(--google-blue)] hover:bg-[#1557b0] text-white font-bold rounded-none text-sm transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -646,7 +646,7 @@ export default function BlogPageClient() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
-                href="https://open.kakao.com/o/sWeszp7"
+                href={KAKAO_OPEN_CHAT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-white font-bold rounded-none text-sm transition-colors"
@@ -655,7 +655,7 @@ export default function BlogPageClient() {
                 카톡 실시간 상담
               </a>
               <a
-                href="https://forms.gle/E9vj7iqAHeJGhJ549" target="_blank" rel="noopener noreferrer"
+                href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[var(--google-blue)] hover:bg-[#1557b0] text-white font-bold rounded-none text-sm transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>

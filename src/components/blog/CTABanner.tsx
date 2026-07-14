@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { KAKAO_OPEN_CHAT_URL, GOOGLE_FORM_URL } from '@/lib/constants';
 
 export default function CTABanner() {
   return (
@@ -23,7 +24,7 @@ export default function CTABanner() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {/* 카드 1: 보상스쿨 내부 실시간 채팅 */}
         <a
-          href="https://open.kakao.com/o/sWeszp7"
+          href={KAKAO_OPEN_CHAT_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-3 p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.2)] hover:border-[#1a73e8] hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10 hover:-translate-y-1 transition-all duration-300 group text-left w-full block"
@@ -40,7 +41,7 @@ export default function CTABanner() {
 
         {/* 카드 2: 상담신청 양식 */}
         <a
-          href="https://forms.gle/E9vj7iqAHeJGhJ549"
+          href={GOOGLE_FORM_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-3 p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgba(52,168,83,0.2)] hover:border-[#34A853] hover:bg-gradient-to-br hover:from-green-50 hover:to-emerald-50 dark:hover:from-green-900/10 dark:hover:to-emerald-900/10 hover:-translate-y-1 transition-all duration-300 group text-left w-full block"

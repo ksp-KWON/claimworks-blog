@@ -105,3 +105,6 @@ export const REGIONS_DATA = [
     districts: ['제주시', '서귀포시']
   }
 ];
+
+export const KAKAO_OPEN_CHAT_URL = 'https://open.kakao.com/o/sWeszp7';
+export const GOOGLE_FORM_URL = 'https://forms.gle/E9vj7iqAHeJGhJ549';

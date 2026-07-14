@@ -223,7 +223,7 @@ export default function AdminPage() {
   }
 
   return (
-      <div className="flex flex-col h-[calc(100dvh)] md:h-[calc(100dvh-64px)] bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
+      <div className="flex flex-col h-[100dvh] bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
       
       {/* Main Workspace - No Global Header */}
       <div className="flex flex-1 overflow-hidden relative h-full pb-[64px] md:pb-0">

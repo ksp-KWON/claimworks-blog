@@ -2,10 +2,9 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
 
 export default function ChatWidget() {
-  const KAKAO_OPEN_CHAT_URL = 'https://open.kakao.com/o/sWeszp7';
-
   const handleOpenKakaoChat = () => {
     window.open(KAKAO_OPEN_CHAT_URL, '_blank', 'noopener,noreferrer');
   };

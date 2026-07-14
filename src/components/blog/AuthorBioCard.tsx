@@ -18,7 +18,7 @@ export default function AuthorBioCard() {
           {/* 아바타 */}
           <div className="w-16 h-16 rounded-none bg-white flex items-center justify-center shrink-0 shadow-sm border border-gray-200 p-1">
             <Image
-              src="/images/author-bio-logo.png"
+              src="/logo.png"
               alt="보상스쿨TV 로고"
               width={64}
               height={64}

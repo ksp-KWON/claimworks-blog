@@ -19,6 +19,7 @@ interface FssNewsItem {
 }
 
 import { cleanFssText } from '@/lib/cleaners';
+import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
 
 
 export default function FssNewsPage() {
@@ -120,7 +121,7 @@ export default function FssNewsPage() {
 
   const openChat = () => {
     if (typeof window !== 'undefined') {
-      window.open('https://open.kakao.com/o/sWeszp7', '_blank', 'noopener,noreferrer');
+      window.open(KAKAO_OPEN_CHAT_URL, '_blank', 'noopener,noreferrer');
     }
   };
 

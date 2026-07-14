@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import ThemeToggle from '@/components/ThemeToggle';
 import SearchBar from '@/components/SearchBar';
 import MobileBottomNav from '@/components/MobileBottomNav';
@@ -25,8 +26,25 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     .sort((a, b) => b[1] - a[1])
     .map(([tag]) => tag);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "보상스쿨",
+    "description": "건강보험심사평가원 공개 정보를 기반으로 보상스쿨 손해사정사가 분석한 보상 노하우를 제공합니다.",
+    "url": "https://claim-works.com",
+    "logo": "https://claim-works.com/logo.png",
+    "image": "https://claim-works.com/logo.png",
+    "areaServed": "KR",
+    "availableLanguage": "Korean",
+    "founder": "보상스쿨 손해사정사"
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ScrollProgressBar />
 
       {/* 헤더 */}
@@ -38,7 +56,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <div className="font-sans font-extrabold text-lg sm:text-xl min-w-0 tracking-tight">
               <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden">
                 <div className="relative flex items-center justify-center h-10 sm:h-11 shrink-0 bg-white dark:bg-[#202124] rounded-none border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.7)] group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.2)] dark:group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.9)] group-hover:border-gray-400 dark:group-hover:border-gray-500 group-hover:scale-105 transition-all duration-300 p-2 sm:p-2.5 z-10">
-                  <img src="/logo_tv.png" alt="보상스쿨 TV" className="h-full w-auto object-contain drop-shadow-sm transition-all duration-300" />
+                  <Image src="/logo.png" alt="보상스쿨 TV" width={100} height={100} className="h-full w-auto object-contain drop-shadow-sm transition-all duration-300" priority />
                 </div>
                 <span className="hidden sm:inline font-extrabold text-[#3c4043] dark:text-[#e8eaed] group-hover:opacity-80 transition-opacity truncate tracking-tight">
                   보상스쿨 헬스케어 &amp; 손해사정 보상가이드

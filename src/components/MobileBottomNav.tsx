@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { KAKAO_OPEN_CHAT_URL, GOOGLE_FORM_URL } from '@/lib/constants';
 
 type ModalType = 'none' | 'home' | 'partner' | 'calculator' | 'hospital' | 'consult';
 
@@ -275,7 +276,7 @@ export default function MobileBottomNav() {
           <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/20 rounded-full mx-auto mb-6"></div>
           <h3 className="font-bold text-lg text-[#202124] dark:text-white mb-4">상담 센터</h3>
           
-          <button onClick={() => { closeModals(); window.open('https://open.kakao.com/o/sWeszp7', '_blank', 'noopener,noreferrer'); }} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[#1a73e8] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 gap-4 w-full text-left" id="mobile-nav-chat-btn">
+          <button onClick={() => { closeModals(); window.open(KAKAO_OPEN_CHAT_URL, '_blank', 'noopener,noreferrer'); }} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[#1a73e8] hover:shadow-[0_8px_30px_rgba(26,115,232,0.15)] transition-all duration-300 gap-4 w-full text-left" id="mobile-nav-chat-btn">
             <div className="w-12 h-12 shrink-0 bg-gray-100 dark:bg-[#3a3b3d] rounded-xl flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
               <svg className="w-6 h-6 text-gray-600 dark:text-gray-300 group-hover:text-[#1a73e8] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
             </div>
@@ -286,7 +287,7 @@ export default function MobileBottomNav() {
             <svg className="w-5 h-5 text-gray-400 group-hover:text-[#1a73e8] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
           </button>
 
-          <a href="https://forms.gle/E9vj7iqAHeJGhJ549" target="_blank" rel="noopener noreferrer" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[#34A853] hover:shadow-[0_8px_30px_rgba(52,168,83,0.15)] transition-all duration-300 gap-4">
+          <a href={GOOGLE_FORM_URL} target="_blank" rel="noopener noreferrer" onClick={closeModals} className="group flex items-center bg-gray-50 dark:bg-[#2d2e30] rounded-2xl p-4 border border-gray-100 dark:border-white/5 hover:border-[#34A853] hover:shadow-[0_8px_30px_rgba(52,168,83,0.15)] transition-all duration-300 gap-4">
             <div className="w-12 h-12 shrink-0 bg-gray-100 dark:bg-[#3a3b3d] rounded-xl flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
               <svg className="w-6 h-6 text-gray-600 dark:text-gray-300 group-hover:text-[#34A853] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             </div>

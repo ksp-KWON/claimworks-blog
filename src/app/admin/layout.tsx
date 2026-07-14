@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import AdminAuth from './AdminAuth';
 
 export const metadata: Metadata = {
   title: '관리자 페이지 | 보상스쿨',
@@ -12,5 +13,5 @@ export const metadata: Metadata = {
  * 따라서 방문자용 MobileBottomNav, Header, Footer가 절대 노출되지 않습니다.
  */
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <AdminAuth>{children}</AdminAuth>;
 }

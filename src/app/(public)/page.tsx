@@ -2,6 +2,8 @@ import { getSortedPostsData } from "@/lib/posts";
 import YouTubeBriefing from "@/components/YouTubeBriefing";
 import HomePostList from "@/components/HomePostList";
 import type { Metadata } from "next";
+import PremiumCard from "@/components/ui/PremiumCard";
+import PremiumHeading from "@/components/ui/PremiumHeading";
 
 export const metadata: Metadata = {
   title: "지역별 병원추천 & 보상 실무 가이드 | 보상스쿨",
@@ -21,15 +23,15 @@ export default function Home() {
       {/* 유튜브 전문가 브리핑 섹션 (소개글 위쪽 배치) */}
       <YouTubeBriefing />
 
-      {/* 2. 메인 페이지 인트로 헤더 (입체 박스 스타일) */}
-      <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 mb-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] hover:border-[var(--google-blue)] transition-all duration-300 relative overflow-hidden group/headerbox mt-4">
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2 border-l-4 border-[var(--google-blue)] pl-2.5 sm:pl-3 mb-3">
-          <span className="bg-gradient-to-r from-[#0d47a1] to-[#669df6] dark:from-[#669df6] dark:to-[#aecbfa] bg-clip-text text-transparent">분야별 전문 보상 가이드 & 판례 분석</span>
-        </h1>
+      {/* 2. 메인 페이지 인트로 헤더 (프리미엄 입체 박스 스타일) */}
+      <PremiumCard borderColor="blue" hoverEffect className="mb-6 mt-4 group/headerbox">
+        <PremiumHeading level={1} gradient="blue" showLeftBorder={true}>
+          분야별 전문 보상 가이드 & 판례 분석
+        </PremiumHeading>
         <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
           사망·후유장해부터 실손·질병 진단까지, 보상스쿨 전문가 그룹이 엄선한 핵심 실무 노하우와 명쾌한 해결책을 제공합니다.
         </p>
-      </div>
+      </PremiumCard>
 
       {/* 3. 본문 영역: 가이드 카드 격자(Grid) 배치 및 실시간 카테고리 필터링 */}
       <HomePostList initialPosts={posts} />

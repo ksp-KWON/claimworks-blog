@@ -5,6 +5,10 @@ import type { Metadata } from 'next';
 import BlogPostContent from '@/components/BlogPostContent';
 import AuthorBioCard from '@/components/blog/AuthorBioCard';
 import { parseBlogPost } from '@/lib/blog-utils';
+import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumHeading from '@/components/ui/PremiumHeading';
+import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumButton from '@/components/ui/PremiumButton';
 
 export const dynamicParams = false;
 
@@ -161,8 +165,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-      <article className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:border-[var(--google-blue)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] transition-all duration-300 overflow-hidden">
-        <div className="px-3 py-6 sm:px-8 sm:py-10 space-y-8">
+      <PremiumCard borderColor="blue" hoverEffect={false} className="!p-3 sm:!p-8">
+        <div className="space-y-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
@@ -180,21 +184,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
       {/* 상단 네비게이션 */}
       <div className="mb-6">
-        <Link
-          href="/blog"
-          className="inline-flex items-center text-sm font-bold text-[#5f6368] hover:text-[var(--google-blue)] transition-colors"
+        <PremiumButton 
+          variant="ghost" 
+          href="/blog" 
+          icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>}
         >
-          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
           목록으로 돌아가기
-        </Link>
+        </PremiumButton>
       </div>
 
       {/* 글 헤더 */}
       <header className="border-b border-[var(--google-border)] pb-8 mb-8 sm:mb-10">
         <div className="flex flex-wrap items-center gap-3 text-xs mb-4">
-          <span className="px-2.5 py-1 font-bold rounded-none bg-[var(--google-surface-variant)] text-[#5f6368] dark:bg-[#303134] dark:text-[#9aa0a6] border border-transparent">
+          <PremiumBadge color="gray">
             {post.category}
-          </span>
+          </PremiumBadge>
           {post.caseNumber && (
             <span className="px-2.5 py-1 font-bold rounded-none bg-[#fce8e6] dark:bg-[#c5221f]/10 text-[#c5221f] dark:text-[#f28b82] border border-[#f28b82]/30 flex items-center gap-1">
               ⚖️ 사건번호: {post.caseNumber}
@@ -249,7 +253,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
       </footer>
         </div>
-      </article>
+      </PremiumCard>
     </div>
   );
 }
@@ -280,17 +284,16 @@ function RelatedPostsBox({
   if (scored.length === 0) return null;
 
   return (
-    <div className="mt-12 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[#1a73e8] transition-all duration-300 relative overflow-hidden group">
+    <PremiumCard borderColor="blue" hoverEffect className="mt-12 !p-5 sm:!p-6 group">
       <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
         🔗
       </div>
       
       <div className="relative z-10 space-y-5">
         <div>
-          <h3 className="font-extrabold text-gray-900 dark:text-white text-[16px] tracking-tight flex items-center gap-2 border-l-4 border-[#1a73e8] pl-2.5">
-            <span className="text-[17px] leading-none">🔗</span>
+          <PremiumHeading level={3} showLeftBorder={true} gradient="blue" icon={<span className="text-[17px] leading-none">🔗</span>} className="!mb-0 !text-[16px]">
             함께 읽으면 도움이 되는 글
-          </h3>
+          </PremiumHeading>
           <p className="text-xs sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] mt-2 leading-relaxed ml-3.5">
             비슷한 주제의 다른 보상 사례들도 확인해 보세요
           </p>
@@ -303,9 +306,9 @@ function RelatedPostsBox({
               href={`/blog/${p.slug}`}
               className="group flex flex-row items-center gap-3 p-3.5 rounded-none bg-gray-50 dark:bg-[#2d2e30] border border-gray-100 dark:border-white/5 hover:border-[#1A73E8] hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(26,115,232,0.15)] hover:bg-white dark:hover:bg-[#353638] transition-all duration-300 relative overflow-hidden"
             >
-              <span className="text-[10px] font-bold px-2 py-1 rounded-none bg-white dark:bg-white/10 text-[#1A73E8] dark:text-[#8ab4f8] border border-gray-200 dark:border-white/10 shadow-sm shrink-0">
+              <PremiumBadge color="blue">
                 {p.category}
-              </span>
+              </PremiumBadge>
               <span className="flex-1 text-[14px] font-bold text-gray-800 dark:text-gray-100 leading-snug line-clamp-1 group-hover:text-[#1A73E8] dark:group-hover:text-[#8ab4f8] transition-colors">
                 {p.title}
               </span>
@@ -314,6 +317,6 @@ function RelatedPostsBox({
           ))}
         </div>
       </div>
-    </div>
+    </PremiumCard>
   );
 }

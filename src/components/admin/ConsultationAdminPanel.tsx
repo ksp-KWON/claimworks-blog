@@ -103,6 +103,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
       alert('삭제 중 오류가 발생했습니다.');
     } else {
       if (selectedId === id) setSelectedId(null);
+      setConsultations(prev => prev.filter(c => c.id !== id));
     }
   };
 
@@ -217,12 +218,12 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         <select
                           value={item.status === '상담완료' || item.status === '상담 완료' ? '완료' : item.status}
                           onChange={(e) => {
-                            if (e.target.value === 'delete') {
-                              if (window.confirm('정말 삭제하시겠습니까?')) {
-                                deleteConsultation(item.id);
-                              }
+                            const val = e.target.value;
+                            if (val === 'delete') {
+                              e.target.value = item.status; // revert visual selection temporarily
+                              deleteConsultation(item.id);
                             } else {
-                              updateStatus(item.id, e.target.value);
+                              updateStatus(item.id, val);
                             }
                           }}
                           className={`text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
@@ -303,12 +304,12 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         value={item.status === '상담완료' || item.status === '상담 완료' ? '완료' : item.status}
                         onClick={e => e.stopPropagation()}
                         onChange={(e) => {
-                          if (e.target.value === 'delete') {
-                            if (window.confirm('정말 삭제하시겠습니까?')) {
-                              deleteConsultation(item.id);
-                            }
+                          const val = e.target.value;
+                          if (val === 'delete') {
+                            e.target.value = item.status; // revert visual selection temporarily
+                            deleteConsultation(item.id);
                           } else {
-                            updateStatus(item.id, e.target.value);
+                            updateStatus(item.id, val);
                           }
                         }}
                         className={`text-sm font-bold px-2.5 py-0.5 outline-none border-0 cursor-pointer shadow-sm ${

@@ -253,100 +253,99 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
       <div className="flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden flex-1 w-full">
 
         <div className="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar p-4 md:p-8">
-          {/* 데스크탑 버전 (카드형 리스트) */}
-          <div className="hidden md:flex flex-col space-y-3 pb-8">
-            {/* 헤더 */}
-            <div className="flex px-6 py-3.5 bg-white dark:bg-zinc-800 rounded-xl text-sm font-bold text-gray-500 shadow-sm border border-gray-200 dark:border-zinc-700">
-              <div className="w-24 text-center uppercase tracking-wider">상태</div>
-              <div className="w-36 text-center uppercase tracking-wider">접수시간</div>
-              <div className="w-48 text-center uppercase tracking-wider">상담자 정보</div>
-              <div className="flex-1 text-center uppercase tracking-wider">주요 내용</div>
-            </div>
-
-            {/* 목록 */}
-            {sortedAndFilteredConsultations.length === 0 ? (
-              <div className="text-center py-8 text-sm text-gray-500 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800">
-                {searchQuery ? '검색 결과가 없습니다.' : '아직 접수된 상담 내역이 없습니다.'}
-              </div>
-            ) : (
-              sortedAndFilteredConsultations.map((item) => (
-                <PremiumCard 
-                  key={item.id} 
-                  className={`p-0 overflow-hidden transition-colors group cursor-pointer ${selectedId === item.id ? 'border-blue-400 bg-blue-50/10' : 'hover:border-blue-300'}`}
-                  onClick={() => handleRowClick(item.id)}
-                >
-                  <div className="flex items-center px-6 py-4">
-                    <div className="w-24 flex items-center justify-center" onClick={e => e.stopPropagation()}>
-                      <select
-                        value={item.status === '상담완료' || item.status === '상담 완료' ? '완료' : item.status}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val === 'delete') {
-                            e.target.value = item.status;
-                            deleteConsultation(item.id);
-                          } else {
-                            updateStatus(item.id, val);
-                          }
-                        }}
-                        className={`text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm rounded-lg ${
-                          item.status === '대기' ? 'bg-red-50 text-red-600' :
-                          item.status === '상담' ? 'bg-blue-50 text-blue-600' :
-                          (item.status === '완료' || item.status === '상담완료' || item.status === '상담 완료') ? 'bg-green-50 text-green-600' :
-                          item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
-                          'bg-gray-50 text-gray-600'
-                        }`}
-                      >
-                        <option value="대기" className="text-gray-900 bg-white font-medium">대기</option>
-                        <option value="상담" className="text-gray-900 bg-white font-medium">상담</option>
-                        <option value="완료" className="text-gray-900 bg-white font-medium">완료</option>
-                        <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
-                        <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
-                      </select>
-                    </div>
-                    
-                    <div className="w-36 text-center">
-                      <span className="text-sm font-mono text-gray-600 dark:text-gray-400 font-medium">
+          {/* 데스크탑 버전 (Table) */}
+          <PremiumCard hoverEffect={true} className="hidden md:block p-0 sm:p-0 border-0">
+            <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
+              <thead className="bg-slate-100 dark:bg-zinc-800">
+                <tr>
+                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20">상태</th>
+                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-36">접수시간</th>
+                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-56">이름</th>
+                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">문의내용</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-50 dark:divide-zinc-800/50">
+              {sortedAndFilteredConsultations.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-500">
+                    {searchQuery ? '검색 결과가 없습니다.' : '아직 접수된 상담 내역이 없습니다.'}
+                  </td>
+                </tr>
+              ) : (
+                sortedAndFilteredConsultations.map((item) => (
+                  <React.Fragment key={item.id}>
+                    <tr 
+                      onClick={() => handleRowClick(item.id)}
+                      className={`cursor-pointer transition-colors ${selectedId === item.id ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-center" onClick={e => e.stopPropagation()}>
+                        <select
+                          value={item.status === '상담완료' || item.status === '상담 완료' ? '완료' : item.status}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === 'delete') {
+                              e.target.value = item.status; // revert visual selection temporarily
+                              deleteConsultation(item.id);
+                            } else {
+                              updateStatus(item.id, val);
+                            }
+                          }}
+                          className={`text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
+                            item.status === '대기' ? 'bg-red-50 text-red-600' :
+                            item.status === '상담' ? 'bg-blue-50 text-blue-600' :
+                            (item.status === '완료' || item.status === '상담완료' || item.status === '상담 완료') ? 'bg-green-50 text-green-600' :
+                            item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
+                            'bg-gray-50 text-gray-600'
+                          }`}
+                        >
+                          <option value="대기" className="text-gray-900 bg-white font-medium">대기</option>
+                          <option value="상담" className="text-gray-900 bg-white font-medium">상담</option>
+                          <option value="완료" className="text-gray-900 bg-white font-medium">완료</option>
+                          <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
+                          <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
+                        </select>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400 font-mono text-center">
                         {formatDateTime(item.created_at)}
-                      </span>
-                    </div>
-
-                    <div className="w-48 text-center px-2">
-                      <div className="flex items-center justify-center gap-3 text-sm">
-                        <span className="font-bold text-gray-900 dark:text-white truncate max-w-[80px]">{item.name}</span>
-                        <span className="text-blue-600 dark:text-blue-400 font-medium font-mono whitespace-nowrap">{item.phone}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex-1 px-4 min-w-0">
-                      <div className="flex items-center gap-3 text-sm text-gray-800 dark:text-gray-300 w-full">
-                        <div className="shrink-0">
-                          <PremiumBadge color="blue" className="px-2 whitespace-nowrap">{item.accident_type}</PremiumBadge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <div className="flex items-center justify-center gap-4 text-sm">
+                          <span className="font-bold text-gray-900 dark:text-white w-20 truncate">{item.name}</span>
+                          <span className="text-blue-600 dark:text-blue-400 font-medium font-mono">{item.phone}</span>
                         </div>
-                        <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap shrink-0 w-24 font-mono">
-                          {formatAccidentDate(item.accident_date)}
-                        </span>
-                        <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>
-                        <span className="text-gray-500 font-medium whitespace-nowrap">장소: </span>
-                        <span className="truncate w-24 shrink-0" title={item.accident_location || '미상'}>{item.accident_location || '미상'}</span>
-                        <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>
-                        <span className="truncate min-w-0 flex-1" title={item.diagnosis}>
-                          <span className="text-gray-500 font-medium">진단: </span>
-                          {item.diagnosis}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Accordion Detail Component */}
-                  {selectedId === item.id && (
-                    <div className="border-t border-gray-100 dark:border-zinc-800 bg-[#f8f9fa] dark:bg-zinc-950/50" onClick={e => e.stopPropagation()}>
-                      {renderAccordionDetail()}
-                    </div>
-                  )}
-                </PremiumCard>
-              ))
-            )}
-          </div>
+                      </td>
+                      <td className="px-6 py-4 max-w-md truncate">
+                        <div className="flex items-center gap-3 text-sm text-gray-800 dark:text-gray-300 w-full">
+                          <div className="w-20 shrink-0">
+                            <PremiumBadge color="blue" className="px-2 whitespace-nowrap">{item.accident_type}</PremiumBadge>
+                          </div>
+                          <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap shrink-0 w-24 font-mono">
+                            {formatAccidentDate(item.accident_date)}
+                          </span>
+                          <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>
+                          <span className="text-gray-500 font-medium whitespace-nowrap">장소 : </span>
+                          <span className="truncate w-24 shrink-0" title={item.accident_location || '미상'}>{item.accident_location || '미상'}</span>
+                          <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>
+                          <span className="truncate" title={item.diagnosis}>
+                            <span className="text-gray-500 font-medium">진단 : </span>
+                            {item.diagnosis}
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                    {selectedId === item.id && (
+                      <tr>
+                        <td colSpan={4} className="p-0 border-0 bg-[#f8f9fa] dark:bg-zinc-950/50">
+                          {renderAccordionDetail()}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))
+              )}
+            </tbody>
+            </table>
+          </PremiumCard>
 
           {/* 모바일 뷰 */}
           <div className="md:hidden space-y-3 mt-4">

@@ -246,6 +246,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                           }}
                           className={`text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
                             item.status === '대기' ? 'bg-red-50 text-red-600' :
+                            (item.status === '상담완료' || item.status === '상담 완료') ? 'bg-blue-50 text-blue-600' :
                             item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
                             'bg-gray-50 text-gray-600'
                           }`}
@@ -307,7 +308,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   key={item.id}
                   onClick={() => handleRowClick(item.id)}
                   hoverEffect={true}
-                  borderColor={item.status === '대기' ? 'red' : item.status === '보류' ? 'yellow' : 'default'}
+                  borderColor={item.status === '대기' ? 'red' : item.status === '보류' ? 'yellow' : (item.status === '상담완료' || item.status === '상담 완료') ? 'blue' : 'default'}
                   className={`flex flex-col gap-4 cursor-pointer overflow-hidden ${selectedId === item.id ? 'ring-2 ring-blue-500/50' : ''}`}
                 >
                   <div className="flex justify-between items-center pl-2">
@@ -326,6 +327,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         }}
                         className={`text-sm font-bold px-2.5 py-0.5 outline-none border-0 cursor-pointer shadow-sm ${
                           item.status === '대기' ? 'bg-red-50 text-red-600' :
+                          (item.status === '상담완료' || item.status === '상담 완료') ? 'bg-blue-50 text-blue-600' :
                           item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
                           'bg-gray-50 text-gray-600'
                         }`}

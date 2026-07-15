@@ -18,13 +18,13 @@ export default function Home() {
   const posts = getSortedPostsData();
 
   return (
-    <div className="space-y-8 sm:px-0">
+    <div className="space-y-12 sm:space-y-16 sm:px-0">
       
       {/* 유튜브 전문가 브리핑 섹션 (소개글 위쪽 배치) */}
       <YouTubeBriefing />
 
       {/* 2. 메인 페이지 인트로 헤더 (프리미엄 입체 박스 스타일) */}
-      <PremiumCard borderColor="blue" hoverEffect className="mb-6 mt-4 group/headerbox">
+      <PremiumCard borderColor="blue" hoverEffect className="group/headerbox">
         <PremiumHeading level={1} gradient="blue" showLeftBorder={true}>
           분야별 전문 보상 가이드 & 판례 분석
         </PremiumHeading>

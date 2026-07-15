@@ -19,7 +19,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: Omit<Post
   }).filter(item => item.posts.length > 0);
 
   return (
-    <div className="space-y-8 sm:space-y-12">
+    <div className="space-y-10 sm:space-y-14">
       {categoriesWithPosts.map(({ category, posts }) => {
         const theme = getCategoryTheme(category);
         const displayPosts = posts.slice(0, 2);

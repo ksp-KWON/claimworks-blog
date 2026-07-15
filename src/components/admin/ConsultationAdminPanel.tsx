@@ -138,11 +138,11 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
             <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
               <thead className="bg-slate-100 dark:bg-zinc-800">
                 <tr>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-20">상태</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-32">접수시간</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-40">이름</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">문의내용</th>
-                  <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider w-16">관리</th>
+                  <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20">상태</th>
+                  <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-36">접수시간</th>
+                  <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-40">이름</th>
+                  <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">문의내용</th>
+                  <th scope="col" className="px-6 py-4 text-right text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-16">관리</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-50 dark:divide-zinc-800/50">
@@ -163,7 +163,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                       <select
                         value={item.status}
                         onChange={(e) => updateStatus(item.id, e.target.value)}
-                        className={`text-[12px] font-bold rounded-full px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
+                        className={`text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
                           item.status === '대기' ? 'bg-red-50 text-red-600' :
                           item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
                           'bg-gray-50 text-gray-600'
@@ -174,23 +174,26 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         <option value="보류">보류</option>
                       </select>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400">
                       {new Date(item.created_at).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">{item.name}</div>
-                      <div className="text-[12px] text-blue-600 dark:text-blue-400 font-medium">{item.phone}</div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="font-bold text-gray-900 dark:text-white">{item.name}</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-medium">{item.phone}</span>
+                      </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <PremiumBadge color="blue" className="px-2">{item.accident_type}</PremiumBadge>
-                        <span className="text-[12px] text-gray-500 dark:text-gray-400 flex items-center gap-1 font-medium">
-                          <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <td className="px-6 py-4 max-w-md truncate">
+                      <div className="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300 w-full">
+                        <PremiumBadge color="blue" className="px-2 whitespace-nowrap shrink-0">{item.accident_type}</PremiumBadge>
+                        <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap shrink-0">
                           {item.accident_date}
                         </span>
-                      </div>
-                      <div className="text-[13px] font-medium text-gray-800 dark:text-gray-300 line-clamp-1" title={item.diagnosis}>
-                        <span className="text-gray-400 mr-1.5">진단병명:</span>{item.diagnosis}
+                        <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>
+                        <span className="truncate" title={item.diagnosis}>
+                          <span className="text-gray-500 mr-1 font-medium">진단:</span>
+                          {item.diagnosis}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={e => e.stopPropagation()}>

@@ -177,7 +177,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         }`}
                       >
                         <option value="대기">대기</option>
-                        <option value="상담완료">상담완료</option>
+                        <option value="상담완료">상담 완료</option>
                         <option value="보류">보류</option>
                         <option value="delete" className="text-red-500 font-bold">삭제</option>
                       </select>
@@ -249,7 +249,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         }`}
                       >
                         <option value="대기">대기</option>
-                        <option value="상담완료">상담완료</option>
+                        <option value="상담완료">상담 완료</option>
                         <option value="보류">보류</option>
                         <option value="delete" className="text-red-500 font-bold">삭제</option>
                       </select>

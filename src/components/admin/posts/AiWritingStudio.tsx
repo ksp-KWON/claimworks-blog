@@ -3,7 +3,7 @@ import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumBadge from '@/components/ui/PremiumBadge';
-import MarkdownEditor from '@/components/admin/posts/MarkdownEditor';
+import MarkdownEditor from '@/components/admin/MarkdownEditor';
 
 interface AiWritingStudioProps {
   isLoading: boolean;
@@ -146,7 +146,7 @@ export default function AiWritingStudio({
                   />
                   <div className="flex justify-end mt-4 gap-3">
                     <PremiumButton
-                      onClick={onOpenEditor}
+                      onClick={onCreateBlank}
                       variant="secondary"
                       className="!py-2.5"
                       title="아무 내용 없이 빈 에디터로 바로 이동합니다"

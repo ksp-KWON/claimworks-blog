@@ -142,13 +142,12 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-36">접수시간</th>
                   <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-56">이름</th>
                   <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">문의내용</th>
-                  <th scope="col" className="px-6 py-4 text-right text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20 whitespace-nowrap">관리</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-50 dark:divide-zinc-800/50">
               {consultations.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">
+                  <td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-500">
                     아직 접수된 상담 내역이 없습니다.
                   </td>
                 </tr>
@@ -162,7 +161,15 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                     <td className="px-6 py-4 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                       <select
                         value={item.status}
-                        onChange={(e) => updateStatus(item.id, e.target.value)}
+                        onChange={(e) => {
+                          if (e.target.value === 'delete') {
+                            if (window.confirm('정말 삭제하시겠습니까?')) {
+                              deleteConsultation(item.id);
+                            }
+                          } else {
+                            updateStatus(item.id, e.target.value);
+                          }
+                        }}
                         className={`text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
                           item.status === '대기' ? 'bg-red-50 text-red-600' :
                           item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
@@ -172,6 +179,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         <option value="대기">대기</option>
                         <option value="상담완료">상담완료</option>
                         <option value="보류">보류</option>
+                        <option value="delete" className="text-red-500 font-bold">삭제</option>
                       </select>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400 font-mono">
@@ -198,15 +206,6 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={e => e.stopPropagation()}>
-                      <button 
-                        onClick={() => deleteConsultation(item.id)}
-                        className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                        title="삭제"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                      </button>
-                    </td>
                   </tr>
                 ))
               )}
@@ -231,17 +230,31 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 >
                   <div className="flex justify-between items-center pl-2">
                     <div className="flex items-center gap-2">
-                      <PremiumBadge color={item.status === '대기' ? 'red' : item.status === '보류' ? 'yellow' : 'gray'} className="px-2.5">
-                        {item.status}
-                      </PremiumBadge>
-                      <span className="text-xs font-medium text-gray-400">{new Date(item.created_at).toLocaleDateString('ko-KR')}</span>
+                      <select
+                        value={item.status}
+                        onClick={e => e.stopPropagation()}
+                        onChange={(e) => {
+                          if (e.target.value === 'delete') {
+                            if (window.confirm('정말 삭제하시겠습니까?')) {
+                              deleteConsultation(item.id);
+                            }
+                          } else {
+                            updateStatus(item.id, e.target.value);
+                          }
+                        }}
+                        className={`text-sm font-bold px-2.5 py-0.5 outline-none border-0 cursor-pointer shadow-sm ${
+                          item.status === '대기' ? 'bg-red-50 text-red-600' :
+                          item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
+                          'bg-gray-50 text-gray-600'
+                        }`}
+                      >
+                        <option value="대기">대기</option>
+                        <option value="상담완료">상담완료</option>
+                        <option value="보류">보류</option>
+                        <option value="delete" className="text-red-500 font-bold">삭제</option>
+                      </select>
+                      <span className="text-xs font-medium text-gray-400 font-mono">{new Date(item.created_at).toLocaleDateString('ko-KR')}</span>
                     </div>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); deleteConsultation(item.id); }}
-                      className="text-red-400 p-1.5 hover:bg-red-50 rounded-none transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
                   </div>
                   <div className="pl-2">
                     <div className="text-[17px] font-bold text-gray-900 dark:text-white flex items-center gap-2">

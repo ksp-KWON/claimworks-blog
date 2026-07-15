@@ -272,24 +272,19 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
               <div className="space-y-6">
                 
                 {/* Customer Info Card */}
-                <div className="bg-white dark:bg-zinc-900 p-5 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm">
-                  <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100 dark:border-zinc-800">
-                    <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xl shadow-inner">
-                      {activeConsultation.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
-                      <div className="text-sm text-blue-600 dark:text-blue-400 font-mono mt-1">{activeConsultation.phone}</div>
-                    </div>
+                <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm flex flex-col gap-2">
+                  <div className="flex items-baseline justify-between pb-2 border-b border-gray-100 dark:border-zinc-800">
+                    <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
+                    <div className="text-sm font-medium text-blue-600 dark:text-blue-400 font-mono">{activeConsultation.phone}</div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-6 text-[13px]">
                     <div>
-                      <span className="block text-xs text-gray-500 mb-1">생년월일</span>
+                      <span className="text-gray-500 mr-2">생년월일</span>
                       <span className="font-medium text-gray-800 dark:text-gray-200">{activeConsultation.birth_date || '-'}</span>
                     </div>
                     <div>
-                      <span className="block text-xs text-gray-500 mb-1">접수일시</span>
+                      <span className="text-gray-500 mr-2">접수일시</span>
                       <span className="font-medium text-gray-800 dark:text-gray-200">{new Date(activeConsultation.created_at).toLocaleString('ko-KR')}</span>
                     </div>
                   </div>
@@ -353,24 +348,19 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
             </h3>
 
             {/* Customer Info Card */}
-            <div className="bg-white dark:bg-zinc-900 p-5 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm mb-4">
-              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100 dark:border-zinc-800">
-                <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xl shadow-inner">
-                  {activeConsultation.name.charAt(0)}
-                </div>
-                <div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
-                  <div className="text-sm text-blue-600 dark:text-blue-400 font-mono mt-1">{activeConsultation.phone}</div>
-                </div>
+            <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm mb-4 flex flex-col gap-2">
+              <div className="flex items-baseline justify-between pb-2 border-b border-gray-100 dark:border-zinc-800">
+                <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
+                <div className="text-sm font-medium text-blue-600 dark:text-blue-400 font-mono">{activeConsultation.phone}</div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center gap-4 text-[13px] flex-wrap">
                 <div>
-                  <span className="block text-xs text-gray-500 mb-1">생년월일</span>
+                  <span className="text-gray-500 mr-2">생년월일</span>
                   <span className="font-medium text-gray-800 dark:text-gray-200">{activeConsultation.birth_date || '-'}</span>
                 </div>
                 <div>
-                  <span className="block text-xs text-gray-500 mb-1">접수일시</span>
+                  <span className="text-gray-500 mr-2">접수일시</span>
                   <span className="font-medium text-gray-800 dark:text-gray-200">{new Date(activeConsultation.created_at).toLocaleString('ko-KR')}</span>
                 </div>
               </div>

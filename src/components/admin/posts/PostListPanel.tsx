@@ -32,44 +32,46 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
 
   return (
     <div className="flex-1 flex flex-col bg-[#f8f9fa] dark:bg-zinc-950 overflow-hidden relative">
-      <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0 shadow-sm z-10 w-full overflow-x-auto">
-        <div className="flex items-center gap-3 shrink-0">
-          <PremiumHeading level={2} className="!text-lg !mb-0 flex items-center gap-2">
-            📂 기존 글 관리
-          </PremiumHeading>
-          <span className="text-[10px] md:text-xs text-gray-400 font-medium hidden sm:inline">블로그에 발행된 포스팅을 관리하고 수정합니다.</span>
-        </div>
-          
-        <div className="flex items-center gap-3 shrink-0 ml-4">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="제목으로 검색..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-3 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-gray-50 dark:bg-zinc-950 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none w-[160px] md:w-[220px] transition-all font-medium"
-            />
-            <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-          </div>
-          
-          <select
-            value={sortType}
-            onChange={(e) => setSortType(e.target.value as 'date' | 'alpha')}
-            className="px-3 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-white dark:bg-zinc-900 cursor-pointer outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"
-          >
-            <option value="date">최신순</option>
-            <option value="alpha">가나다순</option>
-          </select>
+      <div className="shrink-0 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm z-10">
+        <div className="flex items-center h-14 px-5 gap-4 overflow-x-auto">
 
-          <PremiumButton 
-            onClick={onRefreshList} 
-            disabled={isLoading} 
-            variant="secondary"
-            className="!p-2"
-            title="새로고침"
-          >
-            <svg className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-500' : 'text-gray-600 dark:text-gray-300'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-          </PremiumButton>
+          {/* 아이콘 + 타이틀 */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-500 to-slate-600 flex items-center justify-center shadow-sm shrink-0">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <span className="text-base font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">기존 글 관리</span>
+          </div>
+
+          {/* 구분선 */}
+          <div className="h-6 w-px bg-gray-200 dark:bg-zinc-700 shrink-0" />
+
+          {/* 검색 + 정렬 + 새로고침 */}
+          <div className="flex items-center gap-2 ml-auto shrink-0">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="제목으로 검색..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 pr-3 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-gray-50 dark:bg-zinc-950 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none w-[150px] md:w-[200px] transition-all font-medium"
+              />
+              <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </div>
+            <select
+              value={sortType}
+              onChange={(e) => setSortType(e.target.value as 'date' | 'alpha')}
+              className="px-3 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-white dark:bg-zinc-900 cursor-pointer outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"
+            >
+              <option value="date">최신순</option>
+              <option value="alpha">가나다순</option>
+            </select>
+            <PremiumButton onClick={onRefreshList} disabled={isLoading} variant="secondary" className="!p-2" title="새로고침">
+              <svg className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-500' : 'text-gray-600 dark:text-gray-300'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+            </PremiumButton>
+          </div>
         </div>
       </div>
       

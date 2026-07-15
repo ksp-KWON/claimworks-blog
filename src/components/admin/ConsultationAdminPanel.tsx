@@ -112,6 +112,80 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
 
   const activeConsultation = consultations.find(c => c.id === selectedId);
 
+  const renderAccordionDetail = () => {
+    if (!activeConsultation) return null;
+    return (
+      <div className="bg-[#f8f9fa] dark:bg-zinc-950/50 p-4 md:p-6 shadow-[inset_0_4px_6px_rgba(0,0,0,0.02)] border-b border-gray-100 dark:border-zinc-800 animate-in slide-in-from-top-4 fade-in duration-300 w-full" onClick={e => e.stopPropagation()}>
+        <div className="flex justify-between items-center mb-6">
+          <PremiumHeading level={3} showLeftBorder={true} className="mb-0 text-lg font-bold">
+            접수 상세내용
+          </PremiumHeading>
+          <button onClick={() => setSelectedId(null)} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-800 rounded transition-colors" title="닫기">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+        
+        <div className="space-y-6">
+          {/* Customer Info Card */}
+          <PremiumCard className="shadow-sm flex flex-col gap-3">
+            <div className="flex items-baseline justify-between pb-3 border-b border-gray-50 dark:border-zinc-800">
+              <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
+              <div className="text-sm font-medium text-blue-600 dark:text-blue-400 font-mono">{activeConsultation.phone}</div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-[13px]">
+              <div>
+                <span className="text-gray-500 mr-2">생년월일</span>
+                <span className="font-medium text-gray-800 dark:text-gray-200">{activeConsultation.birth_date || '-'}</span>
+              </div>
+              <div>
+                <span className="text-gray-500 mr-2">접수일시</span>
+                <span className="font-medium text-gray-800 dark:text-gray-200">{new Date(activeConsultation.created_at).toLocaleString('ko-KR')}</span>
+              </div>
+            </div>
+          </PremiumCard>
+
+          <ConsultationDetailCard 
+            data={{
+              category: activeConsultation.accident_type,
+              diagnosis: activeConsultation.diagnosis,
+              date: activeConsultation.accident_date,
+              location: activeConsultation.accident_location || '',
+              details: activeConsultation.content,
+              inquiries: activeConsultation.inquiry || '',
+              insurances: [],
+              treatmentHistory: '',
+              hospitalization: false,
+              outpatient: false,
+              surgery: false,
+              test: false,
+            }} 
+            readOnly={true} 
+          />
+
+          <PremiumButton
+            onClick={() => {
+              const title = `[예약접수] ${activeConsultation.name}`;
+              const contentText = `연락처: ${activeConsultation.phone}\n사고유형: ${activeConsultation.accident_type}\n사고일자: ${activeConsultation.accident_date}\n진단명: ${activeConsultation.diagnosis}\n\n내용:\n${activeConsultation.content}\n\n문의사항:\n${activeConsultation.inquiry || '-'}`;
+              const payload = {
+                title,
+                text: contentText,
+                sourceApp: 'consultations',
+                sourceId: activeConsultation.id
+              };
+              sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
+              window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
+            }}
+            variant="primary"
+            className="w-full mt-2 !py-3 font-bold text-sm"
+          >
+            📅 캘린더 일정으로 보내기
+          </PremiumButton>
+        </div>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-800 m-4">
@@ -124,7 +198,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     <div className="flex flex-1 h-full bg-gray-50 dark:bg-zinc-950 overflow-hidden relative">
       
       {/* List Panel */}
-      <div className={`flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden transition-all duration-300 flex-1 ${selectedId ? 'hidden md:flex md:max-w-[45%] lg:max-w-[50%]' : 'max-w-full'}`}>
+      <div className="flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden flex-1 w-full">
         {/* Header Section */}
         <div className="shrink-0 px-4 md:px-8 py-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm flex items-center justify-between">
           <PremiumHeading level={2} showLeftBorder={true} className="mb-0 text-xl font-bold">
@@ -153,60 +227,68 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 </tr>
               ) : (
                 consultations.map((item) => (
-                  <tr 
-                    key={item.id} 
-                    onClick={() => handleRowClick(item.id)}
-                    className={`cursor-pointer transition-colors ${selectedId === item.id ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap" onClick={e => e.stopPropagation()}>
-                      <select
-                        value={item.status}
-                        onChange={(e) => {
-                          if (e.target.value === 'delete') {
-                            if (window.confirm('정말 삭제하시겠습니까?')) {
-                              deleteConsultation(item.id);
+                  <React.Fragment key={item.id}>
+                    <tr 
+                      onClick={() => handleRowClick(item.id)}
+                      className={`cursor-pointer transition-colors ${selectedId === item.id ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap" onClick={e => e.stopPropagation()}>
+                        <select
+                          value={item.status}
+                          onChange={(e) => {
+                            if (e.target.value === 'delete') {
+                              if (window.confirm('정말 삭제하시겠습니까?')) {
+                                deleteConsultation(item.id);
+                              }
+                            } else {
+                              updateStatus(item.id, e.target.value);
                             }
-                          } else {
-                            updateStatus(item.id, e.target.value);
-                          }
-                        }}
-                        className={`text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
-                          item.status === '대기' ? 'bg-red-50 text-red-600' :
-                          item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
-                          'bg-gray-50 text-gray-600'
-                        }`}
-                      >
-                        <option value="대기">대기</option>
-                        <option value="상담완료">상담 완료</option>
-                        <option value="보류">보류</option>
-                        <option value="delete" className="text-red-500 font-bold">삭제</option>
-                      </select>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400 font-mono">
-                      {new Date(item.created_at).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' })}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="font-bold text-gray-900 dark:text-white w-20 truncate">{item.name}</span>
-                        <span className="text-blue-600 dark:text-blue-400 font-medium font-mono">{item.phone}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 max-w-md truncate">
-                      <div className="flex items-center gap-3 text-sm text-gray-800 dark:text-gray-300 w-full">
-                        <div className="w-20 shrink-0">
-                          <PremiumBadge color="blue" className="px-2 whitespace-nowrap">{item.accident_type}</PremiumBadge>
+                          }}
+                          className={`text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
+                            item.status === '대기' ? 'bg-red-50 text-red-600' :
+                            item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
+                            'bg-gray-50 text-gray-600'
+                          }`}
+                        >
+                          <option value="대기">대기</option>
+                          <option value="상담완료">상담 완료</option>
+                          <option value="보류">보류</option>
+                          <option value="delete" className="text-red-500 font-bold">삭제</option>
+                        </select>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400 font-mono">
+                        {new Date(item.created_at).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="font-bold text-gray-900 dark:text-white w-20 truncate">{item.name}</span>
+                          <span className="text-blue-600 dark:text-blue-400 font-medium font-mono">{item.phone}</span>
                         </div>
-                        <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap shrink-0 w-24 font-mono">
-                          {item.accident_date}
-                        </span>
-                        <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>
-                        <span className="truncate" title={item.diagnosis}>
-                          <span className="text-gray-500 mr-1 font-medium">진단:</span>
-                          {item.diagnosis}
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
+                      </td>
+                      <td className="px-6 py-4 max-w-md truncate">
+                        <div className="flex items-center gap-3 text-sm text-gray-800 dark:text-gray-300 w-full">
+                          <div className="w-20 shrink-0">
+                            <PremiumBadge color="blue" className="px-2 whitespace-nowrap">{item.accident_type}</PremiumBadge>
+                          </div>
+                          <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap shrink-0 w-24 font-mono">
+                            {item.accident_date}
+                          </span>
+                          <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>
+                          <span className="truncate" title={item.diagnosis}>
+                            <span className="text-gray-500 mr-1 font-medium">진단:</span>
+                            {item.diagnosis}
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                    {selectedId === item.id && (
+                      <tr>
+                        <td colSpan={4} className="p-0 border-0 bg-[#f8f9fa] dark:bg-zinc-950/50">
+                          {renderAccordionDetail()}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))
               )}
             </tbody>
@@ -270,165 +352,17 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                       <span className="text-gray-400 mr-1">진단병명:</span>{item.diagnosis}
                     </div>
                   </div>
+                  {selectedId === item.id && (
+                    <div className="mt-2 w-full">
+                      {renderAccordionDetail()}
+                    </div>
+                  )}
                 </PremiumCard>
               ))
             )}
           </div>
         </div>
       </div>
-
-      {/* Details Side Panel (Desktop) */}
-      {selectedId && activeConsultation && (
-        <div 
-          className="hidden md:flex flex-col w-[55%] lg:w-[50%] bg-[#f8f9fa] dark:bg-zinc-950 border-l border-gray-200 dark:border-zinc-800 shadow-xl z-10 animate-in slide-in-from-right-8 fade-in duration-300 h-full overflow-hidden shrink-0" 
-        >
-            <div className="h-16 px-6 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 flex items-center justify-between shadow-sm z-10 w-full">
-              <PremiumHeading level={3} showLeftBorder={true} className="mb-0 text-lg font-bold">
-                접수 상세내용
-              </PremiumHeading>
-              <button onClick={() => setSelectedId(null)} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-50 hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-none transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-              <div className="space-y-6">
-                
-                {/* Customer Info Card */}
-                <PremiumCard className="shadow-sm flex flex-col gap-3">
-                  <div className="flex items-baseline justify-between pb-3 border-b border-gray-50 dark:border-zinc-800">
-                    <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
-                    <div className="text-sm font-medium text-blue-600 dark:text-blue-400 font-mono">{activeConsultation.phone}</div>
-                  </div>
-                  
-                  <div className="flex items-center gap-6 text-[13px]">
-                    <div>
-                      <span className="text-gray-500 mr-2">생년월일</span>
-                      <span className="font-medium text-gray-800 dark:text-gray-200">{activeConsultation.birth_date || '-'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 mr-2">접수일시</span>
-                      <span className="font-medium text-gray-800 dark:text-gray-200">{new Date(activeConsultation.created_at).toLocaleString('ko-KR')}</span>
-                    </div>
-                  </div>
-                </PremiumCard>
-
-                <ConsultationDetailCard 
-                  data={{
-                    category: activeConsultation.accident_type,
-                    diagnosis: activeConsultation.diagnosis,
-                    date: activeConsultation.accident_date,
-                    location: activeConsultation.accident_location || '',
-                    details: activeConsultation.content,
-                    inquiries: activeConsultation.inquiry || '',
-                    insurances: [],
-                    treatmentHistory: '',
-                    hospitalization: false,
-                    outpatient: false,
-                    surgery: false,
-                    test: false,
-                  }} 
-                  readOnly={true} 
-                />
-
-                <PremiumButton
-                  onClick={() => {
-                    const title = `[예약접수] ${activeConsultation.name}`;
-                    const contentText = `연락처: ${activeConsultation.phone}\n사고유형: ${activeConsultation.accident_type}\n사고일자: ${activeConsultation.accident_date}\n진단명: ${activeConsultation.diagnosis}\n\n내용:\n${activeConsultation.content}\n\n문의사항:\n${activeConsultation.inquiry || '-'}`;
-                    const payload = {
-                      title,
-                      text: contentText,
-                      sourceApp: 'consultations',
-                      sourceId: activeConsultation.id
-                    };
-                    sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
-                    window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
-                  }}
-                  variant="primary"
-                  className="w-full mt-2 !py-3 font-bold text-sm"
-                >
-                  📅 캘린더 일정으로 보내기
-                </PremiumButton>
-              </div>
-            </div>
-        </div>
-      )}
-
-      {/* Details BottomSheet (Mobile) */}
-      <BottomSheet 
-        isOpen={!!selectedId && !!activeConsultation} 
-        onClose={() => setSelectedId(null)}
-        showBackdrop={true}
-        maxHeight="max-h-[90vh]"
-        bottomOffset="bottom-[64px]"
-        padding="p-0 pb-10"
-      >
-        {activeConsultation && (
-          <div className="w-full flex flex-col px-5 pt-2">
-            <div className="flex items-center gap-3 mb-5 px-1">
-              <PremiumHeading level={3} showLeftBorder={true} className="mb-0 text-xl font-bold">
-                접수 상세내용
-              </PremiumHeading>
-            </div>
-
-            {/* Customer Info Card */}
-            <PremiumCard className="shadow-sm mb-5 flex flex-col gap-3 p-5">
-              <div className="flex items-baseline justify-between pb-3 border-b border-gray-50 dark:border-zinc-800">
-                <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
-                <div className="text-sm font-medium text-blue-600 dark:text-blue-400 font-mono">{activeConsultation.phone}</div>
-              </div>
-              
-              <div className="flex items-center gap-4 text-[13px] flex-wrap">
-                <div>
-                  <span className="text-gray-500 mr-2">생년월일</span>
-                  <span className="font-medium text-gray-800 dark:text-gray-200">{activeConsultation.birth_date || '-'}</span>
-                </div>
-                <div>
-                  <span className="text-gray-500 mr-2">접수일시</span>
-                  <span className="font-medium text-gray-800 dark:text-gray-200">{new Date(activeConsultation.created_at).toLocaleString('ko-KR')}</span>
-                </div>
-              </div>
-            </PremiumCard>
-
-            <ConsultationDetailCard 
-              data={{
-                category: activeConsultation.accident_type,
-                diagnosis: activeConsultation.diagnosis,
-                date: activeConsultation.accident_date,
-                location: activeConsultation.accident_location || '',
-                details: activeConsultation.content,
-                inquiries: activeConsultation.inquiry || '',
-                insurances: [],
-                treatmentHistory: '',
-                hospitalization: false,
-                outpatient: false,
-                surgery: false,
-                test: false,
-              }} 
-              readOnly={true} 
-            />
-
-            <PremiumButton
-              onClick={() => {
-                const title = `[예약접수] ${activeConsultation.name}`;
-                const contentText = `연락처: ${activeConsultation.phone}\n사고유형: ${activeConsultation.accident_type}\n사고일자: ${activeConsultation.accident_date}\n진단명: ${activeConsultation.diagnosis}\n\n내용:\n${activeConsultation.content}\n\n문의사항:\n${activeConsultation.inquiry || '-'}`;
-                const payload = {
-                  title,
-                  text: contentText,
-                  sourceApp: 'consultations',
-                  sourceId: activeConsultation.id
-                };
-                sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
-                window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
-              }}
-              variant="primary"
-              className="w-full mt-4 !py-3 font-bold text-sm"
-            >
-              📅 캘린더 일정으로 보내기
-            </PremiumButton>
-          </div>
-        )}
-      </BottomSheet>
     </div>
   );
 }

@@ -134,9 +134,9 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
 
         <div className="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar p-4 md:p-8">
           {/* 데스크탑 버전 (Table) */}
-          <PremiumCard className="hidden md:block p-0 sm:p-0 rounded-[24px]">
+          <PremiumCard hoverEffect={true} className="hidden md:block p-0 sm:p-0 border-0">
             <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
-              <thead className="bg-gray-50/50 dark:bg-zinc-950/50">
+              <thead className="bg-slate-100 dark:bg-zinc-800">
                 <tr>
                   <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-20">상태</th>
                   <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-32">접수시간</th>
@@ -183,7 +183,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <PremiumBadge color="blue" className="rounded-full px-2">{item.accident_type}</PremiumBadge>
+                        <PremiumBadge color="blue" className="px-2">{item.accident_type}</PremiumBadge>
                         <span className="text-[12px] text-gray-500 dark:text-gray-400 flex items-center gap-1 font-medium">
                           <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                           {item.accident_date}
@@ -222,18 +222,18 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   onClick={() => handleRowClick(item.id)}
                   hoverEffect={true}
                   borderColor={item.status === '대기' ? 'red' : item.status === '보류' ? 'yellow' : 'default'}
-                  className={`!rounded-[20px] flex flex-col gap-4 cursor-pointer overflow-hidden ${selectedId === item.id ? 'ring-2 ring-blue-500/50' : ''}`}
+                  className={`flex flex-col gap-4 cursor-pointer overflow-hidden ${selectedId === item.id ? 'ring-2 ring-blue-500/50' : ''}`}
                 >
                   <div className="flex justify-between items-center pl-2">
                     <div className="flex items-center gap-2">
-                      <PremiumBadge color={item.status === '대기' ? 'red' : item.status === '보류' ? 'yellow' : 'gray'} className="rounded-full px-2.5">
+                      <PremiumBadge color={item.status === '대기' ? 'red' : item.status === '보류' ? 'yellow' : 'gray'} className="px-2.5">
                         {item.status}
                       </PremiumBadge>
                       <span className="text-xs font-medium text-gray-400">{new Date(item.created_at).toLocaleDateString('ko-KR')}</span>
                     </div>
                     <button 
                       onClick={(e) => { e.stopPropagation(); deleteConsultation(item.id); }}
-                      className="text-red-400 p-1.5 hover:bg-red-50 rounded-full transition-colors"
+                      className="text-red-400 p-1.5 hover:bg-red-50 rounded-none transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
@@ -243,9 +243,9 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                       {item.name} <span className="text-[13px] font-medium text-blue-500">{item.phone}</span>
                     </div>
                   </div>
-                  <div className="bg-gray-50 dark:bg-zinc-950 p-2.5 rounded-lg text-xs text-gray-600 dark:text-gray-400">
+                  <div className="bg-gray-50 dark:bg-zinc-950 p-2.5 rounded-none text-xs text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-2 mb-1">
-                      <PremiumBadge color="blue" className="rounded px-1.5">{item.accident_type}</PremiumBadge>
+                      <PremiumBadge color="blue" className="px-1.5">{item.accident_type}</PremiumBadge>
                       <span className="text-[11px]">일자: {item.accident_date}</span>
                     </div>
                     <div className="line-clamp-1">
@@ -266,14 +266,14 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
           onClick={() => setSelectedId(null)}
         >
           <div 
-            className="bg-[#f8f9fa] dark:bg-zinc-950 w-full max-w-3xl max-h-[90vh] sm:max-h-[85vh] rounded-[24px] flex flex-col shadow-2xl overflow-hidden border border-gray-100 dark:border-zinc-800 animate-in fade-in zoom-in-95 duration-200" 
+            className="bg-[#f8f9fa] dark:bg-zinc-950 w-full max-w-3xl max-h-[90vh] sm:max-h-[85vh] rounded-none flex flex-col shadow-2xl overflow-hidden border border-gray-100 dark:border-zinc-800 animate-in fade-in zoom-in-95 duration-200" 
             onClick={(e) => e.stopPropagation()}
           >
             <div className="h-16 px-6 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 flex items-center justify-between shadow-sm z-10 w-full">
               <PremiumHeading level={3} showLeftBorder={true} className="mb-0 text-lg font-bold">
                 접수 상세내용
               </PremiumHeading>
-              <button onClick={() => setSelectedId(null)} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-50 hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-full transition-colors">
+              <button onClick={() => setSelectedId(null)} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-50 hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-none transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
@@ -282,7 +282,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
               <div className="space-y-6">
                 
                 {/* Customer Info Card */}
-                <PremiumCard className="!rounded-[20px] shadow-[0_2px_15px_rgba(0,0,0,0.03)] flex flex-col gap-3">
+                <PremiumCard className="shadow-sm flex flex-col gap-3">
                   <div className="flex items-baseline justify-between pb-3 border-b border-gray-50 dark:border-zinc-800">
                     <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
                     <div className="text-sm font-medium text-blue-600 dark:text-blue-400 font-mono">{activeConsultation.phone}</div>
@@ -332,7 +332,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                     window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
                   }}
                   variant="primary"
-                  className="w-full mt-2 !rounded-xl !py-3 font-bold text-sm"
+                  className="w-full mt-2 !py-3 font-bold text-sm"
                 >
                   📅 캘린더 일정으로 보내기
                 </PremiumButton>
@@ -360,7 +360,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
             </div>
 
             {/* Customer Info Card */}
-            <PremiumCard className="!rounded-[20px] shadow-[0_2px_15px_rgba(0,0,0,0.03)] mb-5 flex flex-col gap-3 p-5">
+            <PremiumCard className="shadow-sm mb-5 flex flex-col gap-3 p-5">
               <div className="flex items-baseline justify-between pb-3 border-b border-gray-50 dark:border-zinc-800">
                 <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
                 <div className="text-sm font-medium text-blue-600 dark:text-blue-400 font-mono">{activeConsultation.phone}</div>
@@ -410,7 +410,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
               }}
               variant="primary"
-              className="w-full mt-4 !rounded-xl !py-3 font-bold text-sm"
+              className="w-full mt-4 !py-3 font-bold text-sm"
             >
               📅 캘린더 일정으로 보내기
             </PremiumButton>

@@ -61,40 +61,40 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
 
   const Label = ({ children, required = false }: { children: React.ReactNode, required?: boolean }) => (
     <span className="flex items-center gap-2 text-[13px] font-bold text-gray-800 dark:text-gray-200 mb-2.5">
-      <div className="w-1 h-3.5 bg-blue-500 rounded-full"></div>
+      <div className="w-1 h-3.5 bg-blue-500 rounded-none"></div>
       <span>
         {children} {required && <span className="text-red-500 ml-0.5">*</span>}
       </span>
     </span>
   );
 
-  const boxClass = "w-full text-sm text-gray-800 dark:text-gray-200 bg-gray-50/50 dark:bg-zinc-900 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 min-h-[50px] flex items-center";
-  const inputClass = "w-full text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-gray-400 shadow-[0_2px_10px_rgba(0,0,0,0.02)]";
-  const textareaClass = "w-full text-sm text-gray-800 dark:text-gray-200 leading-relaxed bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none overflow-hidden min-h-[100px] placeholder:text-gray-400 shadow-[0_2px_10px_rgba(0,0,0,0.02)]";
+  const boxClass = "w-full text-sm text-gray-800 dark:text-gray-200 bg-gray-50/50 dark:bg-zinc-900 p-4 rounded-none border border-gray-100 dark:border-zinc-800 min-h-[50px] flex items-center";
+  const inputClass = "w-full text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-zinc-900 p-4 rounded-none border border-gray-200 dark:border-zinc-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-gray-400 shadow-[0_2px_10px_rgba(0,0,0,0.02)]";
+  const textareaClass = "w-full text-sm text-gray-800 dark:text-gray-200 leading-relaxed bg-white dark:bg-zinc-900 p-4 rounded-none border border-gray-200 dark:border-zinc-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none overflow-hidden min-h-[100px] placeholder:text-gray-400 shadow-[0_2px_10px_rgba(0,0,0,0.02)]";
 
   return (
     <div className="w-full flex flex-col h-full">
       {/* 탭 네비게이션 */}
-      <div className="flex bg-gray-50 p-1.5 rounded-2xl dark:bg-zinc-900 mb-6 shrink-0 overflow-x-auto custom-scrollbar gap-1 border border-gray-100 dark:border-zinc-800">
+      <div className="flex bg-gray-50 p-1.5 rounded-none dark:bg-zinc-900 mb-6 shrink-0 overflow-x-auto custom-scrollbar gap-1 border border-gray-100 dark:border-zinc-800">
         <button
           onClick={() => setActiveTab('basic')}
-          className={`flex-1 py-2.5 text-[13px] font-bold rounded-xl transition-all whitespace-nowrap px-4 ${activeTab === 'basic' ? 'bg-white shadow-sm text-blue-600 dark:text-blue-400 dark:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+          className={`flex-1 py-2.5 text-[13px] font-bold rounded-none transition-all whitespace-nowrap px-4 ${activeTab === 'basic' ? 'bg-white shadow-sm text-blue-600 dark:text-blue-400 dark:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
         >
           기본 정보
         </button>
         <button
           onClick={() => setActiveTab('details')}
-          className={`flex-1 py-2.5 text-[13px] font-bold rounded-xl transition-all whitespace-nowrap px-4 ${activeTab === 'details' ? 'bg-white shadow-sm text-blue-600 dark:text-blue-400 dark:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+          className={`flex-1 py-2.5 text-[13px] font-bold rounded-none transition-all whitespace-nowrap px-4 ${activeTab === 'details' ? 'bg-white shadow-sm text-blue-600 dark:text-blue-400 dark:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
         >
           사고 내용
         </button>
         <button
           onClick={() => setActiveTab('insurance')}
-          className={`flex-1 py-2.5 text-[13px] font-bold rounded-xl transition-all whitespace-nowrap px-4 flex items-center justify-center gap-1.5 ${activeTab === 'insurance' ? 'bg-white shadow-sm text-blue-600 dark:text-blue-400 dark:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+          className={`flex-1 py-2.5 text-[13px] font-bold rounded-none transition-all whitespace-nowrap px-4 flex items-center justify-center gap-1.5 ${activeTab === 'insurance' ? 'bg-white shadow-sm text-blue-600 dark:text-blue-400 dark:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
         >
           가입 보험
           {data.insurances?.length > 0 && (
-            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold transition-colors ${activeTab === 'insurance' ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-500'}`}>
+            <span className={`px-1.5 py-0.5 rounded-none text-[10px] font-bold transition-colors ${activeTab === 'insurance' ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-500'}`}>
               {data.insurances.length}
             </span>
           )}

@@ -35,7 +35,7 @@ export interface Consultation {
   diagnosis: string;
   content: string;
   inquiry?: string;
-  status: '대기' | '상담완료' | '상담 완료' | '보류';
+  status: '대기' | '상담' | '완료' | '보류' | '상담완료' | '상담 완료';
   created_at: string;
 }
 

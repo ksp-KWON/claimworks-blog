@@ -198,7 +198,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                     >
                       <td className="px-6 py-4 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                         <select
-                          value={item.status === '상담완료' ? '상담 완료' : item.status}
+                          value={item.status === '상담완료' || item.status === '상담 완료' ? '완료' : item.status}
                           onChange={(e) => {
                             if (e.target.value === 'delete') {
                               if (window.confirm('정말 삭제하시겠습니까?')) {
@@ -210,13 +210,15 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                           }}
                           className={`text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
                             item.status === '대기' ? 'bg-red-50 text-red-600' :
-                            (item.status === '상담완료' || item.status === '상담 완료') ? 'bg-blue-50 text-blue-600' :
+                            item.status === '상담' ? 'bg-blue-50 text-blue-600' :
+                            (item.status === '완료' || item.status === '상담완료' || item.status === '상담 완료') ? 'bg-green-50 text-green-600' :
                             item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
                             'bg-gray-50 text-gray-600'
                           }`}
                         >
                           <option value="대기" className="text-gray-900 bg-white font-medium">대기</option>
-                          <option value="상담 완료" className="text-gray-900 bg-white font-medium">상담 완료</option>
+                          <option value="상담" className="text-gray-900 bg-white font-medium">상담</option>
+                          <option value="완료" className="text-gray-900 bg-white font-medium">완료</option>
                           <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
                           <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
                         </select>
@@ -275,13 +277,13 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   key={item.id}
                   onClick={() => handleRowClick(item.id)}
                   hoverEffect={true}
-                  borderColor={item.status === '대기' ? 'red' : item.status === '보류' ? 'yellow' : (item.status === '상담완료' || item.status === '상담 완료') ? 'blue' : 'default'}
+                  borderColor={item.status === '대기' ? 'red' : item.status === '보류' ? 'yellow' : item.status === '상담' ? 'blue' : (item.status === '완료' || item.status === '상담완료' || item.status === '상담 완료') ? 'green' : 'default'}
                   className={`flex flex-col gap-4 cursor-pointer overflow-hidden ${selectedId === item.id ? 'ring-2 ring-blue-500/50' : ''}`}
                 >
                   <div className="flex justify-between items-center pl-2">
                     <div className="flex items-center gap-2">
                       <select
-                        value={item.status === '상담완료' ? '상담 완료' : item.status}
+                        value={item.status === '상담완료' || item.status === '상담 완료' ? '완료' : item.status}
                         onClick={e => e.stopPropagation()}
                         onChange={(e) => {
                           if (e.target.value === 'delete') {
@@ -294,13 +296,15 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         }}
                         className={`text-sm font-bold px-2.5 py-0.5 outline-none border-0 cursor-pointer shadow-sm ${
                           item.status === '대기' ? 'bg-red-50 text-red-600' :
-                          (item.status === '상담완료' || item.status === '상담 완료') ? 'bg-blue-50 text-blue-600' :
+                          item.status === '상담' ? 'bg-blue-50 text-blue-600' :
+                          (item.status === '완료' || item.status === '상담완료' || item.status === '상담 완료') ? 'bg-green-50 text-green-600' :
                           item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
                           'bg-gray-50 text-gray-600'
                         }`}
                       >
                         <option value="대기" className="text-gray-900 bg-white font-medium">대기</option>
-                        <option value="상담 완료" className="text-gray-900 bg-white font-medium">상담 완료</option>
+                        <option value="상담" className="text-gray-900 bg-white font-medium">상담</option>
+                        <option value="완료" className="text-gray-900 bg-white font-medium">완료</option>
                         <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
                         <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
                       </select>

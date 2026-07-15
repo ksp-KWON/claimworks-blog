@@ -140,9 +140,9 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 <tr>
                   <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20">상태</th>
                   <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-36">접수시간</th>
-                  <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-40">이름</th>
+                  <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-56">이름</th>
                   <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">문의내용</th>
-                  <th scope="col" className="px-6 py-4 text-right text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-16">관리</th>
+                  <th scope="col" className="px-6 py-4 text-right text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20 whitespace-nowrap">관리</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-50 dark:divide-zinc-800/50">
@@ -174,19 +174,21 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         <option value="보류">보류</option>
                       </select>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400 font-mono">
                       {new Date(item.created_at).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="font-bold text-gray-900 dark:text-white">{item.name}</span>
-                        <span className="text-blue-600 dark:text-blue-400 font-medium">{item.phone}</span>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="font-bold text-gray-900 dark:text-white w-20 truncate">{item.name}</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-medium font-mono">{item.phone}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 max-w-md truncate">
-                      <div className="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300 w-full">
-                        <PremiumBadge color="blue" className="px-2 whitespace-nowrap shrink-0">{item.accident_type}</PremiumBadge>
-                        <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap shrink-0">
+                      <div className="flex items-center gap-3 text-sm text-gray-800 dark:text-gray-300 w-full">
+                        <div className="w-20 shrink-0">
+                          <PremiumBadge color="blue" className="px-2 whitespace-nowrap">{item.accident_type}</PremiumBadge>
+                        </div>
+                        <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap shrink-0 w-24 font-mono">
                           {item.accident_date}
                         </span>
                         <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>

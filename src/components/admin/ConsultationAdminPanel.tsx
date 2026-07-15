@@ -116,14 +116,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     if (!activeConsultation) return null;
     return (
       <div className="bg-[#f8f9fa] dark:bg-zinc-950/50 p-4 md:p-6 shadow-[inset_0_4px_6px_rgba(0,0,0,0.02)] border-b border-gray-100 dark:border-zinc-800 animate-in slide-in-from-top-4 fade-in duration-300 w-full" onClick={e => e.stopPropagation()}>
-        <div className="flex justify-between items-center mb-4">
-          <PremiumHeading level={3} showLeftBorder={true} className="mb-0 text-lg font-bold">
-            상세 내용
-          </PremiumHeading>
-          <button onClick={() => setSelectedId(null)} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-800 rounded transition-colors" title="닫기">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
+
         
         <div className="flex flex-col gap-4">
           <div className="bg-white dark:bg-zinc-900 p-4 border border-gray-200 dark:border-zinc-700 rounded-none shadow-sm">
@@ -222,10 +215,10 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                             'bg-gray-50 text-gray-600'
                           }`}
                         >
-                          <option value="대기">대기</option>
-                          <option value="상담 완료">상담 완료</option>
-                          <option value="보류">보류</option>
-                          <option value="delete" className="text-red-500 font-bold">삭제</option>
+                          <option value="대기" className="text-gray-900 bg-white font-medium">대기</option>
+                          <option value="상담 완료" className="text-gray-900 bg-white font-medium">상담 완료</option>
+                          <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
+                          <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
                         </select>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400 font-mono">
@@ -306,10 +299,10 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                           'bg-gray-50 text-gray-600'
                         }`}
                       >
-                        <option value="대기">대기</option>
-                        <option value="상담 완료">상담 완료</option>
-                        <option value="보류">보류</option>
-                        <option value="delete" className="text-red-500 font-bold">삭제</option>
+                        <option value="대기" className="text-gray-900 bg-white font-medium">대기</option>
+                        <option value="상담 완료" className="text-gray-900 bg-white font-medium">상담 완료</option>
+                        <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
+                        <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
                       </select>
                       <span className="text-xs font-medium text-gray-400 font-mono">{new Date(item.created_at).toLocaleDateString('ko-KR')}</span>
                     </div>

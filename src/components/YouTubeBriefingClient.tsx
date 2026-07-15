@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import type { YouTubeVideo } from './YouTubeBriefing';
+import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumHeading from '@/components/ui/PremiumHeading';
 
 export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVideos: YouTubeVideo[] }) {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
@@ -33,26 +35,25 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
     <section className="relative">
       
       {/* 1. 사이드바 스타일 헤더 (입체 박스) */}
-      <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 mb-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(255,0,0,0.2)] hover:border-[#FF0000] transition-all duration-300 relative overflow-hidden group/headerbox">
-        <div className="flex items-end justify-between mb-3">
-          <h3 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2 border-l-4 border-[#FF0000] pl-2.5 sm:pl-3">
-            <span className="text-[#FF0000] text-2xl leading-none">📺</span>
-            <span className="bg-gradient-to-r from-red-600 to-amber-500 bg-clip-text text-transparent">보상스쿨 미디어 센터</span>
-          </h3>
+      <PremiumCard borderColor="red" hoverEffect className="mb-6 !p-5 sm:!p-6 group/headerbox">
+        <div className="flex items-end justify-between mb-3 relative z-10">
+          <PremiumHeading level={3} gradient="red" showLeftBorder={true} icon={<span aria-hidden="true" className="text-2xl leading-none mr-2">📺</span>} className="!mb-0 !text-xl sm:!text-2xl">
+            보상스쿨 미디어 센터
+          </PremiumHeading>
           <a 
             href="https://www.youtube.com/@bosangschool" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-[#FF0000] transition-colors group/link"
+            className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-red-500 transition-colors group/link"
           >
             전체보기
             <svg className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </a>
         </div>
-        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
+        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed relative z-10">
           어렵고 복잡한 보상 실무와 의학 지식을 보상스쿨 전문가가 영상으로 알기 쉽게 브리핑합니다.
         </p>
-      </div>
+      </PremiumCard>
 
       {/* 2. 비디오 리스트 레이아웃: 가로형 2단 그리드 (모바일 1단) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">

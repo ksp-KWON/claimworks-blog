@@ -31,7 +31,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: Omit<Post
               {/* 블록 헤더 */}
               <div className="flex items-end justify-between mb-6 pb-2 border-b border-gray-100 dark:border-white/5 relative z-10 group/header">
                 
-                <PremiumHeading level={2} gradient={theme.color} icon={<span aria-hidden="true">{theme.icon}</span>} className="!mb-0" showLeftBorder={false}>
+                <PremiumHeading level={2} gradient={theme.color} icon={<span aria-hidden="true">{theme.icon}</span>} className="!mb-0" showLeftBorder={true}>
                   {category}
                 </PremiumHeading>
                 

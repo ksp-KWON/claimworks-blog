@@ -3,16 +3,25 @@ import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import MarkdownEditor from '@/components/admin/posts/MarkdownEditor';
 
 interface AiWritingStudioProps {
   isLoading: boolean;
   onRunAi: (mode: 'manual-preserve' | 'manual-expand' | 'semi-auto', inputText: string) => void;
-  onOpenEditor: () => void;
   onRunAuto: (type: 'all' | 'precedent' | 'trend') => void;
+  activeTab: 'manual' | 'auto' | 'editor';
+  setActiveTab: (tab: 'manual' | 'auto' | 'editor') => void;
+  postMeta: any;
+  setPostMeta: any;
+  onSavePost: () => void;
+  onCreateBlank: () => void;
 }
 
-export default function AiWritingStudio({ isLoading, onRunAi, onOpenEditor, onRunAuto }: AiWritingStudioProps) {
-  const [activeTab, setActiveTab] = useState<'manual' | 'auto'>('manual');
+export default function AiWritingStudio({ 
+  isLoading, onRunAi, onRunAuto, 
+  activeTab, setActiveTab,
+  postMeta, setPostMeta, onSavePost, onCreateBlank
+}: AiWritingStudioProps) {
   const [inputText, setInputText] = useState('');
   const [aiMode, setAiMode] = useState<'manual-preserve' | 'manual-expand' | 'semi-auto'>('manual-preserve');
   const [autoType, setAutoType] = useState<'all' | 'precedent' | 'trend'>('all');
@@ -20,44 +29,73 @@ export default function AiWritingStudio({ isLoading, onRunAi, onOpenEditor, onRu
   return (
     <div className="flex-1 flex flex-col bg-[#f8f9fa] dark:bg-zinc-950 overflow-hidden relative">
       <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0 shadow-sm z-10 w-full overflow-x-auto">
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 mr-4">
           <PremiumHeading level={2} className="!text-lg !mb-0 flex items-center gap-2">
             ✨ AI 크리에이터 스튜디오
           </PremiumHeading>
-          <span className="text-[10px] md:text-xs text-gray-400 font-medium hidden sm:inline">원문을 기반으로 창작하거나 백그라운드 엔진을 통해 포스팅을 자동 발행합니다.</span>
+          <span className="text-[10px] md:text-xs text-gray-400 font-medium hidden lg:inline">원문을 기반으로 창작하거나 백그라운드 엔진을 통해 포스팅을 자동 발행합니다.</span>
+        </div>
+        
+        <div className="flex bg-gray-100 dark:bg-zinc-800 p-1 rounded-lg shrink-0 h-10">
+          <button
+            onClick={() => setActiveTab('manual')}
+            className={`px-4 rounded-md font-bold text-sm transition-all ${
+              activeTab === 'manual' 
+                ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm' 
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+            }`}
+          >
+            창작모드
+          </button>
+          <button
+            onClick={() => setActiveTab('auto')}
+            className={`px-4 rounded-md font-bold text-sm transition-all ${
+              activeTab === 'auto' 
+                ? 'bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+            }`}
+          >
+            자동모드
+          </button>
+          <button
+            onClick={() => setActiveTab('editor')}
+            className={`px-4 rounded-md font-bold text-sm transition-all ${
+              activeTab === 'editor' 
+                ? 'bg-white dark:bg-zinc-700 text-green-600 dark:text-green-400 shadow-sm' 
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+            }`}
+          >
+            에디터
+          </button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 lg:p-8">
-        <div className="max-w-5xl mx-auto w-full flex flex-col h-full space-y-6">
-          
-          {/* Tabs */}
-          <div className="flex p-1 bg-gray-200/50 dark:bg-zinc-800/50 rounded-xl w-fit mx-auto shadow-inner">
-            <button
-              onClick={() => setActiveTab('manual')}
-              className={`px-6 py-2.5 rounded-lg font-bold text-sm transition-all ${
-                activeTab === 'manual' 
-                  ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-              }`}
-            >
-              수동 / 반자동 창작
-            </button>
-            <button
-              onClick={() => setActiveTab('auto')}
-              className={`px-6 py-2.5 rounded-lg font-bold text-sm transition-all ${
-                activeTab === 'auto' 
-                  ? 'bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-              }`}
-            >
-              백그라운드 완전 자동화
-            </button>
+      {activeTab === 'editor' ? (
+        <div className="flex flex-col flex-1 h-full relative">
+          <div className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 shrink-0">
+            <h3 className="font-bold text-gray-800 dark:text-gray-200 text-sm">포스팅 에디터</h3>
+            <div className="flex gap-2">
+              <PremiumButton onClick={onCreateBlank} variant="secondary" className="!py-1.5 !px-3 !text-xs">
+                새 문서
+              </PremiumButton>
+              <PremiumButton onClick={onSavePost} disabled={isLoading} className="!py-1.5 !px-4 !text-xs">
+                {isLoading ? '저장 중...' : '저장 및 발행'}
+              </PremiumButton>
+            </div>
           </div>
-
-          <PremiumCard className="p-6 md:p-8 border-t-4 border-t-blue-500 min-h-[500px]">
-            {activeTab === 'manual' ? (
-              <div className="flex flex-col h-full animate-in fade-in duration-300">
+          <div className="flex-1 overflow-hidden">
+            <MarkdownEditor 
+              title={postMeta.title} setTitle={(t: string) => setPostMeta((prev: any) => ({ ...prev, title: t }))}
+              content={postMeta.content} setContent={(c: any) => setPostMeta((prev: any) => ({ ...prev, content: typeof c === 'function' ? c(prev.content) : c }))}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 lg:p-8">
+          <div className="max-w-5xl mx-auto w-full flex flex-col h-full space-y-6">
+            <PremiumCard className="p-6 md:p-8 border-t-4 border-t-blue-500 min-h-[500px]">
+              {activeTab === 'manual' ? (
+                <div className="flex flex-col h-full animate-in fade-in duration-300">
                 <div className="mb-6">
                   <PremiumHeading level={3} className="!text-xl mb-2">창작 모드 선택</PremiumHeading>
                   <p className="text-gray-500 text-sm">입력하신 데이터를 기반으로 AI가 어떤 스타일로 포스팅을 작성할지 선택하세요.</p>
@@ -199,9 +237,10 @@ export default function AiWritingStudio({ isLoading, onRunAi, onOpenEditor, onRu
                 </div>
               </div>
             )}
-          </PremiumCard>
+            </PremiumCard>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

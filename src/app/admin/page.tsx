@@ -20,7 +20,8 @@ import {
 } from '@/lib/admin-api';
 
 export default function AdminPage() {
-  const [activeApp, setActiveApp] = useState<AdminAppType>('post-list');
+  const [activeApp, setActiveApp] = useState<AdminAppType>('consult-manage');
+  const [aiActiveTab, setAiActiveTab] = useState<'manual' | 'auto' | 'editor'>('manual');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   // Editor State
@@ -139,8 +140,9 @@ export default function AdminPage() {
           ...prev,
           content: prev.content ? prev.content + '\n\n' + generated : generated
         }));
-        // Switch to editor
-        setActiveApp('editor');
+        // Switch to editor inside AI Studio
+        setAiActiveTab('editor');
+        setActiveApp('post-ai');
       }
     } catch (e: any) {
       alert(e.message);
@@ -160,7 +162,8 @@ export default function AdminPage() {
       title: '', summary: '', date: '', category: '', tags: '',
       content: '', currentSha: null, currentFilename: null
     });
-    setActiveApp('editor');
+    setAiActiveTab('editor');
+    setActiveApp('post-ai');
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -256,10 +259,17 @@ export default function AdminPage() {
 
           {/* Posting Center Tools */}
           {activeApp === 'post-ai' && (
-            <AiWritingStudio isLoading={isLoading} onRunAi={handleRunAi} onRunAuto={handleRunAuto} onOpenEditor={() => {
-              if (!postMeta.currentFilename) handleCreateBlankPost();
-              else setActiveApp('editor');
-            }} />
+            <AiWritingStudio 
+              isLoading={isLoading} 
+              onRunAi={handleRunAi} 
+              onRunAuto={handleRunAuto}
+              activeTab={aiActiveTab}
+              setActiveTab={setAiActiveTab}
+              postMeta={postMeta}
+              setPostMeta={setPostMeta}
+              onSavePost={handleSavePost}
+              onCreateBlank={handleCreateBlankPost}
+            />
           )}
           {activeApp === 'post-list' && (
             <PostListPanel 
@@ -278,45 +288,7 @@ export default function AdminPage() {
             />
           )}
 
-          {/* Text Editor App */}
-          {activeApp === 'editor' && (
-            <div className="flex flex-col h-full w-full relative">
-              {/* Editor Header */}
-              <div className="h-14 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 shrink-0 z-10 shadow-sm">
-                <h2 className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                  블로그 문서 편집기
-                </h2>
-                <div className="flex items-center gap-3">
-                  <button 
-                    onClick={handleCreateBlankPost}
-                    className="px-4 py-1.5 rounded-full text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors flex items-center gap-1.5"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
-                    새 문서
-                  </button>
-                  <button 
-                    onClick={handleSavePost}
-                    disabled={isLoading}
-                    className={`px-5 py-1.5 rounded-full text-sm font-bold shadow-sm flex items-center gap-1.5 transition-all bg-gray-900 text-white hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100`}
-                  >
-                    {isLoading ? (
-                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    ) : (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
-                    )}
-                    저장 및 발행
-                  </button>
-                </div>
-              </div>
-              <div className="flex-1 flex overflow-hidden">
-                <MarkdownEditor 
-                  title={postMeta.title} setTitle={(t: string) => setPostMeta(prev => ({ ...prev, title: t }))}
-                  content={postMeta.content} setContent={(c: any) => setPostMeta(prev => ({ ...prev, content: typeof c === 'function' ? c(prev.content) : c }))}
-                />
-              </div>
-            </div>
-          )}
+
 
         </div>
       </div>

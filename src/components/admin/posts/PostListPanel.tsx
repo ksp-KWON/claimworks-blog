@@ -124,7 +124,7 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
                   <thead className="bg-slate-100 dark:bg-zinc-800">
                     <tr>
                       <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-40">발행일</th>
-                      <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">포스팅 제목</th>
+                      <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">포스팅 제목</th>
                       <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-40">관리</th>
                     </tr>
                   </thead>
@@ -136,7 +136,7 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
                             {post.date || post.name.replace('.md', '')}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-6 py-4 text-left">
                           <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors w-full truncate">
                             {post.title}
                           </div>

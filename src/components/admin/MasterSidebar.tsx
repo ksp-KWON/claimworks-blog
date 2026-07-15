@@ -17,7 +17,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
   const [isPostsExpanded, setIsPostsExpanded] = useState(true);
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
 
-  const isPostActive = activeApp.startsWith('post-') || activeApp === 'editor';
+  const isPostActive = activeApp.startsWith('post-');
 
   return (
     <div 
@@ -79,14 +79,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
               >
                 AI 스튜디오
               </button>
-              <button
-                onClick={() => setActiveApp('editor')}
-                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${
-                  activeApp === 'editor' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                }`}
-              >
-                글쓰기 에디터
-              </button>
+
               <button
                 onClick={() => setActiveApp('post-list')}
                 className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${

@@ -49,11 +49,11 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
       id: 'posts',
       label: '포스팅',
       icon: (
-        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={(activeApp.startsWith('post') || activeApp === 'editor') ? "2" : "1.5"} strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={activeApp.startsWith('post') ? "2" : "1.5"} strokeLinecap="round" strokeLinejoin="round">
           <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
         </svg>
       ),
-      isActive: activeApp.startsWith('post') || activeApp === 'editor' || openModal === 'posts'
+      isActive: activeApp.startsWith('post') || openModal === 'posts'
     },
     {
       id: 'settings',
@@ -76,11 +76,8 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
         <button onClick={() => { setActiveApp('post-ai'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors mb-3">
           <span className="text-base text-gray-900 dark:text-white font-bold">✨ AI 스튜디오</span>
         </button>
-        <button onClick={() => { setActiveApp('post-list'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors mb-3">
+        <button onClick={() => { setActiveApp('post-list'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
           <span className="text-base text-gray-900 dark:text-white font-bold">📂 기존 글 관리</span>
-        </button>
-        <button onClick={() => { setActiveApp('editor'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
-          <span className="text-base text-gray-900 dark:text-white font-bold">📝 빈 문서 에디터</span>
         </button>
       </BottomSheet>
 

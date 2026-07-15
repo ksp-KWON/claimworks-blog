@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Consultation } from '@/lib/supabase';
 import ConsultationDetailCard from './ConsultationDetailCard';
@@ -18,9 +18,28 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
   const [isLoading, setIsLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   
-  // Memo state
-  // Memo state
   const [memoText, setMemoText] = useState('');
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortType, setSortType] = useState<'date' | 'alpha'>('date');
+
+  const sortedAndFilteredConsultations = useMemo(() => {
+    return [...consultations]
+      .filter(item => {
+        const query = searchQuery.toLowerCase();
+        const contentMatch = item.content?.toLowerCase().includes(query) || false;
+        const inquiryMatch = item.inquiry?.toLowerCase().includes(query) || false;
+        const nameMatch = item.name?.toLowerCase().includes(query) || false;
+        return nameMatch || contentMatch || inquiryMatch;
+      })
+      .sort((a, b) => {
+        if (sortType === 'date') {
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        } else {
+          return (a.name || '').localeCompare(b.name || '');
+        }
+      });
+  }, [consultations, searchQuery, sortType]);
   async function fetchConsultations() {
     setIsLoading(true);
     const { data, error } = await supabase
@@ -198,6 +217,26 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
         </div>
           
         <div className="flex items-center gap-3 shrink-0 ml-4">
+          <div className="relative hidden sm:block">
+            <input
+              type="text"
+              placeholder="이름, 내용 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-3 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-gray-50 dark:bg-zinc-950 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none w-[160px] md:w-[220px] transition-all font-medium"
+            />
+            <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          </div>
+          
+          <select
+            value={sortType}
+            onChange={(e) => setSortType(e.target.value as 'date' | 'alpha')}
+            className="px-3 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-white dark:bg-zinc-900 cursor-pointer outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium hidden sm:block"
+          >
+            <option value="date">최신순</option>
+            <option value="alpha">가나다순</option>
+          </select>
+
           <PremiumButton 
             onClick={fetchConsultations} 
             disabled={isLoading} 
@@ -226,14 +265,14 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-50 dark:divide-zinc-800/50">
-              {consultations.length === 0 ? (
+              {sortedAndFilteredConsultations.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-500">
-                    아직 접수된 상담 내역이 없습니다.
+                    {searchQuery ? '검색 결과가 없습니다.' : '아직 접수된 상담 내역이 없습니다.'}
                   </td>
                 </tr>
               ) : (
-                consultations.map((item) => (
+                sortedAndFilteredConsultations.map((item) => (
                   <React.Fragment key={item.id}>
                     <tr 
                       onClick={() => handleRowClick(item.id)}
@@ -308,14 +347,36 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
             </table>
           </PremiumCard>
 
-          {/* 모바일 버전 (Card List) */}
-          <div className="md:hidden flex flex-col space-y-3 pb-24 pt-2">
-            {consultations.length === 0 ? (
-              <div className="py-10 text-center text-sm text-gray-500">
-                아직 접수된 상담 내역이 없습니다.
+          {/* 모바일 뷰 */}
+          <div className="md:hidden space-y-3 mt-4">
+            
+            <div className="flex items-center gap-2 mb-4">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  placeholder="검색..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                />
+                <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              </div>
+              <select
+                value={sortType}
+                onChange={(e) => setSortType(e.target.value as 'date' | 'alpha')}
+                className="px-3 py-2 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-white dark:bg-zinc-900 cursor-pointer outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              >
+                <option value="date">최신순</option>
+                <option value="alpha">가나다순</option>
+              </select>
+            </div>
+
+            {sortedAndFilteredConsultations.length === 0 ? (
+              <div className="text-center py-8 text-sm text-gray-500 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800">
+                {searchQuery ? '검색 결과가 없습니다.' : '아직 접수된 상담 내역이 없습니다.'}
               </div>
             ) : (
-              consultations.map((item) => (
+              sortedAndFilteredConsultations.map((item) => (
                 <PremiumCard 
                   key={item.id}
                   onClick={() => handleRowClick(item.id)}

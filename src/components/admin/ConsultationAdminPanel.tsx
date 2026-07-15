@@ -3,6 +3,10 @@ import { supabase } from '@/lib/supabase';
 import { Consultation } from '@/lib/supabase';
 import ConsultationDetailCard from './ConsultationDetailCard';
 import BottomSheet from '@/components/ui/BottomSheet';
+import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumHeading from '@/components/ui/PremiumHeading';
+import PremiumButton from '@/components/ui/PremiumButton';
 
 interface ConsultationAdminPanelProps {
   isSplitView: boolean;
@@ -123,15 +127,14 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
       <div className="flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden flex-1 w-full">
         {/* Header Section */}
         <div className="shrink-0 px-4 md:px-8 py-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
-            <h2 className="text-[17px] md:text-[19px] font-bold text-gray-900 dark:text-white">상담 접수 관리</h2>
-          </div>
+          <PremiumHeading level={2} showLeftBorder={true} className="mb-0 text-xl font-bold">
+            상담 접수 관리
+          </PremiumHeading>
         </div>
 
         <div className="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar p-4 md:p-8">
           {/* 데스크탑 버전 (Table) */}
-          <div className="hidden md:block bg-white dark:bg-zinc-900 rounded-[24px] shadow-[0_2px_20px_rgba(0,0,0,0.03)] border border-gray-100 dark:border-zinc-800 overflow-hidden">
+          <PremiumCard className="hidden md:block p-0 sm:p-0 rounded-[24px]">
             <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
               <thead className="bg-gray-50/50 dark:bg-zinc-950/50">
                 <tr>
@@ -180,7 +183,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <span className="text-[11px] bg-blue-50/50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-0.5 rounded-full font-bold border border-blue-100/50 dark:border-blue-800/50">{item.accident_type}</span>
+                        <PremiumBadge color="blue" className="rounded-full px-2">{item.accident_type}</PremiumBadge>
                         <span className="text-[12px] text-gray-500 dark:text-gray-400 flex items-center gap-1 font-medium">
                           <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                           {item.accident_date}
@@ -203,8 +206,8 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 ))
               )}
             </tbody>
-          </table>
-          </div>
+            </table>
+          </PremiumCard>
 
           {/* 모바일 버전 (Card List) */}
           <div className="md:hidden flex flex-col space-y-3 pb-24 pt-2">
@@ -214,27 +217,18 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
               </div>
             ) : (
               consultations.map((item) => (
-                <div 
+                <PremiumCard 
                   key={item.id}
                   onClick={() => handleRowClick(item.id)}
-                  className={`relative bg-white dark:bg-zinc-900 p-5 rounded-[20px] border border-gray-100 dark:border-zinc-800 shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex flex-col gap-4 cursor-pointer transition-all duration-300 overflow-hidden ${selectedId === item.id ? 'ring-2 ring-blue-500/50' : ''}`}
+                  hoverEffect={true}
+                  borderColor={item.status === '대기' ? 'red' : item.status === '보류' ? 'yellow' : 'default'}
+                  className={`!rounded-[20px] flex flex-col gap-4 cursor-pointer overflow-hidden ${selectedId === item.id ? 'ring-2 ring-blue-500/50' : ''}`}
                 >
-                  {/* Status Indicator Bar */}
-                  <div className={`absolute left-0 top-0 bottom-0 w-[4px] ${
-                    item.status === '대기' ? 'bg-red-400' :
-                    item.status === '보류' ? 'bg-yellow-400' :
-                    'bg-gray-300'
-                  }`} />
-                  
                   <div className="flex justify-between items-center pl-2">
                     <div className="flex items-center gap-2">
-                      <span className={`text-[11px] font-bold rounded-full px-2.5 py-0.5 ${
-                        item.status === '대기' ? 'bg-red-50 text-red-600' :
-                        item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
-                        'bg-gray-50 text-gray-600'
-                      }`}>
+                      <PremiumBadge color={item.status === '대기' ? 'red' : item.status === '보류' ? 'yellow' : 'gray'} className="rounded-full px-2.5">
                         {item.status}
-                      </span>
+                      </PremiumBadge>
                       <span className="text-xs font-medium text-gray-400">{new Date(item.created_at).toLocaleDateString('ko-KR')}</span>
                     </div>
                     <button 
@@ -251,14 +245,14 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   </div>
                   <div className="bg-gray-50 dark:bg-zinc-950 p-2.5 rounded-lg text-xs text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-blue-600 dark:text-blue-400">[{item.accident_type}]</span>
+                      <PremiumBadge color="blue" className="rounded px-1.5">{item.accident_type}</PremiumBadge>
                       <span className="text-[11px]">일자: {item.accident_date}</span>
                     </div>
                     <div className="line-clamp-1">
                       <span className="text-gray-400 mr-1">진단병명:</span>{item.diagnosis}
                     </div>
                   </div>
-                </div>
+                </PremiumCard>
               ))
             )}
           </div>
@@ -276,10 +270,9 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
             onClick={(e) => e.stopPropagation()}
           >
             <div className="h-16 px-6 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 flex items-center justify-between shadow-sm z-10 w-full">
-              <div className="flex items-center gap-3">
-                <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">접수 상세내용</h3>
-              </div>
+              <PremiumHeading level={3} showLeftBorder={true} className="mb-0 text-lg font-bold">
+                접수 상세내용
+              </PremiumHeading>
               <button onClick={() => setSelectedId(null)} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-50 hover:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-full transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
@@ -289,7 +282,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
               <div className="space-y-6">
                 
                 {/* Customer Info Card */}
-                <div className="bg-white dark:bg-zinc-900 p-5 rounded-[20px] border border-gray-100 dark:border-zinc-800 shadow-[0_2px_15px_rgba(0,0,0,0.03)] flex flex-col gap-3">
+                <PremiumCard className="!rounded-[20px] shadow-[0_2px_15px_rgba(0,0,0,0.03)] flex flex-col gap-3">
                   <div className="flex items-baseline justify-between pb-3 border-b border-gray-50 dark:border-zinc-800">
                     <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
                     <div className="text-sm font-medium text-blue-600 dark:text-blue-400 font-mono">{activeConsultation.phone}</div>
@@ -305,7 +298,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                       <span className="font-medium text-gray-800 dark:text-gray-200">{new Date(activeConsultation.created_at).toLocaleString('ko-KR')}</span>
                     </div>
                   </div>
-                </div>
+                </PremiumCard>
 
                 <ConsultationDetailCard 
                   data={{
@@ -325,7 +318,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   readOnly={true} 
                 />
 
-                <button
+                <PremiumButton
                   onClick={() => {
                     const title = `[예약접수] ${activeConsultation.name}`;
                     const contentText = `연락처: ${activeConsultation.phone}\n사고유형: ${activeConsultation.accident_type}\n사고일자: ${activeConsultation.accident_date}\n진단명: ${activeConsultation.diagnosis}\n\n내용:\n${activeConsultation.content}\n\n문의사항:\n${activeConsultation.inquiry || '-'}`;
@@ -338,10 +331,11 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                     sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
                     window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
                   }}
-                  className="w-full mt-2 py-3 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 text-sm border border-blue-200 dark:border-blue-800 shadow-sm"
+                  variant="primary"
+                  className="w-full mt-2 !rounded-xl !py-3 font-bold text-sm"
                 >
                   📅 캘린더 일정으로 보내기
-                </button>
+                </PremiumButton>
               </div>
             </div>
           </div>
@@ -360,12 +354,13 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
         {activeConsultation && (
           <div className="w-full flex flex-col px-5 pt-2">
             <div className="flex items-center gap-3 mb-5 px-1">
-              <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">접수 상세내용</h3>
+              <PremiumHeading level={3} showLeftBorder={true} className="mb-0 text-xl font-bold">
+                접수 상세내용
+              </PremiumHeading>
             </div>
 
             {/* Customer Info Card */}
-            <div className="bg-white dark:bg-zinc-900 p-5 rounded-[20px] border border-gray-100 dark:border-zinc-800 shadow-[0_2px_15px_rgba(0,0,0,0.03)] mb-5 flex flex-col gap-3">
+            <PremiumCard className="!rounded-[20px] shadow-[0_2px_15px_rgba(0,0,0,0.03)] mb-5 flex flex-col gap-3 p-5">
               <div className="flex items-baseline justify-between pb-3 border-b border-gray-50 dark:border-zinc-800">
                 <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
                 <div className="text-sm font-medium text-blue-600 dark:text-blue-400 font-mono">{activeConsultation.phone}</div>
@@ -381,7 +376,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   <span className="font-medium text-gray-800 dark:text-gray-200">{new Date(activeConsultation.created_at).toLocaleString('ko-KR')}</span>
                 </div>
               </div>
-            </div>
+            </PremiumCard>
 
             <ConsultationDetailCard 
               data={{
@@ -401,7 +396,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
               readOnly={true} 
             />
 
-            <button
+            <PremiumButton
               onClick={() => {
                 const title = `[예약접수] ${activeConsultation.name}`;
                 const contentText = `연락처: ${activeConsultation.phone}\n사고유형: ${activeConsultation.accident_type}\n사고일자: ${activeConsultation.accident_date}\n진단명: ${activeConsultation.diagnosis}\n\n내용:\n${activeConsultation.content}\n\n문의사항:\n${activeConsultation.inquiry || '-'}`;
@@ -414,10 +409,11 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
                 window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
               }}
-              className="w-full mt-4 py-3 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 text-sm border border-blue-200 dark:border-blue-800 shadow-sm"
+              variant="primary"
+              className="w-full mt-4 !rounded-xl !py-3 font-bold text-sm"
             >
               📅 캘린더 일정으로 보내기
-            </button>
+            </PremiumButton>
           </div>
         )}
       </BottomSheet>

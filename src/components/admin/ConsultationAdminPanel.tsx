@@ -199,12 +199,6 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
       
       {/* List Panel */}
       <div className="flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden flex-1 w-full">
-        {/* Header Section */}
-        <div className="shrink-0 px-4 md:px-8 py-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm flex items-center justify-between">
-          <PremiumHeading level={2} showLeftBorder={true} className="mb-0 text-xl font-bold">
-            상담 접수 관리
-          </PremiumHeading>
-        </div>
 
         <div className="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar p-4 md:p-8">
           {/* 데스크탑 버전 (Table) */}

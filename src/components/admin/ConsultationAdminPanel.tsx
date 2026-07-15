@@ -205,7 +205,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                     >
                       <td className="px-6 py-4 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                         <select
-                          value={item.status}
+                          value={item.status === '상담완료' ? '상담 완료' : item.status}
                           onChange={(e) => {
                             if (e.target.value === 'delete') {
                               if (window.confirm('정말 삭제하시겠습니까?')) {
@@ -223,7 +223,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                           }`}
                         >
                           <option value="대기">대기</option>
-                          <option value="상담완료">상담 완료</option>
+                          <option value="상담 완료">상담 완료</option>
                           <option value="보류">보류</option>
                           <option value="delete" className="text-red-500 font-bold">삭제</option>
                         </select>
@@ -288,7 +288,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   <div className="flex justify-between items-center pl-2">
                     <div className="flex items-center gap-2">
                       <select
-                        value={item.status}
+                        value={item.status === '상담완료' ? '상담 완료' : item.status}
                         onClick={e => e.stopPropagation()}
                         onChange={(e) => {
                           if (e.target.value === 'delete') {
@@ -307,7 +307,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         }`}
                       >
                         <option value="대기">대기</option>
-                        <option value="상담완료">상담 완료</option>
+                        <option value="상담 완료">상담 완료</option>
                         <option value="보류">보류</option>
                         <option value="delete" className="text-red-500 font-bold">삭제</option>
                       </select>

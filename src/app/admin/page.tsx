@@ -167,6 +167,7 @@ export default function AdminPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!passwordInput) return;
+
     setIsVerifying(true);
     setAuthError('');
     try {

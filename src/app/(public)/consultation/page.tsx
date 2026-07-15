@@ -114,9 +114,9 @@ export default function ConsultationPage() {
         <div className="p-6 sm:p-10 space-y-8 flex-1">
           {/* 헤더 섹션 */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 pb-4 text-center md:text-left">
-            <div className="shrink-0">
-              <div className="bg-white px-6 py-4 shadow-sm border border-gray-100 dark:border-white/10">
-                <img src="/logo_tv.png" alt="보상스쿨 로고" className="h-14 sm:h-16 object-contain" />
+            <div className="shrink-0 w-24 sm:w-28 h-24 sm:h-28">
+              <div className="bg-white p-2 shadow-sm border border-gray-100 dark:border-white/10 w-full h-full flex items-center justify-center">
+                <img src="/logo.png" alt="보상스쿨 로고" className="w-full h-full object-contain" />
               </div>
             </div>
             <div className="space-y-3">

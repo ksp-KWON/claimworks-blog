@@ -31,7 +31,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     if (error) {
       console.error('Error fetching consultations:', error);
     } else {
-      setConsultations(data || []);
+      setConsultations((data || []).filter(c => c.status !== '삭제'));
     }
     setIsLoading(false);
   }
@@ -45,7 +45,11 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
         if (payload.eventType === 'INSERT') {
           setConsultations(prev => [payload.new as Consultation, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
-          setConsultations(prev => prev.map(c => c.id === payload.new.id ? payload.new as Consultation : c));
+          if ((payload.new as Consultation).status === '삭제') {
+            setConsultations(prev => prev.filter(c => c.id !== payload.new.id));
+          } else {
+            setConsultations(prev => prev.map(c => c.id === payload.new.id ? payload.new as Consultation : c));
+          }
         } else if (payload.eventType === 'DELETE') {
           setConsultations(prev => prev.filter(c => c.id !== payload.old.id));
         }
@@ -94,10 +98,10 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
   };
 
   const deleteConsultation = async (id: string) => {
-    if (!window.confirm('정말로 이 접수 내역을 삭제하시겠습니까? (복구 불가)')) return;
+    if (!window.confirm('정말로 이 접수 내역을 삭제하시겠습니까? (목록에서 삭제 처리됩니다)')) return;
     const { error } = await supabase
       .from('consultations')
-      .delete()
+      .update({ status: '삭제' })
       .eq('id', id);
     if (error) {
       alert('삭제 중 오류가 발생했습니다.');

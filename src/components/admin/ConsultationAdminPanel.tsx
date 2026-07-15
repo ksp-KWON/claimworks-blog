@@ -193,10 +193,10 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
             <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
               <thead className="bg-slate-100 dark:bg-zinc-800">
                 <tr>
-                  <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20">상태</th>
-                  <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-36">접수시간</th>
-                  <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-56">이름</th>
-                  <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">문의내용</th>
+                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20">상태</th>
+                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-36">접수시간</th>
+                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-56">이름</th>
+                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">문의내용</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-50 dark:divide-zinc-800/50">
@@ -213,7 +213,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                       onClick={() => handleRowClick(item.id)}
                       className={`cursor-pointer transition-colors ${selectedId === item.id ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap" onClick={e => e.stopPropagation()}>
+                      <td className="px-6 py-4 whitespace-nowrap text-center" onClick={e => e.stopPropagation()}>
                         <select
                           value={item.status === '상담완료' || item.status === '상담 완료' ? '완료' : item.status}
                           onChange={(e) => {
@@ -240,11 +240,11 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                           <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
                         </select>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400 font-mono">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400 font-mono text-center">
                         {formatDateTime(item.created_at)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-4 text-sm">
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <div className="flex items-center justify-center gap-4 text-sm">
                           <span className="font-bold text-gray-900 dark:text-white w-20 truncate">{item.name}</span>
                           <span className="text-blue-600 dark:text-blue-400 font-medium font-mono">{item.phone}</span>
                         </div>

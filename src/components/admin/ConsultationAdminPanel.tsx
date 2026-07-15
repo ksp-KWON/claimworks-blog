@@ -116,52 +116,29 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     if (!activeConsultation) return null;
     return (
       <div className="bg-[#f8f9fa] dark:bg-zinc-950/50 p-4 md:p-6 shadow-[inset_0_4px_6px_rgba(0,0,0,0.02)] border-b border-gray-100 dark:border-zinc-800 animate-in slide-in-from-top-4 fade-in duration-300 w-full" onClick={e => e.stopPropagation()}>
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-4">
           <PremiumHeading level={3} showLeftBorder={true} className="mb-0 text-lg font-bold">
-            접수 상세내용
+            상세 내용
           </PremiumHeading>
           <button onClick={() => setSelectedId(null)} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-800 rounded transition-colors" title="닫기">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
         
-        <div className="space-y-6">
-          {/* Customer Info Card */}
-          <PremiumCard className="shadow-sm flex flex-col gap-3">
-            <div className="flex items-baseline justify-between pb-3 border-b border-gray-50 dark:border-zinc-800">
-              <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
-              <div className="text-sm font-medium text-blue-600 dark:text-blue-400 font-mono">{activeConsultation.phone}</div>
+        <div className="flex flex-col gap-4">
+          <div className="bg-white dark:bg-zinc-900 p-4 border border-gray-200 dark:border-zinc-700 rounded-none shadow-sm">
+            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 border-b border-gray-100 dark:border-zinc-800 pb-2">사고 내용</div>
+            <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+              {activeConsultation.content || '내용 없음'}
             </div>
-            
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-[13px]">
-              <div>
-                <span className="text-gray-500 mr-2">생년월일</span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">{activeConsultation.birth_date || '-'}</span>
-              </div>
-              <div>
-                <span className="text-gray-500 mr-2">접수일시</span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">{new Date(activeConsultation.created_at).toLocaleString('ko-KR')}</span>
-              </div>
+          </div>
+          
+          <div className="bg-white dark:bg-zinc-900 p-4 border border-gray-200 dark:border-zinc-700 rounded-none shadow-sm">
+            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 border-b border-gray-100 dark:border-zinc-800 pb-2">문의 사항</div>
+            <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+              {activeConsultation.inquiry || '문의사항 없음'}
             </div>
-          </PremiumCard>
-
-          <ConsultationDetailCard 
-            data={{
-              category: activeConsultation.accident_type,
-              diagnosis: activeConsultation.diagnosis,
-              date: activeConsultation.accident_date,
-              location: activeConsultation.accident_location || '',
-              details: activeConsultation.content,
-              inquiries: activeConsultation.inquiry || '',
-              insurances: [],
-              treatmentHistory: '',
-              hospitalization: false,
-              outpatient: false,
-              surgery: false,
-              test: false,
-            }} 
-            readOnly={true} 
-          />
+          </div>
 
           <PremiumButton
             onClick={() => {
@@ -269,6 +246,9 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                             {item.accident_date}
                           </span>
                           <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>
+                          <span className="text-gray-500 mr-1 font-medium whitespace-nowrap">장소:</span>
+                          <span className="truncate w-24 shrink-0" title={item.accident_location || '미상'}>{item.accident_location || '미상'}</span>
+                          <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>
                           <span className="truncate" title={item.diagnosis}>
                             <span className="text-gray-500 mr-1 font-medium">진단:</span>
                             {item.diagnosis}
@@ -343,6 +323,8 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                     <div className="flex items-center gap-2 mb-1">
                       <PremiumBadge color="blue" className="px-1.5">{item.accident_type}</PremiumBadge>
                       <span className="text-[11px]">일자: {item.accident_date}</span>
+                      <span className="text-gray-300 dark:text-gray-600">|</span>
+                      <span className="text-[11px] truncate max-w-[100px]" title={item.accident_location || '미상'}>장소: {item.accident_location || '미상'}</span>
                     </div>
                     <div className="line-clamp-1">
                       <span className="text-gray-400 mr-1">진단병명:</span>{item.diagnosis}

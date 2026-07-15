@@ -93,9 +93,6 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
 
   const handleRowClick = (id: string) => {
     setSelectedId(id);
-    if (!isSplitView) {
-      onNavigateToManage();
-    }
   };
 
   const activeConsultation = consultations.find(c => c.id === selectedId);
@@ -112,7 +109,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     <div className="flex flex-1 h-full bg-white dark:bg-zinc-950 overflow-hidden relative">
       
       {/* List Panel */}
-      <div className={`flex flex-col bg-white dark:bg-zinc-900 overflow-hidden absolute md:relative inset-0 z-10 md:z-auto transition-transform ${isSplitView ? 'flex-1 border-r border-gray-200 dark:border-zinc-800' : 'flex-1'} ${selectedId && isSplitView ? 'hidden md:flex' : 'flex'}`}>
+      <div className="flex flex-col bg-white dark:bg-zinc-900 overflow-hidden flex-1 w-full">
         <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0 shadow-sm z-10 w-full">
           <div className="flex items-center gap-3">
             <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white">예약상담 접수함</h2>
@@ -132,14 +129,14 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">상태</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">접수일</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">고객명 / 연락처</th>
-                {!isSplitView && <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">사고 개요</th>}
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">사고 개요</th>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-20">관리</th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
               {consultations.length === 0 ? (
                 <tr>
-                  <td colSpan={isSplitView ? 4 : 5} className="px-6 py-10 text-center text-sm text-gray-500">
+                  <td colSpan={5} className="px-6 py-10 text-center text-sm text-gray-500">
                     아직 접수된 상담 내역이 없습니다.
                   </td>
                 </tr>
@@ -173,22 +170,20 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                       <div className="text-xs text-blue-600 dark:text-blue-400 mt-0.5 font-medium">{item.phone}</div>
                       {item.birth_date && <div className="text-[10px] text-gray-400 mt-1">생년월일: {item.birth_date}</div>}
                     </td>
-                    {!isSplitView && (
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold rounded border border-blue-200 dark:border-blue-800">
-                            {item.accident_type}
-                          </span>
-                          <span className="text-xs font-bold text-gray-800 dark:text-gray-200">
-                            {item.diagnosis}
-                          </span>
-                        </div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                          <span className="font-semibold text-gray-800 dark:text-gray-300 mr-1">[{item.accident_date}]</span>
-                          {item.content}
-                        </div>
-                      </td>
-                    )}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold rounded border border-blue-200 dark:border-blue-800">
+                          {item.accident_type}
+                        </span>
+                        <span className="text-xs font-bold text-gray-800 dark:text-gray-200">
+                          {item.diagnosis}
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                        <span className="font-semibold text-gray-800 dark:text-gray-300 mr-1">[{item.accident_date}]</span>
+                        {item.content}
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={e => e.stopPropagation()}>
                       <button 
                         onClick={() => deleteConsultation(item.id)}
@@ -206,32 +201,38 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
         </div>
       </div>
 
-      {/* Details Panel (항목 관리) */}
-      {isSplitView && (
-        <div className={`w-full md:w-1/2 bg-gray-50 dark:bg-zinc-950 flex-col shrink-0 absolute md:relative inset-0 z-20 md:z-auto border-l border-gray-200 dark:border-zinc-800 ${selectedId ? 'flex' : 'hidden md:flex'}`}>
-          <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 flex items-center gap-3 shadow-sm z-10 w-full">
-            <button onClick={() => setSelectedId(null)} className="md:hidden p-1 -ml-1 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-            </button>
-            <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-              접수 항목 상세정보
-            </h3>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-            {activeConsultation ? (
+      {/* Details Modal */}
+      {selectedId && activeConsultation && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm transition-opacity" 
+          onClick={() => setSelectedId(null)}
+        >
+          <div 
+            className="bg-gray-50 dark:bg-zinc-950 w-full max-w-3xl max-h-[90vh] sm:max-h-[85vh] rounded-2xl flex flex-col shadow-2xl overflow-hidden border border-gray-200 dark:border-zinc-700 animate-in fade-in zoom-in-95 duration-200" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="h-16 px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 flex items-center justify-between shadow-sm z-10 w-full">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                접수 항목 상세정보
+              </h3>
+              <button onClick={() => setSelectedId(null)} className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-full transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
               <div className="space-y-6">
                 
                 {/* Customer Info Card */}
                 <div className="bg-white dark:bg-zinc-900 p-5 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm">
                   <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100 dark:border-zinc-800">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                    <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xl shadow-inner">
                       {activeConsultation.name.charAt(0)}
                     </div>
                     <div>
-                      <div className="text-base font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
-                      <div className="text-sm text-blue-600 dark:text-blue-400 font-mono mt-0.5">{activeConsultation.phone}</div>
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">{activeConsultation.name}</div>
+                      <div className="text-sm text-blue-600 dark:text-blue-400 font-mono mt-1">{activeConsultation.phone}</div>
                     </div>
                   </div>
                   
@@ -278,18 +279,12 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                     sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
                     window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
                   }}
-                  className="w-full mt-2 py-2 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 text-sm border border-blue-200 dark:border-blue-800"
+                  className="w-full mt-2 py-3 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 text-sm border border-blue-200 dark:border-blue-800 shadow-sm"
                 >
                   📅 캘린더 일정으로 보내기
                 </button>
-
               </div>
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-gray-400">
-                <svg className="w-16 h-16 mb-4 text-gray-200 dark:text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg>
-                <p>좌측 목록에서 항목을 선택해주세요.</p>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       )}

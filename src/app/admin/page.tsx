@@ -191,30 +191,31 @@ export default function AdminPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-zinc-950 px-4 font-sans">
-        <div className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-200 dark:border-zinc-800 p-8">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black shadow-inner shadow-white/20 mx-auto mb-4 text-xl">
-            C
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-50 font-sans">
+        <div className="bg-white dark:bg-zinc-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 dark:border-zinc-700">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">관리자 로그인</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">비밀번호를 입력해주세요</p>
           </div>
-          <h2 className="text-2xl font-black text-center text-gray-900 dark:text-white tracking-tight mb-2">ClaimWorks Admin</h2>
-          <p className="text-sm text-center text-gray-500 mb-8">보상스쿨 통합 관리자 시스템입니다.<br/>비밀번호를 입력해주세요.</p>
-          
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <input 
-                type="password" 
+              <input
+                type="password"
                 value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                placeholder="관리자 비밀번호"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 text-sm text-gray-900 dark:text-white"
+                onChange={(e) => {
+                  setPasswordInput(e.target.value);
+                  setAuthError('');
+                }}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                placeholder="비밀번호"
                 autoFocus
               />
+              {authError && <p className="text-red-500 text-sm mt-2 ml-1">{authError}</p>}
             </div>
-            {authError && <p className="text-red-500 text-xs text-center font-bold">{authError}</p>}
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isVerifying || !passwordInput}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="w-full py-3 px-4 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-xl font-bold transition-colors shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isVerifying ? '확인 중...' : '로그인'}
             </button>
@@ -249,7 +250,7 @@ export default function AdminPage() {
 
           {/* Consultations */}
           {activeApp === 'consult-manage' && (
-            <ConsultationAdminPanel isSplitView={false} onNavigateToManage={() => {}} />
+            <ConsultationAdminPanel isSplitView={true} onNavigateToManage={() => {}} />
           )}
 
           {/* Posting Center Tools */}

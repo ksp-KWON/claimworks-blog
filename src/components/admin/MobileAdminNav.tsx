@@ -73,17 +73,14 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
       {/* 포스팅 팝업 */}
       <BottomSheet isOpen={openModal === 'posts'} onClose={closeModals} showBackdrop={true}>
         <h3 className="text-lg font-bold text-gray-900 dark:text-white px-1 mb-4">포스팅 센터</h3>
-        <button onClick={() => { setActiveApp('post-ai'); closeModals(); }} className="w-full flex items-center p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
-          <span className="text-base text-gray-900 dark:text-white font-bold">AI 글쓰기</span>
+        <button onClick={() => { setActiveApp('post-ai'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors mb-3">
+          <span className="text-base text-gray-900 dark:text-white font-bold">✨ AI 스튜디오</span>
         </button>
-        <button onClick={() => { setActiveApp('editor'); closeModals(); }} className="w-full flex items-center p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
-          <span className="text-base text-gray-900 dark:text-white font-bold">글쓰기 에디터</span>
+        <button onClick={() => { setActiveApp('post-list'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors mb-3">
+          <span className="text-base text-gray-900 dark:text-white font-bold">📂 기존 글 관리</span>
         </button>
-        <button onClick={() => { setActiveApp('post-list'); closeModals(); }} className="w-full flex items-center p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
-          <span className="text-base text-gray-900 dark:text-white font-bold">기존 글 관리</span>
-        </button>
-        <button onClick={() => { setActiveApp('post-daily'); closeModals(); }} className="w-full flex items-center p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
-          <span className="text-base text-gray-900 dark:text-white font-bold">데일리 자동화</span>
+        <button onClick={() => { setActiveApp('editor'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
+          <span className="text-base text-gray-900 dark:text-white font-bold">📝 빈 문서 에디터</span>
         </button>
       </BottomSheet>
 

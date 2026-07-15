@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 export type AdminAppType = 
-  | 'post-ai' | 'post-list' | 'post-daily' | 'post-settings' 
+  | 'post-ai' | 'post-list' | 'post-settings' 
   | 'editor' | 'consult-manage';
 
 interface MasterSidebarProps {
@@ -77,7 +77,7 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
                   activeApp === 'post-ai' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
                 }`}
               >
-                AI 글쓰기
+                AI 스튜디오
               </button>
               <button
                 onClick={() => setActiveApp('editor')}
@@ -94,14 +94,6 @@ export default function MasterSidebar({ activeApp, setActiveApp, isCollapsed, to
                 }`}
               >
                 기존 글 관리
-              </button>
-              <button
-                onClick={() => setActiveApp('post-daily')}
-                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${
-                  activeApp === 'post-daily' ? 'bg-zinc-800 text-white font-bold' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                }`}
-              >
-                데일리 자동화
               </button>
             </div>
           )}

@@ -6,9 +6,8 @@ import MobileAdminNav from '@/components/admin/MobileAdminNav';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import dynamic from 'next/dynamic';
 import ConsultationAdminPanel from '@/components/admin/ConsultationAdminPanel';
-const AiWritingPanel = dynamic(() => import('@/components/admin/posts/AiWritingPanel'), { ssr: false });
+const AiWritingStudio = dynamic(() => import('@/components/admin/posts/AiWritingStudio'), { ssr: false });
 const PostListPanel = dynamic(() => import('@/components/admin/posts/PostListPanel'), { ssr: false });
-const DailyAutoPanel = dynamic(() => import('@/components/admin/posts/DailyAutoPanel'), { ssr: false });
 const SettingsPanel = dynamic(() => import('@/components/admin/posts/SettingsPanel'), { ssr: false });
 
 import { 
@@ -257,7 +256,7 @@ export default function AdminPage() {
 
           {/* Posting Center Tools */}
           {activeApp === 'post-ai' && (
-            <AiWritingPanel isLoading={isLoading} onRunAi={handleRunAi} onOpenEditor={() => {
+            <AiWritingStudio isLoading={isLoading} onRunAi={handleRunAi} onRunAuto={handleRunAuto} onOpenEditor={() => {
               if (!postMeta.currentFilename) handleCreateBlankPost();
               else setActiveApp('editor');
             }} />
@@ -270,9 +269,6 @@ export default function AdminPage() {
               onDeletePost={handleDeletePost} 
               onRefreshList={handleFetchList} 
             />
-          )}
-          {activeApp === 'post-daily' && (
-            <DailyAutoPanel isLoading={isLoading} onRunAuto={handleRunAuto} />
           )}
           {activeApp === 'post-settings' && (
             <SettingsPanel 

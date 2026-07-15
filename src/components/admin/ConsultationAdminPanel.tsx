@@ -128,16 +128,15 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
               <tr>
                 <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">상태</th>
                 <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">접수시간</th>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">인적사항</th>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">사고내용</th>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48">치료사항</th>
+                <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">이름</th>
+                <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">문의내용</th>
                 <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-16">관리</th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
               {consultations.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-500">
+                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500">
                     아직 접수된 상담 내역이 없습니다.
                   </td>
                 </tr>
@@ -170,15 +169,16 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                       <div className="text-xs font-bold text-gray-900 dark:text-white">{item.name}</div>
                       <div className="text-[11px] text-blue-600 dark:text-blue-400 font-medium">{item.phone}</div>
                     </td>
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] text-gray-600 dark:text-gray-400 font-medium">[{item.accident_date}]</span>
-                        <span className="text-xs font-bold text-gray-800 dark:text-gray-200">{item.accident_type}</span>
-                      </div>
-                    </td>
                     <td className="px-4 py-2">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[11px] bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 px-1.5 py-0.5 rounded font-bold border border-blue-100 dark:border-blue-800/50">{item.accident_type}</span>
+                        <span className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                          {item.accident_date}
+                        </span>
+                      </div>
                       <div className="text-xs font-medium text-gray-800 dark:text-gray-300 line-clamp-1" title={item.diagnosis}>
-                        {item.diagnosis}
+                        <span className="text-gray-400 mr-1">진단병명:</span>{item.diagnosis}
                       </div>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium" onClick={e => e.stopPropagation()}>
@@ -232,9 +232,14 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                       {item.name} <span className="text-xs font-normal text-blue-500">{item.phone}</span>
                     </div>
                   </div>
-                  <div className="bg-gray-50 dark:bg-zinc-950 p-2.5 rounded-lg text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                    <span className="font-bold text-blue-600 dark:text-blue-400 mr-2">[{item.accident_type}]</span>
-                    {item.content}
+                  <div className="bg-gray-50 dark:bg-zinc-950 p-2.5 rounded-lg text-xs text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-bold text-blue-600 dark:text-blue-400">[{item.accident_type}]</span>
+                      <span className="text-[11px]">일자: {item.accident_date}</span>
+                    </div>
+                    <div className="line-clamp-1">
+                      <span className="text-gray-400 mr-1">진단병명:</span>{item.diagnosis}
+                    </div>
                   </div>
                 </div>
               ))

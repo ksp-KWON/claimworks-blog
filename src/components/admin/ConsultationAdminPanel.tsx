@@ -124,7 +124,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     <div className="flex flex-1 h-full bg-gray-50 dark:bg-zinc-950 overflow-hidden relative">
       
       {/* List Panel */}
-      <div className="flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden flex-1 w-full">
+      <div className={`flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden transition-all duration-300 flex-1 ${selectedId ? 'hidden md:flex md:max-w-[45%] lg:max-w-[50%]' : 'max-w-full'}`}>
         {/* Header Section */}
         <div className="shrink-0 px-4 md:px-8 py-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm flex items-center justify-between">
           <PremiumHeading level={2} showLeftBorder={true} className="mb-0 text-xl font-bold">
@@ -277,16 +277,11 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
         </div>
       </div>
 
-      {/* Details Modal (Desktop) */}
+      {/* Details Side Panel (Desktop) */}
       {selectedId && activeConsultation && (
         <div 
-          className="hidden md:flex fixed inset-0 z-50 items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-sm transition-opacity" 
-          onClick={() => setSelectedId(null)}
+          className="hidden md:flex flex-col w-[55%] lg:w-[50%] bg-[#f8f9fa] dark:bg-zinc-950 border-l border-gray-200 dark:border-zinc-800 shadow-xl z-10 animate-in slide-in-from-right-8 fade-in duration-300 h-full overflow-hidden shrink-0" 
         >
-          <div 
-            className="bg-[#f8f9fa] dark:bg-zinc-950 w-full max-w-3xl max-h-[90vh] sm:max-h-[85vh] rounded-none flex flex-col shadow-2xl overflow-hidden border border-gray-100 dark:border-zinc-800 animate-in fade-in zoom-in-95 duration-200" 
-            onClick={(e) => e.stopPropagation()}
-          >
             <div className="h-16 px-6 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 flex items-center justify-between shadow-sm z-10 w-full">
               <PremiumHeading level={3} showLeftBorder={true} className="mb-0 text-lg font-bold">
                 접수 상세내용
@@ -356,7 +351,6 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 </PremiumButton>
               </div>
             </div>
-          </div>
         </div>
       )}
 

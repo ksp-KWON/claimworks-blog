@@ -183,8 +183,29 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
   }
 
   return (
-    <div className="flex flex-1 h-full bg-gray-50 dark:bg-zinc-950 overflow-hidden relative">
+    <div className="flex flex-col flex-1 h-full bg-gray-50 dark:bg-zinc-950 overflow-hidden relative">
       
+      <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0 shadow-sm z-10 w-full overflow-x-auto">
+        <div className="flex items-center gap-3 shrink-0">
+          <PremiumHeading level={2} className="!text-lg !mb-0 flex items-center gap-2">
+            💬 상담 접수 관리
+          </PremiumHeading>
+          <span className="text-[10px] md:text-xs text-gray-400 font-medium hidden sm:inline">홈페이지를 통해 접수된 고객 상담 내역을 확인하고 상태를 변경합니다.</span>
+        </div>
+          
+        <div className="flex items-center gap-3 shrink-0 ml-4">
+          <PremiumButton 
+            onClick={fetchConsultations} 
+            disabled={isLoading} 
+            variant="secondary"
+            className="!p-2"
+            title="새로고침"
+          >
+            <svg className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-500' : 'text-gray-600 dark:text-gray-300'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+          </PremiumButton>
+        </div>
+      </div>
+
       {/* List Panel */}
       <div className="flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden flex-1 w-full">
 

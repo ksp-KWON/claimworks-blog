@@ -109,7 +109,7 @@ export default function AiWritingStudio({ isLoading, onRunAi, onOpenEditor, onRu
                   <div className="flex justify-end mt-4 gap-3">
                     <PremiumButton
                       onClick={onOpenEditor}
-                      variant="outline"
+                      variant="secondary"
                       className="!py-2.5"
                       title="아무 내용 없이 빈 에디터로 바로 이동합니다"
                     >

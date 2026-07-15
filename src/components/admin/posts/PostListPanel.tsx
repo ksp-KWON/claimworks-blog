@@ -64,7 +64,7 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
           <PremiumButton 
             onClick={onRefreshList} 
             disabled={isLoading} 
-            variant="outline"
+            variant="secondary"
             className="!p-2"
             title="새로고침"
           >

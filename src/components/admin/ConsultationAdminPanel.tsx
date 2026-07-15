@@ -107,7 +107,22 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
   };
 
   const handleRowClick = (id: string) => {
-    setSelectedId(id);
+    setSelectedId(prev => prev === id ? null : id);
+  };
+
+  const formatDateTime = (dateString: string) => {
+    if (!dateString) return '';
+    const d = new Date(dateString);
+    const MM = String(d.getMonth() + 1).padStart(2, '0');
+    const DD = String(d.getDate()).padStart(2, '0');
+    const HH = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return `${MM}.${DD}.${HH}:${mm}`;
+  };
+
+  const formatAccidentDate = (dateString: string) => {
+    if (!dateString) return '';
+    return dateString.replace(/-/g, '.') + '.';
   };
 
   const activeConsultation = consultations.find(c => c.id === selectedId);
@@ -120,7 +135,28 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
         
         <div className="flex flex-col gap-4">
           <div className="bg-white dark:bg-zinc-900 p-4 border border-gray-200 dark:border-zinc-700 rounded-none shadow-sm">
-            <div className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 border-b border-gray-100 dark:border-zinc-800 pb-2">사고 내용</div>
+            <div className="flex justify-between items-center mb-2 border-b border-gray-100 dark:border-zinc-800 pb-2">
+              <div className="text-sm font-bold text-gray-700 dark:text-gray-300">사고 내용</div>
+              <button
+                onClick={() => {
+                  const title = `[예약접수] ${activeConsultation.name}`;
+                  const contentText = `연락처: ${activeConsultation.phone}\n사고유형: ${activeConsultation.accident_type}\n사고일자: ${activeConsultation.accident_date}\n진단명: ${activeConsultation.diagnosis}\n\n내용:\n${activeConsultation.content}\n\n문의사항:\n${activeConsultation.inquiry || '-'}`;
+                  const payload = {
+                    title,
+                    text: contentText,
+                    sourceApp: 'consultations',
+                    sourceId: activeConsultation.id
+                  };
+                  sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
+                  window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
+                }}
+                className="flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                title="캘린더 일정으로 보내기"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                일정 등록
+              </button>
+            </div>
             <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
               {activeConsultation.content || '내용 없음'}
             </div>
@@ -132,25 +168,6 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
               {activeConsultation.inquiry || '문의사항 없음'}
             </div>
           </div>
-
-          <PremiumButton
-            onClick={() => {
-              const title = `[예약접수] ${activeConsultation.name}`;
-              const contentText = `연락처: ${activeConsultation.phone}\n사고유형: ${activeConsultation.accident_type}\n사고일자: ${activeConsultation.accident_date}\n진단명: ${activeConsultation.diagnosis}\n\n내용:\n${activeConsultation.content}\n\n문의사항:\n${activeConsultation.inquiry || '-'}`;
-              const payload = {
-                title,
-                text: contentText,
-                sourceApp: 'consultations',
-                sourceId: activeConsultation.id
-              };
-              sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
-              window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
-            }}
-            variant="primary"
-            className="w-full mt-2 !py-3 font-bold text-sm"
-          >
-            📅 캘린더 일정으로 보내기
-          </PremiumButton>
         </div>
       </div>
     );
@@ -224,7 +241,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         </select>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400 font-mono">
-                        {new Date(item.created_at).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' })}
+                        {formatDateTime(item.created_at)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-4 text-sm">
@@ -238,14 +255,14 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                             <PremiumBadge color="blue" className="px-2 whitespace-nowrap">{item.accident_type}</PremiumBadge>
                           </div>
                           <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap shrink-0 w-24 font-mono">
-                            {item.accident_date}
+                            {formatAccidentDate(item.accident_date)}
                           </span>
                           <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>
-                          <span className="text-gray-500 mr-1 font-medium whitespace-nowrap">장소:</span>
+                          <span className="text-gray-500 font-medium whitespace-nowrap">장소 : </span>
                           <span className="truncate w-24 shrink-0" title={item.accident_location || '미상'}>{item.accident_location || '미상'}</span>
                           <span className="text-gray-300 dark:text-gray-600 shrink-0">|</span>
                           <span className="truncate" title={item.diagnosis}>
-                            <span className="text-gray-500 mr-1 font-medium">진단:</span>
+                            <span className="text-gray-500 font-medium">진단 : </span>
                             {item.diagnosis}
                           </span>
                         </div>
@@ -308,7 +325,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                         <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
                         <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
                       </select>
-                      <span className="text-xs font-medium text-gray-400 font-mono">{new Date(item.created_at).toLocaleDateString('ko-KR')}</span>
+                      <span className="text-xs font-medium text-gray-400 font-mono">{formatDateTime(item.created_at)}</span>
                     </div>
                   </div>
                   <div className="pl-2">
@@ -319,12 +336,12 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   <div className="bg-gray-50 dark:bg-zinc-950 p-2.5 rounded-none text-xs text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-2 mb-1">
                       <PremiumBadge color="blue" className="px-1.5">{item.accident_type}</PremiumBadge>
-                      <span className="text-[11px]">일자: {item.accident_date}</span>
+                      <span className="text-[11px]">일자 : {formatAccidentDate(item.accident_date)}</span>
                       <span className="text-gray-300 dark:text-gray-600">|</span>
-                      <span className="text-[11px] truncate max-w-[100px]" title={item.accident_location || '미상'}>장소: {item.accident_location || '미상'}</span>
+                      <span className="text-[11px] truncate max-w-[100px]" title={item.accident_location || '미상'}>장소 : {item.accident_location || '미상'}</span>
                     </div>
                     <div className="line-clamp-1">
-                      <span className="text-gray-400 mr-1">진단병명:</span>{item.diagnosis}
+                      <span className="text-gray-400 font-medium">진단병명 : </span>{item.diagnosis}
                     </div>
                   </div>
                   {selectedId === item.id && (

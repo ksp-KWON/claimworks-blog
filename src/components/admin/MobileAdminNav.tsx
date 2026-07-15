@@ -40,7 +40,12 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
     setIsViewExpanded(false);
   };
 
-  const handleNavClick = (id: 'posts' | 'settings') => {
+  const handleNavClick = (id: 'posts' | 'settings' | 'consult') => {
+    if (id === 'consult') {
+      setActiveApp('consult-manage');
+      closeModals();
+      return;
+    }
     if (openModal === id) {
       closeModals();
     } else {
@@ -49,6 +54,16 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
   };
 
   const navItems = [
+    {
+      id: 'consult',
+      label: '상담',
+      icon: (
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={activeApp === 'consult-manage' ? "2" : "1.5"} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      ),
+      isActive: activeApp === 'consult-manage'
+    },
     {
       id: 'posts',
       label: '포스팅',

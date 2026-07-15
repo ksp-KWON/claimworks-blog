@@ -28,67 +28,34 @@ export default async function Image() {
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#1a73e8',
-          backgroundImage: 'linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%)',
-          padding: '80px',
+          backgroundColor: '#ffffff',
+          padding: '40px',
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            width: '100%',
-            height: '100%',
-            borderRadius: '40px',
-            padding: '60px',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-          }}
-        >
-          {logoBase64 ? (
-            <img
-              src={logoBase64}
-              alt="보상스쿨"
-              style={{
-                width: '100%',
-                height: '100%',
-                maxWidth: '100%',
-                maxHeight: '100%',
-                flex: 1,
-                objectFit: 'contain',
-                objectPosition: 'center',
-                marginBottom: '40px',
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                fontSize: '64px',
-                fontWeight: '900',
-                color: '#1a73e8',
-                marginBottom: '40px',
-              }}
-            >
-              보상스쿨
-            </div>
-          )}
+        {logoBase64 ? (
+          <img
+            src={logoBase64}
+            alt="보상스쿨"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              objectPosition: 'center',
+            }}
+          />
+        ) : (
           <div
             style={{
-              fontSize: '48px',
-              fontWeight: 'bold',
+              fontSize: '80px',
+              fontWeight: '900',
               color: '#111827',
-              textAlign: 'center',
-              letterSpacing: '-0.02em',
             }}
           >
-            AI 판례검색 및 맞춤형 보상가이드
+            보상스쿨
           </div>
-        </div>
+        )}
       </div>
     ),
     {

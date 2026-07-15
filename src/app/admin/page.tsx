@@ -5,6 +5,7 @@ import MasterSidebar, { AdminAppType } from '@/components/admin/MasterSidebar';
 import MobileAdminNav from '@/components/admin/MobileAdminNav';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import dynamic from 'next/dynamic';
+import ConsultationAdminPanel from '@/components/admin/ConsultationAdminPanel';
 const AiWritingPanel = dynamic(() => import('@/components/admin/posts/AiWritingPanel'), { ssr: false });
 const PostListPanel = dynamic(() => import('@/components/admin/posts/PostListPanel'), { ssr: false });
 const DailyAutoPanel = dynamic(() => import('@/components/admin/posts/DailyAutoPanel'), { ssr: false });
@@ -244,6 +245,11 @@ export default function AdminPage() {
 
         {/* Dynamic Workspace based on activeApp */}
         <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-zinc-950 relative">
+
+          {/* Consultations */}
+          {activeApp === 'consult-manage' && (
+            <ConsultationAdminPanel isSplitView={false} onNavigateToManage={() => {}} />
+          )}
 
           {/* Posting Center Tools */}
           {activeApp === 'post-ai' && (

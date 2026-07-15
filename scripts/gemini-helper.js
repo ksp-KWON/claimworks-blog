@@ -10,9 +10,9 @@ const { calculateModelCapacity } = require('../src/lib/prompt-rules.js');
 
 // 모델별 실제 허용 최대 출력 토큰 (보수적 설정 — 공식 API 한도보다 약간 낮게 잡아 안전 마진 확보)
 const GEMINI_MODELS = [
-  { name: 'gemini-pro-latest',       maxTokens: 32768 },
-  { name: 'gemini-flash-latest',     maxTokens: 32768 },
-  { name: 'gemini-flash-lite-latest',maxTokens: 16384 },
+  { name: 'gemini-3.1-pro',       maxTokens: 32768 },
+  { name: 'gemini-3.5-flash',     maxTokens: 32768 },
+  { name: 'gemini-3.1-flash-lite',maxTokens: 16384 },
 ];
 
 // 재시도 설정

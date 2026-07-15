@@ -78,7 +78,7 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
       <div className="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar p-4 md:p-8 w-full">
         <div className="max-w-7xl mx-auto w-full h-full flex flex-col">
           {sortedAndFilteredList.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-gray-400 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-10">
+            <div className="h-full flex flex-col items-center justify-center text-gray-400 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-[0_4px_20px_rgba(0,0,0,0.06)] p-10">
               <svg className="w-16 h-16 mb-4 text-gray-200 dark:text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
               <p className="font-bold text-gray-500">{isLoading ? '게시물을 불러오는 중입니다...' : '조건에 맞는 게시물이 없습니다.'}</p>
             </div>
@@ -121,7 +121,7 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
               </div>
 
               {/* 데스크탑 뷰 (테이블형) */}
-              <PremiumCard hoverEffect={true} className="hidden md:block p-0 sm:p-0 border-0">
+              <PremiumCard hoverEffect={true} className="hidden md:block p-0 sm:p-0 border-0 rounded-none">
                 <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
                   <thead className="bg-slate-100 dark:bg-zinc-800">
                     <tr>

@@ -69,7 +69,7 @@ export default function MarkdownEditor({
   };
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-[#f9f9f9] dark:bg-zinc-950 overflow-y-auto">
+    <div className="flex-1 flex flex-col min-w-0 bg-[#f9f9f9] dark:bg-zinc-950">
       
       {/* Editor Toolbar (Naver SmartEditor Style) */}
       <EditorToolbar 
@@ -80,9 +80,8 @@ export default function MarkdownEditor({
         wrapWithMarkdown={wrapWithMarkdown}
       />
 
-      {/* Editor Canvas (A4 Paper Style) */}
-      <div className="flex-1 py-10 px-4 md:px-0 pb-32">
-        <div className="max-w-[850px] mx-auto bg-white dark:bg-zinc-900 min-h-[1000px] shadow-sm border border-gray-100 dark:border-zinc-800 rounded-xl overflow-hidden flex flex-col">
+      <div className="flex-1 py-8 px-4 md:px-10">
+        <div className="w-full bg-white dark:bg-zinc-900 min-h-[900px] shadow-[0_4px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-zinc-700 flex flex-col">
           
           {/* Document Title Input */}
           <div className="px-10 pt-16 pb-4">

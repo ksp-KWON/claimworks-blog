@@ -156,14 +156,12 @@ export default function AiWritingStudio({
             </div>
           </div>
 
-          {/* 에디터 작업영역 — 각진 형태, 반응형으로 늘어남 */}
-          <div className="flex-1 overflow-y-auto p-4 md:p-6">
-            <div className="min-h-full">
-              <MarkdownEditor
-                title={postMeta.title} setTitle={(t: string) => setPostMeta((prev: any) => ({ ...prev, title: t }))}
-                content={postMeta.content} setContent={(c: any) => setPostMeta((prev: any) => ({ ...prev, content: typeof c === 'function' ? c(prev.content) : c }))}
-              />
-            </div>
+          {/* 에디터 작업영역 — 스크롤 없이 꽉 채움 */}
+          <div className="flex-1 overflow-y-auto">
+            <MarkdownEditor
+              title={postMeta.title} setTitle={(t: string) => setPostMeta((prev: any) => ({ ...prev, title: t }))}
+              content={postMeta.content} setContent={(c: any) => setPostMeta((prev: any) => ({ ...prev, content: typeof c === 'function' ? c(prev.content) : c }))}
+            />
           </div>
         </div>
 
@@ -181,7 +179,7 @@ export default function AiWritingStudio({
                       key={mode.id}
                       onClick={() => setAiMode(mode.id as any)}
                       className={`
-                        flex flex-col p-5 rounded-xl border-2 text-left transition-all group
+                        flex flex-col p-5 rounded-none border-2 text-left transition-all group
                         ${aiMode === mode.id
                           ? mode.accentClass + ' shadow-sm'
                           : 'border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-gray-200 hover:shadow-sm'
@@ -202,8 +200,8 @@ export default function AiWritingStudio({
                   ))}
                 </div>
 
-                {/* 입력창 — 컬러 세로선 제거 */}
-                <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-5">
+                {/* 입력창 — 각진 사각형, PremiumCard 3D 입체 스타일 */}
+                <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] p-5">
                   <label className="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-gray-200 mb-3">
                     <PremiumBadge color="blue">Input</PremiumBadge>
                     {aiMode === 'semi-auto' ? '키워드 또는 참고 링크' : '유튜브 대본 / 원문'}
@@ -211,7 +209,7 @@ export default function AiWritingStudio({
                   <textarea
                     value={inputText}
                     onChange={e => setInputText(e.target.value)}
-                    className="w-full min-h-[220px] p-4 rounded-xl border border-gray-200 dark:border-zinc-700 bg-[#f8f9fa] dark:bg-zinc-950 text-sm resize-none focus:ring-2 focus:ring-blue-500 outline-none custom-scrollbar"
+                    className="w-full min-h-[220px] p-4 border border-gray-200 dark:border-zinc-700 bg-[#f8f9fa] dark:bg-zinc-950 text-sm resize-none focus:ring-2 focus:ring-blue-500 outline-none custom-scrollbar"
                     placeholder={
                       aiMode === 'semi-auto'
                         ? '참고할 링크 주소나 핵심 키워드를 적어주세요...\n\n예시:\n- 음주운전 면허취소 구제 방법\n- https://news.naver.com/...'
@@ -256,7 +254,7 @@ export default function AiWritingStudio({
                       key={type.id}
                       onClick={() => setAutoType(type.id as any)}
                       className={`
-                        flex flex-col p-5 rounded-xl border-2 text-left transition-all group
+                        flex flex-col p-5 rounded-none border-2 text-left transition-all group
                         ${autoType === type.id
                           ? type.accentClass + ' shadow-sm'
                           : 'border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-gray-200 hover:shadow-sm'
@@ -274,8 +272,8 @@ export default function AiWritingStudio({
                   ))}
                 </div>
 
-                {/* 실행 패널 — 컬러 세로선 제거 */}
-                <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-5">
+                {/* 실행 패널 — 각진 사각형, 3D 입체 스타일 */}
+                <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] p-5">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-0.5">

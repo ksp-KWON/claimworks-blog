@@ -156,8 +156,8 @@ export default function AiWritingStudio({
             </div>
           </div>
 
-          {/* 에디터 작업영역 — 스크롤 없이 꽉 채움 */}
-          <div className="flex-1 overflow-y-auto">
+          {/* 에디터 작업영역 — h-full로 꽉 채움, 스크롤은 MarkdownEditor 내부에서 처리 */}
+          <div className="flex-1 overflow-hidden h-full">
             <MarkdownEditor
               title={postMeta.title} setTitle={(t: string) => setPostMeta((prev: any) => ({ ...prev, title: t }))}
               content={postMeta.content} setContent={(c: any) => setPostMeta((prev: any) => ({ ...prev, content: typeof c === 'function' ? c(prev.content) : c }))}

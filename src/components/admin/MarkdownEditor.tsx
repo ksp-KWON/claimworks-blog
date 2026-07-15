@@ -69,9 +69,9 @@ export default function MarkdownEditor({
   };
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-[#f9f9f9] dark:bg-zinc-950">
+    <div className="h-full flex flex-col min-w-0 bg-[#f9f9f9] dark:bg-zinc-950 overflow-hidden">
       
-      {/* Editor Toolbar (Naver SmartEditor Style) */}
+      {/* Editor Toolbar */}
       <EditorToolbar 
         editorMode={editorMode}
         setEditorMode={setEditorMode}
@@ -80,8 +80,9 @@ export default function MarkdownEditor({
         wrapWithMarkdown={wrapWithMarkdown}
       />
 
-      <div className="flex-1 py-8 px-4 md:px-10">
-        <div className="w-full bg-white dark:bg-zinc-900 min-h-[900px] shadow-[0_4px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-zinc-700 flex flex-col">
+      {/* Scrollable canvas area */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-100 dark:bg-zinc-950 px-6 md:px-12 py-8">
+        <div className="w-full bg-white dark:bg-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-zinc-700 flex flex-col">
           
           {/* Document Title Input */}
           <div className="px-10 pt-16 pb-4">
@@ -95,7 +96,7 @@ export default function MarkdownEditor({
           </div>
 
           {/* Editor Canvas Depending on Mode */}
-          <div className="flex-1 px-6 pb-16 flex flex-col min-h-[500px]">
+          <div className="flex-1 px-6 pb-8 flex flex-col">
             {editorMode === 'wysiwyg' && (
               <WysiwygEditor
                 ref={editorRef}

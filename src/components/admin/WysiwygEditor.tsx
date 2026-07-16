@@ -18,7 +18,8 @@ import {
   InsertTable,
   BlockTypeSelect,
   diffSourcePlugin,
-  DiffSourceToggleWrapper
+  DiffSourceToggleWrapper,
+  jsxPlugin
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 
@@ -103,6 +104,7 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
           imagePlugin(),
           tablePlugin(),
           markdownShortcutPlugin(),
+          jsxPlugin(),
           diffSourcePlugin({ diffMarkdown: 'calc', viewMode: 'rich-text' }),
           toolbarPlugin({
             toolbarContents: () => <PortalToolbar />

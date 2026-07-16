@@ -21,7 +21,6 @@ import {
 
 export default function AdminPage() {
   const [activeApp, setActiveApp] = useState<AdminAppType>('consult-manage');
-  const [aiActiveTab, setAiActiveTab] = useState<'manual' | 'auto' | 'editor'>('manual');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   // Editor State
@@ -263,8 +262,6 @@ export default function AdminPage() {
               isLoading={isLoading} 
               onRunAi={handleRunAi} 
               onRunAuto={handleRunAuto}
-              activeTab={aiActiveTab}
-              setActiveTab={setAiActiveTab}
               postMeta={postMeta}
               setPostMeta={setPostMeta}
               onSavePost={handleSavePost}

@@ -54,9 +54,9 @@ export default function CategoriesIndex() {
             </div>
           </div>
 
-          <div className="p-6 sm:p-10 space-y-12">
+          <div className="p-6 sm:p-10 space-y-6">
             {/* 헤더 타이틀 */}
-            <div className="text-center space-y-3">
+            <div className="text-center space-y-3 pb-4 border-b border-gray-100 dark:border-white/5 mb-6">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
                 보상스쿨 <span className="bg-gradient-to-r from-yellow-500 to-yellow-700 bg-clip-text text-transparent">분야별 전문 보상 가이드</span>
               </h1>

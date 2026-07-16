@@ -101,20 +101,40 @@ export const sharedComponents: any = {
   'bg-red': ({ children }: { children: React.ReactNode }) => <span className="bg-red-200/60 dark:bg-red-900/40 px-1 py-0.5 rounded">{children}</span>,
   'bg-green': ({ children }: { children: React.ReactNode }) => <span className="bg-green-200/60 dark:bg-green-900/40 px-1 py-0.5 rounded">{children}</span>,
   
-   
+  relatedbox: ({ children }: any) => (
+    <div className="my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[#1A73E8] transition-all duration-300 relative overflow-hidden group">
+      <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300">
+        🔗
+      </div>
+      <div className="relative z-10">
+        <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-4">
+          <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[#1A73E8] pl-2.5">
+            <span className="text-[#1A73E8] text-lg leading-none">🔗</span>
+            함께 읽으면 도움이 되는 글
+          </h3>
+        </div>
+        <ul className="space-y-3">
+          {children}
+        </ul>
+      </div>
+    </div>
+  ),
+
   calloutlink: ({ ...props }: any) => {
     const href = props.href || '';
     const text = props.text || '';
     return (
-      <a
-        href={href}
-        className="inline-flex items-center gap-2 px-3.5 py-2 my-3 text-[14px] font-bold text-[#1A73E8] dark:text-[#8ab4f8] bg-[#e8f0fe]/60 hover:bg-[#d2e3fc]/80 dark:bg-[#1a2540]/40 dark:hover:bg-[#1a2540]/70 rounded-full transition-all duration-200 break-keep border border-[#1A73E8]/10 dark:border-[#8ab4f8]/10 group no-underline"
-      >
-        <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-white/60 dark:bg-black/20 text-[#1A73E8] dark:text-[#8ab4f8] shadow-sm">
-          <svg className="w-3 h-3 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+      <li className="flex items-start gap-2.5 group">
+        <span className="text-[#1A73E8] dark:text-[#8ab4f8] mt-0.5 font-bold shrink-0">
+          <svg className="w-4 h-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
         </span>
-        <span className="group-hover:underline underline-offset-4 decoration-[#1A73E8]/30 transition-all">{text}</span>
-      </a>
+        <a
+          href={href}
+          className="flex-1 text-[14.5px] font-normal text-gray-700 dark:text-[#bdc1c6] group-hover:text-[#1A73E8] dark:group-hover:text-[#8ab4f8] leading-[1.7] break-keep transition-colors no-underline"
+        >
+          <span className="group-hover:underline underline-offset-4 decoration-[#1A73E8]/30 transition-all">{text}</span>
+        </a>
+      </li>
     );
   },
   hr1: () => (

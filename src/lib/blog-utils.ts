@@ -193,5 +193,17 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   result.checklistItems = result.checklistItems.map(applyBold);
   result.faqItems = result.faqItems.map(faq => ({ ...faq, a: applyBold(faq.a) }));
 
+  // 연달아 나오는 calloutlink들을 하나의 relatedbox로 묶기
+  const groupRelatedLinks = (text: string) => {
+    return text.replace(/(<calloutlink[^>]+>\s*<\/calloutlink>\s*)+/g, (match) => {
+      return `<relatedbox>\n${match.trim()}\n</relatedbox>`;
+    });
+  };
+
+  if (result.opening) {
+    result.opening = groupRelatedLinks(result.opening);
+  }
+  result.sections = result.sections.map(groupRelatedLinks);
+
   return result;
 }

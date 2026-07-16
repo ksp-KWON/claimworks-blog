@@ -6,6 +6,7 @@ import MobileAdminNav from '@/components/admin/MobileAdminNav';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import PremiumButton from '@/components/ui/PremiumButton';
 import ConsultationAdminPanel from '@/components/admin/ConsultationAdminPanel';
 const AiWritingStudio = dynamic(() => import('@/components/admin/posts/AiWritingStudio'), { ssr: false });
 const PostListPanel = dynamic(() => import('@/components/admin/posts/PostListPanel'), { ssr: false });
@@ -281,6 +282,14 @@ export default function AdminPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
               </button>
+            </div>
+          )}
+          {activeApp === 'post-ai' && (
+            <div className="flex items-center gap-2">
+              <PremiumButton onClick={handleCreateBlankPost} variant="secondary" className="!py-1.5 !px-3 !text-xs hidden sm:flex">새 문서</PremiumButton>
+              <PremiumButton onClick={handleSavePost} disabled={isLoading} className="!py-1.5 !px-4 !text-xs whitespace-nowrap">
+                {isLoading ? '저장 중...' : '저장 및 발행'}
+              </PremiumButton>
             </div>
           )}
         </div>

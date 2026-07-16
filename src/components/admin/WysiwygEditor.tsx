@@ -80,10 +80,10 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
 
   // 외부 데이터 로딩 등으로 initialValue가 크게 변할 때
   useEffect(() => {
-    if (editorRef.current && initialValue) {
+    if (editorRef.current && initialValue !== undefined) {
       const currentMd = editorRef.current.getMarkdown();
-      if (currentMd !== initialValue) {
-        editorRef.current.setMarkdown(initialValue);
+      if (currentMd !== (initialValue || '')) {
+        editorRef.current.setMarkdown(initialValue || '');
       }
     }
   }, [initialValue]);

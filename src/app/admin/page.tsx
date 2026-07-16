@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { AdminAppType } from '@/components/admin/MobileAdminNav';
 import MobileAdminNav from '@/components/admin/MobileAdminNav';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import ConsultationAdminPanel from '@/components/admin/ConsultationAdminPanel';
 const AiWritingStudio = dynamic(() => import('@/components/admin/posts/AiWritingStudio'), { ssr: false });
@@ -21,6 +22,11 @@ import {
 
 export default function AdminPage() {
   const [activeApp, setActiveApp] = useState<AdminAppType>('consult-manage');
+  
+  // Shared Header Controls
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortType, setSortType] = useState('date');
+  const [refreshCounter, setRefreshCounter] = useState(0);
   
   // Editor State
   const [postMeta, setPostMeta] = useState({
@@ -52,6 +58,9 @@ export default function AdminPage() {
     const handleNavigate = (e: any) => {
       if (e.detail && e.detail.app) {
         setActiveApp(e.detail.app);
+        // 앱 이동 시 검색/정렬 초기화
+        setSearchQuery('');
+        setSortType('date');
       }
     };
     window.addEventListener('navigate-admin-app', handleNavigate);
@@ -231,45 +240,85 @@ export default function AdminPage() {
       {/* ── 글로벌 상단 네비게이션 (데스크톱 전용) ── */}
       <div className="hidden md:flex h-14 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 items-center justify-between px-5 shrink-0 z-50">
         
-        {/* 로고 영역 */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black shadow-sm">
-            C
-          </div>
-          <span className="font-black text-gray-900 dark:text-white tracking-tight">ClaimWorks</span>
+        {/* 좌측 로고 영역 */}
+        <div className="flex items-center gap-2">
+          <Image src="/logo.png" alt="보상스쿨" width={100} height={24} className="object-contain" />
         </div>
 
-        {/* 메뉴 영역 */}
-        <div className="flex items-center gap-2">
+        {/* 중앙 헤더 컨트롤 영역 (상담 관리, 원고 관리 탭에서만 보임) */}
+        <div className="flex-1 flex items-center justify-center px-4">
+          {(activeApp === 'consult-manage' || activeApp === 'post-list') && (
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="제목/내용 검색..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 pr-3 py-1.5 w-64 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <select
+                value={sortType}
+                onChange={(e) => setSortType(e.target.value)}
+                className="py-1.5 px-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 text-center appearance-none cursor-pointer"
+              >
+                <option value="date">최신순</option>
+                <option value="alpha">가나다순</option>
+              </select>
+              <button
+                onClick={() => {
+                  if (activeApp === 'post-list') handleFetchList();
+                  else setRefreshCounter(c => c + 1);
+                }}
+                className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors border border-gray-200 dark:border-zinc-700"
+                title="새로고침"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* 우측 메뉴 영역 */}
+        <div className="flex items-center gap-1 shrink-0">
           <button 
             onClick={() => setActiveApp('consult-manage')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'consult-manage' ? 'bg-gray-100 dark:bg-zinc-800 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'consult-manage' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
           >
             상담 관리
           </button>
           
-          <div className="w-px h-4 bg-gray-300 dark:bg-zinc-700 mx-2" />
+          <div className="w-px h-3 bg-gray-300 dark:bg-zinc-700 mx-1" />
           
-          <button 
-            onClick={() => setActiveApp('post-ai')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-ai' ? 'bg-gray-100 dark:bg-zinc-800 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
-          >
-            AI 스튜디오
-          </button>
           <button 
             onClick={() => setActiveApp('post-list')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-list' ? 'bg-gray-100 dark:bg-zinc-800 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-list' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
           >
-            기존 글 관리
+            원고 관리
           </button>
           
-          <div className="w-px h-4 bg-gray-300 dark:bg-zinc-700 mx-2" />
+          <div className="w-px h-3 bg-gray-300 dark:bg-zinc-700 mx-1" />
+
+          <button 
+            onClick={() => setActiveApp('post-ai')}
+            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-ai' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+          >
+            작업 관리
+          </button>
+          
+          <div className="w-px h-3 bg-gray-300 dark:bg-zinc-700 mx-1" />
 
           <button 
             onClick={() => setActiveApp('post-settings')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-settings' ? 'bg-gray-100 dark:bg-zinc-800 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-settings' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
           >
-            API 입력
+            환경설정
           </button>
           
           <button 
@@ -292,7 +341,7 @@ export default function AdminPage() {
 
           {/* Consultations */}
           {activeApp === 'consult-manage' && (
-            <ConsultationAdminPanel isSplitView={true} onNavigateToManage={() => {}} />
+            <ConsultationAdminPanel isSplitView={true} onNavigateToManage={() => {}} searchQuery={searchQuery} sortType={sortType} refreshCounter={refreshCounter} />
           )}
 
           {/* Posting Center Tools */}
@@ -313,7 +362,9 @@ export default function AdminPage() {
               postList={postList} 
               onLoadPost={handleLoadPost} 
               onDeletePost={handleDeletePost} 
-              onRefreshList={handleFetchList} 
+              onRefreshList={handleFetchList}
+              searchQuery={searchQuery}
+              sortType={sortType}
             />
           )}
           {activeApp === 'post-settings' && (

@@ -11,17 +11,17 @@ import PremiumButton from '@/components/ui/PremiumButton';
 interface ConsultationAdminPanelProps {
   isSplitView: boolean;
   onNavigateToManage: () => void;
+  searchQuery: string;
+  sortType: string;
+  refreshCounter: number;
 }
 
-export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage }: ConsultationAdminPanelProps) {
+export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage, searchQuery, sortType, refreshCounter }: ConsultationAdminPanelProps) {
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   
   const [memoText, setMemoText] = useState('');
-  
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortType, setSortType] = useState<'date' | 'alpha'>('date');
 
   const sortedAndFilteredConsultations = useMemo(() => {
     return [...consultations]
@@ -79,6 +79,12 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
       supabase.removeChannel(subscription);
     };
   }, []);
+
+  useEffect(() => {
+    if (refreshCounter > 0) {
+      fetchConsultations();
+    }
+  }, [refreshCounter]);
 
   useEffect(() => {
     const pendingId = sessionStorage.getItem('pending_select_id');
@@ -207,49 +213,6 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
 
   return (
     <div className="flex flex-col flex-1 h-full bg-gray-50 dark:bg-zinc-950 overflow-hidden relative">
-      
-      <div className="shrink-0 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm z-10">
-        <div className="flex items-center h-14 px-5 gap-4 overflow-x-auto">
-
-          {/* 아이콘 + 타이틀 */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z" />
-              </svg>
-            </div>
-            <span className="text-base font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">상담 접수 관리</span>
-          </div>
-
-          {/* 구분선 */}
-          <div className="h-6 w-px bg-gray-200 dark:bg-zinc-700 shrink-0" />
-
-          {/* 검색 + 정렬 + 새로고침 */}
-          <div className="flex items-center gap-2 ml-auto shrink-0">
-            <div className="relative hidden sm:block">
-              <input
-                type="text"
-                placeholder="이름, 내용 검색..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-3 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-gray-50 dark:bg-zinc-950 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none w-[150px] md:w-[200px] transition-all font-medium"
-              />
-              <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            </div>
-            <select
-              value={sortType}
-              onChange={(e) => setSortType(e.target.value as 'date' | 'alpha')}
-              className="px-3 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-white dark:bg-zinc-900 cursor-pointer outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium hidden sm:block"
-            >
-              <option value="date">최신순</option>
-              <option value="alpha">가나다순</option>
-            </select>
-            <PremiumButton onClick={fetchConsultations} disabled={isLoading} variant="secondary" className="!p-2" title="새로고침">
-              <svg className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-500' : 'text-gray-600 dark:text-gray-300'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-            </PremiumButton>
-          </div>
-        </div>
-      </div>
 
       {/* List Panel */}
       <div className="flex flex-col bg-gray-50 dark:bg-zinc-950 overflow-hidden flex-1 w-full">
@@ -351,27 +314,6 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
 
           {/* 모바일 뷰 */}
           <div className="md:hidden space-y-3 mt-4">
-            
-            <div className="flex items-center gap-2 mb-4">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  placeholder="검색..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
-                />
-                <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              </div>
-              <select
-                value={sortType}
-                onChange={(e) => setSortType(e.target.value as 'date' | 'alpha')}
-                className="px-3 py-2 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm bg-white dark:bg-zinc-900 cursor-pointer outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-              >
-                <option value="date">최신순</option>
-                <option value="alpha">가나다순</option>
-              </select>
-            </div>
 
             {sortedAndFilteredConsultations.length === 0 ? (
               <div className="text-center py-8 text-sm text-gray-500 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800">

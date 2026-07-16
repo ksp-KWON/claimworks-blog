@@ -73,11 +73,11 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
       {/* 포스팅 팝업 */}
       <BottomSheet isOpen={openModal === 'posts'} onClose={closeModals} showBackdrop={true}>
         <h3 className="text-lg font-bold text-gray-900 dark:text-white px-1 mb-4">포스팅 센터</h3>
-        <button onClick={() => { setActiveApp('post-ai'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors mb-3">
-          <span className="text-base text-gray-900 dark:text-white font-bold">✨ AI 스튜디오</span>
+        <button onClick={() => { setActiveApp('post-list'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors mb-3">
+          <span className="text-base text-gray-900 dark:text-white font-bold">📂 원고 관리</span>
         </button>
-        <button onClick={() => { setActiveApp('post-list'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
-          <span className="text-base text-gray-900 dark:text-white font-bold">📂 기존 글 관리</span>
+        <button onClick={() => { setActiveApp('post-ai'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
+          <span className="text-base text-gray-900 dark:text-white font-bold">✨ 작업 관리</span>
         </button>
       </BottomSheet>
 
@@ -85,7 +85,7 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
       <BottomSheet isOpen={openModal === 'settings'} onClose={closeModals} showBackdrop={true}>
         <h3 className="text-lg font-bold text-gray-900 dark:text-white px-1 mb-4">환경설정</h3>
         <button onClick={() => { setActiveApp('post-settings'); closeModals(); }} className="w-full flex items-center p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
-          <span className="text-base text-gray-900 dark:text-white font-bold">API 설정</span>
+          <span className="text-base text-gray-900 dark:text-white font-bold">환경설정</span>
         </button>
         {onLogout && (
           <button onClick={() => { onLogout(); closeModals(); }} className="w-full flex items-center p-4 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-left transition-colors">

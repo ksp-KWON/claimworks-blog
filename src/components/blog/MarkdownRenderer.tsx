@@ -108,17 +108,12 @@ export const sharedComponents: any = {
     return (
       <a
         href={href}
-        className="flex items-center justify-between p-4 my-5 bg-[#e8f0fe]/30 hover:bg-[#e8f0fe]/60 dark:bg-[#1a2540]/15 dark:hover:bg-[#1a2540]/30 border-l-4 border-l-[#1A73E8] rounded-r-xl transition-all duration-200 text-[#1A73E8] dark:text-[#8ab4f8] group no-underline break-keep shadow-2xs"
+        className="inline-flex items-center gap-2 px-3.5 py-2 my-3 text-[14px] font-bold text-[#1A73E8] dark:text-[#8ab4f8] bg-[#e8f0fe]/60 hover:bg-[#d2e3fc]/80 dark:bg-[#1a2540]/40 dark:hover:bg-[#1a2540]/70 rounded-full transition-all duration-200 break-keep border border-[#1A73E8]/10 dark:border-[#8ab4f8]/10 group no-underline"
       >
-        <div className="flex items-center gap-3">
-          <span className="flex-shrink-0 w-8 h-8 rounded-none border border-[#1A73E8]/30 dark:border-[#8ab4f8]/30 bg-white dark:bg-[#1a2540] flex items-center justify-center shadow-sm">
-            <svg className="w-4 h-4 text-[#1A73E8] dark:text-[#8ab4f8] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          </span>
-          <div className="flex flex-col text-left">
-            <span className="text-[10px] font-extrabold text-[#1A73E8] dark:text-[#8ab4f8] uppercase tracking-wider mb-0.5">관련 추천 글</span>
-            <span className="text-[13.5px] sm:text-[14px] font-extrabold text-gray-800 dark:text-[#e8eaed] leading-snug group-hover:text-[#1A73E8] dark:group-hover:text-[#8ab4f8] transition-colors">{text}</span>
-          </div>
-        </div>
+        <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-white/60 dark:bg-black/20 text-[#1A73E8] dark:text-[#8ab4f8] shadow-sm">
+          <svg className="w-3 h-3 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+        </span>
+        <span className="group-hover:underline underline-offset-4 decoration-[#1A73E8]/30 transition-all">{text}</span>
       </a>
     );
   },

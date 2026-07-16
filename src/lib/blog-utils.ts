@@ -158,7 +158,14 @@ export function parseBlogPost(content: string): ParsedBlogPost {
       // skip
     } else if (currentSectionType === 'NONE') {
       let processedLine = line;
-      const singleLinkMatch = trimmed.match(/^\s*\[([^\]]+)\]\(([^)]+)\)\s*$/);
+
+      // 1. 관련 정보 텍스트 자동 삭제 (피로감 줄이기)
+      if (/^\s*(\[|\*\*|#+\s*)?(관련\s*(정보|글|포스팅)|함께\s*읽기|관련정보|관련글)(\]|\*\*|:)?\s*$/.test(trimmed)) {
+        continue; // 이 줄은 완전히 렌더링에서 제외
+      }
+
+      // 2. 단독 링크 자동 감지 및 변환 (불릿 유무 무관)
+      const singleLinkMatch = trimmed.match(/^\s*(?:[-*]\s*)?\[([^\]]+)\]\(([^)]+)\)\s*$/);
       if (singleLinkMatch) {
         const text = singleLinkMatch[1].trim();
         const href = singleLinkMatch[2].trim();

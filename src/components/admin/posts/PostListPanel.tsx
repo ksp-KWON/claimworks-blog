@@ -46,8 +46,15 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
                 {sortedAndFilteredList.map((post) => (
                   <PremiumCard key={post.sha} className="p-4 hover:border-blue-300 transition-colors">
                     <div className="flex flex-col gap-3">
-                      <div className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug">
-                        {post.title}
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug">
+                          {post.title}
+                        </div>
+                        {post.published === false && (
+                          <PremiumBadge color="gray" className="text-[10px] px-1.5 py-0.5 whitespace-nowrap bg-gray-200 text-gray-600 dark:bg-zinc-700 dark:text-gray-300">
+                            임시저장
+                          </PremiumBadge>
+                        )}
                       </div>
                       <div className="flex items-center justify-between">
                         <PremiumBadge color="gray" className="font-mono text-xs">
@@ -96,8 +103,15 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
                           </span>
                         </td>
                         <td className="px-6 py-4 text-left">
-                          <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors w-full truncate">
-                            {post.title}
+                          <div className="flex items-center gap-2">
+                            <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate max-w-sm">
+                              {post.title}
+                            </div>
+                            {post.published === false && (
+                              <PremiumBadge color="gray" className="text-[10px] px-1.5 py-0.5 whitespace-nowrap bg-gray-200 text-gray-600 dark:bg-zinc-700 dark:text-gray-300">
+                                임시저장
+                              </PremiumBadge>
+                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">

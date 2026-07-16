@@ -50,23 +50,28 @@ export async function fetchPostList(githubToken: string) {
   const githubFiles = await res.json();
   const mdFiles = githubFiles.filter((f: any) => f.name.endsWith('.md'));
 
-  const titlesMap: Record<string, {title: string, date: string}> = {};
+  const titlesMap: Record<string, {title: string, date: string, published: boolean}> = {};
   try {
-    const dataRes = await fetch('/api/posts');
+    const dataRes = await fetch('/api/posts?admin=true');
     if (dataRes.ok) {
       const postsData = await dataRes.json();
       postsData.forEach((post: any) => {
-        titlesMap[`${post.slug}.md`] = {title: post.title, date: post.date};
+        titlesMap[`${post.slug}.md`] = {title: post.title, date: post.date, published: post.published !== false};
       });
     }
   } catch {}
 
-  return mdFiles.map((file: any) => ({
-    name: file.name,
-    sha: file.sha,
-    title: titlesMap[file.name]?.title || file.name.replace('.md', ''),
-    date: titlesMap[file.name]?.date || ''
-  }));
+  return mdFiles.map((file: any) => {
+    const mapped = titlesMap[file.name];
+    // If not in API (e.g. newly created draft not built yet), we safely assume it's published unless we parse it. But mostly drafts will eventually show up, or we assume true for unknowns.
+    return {
+      name: file.name,
+      sha: file.sha,
+      title: mapped?.title || file.name.replace('.md', ''),
+      date: mapped?.date || '',
+      published: mapped?.published !== false
+    };
+  });
 }
 
 export async function loadPost(githubToken: string, filename: string) {
@@ -86,6 +91,7 @@ export async function loadPost(githubToken: string, filename: string) {
     category: meta.category || '기타',
     date: meta.date || new Date().toISOString().split('T')[0],
     tags: Array.isArray(meta.tags) ? meta.tags.join(', ') : '',
+    published: meta.published !== false,
     content: rawContent
   };
 }
@@ -100,6 +106,7 @@ title: "${data.title.replace(/"/g, '\\"')}"
 summary: "${data.summary.replace(/"/g, '\\"')}"
 category: "${data.category || '기타'}"
 date: "${data.date || new Date().toISOString().split('T')[0]}"
+published: ${data.published !== false}
 tags: ${JSON.stringify(compiledTags)}
 ---
 

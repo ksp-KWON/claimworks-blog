@@ -32,7 +32,8 @@ export default function AdminPage() {
   // Editor State
   const [postMeta, setPostMeta] = useState({
     title: '', summary: '', date: '', category: '', tags: '',
-    content: '', currentSha: null as string | null, currentFilename: null as string | null
+    content: '', currentSha: null as string | null, currentFilename: null as string | null,
+    published: false
   });
 
   // Auth State
@@ -103,7 +104,8 @@ export default function AdminPage() {
         tags: postData.tags,
         content: postData.content,
         currentSha: sha,
-        currentFilename: filename
+        currentFilename: filename,
+        published: postData.published
       });
       // Switch to editor
       setActiveApp('editor');
@@ -111,15 +113,21 @@ export default function AdminPage() {
     setIsLoading(false);
   };
 
-  const handleSavePost = async () => {
+  const handleSavePost = async (isDraft: boolean = false) => {
     if (!postMeta.title || !postMeta.content) {
       alert('제목과 내용을 입력하세요.');
       return;
     }
     setIsLoading(true);
-    const success = await savePost(githubToken, postMeta);
+    const postDataToSave = {
+      ...postMeta,
+      published: !isDraft
+    };
+    const success = await savePost(githubToken, postDataToSave);
     if (success) {
-      alert('포스팅이 성공적으로 저장/수정 되었습니다.');
+      alert(isDraft ? '임시저장이 완료되었습니다.' : '포스팅이 성공적으로 발행되었습니다.');
+      // 저장 성공 후 현재 상태 갱신 (SHA는 fetch 후 다시 로드해야 알지만, published 상태는 업데이트)
+      setPostMeta(prev => ({ ...prev, published: !isDraft }));
       handleFetchList();
     }
     setIsLoading(false);
@@ -185,7 +193,7 @@ export default function AdminPage() {
   const handleCreateBlankPost = () => {
     setPostMeta({
       title: '', summary: '', date: '', category: '', tags: '',
-      content: '', currentSha: null, currentFilename: null
+      content: '', currentSha: null, currentFilename: null, published: false
     });
     setActiveApp('post-ai');
   };
@@ -300,14 +308,6 @@ export default function AdminPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
               </button>
-            </div>
-          )}
-          {activeApp === 'post-ai' && (
-            <div className="flex items-center gap-2">
-              <PremiumButton onClick={handleCreateBlankPost} variant="secondary" className="!py-1.5 !px-3 !text-xs hidden sm:flex">새 문서</PremiumButton>
-              <PremiumButton onClick={handleSavePost} disabled={isLoading} className="!py-1.5 !px-4 !text-xs whitespace-nowrap">
-                {isLoading ? '저장 중...' : '저장 및 발행'}
-              </PremiumButton>
             </div>
           )}
         </div>

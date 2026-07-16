@@ -11,7 +11,7 @@ interface AiWritingStudioProps {
   onRunAuto: (type: 'all' | 'precedent' | 'trend') => void;
   postMeta: any;
   setPostMeta: any;
-  onSavePost: () => void;
+  onSavePost: (isDraft?: boolean) => void;
   onCreateBlank: () => void;
   autoProgress?: string;
 }
@@ -167,6 +167,21 @@ export default function AiWritingStudio({
             </div>
           </>
         )}
+      </div>
+
+      {/* ── 문서 액션 (새문서, 임시저장, 발행) ── */}
+      <div className="shrink-0 p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 relative z-20">
+        <div className="flex gap-2 mb-2">
+          <PremiumButton onClick={onCreateBlank} variant="secondary" className="flex-1 !py-2 !text-xs border-gray-200 dark:border-zinc-700">
+            새 문서
+          </PremiumButton>
+          <PremiumButton onClick={() => onSavePost(true)} disabled={isLoading} variant="secondary" className="flex-1 !py-2 !text-xs border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-gray-300">
+            임시 저장
+          </PremiumButton>
+        </div>
+        <PremiumButton onClick={() => onSavePost(false)} disabled={isLoading} variant="primary" className="w-full !py-2.5 shadow-md shadow-blue-500/20">
+          {isLoading ? '처리 중...' : '발행하기'}
+        </PremiumButton>
       </div>
     </div>
   );

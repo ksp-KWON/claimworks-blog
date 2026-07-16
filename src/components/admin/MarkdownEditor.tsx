@@ -127,6 +127,7 @@ export default function MarkdownEditor({
             )}
             </div>
           </div>
+        </div>
       </div>
     </div>
   );

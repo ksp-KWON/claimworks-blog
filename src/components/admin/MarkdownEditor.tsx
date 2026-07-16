@@ -69,7 +69,7 @@ export default function MarkdownEditor({
   };
 
   return (
-    <div className="h-full flex flex-col min-w-0 bg-[#f9f9f9] dark:bg-zinc-950 overflow-hidden">
+    <div className="h-full flex flex-col min-w-0 bg-white dark:bg-zinc-950 overflow-hidden">
       
       {/* Editor Toolbar */}
       <EditorToolbar 
@@ -80,34 +80,36 @@ export default function MarkdownEditor({
         wrapWithMarkdown={wrapWithMarkdown}
       />
 
-      {/* Canvas wrapper with % padding to fill available space nicely */}
-      <div className="flex-1 p-[2%] md:p-[3%] bg-gray-100 dark:bg-zinc-950 flex flex-col overflow-hidden">
-        <div className="flex-1 w-full bg-white dark:bg-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-zinc-700 flex flex-col overflow-hidden">
+      {/* Edge-to-edge white background for standard editor look */}
+      <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-zinc-900">
+        
+        {/* Scrollable inner content */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center">
           
-          {/* Scrollable inner content */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
-            {/* Document Title Input */}
-            <div className="px-6 md:px-10 pt-10 md:pt-16 pb-4 shrink-0">
-            <input 
-              type="text" 
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              placeholder="제목" 
-              className="text-[40px] leading-tight font-light text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-zinc-700 bg-transparent outline-none w-full"
-            />
-          </div>
+          <div className="w-full max-w-4xl flex flex-col flex-1 px-5 md:px-8">
+            
+            {/* Document Title Input (Naver Style with divider) */}
+            <div className="pt-12 md:pt-16 pb-6 shrink-0 border-b border-gray-200 dark:border-zinc-800 mb-4">
+              <input 
+                type="text" 
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                placeholder="제목" 
+                className="text-[40px] leading-tight font-light text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-zinc-700 bg-transparent outline-none w-full"
+              />
+            </div>
 
             {/* Editor Canvas Depending on Mode */}
-            <div className="flex-1 px-6 md:px-10 pb-8 flex flex-col min-h-0">
-            {editorMode === 'wysiwyg' && (
-              <WysiwygEditor
-                ref={editorRef}
-                initialValue={content}
-                onChange={(md) => setContent(md)}
-              />
-            )}
-            
-            {editorMode === 'markdown' && (
+            <div className="flex-1 pb-16 flex flex-col min-h-0">
+              {editorMode === 'wysiwyg' && (
+                <WysiwygEditor
+                  ref={editorRef}
+                  initialValue={content}
+                  onChange={(md) => setContent(md)}
+                />
+              )}
+              
+              {editorMode === 'markdown' && (
                 <textarea
                   ref={markdownTextareaRef}
                   value={content}
@@ -115,16 +117,16 @@ export default function MarkdownEditor({
                   className="w-full h-full min-h-[300px] flex-1 p-4 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 font-mono text-sm outline-none resize-none rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 custom-scrollbar"
                   placeholder="마크다운 소스를 입력하세요..."
                 />
-            )}
+              )}
 
-            {editorMode === 'html' && (
-              <div className="w-full h-full min-h-[300px] flex-1 p-4 md:p-8 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-200 dark:border-zinc-700 overflow-y-auto custom-scrollbar prose prose-sm max-w-none dark:prose-invert">
-                <div className="mb-4 text-xs font-bold text-gray-400">읽기 전용 HTML 미리보기 (실제 포스팅 화면)</div>
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                  {content}
-                </ReactMarkdown>
-              </div>
-            )}
+              {editorMode === 'html' && (
+                <div className="w-full h-full min-h-[300px] flex-1 p-4 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-200 dark:border-zinc-700 overflow-y-auto custom-scrollbar prose prose-sm max-w-none dark:prose-invert">
+                  <div className="mb-4 text-xs font-bold text-gray-400">읽기 전용 HTML 미리보기 (실제 포스팅 화면)</div>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                    {content}
+                  </ReactMarkdown>
+                </div>
+              )}
             </div>
           </div>
         </div>

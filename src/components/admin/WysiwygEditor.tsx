@@ -1,27 +1,15 @@
-import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
-import { 
-  MDXEditor, 
-  MDXEditorMethods,
-  headingsPlugin, 
-  quotePlugin, 
-  listsPlugin, 
-  thematicBreakPlugin, 
-  markdownShortcutPlugin, 
-  toolbarPlugin, 
-  UndoRedo, 
-  BoldItalicUnderlineToggles, 
-  linkPlugin, 
-  linkDialogPlugin,
-  CreateLink, 
-  imagePlugin, 
-  tablePlugin,
-  InsertTable,
-  BlockTypeSelect,
-  diffSourcePlugin,
-  DiffSourceToggleWrapper,
-  jsxPlugin
-} from '@mdxeditor/editor';
-import '@mdxeditor/editor/style.css';
+import React, { forwardRef, useImperativeHandle, useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import '@uiw/react-md-editor/markdown-editor.css';
+import '@uiw/react-markdown-preview/markdown.css';
+import { sharedComponents } from '@/components/blog/MarkdownRenderer';
+import rehypeRaw from 'rehype-raw';
+
+// Dynamically import MDEditor to prevent SSR issues in Next.js
+const MDEditor = dynamic(
+  () => import('@uiw/react-md-editor').then((mod) => mod.default),
+  { ssr: false, loading: () => <div className="p-8 text-center text-gray-500">에디터 로딩 중...</div> }
+);
 
 interface WysiwygEditorProps {
   initialValue: string;
@@ -34,96 +22,70 @@ export interface WysiwygEditorRef {
   getMarkdown: () => string;
 }
 
-import { createPortal } from 'react-dom';
-
-const PortalToolbar = () => {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  
-  if (!mounted) return null;
-  const portalTarget = document.getElementById('custom-toolbar-portal');
-  if (!portalTarget) return null;
-
-  return createPortal(
-    <div className="mdxeditor" style={{ background: 'transparent', border: 'none', padding: 0 }}>
-      <div className="mdxeditor-toolbar flex items-center gap-1 border-r border-gray-200 dark:border-zinc-700 pr-3 shrink-0" style={{ background: 'transparent', border: 'none', padding: 0 }}>
-        <UndoRedo />
-        <BlockTypeSelect />
-        <BoldItalicUnderlineToggles />
-        <CreateLink />
-        <InsertTable />
-        <div className="ml-auto flex items-center border-l border-gray-200 dark:border-zinc-700 pl-2">
-          <DiffSourceToggleWrapper children={undefined} />
-        </div>
-      </div>
-    </div>,
-    portalTarget
-  );
-};
-
 const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initialValue, onChange }, ref) => {
-  const editorRef = useRef<MDXEditorMethods>(null);
+  const [value, setValue] = useState(initialValue || '');
 
   useImperativeHandle(ref, () => ({
     insertText: (text: string) => {
-      editorRef.current?.insertMarkdown(text);
-      editorRef.current?.focus();
+      setValue(prev => prev + '\n' + text);
+      onChange(value + '\n' + text);
     },
     setMarkdown: (markdown: string) => {
-      editorRef.current?.setMarkdown(markdown);
+      setValue(markdown);
+      onChange(markdown);
     },
     getMarkdown: () => {
-      return editorRef.current?.getMarkdown() || '';
+      return value;
     }
   }));
 
-  // 외부 데이터 로딩 등으로 initialValue가 크게 변할 때
   useEffect(() => {
-    if (editorRef.current && initialValue) {
-      const currentMd = editorRef.current.getMarkdown();
-      if (currentMd !== initialValue) {
-        editorRef.current.setMarkdown(initialValue);
-      }
+    if (initialValue !== value) {
+      setValue(initialValue || '');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialValue]);
 
+  const handleChange = (val?: string) => {
+    const md = val || '';
+    setValue(md);
+    onChange(md);
+  };
+
   return (
-    <div className="mdx-editor-wrapper h-full flex flex-col prose prose-sm max-w-none dark:prose-invert">
-      <MDXEditor
-        ref={editorRef}
-        markdown={initialValue || ''}
-        onChange={onChange}
-        contentEditableClassName="prose max-w-none w-full h-full p-4 outline-none min-h-[500px]"
-        plugins={[
-          headingsPlugin(),
-          quotePlugin(),
-          listsPlugin(),
-          thematicBreakPlugin(),
-          linkPlugin(),
-          linkDialogPlugin(),
-          imagePlugin(),
-          tablePlugin(),
-          markdownShortcutPlugin(),
-          jsxPlugin(),
-          diffSourcePlugin({ diffMarkdown: 'calc', viewMode: 'rich-text' }),
-          toolbarPlugin({
-            toolbarContents: () => <PortalToolbar />
-          })
-        ]}
+    <div className="w-full h-full min-h-[600px] bg-white dark:bg-zinc-950 uiw-editor-container" data-color-mode="light">
+      <MDEditor
+        value={value}
+        onChange={handleChange}
+        height="100%"
+        minHeight={600}
+        visibleDragbar={false}
+        previewOptions={{
+          rehypePlugins: [rehypeRaw],
+          components: sharedComponents
+        }}
+        className="!border-0 !shadow-none"
       />
       <style>{`
-        .mdx-editor-wrapper .mdxeditor {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
+        .uiw-editor-container .w-md-editor {
+          background-color: transparent !important;
+          box-shadow: none !important;
         }
-        .mdx-editor-wrapper .mdxeditor-toolbar {
-          display: none !important;
+        .uiw-editor-container .w-md-editor-toolbar {
+          border-bottom: 1px solid #e5e7eb;
+          background-color: transparent !important;
+          padding: 8px !important;
         }
-
-        .mdx-editor-wrapper [data-lexical-editor] {
-          flex: 1;
-          overflow-y: auto;
+        .uiw-editor-container .w-md-editor-content {
+          background-color: transparent !important;
+        }
+        @media (prefers-color-scheme: dark) {
+          .uiw-editor-container {
+            data-color-mode: "dark";
+          }
+          .uiw-editor-container .w-md-editor-toolbar {
+            border-bottom: 1px solid #27272a;
+          }
         }
       `}</style>
     </div>

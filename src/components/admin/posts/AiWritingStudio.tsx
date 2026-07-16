@@ -97,7 +97,7 @@ export default function AiWritingStudio({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 pb-20 md:pb-4">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 pb-2 md:pb-2">
         {activePanelTab === 'manual' ? (
           <>
             <div className="grid grid-cols-1 gap-2">
@@ -123,13 +123,9 @@ export default function AiWritingStudio({
             <div className="space-y-2 mt-4 p-3 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-xl">
               <p className="text-xs text-blue-700 dark:text-blue-400 font-medium leading-relaxed">
                 💡 <b>작성 가이드</b><br/>
-                중앙의 에디터 창에 원문 데이터나 대본을 입력한 뒤, 창작 버튼을 누르면 AI가 이를 바탕으로 새로운 글을 완성하여 에디터에 보여줍니다.
+                중앙의 에디터 창에 원문 데이터나 대본을 입력한 뒤, 하단의 창작 시작 버튼을 누르면 AI가 새로운 글을 완성해줍니다.
               </p>
             </div>
-
-            <PremiumButton onClick={handleRunAi} disabled={isLoading || !(postMeta.content || '').trim()} variant="primary" className="w-full !py-2.5 mt-2">
-              {isLoading ? '창작 중...' : '창작 시작'}
-            </PremiumButton>
           </>
         ) : (
           <>
@@ -153,35 +149,57 @@ export default function AiWritingStudio({
 
             <div className="mt-6 p-4 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl">
               {autoProgress ? (
-                <div className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-3 text-center animate-pulse">
+                <div className="text-sm font-bold text-blue-600 dark:text-blue-400 text-center animate-pulse">
                   {autoProgress}
                 </div>
               ) : (
-                <p className="text-xs text-gray-500 mb-3 text-center break-keep">
-                  Vercel 타임아웃 걱정 없는 프론트엔드 오케스트레이션 방식으로<br/>에디터에 결과를 렌더링합니다. (자동 Push 안 됨)
+                <p className="text-xs text-gray-500 text-center break-keep">
+                  Vercel 타임아웃 걱정 없는 프론트엔드 오케스트레이션 방식으로 에디터에 결과를 렌더링합니다. (자동 Push 안 됨)
                 </p>
               )}
-              <PremiumButton onClick={handleRunAuto} disabled={isLoading} variant="primary" className="w-full !py-2.5">
-                {isLoading ? '실행 중...' : '자동 엔진 가동'}
-              </PremiumButton>
             </div>
           </>
         )}
       </div>
 
-      {/* ── 문서 액션 (새문서, 임시저장, 발행) ── */}
-      <div className="shrink-0 p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 relative z-20">
-        <div className="flex gap-2 mb-2">
-          <PremiumButton onClick={onCreateBlank} variant="secondary" className="flex-1 !py-2 !text-xs border-gray-200 dark:border-zinc-700">
-            새 문서
+      {/* ── 하단 공통 액션 영역 (Sticky) ── */}
+      <div className="shrink-0 p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 relative z-20 space-y-4 shadow-[0_-4px_15px_rgba(0,0,0,0.02)]">
+        
+        {/* 1. AI 실행 버튼 (현재 탭에 따라 렌더링) */}
+        {activePanelTab === 'manual' ? (
+          <PremiumButton 
+            onClick={handleRunAi} 
+            disabled={isLoading || !(postMeta.content || '').trim()} 
+            variant="primary" 
+            className="w-full !py-3 !rounded-xl text-[15px] shadow-[0_4px_15px_rgba(26,115,232,0.2)] border-none"
+          >
+            {isLoading ? '창작 중...' : '창작 시작'}
           </PremiumButton>
-          <PremiumButton onClick={() => onSavePost(true)} disabled={isLoading} variant="secondary" className="flex-1 !py-2 !text-xs border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-gray-300">
-            임시 저장
+        ) : (
+          <PremiumButton 
+            onClick={handleRunAuto} 
+            disabled={isLoading} 
+            variant="primary" 
+            className="w-full !py-3 !rounded-xl text-[15px] shadow-[0_4px_15px_rgba(225,29,72,0.2)] !bg-rose-600 hover:!bg-rose-700 border-none"
+          >
+            {isLoading ? '실행 중...' : '자동 엔진 가동'}
+          </PremiumButton>
+        )}
+
+        {/* 2. 문서 관리 액션 (새문서, 임시저장, 발행) */}
+        <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 space-y-2">
+          <div className="flex gap-2">
+            <PremiumButton onClick={onCreateBlank} variant="secondary" className="flex-1 !py-2.5 !text-xs !rounded-xl border-gray-200 dark:border-zinc-700">
+              새 문서
+            </PremiumButton>
+            <PremiumButton onClick={() => onSavePost(true)} disabled={isLoading} variant="secondary" className="flex-1 !py-2.5 !text-xs !rounded-xl border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-gray-300">
+              임시 저장
+            </PremiumButton>
+          </div>
+          <PremiumButton onClick={() => onSavePost(false)} disabled={isLoading} variant="primary" className="w-full !py-2.5 !rounded-xl shadow-md !bg-gray-800 hover:!bg-gray-900 dark:!bg-white dark:text-gray-900 border-none">
+            {isLoading ? '처리 중...' : '발행하기'}
           </PremiumButton>
         </div>
-        <PremiumButton onClick={() => onSavePost(false)} disabled={isLoading} variant="primary" className="w-full !py-2.5 shadow-md shadow-blue-500/20">
-          {isLoading ? '처리 중...' : '발행하기'}
-        </PremiumButton>
       </div>
     </div>
   );

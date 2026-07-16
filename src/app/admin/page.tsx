@@ -17,9 +17,9 @@ import {
   loadPost, 
   savePost, 
   deletePost, 
-  callGeminiAPI, 
-  runAutoPublish 
+  callGeminiAPI 
 } from '@/lib/admin-api';
+import { runAutoGenerationWorkflow } from '@/lib/auto-writer';
 
 export default function AdminPage() {
   const [activeApp, setActiveApp] = useState<AdminAppType>('consult-manage');
@@ -39,6 +39,7 @@ export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
+  const [autoProgress, setAutoProgress] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
 
   // Common State
@@ -143,10 +144,10 @@ export default function AdminPage() {
     try {
       const generated = await callGeminiAPI(geminiKey, inputText, mode);
       if (generated) {
-        // 기존 작성 내용을 유지하면서 내용 추가
+        // 에디터 내용을 새로 생성된 결과물로 완전히 덮어씌움 (기존 원문은 뼈대로만 사용)
         setPostMeta(prev => ({
           ...prev,
-          content: prev.content ? prev.content + '\n\n' + generated : generated
+          content: generated
         }));
         // Switch to editor inside AI Studio
         setActiveApp('post-ai');
@@ -158,10 +159,27 @@ export default function AdminPage() {
   };
 
   const handleRunAuto = async (type: 'all' | 'precedent' | 'trend') => {
-    if (!githubToken) { alert('GitHub Token을 먼저 설정하세요.'); return; }
+    if (!geminiKey) { alert('Gemini API 키를 먼저 설정하세요.'); return; }
     setIsLoading(true);
-    await runAutoPublish(githubToken, type);
+    setAutoProgress('자동글쓰기 시작 대기 중...');
+    try {
+      const generated = await runAutoGenerationWorkflow(type, geminiKey, (msg) => {
+        setAutoProgress(msg);
+      });
+      
+      if (generated) {
+        setPostMeta(prev => ({
+          ...prev,
+          content: generated
+        }));
+        alert('자동 생성이 완료되었습니다. 에디터에서 내용을 검토 후 [저장 및 발행] 버튼을 눌러주세요.');
+        setActiveApp('post-ai');
+      }
+    } catch (e: any) {
+      alert(`자동 생성 실패: ${e.message}`);
+    }
     setIsLoading(false);
+    setAutoProgress('');
   };
 
   const handleCreateBlankPost = () => {
@@ -363,6 +381,7 @@ export default function AdminPage() {
               setPostMeta={setPostMeta}
               onSavePost={handleSavePost}
               onCreateBlank={handleCreateBlankPost}
+              autoProgress={autoProgress}
             />
           )}
           {activeApp === 'post-list' && (

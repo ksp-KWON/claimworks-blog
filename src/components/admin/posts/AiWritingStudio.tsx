@@ -13,6 +13,7 @@ interface AiWritingStudioProps {
   setPostMeta: any;
   onSavePost: () => void;
   onCreateBlank: () => void;
+  autoProgress?: string;
 }
 
 const MANUAL_MODES = [
@@ -50,12 +51,12 @@ const AUTO_TYPES = [
 
 export default function AiWritingStudio({
   isLoading, onRunAi, onRunAuto,
-  postMeta, setPostMeta, onSavePost, onCreateBlank
+  postMeta, setPostMeta, onSavePost, onCreateBlank,
+  autoProgress
 }: AiWritingStudioProps) {
   
   // AI Controls State
   const [activePanelTab, setActivePanelTab] = useState<'manual' | 'auto'>('manual');
-  const [inputText, setInputText] = useState('');
   const [aiMode, setAiMode] = useState<'manual-preserve' | 'manual-expand' | 'semi-auto'>('manual-preserve');
   const [autoType, setAutoType] = useState<'all' | 'precedent' | 'trend'>('all');
 
@@ -63,7 +64,7 @@ export default function AiWritingStudio({
   const [isMobileAiOpen, setIsMobileAiOpen] = useState(false);
 
   const handleRunAi = () => {
-    onRunAi(aiMode, inputText);
+    onRunAi(aiMode, postMeta.content || '');
     setIsMobileAiOpen(false); // 실행 후 모바일 서랍 닫기
   };
 
@@ -119,19 +120,14 @@ export default function AiWritingStudio({
               ))}
             </div>
             
-            <div className="space-y-2 mt-4">
-              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">
-                {aiMode === 'semi-auto' ? '키워드 또는 참고 링크' : '원문 데이터 입력'}
-              </label>
-              <textarea
-                value={inputText}
-                onChange={e => setInputText(e.target.value)}
-                className="w-full h-32 md:h-48 p-3 border border-gray-200 dark:border-zinc-700 bg-[#f8f9fa] dark:bg-zinc-950 text-sm resize-none focus:ring-2 focus:ring-blue-500 outline-none rounded-xl custom-scrollbar"
-                placeholder={aiMode === 'semi-auto' ? '예: 음주운전 구제 방법' : '대본을 붙여넣으세요...'}
-              />
+            <div className="space-y-2 mt-4 p-3 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-xl">
+              <p className="text-xs text-blue-700 dark:text-blue-400 font-medium leading-relaxed">
+                💡 <b>작성 가이드</b><br/>
+                중앙의 에디터 창에 원문 데이터나 대본을 입력한 뒤, 창작 버튼을 누르면 AI가 이를 바탕으로 새로운 글을 완성하여 에디터에 보여줍니다.
+              </p>
             </div>
 
-            <PremiumButton onClick={handleRunAi} disabled={isLoading || !inputText.trim()} variant="primary" className="w-full !py-2.5 mt-2">
+            <PremiumButton onClick={handleRunAi} disabled={isLoading || !(postMeta.content || '').trim()} variant="primary" className="w-full !py-2.5 mt-2">
               {isLoading ? '창작 중...' : '창작 시작'}
             </PremiumButton>
           </>
@@ -156,7 +152,15 @@ export default function AiWritingStudio({
             </div>
 
             <div className="mt-6 p-4 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl">
-              <p className="text-xs text-gray-500 mb-3 text-center break-keep">선택된 모드로 즉시 파이프라인이 가동됩니다.</p>
+              {autoProgress ? (
+                <div className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-3 text-center animate-pulse">
+                  {autoProgress}
+                </div>
+              ) : (
+                <p className="text-xs text-gray-500 mb-3 text-center break-keep">
+                  Vercel 타임아웃 걱정 없는 프론트엔드 오케스트레이션 방식으로<br/>에디터에 결과를 렌더링합니다. (자동 Push 안 됨)
+                </p>
+              )}
               <PremiumButton onClick={handleRunAuto} disabled={isLoading} variant="primary" className="w-full !py-2.5">
                 {isLoading ? '실행 중...' : '자동 엔진 가동'}
               </PremiumButton>

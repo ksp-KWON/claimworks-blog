@@ -148,20 +148,6 @@ export async function deletePost(githubToken: string, filename: string, sha: str
   return true;
 }
 
-export async function runAutoPublish(githubToken: string, type: string) {
-  if (!githubToken) throw new Error('GitHub Token이 없습니다.');
-  const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/auto-post.yml/dispatches`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${githubToken}`,
-      'Accept': 'application/vnd.github+json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ ref: 'main', inputs: { post_type: type } })
-  });
-  if (res.status !== 204) throw new Error(`HTTP ${res.status}`);
-  return true;
-}
 
 export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: string) {
   if (!geminiKey) throw new Error('Gemini API 키가 없습니다.');

@@ -80,12 +80,14 @@ export default function MarkdownEditor({
         wrapWithMarkdown={wrapWithMarkdown}
       />
 
-      {/* Scrollable canvas area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-100 dark:bg-zinc-950 px-6 md:px-12 py-8">
-        <div className="w-full bg-white dark:bg-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-zinc-700 flex flex-col">
+      {/* Canvas wrapper with % padding to fill available space nicely */}
+      <div className="flex-1 p-[2%] md:p-[3%] bg-gray-100 dark:bg-zinc-950 flex flex-col overflow-hidden">
+        <div className="flex-1 w-full bg-white dark:bg-zinc-900 shadow-[0_4px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-zinc-700 flex flex-col overflow-hidden">
           
-          {/* Document Title Input */}
-          <div className="px-10 pt-16 pb-4">
+          {/* Scrollable inner content */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+            {/* Document Title Input */}
+            <div className="px-6 md:px-10 pt-10 md:pt-16 pb-4 shrink-0">
             <input 
               type="text" 
               value={title}
@@ -95,8 +97,8 @@ export default function MarkdownEditor({
             />
           </div>
 
-          {/* Editor Canvas Depending on Mode */}
-          <div className="flex-1 px-6 pb-8 flex flex-col">
+            {/* Editor Canvas Depending on Mode */}
+            <div className="flex-1 px-6 md:px-10 pb-8 flex flex-col min-h-0">
             {editorMode === 'wysiwyg' && (
               <WysiwygEditor
                 ref={editorRef}
@@ -106,26 +108,25 @@ export default function MarkdownEditor({
             )}
             
             {editorMode === 'markdown' && (
-              <textarea
-                ref={markdownTextareaRef}
-                value={content}
-                onChange={e => setContent(e.target.value)}
-                className="w-full h-full min-h-[500px] flex-1 p-4 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 font-mono text-sm outline-none resize-none rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500"
-                placeholder="마크다운 소스를 입력하세요..."
-              />
+                <textarea
+                  ref={markdownTextareaRef}
+                  value={content}
+                  onChange={e => setContent(e.target.value)}
+                  className="w-full h-full min-h-[300px] flex-1 p-4 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 font-mono text-sm outline-none resize-none rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 custom-scrollbar"
+                  placeholder="마크다운 소스를 입력하세요..."
+                />
             )}
 
             {editorMode === 'html' && (
-              <div className="w-full h-full min-h-[500px] flex-1 p-8 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-200 dark:border-zinc-700 overflow-y-auto prose prose-sm max-w-none dark:prose-invert">
+              <div className="w-full h-full min-h-[300px] flex-1 p-4 md:p-8 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-200 dark:border-zinc-700 overflow-y-auto custom-scrollbar prose prose-sm max-w-none dark:prose-invert">
                 <div className="mb-4 text-xs font-bold text-gray-400">읽기 전용 HTML 미리보기 (실제 포스팅 화면)</div>
                 <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                   {content}
                 </ReactMarkdown>
               </div>
             )}
+            </div>
           </div>
-
-        </div>
       </div>
     </div>
   );

@@ -137,16 +137,10 @@ export default function AiWritingStudio({
               </button>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* ── 에디터 탭 ── */}
-      {activeTab === 'editor' ? (
-        <div className="flex flex-col flex-1 overflow-hidden">
-          {/* 에디터 툴바 */}
-          <div className="flex items-center justify-between px-5 py-2.5 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 shrink-0">
-            <PremiumBadge color="green">에디터</PremiumBadge>
-            <div className="flex gap-2">
+          {/* 에디터 액션 버튼 (에디터 탭에서만 활성화) */}
+          {activeTab === 'editor' && (
+            <div className="ml-auto flex items-center gap-2 pl-4 shrink-0">
               <PremiumButton onClick={onCreateBlank} variant="secondary" className="!py-1.5 !px-3 !text-xs">
                 새 문서
               </PremiumButton>
@@ -154,8 +148,13 @@ export default function AiWritingStudio({
                 {isLoading ? '저장 중...' : '저장 및 발행'}
               </PremiumButton>
             </div>
-          </div>
+          )}
+        </div>
+      </div>
 
+      {/* ── 에디터 탭 ── */}
+      {activeTab === 'editor' ? (
+        <div className="flex flex-col flex-1 overflow-hidden">
           {/* 에디터 작업영역 — h-full로 꽉 채움, 스크롤은 MarkdownEditor 내부에서 처리 */}
           <div className="flex-1 overflow-hidden h-full">
             <MarkdownEditor

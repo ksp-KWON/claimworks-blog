@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import MasterSidebar, { AdminAppType } from '@/components/admin/MasterSidebar';
+import { AdminAppType } from '@/components/admin/MobileAdminNav';
 import MobileAdminNav from '@/components/admin/MobileAdminNav';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import dynamic from 'next/dynamic';
@@ -21,7 +21,6 @@ import {
 
 export default function AdminPage() {
   const [activeApp, setActiveApp] = useState<AdminAppType>('consult-manage');
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   // Editor State
   const [postMeta, setPostMeta] = useState({
@@ -227,27 +226,69 @@ export default function AdminPage() {
   }
 
   return (
-      <div className="flex flex-col h-[100dvh] bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
+    <div className="flex flex-col h-[100dvh] bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
       
-      {/* Main Workspace - No Global Header */}
-      <div className="flex flex-1 overflow-hidden relative h-full pb-[64px] md:pb-0">
+      {/* ── 글로벌 상단 네비게이션 (데스크톱 전용) ── */}
+      <div className="hidden md:flex h-14 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 items-center justify-between px-5 shrink-0 z-50">
         
-        {/* Master Sidebar (Desktop Only) */}
-        <div className="hidden md:flex h-full border-r border-zinc-700/50">
-        <MasterSidebar 
-          activeApp={activeApp} 
-          setActiveApp={setActiveApp} 
-          isCollapsed={isSidebarCollapsed} 
-          toggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
-          onLogout={() => {
-            sessionStorage.removeItem('admin_auth');
-            setIsLoggedIn(false);
-          }}
-        />
+        {/* 로고 영역 */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black shadow-sm">
+            C
+          </div>
+          <span className="font-black text-gray-900 dark:text-white tracking-tight">ClaimWorks</span>
         </div>
 
+        {/* 메뉴 영역 */}
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setActiveApp('consult-manage')}
+            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'consult-manage' ? 'bg-gray-100 dark:bg-zinc-800 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+          >
+            상담 관리
+          </button>
+          
+          <div className="w-px h-4 bg-gray-300 dark:bg-zinc-700 mx-2" />
+          
+          <button 
+            onClick={() => setActiveApp('post-ai')}
+            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-ai' ? 'bg-gray-100 dark:bg-zinc-800 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+          >
+            AI 스튜디오
+          </button>
+          <button 
+            onClick={() => setActiveApp('post-list')}
+            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-list' ? 'bg-gray-100 dark:bg-zinc-800 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+          >
+            기존 글 관리
+          </button>
+          
+          <div className="w-px h-4 bg-gray-300 dark:bg-zinc-700 mx-2" />
+
+          <button 
+            onClick={() => setActiveApp('post-settings')}
+            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-settings' ? 'bg-gray-100 dark:bg-zinc-800 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+          >
+            API 입력
+          </button>
+          
+          <button 
+            onClick={() => {
+              sessionStorage.removeItem('admin_auth');
+              setIsLoggedIn(false);
+            }}
+            className="px-3 py-2 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors ml-2"
+          >
+            로그아웃
+          </button>
+        </div>
+      </div>
+
+      {/* Main Workspace */}
+      <div className="flex flex-1 overflow-hidden relative h-full pb-[64px] md:pb-0">
+        
         {/* Dynamic Workspace based on activeApp */}
-        <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-zinc-950 relative">
+        <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-zinc-950 relative w-full">
 
           {/* Consultations */}
           {activeApp === 'consult-manage' && (

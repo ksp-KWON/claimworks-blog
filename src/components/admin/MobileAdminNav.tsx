@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AdminAppType } from './MasterSidebar';
+export type AdminAppType = 'post-ai' | 'post-list' | 'post-settings' | 'editor' | 'consult-manage';
 import BottomSheet from '@/components/ui/BottomSheet';
 
 type ModalType = 'none' | 'posts' | 'settings';

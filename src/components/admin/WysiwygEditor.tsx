@@ -19,7 +19,8 @@ import {
   BlockTypeSelect,
   diffSourcePlugin,
   DiffSourceToggleWrapper,
-  jsxPlugin
+  jsxPlugin,
+  GenericJsxEditor
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 
@@ -104,7 +105,18 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
           imagePlugin(),
           tablePlugin(),
           markdownShortcutPlugin(),
-          jsxPlugin(),
+          jsxPlugin({
+            jsxComponentDescriptors: [
+              {
+                name: '*',
+                kind: 'text',
+                source: '',
+                props: [],
+                hasChildren: true,
+                Editor: GenericJsxEditor
+              }
+            ]
+          }),
           diffSourcePlugin({ diffMarkdown: 'calc', viewMode: 'rich-text' }),
           toolbarPlugin({
             toolbarContents: () => <PortalToolbar />

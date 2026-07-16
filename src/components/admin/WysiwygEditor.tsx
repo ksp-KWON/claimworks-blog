@@ -16,7 +16,9 @@ import {
   imagePlugin, 
   tablePlugin,
   InsertTable,
-  BlockTypeSelect
+  BlockTypeSelect,
+  diffSourcePlugin,
+  DiffSourceToggleWrapper
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 
@@ -49,6 +51,9 @@ const PortalToolbar = () => {
         <BoldItalicUnderlineToggles />
         <CreateLink />
         <InsertTable />
+        <div className="ml-auto flex items-center border-l border-gray-200 dark:border-zinc-700 pl-2">
+          <DiffSourceToggleWrapper children={undefined} />
+        </div>
       </div>
     </div>,
     portalTarget
@@ -98,6 +103,7 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
           imagePlugin(),
           tablePlugin(),
           markdownShortcutPlugin(),
+          diffSourcePlugin({ diffMarkdown: 'calc', viewMode: 'rich-text' }),
           toolbarPlugin({
             toolbarContents: () => <PortalToolbar />
           })

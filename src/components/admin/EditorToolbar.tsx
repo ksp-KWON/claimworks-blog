@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
 interface EditorToolbarProps {
-  editorMode: 'wysiwyg' | 'markdown' | 'html';
-  setEditorMode: (mode: 'wysiwyg' | 'markdown' | 'html') => void;
   insertMarkdown: (template: string) => void;
   wrapTextWithTag: (tag: string) => void;
   wrapWithMarkdown: (prefix: string, suffix?: string) => void;
@@ -20,8 +18,6 @@ const COLORS = [
 ];
 
 export default function EditorToolbar({
-  editorMode,
-  setEditorMode,
   insertMarkdown,
   wrapTextWithTag,
   wrapWithMarkdown
@@ -36,7 +32,6 @@ export default function EditorToolbar({
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (!target.closest('[data-dropdown="mode"]')) setIsModeOpen(false);
       if (!target.closest('[data-dropdown="block"]')) setIsBlockTypeOpen(false);
       if (!target.closest('[data-dropdown="textColor"]')) setIsTextColorOpen(false);
       if (!target.closest('[data-dropdown="bgColor"]')) setIsBgColorOpen(false);
@@ -52,12 +47,6 @@ export default function EditorToolbar({
     insertMarkdown(`<span style="${styleStr}">텍스트</span>`);
   };
 
-  const modeLabels = {
-    wysiwyg: '새글 작성 보기',
-    markdown: 'MD 보기',
-    html: 'HTML 보기'
-  };
-
   return (
     <div 
       className="sticky top-0 z-20 flex flex-wrap gap-1 p-2 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm items-center text-gray-700 dark:text-gray-300"
@@ -69,30 +58,7 @@ export default function EditorToolbar({
       }}
     >
       
-      {/* Mode Switcher */}
-      <div className="relative pr-2 border-r border-gray-200 dark:border-zinc-700" data-dropdown="mode">
-        <button 
-          onClick={() => setIsModeOpen(!isModeOpen)}
-          className="flex items-center gap-1 p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded text-sm"
-          title="편집 모드 변경"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-        </button>
-        {isModeOpen && (
-          <div className="absolute top-full left-0 mt-1 w-36 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-lg rounded py-1 z-50">
-            {(['wysiwyg', 'markdown', 'html'] as const).map(m => (
-              <button 
-                key={m}
-                onClick={() => { setEditorMode(m); setIsModeOpen(false); }}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-zinc-700 ${editorMode === m ? 'font-bold text-blue-600 dark:text-blue-400' : ''}`}
-              >
-                {modeLabels[m]}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <div id="custom-toolbar-portal" className="pr-2 mr-2 border-r border-gray-200 dark:border-zinc-700"></div>
 
       {/* Undo/Redo */}
       <div className="flex gap-1 pr-2 border-r border-gray-200 dark:border-zinc-700">

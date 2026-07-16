@@ -140,7 +140,6 @@ export default function AdminPage() {
           content: prev.content ? prev.content + '\n\n' + generated : generated
         }));
         // Switch to editor inside AI Studio
-        setAiActiveTab('editor');
         setActiveApp('post-ai');
       }
     } catch (e: any) {
@@ -161,7 +160,6 @@ export default function AdminPage() {
       title: '', summary: '', date: '', category: '', tags: '',
       content: '', currentSha: null, currentFilename: null
     });
-    setAiActiveTab('editor');
     setActiveApp('post-ai');
   };
 

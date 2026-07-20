@@ -74,7 +74,7 @@ export default function CalculatorIndex() {
                 보상스쿨 <span className="bg-gradient-to-r from-[var(--google-blue)] to-[#174ea6] bg-clip-text text-transparent">스마트 보상금 계산기</span>
               </h1>
               <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-lg mx-auto leading-relaxed font-medium">
-                복잡한 계산식과 수많은 예외 규정을 AI 기반 알고리즘으로 단순화했습니다. 원하시는 계산기를 선택하여 나에게 맞는 보상금 규모를 미리 파악해 보세요.
+                복잡한 계산식과 수많은 예외 규정을 보상스쿨 빅데이터 알고리즘으로 단순화했습니다. 원하시는 계산기를 선택하여 나에게 맞는 보상금 규모를 미리 파악해 보세요.
               </p>
             </div>
 

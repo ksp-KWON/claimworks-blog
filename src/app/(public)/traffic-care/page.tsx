@@ -649,7 +649,7 @@ export default function TrafficCarePage() {
             <div className="bg-green-50/20 dark:bg-green-950/10 p-4 rounded-none border border-green-100/30 dark:border-green-900/25 space-y-2.5 mt-2">
               <div className="flex items-center gap-1.5 text-xs font-bold text-[#137333] dark:text-[#81c995]">
                 <span className="text-sm"><IconBrain className="w-4 h-4" /></span>
-                AI 실시간 사고위험 분석 보고
+                빅데이터 실시간 사고위험 분석 보고
               </div>
               <ul className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium space-y-1.5 list-disc pl-4">
                 {getAiSummary(activeZone).map((line, sumIdx) => (

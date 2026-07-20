@@ -27,7 +27,7 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
 
   return (
     <div className="space-y-6">
-      {/* ⚖️ AI 판례검색센터 바로가기 배너 */}
+      {/* ⚖️ 빅데이터 판례검색센터 바로가기 배너 */}
       <Link href="/precedent-search" className="block group">
         <PremiumCard borderColor="blue" hoverEffect className="!p-5 relative overflow-hidden">
           <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">⚖️</div>
@@ -35,14 +35,14 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
             <div className="flex items-center justify-between">
               <PremiumHeading level={3} gradient="blue" showLeftBorder={true} className="!mb-0 !text-sm">
                 <span className="text-[var(--google-blue)] text-lg leading-none mr-2">⚖️</span>
-                AI 판례검색센터
+                빅데이터 판례검색센터
               </PremiumHeading>
               <span className="bg-[#e8f0fe] dark:bg-[#174ea6]/20 text-[var(--google-blue)] dark:text-[#8ab4f8] text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-[#d2e3fc]/30 dark:border-[#174ea6]/30">실시간 연동</span>
             </div>
             <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">사고 경위나 보상 문제를 일상어로 검색하면, 법제처 공공데이터에서 나에게 가장 유리한 핵심 대법원 판례를 찾아드립니다.</p>
             <div className="mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-[#e8f0fe] dark:group-hover:bg-[#174ea6]/20 group-hover:text-[var(--google-blue)] dark:group-hover:text-[#8ab4f8]">
               <div className="flex items-center gap-2">
-                AI 판례 검색 시작하기
+                빅데이터 판례 검색 시작하기
               </div>
               <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </div>
@@ -81,9 +81,9 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
             <div className="flex items-center justify-between">
               <PremiumHeading level={3} gradient="green" showLeftBorder={true} className="!mb-0 !text-sm">
                 <span className="text-[#137333] text-lg leading-none mr-2">🚗</span>
-                교통사고 로컬 안심케어
+                교통사고 로컬 케어
               </PremiumHeading>
-              <span className="bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-green-100/30 dark:border-green-950/30">실시간 연동</span>
+              <span className="bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-green-100/30 dark:border-green-950/30">지역 안내</span>
             </div>
             <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">도로교통공단 안전 통계와 우수 신경/정형외과 병원 및 사고 맞춤형 손해사정 지식을 안내해 드립니다.</p>
             <div className="mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-green-50 dark:group-hover:bg-green-950/20 group-hover:text-[#137333] dark:group-hover:text-[#81c995]">

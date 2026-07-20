@@ -61,9 +61,14 @@ export async function fetchPostList(githubToken: string) {
     }
   } catch {}
 
+  let localCache: Record<string, any> = {};
+  try {
+    localCache = JSON.parse(localStorage.getItem('admin_recent_posts') || '{}');
+  } catch {}
+
   return mdFiles.map((file: any) => {
-    const mapped = titlesMap[file.name];
-    // If not in API (e.g. newly created draft not built yet), we safely assume it's published unless we parse it. But mostly drafts will eventually show up, or we assume true for unknowns.
+    const mapped = titlesMap[file.name] || localCache[file.name];
+    // If not in API (e.g. newly created draft not built yet), we use local cache or fallback.
     return {
       name: file.name,
       sha: file.sha,
@@ -133,6 +138,17 @@ ${data.content}
     body: JSON.stringify(body)
   });
   if (!res.ok) throw new Error(await res.text());
+
+  try {
+    const cached = JSON.parse(localStorage.getItem('admin_recent_posts') || '{}');
+    cached[filename] = {
+      title: data.title,
+      date: data.date || new Date().toISOString().split('T')[0],
+      published: data.published !== false
+    };
+    localStorage.setItem('admin_recent_posts', JSON.stringify(cached));
+  } catch(e) {}
+
   return true;
 }
 

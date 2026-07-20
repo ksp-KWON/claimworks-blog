@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import type { YouTubeVideo } from './YouTubeBriefing';
-import SectionLayout from '@/components/ui/SectionLayout';
+import PremiumHeading from '@/components/ui/PremiumHeading';
 
 export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVideos: YouTubeVideo[] }) {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
@@ -31,14 +31,32 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
   }, [fallbackVideos]);
 
   return (
-    <SectionLayout
-      title="보상스쿨 미디어 센터"
-      description="어렵고 복잡한 보상 실무와 의학 지식을 보상스쿨 전문가가 영상으로 알기 쉽게 브리핑합니다."
-      icon={<span aria-hidden="true" className="text-2xl leading-none mr-2">📺</span>}
-      themeColor="red"
-      headingLevel={3}
-      viewAllLink={{ href: "https://www.youtube.com/@bosangschool", isExternal: true }}
-    >
+    <section className="space-y-6 sm:space-y-8">
+      {/* 텍스트 타이틀 영역 (시각적 계층화를 위해 박스 제거) */}
+      <div className="px-1 sm:px-2">
+        <div className="flex flex-wrap gap-y-2 items-end justify-between mb-3">
+          <PremiumHeading level={2} gradient="red" showLeftBorder={true} className="!mb-0 !text-xl sm:!text-2xl flex items-center">
+            <span aria-hidden="true" className="text-2xl leading-none mr-2">📺</span>
+            보상스쿨 미디어 센터
+          </PremiumHeading>
+          
+          {/* 전체보기 링크 */}
+          <a 
+            href="https://www.youtube.com/@bosangschool" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-red-500 transition-colors group/link shrink-0"
+          >
+            전체보기
+            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+        </div>
+        
+        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
+          어렵고 복잡한 보상 실무와 의학 지식을 보상스쿨 전문가가 영상으로 알기 쉽게 브리핑합니다.
+        </p>
+      </div>
+
       {/* 비디오 리스트 레이아웃: 가로형 2단 그리드 (모바일 1단) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         {loading ? (
@@ -96,6 +114,6 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
           ))
         )}
       </div>
-    </SectionLayout>
+    </section>
   );
 }

@@ -9,36 +9,13 @@ import {
   calculateModelCapacity,
   cleanAnalysisBlock
 } from '@/lib/prompt-rules';
+import { parseMarkdown, stringifyMarkdown } from './markdown-utils';
 
 const REPO_OWNER = 'ksp-KWON';
 const REPO_NAME = 'claimworks-blog';
 const POSTS_PATH = 'src/content/posts';
 
-function parseYamlFrontmatter(markdown: string) {
-  const cleanMarkdown = markdown.replace(/^```(?:markdown|md)?\s*\n/i, '').replace(/\n```\s*$/, '').trim();
-  const match = cleanMarkdown.match(/---\n([\s\S]*?)\n---/);
-  if (!match) return { content: cleanMarkdown, data: {} as any };
-  
-  const yamlContent = match[1];
-  const restContent = cleanMarkdown.substring(match.index! + match[0].length).trim();
-  
-  const data: any = {};
-  const lines = yamlContent.split('\n');
-  lines.forEach(line => {
-    const colonIdx = line.indexOf(':');
-    if (colonIdx > 0) {
-      const key = line.slice(0, colonIdx).trim();
-      let value = line.slice(colonIdx + 1).trim();
-      if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
-      if (key === 'tags' && value.startsWith('[')) {
-        try { data[key] = JSON.parse(value); } catch { data[key] = []; }
-      } else {
-        data[key] = value;
-      }
-    }
-  });
-  return { content: restContent, data };
-}
+
 
 export async function fetchPostList(githubToken: string) {
   if (!githubToken) throw new Error('GitHub Token이 없습니다.');
@@ -79,7 +56,7 @@ export async function fetchPostList(githubToken: string) {
         if (fileRes.ok) {
           const fileData = await fileRes.json();
           const rawMarkdown = decodeURIComponent(escape(window.atob(fileData.content)));
-          const { data: meta } = parseYamlFrontmatter(rawMarkdown);
+          const { data: meta } = parseMarkdown(rawMarkdown);
           
           mapped = {
             title: meta.title || file.name.replace('.md', ''),
@@ -118,13 +95,13 @@ export async function loadPost(githubToken: string, filename: string) {
   const data = await res.json();
   const rawMarkdown = decodeURIComponent(escape(window.atob(data.content)));
   
-  const { content: rawContent, data: meta } = parseYamlFrontmatter(rawMarkdown);
+  const { content: rawContent, data: meta } = parseMarkdown(rawMarkdown);
   return {
     title: meta.title || '',
     summary: meta.summary || '',
     category: meta.category || '기타',
     date: meta.date || new Date().toISOString().split('T')[0],
-    tags: Array.isArray(meta.tags) ? meta.tags.join(', ') : '',
+    tags: Array.isArray(meta.tags) ? meta.tags.join(', ') : (meta.tags || ''),
     specialtyCategory: meta.specialtyCategory || '',
     caseNumber: meta.caseNumber || '',
     published: meta.published !== false,
@@ -137,19 +114,19 @@ export async function savePost(githubToken: string, data: any) {
   const finalSlug = data.currentFilename ? data.currentFilename.replace('.md', '') : `post-${Date.now()}`;
   
   const compiledTags = data.tags ? data.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
-  const compiledMarkdown = `---
-title: "${data.title.replace(/"/g, '\\"')}"
-summary: "${(data.summary || '').replace(/"/g, '\\"')}"
-category: "${data.category || '기타'}"
-date: "${data.date || new Date().toISOString().split('T')[0]}"
-specialtyCategory: "${(data.specialtyCategory || '').replace(/"/g, "'")}"
-caseNumber: "${(data.caseNumber || '').replace(/"/g, "'")}"
-published: ${data.published !== false}
-tags: ${JSON.stringify(compiledTags)}
----
+  
+  const frontmatterData = {
+    title: data.title,
+    summary: data.summary || '',
+    category: data.category || '기타',
+    date: data.date || new Date().toISOString().split('T')[0],
+    specialtyCategory: data.specialtyCategory || '',
+    caseNumber: data.caseNumber || '',
+    published: data.published !== false,
+    tags: compiledTags
+  };
 
-${data.content}
-`;
+  const compiledMarkdown = stringifyMarkdown(frontmatterData, data.content);
 
   const contentBase64 = window.btoa(unescape(encodeURIComponent(compiledMarkdown)));
   const filename = `${finalSlug}.md`;

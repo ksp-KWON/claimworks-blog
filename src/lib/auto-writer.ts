@@ -8,7 +8,8 @@ import {
   buildPrecedentPrompt,
   TOPIC_SCHEMA
 } from './prompt-rules';
-import { parseGeneratedContent, buildMarkdownFrontmatter } from './content-parser';
+import { parseGeneratedContent } from './content-parser';
+import { stringifyMarkdown } from './markdown-utils';
 
 // Removed hardcoded NEWS_QUERIES
 // Helper to call our Next.js proxy for CORS-restricted APIs
@@ -209,13 +210,25 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
   }
   if (summary.length > 158) summary = summary.slice(0, 155) + '...';
   
-  // 판례 번호를 프론트매터(SEO)에 확실히 주입
-  const additionalFrontmatter: any = {};
+  const kstDate = new Date(Date.now() + 9 * 3600 * 1000).toISOString().split('T')[0];
+  const frontmatterData: any = {
+    title: topic.title,
+    slug: topic.slug || '',
+    date: kstDate,
+    updatedAt: kstDate,
+    summary: summary,
+    category: topic.category,
+    regionCategory: "",
+    specialtyCategory: topic.specialtyCategory || '',
+    tags: topic.tags || [],
+    published: true
+  };
+  
   if (precedentDetail && precedentDetail.caseNo) {
-    additionalFrontmatter.caseNumber = precedentDetail.caseNo;
+    frontmatterData.caseNumber = precedentDetail.caseNo;
   }
   
-  const finalContent = buildMarkdownFrontmatter(topic, summary, content, additionalFrontmatter);
+  const finalContent = stringifyMarkdown(frontmatterData, content);
   
   onProgress('완료! 에디터에서 내용을 확인하세요.');
   return finalContent;

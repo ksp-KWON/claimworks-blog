@@ -20,60 +20,21 @@ import {
   callGeminiAPI 
 } from '@/lib/admin-api';
 import { runAutoGenerationWorkflow } from '@/lib/auto-writer';
+import { parseMarkdown } from '@/lib/markdown-utils';
 
-function parseGeneratedPost(raw: string) {
-  // ✅ 근본 해결: CRLF(\r\n)를 LF(\n)로 정규화 — buildMarkdownFrontmatter가 \r\n을 생성하므로
-  // 기존 정규식 /---\n...\n---/이 매칭 실패하던 버그를 완전히 수정
-  const cleanRaw = raw
-    .replace(/\r\n/g, '\n')
-    .replace(/^```(?:markdown|md)?\s*\n/i, '')
-    .replace(/\n```\s*$/, '')
-    .trim();
-  const match = cleanRaw.match(/---\n([\s\S]*?)\n---/);
-  if (!match) return { title: '', summary: '', date: '', category: '', tags: '', slug: '', specialtyCategory: '', caseNumber: '', content: cleanRaw };
-  const yamlStr = match[1];
-  const content = cleanRaw.substring(match.index! + match[0].length).trim();
+function normalizeCategory(val: string) {
+  if (!val) return '보상가이드';
+  const allowed = ['사망·자살 보험금', '질병진단·실손', '교통사고 보상', '배상책임·의료', '근재·산재 사고', '장해평가·면책', '보상가이드', '판례·법률 해석'];
+  if (allowed.includes(val)) return val;
   
-  const parse = (key: string) => {
-    const line = yamlStr.split('\n').find(l => l.trimStart().startsWith(key + ':'));
-    if (!line) return '';
-    let val = line.slice(line.indexOf(':') + 1).trim();
-    if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
-    else if (val.startsWith("'") && val.endsWith("'")) val = val.slice(1, -1);
-
-    if (key === 'tags') {
-      if (val.startsWith('[')) {
-        // Robustly parse array even if missing quotes
-        return val.slice(1, -1).split(',').map(t => t.replace(/["']/g, '').trim()).filter(Boolean).join(', ');
-      }
-      return val;
-    }
-    
-    // 데일리 엔진 수준의 카테고리 강제 교정 (매핑)
-    if (key === 'category') {
-      const allowed = ['사망·자살 보험금', '질병진단·실손', '교통사고 보상', '배상책임·의료', '근재·산재 사고', '장해평가·면책', '보상가이드', '판례·법률 해석'];
-      if (allowed.includes(val)) return val;
-      
-      if (val.includes('교통')) return '교통사고 보상';
-      if (val.includes('사망') || val.includes('자살')) return '사망·자살 보험금';
-      if (val.includes('질병') || val.includes('실손')) return '질병진단·실손';
-      if (val.includes('배상') || val.includes('의료')) return '배상책임·의료';
-      if (val.includes('산재') || val.includes('근재')) return '근재·산재 사고';
-      if (val.includes('장해') || val.includes('면책') || val.includes('후유')) return '장해평가·면책';
-      if (val.includes('판례') || val.includes('법률')) return '판례·법률 해석';
-      return '보상가이드'; // 기본값
-    }
-    
-    return val;
-  };
-  
-  return {
-    title: parse('title'), summary: parse('summary'), date: parse('date'),
-    category: parse('category'), tags: parse('tags'), slug: parse('slug'),
-    specialtyCategory: parse('specialtyCategory'),
-    caseNumber: parse('caseNumber'),
-    content
-  };
+  if (val.includes('교통')) return '교통사고 보상';
+  if (val.includes('사망') || val.includes('자살')) return '사망·자살 보험금';
+  if (val.includes('질병') || val.includes('실손')) return '질병진단·실손';
+  if (val.includes('배상') || val.includes('의료')) return '배상책임·의료';
+  if (val.includes('산재') || val.includes('근재')) return '근재·산재 사고';
+  if (val.includes('장해') || val.includes('면책') || val.includes('후유')) return '장해평가·면책';
+  if (val.includes('판례') || val.includes('법률')) return '판례·법률 해석';
+  return '보상가이드'; // 기본값
 }
 
 export default function AdminPage() {
@@ -210,16 +171,17 @@ export default function AdminPage() {
     try {
       const generated = await callGeminiAPI(geminiKey, inputText, mode);
       if (generated) {
-        const parsed = parseGeneratedPost(generated);
+        const parsed = parseMarkdown(generated);
         setPostMeta(prev => ({
           ...prev,
-          title: parsed.title || prev.title,
-          date: parsed.date || prev.date,
-          category: parsed.category || prev.category,
-          tags: parsed.tags || prev.tags,
-          specialtyCategory: parsed.specialtyCategory || prev.specialtyCategory,
-          caseNumber: parsed.caseNumber || prev.caseNumber,
-          currentFilename: parsed.slug ? `${parsed.slug}.md` : prev.currentFilename,
+          title: parsed.data.title || prev.title,
+          summary: parsed.data.summary || prev.summary,
+          date: parsed.data.date || prev.date,
+          category: normalizeCategory(parsed.data.category) || prev.category,
+          tags: Array.isArray(parsed.data.tags) ? parsed.data.tags.join(', ') : (parsed.data.tags || prev.tags),
+          specialtyCategory: parsed.data.specialtyCategory || prev.specialtyCategory,
+          caseNumber: parsed.data.caseNumber || prev.caseNumber,
+          currentFilename: parsed.data.slug ? `${parsed.data.slug}.md` : prev.currentFilename,
           content: parsed.content
         }));
         setActiveApp('post-ai');
@@ -240,16 +202,17 @@ export default function AdminPage() {
       });
       
       if (generated) {
-        const parsed = parseGeneratedPost(generated);
+        const parsed = parseMarkdown(generated);
         setPostMeta(prev => ({
           ...prev,
-          title: parsed.title || prev.title,
-          date: parsed.date || prev.date,
-          category: parsed.category || prev.category,
-          tags: parsed.tags || prev.tags,
-          specialtyCategory: parsed.specialtyCategory || prev.specialtyCategory,
-          caseNumber: parsed.caseNumber || prev.caseNumber,
-          currentFilename: parsed.slug ? `${parsed.slug}.md` : prev.currentFilename,
+          title: parsed.data.title || prev.title,
+          summary: parsed.data.summary || prev.summary,
+          date: parsed.data.date || prev.date,
+          category: normalizeCategory(parsed.data.category) || prev.category,
+          tags: Array.isArray(parsed.data.tags) ? parsed.data.tags.join(', ') : (parsed.data.tags || prev.tags),
+          specialtyCategory: parsed.data.specialtyCategory || prev.specialtyCategory,
+          caseNumber: parsed.data.caseNumber || prev.caseNumber,
+          currentFilename: parsed.data.slug ? `${parsed.data.slug}.md` : prev.currentFilename,
           content: parsed.content
         }));
         alert('자동 생성이 완료되었습니다. 에디터에서 내용을 검토 후 [저장 및 발행] 버튼을 눌러주세요.');

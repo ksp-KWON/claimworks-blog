@@ -59,34 +59,7 @@ function parseGeneratedContent(rawOutput) {
   return { content };
 }
 
-function buildMarkdownFrontmatter(topic, summary, content, additionalFrontmatter = {}) {
-  const kstDate = new Date(Date.now() + 9 * 3600 * 1000).toISOString().split('T')[0];
-  const tagsStr = (topic.tags || []).map(t => `"${yamlSafe(t)}"`).join(', ');
-
-  let fm = `---
-title: "${yamlSafe(topic.title)}"
-slug: "${topic.slug || ''}"
-date: "${kstDate}"
-updatedAt: "${kstDate}"
-summary: "${summary}"
-category: "${yamlSafe(topic.category)}"
-regionCategory: ""
-specialtyCategory: "${yamlSafe(topic.specialtyCategory || '')}"
-tags: [${tagsStr}]
-`;
-
-  // 판례번호 등 추가 필드 병합
-  for (const [k, v] of Object.entries(additionalFrontmatter)) {
-    if (v) fm += `${k}: "${yamlSafe(v)}"\n`;
-  }
-  
-  fm += `published: true\n---\n\n${content}\n`;
-  
-  return fm;
-}
-
 module.exports = {
   yamlSafe,
-  parseGeneratedContent,
-  buildMarkdownFrontmatter
+  parseGeneratedContent
 };

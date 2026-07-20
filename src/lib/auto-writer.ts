@@ -26,7 +26,7 @@ async function fetchProxy(action: string, payload: any = {}) {
 // ─── 공용 모듈 (content-parser)에서 자동 처리 ───
 
 export async function runAutoGenerationWorkflow(
-  type: 'all' | 'precedent' | 'trend',
+  type: 'precedent' | 'trend',
   geminiKey: string,
   onProgress: (msg: string) => void
 ) {

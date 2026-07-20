@@ -8,7 +8,7 @@ import BottomSheet from '@/components/ui/BottomSheet';
 interface AiWritingStudioProps {
   isLoading: boolean;
   onRunAi: (mode: 'manual-preserve' | 'manual-expand' | 'semi-auto', inputText: string) => void;
-  onRunAuto: (type: 'all' | 'precedent' | 'trend') => void;
+  onRunAuto: (type: 'precedent' | 'trend') => void;
   postMeta: any;
   setPostMeta: any;
   onSavePost: (isDraft?: boolean) => void;
@@ -36,10 +36,6 @@ const MANUAL_MODES = [
 
 const AUTO_TYPES = [
   {
-    id: 'all', icon: '🔥', label: '통합 자동화', desc: '판례·트렌드 종합 자동 발행',
-    accentClass: 'border-rose-500 bg-rose-50/50 dark:bg-rose-900/10', iconBg: 'from-rose-500 to-orange-500', textColor: 'text-rose-600 dark:text-rose-400'
-  },
-  {
     id: 'precedent', icon: '⚖️', label: '전문 법률 칼럼', desc: '판례·심결례 기반 보상 분석',
     accentClass: 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/10', iconBg: 'from-indigo-500 to-blue-600', textColor: 'text-indigo-600 dark:text-indigo-400'
   },
@@ -58,7 +54,7 @@ export default function AiWritingStudio({
   // AI Controls State
   const [activePanelTab, setActivePanelTab] = useState<'manual' | 'auto'>('manual');
   const [aiMode, setAiMode] = useState<'manual-preserve' | 'manual-expand' | 'semi-auto'>('manual-preserve');
-  const [autoType, setAutoType] = useState<'all' | 'precedent' | 'trend'>('all');
+  const [autoType, setAutoType] = useState<'precedent' | 'trend'>('precedent');
 
   // Mobile Bottom Sheet State
   const [isMobileAiOpen, setIsMobileAiOpen] = useState(false);

@@ -192,7 +192,7 @@ export default function AdminPage() {
     setIsLoading(false);
   };
 
-  const handleRunAuto = async (type: 'all' | 'precedent' | 'trend') => {
+  const handleRunAuto = async (type: 'precedent' | 'trend') => {
     if (!geminiKey) { alert('Gemini API 키를 먼저 설정하세요.'); return; }
     setIsLoading(true);
     setAutoProgress('자동글쓰기 시작 대기 중...');

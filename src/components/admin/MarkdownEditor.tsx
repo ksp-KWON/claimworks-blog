@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import dynamic from 'next/dynamic';
 import type { WysiwygEditorRef } from './WysiwygEditor';
-import EditorToolbar from './EditorToolbar';
+
 
 const WysiwygEditor = dynamic(() => import('./WysiwygEditor'), { ssr: false });
 
@@ -19,27 +19,13 @@ export default function MarkdownEditor({
   
   const editorRef = useRef<WysiwygEditorRef>(null);
 
-  const insertMarkdown = (template: string) => {
-    editorRef.current?.insertText(template);
-  };
-
-  const wrapTextWithTag = (tagName: string, attributes: string = '') => {
-    insertMarkdown(`<${tagName}${attributes}>텍스트</${tagName}>`);
-  };
-
-  const wrapWithMarkdown = (prefix: string, suffix: string = '') => {
-    insertMarkdown(`${prefix}텍스트${suffix}`);
-  };
-
   return (
     <div className="flex flex-col min-w-0 bg-white dark:bg-zinc-950">
-      
-      {/* Editor Toolbar */}
-      <EditorToolbar 
-        insertMarkdown={insertMarkdown}
-        wrapTextWithTag={wrapTextWithTag}
-        wrapWithMarkdown={wrapWithMarkdown}
-      />
+      {/* Editor Toolbar Portal Target */}
+      <div 
+        id="custom-toolbar-portal" 
+        className="sticky top-0 z-20 flex flex-wrap gap-1 p-2 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm items-center text-gray-700 dark:text-gray-300 min-h-[48px] w-full"
+      ></div>
 
       {/* Editor Canvas */}
       <div className="w-full max-w-4xl mx-auto px-5 md:px-8">

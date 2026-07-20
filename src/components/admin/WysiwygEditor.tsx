@@ -23,7 +23,12 @@ import {
   GenericJsxEditor,
   frontmatterPlugin,
   codeBlockPlugin,
-  codeMirrorPlugin
+  codeMirrorPlugin,
+  StrikeThroughSupSubToggles,
+  ListsToggle,
+  InsertImage,
+  InsertThematicBreak,
+  CodeToggle
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 
@@ -54,8 +59,15 @@ const PortalToolbar = () => {
         <UndoRedo />
         <BlockTypeSelect />
         <BoldItalicUnderlineToggles />
+        <StrikeThroughSupSubToggles />
+        <CodeToggle />
+        <div className="w-px h-5 bg-gray-200 dark:bg-zinc-700 mx-1"></div>
+        <ListsToggle />
+        <div className="w-px h-5 bg-gray-200 dark:bg-zinc-700 mx-1"></div>
         <CreateLink />
+        <InsertImage />
         <InsertTable />
+        <InsertThematicBreak />
         <div className="ml-auto flex items-center border-l border-gray-200 dark:border-zinc-700 pl-2">
           <DiffSourceToggleWrapper children={undefined} />
         </div>

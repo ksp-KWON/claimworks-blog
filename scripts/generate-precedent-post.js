@@ -16,7 +16,9 @@ const {
   getPrecedentObjective, 
   getPrecedentMetaFirstLine, 
   getPrecedentPlanningPrompt, 
-  getPrecedentSkeleton
+  getPrecedentSkeleton,
+  TOPIC_SCHEMA,
+  buildPrecedentPrompt
 } = require('../src/lib/prompt-rules.js');
 
 const {
@@ -26,56 +28,7 @@ const {
   saveMarkdownPost
 } = require('../src/lib/post-builder.js');
 
-// ── 토픽 정보 구조화용 스키마 ──────────────────────────────────────────────
-const TOPIC_SCHEMA = {
-  type: 'OBJECT',
-  properties: {
-    slug: { type: 'STRING', description: '영문 소문자 URL 슬러그' },
-    title: { type: 'STRING', description: 'SEO 최적화 제목' },
-    category: { type: 'STRING', description: '무조건 "판례·법률 해석"' },
-    specialtyCategory: { type: 'STRING', description: '전문 진료과목' },
-    tags: { type: 'ARRAY', items: { type: 'STRING' }, description: '태그 5개' },
-    keywords: { type: 'STRING', description: '타겟 키워드 목록' },
-    calculatorType: { type: 'STRING', description: 'auto 또는 medical' }
-  },
-  required: ['slug', 'title', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
-};
-
-// ── 본문 프롬프트 빌더 ──────────────────────────────────────────────────────
-function buildWritingPrompt(detail, topic, angle, existingPosts) {
-  const postsCtx = existingPosts.length > 0
-    ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
-    : '- (없음)';
-
-  const calcTag = topic.calculatorType === 'medical'
-    ? '<calculator type="medical" />'
-    : '<calculator type="auto" />';
-
-  return `${getPrecedentRole()}
-
-${getPrecedentObjective()}
-
-# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
-${STRICT_RULES}
-
-[원본 판례 정보]
-* 사건번호: ${detail.caseNo} (${detail.courtName} ${detail.judgmentDate} 선고)
-* 사건명: ${detail.caseName}
-* 판결요지: 
-${detail.judgmentSummary}
-${detail.caseContent.slice(0, 3000)} (본문 일부)
-
-[기획안]
-* 제목: ${topic.title}
-* 카테고리: ${topic.category}
-* 핵심 키워드: ${topic.keywords}
-
-${getPrecedentMetaFirstLine()}
-
-${getPrecedentSkeleton(detail, angle, calcTag, postsCtx)}
-
-위 뼈대와 규칙을 바탕으로 상세하게 본문을 작성해 주세요.`;
-}
+// ── 프롬프트 빌더는 prompt-rules.js 로 공통화 됨 ──
 
 // ── 메인 ───────────────────────────────────────────────────────────────────
 async function main() {
@@ -101,9 +54,9 @@ async function main() {
   const topic = await callGemini(planPrompt, TOPIC_SCHEMA);
   console.log(`    기획 완료: ${topic.title} (${topic.slug})`);
 
-  // 3. 본문 생성
-  console.log('[3] 판례 분석 칼럼 작성 중...');
-  const rawOutput = await callGemini(buildWritingPrompt(detail, topic, currentAngle, existingPosts));
+  // 4. 본문 생성 (Gemini)
+  console.log('[3] 판례 분석 본문 작성 중...');
+  const rawOutput = await callGemini(buildPrecedentPrompt(detail, topic, currentAngle, existingPosts));
 
   // 4. 파싱 및 저장
   const { summary, content } = parseGeneratedContent(rawOutput);

@@ -33,3 +33,7 @@ export function getPrecedentSkeleton(
 export function calculateModelCapacity(maxTokens: number): string;
 export function cleanAnalysisBlock(text: string): string;
 export function getRenewalPrompt(currentTitle: string, query: string): string;
+
+export const TOPIC_SCHEMA: any;
+export function buildBlogPrompt(topic: any, angle: Angle, existingPosts: any[]): string;
+export function buildPrecedentPrompt(detail: any, topic: any, angle: Angle, existingPosts: any[]): string;

@@ -2,12 +2,11 @@ import { callGeminiAPI } from './admin-api';
 import {
   STRICT_RULES,
   getRandomAngle,
-  getBlogRole,
-  getBlogSkeleton,
-  getBlogFrontmatter,
-  getPrecedentRole,
-  getPrecedentObjective,
-  getPrecedentSkeleton,
+  getTopicPlanningPrompt,
+  getPrecedentPlanningPrompt,
+  buildBlogPrompt,
+  buildPrecedentPrompt,
+  TOPIC_SCHEMA
 } from './prompt-rules';
 
 const NEWS_QUERIES = [
@@ -97,42 +96,37 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
   onProgress('5/6: 블로그 포스팅 기획 및 설계 중...');
   const angle = getRandomAngle();
-  const existingPostsList = '- (없음)'; // In client side, we could pass titles if fetched
+  const existingPostsArr: any[] = [];
+  const existingSlugs = '- (없음)'; 
+  const trendTitle = rankedKeywords.find(k => k.searchKeyword === finalKeyword)?.newsTitle || '없음';
+
+  let topicPlanStr = '';
+  try {
+    const planPrompt = (type === 'precedent' && precedentDetail)
+      ? getPrecedentPlanningPrompt(precedentDetail, existingSlugs)
+      : getTopicPlanningPrompt(finalKeyword, trendTitle, existingSlugs);
+      
+    topicPlanStr = await callGeminiAPI(geminiKey, planPrompt, 'keyword-extraction', TOPIC_SCHEMA);
+  } catch(e: any) {
+    throw new Error('기획안 도출에 실패했습니다: ' + e.message);
+  }
+  
+  let topic;
+  try {
+    const match = topicPlanStr.match(/```(?:json)?\n([\s\S]*?)\n```/) || topicPlanStr.match(/{[\s\S]*}/);
+    const jsonStr = match ? match[0].replace(/```json/g, '').replace(/```/g, '') : topicPlanStr;
+    topic = JSON.parse(jsonStr);
+  } catch(e) {
+    throw new Error('기획안 JSON 파싱 실패');
+  }
 
   onProgress('6/6: AI가 심층 전문 칼럼을 작성 중입니다. (약 30초 소요)...');
   
-  const currentDate = new Date().toISOString().split('T')[0];
   let prompt = '';
   if (type === 'precedent' && precedentDetail) {
-    prompt = `
-${getPrecedentRole()}
-${getPrecedentObjective()}
-
-# 🚨 STRICT WRITING RULES
-${STRICT_RULES}
-
-[원본 판례 정보]
-* 사건번호: ${precedentDetail.caseNo}
-* 판결요지: 
-${precedentDetail.judgmentSummary}
-${precedentDetail.caseContent.slice(0, 3000)} (본문 일부)
-
-${getBlogFrontmatter('판례 분석 기반 칼럼 제목', currentDate)}
-${getPrecedentSkeleton(precedentDetail, angle, '<calculator type="medical" />', existingPostsList)}
-`;
+    prompt = buildPrecedentPrompt(precedentDetail, topic, angle, existingPostsArr);
   } else {
-    prompt = `
-${getBlogRole()}
-# Objective
-다음 키워드와 트렌드를 바탕으로 독자를 끌어들이는 전문 손해사정 칼럼을 작성하세요.
-주제 키워드: ${finalKeyword}
-
-# 🚨 STRICT WRITING RULES
-${STRICT_RULES}
-
-${getBlogFrontmatter('트렌드 기반 매력적인 칼럼 제목', currentDate)}
-${getBlogSkeleton(angle, '<calculator type="auto" />', existingPostsList)}
-`;
+    prompt = buildBlogPrompt(topic, angle, existingPostsArr);
   }
 
   const generated = await callGeminiAPI(geminiKey, prompt, 'auto-generate');

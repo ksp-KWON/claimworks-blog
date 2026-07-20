@@ -16,7 +16,9 @@ const {
   getBlogObjective, 
   getBlogMetaFirstLine, 
   getTopicPlanningPrompt, 
-  getBlogSkeleton
+  getBlogSkeleton,
+  TOPIC_SCHEMA,
+  buildBlogPrompt
 } = require('../src/lib/prompt-rules.js');
 
 const {
@@ -26,46 +28,7 @@ const {
   saveMarkdownPost
 } = require('../src/lib/post-builder.js');
 
-// ── 토픽 선정 스키마 ────────────────────────────────────────────────────────
-const TOPIC_SCHEMA = {
-  type: 'OBJECT',
-  properties: {
-    slug: { type: 'STRING', description: '하이픈 구분 영문 소문자 URL 슬러그' },
-    title: { type: 'STRING', description: 'SEO 최적화 포스팅 제목' },
-    category: { type: 'STRING', description: '카테고리명' },
-    specialtyCategory: { type: 'STRING', description: '전문 진료과목' },
-    tags: { type: 'ARRAY', items: { type: 'STRING' }, description: '관련 태그 5개' },
-    keywords: { type: 'STRING', description: '타겟 키워드 목록' },
-    calculatorType: { type: 'STRING', description: '"auto" 또는 "medical"' },
-  },
-  required: ['slug', 'title', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
-};
-
-// ── 프롬프트 빌더 ────────────────────────────────────────────────────────────
-function buildPrompt(topic, angle, existingPosts) {
-  const postsCtx = existingPosts.length > 0
-    ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
-    : '- (없음)';
-
-  const calcTag = topic.calculatorType === 'medical'
-    ? '<calculator type="medical" />'
-    : '<calculator type="auto" />';
-
-  return `${getBlogRole()}
-
-${getBlogObjective(topic.keywords)}
-
-# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
-${STRICT_RULES}
-
-${getBlogMetaFirstLine()}
-
-${getBlogSkeleton(angle, calcTag, postsCtx)}
-
-위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.
-`;
-}
-
+// ── 프롬프트 빌더는 prompt-rules.js 로 공통화 됨 ──
 // ── 메인 실행 ───────────────────────────────────────────────────────────────
 async function main() {
   console.log(`=== 자동글쓰기 (트렌드 블로그) 시작 (${new Date().toISOString()}) ===`);
@@ -95,7 +58,7 @@ async function main() {
 
   // 4. 본문 생성 (Gemini)
   console.log('[3] 블로그 본문 칼럼 작성 중...');
-  const rawOutput = await callGemini(buildPrompt(topic, currentAngle, existingPosts));
+  const rawOutput = await callGemini(buildBlogPrompt(topic, currentAngle, existingPosts));
 
   // 5. 파싱 및 저장
   const { summary, content } = parseGeneratedContent(rawOutput);

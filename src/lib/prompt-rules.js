@@ -394,6 +394,84 @@ function getRenewalPrompt(currentTitle, query) {
 }`;
 }
 
+const TOPIC_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    slug: { type: 'STRING', description: '하이픈 구분 영문 소문자 URL 슬러그' },
+    title: { type: 'STRING', description: 'SEO 최적화 포스팅 제목' },
+    category: { type: 'STRING', description: '카테고리명' },
+    specialtyCategory: { type: 'STRING', description: '전문 진료과목' },
+    tags: { type: 'ARRAY', items: { type: 'STRING' }, description: '관련 태그 5개' },
+    keywords: { type: 'STRING', description: '타겟 키워드 목록' },
+    calculatorType: { type: 'STRING', description: '"auto" 또는 "medical"' },
+  },
+  required: ['slug', 'title', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
+};
+
+function buildBlogPrompt(topic, angle, existingPosts) {
+  const postsCtx = existingPosts.length > 0
+    ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
+    : '- (없음)';
+
+  const calcTag = topic.calculatorType === 'medical'
+    ? '<calculator type="medical" />'
+    : '<calculator type="auto" />';
+
+  return `${getBlogRole()}
+
+${getBlogObjective(topic.keywords)}
+
+# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
+${STRICT_RULES}
+
+[기획안]
+* 제목: ${topic.title}
+* 카테고리: ${topic.category}
+* 전문 진료과목: ${topic.specialtyCategory}
+* 태그: ${topic.tags.join(', ')}
+
+${getBlogMetaFirstLine()}
+
+${getBlogSkeleton(angle, calcTag, postsCtx)}
+
+위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.
+`;
+}
+
+function buildPrecedentPrompt(detail, topic, angle, existingPosts) {
+  const postsCtx = existingPosts.length > 0
+    ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
+    : '- (없음)';
+
+  const calcTag = topic.calculatorType === 'medical'
+    ? '<calculator type="medical" />'
+    : '<calculator type="auto" />';
+
+  return `${getPrecedentRole()}
+
+${getPrecedentObjective()}
+
+# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
+${STRICT_RULES}
+
+[원본 판례 정보]
+* 사건번호: ${detail.caseNo} (${detail.courtName || ''} ${detail.judgmentDate || ''})
+* 사건명: ${detail.caseName || ''}
+* 판결요지: 
+${detail.judgmentSummary}
+${(detail.caseContent || '').slice(0, 3000)} (본문 일부)
+
+[기획안]
+* 제목: ${topic.title}
+* 카테고리: ${topic.category}
+* 전문 진료과목: ${topic.specialtyCategory}
+* 태그: ${topic.tags.join(', ')}
+
+${getPrecedentMetaFirstLine()}
+
+${getPrecedentSkeleton(detail, angle, calcTag, postsCtx)}`;
+}
+
 module.exports = {
   STRICT_RULES,
   getRandomAngle,
@@ -412,5 +490,8 @@ module.exports = {
   getPrecedentSkeleton,
   calculateModelCapacity,
   cleanAnalysisBlock,
-  getRenewalPrompt
+  getRenewalPrompt,
+  TOPIC_SCHEMA,
+  buildBlogPrompt,
+  buildPrecedentPrompt
 };

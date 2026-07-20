@@ -201,7 +201,7 @@ export async function deletePost(githubToken: string, filename: string, sha: str
 }
 
 
-export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: string) {
+export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: string, schema?: any) {
   if (!geminiKey) throw new Error('Gemini API 키가 없습니다.');
   
   const existingPostsList = "- (없음)";
@@ -265,12 +265,18 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
     const finalizedPrompt = prompt.replace(/\{\{TARGET_MODEL_CAPACITY\}\}/g, modelCapacityText);
 
     try {
+      const generationConfig: any = { temperature: 0.7, maxOutputTokens: maxTokens };
+      if (schema) {
+        generationConfig.responseMimeType = 'application/json';
+        generationConfig.responseSchema = schema;
+      }
+
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: finalizedPrompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: maxTokens }
+          generationConfig
         })
       });
       

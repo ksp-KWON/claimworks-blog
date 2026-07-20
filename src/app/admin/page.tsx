@@ -21,23 +21,46 @@ import {
 } from '@/lib/admin-api';
 import { runAutoGenerationWorkflow } from '@/lib/auto-writer';
 
-// AI가 생성한 마크다운에서 프론트매터(메타)와 본문을 분리하는 헬퍼
 function parseGeneratedPost(raw: string) {
   const cleanRaw = raw.replace(/^```(?:markdown|md)?\s*\n/i, '').replace(/\n```\s*$/, '').trim();
   const match = cleanRaw.match(/---\n([\s\S]*?)\n---/);
   if (!match) return { title: '', summary: '', date: '', category: '', tags: '', slug: '', content: cleanRaw };
   const yamlStr = match[1];
   const content = cleanRaw.substring(match.index! + match[0].length).trim();
+  
   const parse = (key: string) => {
     const line = yamlStr.split('\n').find(l => l.trimStart().startsWith(key + ':'));
     if (!line) return '';
     let val = line.slice(line.indexOf(':') + 1).trim();
     if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
-    if (key === 'tags' && val.startsWith('[')) {
-      try { return JSON.parse(val).join(', '); } catch { return ''; }
+    else if (val.startsWith("'") && val.endsWith("'")) val = val.slice(1, -1);
+
+    if (key === 'tags') {
+      if (val.startsWith('[')) {
+        // Robustly parse array even if missing quotes
+        return val.slice(1, -1).split(',').map(t => t.replace(/["']/g, '').trim()).filter(Boolean).join(', ');
+      }
+      return val;
     }
+    
+    // 데일리 엔진 수준의 카테고리 강제 교정 (매핑)
+    if (key === 'category') {
+      const allowed = ['사망·자살 보험금', '질병진단·실손', '교통사고 보상', '배상책임·의료', '근재·산재 사고', '장해평가·면책', '보상가이드', '판례·법률 해석'];
+      if (allowed.includes(val)) return val;
+      
+      if (val.includes('교통')) return '교통사고 보상';
+      if (val.includes('사망') || val.includes('자살')) return '사망·자살 보험금';
+      if (val.includes('질병') || val.includes('실손')) return '질병진단·실손';
+      if (val.includes('배상') || val.includes('의료')) return '배상책임·의료';
+      if (val.includes('산재') || val.includes('근재')) return '근재·산재 사고';
+      if (val.includes('장해') || val.includes('면책') || val.includes('후유')) return '장해평가·면책';
+      if (val.includes('판례') || val.includes('법률')) return '판례·법률 해석';
+      return '보상가이드'; // 기본값
+    }
+    
     return val;
   };
+  
   return {
     title: parse('title'), summary: parse('summary'), date: parse('date'),
     category: parse('category'), tags: parse('tags'), slug: parse('slug'), content

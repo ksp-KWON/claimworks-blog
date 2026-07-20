@@ -21,6 +21,29 @@ import {
 } from '@/lib/admin-api';
 import { runAutoGenerationWorkflow } from '@/lib/auto-writer';
 
+// AI가 생성한 마크다운에서 프론트매터(메타)와 본문을 분리하는 헬퍼
+function parseGeneratedPost(raw: string) {
+  const cleanRaw = raw.replace(/^```(?:markdown|md)?\s*\n/i, '').replace(/\n```\s*$/, '').trim();
+  const match = cleanRaw.match(/---\n([\s\S]*?)\n---/);
+  if (!match) return { title: '', summary: '', date: '', category: '', tags: '', slug: '', content: cleanRaw };
+  const yamlStr = match[1];
+  const content = cleanRaw.substring(match.index! + match[0].length).trim();
+  const parse = (key: string) => {
+    const line = yamlStr.split('\n').find(l => l.trimStart().startsWith(key + ':'));
+    if (!line) return '';
+    let val = line.slice(line.indexOf(':') + 1).trim();
+    if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+    if (key === 'tags' && val.startsWith('[')) {
+      try { return JSON.parse(val).join(', '); } catch { return ''; }
+    }
+    return val;
+  };
+  return {
+    title: parse('title'), summary: parse('summary'), date: parse('date'),
+    category: parse('category'), tags: parse('tags'), slug: parse('slug'), content
+  };
+}
+
 export default function AdminPage() {
   const [activeApp, setActiveApp] = useState<AdminAppType>('consult-manage');
   
@@ -152,12 +175,16 @@ export default function AdminPage() {
     try {
       const generated = await callGeminiAPI(geminiKey, inputText, mode);
       if (generated) {
-        // 에디터 내용을 새로 생성된 결과물로 완전히 덮어씌움 (기존 원문은 뼈대로만 사용)
+        const parsed = parseGeneratedPost(generated);
         setPostMeta(prev => ({
           ...prev,
-          content: generated
+          title: parsed.title || prev.title,
+          date: parsed.date || prev.date,
+          category: parsed.category || prev.category,
+          tags: parsed.tags || prev.tags,
+          currentFilename: parsed.slug ? `${parsed.slug}.md` : prev.currentFilename,
+          content: parsed.content
         }));
-        // Switch to editor inside AI Studio
         setActiveApp('post-ai');
       }
     } catch (e: any) {
@@ -176,9 +203,15 @@ export default function AdminPage() {
       });
       
       if (generated) {
+        const parsed = parseGeneratedPost(generated);
         setPostMeta(prev => ({
           ...prev,
-          content: generated
+          title: parsed.title || prev.title,
+          date: parsed.date || prev.date,
+          category: parsed.category || prev.category,
+          tags: parsed.tags || prev.tags,
+          currentFilename: parsed.slug ? `${parsed.slug}.md` : prev.currentFilename,
+          content: parsed.content
         }));
         alert('자동 생성이 완료되었습니다. 에디터에서 내용을 검토 후 [저장 및 발행] 버튼을 눌러주세요.');
         setActiveApp('post-ai');

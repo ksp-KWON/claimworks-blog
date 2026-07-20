@@ -28,7 +28,10 @@ import {
   ListsToggle,
   InsertImage,
   InsertThematicBreak,
-  CodeToggle
+  CodeToggle,
+  directivesPlugin,
+  AdmonitionDirectiveDescriptor,
+  InsertAdmonition
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 
@@ -68,6 +71,7 @@ const PortalToolbar = () => {
         <InsertImage />
         <InsertTable />
         <InsertThematicBreak />
+        <InsertAdmonition />
         <div className="ml-auto flex items-center border-l border-gray-200 dark:border-zinc-700 pl-2">
           <DiffSourceToggleWrapper children={undefined} />
         </div>
@@ -75,6 +79,49 @@ const PortalToolbar = () => {
     </div>,
     portalTarget
   );
+};
+
+const translateToKorean = (key: string, defaultValue: string) => {
+  const dict: Record<string, string> = {
+    'Bold': '굵게',
+    'Italic': '기울임',
+    'Underline': '밑줄',
+    'Strikethrough': '취소선',
+    'Superscript': '위첨자',
+    'Subscript': '아래첨자',
+    'Link': '링크',
+    'Insert image': '이미지',
+    'Insert table': '표',
+    'Insert thematic break': '구분선',
+    'Code block': '코드 블록',
+    'Bullet list': '기호 목록',
+    'Numbered list': '번호 목록',
+    'Check list': '체크 목록',
+    'Paragraph': '본문',
+    'Heading 1': '제목 1 (가장 큼)',
+    'Heading 2': '제목 2',
+    'Heading 3': '제목 3',
+    'Heading 4': '제목 4',
+    'Heading 5': '제목 5',
+    'Heading 6': '제목 6 (가장 작음)',
+    'Quote': '인용구',
+    'Insert admonition': '알림 박스',
+    'Undo': '실행 취소',
+    'Redo': '다시 실행',
+    'Title': '제목',
+    'URL': '주소(URL)',
+    'Alt Text': '대체 텍스트',
+    'Save': '저장',
+    'Cancel': '취소',
+    'Source': '소스 코드',
+    'Rich Text': '서식 적용',
+    'note': '노트',
+    'tip': '팁',
+    'danger': '위험',
+    'info': '정보',
+    'caution': '주의',
+  };
+  return dict[defaultValue] || defaultValue;
 };
 
 const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initialValue, onChange }, ref) => {
@@ -109,6 +156,7 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
         ref={editorRef}
         markdown={initialValue || ''}
         onChange={onChange}
+        translation={translateToKorean}
         contentEditableClassName="prose max-w-none w-full h-auto p-4 outline-none min-h-[500px]"
         plugins={[
           headingsPlugin(),
@@ -132,6 +180,7 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
               }
             ]
           }),
+          directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
           frontmatterPlugin(),
           codeBlockPlugin({ defaultCodeBlockLanguage: 'markdown' }),
           codeMirrorPlugin({ codeBlockLanguages: { markdown: 'Markdown', js: 'JavaScript', css: 'CSS', txt: 'Text' } }),

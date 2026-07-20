@@ -223,6 +223,28 @@ ${existingPosts}
 JSON으로 반환하십시오.`;
 }
 
+function getManualPlanningPrompt(aiInput, existingPosts) {
+  return `당신은 '보상스쿨'의 콘텐츠 기획자입니다.
+사용자가 작성한 아래의 원문/초안 데이터를 바탕으로 포스팅 기획 정보를 생성해 주세요.
+
+[사용자 원문]
+${aiInput}
+
+[기존 슬러그 (중복 금지)]
+${existingPosts}
+
+[기획 원칙]
+1. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
+2. title: SEO 최적화 제목 (원문의 의도를 살려 클릭을 유도하는 제목)
+3. summary: 구글 검색 결과에 노출될 150자 이내의 매력적인 한글 요약문
+4. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 원문에 가장 알맞은 1개
+5. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
+6. tags: 원문과 관련된 태그 5개
+7. keywords: 타겟 키워드 목록
+
+무조건 JSON 형식으로만 반환하십시오. 다른 설명은 붙이지 마십시오.`;
+}
+
 function getBlogSkeleton(angle, calcTag, postsCtx) {
   return `
 [ANALYSIS_START]
@@ -488,6 +510,7 @@ module.exports = {
   getBlogFrontmatter,
   getTopicPlanningPrompt,
   getPrecedentPlanningPrompt,
+  getManualPlanningPrompt,
   getBlogSkeleton,
   getPrecedentSkeleton,
   calculateModelCapacity,

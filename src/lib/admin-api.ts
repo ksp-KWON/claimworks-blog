@@ -201,7 +201,6 @@ ${getBlogRole()}
 ${getBlogLengthRulesManual()}
 # 🚨 STRICT WRITING RULES
 ${strictRulesPrompt}
-${getBlogFrontmatter('알맞은 제목 생성', currentDate)}
 제시된 원문:
 ${aiInput}
 ${getBlogSkeleton(angle, calcTag, existingPostsList)}
@@ -214,7 +213,6 @@ ${getBlogRole()}
 ${getBlogLengthRulesSemiAuto()}
 # 🚨 STRICT WRITING RULES
 ${strictRulesPrompt}
-${getBlogFrontmatter('알맞은 제목 생성', currentDate)}
 제시된 원문/뼈대:
 ${aiInput}
 ${getBlogSkeleton(angle, calcTag, existingPostsList)}

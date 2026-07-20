@@ -6,6 +6,7 @@ import {
   getPrecedentPlanningPrompt,
   buildBlogPrompt,
   buildPrecedentPrompt,
+  getManualPlanningPrompt,
   TOPIC_SCHEMA
 } from './prompt-rules';
 import { parseGeneratedContent } from './content-parser';
@@ -227,6 +228,76 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
   if (precedentDetail && precedentDetail.caseNo) {
     frontmatterData.caseNumber = precedentDetail.caseNo;
   }
+  
+  const finalContent = stringifyMarkdown(frontmatterData, content);
+  
+  onProgress('완료! 에디터에서 내용을 확인하세요.');
+  return finalContent;
+}
+
+export async function runManualGenerationWorkflow(
+  mode: 'manual-preserve' | 'manual-expand' | 'semi-auto',
+  aiInput: string,
+  geminiKey: string,
+  onProgress: (msg: string) => void
+) {
+  if (!geminiKey) throw new Error('Gemini API 키가 없습니다.');
+  
+  onProgress('1/3: 기존 글 목록 분석 중...');
+  let existingSlugs = "- (없음)";
+  try {
+    const { posts } = await fetchProxy('list', { admin: true });
+    if (posts && posts.length > 0) {
+      existingSlugs = posts.map((p: any) => p.slug).join(', ');
+    }
+  } catch (e) {
+    console.warn('Failed to load existing posts for manual mode', e);
+  }
+
+  onProgress('2/3: 사용자 원문 기반 SEO 기획안 도출 중...');
+  let topicPlanStr = '';
+  try {
+    const planPrompt = getManualPlanningPrompt(aiInput, existingSlugs);
+    topicPlanStr = await callGeminiAPI(geminiKey, planPrompt, 'keyword-extraction', TOPIC_SCHEMA);
+  } catch (e: any) {
+    throw new Error('기획안 도출에 실패했습니다: ' + e.message);
+  }
+
+  let topic;
+  try {
+    const match = topicPlanStr.match(/```(?:json)?\n([\s\S]*?)\n```/) || topicPlanStr.match(/{[\s\S]*}/);
+    const jsonStr = match ? match[0].replace(/```json/g, '').replace(/```/g, '') : topicPlanStr;
+    topic = JSON.parse(jsonStr);
+  } catch (e) {
+    throw new Error('기획안 JSON 파싱 실패');
+  }
+
+  onProgress('3/3: 전문 칼럼 창작 중 (약 30초 소요)...');
+  
+  // mode에 따라 callGeminiAPI를 호출하여 본문 생성 (frontmatter 없이)
+  const generated = await callGeminiAPI(geminiKey, aiInput, mode);
+  
+  const { content } = parseGeneratedContent(generated);
+  
+  let summary = (topic.summary || '').replace(/"/g, "'").replace(/\n/g, ' ').trim();
+  if (!summary) {
+    summary = content.replace(/[#*`>[\]!]/g, '').replace(/\s+/g, ' ').trim().slice(0, 140);
+  }
+  if (summary.length > 158) summary = summary.slice(0, 155) + '...';
+  
+  const kstDate = new Date(Date.now() + 9 * 3600 * 1000).toISOString().split('T')[0];
+  const frontmatterData: any = {
+    title: topic.title || '새 문서',
+    slug: topic.slug || '',
+    date: kstDate,
+    updatedAt: kstDate,
+    summary: summary,
+    category: topic.category || '',
+    regionCategory: "",
+    specialtyCategory: topic.specialtyCategory || '',
+    tags: topic.tags || [],
+    published: true
+  };
   
   const finalContent = stringifyMarkdown(frontmatterData, content);
   

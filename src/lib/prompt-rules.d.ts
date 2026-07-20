@@ -22,6 +22,7 @@ export function getPrecedentPlanningPrompt(
   detail: { courtName: string; caseName: string; caseNo: string; judgmentDate: string; judgmentSummary: string },
   existingPosts: string
 ): string;
+export function getManualPlanningPrompt(aiInput: string, existingPosts: string): string;
 export function getBlogSkeleton(angle: Angle, calcTag: string, postsCtx: string): string;
 export function getPrecedentSkeleton(
   detail: { caseNo: string; caseName: string; courtName: string },

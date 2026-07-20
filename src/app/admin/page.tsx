@@ -19,7 +19,7 @@ import {
   deletePost, 
   callGeminiAPI 
 } from '@/lib/admin-api';
-import { runAutoGenerationWorkflow } from '@/lib/auto-writer';
+import { runAutoGenerationWorkflow, runManualGenerationWorkflow } from '@/lib/auto-writer';
 import { parseMarkdown } from '@/lib/markdown-utils';
 
 function normalizeCategory(val: string) {
@@ -169,7 +169,9 @@ export default function AdminPage() {
     setIsLoading(true);
     
     try {
-      const generated = await callGeminiAPI(geminiKey, inputText, mode);
+      const generated = await runManualGenerationWorkflow(mode, inputText, geminiKey, (msg) => {
+        setAutoProgress(msg);
+      });
       if (generated) {
         const parsed = parseMarkdown(generated);
         setPostMeta(prev => ({
@@ -190,6 +192,7 @@ export default function AdminPage() {
       alert(e.message);
     }
     setIsLoading(false);
+    setAutoProgress('');
   };
 
   const handleRunAuto = async (type: 'precedent' | 'trend') => {

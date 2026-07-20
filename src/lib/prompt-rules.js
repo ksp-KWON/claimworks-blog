@@ -283,8 +283,6 @@ function getPrecedentSkeleton(detail, angle, calcTag, postsCtx) {
   ...
 [ANALYSIS_END]
 
-SEO_META:[요약문]
-
 # ════════════════════════════════════════════════════════════════
 # 판례 출력 뼈대 (OUTPUT SKELETON)
 # ════════════════════════════════════════════════════════════════

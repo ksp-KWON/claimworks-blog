@@ -5,6 +5,9 @@ import {
   getBlogRole,
   getBlogSkeleton,
   getBlogFrontmatter,
+  getPrecedentRole,
+  getPrecedentObjective,
+  getPrecedentSkeleton,
 } from './prompt-rules';
 
 const NEWS_QUERIES = [
@@ -117,19 +120,20 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
   let prompt = '';
   if (type === 'precedent' && precedentDetail) {
     prompt = `
-${getBlogRole()}
-# Objective
-다음 판례 데이터를 바탕으로 전문가 수준의 심층 법률 칼럼을 작성하세요.
-주제 키워드: ${finalKeyword}
-사건번호: ${precedentDetail.caseNo}
-판결요지: ${precedentDetail.judgmentSummary}
-판례내용: ${precedentDetail.caseContent}
+${getPrecedentRole()}
+${getPrecedentObjective()}
 
 # 🚨 STRICT WRITING RULES
 ${STRICT_RULES}
 
+[원본 판례 정보]
+* 사건번호: ${precedentDetail.caseNo}
+* 판결요지: 
+${precedentDetail.judgmentSummary}
+${precedentDetail.caseContent.slice(0, 3000)} (본문 일부)
+
 ${getBlogFrontmatter('판례 분석 기반 칼럼 제목', currentDate)}
-${getBlogSkeleton(angle, '<calculator type="medical" />', existingPostsList)}
+${getPrecedentSkeleton(precedentDetail, angle, '<calculator type="medical" />', existingPostsList)}
 `;
   } else {
     prompt = `

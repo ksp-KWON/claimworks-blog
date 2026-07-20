@@ -211,9 +211,10 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     <div className="flex-1 min-h-0 flex flex-col p-4 md:p-8 bg-gray-50 dark:bg-zinc-950">
       <div className="flex-1 min-h-0 flex flex-col">
           {/* 데스크탑 버전 (Table) */}
-          <PremiumCard className="hidden md:flex md:flex-col p-0 sm:p-0 border-0 flex-1 min-h-0 overflow-hidden">
-            <div className="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
-              <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
+          <PremiumCard className="hidden md:block p-0 sm:p-0 border-0 flex-1 min-h-0 overflow-hidden">
+            <div className="h-full flex flex-col">
+              <div className="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
+                <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
               <thead className="sticky top-0 z-10 bg-slate-100 dark:bg-zinc-800 shadow-[0_1px_0_rgba(0,0,0,0.05)] dark:shadow-[0_1px_0_rgba(255,255,255,0.05)]">
                 <tr>
                   <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20">상태</th>
@@ -302,7 +303,8 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 ))
               )}
               </tbody>
-              </table>
+                </table>
+              </div>
             </div>
           </PremiumCard>
 

@@ -66,9 +66,36 @@ export async function fetchPostList(githubToken: string) {
     localCache = JSON.parse(localStorage.getItem('admin_recent_posts') || '{}');
   } catch {}
 
-  return mdFiles.map((file: any) => {
-    const mapped = titlesMap[file.name] || localCache[file.name];
-    // If not in API (e.g. newly created draft not built yet), we use local cache or fallback.
+  const result = await Promise.all(mdFiles.map(async (file: any) => {
+    let mapped = titlesMap[file.name] || localCache[file.name];
+
+    // If not in API and not in local cache (newly saved on another device/browser),
+    // fetch the file content directly from GitHub to parse its frontmatter.
+    if (!mapped) {
+      try {
+        const fileRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${POSTS_PATH}/${file.name}`, {
+          headers: { 'Authorization': `Bearer ${githubToken}` }
+        });
+        if (fileRes.ok) {
+          const fileData = await fileRes.json();
+          const rawMarkdown = decodeURIComponent(escape(window.atob(fileData.content)));
+          const { data: meta } = parseYamlFrontmatter(rawMarkdown);
+          
+          mapped = {
+            title: meta.title || file.name.replace('.md', ''),
+            date: meta.date || new Date().toISOString().split('T')[0],
+            published: meta.published !== false
+          };
+          
+          // Save to local cache for next time
+          localCache[file.name] = mapped;
+          localStorage.setItem('admin_recent_posts', JSON.stringify(localCache));
+        }
+      } catch (e) {
+        console.warn('Failed to fetch fallback metadata for', file.name);
+      }
+    }
+
     return {
       name: file.name,
       sha: file.sha,
@@ -76,7 +103,9 @@ export async function fetchPostList(githubToken: string) {
       date: mapped?.date || '',
       published: mapped?.published !== false
     };
-  });
+  }));
+
+  return result;
 }
 
 export async function loadPost(githubToken: string, filename: string) {

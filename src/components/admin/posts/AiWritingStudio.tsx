@@ -205,14 +205,13 @@ export default function AiWritingStudio({
   );
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row bg-[#f8f9fa] dark:bg-zinc-950 overflow-hidden relative w-full h-full">
+    <div className="flex-1 flex flex-col md:flex-row bg-[#f8f9fa] dark:bg-zinc-950 relative w-full min-h-0">
       
       {/* ── 좌측/중앙: 메인 에디터 (항상 노출) ── */}
-      <div className="flex-1 flex flex-col min-w-0 border-r border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+      <div className="flex-1 flex flex-col min-w-0 border-r border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-y-auto">
         
-
         {/* 에디터 캔버스 */}
-        <div className="flex-1 overflow-hidden h-full">
+        <div className="flex-1">
           <MarkdownEditor
             title={postMeta.title} setTitle={(t: string) => setPostMeta((prev: any) => ({ ...prev, title: t }))}
             content={postMeta.content} setContent={(c: any) => setPostMeta((prev: any) => ({ ...prev, content: typeof c === 'function' ? c(prev.content) : c }))}

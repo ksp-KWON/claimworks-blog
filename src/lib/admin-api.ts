@@ -238,7 +238,7 @@ ${getBlogFrontmatter('알맞은 제목 생성', currentDate)}
 ${aiInput}
 ${getBlogSkeleton(angle, calcTag, existingPostsList)}
 `;
-  } else if (mode === 'auto-generate') {
+  } else if (mode === 'auto-generate' || mode === 'keyword-extraction') {
     prompt = aiInput;
   } else {
     prompt = `

@@ -3,8 +3,8 @@ import {
   STRICT_RULES,
   getRandomAngle,
   getBlogRole,
-  getBlogMetaFirstLine,
   getBlogSkeleton,
+  getBlogFrontmatter,
 } from './prompt-rules';
 
 const NEWS_QUERIES = [
@@ -102,6 +102,7 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
   onProgress('6/6: AI가 심층 전문 칼럼을 작성 중입니다. (약 30초 소요)...');
   
+  const currentDate = new Date().toISOString().split('T')[0];
   let prompt = '';
   if (type === 'precedent' && precedentDetail) {
     prompt = `
@@ -116,7 +117,7 @@ ${getBlogRole()}
 # 🚨 STRICT WRITING RULES
 ${STRICT_RULES}
 
-${getBlogMetaFirstLine()}
+${getBlogFrontmatter('판례 분석 기반 칼럼 제목', currentDate)}
 ${getBlogSkeleton(angle, '<calculator type="medical" />', existingPostsList)}
 `;
   } else {
@@ -129,7 +130,7 @@ ${getBlogRole()}
 # 🚨 STRICT WRITING RULES
 ${STRICT_RULES}
 
-${getBlogMetaFirstLine()}
+${getBlogFrontmatter('트렌드 기반 매력적인 칼럼 제목', currentDate)}
 ${getBlogSkeleton(angle, '<calculator type="auto" />', existingPostsList)}
 `;
   }

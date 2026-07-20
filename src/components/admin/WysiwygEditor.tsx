@@ -125,7 +125,8 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
       />
       <style>{`
         .mdx-editor-wrapper .mdxeditor {
-          height: 100%;
+          min-height: 500px;
+          height: auto;
           display: flex;
           flex-direction: column;
         }
@@ -135,7 +136,7 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
 
         .mdx-editor-wrapper [data-lexical-editor] {
           flex: 1;
-          overflow-y: auto;
+          height: auto;
         }
       `}</style>
     </div>

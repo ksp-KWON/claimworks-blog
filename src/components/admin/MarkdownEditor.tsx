@@ -61,7 +61,7 @@ export default function MarkdownEditor({
             </div>
 
             {/* Editor Canvas (MDX Editor) */}
-            <div className="flex-1 pb-16 flex flex-col min-h-0">
+            <div className="pb-16 flex flex-col">
               <WysiwygEditor
                 ref={editorRef}
                 initialValue={content}

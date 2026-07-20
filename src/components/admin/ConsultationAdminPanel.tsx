@@ -126,7 +126,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     if (!window.confirm('정말로 이 접수 내역을 삭제하시겠습니까? (목록에서 삭제 처리됩니다)')) return;
     const { error } = await supabase
       .from('consultations')
-      .update({ status: '삭제' })
+      .delete()
       .eq('id', id);
     if (error) {
       alert('삭제 중 오류가 발생했습니다.');

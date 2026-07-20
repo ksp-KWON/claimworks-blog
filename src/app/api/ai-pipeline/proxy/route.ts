@@ -37,63 +37,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ data: [...new Set(headlines)] });
     }
 
-    // 2. Naver Datalab Proxy
-    if (action === 'naver') {
-      const { NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, NCP_API_KEY_ID, NCP_API_KEY } = process.env;
-      
-      const hasNCP = !!(NCP_API_KEY_ID && NCP_API_KEY);
-      const hasNaver = !!(NAVER_CLIENT_ID && NAVER_CLIENT_SECRET);
-      
-      if (!hasNCP && !hasNaver) {
-        return NextResponse.json({ data: payload.candidates });
-      }
-
-      const today = new Date();
-      const endDate = today.toISOString().slice(0, 10);
-      const startDate = new Date(today.getTime() - 30 * 86400000).toISOString().slice(0, 10);
-      const scores = new Map();
-      const candidates = payload.candidates || [];
-
-      for (let i = 0; i < candidates.length; i += 5) {
-        const batch = candidates.slice(i, i + 5);
-        try {
-          const url = hasNCP 
-            ? 'https://naverapihub.apigw.ntruss.com/search-trend/v1/search'
-            : 'https://openapi.naver.com/v1/datalab/search';
-            
-          const headers: any = hasNCP ? {
-              'x-ncp-apigw-api-key-id': NCP_API_KEY_ID,
-              'x-ncp-apigw-api-key': NCP_API_KEY,
-              'Content-Type': 'application/json',
-          } : {
-              'X-Naver-Client-Id': NAVER_CLIENT_ID,
-              'X-Naver-Client-Secret': NAVER_CLIENT_SECRET,
-              'Content-Type': 'application/json',
-          };
-
-          const res = await fetch(url, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              startDate, endDate, timeUnit: 'month',
-              keywordGroups: batch.map((c: any) => ({ groupName: c.searchKeyword, keywords: [c.searchKeyword] })),
-            }),
-          });
-          if (res.ok) {
-            const result = await res.json();
-            for (const r of (result.results || [])) {
-              const avg = r.data.reduce((s: number, d: any) => s + d.ratio, 0) / (r.data.length || 1);
-              scores.set(r.title, avg);
-            }
-          }
-        } catch (e) {}
-      }
-
-      const ranked = [...candidates].sort((a, b) =>
-        (scores.get(b.searchKeyword) ?? 0) - (scores.get(a.searchKeyword) ?? 0)
-      );
-      return NextResponse.json({ data: ranked });
-    }
+    // (네이버 데이터랩 API 기능은 2026.07.23 서비스 종료로 인해 삭제됨)
 
     // 3. Law API Proxy
     if (action === 'law') {

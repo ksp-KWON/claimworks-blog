@@ -36,10 +36,6 @@ const POSTS_DIR            = path.join(process.cwd(), 'src/content/posts');
 const LAW_API_KEY          = process.env.LAW_API_KEY;
 const LAW_PROXY_ENDPOINT   = process.env.LAW_PROXY_ENDPOINT;
 const LAW_PROXY_TOKEN      = process.env.LAW_PROXY_TOKEN;
-const NAVER_CLIENT_ID      = process.env.NAVER_CLIENT_ID;
-const NAVER_CLIENT_SECRET  = process.env.NAVER_CLIENT_SECRET;
-const NCP_API_KEY_ID       = process.env.NCP_API_KEY_ID;
-const NCP_API_KEY          = process.env.NCP_API_KEY;
 
 /** 구글 뉴스 RSS 검색 쿼리 — 보험·손해사정 도메인 특화 */
 const NEWS_QUERIES = [
@@ -66,21 +62,6 @@ const BACKUP_KEYWORDS = [
 ];
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-function getNaverHeaders() {
-  if (NCP_API_KEY_ID && NCP_API_KEY) {
-    return {
-      'x-ncp-apigw-api-key-id': NCP_API_KEY_ID,
-      'x-ncp-apigw-api-key': NCP_API_KEY,
-      'Content-Type': 'application/json',
-    };
-  }
-  return {
-    'X-Naver-Client-Id': NAVER_CLIENT_ID,
-    'X-Naver-Client-Secret': NAVER_CLIENT_SECRET,
-    'Content-Type': 'application/json',
-  };
-}
 
 // ── 기존 포스트 분석 (중복 방지) ─────────────────────────────────────────
 function getUsedMetadata() {
@@ -159,6 +140,11 @@ async function extractInsuranceKeywords(headlines) {
 아래 뉴스 헤드라인 목록에서 손해사정(교통사고·산재·질병·배상책임·보험금 분쟁)과
 직접 연관된 이슈를 분석하여, 법제처 판례 API 검색에 즉시 활용할 구체적인 법률·보험 용어 키워드를 추출하세요.
 
+[중요 지시사항]
+반드시 아래 뉴스 헤드라인에서 가장 자주 언급된 빈도수(Frequency)와 사회적 파급력을 분석하여, 
+대중의 검색 수요와 화제성이 가장 높을 것으로 예상되는 순서대로 키워드 순위를 정렬하여 반환하세요.
+(1위 키워드가 가장 핫한 이슈가 되도록 정렬해야 합니다.)
+
 [헤드라인 목록]
 ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}`;
 
@@ -187,62 +173,6 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}`;
     console.warn(`    [경고] AI 키워드 추출 오류: ${err.message}`);
     return [];
   }
-}
-
-// ── [3단계] 네이버 데이터랩 API → 검색 수요 기반 키워드 순위화 ──────────
-async function rankByNaverDatalab(candidates) {
-  if ((!NAVER_CLIENT_ID || !NAVER_CLIENT_SECRET) && (!NCP_API_KEY_ID || !NCP_API_KEY)) {
-    console.warn('    [데이터랩 스킵] 인증키 미설정 — 원본 순서 유지');
-    return candidates;
-  }
-  if (!candidates.length) return candidates;
-
-  console.log('[3/5] 네이버 데이터랩 API — 키워드 검색 수요 검증 중...');
-
-  const today     = new Date();
-  const endDate   = today.toISOString().slice(0, 10);
-  const startDate = new Date(today - 30 * 86400000).toISOString().slice(0, 10);
-  const scores    = new Map();
-
-  // 데이터랩 API 제한: 요청당 최대 5개 그룹
-  for (let i = 0; i < candidates.length; i += 5) {
-    const batch = candidates.slice(i, i + 5);
-    try {
-      const bodyData = {
-        startDate, endDate, timeUnit: 'month',
-        keywordGroups: batch.map(c => ({ groupName: c.searchKeyword, keywords: [c.searchKeyword] })),
-      };
-
-      const endpoint = (NCP_API_KEY_ID && NCP_API_KEY)
-        ? 'https://naverapihub.apigw.ntruss.com/search-trend/v1/search'
-        : 'https://openapi.naver.com/v1/datalab/search';
-
-      const res = await safeFetch(endpoint, {
-        method: 'POST',
-        headers: getNaverHeaders(),
-        body: JSON.stringify(bodyData)
-      }, 10000);
-
-      if (!res.ok) { console.warn(`    [경고] 데이터랩 HTTP ${res.status}`); continue; }
-
-      const { results = [] } = await res.json();
-      for (const r of results) {
-        const avg = r.data.reduce((s, d) => s + d.ratio, 0) / (r.data.length || 1);
-        scores.set(r.title, avg);
-      }
-    } catch (err) {
-      console.warn(`    [경고] 데이터랩 오류: ${err.message}`);
-    }
-    await sleep(300);
-  }
-
-  if (!scores.size) { console.log('    유효 응답 없음 — 원본 순서 유지'); return candidates; }
-
-  const ranked = [...candidates].sort((a, b) =>
-    (scores.get(b.searchKeyword) ?? 0) - (scores.get(a.searchKeyword) ?? 0)
-  );
-  console.log(`    상위 키워드: ${ranked.slice(0, 3).map(c => `"${c.searchKeyword}"(${(scores.get(c.searchKeyword) ?? 0).toFixed(1)})`).join(', ')}`);
-  return ranked;
 }
 
 // ── 법제처 API 공통 호출 ─────────────────────────────────────────────────
@@ -337,19 +267,16 @@ async function main() {
   // 1. 구글 뉴스 RSS 수집
   const headlines = await fetchTrendingNews();
 
-  // 2. AI 키워드 추출
-  const rawCandidates = await extractInsuranceKeywords(headlines);
+  // 2. AI 키워드 추출 (자동 랭킹 포함)
+  const rankedCandidates = await extractInsuranceKeywords(headlines);
 
-  // 3. 데이터랩 검색 수요 순위화
-  const rankedCandidates = await rankByNaverDatalab(rawCandidates);
-
-  // 4. 트렌드 기반 판례 탐색
-  console.log('[4/5] 트렌드 키워드 기반 법제처 판례 탐색 중...');
+  // 3. 트렌드 기반 판례 탐색
+  console.log('[3/4] 트렌드 키워드 기반 법제처 판례 탐색 중...');
   let found = await findPrecedent(rankedCandidates, usedCaseNumbers);
 
-  // 5. 백업 키워드 탐색 (트렌드 탐색 실패 시)
+  // 4. 백업 키워드 탐색 (트렌드 탐색 실패 시)
   if (!found) {
-    console.log('[5/5] ⚠️ 트렌드 탐색 실패 — 전문 백업 키워드로 재탐색 시작...');
+    console.log('[4/4] ⚠️ 트렌드 탐색 실패 — 전문 백업 키워드로 재탐색 시작...');
     const backupCandidates = BACKUP_KEYWORDS
       .filter(k => !usedKeywords.has(k))
       .map(k => ({ searchKeyword: k, newsTitle: '' }));

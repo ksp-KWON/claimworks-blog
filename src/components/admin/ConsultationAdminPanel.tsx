@@ -125,10 +125,18 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
   const deleteConsultation = async (id: string) => {
     if (!window.confirm('정말로 이 접수 내역을 삭제하시겠습니까? (목록에서 영구 삭제 처리됩니다)')) return;
     try {
-      const res = await fetch(`/api/consultations?id=${id}`, {
-        method: 'DELETE'
+      const res = await fetch(`/api/consultations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error('서버에서 올바르지 않은 응답이 반환되었습니다 (JSON 파싱 실패). 응답: ' + text.substring(0, 50));
+      }
       if (!res.ok || !data.success) {
         throw new Error(data.message || '삭제 실패');
       }

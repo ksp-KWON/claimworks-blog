@@ -47,7 +47,7 @@ export default function MarkdownEditor({
         {/* Scrollable inner content */}
         <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center">
           
-          <div className="w-full max-w-4xl flex flex-col flex-1 px-5 md:px-8">
+          <div className="w-full max-w-4xl flex flex-col min-h-full px-5 md:px-8">
             
             {/* Document Title Input (Naver Style with divider) */}
             <div className="pt-12 md:pt-16 pb-6 shrink-0 border-b border-gray-200 dark:border-zinc-800 mb-4">

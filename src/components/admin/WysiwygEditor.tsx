@@ -89,12 +89,12 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
   }, [initialValue]);
 
   return (
-    <div className="mdx-editor-wrapper h-full flex flex-col prose prose-sm max-w-none dark:prose-invert">
+    <div className="mdx-editor-wrapper h-auto flex flex-col prose prose-sm max-w-none dark:prose-invert">
       <MDXEditor
         ref={editorRef}
         markdown={initialValue || ''}
         onChange={onChange}
-        contentEditableClassName="prose max-w-none w-full h-full p-4 outline-none min-h-[500px]"
+        contentEditableClassName="prose max-w-none w-full h-auto p-4 outline-none min-h-[500px]"
         plugins={[
           headingsPlugin(),
           quotePlugin(),
@@ -124,19 +124,8 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
         ]}
       />
       <style>{`
-        .mdx-editor-wrapper .mdxeditor {
-          min-height: 500px;
-          height: auto;
-          display: flex;
-          flex-direction: column;
-        }
         .mdx-editor-wrapper .mdxeditor-toolbar {
           display: none !important;
-        }
-
-        .mdx-editor-wrapper [data-lexical-editor] {
-          flex: 1;
-          height: auto;
         }
       `}</style>
     </div>

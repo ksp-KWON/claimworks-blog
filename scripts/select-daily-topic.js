@@ -38,6 +38,8 @@ const LAW_PROXY_ENDPOINT   = process.env.LAW_PROXY_ENDPOINT;
 const LAW_PROXY_TOKEN      = process.env.LAW_PROXY_TOKEN;
 const NAVER_CLIENT_ID      = process.env.NAVER_CLIENT_ID;
 const NAVER_CLIENT_SECRET  = process.env.NAVER_CLIENT_SECRET;
+const NCP_API_KEY_ID       = process.env.NCP_API_KEY_ID;
+const NCP_API_KEY          = process.env.NCP_API_KEY;
 
 /** 구글 뉴스 RSS 검색 쿼리 — 보험·손해사정 도메인 특화 */
 const NEWS_QUERIES = [
@@ -66,6 +68,13 @@ const BACKUP_KEYWORDS = [
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 function getNaverHeaders() {
+  if (NCP_API_KEY_ID && NCP_API_KEY) {
+    return {
+      'x-ncp-apigw-api-key-id': NCP_API_KEY_ID,
+      'x-ncp-apigw-api-key': NCP_API_KEY,
+      'Content-Type': 'application/json',
+    };
+  }
   return {
     'X-Naver-Client-Id': NAVER_CLIENT_ID,
     'X-Naver-Client-Secret': NAVER_CLIENT_SECRET,
@@ -182,8 +191,8 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}`;
 
 // ── [3단계] 네이버 데이터랩 API → 검색 수요 기반 키워드 순위화 ──────────
 async function rankByNaverDatalab(candidates) {
-  if (!NAVER_CLIENT_ID || !NAVER_CLIENT_SECRET) {
-    console.warn('    [데이터랩 스킵] NAVER_CLIENT_ID/SECRET 미설정 — 원본 순서 유지');
+  if ((!NAVER_CLIENT_ID || !NAVER_CLIENT_SECRET) && (!NCP_API_KEY_ID || !NCP_API_KEY)) {
+    console.warn('    [데이터랩 스킵] 인증키 미설정 — 원본 순서 유지');
     return candidates;
   }
   if (!candidates.length) return candidates;
@@ -204,7 +213,11 @@ async function rankByNaverDatalab(candidates) {
         keywordGroups: batch.map(c => ({ groupName: c.searchKeyword, keywords: [c.searchKeyword] })),
       };
 
-      const res = await safeFetch('https://openapi.naver.com/v1/datalab/search', {
+      const endpoint = (NCP_API_KEY_ID && NCP_API_KEY)
+        ? 'https://naverapihub.apigw.ntruss.com/search-trend/v1/search'
+        : 'https://openapi.naver.com/v1/datalab/search';
+
+      const res = await safeFetch(endpoint, {
         method: 'POST',
         headers: getNaverHeaders(),
         body: JSON.stringify(bodyData)

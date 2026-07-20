@@ -39,8 +39,12 @@ export async function POST(req: Request) {
 
     // 2. Naver Datalab Proxy
     if (action === 'naver') {
-      const { NAVER_CLIENT_ID, NAVER_CLIENT_SECRET } = process.env;
-      if (!NAVER_CLIENT_ID || !NAVER_CLIENT_SECRET) {
+      const { NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, NCP_API_KEY_ID, NCP_API_KEY } = process.env;
+      
+      const hasNCP = !!(NCP_API_KEY_ID && NCP_API_KEY);
+      const hasNaver = !!(NAVER_CLIENT_ID && NAVER_CLIENT_SECRET);
+      
+      if (!hasNCP && !hasNaver) {
         return NextResponse.json({ data: payload.candidates });
       }
 
@@ -53,13 +57,23 @@ export async function POST(req: Request) {
       for (let i = 0; i < candidates.length; i += 5) {
         const batch = candidates.slice(i, i + 5);
         try {
-          const res = await fetch('https://openapi.naver.com/v1/datalab/search', {
-            method: 'POST',
-            headers: {
+          const url = hasNCP 
+            ? 'https://naverapihub.apigw.ntruss.com/search-trend/v1/search'
+            : 'https://openapi.naver.com/v1/datalab/search';
+            
+          const headers: any = hasNCP ? {
+              'x-ncp-apigw-api-key-id': NCP_API_KEY_ID,
+              'x-ncp-apigw-api-key': NCP_API_KEY,
+              'Content-Type': 'application/json',
+          } : {
               'X-Naver-Client-Id': NAVER_CLIENT_ID,
               'X-Naver-Client-Secret': NAVER_CLIENT_SECRET,
               'Content-Type': 'application/json',
-            },
+          };
+
+          const res = await fetch(url, {
+            method: 'POST',
+            headers,
             body: JSON.stringify({
               startDate, endDate, timeUnit: 'month',
               keywordGroups: batch.map((c: any) => ({ groupName: c.searchKeyword, keywords: [c.searchKeyword] })),

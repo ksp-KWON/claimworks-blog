@@ -361,10 +361,7 @@ export default function AdminPage() {
       </div>
 
       {/* Main Workspace */}
-      <div className="flex flex-1 overflow-hidden relative h-full pb-[64px] md:pb-0">
-        
-        {/* Dynamic Workspace based on activeApp */}
-        <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-zinc-950 relative w-full">
+      <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-zinc-950 pb-[64px] md:pb-0">
 
           {/* Consultations */}
           {activeApp === 'consult-manage' && (
@@ -403,9 +400,6 @@ export default function AdminPage() {
             />
           )}
 
-
-
-        </div>
       </div>
       
       {/* Mobile Admin Nav (Mobile Only) */}

@@ -31,9 +31,8 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
   }, [postList, sortType, searchQuery]);
 
   return (
-    <div className="flex-1 flex flex-col bg-[#f8f9fa] dark:bg-zinc-950 overflow-hidden relative">
-      <div className="flex-1 overflow-x-auto overflow-y-auto custom-scrollbar p-4 md:p-8 w-full">
-        <div className="max-w-7xl mx-auto w-full h-full flex flex-col">
+    <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto custom-scrollbar p-4 md:p-8 bg-[#f8f9fa] dark:bg-zinc-950">
+      <div className="max-w-7xl mx-auto w-full">
           {sortedAndFilteredList.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-400 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-[0_4px_20px_rgba(0,0,0,0.06)] p-10">
               <svg className="w-16 h-16 mb-4 text-gray-200 dark:text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
@@ -142,7 +141,6 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
               </PremiumCard>
             </>
           )}
-        </div>
       </div>
     </div>
   );

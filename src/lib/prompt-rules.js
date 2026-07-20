@@ -212,9 +212,13 @@ function getPrecedentPlanningPrompt(detail, existingPosts) {
 ${existingPosts}
 
 [기획 원칙]
-1. 제목은 딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합.
-2. calculatorType은 "auto" 또는 "medical"을 지정.
-3. category는 무조건 "판례·법률 해석"
+1. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
+2. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합)
+3. category: 무조건 "판례·법률 해석"
+4. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
+5. tags: 관련 태그 5개
+6. keywords: 타겟 키워드 목록
+7. calculatorType: "auto" 또는 "medical" 지정
 
 JSON으로 반환하십시오.`;
 }

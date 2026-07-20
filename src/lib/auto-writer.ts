@@ -203,7 +203,7 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
   // 🔴 근본 해결 2: 판례 번호를 프론트매터(SEO)에 확실히 주입
   const additionalFrontmatter: any = {};
   if (precedentDetail && precedentDetail.caseNo) {
-    additionalFrontmatter.precedentNumber = precedentDetail.caseNo;
+    additionalFrontmatter.caseNumber = precedentDetail.caseNo;
   }
   
   const finalContent = buildMarkdownFrontmatter(topic, summary, content, additionalFrontmatter);

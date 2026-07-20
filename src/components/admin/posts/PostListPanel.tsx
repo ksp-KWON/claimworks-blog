@@ -103,8 +103,8 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
                           </span>
                         </td>
                         <td className="px-6 py-4 text-left">
-                          <div className="flex items-center gap-2">
-                            <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 break-keep">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                               {post.title}
                             </div>
                             {post.published === false && (

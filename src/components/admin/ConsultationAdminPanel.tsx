@@ -123,16 +123,19 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
   };
 
   const deleteConsultation = async (id: string) => {
-    if (!window.confirm('정말로 이 접수 내역을 삭제하시겠습니까? (목록에서 삭제 처리됩니다)')) return;
-    const { error } = await supabase
-      .from('consultations')
-      .delete()
-      .eq('id', id);
-    if (error) {
-      alert('삭제 중 오류가 발생했습니다.');
-    } else {
+    if (!window.confirm('정말로 이 접수 내역을 삭제하시겠습니까? (목록에서 영구 삭제 처리됩니다)')) return;
+    try {
+      const res = await fetch(`/api/consultations?id=${id}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || '삭제 실패');
+      }
       if (selectedId === id) setSelectedId(null);
       setConsultations(prev => prev.filter(c => c.id !== id));
+    } catch (err: any) {
+      alert(`삭제 중 오류가 발생했습니다: ${err.message}`);
     }
   };
 

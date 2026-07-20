@@ -18,26 +18,31 @@ export async function POST(req: Request) {
       const BASE = 'https://news.google.com/rss/search?hl=ko&gl=KR&ceid=KR:ko&q=';
       const queries = payload.queries || ['보험금 지급거절 분쟁'];
       const headlines = [];
-      
+      const { LAW_PROXY_ENDPOINT, LAW_PROXY_TOKEN } = process.env;
+
       for (const query of queries) {
         try {
-          const res = await fetch(BASE + encodeURIComponent(query), {
-            headers: { 
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-              'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-            },
-          });
+          let targetUrl = BASE + encodeURIComponent(query);
+          const headers: any = { 
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+          };
+
+          if (LAW_PROXY_ENDPOINT) {
+            targetUrl = `${LAW_PROXY_ENDPOINT}/api/rss?query=${encodeURIComponent(query)}`;
+            if (LAW_PROXY_TOKEN) headers['X-Proxy-Token'] = LAW_PROXY_TOKEN;
+          }
+
+          const res = await fetch(targetUrl, { headers });
           if (res.ok) {
             const xml = await res.text();
             const titles = extractXmlValues(xml, 'title')
               .filter(t => t && !t.startsWith('"') && !t.includes('Google 뉴스'));
             headlines.push(...titles);
-          } else {
-            console.warn(`RSS fetch failed for ${query}: HTTP ${res.status}`);
           }
         } catch (e) {
-          console.warn('RSS Error:', e);
+          // fetch error ignored
         }
       }
       return NextResponse.json({ data: [...new Set(headlines)] });

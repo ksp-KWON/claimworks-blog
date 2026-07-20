@@ -43,6 +43,8 @@ const server = http.createServer((req, res) => {
     targetUrl = `https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=${LAW_API_KEY}&search=2&display=${display}&page=${page}&query=${encodeURIComponent(query)}`;
   } else if (urlObj.pathname === '/api/precedent-detail') {
     targetUrl = `https://www.law.go.kr/DRF/lawService.do?target=prec&type=XML&OC=${LAW_API_KEY}&ID=${id}`;
+  } else if (urlObj.pathname === '/api/rss') {
+    targetUrl = `https://news.google.com/rss/search?hl=ko&gl=KR&ceid=KR:ko&q=${encodeURIComponent(query)}`;
   } else {
     res.writeHead(404, { 'Content-Type': 'application/json;charset=UTF-8' });
     res.end(JSON.stringify({ error: '지원하지 않는 API 경로입니다.' }));

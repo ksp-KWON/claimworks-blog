@@ -16,22 +16,6 @@ const NEWS_QUERIES = [
   '실손보험 산재 후유장해',
 ];
 
-const BACKUP_KEYWORDS = [
-  '사망보험금', '자살보험금', '암진단비', '뇌출혈', '급성심근경색',
-  '실손의료비', '소비자선임권', '교통사고 과실비율', '교통사고 위자료', '휴업손해',
-  '장해진단', '영업배상책임', '의료사고', '근재보험', '산재보험',
-  '장해평가', '면책보험금', '보험금 지급거절', '척추 압박골절 후유장해', '십자인대 파열',
-  '회전근개 파열', '추간판탈출증 디스크', '고지의무 위반', '통지의무 위반', '일상생활배상책임',
-  '체육시설 사고 배상책임', '도로 관리 하자 배상책임', '스키장 사고 배상책임',
-  '개 물림 사고 배상책임', '자전거 교통사고', '보행자 무단횡단 사고',
-  '음주운전 면책 동의', '무면허 사고 면책', '뺑소니 사고 보상', '산재 유족급여',
-  '산재 요양급여 기각', '소음성 난청 산재', '출퇴근길 사고 산재',
-  '뇌경색 진단비 면책', '허혈성심장질환 진단비', '만성 신부전 장해등급',
-  '대퇴골 경부 골절 후유장해', '고액암 지급거절', '경계성종양 암진단비',
-  '제자리암 소액암 지급', '요추 골절 후유장해', '외상성 뇌손상 인지장해',
-  '골반 골절 장해평가', '오토바이 사고 과실비율', '전동킥보드 사고 배상'
-].sort(() => Math.random() - 0.5);
-
 // Helper to call our Next.js proxy for CORS-restricted APIs
 async function fetchProxy(action: string, payload: any = {}) {
   const res = await fetch('/api/ai-pipeline/proxy', {
@@ -76,12 +60,13 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
       const jsonStr = match ? match[0].replace(/```json/g, '').replace(/```/g, '') : schemaStr;
       const parsed = JSON.parse(jsonStr);
       keywords = parsed.candidates || [];
+      if (keywords.length === 0) throw new Error('추출된 키워드가 없습니다.');
     } catch (e) {
       console.warn('Keyword extraction failed', e);
-      keywords = [...BACKUP_KEYWORDS].sort(() => Math.random() - 0.5).map(k => ({ searchKeyword: k, newsTitle: '' }));
+      throw new Error('뉴스 키워드 추출에 실패했습니다. 프롬프트나 API 응답을 확인하세요.');
     }
   } else {
-    keywords = [...BACKUP_KEYWORDS].sort(() => Math.random() - 0.5).map(k => ({ searchKeyword: k, newsTitle: '' }));
+    throw new Error('오늘자 관련 뉴스가 없어 키워드를 추출할 수 없습니다.');
   }
 
   onProgress('3/6: 네이버 데이터랩에서 키워드 수요 검증 중...');

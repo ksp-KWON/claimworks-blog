@@ -44,23 +44,6 @@ const NEWS_QUERIES = [
   '실손보험 산재 후유장해',
 ];
 
-/** 법제처 탐색 실패 시 사용할 전문 손해사정 백업 키워드 50선 */
-const BACKUP_KEYWORDS = [
-  '사망보험금', '자살보험금', '암진단비', '뇌출혈', '급성심근경색',
-  '실손의료비', '소비자선임권', '교통사고 과실비율', '교통사고 위자료', '휴업손해',
-  '장해진단', '영업배상책임', '의료사고', '근재보험', '산재보험',
-  '장해평가', '면책보험금', '보험금 지급거절', '척추 압박골절 후유장해', '십자인대 파열',
-  '회전근개 파열', '추간판탈출증 디스크', '고지의무 위반', '통지의무 위반', '일상생활배상책임',
-  '체육시설 사고 배상책임', '도로 관리 하자 배상책임', '스키장 사고 배상책임',
-  '개 물림 사고 배상책임', '자전거 교통사고', '보행자 무단횡단 사고',
-  '음주운전 면책 동의', '무면허 사고 면책', '뺑소니 사고 보상', '산재 유족급여',
-  '산재 요양급여 기각', '소음성 난청 산재', '출퇴근길 사고 산재',
-  '뇌경색 진단비 면책', '허혈성심장질환 진단비', '만성 신부전 장해등급',
-  '대퇴골 경부 골절 후유장해', '고액암 지급거절', '경계성종양 암진단비',
-  '제자리암 소액암 지급', '요추 골절 후유장해', '외상성 뇌손상 인지장해',
-  '한시장해 장해진단서', '기왕증 공제 과실상계', '약관 설명의무 위반',
-];
-
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // ── 기존 포스트 분석 (중복 방지) ─────────────────────────────────────────
@@ -168,10 +151,13 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}`;
 
   try {
     const result = await callGemini(prompt, schema);
-    return result.candidates ?? [];
+    if (!result.candidates || result.candidates.length === 0) {
+      throw new Error('추출된 키워드가 없습니다.');
+    }
+    return result.candidates;
   } catch (err) {
-    console.warn(`    [경고] AI 키워드 추출 오류: ${err.message}`);
-    return [];
+    console.warn('❌ Gemini AI 키워드 추출 실패:', err.message);
+    throw new Error('뉴스 키워드 추출에 실패했습니다.');
   }
 }
 
@@ -274,28 +260,9 @@ async function main() {
   console.log('[3/4] 트렌드 키워드 기반 법제처 판례 탐색 중...');
   let found = await findPrecedent(rankedCandidates, usedCaseNumbers);
 
-  // 4. 백업 키워드 탐색 (트렌드 탐색 실패 시)
   if (!found) {
-    console.log('[4/4] ⚠️ 트렌드 탐색 실패 — 전문 백업 키워드로 재탐색 시작...');
-    const backupCandidates = BACKUP_KEYWORDS
-      .filter(k => !usedKeywords.has(k))
-      .map(k => ({ searchKeyword: k, newsTitle: '' }));
-    found = await findPrecedent(backupCandidates, usedCaseNumbers);
-  }
-
-  // 비상 더미 (법제처 완전 다운 등 극한 상황)
-  if (!found) {
-    console.warn('⚠️ 모든 소스 탐색 실패 — 비상 더미 판례로 세션 보호');
-    found = {
-      keyword: '보험금 청구', newsTitle: '',
-      detail: {
-        id: '000000', caseName: '손해배상 지급거절 구제',
-        caseNo: '대법원 2023다000000', judgmentDate: '20230615', courtName: '대법원',
-        judgmentSummary: '보험계약 해석은 신의성실 원칙에 따라야 하며, 신빙성 있는 의학적 소견에 기초한 보험금 청구를 정당한 사유 없이 거절할 수 없다.',
-        caseContent: '보험약관은 평균적 고객의 이해를 기준으로 객관적·획일적으로 해석하여야 하며, 모호할 때는 작성자 불이익의 원칙을 적용해 피보험자에게 유리하게 해석해야 한다.',
-        caseType: '민사',
-      },
-    };
+    console.warn('⚠️ 모든 소스 탐색 실패 — 적절한 판례를 찾지 못했습니다.');
+    throw new Error('적절한 판례를 찾지 못했습니다.');
   }
 
   const output = {

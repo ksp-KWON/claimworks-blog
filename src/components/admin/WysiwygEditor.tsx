@@ -20,7 +20,10 @@ import {
   diffSourcePlugin,
   DiffSourceToggleWrapper,
   jsxPlugin,
-  GenericJsxEditor
+  GenericJsxEditor,
+  frontmatterPlugin,
+  codeBlockPlugin,
+  codeMirrorPlugin
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 
@@ -117,6 +120,9 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
               }
             ]
           }),
+          frontmatterPlugin(),
+          codeBlockPlugin({ defaultCodeBlockLanguage: 'markdown' }),
+          codeMirrorPlugin({ codeBlockLanguages: { markdown: 'Markdown', js: 'JavaScript', css: 'CSS', txt: 'Text' } }),
           diffSourcePlugin({ diffMarkdown: 'calc', viewMode: 'rich-text' }),
           toolbarPlugin({
             toolbarContents: () => <PortalToolbar />

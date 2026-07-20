@@ -208,7 +208,8 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
   }
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto custom-scrollbar p-4 md:p-8 bg-gray-50 dark:bg-zinc-950">
+    <div className="flex-1 min-h-0 flex flex-col p-4 md:p-8 bg-gray-50 dark:bg-zinc-950">
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto custom-scrollbar">
           {/* 데스크탑 버전 (Table) */}
           <PremiumCard hoverEffect={true} className="hidden md:block p-0 sm:p-0 border-0">
             <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
@@ -375,6 +376,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
               ))
             )}
           </div>
+      </div>
     </div>
   );
 }

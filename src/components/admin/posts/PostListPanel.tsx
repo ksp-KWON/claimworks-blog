@@ -104,11 +104,11 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
                         </td>
                         <td className="px-6 py-4 text-left">
                           <div className="flex items-center gap-2">
-                            <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate max-w-sm">
+                            <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 break-keep">
                               {post.title}
                             </div>
                             {post.published === false && (
-                              <PremiumBadge color="gray" className="text-[10px] px-1.5 py-0.5 whitespace-nowrap bg-gray-200 text-gray-600 dark:bg-zinc-700 dark:text-gray-300">
+                              <PremiumBadge color="gray" className="text-[10px] px-1.5 py-0.5 whitespace-nowrap bg-gray-200 text-gray-600 dark:bg-zinc-700 dark:text-gray-300 flex-shrink-0">
                                 임시저장
                               </PremiumBadge>
                             )}

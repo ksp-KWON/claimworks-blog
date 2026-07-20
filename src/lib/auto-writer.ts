@@ -10,12 +10,7 @@ import {
 } from './prompt-rules';
 import { parseGeneratedContent, buildMarkdownFrontmatter } from './content-parser';
 
-const NEWS_QUERIES = [
-  '보험금 지급거절 분쟁',
-  '손해사정 교통사고 보상',
-  '실손보험 산재 후유장해',
-];
-
+// Removed hardcoded NEWS_QUERIES
 // Helper to call our Next.js proxy for CORS-restricted APIs
 async function fetchProxy(action: string, payload: any = {}) {
   const res = await fetch('/api/ai-pipeline/proxy', {
@@ -34,21 +29,60 @@ export async function runAutoGenerationWorkflow(
   geminiKey: string,
   onProgress: (msg: string) => void
 ) {
-  onProgress('1/6: 최신 트렌드 뉴스 수집 중...');
+  onProgress('1/6: 최신 트렌드 뉴스 검색어 자율 생성 중...');
+  let existingPostsArr: any[] = [];
+  try {
+    const res = await fetch('/api/posts?admin=true');
+    existingPostsArr = await res.json();
+  } catch(e) {
+    console.warn('Failed to fetch existing posts', e);
+  }
+  const recentPosts = existingPostsArr.slice(0, 15);
+  const existingSlugs = recentPosts.length > 0 ? recentPosts.map(p => p.slug).join(', ') : '- (없음)';
+  const existingTitles = recentPosts.length > 0 ? recentPosts.map(p => p.title).join(', ') : '- (없음)';
+
+  const queryGenPrompt = `
+당신은 대한민국 최고의 손해사정 블로그 편집장입니다.
+최근 블로그에 아래와 같은 주제의 글들이 발행되었습니다.
+[최근 발행 글]
+${existingTitles}
+
+이 주제들과 겹치지 않는, 오늘 구글 뉴스에서 탐색해 볼 만한 새롭고 실질적인 보상/보험/손해사정 관련 검색어 3개를 창작하세요.
+(예: "요양병원 배상책임", "음주운전 면책금", "백내장 수술 실손")
+반드시 아래 JSON 형식으로만 출력하세요.
+{"queries": ["검색어1", "검색어2", "검색어3"]}
+`;
+
+  let dynamicQueries: string[] = ['보험금 분쟁']; // 최후의 보루
+  try {
+    const qStr = await callGeminiAPI(geminiKey, queryGenPrompt, 'keyword-extraction');
+    const qMatch = qStr.match(/```(?:json)?\n([\s\S]*?)\n```/) || qStr.match(/{[\s\S]*}/);
+    const qParsed = JSON.parse(qMatch ? qMatch[0].replace(/```json/g, '').replace(/```/g, '') : qStr);
+    if (qParsed.queries && qParsed.queries.length > 0) {
+      dynamicQueries = qParsed.queries;
+    }
+  } catch (e) {
+    console.warn('Dynamic query generation failed, using fallback', e);
+  }
+
+  onProgress(`2/6: 동적 검색어로 최신 트렌드 뉴스 수집 중... (${dynamicQueries.join(', ')})`);
   let headlines: string[] = [];
   try {
-    const { data } = await fetchProxy('rss', { queries: NEWS_QUERIES });
+    const { data } = await fetchProxy('rss', { queries: dynamicQueries });
     headlines = data || [];
   } catch (e) {
     console.warn('RSS fetch failed', e);
   }
 
-  onProgress('2/6: AI가 손해사정 핵심 키워드를 추출 중...');
+  onProgress('3/6: AI가 손해사정 핵심 키워드를 추출 중...');
   let keywords: { searchKeyword: string, newsTitle: string }[] = [];
   if (headlines.length > 0) {
     const prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
 아래 뉴스 헤드라인 목록에서 손해사정(교통사고·산재·질병·배상책임·보험금 분쟁)과
 직접 연관된 이슈를 분석하여, 법제처 판례 API 검색에 활용할 구체적인 키워드를 추출하세요.
+
+[최근 발행 글 (이 주제들과 겹치는 키워드는 피할 것!)]
+${existingTitles}
 
 [헤드라인 목록]
 ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
@@ -71,7 +105,7 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
     throw new Error('오늘자 관련 뉴스가 없어 키워드를 추출할 수 없습니다.');
   }
 
-  onProgress('3/6: 법제처 최신 판례 매칭 중...');
+  onProgress('4/6: 법제처 최신 판례 매칭 중...');
   let precedentDetail = null;
   let finalKeyword = keywords[0]?.searchKeyword;
   
@@ -88,36 +122,49 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
     }
   }
 
-  // 🔴 근본 해결 1: '전문 법률 칼럼' 모드인데 판례를 못 찾은 경우, 범용 키워드로 반드시 판례를 하나 물고 오도록 강제
+  // 🔴 근본 해결: 하드코딩 완전 제거 및 AI 자가 치유(Self-Healing) 유기적 탐색
   if (type === 'precedent' && !precedentDetail) {
-    onProgress('3.5/6: 상세 키워드 판례 검색 실패. 범용 판례(손해배상/보험금) 검색 중...');
-    const fallbackLawKeys = ['손해배상', '보험금', '교통사고', '산재'];
-    for (const fw of fallbackLawKeys) {
-      try {
-        const { data } = await fetchProxy('law', { keyword: fw });
-        if (data) {
-          precedentDetail = data;
-          finalKeyword = fw;
-          break;
+    onProgress('4.5/6: 상세 키워드 판례 검색 실패. AI 자가 치유(거시적 법률 용어 유추) 진행 중...');
+    const healingPrompt = `
+뉴스에서 추출된 키워드 "${keywords.map(k => k.searchKeyword).join(', ')}" 로 대법원 판례를 찾지 못했습니다.
+이 사건들의 맥락에 적용할 수 있는 더 상위 개념의 보편적인 법률 용어(예: "안전배려의무", "인과관계", "설명의무", "면책사유" 등) 3가지를 제안하세요.
+반드시 아래 JSON 형식으로만 출력하세요.
+{"keywords": ["용어1", "용어2", "용어3"]}
+`;
+    try {
+      const hStr = await callGeminiAPI(geminiKey, healingPrompt, 'keyword-extraction');
+      const hMatch = hStr.match(/```(?:json)?\n([\s\S]*?)\n```/) || hStr.match(/{[\s\S]*}/);
+      const hParsed = JSON.parse(hMatch ? hMatch[0].replace(/```json/g, '').replace(/```/g, '') : hStr);
+      const healKeys = hParsed.keywords || [];
+      
+      for (const fw of healKeys) {
+        try {
+          const { data } = await fetchProxy('law', { keyword: fw });
+          if (data) {
+            precedentDetail = data;
+            finalKeyword = fw;
+            break;
+          }
+        } catch (e) {
+          console.warn('Law API healing fallback failed for ' + fw);
         }
-      } catch (e) {
-        console.warn('Law API fallback failed for ' + fw);
       }
+    } catch(e) {
+      console.warn('AI Healing failed', e);
     }
   }
 
+  // AI 자가치유로도 판례를 못 찾으면, 하드코딩으로 덮어쓰지 않고 떳떳하게 실패 처리(Fail-Fast)
   if (type === 'precedent' && !precedentDetail) {
-    throw new Error('사용 가능한 판례를 찾을 수 없습니다. 법제처 API 상태를 확인해주세요.');
+    throw new Error('현재 뉴스 트렌드에 부합하는 대법원 판례를 찾지 못했습니다. 다른 시간대에 다시 시도해주세요.');
   }
 
   if (!precedentDetail) {
     console.warn(`[AutoWriter] No precedent found for any of the keywords. Using first keyword: ${finalKeyword}`);
   }
 
-  onProgress('4/6: 블로그 포스팅 기획 및 설계 중...');
+  onProgress('5/6: 블로그 포스팅 기획 및 설계 중...');
   const angle = getRandomAngle();
-  const existingPostsArr: any[] = [];
-  const existingSlugs = '- (없음)'; 
   const trendTitle = keywords.find(k => k.searchKeyword === finalKeyword)?.newsTitle || '없음';
 
   let topicPlanStr = '';
@@ -140,7 +187,7 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
     throw new Error('기획안 JSON 파싱 실패');
   }
 
-  onProgress('5/6: AI가 심층 전문 칼럼을 작성 중입니다. (약 30초 소요)...');
+  onProgress('6/6: AI가 심층 전문 칼럼을 작성 중입니다. (약 30초 소요)...');
   
   let prompt = '';
   if (type === 'precedent' && precedentDetail) {

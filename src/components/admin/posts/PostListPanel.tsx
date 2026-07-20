@@ -44,7 +44,7 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
               {/* 모바일 뷰 (카드형) */}
               <div className="block md:hidden space-y-3">
                 {sortedAndFilteredList.map((post) => (
-                  <PremiumCard key={post.sha} className="p-4 hover:border-blue-300 transition-colors">
+                  <PremiumCard key={post.sha} className="p-4 transition-colors">
                     <div className="flex flex-col gap-3">
                       <div className="flex items-center gap-2">
                         <div className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug">
@@ -85,7 +85,7 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
               </div>
 
               {/* 데스크탑 뷰 (테이블형) */}
-              <PremiumCard hoverEffect={true} className="hidden md:block p-0 sm:p-0 border-0 rounded-none">
+              <PremiumCard className="hidden md:block p-0 sm:p-0 border-0 rounded-none">
                 <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
                   <thead className="bg-slate-100 dark:bg-zinc-800">
                     <tr>

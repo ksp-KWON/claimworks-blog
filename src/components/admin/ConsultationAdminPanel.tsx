@@ -211,7 +211,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     <div className="flex-1 min-h-0 flex flex-col p-4 md:p-8 bg-gray-50 dark:bg-zinc-950">
       <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto custom-scrollbar">
           {/* 데스크탑 버전 (Table) */}
-          <PremiumCard hoverEffect={true} className="hidden md:block p-0 sm:p-0 border-0">
+          <PremiumCard className="hidden md:block p-0 sm:p-0 border-0">
             <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
               <thead className="bg-slate-100 dark:bg-zinc-800">
                 <tr>
@@ -316,7 +316,6 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 <PremiumCard 
                   key={item.id}
                   onClick={() => handleRowClick(item.id)}
-                  hoverEffect={true}
                   borderColor={item.status === '대기' ? 'red' : item.status === '보류' ? 'yellow' : item.status === '상담' ? 'blue' : (item.status === '완료' || item.status === '상담완료' || item.status === '상담 완료') ? 'green' : 'default'}
                   className={`flex flex-col gap-4 cursor-pointer overflow-hidden ${selectedId === item.id ? 'ring-2 ring-blue-500/50' : ''}`}
                 >

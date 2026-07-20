@@ -22,9 +22,15 @@ import {
 import { runAutoGenerationWorkflow } from '@/lib/auto-writer';
 
 function parseGeneratedPost(raw: string) {
-  const cleanRaw = raw.replace(/^```(?:markdown|md)?\s*\n/i, '').replace(/\n```\s*$/, '').trim();
+  // ✅ 근본 해결: CRLF(\r\n)를 LF(\n)로 정규화 — buildMarkdownFrontmatter가 \r\n을 생성하므로
+  // 기존 정규식 /---\n...\n---/이 매칭 실패하던 버그를 완전히 수정
+  const cleanRaw = raw
+    .replace(/\r\n/g, '\n')
+    .replace(/^```(?:markdown|md)?\s*\n/i, '')
+    .replace(/\n```\s*$/, '')
+    .trim();
   const match = cleanRaw.match(/---\n([\s\S]*?)\n---/);
-  if (!match) return { title: '', summary: '', date: '', category: '', tags: '', slug: '', content: cleanRaw };
+  if (!match) return { title: '', summary: '', date: '', category: '', tags: '', slug: '', specialtyCategory: '', caseNumber: '', content: cleanRaw };
   const yamlStr = match[1];
   const content = cleanRaw.substring(match.index! + match[0].length).trim();
   

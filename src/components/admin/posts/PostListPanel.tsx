@@ -46,12 +46,12 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
                 {sortedAndFilteredList.map((post) => (
                   <PremiumCard key={post.sha} className="p-4 transition-colors">
                     <div className="flex flex-col gap-3">
-                      <div className="flex items-center gap-2">
-                        <div className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug">
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <div className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug truncate flex-1 min-w-0">
                           {post.title}
                         </div>
                         {post.published === false && (
-                          <PremiumBadge color="gray" className="text-[10px] px-1.5 py-0.5 whitespace-nowrap bg-gray-200 text-gray-600 dark:bg-zinc-700 dark:text-gray-300">
+                          <PremiumBadge color="gray" className="text-[10px] px-1.5 py-0.5 whitespace-nowrap bg-gray-200 text-gray-600 dark:bg-zinc-700 dark:text-gray-300 flex-shrink-0">
                             임시저장
                           </PremiumBadge>
                         )}
@@ -102,9 +102,9 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
                             {post.date || post.name.replace('.md', '')}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-left">
-                          <div className="flex items-center gap-2 overflow-hidden">
-                            <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                        <td className="px-6 py-4 text-left max-w-0 w-full">
+                          <div className="flex items-center gap-2 overflow-hidden w-full">
+                            <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate flex-1 min-w-0">
                               {post.title}
                             </div>
                             {post.published === false && (

@@ -87,7 +87,7 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
               {/* 데스크탑 뷰 (테이블형) */}
               <PremiumCard className="hidden md:block p-0 sm:p-0 border-0 rounded-none">
                 <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
-                  <thead className="bg-slate-100 dark:bg-zinc-800">
+                  <thead className="sticky top-0 z-10 bg-slate-100 dark:bg-zinc-800 shadow-[0_1px_0_rgba(0,0,0,0.05)] dark:shadow-[0_1px_0_rgba(255,255,255,0.05)]">
                     <tr>
                       <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-40">발행일</th>
                       <th scope="col" className="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">포스팅 제목</th>

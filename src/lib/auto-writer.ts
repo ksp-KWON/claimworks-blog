@@ -8,6 +8,7 @@ import {
   buildPrecedentPrompt,
   TOPIC_SCHEMA
 } from './prompt-rules';
+import { parseGeneratedContent, buildMarkdownFrontmatter } from './content-parser';
 
 const NEWS_QUERIES = [
   '보험금 지급거절 분쟁',
@@ -26,87 +27,7 @@ async function fetchProxy(action: string, payload: any = {}) {
   return res.json();
 }
 
-function yamlSafe(str: string) {
-  return String(str || '').replace(/"/g, "'").replace(/\n/g, ' ').trim();
-}
-
-function parseGeneratedContent(rawOutput: string) {
-  let cleanOutput = rawOutput;
-  if (cleanOutput.includes('[ANALYSIS_START]')) {
-    cleanOutput = cleanOutput.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
-  }
-
-  const lines = cleanOutput.split('\n');
-  let summary = '';
-  let contentStart = 0;
-
-  if (lines[0] && lines[0].startsWith('SEO_META:')) {
-    summary = yamlSafe(lines[0].replace('SEO_META:', '').trim());
-    contentStart = 1;
-    while (contentStart < lines.length && lines[contentStart].trim() === '') contentStart++;
-  }
-
-  let content = lines.slice(contentStart).join('\n').replace(/\[BLOCK-\d+:[^\]]*\]/gi, '').trim();
-
-  if (!summary) {
-    summary = content.replace(/[#*`>[\]!]/g, '').replace(/\s+/g, ' ').trim().slice(0, 140);
-  }
-
-  summary = summary.replace(/^\[(.*)\]$/, '$1').trim();
-  if (summary.length > 158) summary = summary.slice(0, 155) + '...';
-
-  content = content.replace(/<calculator type=".*?" \/>/gi, '');
-  content = content.replace(/\[이미지 제안:.*?\]/g, '');
-  content = content.replace(/\[관련 글 추천\]/g, '');
-  
-  content = content.replace(/^## #\s+Q\s*:/gm, '### Q :');
-  content = content.replace(/^## #\s+/gm, '### ');
-  content = content.replace(/^## ## /gm, '## ');
-
-  const summaryMarkerIdx = content.indexOf('[추천 제목 2개]');
-  if (summaryMarkerIdx >= 0) {
-    const beforeMarker = content.substring(0, summaryMarkerIdx).trimEnd();
-    content = beforeMarker.endsWith('---') ? beforeMarker.slice(0, -3).trimEnd() : beforeMarker;
-  }
-
-  content = content.replace(/^(#{1,3}\s[^`\n]*?)(?<!\s):(?!\s)(?!\/\/)/gm, '$1 : ');
-  content = content.replace(/^(#{1,3}\s[^`\n]*?)(?<!\s):\s+(?!\/\/)/gm, '$1 : ');
-
-  content = content.replace(/<blue>보상스쿨에 문의하세요<\/blue>를 통해/g, '전문가의 조력을 통해');
-  content = content.replace(/<blue>보상스쿨에 문의하세요<\/blue>는/g, '전문가와의 상담은');
-  content = content.replace(/<blue>보상스쿨에 문의하세요<\/blue>와 같은/g, '보상스쿨과 같은');
-  content = content.replace(/언제든 <blue>보상스쿨에 문의하세요<\/blue>\./g, '언제든 전문가와 상의하십시오.');
-  content = content.replace(/<blue>보상스쿨에 문의하세요\.<\/blue>/g, '전문가와 상의하십시오.');
-  content = content.replace(/<blue>보상스쿨에 문의하세요<\/blue>\./g, '전문가와 상의하십시오.');
-  content = content.replace(/\*\s*<blue>보상스쿨에 문의하세요<\/blue>\s*:/g, '* 전문가와의 상담 :');
-  content = content.replace(/언제든 보상스쿨에 문의하세요\./g, '언제든 전문가와 상의하십시오.');
-  content = content.replace(/보상스쿨의 전문 상담 채널을 통해 현재 상황을 진단받아 보시기 바랍니다\.\s*전문가와 상의하십시오\./g, '보상스쿨의 전문 상담 채널을 통해 현재 상황을 진단받아 보시기 바랍니다.');
-
-  content = content.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
-
-  return { summary, content };
-}
-
-function buildMarkdownFrontmatter(topic: any, summary: string, content: string) {
-  const kstDate = new Date(Date.now() + 9 * 3600 * 1000).toISOString().split('T')[0];
-  const tagsStr = (topic.tags || []).map((t: string) => `"${yamlSafe(t)}"`).join(', ');
-
-  let fm = `---
-title: "${yamlSafe(topic.title)}"
-slug: "${topic.slug || ''}"
-date: "${kstDate}"
-updatedAt: "${kstDate}"
-summary: "${summary}"
-category: "${yamlSafe(topic.category)}"
-regionCategory: ""
-specialtyCategory: "${yamlSafe(topic.specialtyCategory)}"
-tags: [${tagsStr}]
----
-
-`;
-  return fm + content;
-}
-
+// ─── 공용 모듈 (content-parser)에서 자동 처리 ───
 
 export async function runAutoGenerationWorkflow(
   type: 'all' | 'precedent' | 'trend',

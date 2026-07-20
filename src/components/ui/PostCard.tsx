@@ -14,14 +14,31 @@ export default function PostCard({ post, variant = 'grid' }: PostCardProps) {
   const firstCategory = post.category ? post.category.split(',')[0].trim() : '보상가이드';
   const theme = getCategoryTheme(firstCategory);
 
+  // Safe-listed gradient colors for Tailwind JIT
+  const gradientMap: Record<string, string> = {
+    red: 'from-red-50/80 to-transparent dark:from-red-950/30',
+    rose: 'from-rose-50/80 to-transparent dark:from-rose-950/30',
+    blue: 'from-blue-50/80 to-transparent dark:from-blue-950/30',
+    green: 'from-green-50/80 to-transparent dark:from-green-950/30',
+    teal: 'from-teal-50/80 to-transparent dark:from-teal-950/30',
+    purple: 'from-purple-50/80 to-transparent dark:from-purple-950/30',
+    indigo: 'from-indigo-50/80 to-transparent dark:from-indigo-950/30',
+    yellow: 'from-yellow-50/80 to-transparent dark:from-yellow-950/30',
+    default: 'from-blue-50/80 to-transparent dark:from-blue-900/20'
+  };
+  const bgGradientClass = gradientMap[theme.color] || gradientMap['default'];
+
+
   if (variant === 'list') {
     // List view (used in BlogPageClient)
     return (
       <article className={`group flex flex-col justify-between bg-white dark:bg-[#202124] p-4 sm:p-6 rounded-none sm:rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:border-${theme.color}-500 hover:shadow-[0_16px_50px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_16px_50px_rgba(0,0,0,0.8)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden`}>
         {/* Subtle left border accent on hover */}
-        <div className={`absolute top-0 left-0 w-1 h-full bg-${theme.color}-500 opacity-0 group-hover:opacity-100 transition-opacity`}></div>
+        <div className={`absolute top-0 left-0 w-1 h-full bg-${theme.color}-500 opacity-0 group-hover:opacity-100 transition-opacity z-20`}></div>
+        {/* Background color gradient on hover */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${bgGradientClass} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0`}></div>
         
-        <div>
+        <div className="relative z-10">
           <div className="flex flex-wrap items-center gap-3 text-xs mb-3">
             <PremiumBadge color={theme.color}>{firstCategory}</PremiumBadge>
             <time className="text-[#5f6368] dark:text-[#9aa0a6] font-medium flex items-center gap-1">
@@ -71,7 +88,8 @@ export default function PostCard({ post, variant = 'grid' }: PostCardProps) {
       href={`/blog/${post.slug}`} 
       className="group flex flex-col relative bg-gray-50/50 dark:bg-[#202124] border border-gray-100 dark:border-white/10 p-5 transition-all duration-300 overflow-hidden hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
     >
-      <div className={`absolute top-0 left-0 w-1 h-full bg-${theme.color}-500 opacity-0 group-hover:opacity-100 transition-opacity`}></div>
+      <div className={`absolute top-0 left-0 w-1 h-full bg-${theme.color}-500 opacity-0 group-hover:opacity-100 transition-opacity z-20`}></div>
+      <div className={`absolute inset-0 bg-gradient-to-br ${bgGradientClass} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0`}></div>
       <div className="flex items-center justify-between gap-2 mb-3 z-10">
         <PremiumBadge color={theme.color}>{firstCategory}</PremiumBadge>
         <time className="text-[11px] font-medium text-gray-400 dark:text-gray-500 flex items-center gap-1">

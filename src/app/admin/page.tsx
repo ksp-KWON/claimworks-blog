@@ -108,7 +108,7 @@ export default function AdminPage() {
         published: postData.published
       });
       // Switch to editor
-      setActiveApp('editor');
+      setActiveApp('post-ai');
     }
     setIsLoading(false);
   };

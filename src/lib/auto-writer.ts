@@ -88,6 +88,32 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
     }
   }
 
+  // 🔴 근본 해결 1: '전문 법률 칼럼' 모드인데 판례를 못 찾은 경우, 범용 키워드로 반드시 판례를 하나 물고 오도록 강제
+  if (type === 'precedent' && !precedentDetail) {
+    onProgress('3.5/6: 상세 키워드 판례 검색 실패. 범용 판례(손해배상/보험금) 검색 중...');
+    const fallbackLawKeys = ['손해배상', '보험금', '교통사고', '산재'];
+    for (const fw of fallbackLawKeys) {
+      try {
+        const { data } = await fetchProxy('law', { keyword: fw });
+        if (data) {
+          precedentDetail = data;
+          finalKeyword = fw;
+          break;
+        }
+      } catch (e) {
+        console.warn('Law API fallback failed for ' + fw);
+      }
+    }
+  }
+
+  if (type === 'precedent' && !precedentDetail) {
+    throw new Error('사용 가능한 판례를 찾을 수 없습니다. 법제처 API 상태를 확인해주세요.');
+  }
+
+  if (!precedentDetail) {
+    console.warn(`[AutoWriter] No precedent found for any of the keywords. Using first keyword: ${finalKeyword}`);
+  }
+
   onProgress('4/6: 블로그 포스팅 기획 및 설계 중...');
   const angle = getRandomAngle();
   const existingPostsArr: any[] = [];
@@ -126,7 +152,14 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
   const generated = await callGeminiAPI(geminiKey, prompt, 'auto-generate');
   
   const { summary, content } = parseGeneratedContent(generated);
-  const finalContent = buildMarkdownFrontmatter(topic, summary, content);
+  
+  // 🔴 근본 해결 2: 판례 번호를 프론트매터(SEO)에 확실히 주입
+  const additionalFrontmatter: any = {};
+  if (precedentDetail && precedentDetail.caseNo) {
+    additionalFrontmatter.precedentNumber = precedentDetail.caseNo;
+  }
+  
+  const finalContent = buildMarkdownFrontmatter(topic, summary, content, additionalFrontmatter);
   
   onProgress('완료! 에디터에서 내용을 확인하세요.');
   return finalContent;

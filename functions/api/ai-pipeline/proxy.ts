@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server';
-
 function extractXmlValues(xml: string, tag: string) {
   const re = new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>|([^<]*?))</${tag}>`, 'g');
   const out = [];
@@ -8,9 +6,10 @@ function extractXmlValues(xml: string, tag: string) {
   return out;
 }
 
-export async function POST(req: Request) {
+export async function onRequestPost(context: any) {
+  const { request, env } = context;
   try {
-    const body = await req.json();
+    const body = await request.json();
     const { action, ...payload } = body;
 
     // 1. Google News RSS Proxy
@@ -33,19 +32,19 @@ export async function POST(req: Request) {
             const titles = extractXmlValues(xml, 'title')
               .filter(t => t && !t.startsWith('"') && !t.includes('Google 뉴스'));
             headlines.push(...titles);
-          } else {
-            console.warn(`RSS fetch failed for ${query}: HTTP ${res.status}`);
           }
         } catch (e) {
-          console.warn('RSS Error:', e);
+          // fetch error ignored
         }
       }
-      return NextResponse.json({ data: [...new Set(headlines)] });
+      return new Response(JSON.stringify({ data: [...new Set(headlines)] }), { 
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } 
+      });
     }
 
     // 2. Law API Proxy
     if (action === 'law') {
-      const { LAW_API_KEY, LAW_PROXY_ENDPOINT, LAW_PROXY_TOKEN } = process.env;
+      const { LAW_API_KEY, LAW_PROXY_ENDPOINT, LAW_PROXY_TOKEN } = env;
       let listUrl = '';
       const headers: any = { 'User-Agent': 'Mozilla/5.0' };
 
@@ -53,16 +52,16 @@ export async function POST(req: Request) {
         listUrl = `${LAW_PROXY_ENDPOINT}/api/precedent?query=${encodeURIComponent(payload.keyword)}`;
         if (LAW_PROXY_TOKEN) headers['X-Proxy-Token'] = LAW_PROXY_TOKEN;
       } else {
-        if (!LAW_API_KEY) throw new Error('LAW_API_KEY missing');
+        if (!LAW_API_KEY) return new Response(JSON.stringify({ error: 'LAW_API_KEY missing' }), { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } });
         listUrl = `https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=${LAW_API_KEY}&search=2&query=${encodeURIComponent(payload.keyword)}`;
       }
 
       const res = await fetch(listUrl, { headers });
-      if (!res.ok) throw new Error('Law list error');
+      if (!res.ok) return new Response(JSON.stringify({ error: 'Law list error' }), { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } });
       const xml = await res.text();
       
       const ids = extractXmlValues(xml, '판례일련번호');
-      if (ids.length === 0) return NextResponse.json({ data: null });
+      if (ids.length === 0) return new Response(JSON.stringify({ data: null }), { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
 
       // Fetch first valid detail
       for (const id of ids.slice(0, 3)) {
@@ -80,23 +79,23 @@ export async function POST(req: Request) {
           const caseContent = extractXmlValues(dXml, '판례내용')[0];
           
           if (judgmentSummary && judgmentSummary.length >= 40 && caseContent) {
-            return NextResponse.json({
+            return new Response(JSON.stringify({
               data: {
                 id,
                 caseNo: extractXmlValues(dXml, '사건번호')[0],
                 judgmentSummary,
                 caseContent
               }
-            });
+            }), { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
           }
         }
       }
-      return NextResponse.json({ data: null });
+      return new Response(JSON.stringify({ data: null }), { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
     }
 
-    return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
+    return new Response(JSON.stringify({ error: 'Unknown action' }), { status: 400, headers: { 'Access-Control-Allow-Origin': '*' } });
 
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } });
   }
 }

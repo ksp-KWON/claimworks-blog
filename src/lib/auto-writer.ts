@@ -71,20 +71,11 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
     throw new Error('오늘자 관련 뉴스가 없어 키워드를 추출할 수 없습니다.');
   }
 
-  onProgress('3/6: 네이버 데이터랩에서 키워드 수요 검증 중...');
-  let rankedKeywords = keywords;
-  try {
-    const { data } = await fetchProxy('naver', { candidates: keywords });
-    if (data && data.length > 0) rankedKeywords = data;
-  } catch (e) {
-    console.warn('Naver API failed', e);
-  }
-
-  onProgress('4/6: 법제처 최신 판례 매칭 중...');
+  onProgress('3/6: 법제처 최신 판례 매칭 중...');
   let precedentDetail = null;
-  let finalKeyword = rankedKeywords[0]?.searchKeyword || '사망보험금';
+  let finalKeyword = keywords[0]?.searchKeyword;
   
-  for (const kw of rankedKeywords.slice(0, 5)) {
+  for (const kw of keywords.slice(0, 5)) {
     try {
       const { data } = await fetchProxy('law', { keyword: kw.searchKeyword });
       if (data) {
@@ -97,11 +88,11 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
     }
   }
 
-  onProgress('5/6: 블로그 포스팅 기획 및 설계 중...');
+  onProgress('4/6: 블로그 포스팅 기획 및 설계 중...');
   const angle = getRandomAngle();
   const existingPostsArr: any[] = [];
   const existingSlugs = '- (없음)'; 
-  const trendTitle = rankedKeywords.find(k => k.searchKeyword === finalKeyword)?.newsTitle || '없음';
+  const trendTitle = keywords.find(k => k.searchKeyword === finalKeyword)?.newsTitle || '없음';
 
   let topicPlanStr = '';
   try {
@@ -123,7 +114,7 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
     throw new Error('기획안 JSON 파싱 실패');
   }
 
-  onProgress('6/6: AI가 심층 전문 칼럼을 작성 중입니다. (약 30초 소요)...');
+  onProgress('5/6: AI가 심층 전문 칼럼을 작성 중입니다. (약 30초 소요)...');
   
   let prompt = '';
   if (type === 'precedent' && precedentDetail) {

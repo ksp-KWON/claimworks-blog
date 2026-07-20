@@ -63,7 +63,10 @@ function parseGeneratedPost(raw: string) {
   
   return {
     title: parse('title'), summary: parse('summary'), date: parse('date'),
-    category: parse('category'), tags: parse('tags'), slug: parse('slug'), content
+    category: parse('category'), tags: parse('tags'), slug: parse('slug'),
+    specialtyCategory: parse('specialtyCategory'),
+    caseNumber: parse('caseNumber'),
+    content
   };
 }
 
@@ -78,6 +81,7 @@ export default function AdminPage() {
   // Editor State
   const [postMeta, setPostMeta] = useState({
     title: '', summary: '', date: '', category: '', tags: '',
+    specialtyCategory: '', caseNumber: '',
     content: '', currentSha: null as string | null, currentFilename: null as string | null,
     published: false
   });
@@ -148,6 +152,8 @@ export default function AdminPage() {
         date: postData.date,
         category: postData.category,
         tags: postData.tags,
+        specialtyCategory: postData.specialtyCategory || '',
+        caseNumber: postData.caseNumber || '',
         content: postData.content,
         currentSha: sha,
         currentFilename: filename,
@@ -205,6 +211,8 @@ export default function AdminPage() {
           date: parsed.date || prev.date,
           category: parsed.category || prev.category,
           tags: parsed.tags || prev.tags,
+          specialtyCategory: parsed.specialtyCategory || prev.specialtyCategory,
+          caseNumber: parsed.caseNumber || prev.caseNumber,
           currentFilename: parsed.slug ? `${parsed.slug}.md` : prev.currentFilename,
           content: parsed.content
         }));
@@ -233,6 +241,8 @@ export default function AdminPage() {
           date: parsed.date || prev.date,
           category: parsed.category || prev.category,
           tags: parsed.tags || prev.tags,
+          specialtyCategory: parsed.specialtyCategory || prev.specialtyCategory,
+          caseNumber: parsed.caseNumber || prev.caseNumber,
           currentFilename: parsed.slug ? `${parsed.slug}.md` : prev.currentFilename,
           content: parsed.content
         }));
@@ -249,6 +259,7 @@ export default function AdminPage() {
   const handleCreateBlankPost = () => {
     setPostMeta({
       title: '', summary: '', date: '', category: '', tags: '',
+      specialtyCategory: '', caseNumber: '',
       content: '', currentSha: null, currentFilename: null, published: false
     });
     setActiveApp('post-ai');

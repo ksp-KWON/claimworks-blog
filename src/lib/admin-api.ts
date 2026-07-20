@@ -125,6 +125,8 @@ export async function loadPost(githubToken: string, filename: string) {
     category: meta.category || '기타',
     date: meta.date || new Date().toISOString().split('T')[0],
     tags: Array.isArray(meta.tags) ? meta.tags.join(', ') : '',
+    specialtyCategory: meta.specialtyCategory || '',
+    caseNumber: meta.caseNumber || '',
     published: meta.published !== false,
     content: rawContent
   };
@@ -137,9 +139,11 @@ export async function savePost(githubToken: string, data: any) {
   const compiledTags = data.tags ? data.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
   const compiledMarkdown = `---
 title: "${data.title.replace(/"/g, '\\"')}"
-summary: "${data.summary.replace(/"/g, '\\"')}"
+summary: "${(data.summary || '').replace(/"/g, '\\"')}"
 category: "${data.category || '기타'}"
 date: "${data.date || new Date().toISOString().split('T')[0]}"
+specialtyCategory: "${(data.specialtyCategory || '').replace(/"/g, "'")}"
+caseNumber: "${(data.caseNumber || '').replace(/"/g, "'")}"
 published: ${data.published !== false}
 tags: ${JSON.stringify(compiledTags)}
 ---

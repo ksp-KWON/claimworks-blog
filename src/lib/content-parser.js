@@ -10,32 +10,19 @@ function yamlSafe(str) {
 
 function parseGeneratedContent(rawOutput) {
   let cleanOutput = rawOutput;
+  // ANALYSIS_START/END 블록 제거 (이미 cleanAnalysisBlock이 안 되었을 때를 대비)
   if (cleanOutput.includes('[ANALYSIS_START]')) {
     cleanOutput = cleanOutput.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
   }
 
-  let summary = '';
-  
-  // SEO_META를 정규식으로 유연하게 추출
-  const seoMetaMatch = cleanOutput.match(/SEO_META:\s*([^\n]+)/);
-  if (seoMetaMatch) {
-    summary = yamlSafe(seoMetaMatch[1].trim());
-    cleanOutput = cleanOutput.replace(seoMetaMatch[0], '').trim();
-  }
+  // SEO_META 스첨이 있으면 제거 (수동모드 호환성 유지)
+  cleanOutput = cleanOutput.replace(/^SEO_META:.*$/m, '').trim();
 
   const lines = cleanOutput.split('\n');
   let contentStart = 0;
   while (contentStart < lines.length && lines[contentStart].trim() === '') contentStart++;
 
   let content = lines.slice(contentStart).join('\n').replace(/\[BLOCK-\d+:[^\]]*\]/gi, '').trim();
-
-  if (!summary) {
-    summary = content.replace(/[#*`>[\]!]/g, '').replace(/\s+/g, ' ').trim().slice(0, 140);
-  }
-
-  summary = summary.replace(/^\[(.*)\]$/, '$1').trim();
-  if (summary.length > 158) summary = summary.slice(0, 155) + '...';
-
   // 글로벌 정제 필터링
   content = content.replace(/<calculator type=".*?" \/>/gi, '');
   content = content.replace(/\[이미지 제안:.*?\]/g, '');
@@ -69,7 +56,7 @@ function parseGeneratedContent(rawOutput) {
 
   content = content.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
 
-  return { summary, content };
+  return { content };
 }
 
 function buildMarkdownFrontmatter(topic, summary, content, additionalFrontmatter = {}) {

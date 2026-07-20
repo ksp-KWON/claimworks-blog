@@ -402,14 +402,15 @@ const TOPIC_SCHEMA = {
   type: 'OBJECT',
   properties: {
     slug: { type: 'STRING', description: '하이픈 구분 영문 소문자 URL 슬러그' },
-    title: { type: 'STRING', description: 'SEO 최적화 포스팅 제목' },
-    category: { type: 'STRING', description: '카테고리명' },
-    specialtyCategory: { type: 'STRING', description: '전문 진료과목' },
-    tags: { type: 'ARRAY', items: { type: 'STRING' }, description: '관련 태그 5개' },
-    keywords: { type: 'STRING', description: '타겟 키워드 목록' },
+    title: { type: 'STRING', description: 'SEO 최적화 포스팅 제목 (50자 내외)' },
+    summary: { type: 'STRING', description: '구글 검색 결과에 노출될 150자 이내의 클릭 유도용 SEO 요약문. 판례번호 또는 핵심 키워드 포함.' },
+    category: { type: 'STRING', description: '카테고리명. 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드|판례·법률 해석 중 1개' },
+    specialtyCategory: { type: 'STRING', description: '사건 관련 전문 진료과목 (정형외과, 신경과, 신경외과 등). 관련 없으면 빈 문자열.' },
+    tags: { type: 'ARRAY', items: { type: 'STRING' }, description: '핵심 검색 키워드 태그 5개' },
+    keywords: { type: 'STRING', description: '타겟 키워드 목록 (쉼표 구분)' },
     calculatorType: { type: 'STRING', description: '"auto" 또는 "medical"' },
   },
-  required: ['slug', 'title', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
+  required: ['slug', 'title', 'summary', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
 };
 
 function buildBlogPrompt(topic, angle, existingPosts) {
@@ -431,10 +432,8 @@ ${STRICT_RULES}
 [기획안]
 * 제목: ${topic.title}
 * 카테고리: ${topic.category}
-* 전문 진료과목: ${topic.specialtyCategory}
-* 태그: ${topic.tags.join(', ')}
-
-${getBlogMetaFirstLine()}
+* 전문 진료과목: ${topic.specialtyCategory || '(해당 없음)'}
+* 태그: ${(topic.tags || []).join(', ')}
 
 ${getBlogSkeleton(angle, calcTag, postsCtx)}
 
@@ -467,11 +466,10 @@ ${(detail.caseContent || '').slice(0, 3000)} (본문 일부)
 
 [기획안]
 * 제목: ${topic.title}
+* 요약: ${topic.summary}
 * 카테고리: ${topic.category}
-* 전문 진료과목: ${topic.specialtyCategory}
-* 태그: ${topic.tags.join(', ')}
-
-${getPrecedentMetaFirstLine()}
+* 전문 진료과목: ${topic.specialtyCategory || '(해당 없음)'}
+* 태그: ${(topic.tags || []).join(', ')}
 
 ${getPrecedentSkeleton(detail, angle, calcTag, postsCtx)}`;
 }

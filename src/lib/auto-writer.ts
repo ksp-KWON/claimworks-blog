@@ -198,9 +198,18 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
   const generated = await callGeminiAPI(geminiKey, prompt, 'auto-generate');
   
-  const { summary, content } = parseGeneratedContent(generated);
+  const { content } = parseGeneratedContent(generated);
   
-  // 🔴 근본 해결 2: 판례 번호를 프론트매터(SEO)에 확실히 주입
+  // summary는 TOPIC_SCHEMA 구조화 출력(JSON)에서 100% 신뢰도로 추출
+  // - topic.summary: Gemini가 기획 단계(5단계)에서 이미 JSON으로 생성한 SEO 요약문
+  // - fallback: 요약문 누락 시 본문 앞부분 140자 사용
+  let summary = (topic.summary || '').replace(/"/g, "'").replace(/\n/g, ' ').trim();
+  if (!summary) {
+    summary = content.replace(/[#*`>[\]!]/g, '').replace(/\s+/g, ' ').trim().slice(0, 140);
+  }
+  if (summary.length > 158) summary = summary.slice(0, 155) + '...';
+  
+  // 판례 번호를 프론트매터(SEO)에 확실히 주입
   const additionalFrontmatter: any = {};
   if (precedentDetail && precedentDetail.caseNo) {
     additionalFrontmatter.caseNumber = precedentDetail.caseNo;

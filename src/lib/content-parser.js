@@ -14,15 +14,18 @@ function parseGeneratedContent(rawOutput) {
     cleanOutput = cleanOutput.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
   }
 
-  const lines = cleanOutput.split('\n');
   let summary = '';
-  let contentStart = 0;
-
-  if (lines[0] && lines[0].startsWith('SEO_META:')) {
-    summary = yamlSafe(lines[0].replace('SEO_META:', '').trim());
-    contentStart = 1;
-    while (contentStart < lines.length && lines[contentStart].trim() === '') contentStart++;
+  
+  // SEO_META를 정규식으로 유연하게 추출
+  const seoMetaMatch = cleanOutput.match(/SEO_META:\s*([^\n]+)/);
+  if (seoMetaMatch) {
+    summary = yamlSafe(seoMetaMatch[1].trim());
+    cleanOutput = cleanOutput.replace(seoMetaMatch[0], '').trim();
   }
+
+  const lines = cleanOutput.split('\n');
+  let contentStart = 0;
+  while (contentStart < lines.length && lines[contentStart].trim() === '') contentStart++;
 
   let content = lines.slice(contentStart).join('\n').replace(/\[BLOCK-\d+:[^\]]*\]/gi, '').trim();
 

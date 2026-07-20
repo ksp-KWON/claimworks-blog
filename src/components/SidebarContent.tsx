@@ -169,7 +169,7 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
 
       {/* 인기 키워드 태그 (layout.tsx 서버에서 전달된 정적 데이터) */}
       {tags.length > 0 && (
-        <PremiumCard borderColor="red" hoverEffect={false} className="!p-5">
+        <PremiumCard borderColor="red" hoverEffect={true} className="!p-5">
           <PremiumHeading level={3} gradient="red" showLeftBorder={true} className="!mb-4 !text-sm">
             <svg className="w-4 h-4 text-[var(--google-red)] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />

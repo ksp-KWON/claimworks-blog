@@ -14,6 +14,8 @@
 
 const fs   = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const { safeFetch } = require('./fetch-utils.js');
 
 // ── 환경변수 로드 (.env.local) ────────────────────────────────────────────
 const envPath = path.join(process.cwd(), '.env.local');
@@ -62,6 +64,14 @@ const BACKUP_KEYWORDS = [
 ];
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function getNaverHeaders() {
+  return {
+    'X-Naver-Client-Id': NAVER_CLIENT_ID,
+    'X-Naver-Client-Secret': NAVER_CLIENT_SECRET,
+    'Content-Type': 'application/json',
+  };
+}
 
 // ── 기존 포스트 분석 (중복 방지) ─────────────────────────────────────────
 function getUsedMetadata() {
@@ -112,9 +122,7 @@ async function fetchTrendingNews() {
 
   for (const query of NEWS_QUERIES) {
     try {
-      const res = await fetch(BASE + encodeURIComponent(query), {
-        headers, signal: AbortSignal.timeout(10000),
-      });
+      const res = await safeFetch(BASE + encodeURIComponent(query), { headers }, 10000);
       if (!res.ok) { console.warn(`    [경고] "${query}" (HTTP ${res.status})`); continue; }
 
       const xml = await res.text();
@@ -191,19 +199,16 @@ async function rankByNaverDatalab(candidates) {
   for (let i = 0; i < candidates.length; i += 5) {
     const batch = candidates.slice(i, i + 5);
     try {
-      const res = await fetch('https://openapi.naver.com/v1/datalab/search', {
+      const bodyData = {
+        startDate, endDate, timeUnit: 'month',
+        keywordGroups: batch.map(c => ({ groupName: c.searchKeyword, keywords: [c.searchKeyword] })),
+      };
+
+      const res = await safeFetch('https://openapi.naver.com/v1/datalab/search', {
         method: 'POST',
-        headers: {
-          'X-Naver-Client-Id':     NAVER_CLIENT_ID,
-          'X-Naver-Client-Secret': NAVER_CLIENT_SECRET,
-          'Content-Type':          'application/json',
-        },
-        body: JSON.stringify({
-          startDate, endDate, timeUnit: 'month',
-          keywordGroups: batch.map(c => ({ groupName: c.searchKeyword, keywords: [c.searchKeyword] })),
-        }),
-        signal: AbortSignal.timeout(8000),
-      });
+        headers: getNaverHeaders(),
+        body: JSON.stringify(bodyData)
+      }, 10000);
 
       if (!res.ok) { console.warn(`    [경고] 데이터랩 HTTP ${res.status}`); continue; }
 
@@ -244,7 +249,7 @@ async function fetchLawAPI(type, params) {
       : `https://www.law.go.kr/DRF/lawService.do?target=prec&type=XML&OC=${LAW_API_KEY}&ID=${params.id}`;
   }
 
-  const res = await fetch(url, { headers, signal: AbortSignal.timeout(10000) });
+  const res = await safeFetch(url, { headers }, 10000);
   if (!res.ok) throw new Error(`법제처 HTTP ${res.status}`);
   return res.text();
 }

@@ -12,12 +12,20 @@ export async function onRequest(context: any) {
 
     const targetUrl = `${proxyEndpoint}/api/precedent?query=${encodeURIComponent(query)}&page=${page}`;
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     const response = await fetch(targetUrl, {
+      method: 'GET',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept': 'application/xml, text/xml, */*; q=0.01',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Cache-Control': 'no-cache',
         'X-Proxy-Token': proxyToken
-      }
+      },
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
 
     const bodyText = await response.text();
 

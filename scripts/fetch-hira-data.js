@@ -9,6 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeFetch } = require('./fetch-utils.js');
 
 function loadEnvLocal() {
   const envPath = path.join(process.cwd(), '.env.local');
@@ -102,7 +103,7 @@ async function fetchAllHospitalsForSido(sidoCode, sidoName) {
   while (true) {
     const url = `${BASE_URL}?serviceKey=${encodeURIComponent(API_KEY)}&pageNo=${pageNo}&numOfRows=${numOfRows}&sidoCd=${sidoCode}&_type=json`;
     try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      const res = await safeFetch(url, {}, 15000);
       const json = await res.json();
       const body = json?.response?.body;
       const items = body?.items?.item;

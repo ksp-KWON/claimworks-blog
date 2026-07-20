@@ -31,6 +31,7 @@ try {
 
 const { callGemini } = require('./gemini-helper');
 const { cleanFssText } = require('../src/lib/cleaners.js');
+const { safeFetch } = require('./fetch-utils.js');
 
 
 // 1. 보안 설정 및 인증키 로드
@@ -80,7 +81,7 @@ async function fetchFssApi(startDate, endDate) {
   const url = `https://www.fss.or.kr/fss/kr/openApi/api/bodoInfo.jsp?apiType=json&startDate=${startDate}&endDate=${endDate}&authKey=${FSS_API_KEY}`;
   
   console.log(`[통신] 금감원 API 호출 기간: ${startDate} ~ ${endDate}`);
-  const res = await fetch(url);
+  const res = await safeFetch(url);
   if (!res.ok) {
     throw new Error(`금감원 API 연결 실패 (HTTP ${res.status})`);
   }
@@ -131,10 +132,7 @@ const GEMINI_RESPONSE_SCHEMA = {
 // 진짜 인터넷 표준 시간을 조회하여 로컬 시계의 왜곡을 방지합니다 (Zero-dependency)
 async function getRealToday() {
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000); // 4초 타임아웃
-    const response = await fetch('http://worldtimeapi.org/api/timezone/Asia/Seoul', { signal: controller.signal });
-    clearTimeout(timeoutId);
+    const response = await safeFetch('http://worldtimeapi.org/api/timezone/Asia/Seoul', {}, 4000);
     if (response.ok) {
       const data = await response.json();
       if (data.datetime) {

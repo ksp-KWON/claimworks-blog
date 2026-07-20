@@ -40,11 +40,15 @@ export default function PremiumCard({
       // Overwrite the generic hover border color with the specific theme color
       baseClass = baseClass.replace('hover:border-[var(--google-blue)]', `hover:border-${borderColor}-500`);
       
-      // Update shadow color based on theme (using more saturated/contrasting colors for stronger pop)
       if (borderColor === 'red') baseClass += ' hover:shadow-[0_20px_60px_rgba(239,68,68,0.35)] dark:hover:shadow-[0_20px_60px_rgba(239,68,68,0.5)]';
-      if (borderColor === 'green') baseClass += ' hover:shadow-[0_20px_60px_rgba(19,115,51,0.35)] dark:hover:shadow-[0_20px_60px_rgba(19,115,51,0.5)]';
-      if (borderColor === 'teal') baseClass += ' hover:shadow-[0_20px_60px_rgba(20,184,166,0.35)] dark:hover:shadow-[0_20px_60px_rgba(20,184,166,0.5)]';
-      if (borderColor === 'blue') baseClass += ' hover:shadow-[0_20px_60px_rgba(26,115,232,0.35)] dark:hover:shadow-[0_20px_60px_rgba(26,115,232,0.5)]';
+      else if (borderColor === 'green') baseClass += ' hover:shadow-[0_20px_60px_rgba(19,115,51,0.35)] dark:hover:shadow-[0_20px_60px_rgba(19,115,51,0.5)]';
+      else if (borderColor === 'teal') baseClass += ' hover:shadow-[0_20px_60px_rgba(20,184,166,0.35)] dark:hover:shadow-[0_20px_60px_rgba(20,184,166,0.5)]';
+      else if (borderColor === 'blue') baseClass += ' hover:shadow-[0_20px_60px_rgba(26,115,232,0.35)] dark:hover:shadow-[0_20px_60px_rgba(26,115,232,0.5)]';
+      else if (borderColor === 'purple') baseClass += ' hover:shadow-[0_20px_60px_rgba(168,85,247,0.35)] dark:hover:shadow-[0_20px_60px_rgba(168,85,247,0.5)]';
+      else if (borderColor === 'yellow') baseClass += ' hover:shadow-[0_20px_60px_rgba(234,179,8,0.35)] dark:hover:shadow-[0_20px_60px_rgba(234,179,8,0.5)]';
+      else if (borderColor === 'rose') baseClass += ' hover:shadow-[0_20px_60px_rgba(244,63,94,0.35)] dark:hover:shadow-[0_20px_60px_rgba(244,63,94,0.5)]';
+      else if (borderColor === 'indigo') baseClass += ' hover:shadow-[0_20px_60px_rgba(99,102,241,0.35)] dark:hover:shadow-[0_20px_60px_rgba(99,102,241,0.5)]';
+      else baseClass += ' hover:shadow-[0_20px_60px_rgba(26,115,232,0.35)] dark:hover:shadow-[0_20px_60px_rgba(26,115,232,0.5)]';
     }
   } else {
     if (hoverEffect) {

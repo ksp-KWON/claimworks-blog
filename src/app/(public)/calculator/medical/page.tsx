@@ -27,6 +27,18 @@ export default function MedicalCalculatorPage() {
       </div>
 
       <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        {/* 🧮 실손의료비 계산기 상단 띠 배너 */}
+        <div className="bg-[var(--google-green)] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3 rounded-t-none">
+          <div className="flex items-center gap-2.5">
+            <span className="text-lg shrink-0">🧮</span>
+            <div className="text-xs sm:text-sm font-extrabold tracking-tight">
+              <span className="underline decoration-wavy mr-1.5">[통합 계산]</span>
+              보상스쿨 빅데이터 알고리즘으로 예상 보상금을 미리 산출해보세요.
+            </div>
+          </div>
+        </div>
+
         <div className="text-center space-y-4">
           <PremiumHeading level={1} gradient="green" className="justify-center !text-3xl">
             실손의료비 보상 계산기

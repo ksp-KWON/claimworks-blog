@@ -14,7 +14,7 @@
  */
 function cleanFssText(text) {
   if (!text) return '';
-  return text
+  let cleaned = text
     // 0. 불필요한 금감원 보도 요지 제목 제거
     .replace(/■?\s*금감원\s*보도\s*요지/g, '')
 
@@ -30,36 +30,56 @@ function cleanFssText(text) {
     .replace(/u203B/g, '※')
     .replace(/\\u203B/g, '※')
     
-    // 2. 따옴표 중복 제거 (예: ''26.6.22. -> '26.6.22.')
+    // 2. 따옴표 중복 제거
     .replace(/''/g, "'")
     .replace(/""/g, '"')
     
-    // 3. 깨진 개행 문자 복원 (nn, nnnn 등)
+    // 3. 깨진 개행 문자 복원
     .replace(/(?<![a-zA-Z])n{2,}(?![a-zA-Z])/g, '\n')
-    // 구두점이나 기호 뒤에 붙어있는 단독 n 처리 (잘못된 개행)
-    .replace(/([가-힣>\]\)\.\!\?\,])n(?=\s|-|①|②|③|④|⑤|■|▲|$)/g, '$1\n')
+    .replace(/([가-힣>\]\)\.\!\?\,])n(?=\s|-|①|②|③|④|⑤|■|▲|$)/g, '$1\n');
+
+  // 4. 구조적 파싱 (마크다운 변환)
+  const lines = cleaned.split('\n');
+  const markdownLines = lines.map(line => {
+    let l = line.trim();
+    if (!l) return '';
+
+    // 대제목/중제목 파싱 (■, ㅁ)
+    if (l.startsWith('■') || l.startsWith('ㅁ')) {
+      return `### ■ ${l.substring(1).trim()}`;
+    }
     
-    // 4. 문단 기호 정돈 및 가독성 개선 (ㅁ -> ■, ㅇ -> •)
-    .replace(/(?:^|\n)\s*ㅁ\s*/g, '\n\n■ ')
-    .replace(/(?:^|\n)\s*■\s*/g, '\n\n■ ')
-    .replace(/(?:^|\n)\s*ㅇ\s*/g, '\n  • ')
-    .replace(/(?:^|\n)\s*\*\s*/g, '\n  - ')
+    // 특별 소제목 파싱 (< 소비자 유의사항 > 등)
+    if (l.startsWith('<') && l.endsWith('>')) {
+      return `### 💡 ${l.substring(1, l.length - 1).trim()}`;
+    }
     
-    // 5. 특정 기호(▲, ①~⑳) 앞 줄바꿈
-    .replace(/(?<!\n)\s*▲/g, '\n▲ ')
-    .replace(/(?<!\n)\s*([①-⑳])/g, '\n$1 ')
-    
-    // 6. 소제목 및 번호(01, 02 등) 앞 줄바꿈
-    .replace(/(?<!\n)\s*(<[^>]+>)\s*/g, '\n\n$1\n')
-    .replace(/(?:^|\n)\s*([0-9]{2}\s+[가-힣])/g, '\n\n$1')
-    .replace(/(?<!\n)\s*예시\)/g, '\n\n예시) ')
-    
-    // 7. 불필요한 안내 멘트 정리
-    .replace(/※\s*자세한\s*내용은\s*첨부파일을\s*참고하시기\s*바랍니다\.?/g, '')
-    
-    // 8. 빈 줄 정리 (과도한 줄바꿈 및 공백 축소)
-    .replace(/\n(?:\s*\n)+/g, '\n\n') // 여러 빈 줄을 단 하나의 빈 줄로 강제 압축
-    .trim();
+    // 소주제 파싱 (▲)
+    if (l.startsWith('▲')) {
+      return `- **▲ ${l.substring(1).trim()}**`;
+    }
+
+    // 불릿 리스트 파싱 (ㅇ, •, *, -)
+    if (l.startsWith('ㅇ') || l.startsWith('•') || l.startsWith('*') || l.startsWith('-')) {
+      return `- ${l.substring(1).trim()}`;
+    }
+
+    // 원문자 넘버링 리스트 파싱 (① ~ ⑳)
+    const circledNums = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳";
+    const index = circledNums.indexOf(l[0]);
+    if (index !== -1) {
+      return `${index + 1}. ${l.substring(1).trim()}`;
+    }
+
+    // 일반 텍스트
+    return l;
+  });
+
+  // 5. 마크다운 간격 통일 및 찌꺼기 제거
+  let finalMarkdown = markdownLines.filter(l => l.length > 0).join('\n\n');
+  finalMarkdown = finalMarkdown.replace(/※\s*자세한\s*내용은\s*첨부파일을\s*참고하시기\s*바랍니다\.?/g, '');
+
+  return finalMarkdown;
 }
 
 module.exports = {

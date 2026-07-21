@@ -1,29 +1,16 @@
 /**
  * post-builder.js
  * 블로그/판례 자동글쓰기 공용 유틸리티 및 파일 IO 모듈
- * (중복 코드 제거 및 콤팩트 빌드 목적)
  */
 
 'use strict';
-const fs = require('fs');
+
+const fs   = require('fs');
 const path = require('path');
+
+// ── 공통 유틸 (pipeline-utils.js 에서 단일 공급) ────────────────────────────
+const { POSTS_DIR, sleep } = require('../../scripts/pipeline-utils.js');
 const { yamlSafe, parseGeneratedContent, buildMarkdownFrontmatter } = require('./content-parser');
-
-// ── 공통 환경변수 로드 (.env.local) ─────────────────────────────────────────
-const envPath = path.join(process.cwd(), '.env.local');
-if (fs.existsSync(envPath)) {
-  fs.readFileSync(envPath, 'utf8').split('\n').forEach(line => {
-    const m = line.match(/^\s*([\w.-]+)\s*=\s*(.*?)?\s*$/);
-    if (m && !process.env[m[1]]) {
-      process.env[m[1]] = (m[2] ?? '').replace(/(^['"]|['"]$)/g, '').trim();
-    }
-  });
-}
-
-const POSTS_DIR = path.join(process.cwd(), 'src/content/posts');
-
-// ── 유틸리티 ────────────────────────────────────────────────────────────────
-const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // ── 공통 비즈니스 로직 ──────────────────────────────────────────────────────
 function getExistingPosts() {
@@ -37,20 +24,18 @@ function getExistingPosts() {
   for (const file of files) {
     try {
       const filePath = path.join(POSTS_DIR, file);
-      const content = fs.readFileSync(filePath, 'utf8');
-      const slug = file.replace(/\.md$/, '');
+      const content  = fs.readFileSync(filePath, 'utf8');
+      const slug     = file.replace(/\.md$/, '');
       const titleMatch = content.match(/^title:\s*["']?(.*?)["']?\r?$/m);
-      const title = titleMatch ? titleMatch[1].trim() : slug;
+      const title    = titleMatch ? titleMatch[1].trim() : slug;
       posts.push({ slug, title });
-    } catch {
-      // 스킵
-    }
+    } catch { /* 스킵 */ }
   }
   return posts;
 }
 
 function resolveUniqueSlug(baseSlug) {
-  let slug = baseSlug;
+  let slug    = baseSlug;
   let counter = 2;
   while (fs.existsSync(path.join(POSTS_DIR, `${slug}.md`))) {
     slug = `${baseSlug}-${counter}`;
@@ -61,7 +46,7 @@ function resolveUniqueSlug(baseSlug) {
 
 function saveMarkdownPost(topic, summary, content, additionalFrontmatter = {}) {
   const uniqueSlug = resolveUniqueSlug(topic.slug);
-  topic.slug = uniqueSlug; // override slug for buildMarkdownFrontmatter
+  topic.slug = uniqueSlug;
 
   const fullContent = buildMarkdownFrontmatter(topic, summary, content, additionalFrontmatter);
 
@@ -79,5 +64,5 @@ module.exports = {
   getExistingPosts,
   resolveUniqueSlug,
   parseGeneratedContent,
-  saveMarkdownPost
+  saveMarkdownPost,
 };

@@ -17,25 +17,16 @@ const path = require('path');
 const crypto = require('crypto');
 const { safeFetch } = require('./fetch-utils.js');
 
-// ── 환경변수 로드 (.env.local) ────────────────────────────────────────────
-const envPath = path.join(process.cwd(), '.env.local');
-if (fs.existsSync(envPath)) {
-  fs.readFileSync(envPath, 'utf8').split('\n').forEach(line => {
-    const m = line.match(/^\s*([\w.-]+)\s*=\s*(.*?)?\s*$/);
-    if (m && !process.env[m[1]]) {
-      process.env[m[1]] = (m[2] ?? '').replace(/(^['"]|['"]$)/g, '').trim();
-    }
-  });
-}
-
+// ── 공통 유틸 (pipeline-utils.js 에서 단일 공급 — .env.local 로드 포함) ────
+const { POSTS_DIR: _POSTS_DIR, sleep } = require('./pipeline-utils.js');
 const { callGemini } = require('./gemini-helper');
 
 // ── 상수 ─────────────────────────────────────────────────────────────────
-const OUTPUT_JSON_PATH     = path.join(process.cwd(), 'scripts/daily-topic.json');
-const POSTS_DIR            = path.join(process.cwd(), 'src/content/posts');
-const LAW_API_KEY          = process.env.LAW_API_KEY;
-const LAW_PROXY_ENDPOINT   = process.env.LAW_PROXY_ENDPOINT;
-const LAW_PROXY_TOKEN      = process.env.LAW_PROXY_TOKEN;
+const OUTPUT_JSON_PATH   = path.join(process.cwd(), 'scripts/daily-topic.json');
+const POSTS_DIR          = _POSTS_DIR; // pipeline-utils 에서 공급
+const LAW_API_KEY        = process.env.LAW_API_KEY;
+const LAW_PROXY_ENDPOINT = process.env.LAW_PROXY_ENDPOINT;
+const LAW_PROXY_TOKEN    = process.env.LAW_PROXY_TOKEN;
 
 /** 구글 뉴스 RSS 검색 쿼리 — 보험·손해사정 도메인 특화 */
 const NEWS_QUERIES = [
@@ -44,7 +35,7 @@ const NEWS_QUERIES = [
   '실손보험 산재 후유장해',
 ];
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+// sleep 은 pipeline-utils.js 에서 공급됨
 
 // ── 기존 포스트 분석 (중복 방지) ─────────────────────────────────────────
 function getUsedMetadata() {

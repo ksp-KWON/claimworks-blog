@@ -56,10 +56,46 @@ function parseGeneratedContent(rawOutput) {
 
   content = content.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
 
-  return { content };
+  return { summary: '', content };
+}
+
+function buildMarkdownFrontmatter(topic, summary, content, additionalFrontmatter = {}) {
+  const dateStr = new Date().toISOString();
+  const safeTitle = yamlSafe(topic.title);
+  const safeSummary = yamlSafe(summary || topic.summary || '');
+  const safeCategory = yamlSafe(topic.category);
+  const safeSlug = topic.slug;
+  const safeCalcType = topic.calculatorType || 'auto';
+  
+  let tagsStr = '';
+  if (Array.isArray(topic.tags)) {
+    tagsStr = `\ntags:\n${topic.tags.map(t => `  - ${yamlSafe(t)}`).join('\n')}`;
+  } else if (typeof topic.tags === 'string') {
+    tagsStr = `\ntags:\n  - ${yamlSafe(topic.tags)}`;
+  }
+
+  let addFm = '';
+  if (additionalFrontmatter) {
+    for (const [k, v] of Object.entries(additionalFrontmatter)) {
+      addFm += `\n${k}: ${yamlSafe(v)}`;
+    }
+  }
+
+  return `---
+title: "${safeTitle}"
+summary: "${safeSummary}"
+date: "${dateStr}"
+category: "${safeCategory}"${tagsStr}${addFm}
+slug: "${safeSlug}"
+calculatorType: "${safeCalcType}"
+---
+
+${content}
+`;
 }
 
 module.exports = {
   yamlSafe,
-  parseGeneratedContent
+  parseGeneratedContent,
+  buildMarkdownFrontmatter
 };

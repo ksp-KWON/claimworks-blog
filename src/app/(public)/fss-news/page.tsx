@@ -23,6 +23,9 @@ interface FssNewsItem {
 
 import { cleanFssText } from '@/lib/cleaners';
 import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
+import PremiumHeading from '@/components/ui/PremiumHeading';
+import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumButton from '@/components/ui/PremiumButton';
 
 
 export default function FssNewsPage() {
@@ -173,9 +176,8 @@ export default function FssNewsPage() {
   };
 
   return (
-    <>
-    <div className="space-y-8 max-w-4xl mx-auto">
-      <div className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:border-red-500 hover:shadow-[0_16px_50px_rgba(239,68,68,0.2)] transition-all duration-300 overflow-hidden">
+    <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      
       {/* 🚨 실시간 소비자 이슈 브리핑 상단 띠 배너 */}
       {latestAlert && (
         <div className="bg-red-600 text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3 animate-pulse">
@@ -198,63 +200,63 @@ export default function FssNewsPage() {
         </div>
       )}
 
-      <div className="p-6 sm:p-10 space-y-8">
-      {/* 헤더 타이틀 */}
-      <div className="text-center space-y-3">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
-          보상스쿨 <span className="bg-gradient-to-r from-red-500 to-amber-500 bg-clip-text text-transparent">금감원 소비자보호센터</span>
-        </h1>
-        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
+      {/* 헤더 영역 */}
+      <div className="text-center space-y-4">
+        <PremiumHeading level={1} gradient="red" className="justify-center !text-3xl">
+          금감원 소비자보호센터
+        </PremiumHeading>
+        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-2xl mx-auto leading-relaxed font-medium">
           금융감독원 공식 API 연동을 통해 소비자 경보, 민원 분쟁사례, 금융꿀팁, 실시간 금융상품 한눈에 비교공시 서비스를 하나의 통합 대시보드에서 제공합니다.
         </p>
       </div>
 
-      {/* 검색 박스 영역 */}
-      <div className="space-y-4">
-        <form onSubmit={handleSearchSubmit} className="flex gap-2 flex-col sm:flex-row">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="검색어를 입력해 보세요 (예: 도수치료, 백내장, 단체보험)"
-            className="flex-1 px-4 py-3 sm:py-3.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 dark:text-white text-sm font-medium shadow-inner"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-6 py-3 sm:py-3.5 rounded-none bg-gradient-to-r from-red-500 to-amber-500 hover:opacity-90 text-white font-bold text-sm tracking-wide shadow-md transition-opacity cursor-pointer disabled:opacity-50"
-          >
-            {loading ? '연동 중...' : '실시간 조회'}
-          </button>
-        </form>
-
-        {/* 탭 카테고리 메뉴 */}
-        <div className="flex w-full gap-1.5 sm:gap-2 mt-5 pt-4 border-t border-gray-100 dark:border-white/5">
-          {[
-            { id: 'all', label: '전체보기' },
-            { id: 'alert', label: '🚨 소비자경보' },
-            { id: 'case', label: '⚖️ 분쟁사례' },
-            { id: 'tip', label: '💡 금융꿀팁' },
-            { id: 'press', label: '📢 보도자료' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => handleTabChange(tab.id as any)}
-              className={`flex-1 min-w-0 text-center py-2 sm:py-2.5 rounded-none text-[10px] sm:text-xs font-bold transition-all cursor-pointer truncate px-0.5 ${
-                activeTab === tab.id
-                  ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm font-black'
-                  : 'bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10'
-              }`}
+      <PremiumCard hoverEffect={false} borderColor="red" className="p-6 sm:p-8">
+        {/* 검색 박스 영역 */}
+        <div className="space-y-4">
+          <form onSubmit={handleSearchSubmit} className="flex gap-2 flex-col sm:flex-row">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="검색어를 입력해 보세요 (예: 도수치료, 백내장, 단체보험)"
+              className="flex-1 px-4 py-3 sm:py-3.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 dark:text-white text-sm font-medium shadow-inner"
+            />
+            <PremiumButton
+              type="submit"
+              disabled={loading}
+              color="red"
+              className="py-3 sm:py-3.5 min-w-[120px] flex items-center justify-center h-full !rounded-none"
             >
-              {tab.label}
-            </button>
-          ))}
-            </div>
+              {loading ? '연동 중...' : '실시간 조회'}
+            </PremiumButton>
+          </form>
+
+          {/* 탭 카테고리 메뉴 */}
+          <div className="flex w-full gap-1.5 sm:gap-2 mt-5 pt-4 border-t border-gray-100 dark:border-white/5">
+            {[
+              { id: 'all', label: '전체보기' },
+              { id: 'alert', label: '🚨 소비자경보' },
+              { id: 'case', label: '⚖️ 분쟁사례' },
+              { id: 'tip', label: '💡 금융꿀팁' },
+              { id: 'press', label: '📢 보도자료' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id as any)}
+                className={`flex-1 min-w-0 text-center py-2 sm:py-2.5 rounded-none text-[10px] sm:text-xs font-bold transition-all cursor-pointer truncate px-0.5 ${
+                  activeTab === tab.id
+                    ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm font-black'
+                    : 'bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
-      </div>
+      </PremiumCard>
     
-      {/* 실시간 로딩 피드백 안내창 */}
+      {/* 로딩 표시 */}
       {loading && (
         <div className="bg-white dark:bg-[#202124] rounded-none py-14 px-6 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4 animate-pulse">
           <div className="inline-block w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
@@ -416,6 +418,5 @@ export default function FssNewsPage() {
         </>
       )}
     </div>
-    </>
   );
 }

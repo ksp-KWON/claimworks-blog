@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AiCommentBox from '@/components/AiCommentBox';
 import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
+import PremiumHeading from '@/components/ui/PremiumHeading';
+import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumButton from '@/components/ui/PremiumButton';
 interface Precedent {
   id: string;
   title: string;
@@ -295,71 +298,69 @@ export default function PrecedentSearchPage() {
   };
 
   return (
-    <>
-    <div className="space-y-8 max-w-4xl mx-auto">
-      <div className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:border-[var(--google-blue)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.2)] transition-all duration-300 overflow-hidden">
-        {/* 상단 띠 배너 */}
-        <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-2.5">
-            <span className="text-lg shrink-0">💡</span>
-            <div className="text-xs sm:text-sm font-extrabold tracking-tight">
-              <span className="underline decoration-wavy mr-1.5">[보상 트렌드]</span>
-              법원의 실시간 대법원 판례 기준을 파악하면 보험사의 삭감 주장을 방어할 수 있습니다.
-            </div>
-          </div>
-          <button 
-            onClick={() => document.getElementById('search-box-area')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-            className="text-[10px] font-black uppercase tracking-wider bg-white text-[var(--google-blue)] px-2.5 py-1 rounded-none border border-white hover:bg-blue-50 transition-colors cursor-pointer"
-          >
-            검색하기
-          </button>
-        </div>
-
-        <div className="p-6 sm:p-10 space-y-6">
-          <div className="text-center space-y-3 pb-4 border-b border-gray-100 dark:border-white/5 mb-6">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
-              보상스쿨 <span className="bg-gradient-to-r from-[var(--google-blue)] to-[#174ea6] bg-clip-text text-transparent">손해사정 법률분석센터</span>
-            </h1>
-            <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-lg mx-auto leading-relaxed font-medium">
-              보험사의 억울한 거절과 삭감 주장도 명확한 판례가 있다면 방어할 수 있습니다. 겪으신 상황을 검색하시면 부합하는 법원 판결을 찾아드립니다.
-            </p>
-          </div>
-
-          <div id="search-box-area" className="space-y-4">
-            <div className="flex gap-2 flex-col sm:flex-row">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch(query)}
-                placeholder="상황이나 키워드를 적어보세요 (예: 교통사고 합의금)"
-                className="flex-1 px-4 py-3 sm:py-3.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-[var(--google-blue)] focus:ring-1 focus:ring-[var(--google-blue)] dark:text-white text-sm font-medium shadow-inner"
-              />
-              <button
-                onClick={() => handleSearch(query)}
-                disabled={loading}
-                className="px-6 py-3 sm:py-3.5 rounded-none bg-[var(--google-blue)] hover:bg-[#174ea6] text-white font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {loading ? '검색 중...' : '판례 검색'}
-              </button>
-            </div>
-
-            {recentSearches.length > 0 && (
-              <div className="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-white/5 text-[11px] font-bold">
-                <span className="text-[#9aa0a6] shrink-0">최근 검색:</span>
-                <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
-                  {recentSearches.map((h, idx) => (
-                    <button key={idx} onClick={() => handleSearch(h)} className="px-2 py-0.5 rounded-none hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400 cursor-pointer text-[10px]">
-                      {h}
-                    </button>
-                  ))}
-                </div>
-                <button onClick={clearRecent} className="text-gray-300 dark:text-gray-600 hover:text-[var(--google-red)] cursor-pointer shrink-0">지우기</button>
-              </div>
-            )}
+    <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* 상단 띠 배너 */}
+      <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-2.5">
+          <span className="text-lg shrink-0">💡</span>
+          <div className="text-xs sm:text-sm font-extrabold tracking-tight">
+            <span className="underline decoration-wavy mr-1.5">[보상 트렌드]</span>
+            법원의 실시간 대법원 판례 기준을 파악하면 보험사의 삭감 주장을 방어할 수 있습니다.
           </div>
         </div>
+        <button 
+          onClick={() => document.getElementById('search-box-area')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+          className="text-[10px] font-black uppercase tracking-wider bg-white text-[var(--google-blue)] px-2.5 py-1 rounded-none border border-white hover:bg-blue-50 transition-colors cursor-pointer"
+        >
+          검색하기
+        </button>
       </div>
+
+      <div className="text-center space-y-4">
+        <PremiumHeading level={1} gradient="blue" className="justify-center !text-3xl">
+          손해사정 법률분석센터
+        </PremiumHeading>
+        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-2xl mx-auto leading-relaxed font-medium">
+          보험사의 억울한 거절과 삭감 주장도 명확한 판례가 있다면 방어할 수 있습니다. 겪으신 상황을 검색하시면 부합하는 법원 판결을 찾아드립니다.
+        </p>
+      </div>
+
+      <PremiumCard hoverEffect={false} borderColor="blue" className="p-6 sm:p-8">
+        <div id="search-box-area" className="space-y-4">
+          <div className="flex gap-2 flex-col sm:flex-row">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch(query)}
+              placeholder="상황이나 키워드를 적어보세요 (예: 교통사고 합의금)"
+              className="flex-1 px-4 py-3 sm:py-3.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-[var(--google-blue)] focus:ring-1 focus:ring-[var(--google-blue)] dark:text-white text-sm font-medium shadow-inner"
+            />
+            <PremiumButton
+              onClick={() => handleSearch(query)}
+              disabled={loading}
+              color="blue"
+              className="py-3 sm:py-3.5 min-w-[120px] flex items-center justify-center h-full !rounded-none"
+            >
+              {loading ? '검색 중...' : '판례 검색'}
+            </PremiumButton>
+          </div>
+
+          {recentSearches.length > 0 && (
+            <div className="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-white/5 text-[11px] font-bold">
+              <span className="text-[#9aa0a6] shrink-0">최근 검색:</span>
+              <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
+                {recentSearches.map((h, idx) => (
+                  <button key={idx} onClick={() => handleSearch(h)} className="px-2 py-0.5 rounded-none hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400 cursor-pointer text-[10px]">
+                    {h}
+                  </button>
+                ))}
+              </div>
+              <button onClick={clearRecent} className="text-gray-300 dark:text-gray-600 hover:text-[var(--google-red)] cursor-pointer shrink-0">지우기</button>
+            </div>
+          )}
+        </div>
+      </PremiumCard>
 
       {loading && (
         <div className="bg-white dark:bg-[#202124] rounded-none py-16 px-4 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4">
@@ -517,6 +518,5 @@ export default function PrecedentSearchPage() {
         <span>본 검색 시스템은 공공 API를 바탕으로 한 참고 정보이며, 어떠한 법률 자문도 대행하지 않습니다. 실제 지급 거절 등의 사안은 전문 손해사정사와 직접 상담하십시오.</span>
       </div>
     </div>
-    </>
   );
 }

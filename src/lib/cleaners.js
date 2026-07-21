@@ -35,8 +35,11 @@ function cleanFssText(text) {
     .replace(/""/g, '"')
     
     // 3. 깨진 개행 문자 복원
-    .replace(/(?<![a-zA-Z])n{2,}(?![a-zA-Z])/g, '\n')
-    .replace(/([가-힣>\]\)\.\!\?\,])n(?=\s|-|①|②|③|④|⑤|■|▲|$)/g, '$1\n');
+    // 'n'이 단독으로(앞뒤 공백/줄바꿈) 연속해서 나오거나 하나만 있을 때 줄바꿈으로 변경
+    .replace(/(?:\b|^)n(?:\b|$)/g, '\n')
+    // 중복된 줄바꿈 기호 압축
+    .replace(/\n{2,}/g, '\n')
+    .replace(/([가-힣>\]\)\.\!\?\,])\n(?=\s|-|①|②|③|④|⑤|■|▲|$)/g, '$1\n');
 
   // 4. 구조적 파싱 (마크다운 변환)
   const lines = cleaned.split('\n');
@@ -76,7 +79,14 @@ function cleanFssText(text) {
   });
 
   // 5. 마크다운 간격 통일 및 찌꺼기 제거
-  let finalMarkdown = markdownLines.filter(l => l.length > 0).join('\n\n');
+  // 빈 줄은 하나로 압축하되, 문단 간격이 너무 벌어지지 않도록 \n\n 대신 \n으로 결합하고,
+  // 제목류(###)나 리스트(-, 1.) 앞뒤에만 적절히 간격을 둡니다.
+  let finalMarkdown = markdownLines.filter(l => l.length > 0).join('\n');
+  
+  // 헤딩 앞에 2칸 띄우기 (문단 구분)
+  finalMarkdown = finalMarkdown.replace(/\n(###)/g, '\n\n$1');
+  
+  // 첨부파일 문구 제거
   finalMarkdown = finalMarkdown.replace(/※\s*자세한\s*내용은\s*첨부파일을\s*참고하시기\s*바랍니다\.?/g, '');
 
   return finalMarkdown;

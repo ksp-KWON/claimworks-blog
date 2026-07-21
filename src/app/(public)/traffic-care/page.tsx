@@ -5,6 +5,9 @@ import Link from 'next/link';
 import AiCommentBox from '@/components/AiCommentBox';
 import standardData from '../../../../functions/api/taas-standard-data.json';
 import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
+import PremiumHeading from '@/components/ui/PremiumHeading';
+import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumButton from '@/components/ui/PremiumButton';
 
 // --- SVG Icons (이모지 대신 사용되는 고품격 전문 아이콘 세트) ---
 function IconShield({ className = 'w-4.5 h-4.5' }: { className?: string }) {
@@ -317,81 +320,59 @@ export default function TrafficCarePage() {
   const activeZone = zones.find(z => z.id === selectedZoneId) || zones[0] || null;
 
   return (
-    <>
-    <div className="space-y-8 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-      <div className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:border-[#137333] hover:shadow-[0_16px_50px_rgba(19,115,51,0.2)] transition-all duration-300 overflow-hidden">
-      {/* 💡 상단 정보성 띠 배너 (에메랄드 그린 포인트 테마 - 패밀리룩) */}
-      <div className="bg-[#137333] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-2.5">
-          <span className="text-lg shrink-0"><IconShield className="w-5 h-5" /></span>
-          <div className="text-xs sm:text-sm font-extrabold tracking-tight">
-            <span className="underline decoration-wavy mr-1.5">[실시간 안전망]</span>
-            도로교통공단 안전 데이터와 동네 우수 신경/정형외과 병원을 연동해 우리 동네 안전 지도를 분석합니다.
-          </div>
-        </div>
-        <button 
-          onClick={() => {
-            const el = document.getElementById('search-box-area');
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }}
-          className="text-[10px] font-black uppercase tracking-wider bg-white text-[#137333] px-2.5 py-1 rounded-none border border-white hover:bg-green-50 transition-colors cursor-pointer"
-        >
-          지역 변경하기
-        </button>
-      </div>
-
-      <div className="p-6 sm:p-10 space-y-8">
-      {/* 헤더 타이틀 (다른 검색센터와 완벽한 패밀리룩 일치) */}
-      <div className="text-center space-y-3">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#202124] dark:text-[#e8eaed] tracking-tight">
-          보상스쿨 <span className="bg-gradient-to-r from-[#137333] to-[#0b6623] bg-clip-text text-transparent">교통사고 로컬 안심케어 센터</span>
-        </h1>
-        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-lg mx-auto leading-relaxed font-medium">
+    <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      
+      {/* 헤더 영역 */}
+      <div className="text-center space-y-4">
+        <PremiumHeading level={1} gradient="green" className="justify-center !text-3xl">
+          교통사고 로컬 안심케어 센터
+        </PremiumHeading>
+        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-2xl mx-auto leading-relaxed font-medium">
           자주 오가는 길모퉁이와 집 근처 사거리는 안전할까요? 사시는 행정구역을 선택하시면 실시간 교통사고 다발지역 통계와 인근 전문 의료기관을 안내해 드립니다.
         </p>
       </div>
 
-      {/* 행정구역 선택 박스 영역 */}
-      <div id="search-box-area" className="space-y-4">
-        <div className="flex gap-3 flex-col sm:flex-row items-stretch">
-          <div className="flex-1 grid grid-cols-2 gap-3">
-            <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2">
-              <label className="block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">시/도 선택</label>
-              <select
-                value={selectedSido}
-                onChange={(e) => handleSidoChange(e.target.value)}
-                className="w-full bg-transparent focus:outline-none dark:text-white text-xs font-bold py-0.5 cursor-pointer"
-              >
-                {Object.keys(SIDO_GUGUN_MAP).map(sido => (
-                  <option key={sido} value={sido} className="dark:bg-[#303134]">{sido}</option>
-                ))}
-              </select>
+      <PremiumCard hoverEffect={false} borderColor="green" className="p-6 sm:p-8">
+        {/* 행정구역 선택 박스 영역 */}
+        <div id="search-box-area" className="space-y-4">
+          <div className="flex gap-3 flex-col sm:flex-row items-stretch">
+            <div className="flex-1 grid grid-cols-2 gap-3">
+              <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2">
+                <label className="block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">시/도 선택</label>
+                <select
+                  value={selectedSido}
+                  onChange={(e) => handleSidoChange(e.target.value)}
+                  className="w-full bg-transparent focus:outline-none dark:text-white text-xs font-bold py-0.5 cursor-pointer"
+                >
+                  {Object.keys(SIDO_GUGUN_MAP).map(sido => (
+                    <option key={sido} value={sido} className="dark:bg-[#303134]">{sido}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2">
+                <label className="block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">구/군 선택</label>
+                <select
+                  value={selectedGugun}
+                  onChange={(e) => setSelectedGugun(e.target.value)}
+                  className="w-full bg-transparent focus:outline-none dark:text-white text-xs font-bold py-0.5 cursor-pointer"
+                >
+                  {(SIDO_GUGUN_MAP[selectedSido] || []).map(gugun => (
+                    <option key={gugun} value={gugun} className="dark:bg-[#303134]">{gugun}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2">
-              <label className="block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">구/군 선택</label>
-              <select
-                value={selectedGugun}
-                onChange={(e) => setSelectedGugun(e.target.value)}
-                className="w-full bg-transparent focus:outline-none dark:text-white text-xs font-bold py-0.5 cursor-pointer"
-              >
-                {(SIDO_GUGUN_MAP[selectedSido] || []).map(gugun => (
-                  <option key={gugun} value={gugun} className="dark:bg-[#303134]">{gugun}</option>
-                ))}
-              </select>
-            </div>
+            <PremiumButton
+              onClick={handleSearch}
+              disabled={loading}
+              color="green"
+              className="py-3 sm:py-3.5 min-w-[120px] flex items-center justify-center h-full !rounded-none"
+            >
+              {loading ? '분석 중...' : '실시간 지역 분석'}
+            </PremiumButton>
           </div>
-          <button
-            onClick={handleSearch}
-            disabled={loading}
-            className="px-6 py-3 sm:py-3.5 rounded-none bg-[#137333] hover:bg-[#0b6623] text-white font-bold text-sm tracking-wide shadow-md transition-colors cursor-pointer disabled:opacity-50 min-w-[120px] flex items-center justify-center"
-          >
-            {loading ? '분석 중...' : '실시간 지역 분석'}
-          </button>
         </div>
-      </div>
-    </div>
-
-      </div>
+      </PremiumCard>
 
       {/* 실시간 로딩바 (에메랄드 그린 테마) */}
       {loading && (
@@ -698,17 +679,8 @@ export default function TrafficCarePage() {
               </a>
             </div>
           </article>
-
-
-        </div>
+        </div>
       )}
-
-      {/* ⚠️ 법률 면책 고지 배너 (패밀리룩 적용) */}
-      <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-3.5 rounded-none flex items-start gap-2.5 text-xs font-semibold leading-relaxed shadow-sm mt-8">
-        <span className="text-base shrink-0 mt-0.5">⚠️</span>
-        <span>본 교통사고 로컬 안심케어 서비스는 도로교통공단 및 심평원의 공공 데이터에 기반하여 참고용으로 제공되는 정보로, 법적 판결이나 배상 합의에 직접적인 대행 행위를 하지 않으며, 실제 사고 시에는 전문 손해사정사의 검토를 받으셔야 권리를 온전히 확보할 수 있습니다.</span>
-      </div>
     </div>
-    </>
   );
 }

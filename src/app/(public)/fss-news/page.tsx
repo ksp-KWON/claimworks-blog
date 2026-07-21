@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AiCommentBox from '@/components/AiCommentBox';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface FssNewsItem {
   id: string;
@@ -363,7 +365,11 @@ export default function FssNewsPage() {
                           <span>📄 금융감독원 보도문/결정문 전문 (한글 HWP 대체 텍스트)</span>
                           <span>HWP 뷰어 무설치 열람 중</span>
                         </div>
-                        {cleanFssText(item.fullContent)}
+                        <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-a:text-amber-500 hover:prose-a:text-amber-600 prose-headings:font-bold prose-headings:text-gray-800 dark:prose-headings:text-gray-200">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {cleanFssText(item.fullContent)}
+                          </ReactMarkdown>
+                        </div>
                       </div>
                     )}
 

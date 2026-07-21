@@ -41,19 +41,19 @@ const SIDO_LIST = [
   { code:'210000', name:'부산광역시' },
   { code:'220000', name:'인천광역시' },
   { code:'230000', name:'대구광역시' },
-  { code:'240000', name:'광주광역시' },
+  { code:'240000', name:'광주광역시(구)' }, // 예비용
   { code:'250000', name:'대전광역시' },
   { code:'260000', name:'울산광역시' },
-  { code:'290000', name:'세종특별자치시' },
   { code:'310000', name:'경기도' },
   { code:'320000', name:'강원특별자치도' },
   { code:'330000', name:'충청북도' },
   { code:'340000', name:'충청남도' },
   { code:'350000', name:'전북특별자치도' },
-  { code:'360000', name:'전라남도' },
+  { code:'360000', name:'전라남도/광주' },
   { code:'370000', name:'경상북도' },
   { code:'380000', name:'경상남도' },
   { code:'390000', name:'제주특별자치도' },
+  { code:'410000', name:'세종특별자치시' },
 ];
 
 // 진료과목별 주요 질환 매핑 (보상 실무 관련)
@@ -134,8 +134,27 @@ function buildStructure(allHospitals) {
 
   for (const h of allHospitals) {
     // 시도명 / 구군명 추출
-    const sido = h.sidoFullName || h.addr?.split(' ')[0] || '기타';
-    const sggu = h.sgguCdNm || h.addr?.split(' ')[1] || '기타';
+    let sido = h.sidoFullName || h.addr?.split(' ')[0] || '기타';
+    let sggu = h.sgguCdNm || h.addr?.split(' ')[1] || '기타';
+
+    // 전남광주 분리 로직 (HIRA에서 360000으로 함께 내려옴)
+    if (sido === '전라남도/광주') {
+      if (sggu.startsWith('광주') || (h.addr && h.addr.includes('광주'))) {
+        sido = '광주광역시';
+      } else {
+        sido = '전라남도';
+      }
+    }
+    // 광주광역시(구)
+    if (sido === '광주광역시(구)') {
+      sido = '광주광역시';
+    }
+    // 세종특별자치시
+    if (sido === '세종특별자치시') {
+      sido = '세종특별자치시';
+      sggu = '세종특별자치시'; // 세종은 구가 없음
+    }
+
     // 진료과목 정보 (API에서 제공하는 clCdNm은 종별구분, 실제 과목은 없음)
     // → 종별구분(clCdNm)을 진료과목으로 대신 사용하고, 상세 과목은 별도 매핑
     const clNm = h.clCdNm || '의원';

@@ -6,7 +6,6 @@ import {
   getBlogLengthRulesSemiAuto, 
   getBlogFrontmatter, 
   getBlogSkeleton,
-  calculateModelCapacity,
   cleanAnalysisBlock
 } from '@/lib/prompt-rules';
 import { callGeminiClient } from '@/lib/gemini-client';
@@ -69,7 +68,7 @@ export async function fetchPostList(githubToken: string) {
           localCache[file.name] = mapped;
           localStorage.setItem('admin_recent_posts', JSON.stringify(localCache));
         }
-      } catch (e) {
+      } catch {
         console.warn('Failed to fetch fallback metadata for', file.name);
       }
     }

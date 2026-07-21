@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { KAKAO_OPEN_CHAT_URL, GOOGLE_FORM_URL } from '@/lib/constants';
+import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
 
 export default function CTABanner() {
   return (

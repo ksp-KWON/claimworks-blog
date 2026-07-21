@@ -86,8 +86,8 @@ export async function discoverGeminiModels(apiKey: string): Promise<typeof FALLB
       _cachedModels = selected;
       return selected;
     }
-  } catch (err) {
-    console.warn('[gemini-client] 모델 탐색 실패, 기본값 사용:', err);
+  } catch {
+    console.warn('[gemini-client] 모델 탐색 실패, 기본값 사용');
   }
 
   _cachedModels = FALLBACK_MODELS;

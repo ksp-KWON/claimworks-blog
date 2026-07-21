@@ -1,20 +1,17 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import PremiumCard from '@/components/ui/PremiumCard';
-import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumBadge from '@/components/ui/PremiumBadge';
-import PremiumButton from '@/components/ui/PremiumButton';
 
 interface PostListPanelProps {
   isLoading: boolean;
   postList: any[];
   onLoadPost: (filename: string, sha: string) => void;
   onDeletePost: (filename: string, sha: string) => void;
-  onRefreshList: () => void;
   searchQuery: string;
   sortType: string;
 }
 
-export default function PostListPanel({ isLoading, postList, onLoadPost, onDeletePost, onRefreshList, searchQuery, sortType }: PostListPanelProps) {
+export default function PostListPanel({ isLoading, postList, onLoadPost, onDeletePost, searchQuery, sortType }: PostListPanelProps) {
 
   const sortedAndFilteredList = useMemo(() => {
     return [...postList]

@@ -29,6 +29,15 @@ interface Props {
   readOnly?: boolean;
 }
 
+const Label = ({ children, required = false }: { children: React.ReactNode, required?: boolean }) => (
+  <span className="flex items-center gap-2 text-[13px] font-bold text-gray-800 dark:text-gray-200 mb-2.5">
+    <div className="w-1 h-3.5 bg-blue-500 rounded-none"></div>
+    <span>
+      {children} {required && <span className="text-red-500 ml-0.5">*</span>}
+    </span>
+  </span>
+);
+
 export default function ConsultationDetailCard({ data, onChange, readOnly = true }: Props) {
   const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'insurance'>('basic');
   
@@ -59,14 +68,7 @@ export default function ConsultationDetailCard({ data, onChange, readOnly = true
     target.style.height = `${target.scrollHeight}px`;
   };
 
-  const Label = ({ children, required = false }: { children: React.ReactNode, required?: boolean }) => (
-    <span className="flex items-center gap-2 text-[13px] font-bold text-gray-800 dark:text-gray-200 mb-2.5">
-      <div className="w-1 h-3.5 bg-blue-500 rounded-none"></div>
-      <span>
-        {children} {required && <span className="text-red-500 ml-0.5">*</span>}
-      </span>
-    </span>
-  );
+
 
   const boxClass = "w-full text-sm text-gray-800 dark:text-gray-200 bg-gray-50/50 dark:bg-zinc-900 p-4 rounded-none border border-gray-100 dark:border-zinc-800 min-h-[50px] flex items-center";
   const inputClass = "w-full text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-zinc-900 p-4 rounded-none border border-gray-200 dark:border-zinc-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-gray-400 shadow-[0_2px_10px_rgba(0,0,0,0.02)]";

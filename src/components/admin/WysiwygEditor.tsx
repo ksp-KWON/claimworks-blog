@@ -73,7 +73,7 @@ const PortalToolbar = () => {
         <InsertThematicBreak />
         <InsertAdmonition />
         <div className="ml-auto flex items-center border-l border-gray-200 dark:border-zinc-700 pl-2">
-          <DiffSourceToggleWrapper children={undefined} />
+          <DiffSourceToggleWrapper>{null}</DiffSourceToggleWrapper>
         </div>
       </div>
     </div>,

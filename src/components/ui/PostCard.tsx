@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { PostData } from '@/lib/posts';
 import { getCategoryTheme } from '@/lib/constants';
 import PremiumBadge from '@/components/ui/PremiumBadge';
-import PremiumCard from '@/components/ui/PremiumCard';
 
 interface PostCardProps {
   post: Omit<PostData, 'content'>;

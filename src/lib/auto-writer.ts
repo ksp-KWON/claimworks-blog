@@ -1,6 +1,5 @@
 import { callGeminiAPI } from './admin-api';
 import {
-  STRICT_RULES,
   getRandomAngle,
   getTopicPlanningPrompt,
   getPrecedentPlanningPrompt,
@@ -119,7 +118,7 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
         finalKeyword = kw.searchKeyword;
         break;
       }
-    } catch (e) {
+    } catch {
       console.warn('Law API failed for ' + kw.searchKeyword);
     }
   }
@@ -147,7 +146,7 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
             finalKeyword = fw;
             break;
           }
-        } catch (e) {
+        } catch {
           console.warn('Law API healing fallback failed for ' + fw);
         }
       }
@@ -185,7 +184,7 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
     const match = topicPlanStr.match(/```(?:json)?\n([\s\S]*?)\n```/) || topicPlanStr.match(/{[\s\S]*}/);
     const jsonStr = match ? match[0].replace(/```json/g, '').replace(/```/g, '') : topicPlanStr;
     topic = JSON.parse(jsonStr);
-  } catch(e) {
+  } catch {
     throw new Error('기획안 JSON 파싱 실패');
   }
 
@@ -268,7 +267,7 @@ export async function runManualGenerationWorkflow(
     const match = topicPlanStr.match(/```(?:json)?\n([\s\S]*?)\n```/) || topicPlanStr.match(/{[\s\S]*}/);
     const jsonStr = match ? match[0].replace(/```json/g, '').replace(/```/g, '') : topicPlanStr;
     topic = JSON.parse(jsonStr);
-  } catch (e) {
+  } catch {
     throw new Error('기획안 JSON 파싱 실패');
   }
 

@@ -426,7 +426,6 @@ export default function AdminPage() {
               postList={postList} 
               onLoadPost={handleLoadPost} 
               onDeletePost={handleDeletePost} 
-              onRefreshList={handleFetchList}
               searchQuery={searchQuery}
               sortType={sortType}
             />

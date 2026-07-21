@@ -45,7 +45,7 @@ export default function PremiumBadge({
 
   return (
     <span 
-      className={`inline-flex items-center px-2 py-0.5 text-[11px] sm:text-xs font-bold rounded-none ${colorClass} ${className}`}
+      className={`inline-flex items-center px-2 py-0.5 text-[11px] sm:text-xs font-bold rounded-none shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-black/5 dark:border-white/10 ${colorClass} ${className}`}
       {...props}
     >
       {children}

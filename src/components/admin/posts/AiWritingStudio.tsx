@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';
-import PremiumBadge from '@/components/ui/PremiumBadge';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import BottomSheet from '@/components/ui/BottomSheet';
 
@@ -70,7 +68,7 @@ export default function AiWritingStudio({
   };
 
   // 공통으로 사용될 AI 어시스턴트 컨트롤 패널 (데스크톱/모바일 공용)
-  const AiControls = () => (
+  const renderAiControls = () => (
     <div className="flex flex-col h-full overflow-hidden">
       {/* 어시스턴트 헤더 & 탭 */}
       <div className="shrink-0 p-4 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 sticky top-0 z-10">
@@ -217,7 +215,7 @@ export default function AiWritingStudio({
 
       {/* ── 우측: AI 어시스턴트 사이드바 (데스크톱 전용) ── */}
       <div className="hidden md:flex w-80 lg:w-[320px] shrink-0 flex-col bg-white dark:bg-zinc-900 overflow-hidden shadow-[-4px_0_15px_rgba(0,0,0,0.03)] z-10">
-        <AiControls />
+        {renderAiControls()}
       </div>
 
       {/* ── 모바일: 하단 플로팅 버튼 ── */}
@@ -240,7 +238,7 @@ export default function AiWritingStudio({
         zIndex="z-[100]"
       >
         <div className="h-[75vh] flex flex-col bg-white dark:bg-zinc-900">
-          <AiControls />
+          {renderAiControls()}
         </div>
       </BottomSheet>
     </div>

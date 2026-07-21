@@ -6,7 +6,7 @@ import matter from 'gray-matter';
 export function parseMarkdown(rawContent: string) {
   try {
     // 1. 노이즈 제거 (마크다운 코드블록 마커 등)
-    let cleanRaw = rawContent.replace(/^```(?:markdown|md)?\s*\n/i, '').replace(/\n```\s*$/, '').trim();
+    const cleanRaw = rawContent.replace(/^```(?:markdown|md)?\s*\n/i, '').replace(/\n```\s*$/, '').trim();
     
     // 2. gray-matter를 통해 100% 안전하게 파싱
     const { data, content } = matter(cleanRaw);
@@ -25,7 +25,7 @@ export function stringifyMarkdown(data: Record<string, any>, content: string) {
   try {
     // 데이터 중 null/undefined 정리
     const cleanData = Object.fromEntries(
-      Object.entries(data).filter(([_, v]) => v != null && v !== '')
+      Object.entries(data).filter(([k, v]) => v != null && v !== '')
     );
     
     return matter.stringify(content, cleanData);

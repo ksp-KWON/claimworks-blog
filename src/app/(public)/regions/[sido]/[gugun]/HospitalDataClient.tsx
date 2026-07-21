@@ -64,21 +64,40 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
   const specialtiesList = useMemo(() => {
     if (!data || !data.specialties) return [];
     return Object.entries(data.specialties)
-      .map(([name, hospitals]) => ({ name, count: (hospitals as any[]).length }))
+      .map(([name, specData]: [string, any]) => {
+        // 호환성 처리: specData가 배열인지 객체(count, hospitals)인지 분기
+        let count = 0;
+        if (Array.isArray(specData)) {
+          count = specData.length;
+        } else if (specData && typeof specData === 'object') {
+          count = specData.count || (specData.hospitals ? specData.hospitals.length : 0);
+        }
+        return { name, count };
+      })
       .sort((a, b) => b.count - a.count);
   }, [data]);
 
   const hospitalsToDisplay = useMemo(() => {
     if (!data || !data.specialties) return [];
+    
+    // 선택된 진료과목이 있는 경우
     if (selectedSpecialty) {
-      return data.specialties[selectedSpecialty] || [];
+      const specData = data.specialties[selectedSpecialty];
+      if (!specData) return [];
+      return Array.isArray(specData) ? specData : (specData.hospitals || []);
     }
+    
     // 평탄화 (모든 병원)
     const all = new Map();
-    Object.values(data.specialties).forEach((list: any) => {
-      list.forEach((h: any) => {
-        if (!all.has(h.name)) all.set(h.name, h);
-      });
+    Object.values(data.specialties).forEach((specData: any) => {
+      // 배열인 경우와 객체(hospitals)인 경우 모두 지원하여 오류 방지
+      const list = Array.isArray(specData) ? specData : (specData?.hospitals || []);
+      
+      if (Array.isArray(list)) {
+        list.forEach((h: any) => {
+          if (h && h.name && !all.has(h.name)) all.set(h.name, h);
+        });
+      }
     });
     return Array.from(all.values());
   }, [data, selectedSpecialty]);

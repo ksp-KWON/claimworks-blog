@@ -9,6 +9,7 @@ import {
   calculateModelCapacity,
   cleanAnalysisBlock
 } from '@/lib/prompt-rules';
+import { callGeminiClient } from '@/lib/gemini-client';
 import { parseMarkdown, stringifyMarkdown } from './markdown-utils';
 
 const REPO_OWNER = 'ksp-KWON';
@@ -234,46 +235,10 @@ ${getBlogSkeleton(angle, calcTag, existingPostsList)}
 `;
   }
 
-  // 구글 최신 문서 기준: 1순위(Pro) -> 2순위(Flash) -> 3순위(Flash-Lite) 순서로 자동 대체(Fallback)
-  const models = ['gemini-pro-latest', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
-  let lastError = '';
-
-  for (const model of models) {
-    const maxTokens = 32768;
-    const modelCapacityText = calculateModelCapacity(maxTokens);
-    const finalizedPrompt = prompt.replace(/\{\{TARGET_MODEL_CAPACITY\}\}/g, modelCapacityText);
-
-    try {
-      const generationConfig: any = { temperature: 0.7, maxOutputTokens: maxTokens };
-      if (schema) {
-        generationConfig.responseMimeType = 'application/json';
-        generationConfig.responseSchema = schema;
-      }
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: finalizedPrompt }] }],
-          generationConfig
-        })
-      });
-      
-      if (!response.ok) {
-        if (response.status === 429) {
-          throw new Error('API 사용량 초과 (무료 버전은 1분에 2회까지만 가능합니다. 1분 뒤 다시 시도해주세요.)');
-        }
-        throw new Error(`HTTP ${response.status}`);
-      }
-      const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
-      
-      const text = data.candidates[0].content.parts[0].text;
-      return cleanAnalysisBlock(text);
-    } catch (error: any) {
-      lastError = error.message;
-    }
-  }
-  
-  throw new Error(`API 오류: ${lastError}`);
+  // [핵심] gemini-client.ts 의 자동 탐색(Dynamic Discovery)으로 위임
+  // — 모델명 하드코딩 완전 제거. 최신 Stable 모델 자동 선택 + Pro→Flash→Lite 자동 폴백
+  const rawText = await callGeminiClient(geminiKey, prompt, { schema });
+  // schema 있으면 callGeminiClient가 JSON 반환, 없으면 text 반환 → 문자열로 통일
+  const resultText = typeof rawText === 'string' ? rawText : JSON.stringify(rawText);
+  return cleanAnalysisBlock(resultText);
 }

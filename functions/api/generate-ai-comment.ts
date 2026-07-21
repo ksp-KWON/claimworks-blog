@@ -1,6 +1,59 @@
 // Cloudflare Pages Function: /api/generate-ai-comment
-// 통합 AI 코멘트 모듈 백엔드 (법률센터, 금감원센터, 안심케어 공용)
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// 통합 AI 코멘트 모듈 백엔드 (법률센터, 금감원센터, 안심케어, 교통사고지점 공용)
+//
+// [핵심 설계] 모델 자동 탐색 (Dynamic Discovery)
+// — @google/generative-ai SDK 제거 (Cloudflare 환경 호환성 확보)
+// — models.list API로 최신 Stable 모델을 계열별 자동 선택
+// — 탐색 실패 시 안전한 기본값으로 폴백
+
+// ── 모델 계열 패턴 (gemini-client.ts 와 동일 로직) ────────────────────────
+const MODEL_TIERS = [
+  { tier: 'lite',  match: (n: string) => /gemini/i.test(n) && /flash/i.test(n) && /lite/i.test(n),  fallbackMax: 16384 },
+  { tier: 'flash', match: (n: string) => /gemini/i.test(n) && /flash/i.test(n) && !/lite/i.test(n), fallbackMax: 32768 },
+  { tier: 'pro',   match: (n: string) => /gemini/i.test(n) && /pro/i.test(n)   && !/lite/i.test(n), fallbackMax: 32768 },
+];
+
+const FALLBACK_MODELS = [
+  { name: 'gemini-2.0-flash-lite', maxTokens: 16384 },
+  { name: 'gemini-2.5-flash',      maxTokens: 32768 },
+  { name: 'gemini-2.5-pro',        maxTokens: 32768 },
+];
+
+function isStable(name: string) {
+  return !/preview|experimental|latest/i.test(name);
+}
+
+function parseVersion(name: string): [number, number] {
+  const m = name.match(/(\d+)\.(\d+)/);
+  return m ? [+m[1], +m[2]] : [0, 0];
+}
+
+// AI 코멘트 전용 탐색: Lite → Flash → Pro 순서 (비용 효율 우선)
+async function discoverModels(apiKey: string) {
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=100&key=${apiKey}`);
+    if (!res.ok) throw new Error('list failed');
+    const data: any = await res.json();
+    const all = (data.models ?? [])
+      .filter((m: any) => m.supportedGenerationMethods?.includes('generateContent'))
+      .map((m: any) => ({ name: m.name.replace('models/', ''), maxTokens: m.outputTokenLimit ?? null }));
+
+    const selected = [];
+    for (const { tier, match, fallbackMax } of MODEL_TIERS) {
+      const candidates = all.filter((m: any) => match(m.name) && isStable(m.name))
+        .sort((a: any, b: any) => {
+          const [aMaj, aMin] = parseVersion(a.name), [bMaj, bMin] = parseVersion(b.name);
+          return bMaj !== aMaj ? bMaj - aMaj : bMin - aMin;
+        });
+      if (candidates.length > 0) {
+        selected.push({ name: candidates[0].name, maxTokens: candidates[0].maxTokens ?? fallbackMax });
+      }
+    }
+    return selected.length > 0 ? selected : FALLBACK_MODELS;
+  } catch {
+    return FALLBACK_MODELS;
+  }
+}
 
 export async function onRequestPost(context: any) {
   try {
@@ -12,7 +65,6 @@ export async function onRequestPost(context: any) {
       return new Response(JSON.stringify({ error: 'sourceText is required' }), { status: 400 });
     }
 
-    // Cloudflare 환경변수에서 구글 API 키 가져오기
     const apiKey = env.GEMINI_API_KEY;
     if (!apiKey) {
       return new Response(JSON.stringify({ error: 'GEMINI_API_KEY is not configured on the server.' }), { status: 500 });
@@ -34,7 +86,7 @@ export async function onRequestPost(context: any) {
         contextPrompt = '이 데이터를 바탕으로 보험 소비자에게 유용한 보상 실무 팁을 짚어주세요.';
     }
 
-    const systemInstruction = `너는 보상스쿨의 전문 손해사정사야. 인사말(안녕하세요 등)은 절대 생략하고 곧바로 본론부터 말해.
+    const prompt = `너는 보상스쿨의 전문 손해사정사야. 인사말(안녕하세요 등)은 절대 생략하고 곧바로 본론부터 말해.
 ${contextPrompt}
 반드시 존댓말로 작성하고, 전문 용어를 쉽게 풀어서 콤팩트하게 요약해.
 절대 없는 법령이나 사실을 지어내지 마(Hallucination 금지).
@@ -43,39 +95,49 @@ ${contextPrompt}
 2. 번호(1., 2.)를 매겨서 설명할 경우, 각 번호가 끝날 때마다 반드시 줄바꿈(\\n)을 넣어줘.
 3. 코멘트의 첫 문장은 반드시 아래 형식 중 하나로 시작해.
    - 판례인 경우: "문의하신 판례는 [이 판례가 주는 핵심 인사이트 요약]이라는 중요한 기준을 제시하고 있습니다."
-   - 그 외 자료인 경우: "문의하신 데이터는 [이 데이터가 주는 핵심 인사이트 요약]이라는 중요한 기준을 제시하고 있습니다."`;
+   - 그 외 자료인 경우: "문의하신 데이터는 [이 데이터가 주는 핵심 인사이트 요약]이라는 중요한 기준을 제시하고 있습니다."
 
-    // 최신 기술 스택: 구글 공식 SDK 적용 및 지능형 모델 우회(Failover) 시스템 도입
-    // 단일 모델(Flash)이 구글 서버 과부하(503)나 할당량 초과(429)로 뻗었을 때를 대비한 가장 스테이블한 근본 해결책
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const fallbackModels = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-pro-latest'];
-    
+분석할 데이터:
+${sourceText}`;
+
+    // ── [핵심] 자동 탐색으로 최신 Stable 모델 사용 (Lite→Flash→Pro 순서) ──
+    const models = await discoverModels(apiKey);
     let comment = '';
     let lastError: any = null;
 
-    for (const modelName of fallbackModels) {
+    for (const { name: modelName, maxTokens } of models) {
       try {
-        const model = genAI.getGenerativeModel({
-          model: modelName,
-          systemInstruction: systemInstruction,
-        });
-
-        const result = await model.generateContent({
-          contents: [{ role: 'user', parts: [{ text: `분석할 데이터:\n${sourceText}` }] }],
-          generationConfig: {
-            temperature: 0.3, // 일관성 있고 안정적인 답변 유도
-            maxOutputTokens: 800, // 글자 잘림 방지를 위해 충분한 토큰 할당
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
+          {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                temperature:      0.3,
+                maxOutputTokens:  Math.min(1024, maxTokens),
+              },
+            }),
           }
-        });
+        );
 
-        comment = result.response.text();
-        if (comment) break; // 성공 시 즉시 탈출
+        if (!res.ok) {
+          const errBody: any = await res.json().catch(() => ({}));
+          // 할당량 초과는 즉각 다음 계열로
+          if (res.status === 429) { lastError = new Error('quota'); continue; }
+          // 503/500 은 skip
+          if (res.status >= 500) { lastError = new Error(`HTTP ${res.status}`); continue; }
+          throw new Error(errBody?.error?.message || `HTTP ${res.status}`);
+        }
+
+        const data: any = await res.json();
+        const text = (data.candidates?.[0]?.content?.parts ?? []).map((p: any) => p.text ?? '').join('');
+        if (text) { comment = text; break; }
 
       } catch (err: any) {
         console.error(`[Failover] ${modelName} 실패:`, err.message);
         lastError = err;
-        // 실패 시 대기 시간 없이 즉각 다음 하위/상위 모델로 우회 (자동글쓰기 gemini-helper 로직 통합)
-        continue;
       }
     }
 
@@ -86,8 +148,8 @@ ${contextPrompt}
     return new Response(JSON.stringify({ comment }), {
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
-        'Access-Control-Allow-Origin': '*'
-      }
+        'Access-Control-Allow-Origin': '*',
+      },
     });
 
   } catch (error: any) {
@@ -98,8 +160,8 @@ ${contextPrompt}
         status: 500,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*'
-        }
+          'Access-Control-Allow-Origin': '*',
+        },
       }
     );
   }

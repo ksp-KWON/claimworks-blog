@@ -45,29 +45,49 @@ export default function BlogPageClient() {
     const filterText = categoryFilter.toLowerCase();
     // 무분별한 매칭을 일으키는 일반 명사 금지어
     const stopWords = ['보상', '분쟁', '실손', '보험', '수술', '치료', '가이드', '비급여', '진단비', '수술비', '청구', '손해사정'];
+    
+    // 진료과목별 연관 키워드 매핑
+    const SPECIALTY_KEYWORDS: Record<string, string[]> = {
+      '정형외과': ['골절', '인대', '척추', '디스크', '십자인대', '파열', '회전근개'],
+      '신경외과': ['추간판탈출증', '뇌출혈', '척추관협착증', '뇌경색'],
+      '내과': ['심근경색', '협심증', '기왕증'],
+      '외과': ['소액암', '수술', '하지정맥류'],
+      '산부인과': ['자궁근종', '하이푸', '요실금'],
+      '안과': ['백내장', '황반변성', '녹내장'],
+      '피부/성형외과': ['레이저', '흉터', '비급여', '미용'],
+      '비뇨의학과': ['전립선', '요로결석'],
+      '치과': ['치조골', '임플란트', '크라운'],
+      '한방의학과': ['첩약', '추나']
+    };
 
     displayPosts = displayPosts.filter(p => {
       // 1. 카테고리 또는 특수분류 완전 일치/포함
       if (p.category && p.category.toLowerCase().includes(filterText)) return true;
       if (p.specialtyCategory && p.specialtyCategory.toLowerCase().includes(filterText)) return true;
       
-      // 2. 태그 매칭 (가장 중요)
+      // 진료과목에 해당하는 확장 키워드 목록
+      const keywords = [filterText, ...(SPECIALTY_KEYWORDS[filterText] || [])];
+      
+      // 2. 태그 매칭 (가장 중요) - 확장 키워드 포함
       if (p.tags && p.tags.length > 0) {
         const hasMatchingTag = p.tags.some(t => {
           const tag = t.toLowerCase();
-          // 태그가 필터어에 포함되거나 필터어가 태그에 포함될 때
-          if (filterText.includes(tag) || tag.includes(filterText)) {
-            // 단, 태그가 의미 없는 일반명사면 매칭에서 제외
-            if (stopWords.includes(tag)) return false;
-            return true;
-          }
-          return false;
+          return keywords.some(kw => {
+            if (kw.includes(tag) || tag.includes(kw)) {
+              if (stopWords.includes(tag)) return false;
+              return true;
+            }
+            return false;
+          });
         });
         if (hasMatchingTag) return true;
       }
       
-      // 3. 제목이나 요약에 전체 필터어가 그대로 포함된 경우
-      if (p.title && p.title.toLowerCase().includes(filterText)) return true;
+      // 3. 제목이나 요약에 키워드가 포함된 경우
+      if (p.title) {
+        const titleLower = p.title.toLowerCase();
+        if (keywords.some(kw => titleLower.includes(kw))) return true;
+      }
       
       // 4. 핵심 질환명이 제목에 포함된 경우 (예: "백내장 (다초점 렌즈 실손)" -> "백내장")
       const firstWord = filterText.split(/[\s(]/)[0];

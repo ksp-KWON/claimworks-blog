@@ -21,9 +21,6 @@ if (dns && dns.setDefaultResultOrder) {
  * @returns {Promise<Response>} Fetch Response 객체
  */
 async function safeFetch(url, options = {}, timeoutMs = 15000) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
   const defaultHeaders = {
     // 봇 차단(YouTube, Naver 등) 우회를 위한 표준 브라우저 스푸핑 헤더
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -39,15 +36,10 @@ async function safeFetch(url, options = {}, timeoutMs = 15000) {
       ...defaultHeaders,
       ...(options?.headers || {})
     },
-    signal: controller.signal
+    signal: AbortSignal.timeout(timeoutMs)
   };
 
-  try {
-    const response = await fetch(url, finalOptions);
-    return response;
-  } finally {
-    clearTimeout(timeoutId);
-  }
+  return await fetch(url, finalOptions);
 }
 
 module.exports = {

@@ -98,7 +98,7 @@ function normalizeSpecialty(raw) {
 async function fetchAllHospitalsForSido(sidoCode, sidoName) {
   const hospitals = [];
   let pageNo = 1;
-  const numOfRows = 100;
+  const numOfRows = 1000;
 
   while (true) {
     const url = `${BASE_URL}?serviceKey=${encodeURIComponent(API_KEY)}&pageNo=${pageNo}&numOfRows=${numOfRows}&sidoCd=${sidoCode}&_type=json`;
@@ -109,7 +109,7 @@ async function fetchAllHospitalsForSido(sidoCode, sidoName) {
       const items = body?.items?.item;
 
       if (!items) break;
-      const arr = Array.isArray(items) ? items : [items];
+      const arr = (Array.isArray(items) ? items : [items]).map(item => ({...item, sidoFullName: sidoName}));
       hospitals.push(...arr);
 
       // 마지막 페이지 확인
@@ -134,7 +134,7 @@ function buildStructure(allHospitals) {
 
   for (const h of allHospitals) {
     // 시도명 / 구군명 추출
-    const sido = h.sidoCdNm || h.addr?.split(' ')[0] || '기타';
+    const sido = h.sidoFullName || h.addr?.split(' ')[0] || '기타';
     const sggu = h.sgguCdNm || h.addr?.split(' ')[1] || '기타';
     // 진료과목 정보 (API에서 제공하는 clCdNm은 종별구분, 실제 과목은 없음)
     // → 종별구분(clCdNm)을 진료과목으로 대신 사용하고, 상세 과목은 별도 매핑

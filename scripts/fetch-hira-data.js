@@ -262,6 +262,15 @@ function splitHiraData() {
     console.log('  📡 HIRA 병원 데이터를 구군별 파편 파일로 분할 중...');
     const hiraData = JSON.parse(fs.readFileSync(hiraSourcePath, 'utf8'));
     
+    // TAAS 표준 코드 불러오기
+    let taasData;
+    try {
+      taasData = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'functions/api/taas-standard-data.json'), 'utf8'));
+    } catch (e) {
+      console.warn('  ⚠️ TAAS 표준 코드 파일 로드 실패. 분할을 건너뜁니다.');
+      return;
+    }
+
     if (!fs.existsSync(hospitalsOutputDir)) {
       fs.mkdirSync(hospitalsOutputDir, { recursive: true });
     } else {
@@ -277,13 +286,48 @@ function splitHiraData() {
     if (hiraData && hiraData.regions) {
       for (const [sidoName, sidoData] of Object.entries(hiraData.regions)) {
         if (!sidoData || !sidoData.districts) continue;
+        
+        // 1. Sido Code 매핑
+        const sidoCode = taasData.TAAS_SIDO_CODES[sidoName];
+        if (!sidoCode) {
+          console.warn(`  ⚠️ SIDO 매핑 실패: ${sidoName}`);
+          continue;
+        }
+
+        const gugunCodes = taasData.TAAS_GUGUN_CODES[sidoCode] || {};
+
         for (const [districtName, districtData] of Object.entries(sidoData.districts)) {
+          // 2. Gugun Code 매핑 (정교한 부분 매핑)
+          let gugunCode = '';
+          const cleanGugun = districtName.replace(/^(인천|대구|광주|대전|울산|부산|서울)\s*/, '');
+          
+          const matchedKeys = Object.keys(gugunCodes)
+            .filter(k => cleanGugun.includes(k) || k.includes(cleanGugun))
+            .sort((a, b) => b.length - a.length);
+            
+          if (matchedKeys.length > 0) {
+            gugunCode = gugunCodes[matchedKeys[0]];
+          } else {
+            // fallback (e.g. 여주군 -> 여주시)
+            for (const [key, code] of Object.entries(gugunCodes)) {
+              if (key.substring(0,2) === cleanGugun.substring(0,2)) {
+                gugunCode = code;
+                break;
+              }
+            }
+          }
+
+          if (!gugunCode) {
+            console.warn(`  ⚠️ GUGUN 매핑 실패: ${sidoName} ${districtName}`);
+            continue;
+          }
+
           const fileContent = {
             sido: sidoName,
             district: districtName,
             specialties: districtData.specialties || {}
           };
-          const outputFileName = `${sidoName}-${districtName}.json`;
+          const outputFileName = `${sidoCode}-${gugunCode}.json`;
           fs.writeFileSync(
             path.join(hospitalsOutputDir, outputFileName),
             JSON.stringify(fileContent, null, 2),

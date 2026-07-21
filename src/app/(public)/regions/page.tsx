@@ -43,10 +43,10 @@ export default function RegionsIndex() {
               {REGIONS_DATA.map((region) => (
                 <Link 
                   key={region.name} 
-                  href={`/blog?sido=${encodeURIComponent(region.name)}`} 
+                  href={`/regions/${encodeURIComponent(region.name)}`} 
                   className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-white dark:bg-[#303134] rounded-none border border-gray-200 dark:border-gray-700 shadow-[0_4px_15px_rgba(0,0,0,0.03)] hover:shadow-[4px_8px_20px_rgba(52,168,83,0.15)] hover:border-[var(--google-green)] hover:-translate-y-1 transition-all duration-300"
                 >
-                  <div className="w-12 h-12 flex items-center justify-center text-2xl text-green-600 bg-green-50 dark:bg-green-900/20 rounded-full mb-3 group-hover:scale-110 group-hover:bg-[var(--google-green)] group-hover:text-white transition-all duration-300">
+                  <div className="w-12 h-12 flex items-center justify-center text-2xl text-green-600 bg-green-50 dark:bg-green-900/20 rounded-none mb-3 group-hover:scale-110 group-hover:bg-[var(--google-green)] group-hover:text-white transition-all duration-300">
                     📍
                   </div>
                   <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-green)] transition-colors text-center">{region.name}</h3>

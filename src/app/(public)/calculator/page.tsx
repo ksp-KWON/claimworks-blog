@@ -64,20 +64,22 @@ export default function CalculatorIndex() {
       <div className="space-y-4">
         {CALCULATORS.map((calc) => (
           <Link key={calc.id} href={calc.href} className="group block outline-none">
-            <PremiumCard hoverEffect={true} borderColor={calc.color as any} className="flex flex-row p-0 overflow-hidden items-stretch">
-              <div className="flex items-center justify-center p-4 sm:p-5 w-24 sm:w-32 bg-slate-50 dark:bg-black/20 border-r border-gray-100 dark:border-gray-700 transition-colors shrink-0">
-                <span className="text-3xl sm:text-4xl group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">{calc.icon}</span>
-              </div>
-              <div className="flex-1 p-4 sm:p-6 flex flex-col justify-center min-w-0">
-                <div className="flex items-center gap-3 mb-2">
-                  <PremiumBadge color={calc.color as any}>{calc.tag}</PremiumBadge>
-                  <h2 className="text-base sm:text-xl font-black text-[#202124] dark:text-[#e8eaed] transition-colors tracking-tight truncate">
-                    {calc.title}
-                  </h2>
+            <PremiumCard hoverEffect={true} borderColor={calc.color as any} className="p-0 overflow-hidden h-full">
+              <div className="flex flex-row items-stretch w-full h-full">
+                <div className="flex items-center justify-center p-4 sm:p-5 w-24 sm:w-32 bg-slate-50 dark:bg-black/20 border-r border-gray-100 dark:border-gray-700 transition-colors shrink-0">
+                  <span className="text-3xl sm:text-4xl group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">{calc.icon}</span>
                 </div>
-                <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[11px] sm:text-xs leading-relaxed max-w-xl font-medium break-keep">
-                  {calc.description}
-                </p>
+                <div className="flex-1 p-4 sm:p-6 flex flex-col justify-center min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <PremiumBadge color={calc.color as any}>{calc.tag}</PremiumBadge>
+                    <h2 className="text-base sm:text-xl font-black text-[#202124] dark:text-[#e8eaed] transition-colors tracking-tight truncate">
+                      {calc.title}
+                    </h2>
+                  </div>
+                  <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[11px] sm:text-xs leading-relaxed max-w-xl font-medium break-keep">
+                    {calc.description}
+                  </p>
+                </div>
               </div>
             </PremiumCard>
           </Link>

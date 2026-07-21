@@ -69,17 +69,19 @@ export default function CategoriesIndex() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {COLUMN_CATEGORIES.map((cat) => (
             <Link key={cat.name} href={`/blog?category=${encodeURIComponent(cat.name)}`} className="group outline-none block">
-              <PremiumCard hoverEffect={true} borderColor="yellow" className="flex flex-row items-center p-4 h-full">
-                <div className={`w-12 h-12 flex items-center justify-center text-xl text-white ${cat.color} rounded-sm shadow-inner shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-                  {cat.icon}
-                </div>
-                <div className="ml-4 flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-yellow)] transition-colors mb-1 truncate">
-                    {cat.name}
-                  </h3>
-                  <p className="text-[11px] text-[#5f6368] dark:text-[#9aa0a6] leading-snug break-keep">
-                    {cat.desc}
-                  </p>
+              <PremiumCard hoverEffect={true} borderColor="yellow" className="p-4 h-full">
+                <div className="flex flex-row items-center w-full h-full">
+                  <div className={`w-12 h-12 flex items-center justify-center text-xl text-white ${cat.color} rounded-sm shadow-inner shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                    {cat.icon}
+                  </div>
+                  <div className="ml-4 flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-yellow)] transition-colors mb-1 truncate">
+                      {cat.name}
+                    </h3>
+                    <p className="text-[11px] text-[#5f6368] dark:text-[#9aa0a6] leading-snug break-keep">
+                      {cat.desc}
+                    </p>
+                  </div>
                 </div>
               </PremiumCard>
             </Link>
@@ -96,17 +98,19 @@ export default function CategoriesIndex() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {SPECIALTIES.map((spec) => (
             <Link key={spec.name} href={`/blog?category=${encodeURIComponent(spec.name.split(' ')[0])}`} className="group outline-none block">
-              <PremiumCard hoverEffect={true} borderColor="blue" className="flex flex-row items-center p-4 h-full">
-                <div className={`w-12 h-12 flex items-center justify-center text-xl text-white ${spec.color} rounded-sm shadow-inner shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-                  {spec.icon}
-                </div>
-                <div className="ml-4 flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors mb-1 truncate">
-                    {spec.name}
-                  </h3>
-                  <p className="text-[11px] text-[#5f6368] dark:text-[#9aa0a6] leading-snug break-keep">
-                    {spec.desc}
-                  </p>
+              <PremiumCard hoverEffect={true} borderColor="blue" className="p-4 h-full">
+                <div className="flex flex-row items-center w-full h-full">
+                  <div className={`w-12 h-12 flex items-center justify-center text-xl text-white ${spec.color} rounded-sm shadow-inner shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                    {spec.icon}
+                  </div>
+                  <div className="ml-4 flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors mb-1 truncate">
+                      {spec.name}
+                    </h3>
+                    <p className="text-[11px] text-[#5f6368] dark:text-[#9aa0a6] leading-snug break-keep">
+                      {spec.desc}
+                    </p>
+                  </div>
                 </div>
               </PremiumCard>
             </Link>

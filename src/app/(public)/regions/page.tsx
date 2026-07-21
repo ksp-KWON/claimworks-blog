@@ -43,16 +43,18 @@ export default function RegionsIndex() {
             href={`/regions/${encodeURIComponent(region.name)}`} 
             className="group outline-none block"
           >
-            <PremiumCard hoverEffect={true} borderColor="green" className="flex flex-col items-center justify-center p-6 h-full text-center">
-              <div className="w-14 h-14 flex items-center justify-center text-3xl text-[var(--google-green)] bg-green-50 dark:bg-green-900/20 rounded-none mb-4 shadow-sm group-hover:scale-110 group-hover:bg-[var(--google-green)] group-hover:text-white transition-all duration-300">
-                📍
+            <PremiumCard hoverEffect={true} borderColor="green" className="p-6 h-full text-center">
+              <div className="flex flex-col items-center justify-center w-full h-full">
+                <div className="w-14 h-14 flex items-center justify-center text-3xl text-[var(--google-green)] bg-green-50 dark:bg-green-900/20 rounded-none mb-4 shadow-sm group-hover:scale-110 group-hover:bg-[var(--google-green)] group-hover:text-white transition-all duration-300">
+                  📍
+                </div>
+                <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-green)] transition-colors mb-1.5">
+                  {region.name}
+                </h3>
+                <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] font-medium">
+                  {region.districts.length}개 시/군/구
+                </p>
               </div>
-              <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-green)] transition-colors mb-1.5">
-                {region.name}
-              </h3>
-              <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] font-medium">
-                {region.districts.length}개 시/군/구
-              </p>
             </PremiumCard>
           </Link>
         ))}

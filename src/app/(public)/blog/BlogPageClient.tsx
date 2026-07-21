@@ -14,7 +14,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import PostCard from '@/components/ui/PostCard';
-import { KAKAO_OPEN_CHAT_URL, GOOGLE_FORM_URL } from '@/lib/constants';
+import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
 import { PostData as Post } from '@/lib/posts';
 
 export default function BlogPageClient() {

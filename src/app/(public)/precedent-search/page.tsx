@@ -291,7 +291,7 @@ export default function PrecedentSearchPage() {
     }).slice(0, 2);
   };
 
-  const openChatWithContext = (prec: Precedent) => {
+  const openChatWithContext = () => {
     if (typeof window !== 'undefined') {
       window.open(KAKAO_OPEN_CHAT_URL, '_blank', 'noopener,noreferrer');
     }
@@ -484,7 +484,7 @@ export default function PrecedentSearchPage() {
                                 📖 보상스쿨 전체 칼럼 읽기
                               </Link>
                             )}
-                            <button onClick={() => openChatWithContext(prec)} className="w-full text-center py-3 bg-[var(--google-blue)] hover:bg-[#174ea6] text-white text-xs font-bold shadow-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer" id="precedent-chat-btn">
+                            <button onClick={() => openChatWithContext()} className="w-full text-center py-3 bg-[var(--google-blue)] hover:bg-[#174ea6] text-white text-xs font-bold shadow-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer" id="precedent-chat-btn">
                               💬 무료 보상 검토 신청
                             </button>
                           </div>

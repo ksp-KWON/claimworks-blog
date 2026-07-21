@@ -2,7 +2,6 @@ import { getSortedPostsData } from "@/lib/posts";
 import YouTubeBriefing from "@/components/YouTubeBriefing";
 import HomePostList from "@/components/HomePostList";
 import type { Metadata } from "next";
-import PremiumCard from "@/components/ui/PremiumCard";
 import PremiumHeading from "@/components/ui/PremiumHeading";
 
 export const metadata: Metadata = {

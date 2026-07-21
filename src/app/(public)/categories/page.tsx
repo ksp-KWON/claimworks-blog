@@ -39,6 +39,17 @@ export default function CategoriesIndex() {
   return (
     <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       
+      {/* 📂 전문 보상가이드 상단 띠 배너 */}
+      <div className="bg-[var(--google-yellow)] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3 rounded-t-none">
+        <div className="flex items-center gap-2.5">
+          <span className="text-lg shrink-0">📂</span>
+          <div className="text-xs sm:text-sm font-extrabold tracking-tight">
+            <span className="underline decoration-wavy mr-1.5">[핵심 실무]</span>
+            보상스쿨 손해사정사의 분야별 전문 칼럼과 분쟁 가이드를 확인하세요.
+          </div>
+        </div>
+      </div>
+
       {/* 헤더 영역 */}
       <div className="text-center space-y-4">
         <PremiumHeading level={1} gradient="yellow" className="justify-center !text-3xl">
@@ -57,16 +68,16 @@ export default function CategoriesIndex() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {COLUMN_CATEGORIES.map((cat) => (
-            <Link key={cat.name} href={`/blog?category=${encodeURIComponent(cat.name)}`} className="group outline-none">
-              <PremiumCard hoverEffect={true} borderColor="yellow" className="flex items-center p-4 h-full">
+            <Link key={cat.name} href={`/blog?category=${encodeURIComponent(cat.name)}`} className="group outline-none block">
+              <PremiumCard hoverEffect={true} borderColor="yellow" className="flex flex-row items-center p-4 h-full">
                 <div className={`w-12 h-12 flex items-center justify-center text-xl text-white ${cat.color} rounded-sm shadow-inner shrink-0 group-hover:scale-110 transition-transform duration-300`}>
                   {cat.icon}
                 </div>
-                <div className="ml-4 flex-1">
-                  <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-yellow)] transition-colors mb-1">
+                <div className="ml-4 flex-1 min-w-0">
+                  <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-yellow)] transition-colors mb-1 truncate">
                     {cat.name}
                   </h3>
-                  <p className="text-[11px] text-[#5f6368] dark:text-[#9aa0a6] leading-snug">
+                  <p className="text-[11px] text-[#5f6368] dark:text-[#9aa0a6] leading-snug break-keep">
                     {cat.desc}
                   </p>
                 </div>
@@ -84,16 +95,16 @@ export default function CategoriesIndex() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {SPECIALTIES.map((spec) => (
-            <Link key={spec.name} href={`/blog?tag=${encodeURIComponent(spec.name.split(' ')[0])}`} className="group outline-none">
-              <PremiumCard hoverEffect={true} borderColor="blue" className="flex items-center p-4 h-full">
+            <Link key={spec.name} href={`/blog?category=${encodeURIComponent(spec.name.split(' ')[0])}`} className="group outline-none block">
+              <PremiumCard hoverEffect={true} borderColor="blue" className="flex flex-row items-center p-4 h-full">
                 <div className={`w-12 h-12 flex items-center justify-center text-xl text-white ${spec.color} rounded-sm shadow-inner shrink-0 group-hover:scale-110 transition-transform duration-300`}>
                   {spec.icon}
                 </div>
-                <div className="ml-4 flex-1">
-                  <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors mb-1">
+                <div className="ml-4 flex-1 min-w-0">
+                  <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-blue)] transition-colors mb-1 truncate">
                     {spec.name}
                   </h3>
-                  <p className="text-[11px] text-[#5f6368] dark:text-[#9aa0a6] leading-snug">
+                  <p className="text-[11px] text-[#5f6368] dark:text-[#9aa0a6] leading-snug break-keep">
                     {spec.desc}
                   </p>
                 </div>

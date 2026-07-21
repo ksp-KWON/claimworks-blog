@@ -35,17 +35,17 @@ function cleanFssText(text) {
     .replace(/""/g, '"')
     
     // 3. 깨진 개행 문자 복원
-    // 'n'이 단독으로(앞뒤 공백/줄바꿈) 연속해서 나오거나 하나만 있을 때 줄바꿈으로 변경
+    // 'n'이 단독으로 나오거나(앞뒤 공백/줄바꿈) 비정상적인 \r\n 등을 정제
     .replace(/(?:\b|^)n(?:\b|$)/g, '\n')
-    // 중복된 줄바꿈 기호 압축
-    .replace(/\n{2,}/g, '\n')
-    .replace(/([가-힣>\]\)\.\!\?\,])\n(?=\s|-|①|②|③|④|⑤|■|▲|$)/g, '$1\n');
+    .replace(/\r\n/g, '\n')
+    // 중복된 줄바꿈 기호를 문단 구분이 가능한 \n\n 으로 압축 (기존 땜빵식 \n 교체 제거)
+    .replace(/\n{3,}/g, '\n\n');
 
   // 4. 구조적 파싱 (마크다운 변환)
   const lines = cleaned.split('\n');
   const markdownLines = lines.map(line => {
     let l = line.trim();
-    if (!l) return '';
+    if (!l) return ''; // 빈 줄 유지 (join 시 \n으로 합쳐짐)
 
     // 대제목/중제목 파싱 (■, ㅁ)
     if (l.startsWith('■') || l.startsWith('ㅁ')) {
@@ -79,17 +79,20 @@ function cleanFssText(text) {
   });
 
   // 5. 마크다운 간격 통일 및 찌꺼기 제거
-  // 빈 줄은 하나로 압축하되, 문단 간격이 너무 벌어지지 않도록 \n\n 대신 \n으로 결합하고,
-  // 제목류(###)나 리스트(-, 1.) 앞뒤에만 적절히 간격을 둡니다.
-  let finalMarkdown = markdownLines.filter(l => l.length > 0).join('\n');
+  // 문단 구분을 명확히 하기 위해 조인 (기존 filter(Boolean) 삭제 - 빈 줄을 살려야 markdown 리스트가 깨지지 않음)
+  let finalMarkdown = markdownLines.join('\n');
   
-  // 헤딩 앞에 2칸 띄우기 (문단 구분)
+  // 마크다운 리스트 문법이 정상 작동하도록 헤딩 및 리스트(첫 항목) 앞뒤에 빈 줄 추가
   finalMarkdown = finalMarkdown.replace(/\n(###)/g, '\n\n$1');
+  finalMarkdown = finalMarkdown.replace(/([^\n])\n(- |1\. )/g, '$1\n\n$2');
+  
+  // 연속된 빈 줄 최종 압축
+  finalMarkdown = finalMarkdown.replace(/\n{3,}/g, '\n\n');
   
   // 첨부파일 문구 제거
   finalMarkdown = finalMarkdown.replace(/※\s*자세한\s*내용은\s*첨부파일을\s*참고하시기\s*바랍니다\.?/g, '');
 
-  return finalMarkdown;
+  return finalMarkdown.trim();
 }
 
 module.exports = {

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import Link from 'next/link';
 
 export default function ConsultationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,9 +88,9 @@ export default function ConsultationPage() {
             </p>
           </div>
           <div className="pt-4 border-t border-gray-100 dark:border-white/5">
-            <a href="/" className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-none shadow-sm text-sm font-black tracking-wide text-[var(--google-blue)] bg-blue-50 hover:bg-blue-100 dark:bg-white/5 dark:hover:bg-white/10 dark:text-white transition-colors cursor-pointer">
+            <Link href="/" className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-none shadow-sm text-sm font-black tracking-wide text-[var(--google-blue)] bg-blue-50 hover:bg-blue-100 dark:bg-white/5 dark:hover:bg-white/10 dark:text-white transition-colors cursor-pointer">
               홈으로 돌아가기
-            </a>
+            </Link>
           </div>
         </div>
       </div>

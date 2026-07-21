@@ -5,9 +5,7 @@
  * 사이드바 컴포넌트 (Client Component)
  *
  * [리팩토링] 태그 목록을 외부(layout.tsx)에서 props로 받아 렌더링
- * - 이전: fetch('/api/posts') → 정적 배포에서 API 없어 태그 빈칸 버그
- * - 현재: layout.tsx 서버에서 미리 계산된 tags를 props로 주입
- *         클라이언트에서 추가 네트워크 요청 없이 즉시 렌더링
+ * - 중복 코드를 제거하고 사이드바 아이템을 배열(배치)로 통합 관리 (최신 컴포넌트화)
  */
 
 import Link from 'next/link';
@@ -21,151 +19,142 @@ interface SidebarContentProps {
 
 const INITIAL_TAG_COUNT = 4;
 
+type ThemeColor = 'blue' | 'red' | 'green' | 'yellow';
+
+interface SidebarItem {
+  href: string;
+  icon: string;
+  title: string;
+  themeColor: ThemeColor;
+  badgeText: string;
+  description: string;
+  buttonText: string;
+}
+
+const SIDEBAR_ITEMS: SidebarItem[] = [
+  {
+    href: '/precedent-search',
+    icon: '⚖️',
+    title: '빅데이터 판례검색센터',
+    themeColor: 'blue',
+    badgeText: '실시간 연동',
+    description: '사고 경위나 보상 문제를 일상어로 검색하면, 법제처 공공데이터에서 나에게 가장 유리한 핵심 대법원 판례를 찾아드립니다.',
+    buttonText: '빅데이터 판례 검색 시작하기'
+  },
+  {
+    href: '/fss-news',
+    icon: '🏛️',
+    title: '금감원 소비자보호센터',
+    themeColor: 'red',
+    badgeText: '실시간 연동',
+    description: '금감원 소비자경보, 분쟁조정사례, 금융꿀팁, 약관 보도자료를 실시간 분석하여 권리를 지켜드립니다.',
+    buttonText: '소비자보호 데이터 조회하기'
+  },
+  {
+    href: '/traffic-care',
+    icon: '🚗',
+    title: '교통사고 로컬 케어',
+    themeColor: 'green',
+    badgeText: '지역 안내',
+    description: '도로교통공단 안전 통계와 우수 신경/정형외과 병원 및 사고 맞춤형 손해사정 지식을 안내해 드립니다.',
+    buttonText: '내 지역 교통사고 케어 가기'
+  },
+  {
+    href: '/calculator',
+    icon: '🧮',
+    title: '보상금·합의금 계산기',
+    themeColor: 'blue',
+    badgeText: '통합 계산',
+    description: '약관 지급기준 및 법원 판례 기준을 적용한 예상 합의금과 소송가액을 한 번에 확인하세요.',
+    buttonText: '계산기 시작하기'
+  },
+  {
+    href: '/regions',
+    icon: '🗺️',
+    title: '지역별 의료기관',
+    themeColor: 'green',
+    badgeText: '전국 매핑',
+    description: '전국 17개 시/도, 226개 시/군/구별 보상 전문 의료기관 및 협력 병원 정보를 제공합니다.',
+    buttonText: '지역별 기관 찾기'
+  },
+  {
+    href: '/categories',
+    icon: '📂',
+    title: '분야별 전문 보상 가이드',
+    themeColor: 'yellow',
+    badgeText: '핵심 실무',
+    description: '보상스쿨 손해사정사의 핵심 전문 칼럼들과 진료과목별 주요 의료분쟁 가이드를 통합 제공합니다.',
+    buttonText: '전체 가이드 보기'
+  }
+];
+
+const THEME_STYLES: Record<ThemeColor, { textIcon: string; badgeBg: string; buttonHoverBg: string; buttonHoverText: string }> = {
+  blue: {
+    textIcon: 'text-[var(--google-blue)]',
+    badgeBg: 'bg-[#e8f0fe] dark:bg-[#174ea6]/20 text-[var(--google-blue)] dark:text-[#8ab4f8] border-[#d2e3fc]/30 dark:border-[#174ea6]/30',
+    buttonHoverBg: 'group-hover:bg-[#e8f0fe] dark:group-hover:bg-[#174ea6]/20',
+    buttonHoverText: 'group-hover:text-[var(--google-blue)] dark:group-hover:text-[#8ab4f8]'
+  },
+  red: {
+    textIcon: 'text-red-500',
+    badgeBg: 'bg-red-50 dark:bg-red-950/20 text-red-500 dark:text-red-400 border-red-100/30 dark:border-red-950/30',
+    buttonHoverBg: 'group-hover:bg-red-50 dark:group-hover:bg-red-950/20',
+    buttonHoverText: 'group-hover:text-red-500 dark:group-hover:text-red-400'
+  },
+  green: {
+    textIcon: 'text-[#137333]', // or text-[var(--google-green)]
+    badgeBg: 'bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] border-green-100/30 dark:border-green-950/30',
+    buttonHoverBg: 'group-hover:bg-green-50 dark:group-hover:bg-green-950/20',
+    buttonHoverText: 'group-hover:text-[#137333] dark:group-hover:text-[#81c995]'
+  },
+  yellow: {
+    textIcon: 'text-[var(--google-yellow)]',
+    badgeBg: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 border-yellow-100/30 dark:border-yellow-900/30',
+    buttonHoverBg: 'group-hover:bg-yellow-50 dark:group-hover:bg-yellow-900/20',
+    buttonHoverText: 'group-hover:text-yellow-600 dark:group-hover:text-yellow-500'
+  }
+};
+
 export default function SidebarContent({ tags = [] }: SidebarContentProps) {
   const visibleTags = tags.slice(0, INITIAL_TAG_COUNT);
   const hiddenTags  = tags.slice(INITIAL_TAG_COUNT);
 
   return (
     <div className="space-y-6">
-      {/* ⚖️ 빅데이터 판례검색센터 바로가기 배너 */}
-      <Link href="/precedent-search" className="block group">
-        <PremiumCard borderColor="blue" hoverEffect className="!p-5 relative overflow-hidden">
-          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">⚖️</div>
-          <div className="relative z-10 space-y-2">
-            <div className="flex items-center justify-between">
-              <PremiumHeading level={3} gradient="blue" showLeftBorder={true} className="!mb-0 !text-sm">
-                <span className="text-[var(--google-blue)] text-lg leading-none mr-2">⚖️</span>
-                빅데이터 판례검색센터
-              </PremiumHeading>
-              <span className="bg-[#e8f0fe] dark:bg-[#174ea6]/20 text-[var(--google-blue)] dark:text-[#8ab4f8] text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-[#d2e3fc]/30 dark:border-[#174ea6]/30">실시간 연동</span>
-            </div>
-            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">사고 경위나 보상 문제를 일상어로 검색하면, 법제처 공공데이터에서 나에게 가장 유리한 핵심 대법원 판례를 찾아드립니다.</p>
-            <div className="mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-[#e8f0fe] dark:group-hover:bg-[#174ea6]/20 group-hover:text-[var(--google-blue)] dark:group-hover:text-[#8ab4f8]">
-              <div className="flex items-center gap-2">
-                빅데이터 판례 검색 시작하기
+      {SIDEBAR_ITEMS.map((item, index) => {
+        const theme = THEME_STYLES[item.themeColor];
+        return (
+          <Link key={index} href={item.href} className="block group">
+            <PremiumCard borderColor={item.themeColor} hoverEffect className="!p-5 relative overflow-hidden">
+              <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+                {item.icon}
               </div>
-              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
-          </div>
-        </PremiumCard>
-      </Link>
-
-      {/* 🏛️ 금감원 소비자보호센터 바로가기 배너 */}
-      <Link href="/fss-news" className="block group">
-        <PremiumCard borderColor="red" hoverEffect className="!p-5 relative overflow-hidden">
-          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">🏛️</div>
-          <div className="relative z-10 space-y-2">
-            <div className="flex items-center justify-between">
-              <PremiumHeading level={3} gradient="red" showLeftBorder={true} className="!mb-0 !text-sm">
-                <span className="text-red-500 text-lg leading-none mr-2">🏛️</span>
-                금감원 소비자보호센터
-              </PremiumHeading>
-              <span className="bg-red-50 dark:bg-red-950/20 text-red-500 dark:text-red-400 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-red-100/30 dark:border-red-950/30">실시간 연동</span>
-            </div>
-            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">금감원 소비자경보, 분쟁조정사례, 금융꿀팁, 약관 보도자료를 실시간 분석하여 권리를 지켜드립니다.</p>
-            <div className="mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-red-50 dark:group-hover:bg-red-950/20 group-hover:text-red-500 dark:group-hover:text-red-400">
-              <div className="flex items-center gap-2">
-                소비자보호 데이터 조회하기
+              <div className="relative z-10 space-y-2">
+                <div className="flex items-center justify-between">
+                  <PremiumHeading level={3} gradient={item.themeColor} showLeftBorder={true} className="!mb-0 !text-sm">
+                    <span className={`${theme.textIcon} text-lg leading-none mr-2`}>{item.icon}</span>
+                    {item.title}
+                  </PremiumHeading>
+                  <span className={`${theme.badgeBg} text-[10px] font-extrabold px-2 py-0.5 rounded-md border`}>
+                    {item.badgeText}
+                  </span>
+                </div>
+                <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
+                  {item.description}
+                </p>
+                <div className={`mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 ${theme.buttonHoverBg} ${theme.buttonHoverText}`}>
+                  <div className="flex items-center gap-2">
+                    {item.buttonText}
+                  </div>
+                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
               </div>
-              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
-          </div>
-        </PremiumCard>
-      </Link>
-
-      {/* 🚗 교통사고 로컬 안심케어 센터 */}
-      <Link href="/traffic-care" className="block group">
-        <PremiumCard borderColor="green" hoverEffect className="!p-5 relative overflow-hidden">
-          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">🚗</div>
-          <div className="relative z-10 space-y-2">
-            <div className="flex items-center justify-between">
-              <PremiumHeading level={3} gradient="green" showLeftBorder={true} className="!mb-0 !text-sm">
-                <span className="text-[#137333] text-lg leading-none mr-2">🚗</span>
-                교통사고 로컬 케어
-              </PremiumHeading>
-              <span className="bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-green-100/30 dark:border-green-950/30">지역 안내</span>
-            </div>
-            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">도로교통공단 안전 통계와 우수 신경/정형외과 병원 및 사고 맞춤형 손해사정 지식을 안내해 드립니다.</p>
-            <div className="mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-green-50 dark:group-hover:bg-green-950/20 group-hover:text-[#137333] dark:group-hover:text-[#81c995]">
-              <div className="flex items-center gap-2">
-                내 지역 교통사고 케어 가기
-              </div>
-              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
-          </div>
-        </PremiumCard>
-      </Link>
-
-      {/* 🧮 보상금·합의금 계산기 */}
-      <Link href="/calculator" className="block group">
-        <PremiumCard borderColor="blue" hoverEffect className="!p-5 relative overflow-hidden">
-          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">🧮</div>
-          <div className="relative z-10 space-y-2">
-            <div className="flex items-center justify-between">
-              <PremiumHeading level={3} gradient="blue" showLeftBorder={true} className="!mb-0 !text-sm">
-                <span className="text-[var(--google-blue)] text-lg leading-none mr-2">🧮</span>
-                보상금·합의금 계산기
-              </PremiumHeading>
-              <span className="bg-[#e8f0fe] dark:bg-[#174ea6]/20 text-[var(--google-blue)] dark:text-[#8ab4f8] text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-[#d2e3fc]/30 dark:border-[#174ea6]/30">통합 계산</span>
-            </div>
-            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">약관 지급기준 및 법원 판례 기준을 적용한 예상 합의금과 소송가액을 한 번에 확인하세요.</p>
-            <div className="mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-[#e8f0fe] dark:group-hover:bg-[#174ea6]/20 group-hover:text-[var(--google-blue)] dark:group-hover:text-[#8ab4f8]">
-              <div className="flex items-center gap-2">
-                계산기 시작하기
-              </div>
-              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
-          </div>
-        </PremiumCard>
-      </Link>
-
-      {/* 지역별 의료기관 (계산기 바로 아래로 이동) */}
-      <Link href="/regions" className="block group">
-        <PremiumCard borderColor="green" hoverEffect className="!p-5 relative overflow-hidden">
-          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">🗺️</div>
-          <div className="relative z-10 space-y-2">
-            <div className="flex items-center justify-between">
-              <PremiumHeading level={3} gradient="green" showLeftBorder={true} className="!mb-0 !text-sm">
-                <span className="text-[var(--google-green)] text-lg leading-none mr-2">🗺️</span>
-                지역별 의료기관
-              </PremiumHeading>
-              <span className="bg-green-50 dark:bg-green-950/20 text-[var(--google-green)] dark:text-[#81c995] text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-green-100/30 dark:border-green-950/30">전국 매핑</span>
-            </div>
-            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
-              전국 17개 시/도, 226개 시/군/구별 보상 전문 의료기관 및 협력 병원 정보를 제공합니다.
-            </p>
-            <div className="mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-green-50 dark:group-hover:bg-green-950/20 group-hover:text-[var(--google-green)] dark:group-hover:text-[#81c995]">
-              <div className="flex items-center gap-2">
-                지역별 기관 찾기
-              </div>
-              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
-          </div>
-        </PremiumCard>
-      </Link>
-
-      {/* 📂 분야별 전문 보상 가이드 */}
-      <Link href="/categories" className="block group">
-        <PremiumCard borderColor="yellow" hoverEffect className="!p-5 relative overflow-hidden">
-          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">📂</div>
-          <div className="relative z-10 space-y-2">
-            <div className="flex items-center justify-between">
-              <PremiumHeading level={3} gradient="yellow" showLeftBorder={true} className="!mb-0 !text-sm">
-                <span className="text-[var(--google-yellow)] text-lg leading-none mr-2">📂</span>
-                분야별 전문 보상 가이드
-              </PremiumHeading>
-              <span className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-yellow-100/30 dark:border-yellow-900/30">핵심 실무</span>
-            </div>
-            <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">보상스쿨 손해사정사의 핵심 전문 칼럼들과 진료과목별 주요 의료분쟁 가이드를 통합 제공합니다.</p>
-            <div className="mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 group-hover:bg-yellow-50 dark:group-hover:bg-yellow-900/20 group-hover:text-yellow-600 dark:group-hover:text-yellow-500">
-              <div className="flex items-center gap-2">
-                전체 가이드 보기
-              </div>
-              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
-          </div>
-        </PremiumCard>
-      </Link>
+            </PremiumCard>
+          </Link>
+        );
+      })}
 
       {/* 인기 키워드 태그 (layout.tsx 서버에서 전달된 정적 데이터) */}
       {tags.length > 0 && (

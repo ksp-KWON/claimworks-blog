@@ -41,6 +41,17 @@ const CALCULATORS = [
 export default function CalculatorIndex() {
   return (
     <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* 🧮 스마트 보상금 계산기 상단 띠 배너 */}
+      <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3 rounded-t-none">
+        <div className="flex items-center gap-2.5">
+          <span className="text-lg shrink-0">🧮</span>
+          <div className="text-xs sm:text-sm font-extrabold tracking-tight">
+            <span className="underline decoration-wavy mr-1.5">[통합 계산]</span>
+            보상스쿨 빅데이터 알고리즘으로 예상 보상금을 미리 산출해보세요.
+          </div>
+        </div>
+      </div>
+
       <div className="text-center space-y-4">
         <PremiumHeading level={1} gradient="blue" className="justify-center !text-3xl">
           스마트 보상금 계산기
@@ -53,18 +64,18 @@ export default function CalculatorIndex() {
       <div className="space-y-4">
         {CALCULATORS.map((calc) => (
           <Link key={calc.id} href={calc.href} className="group block outline-none">
-            <PremiumCard hoverEffect={true} borderColor={calc.color as any} className="flex flex-col sm:flex-row p-0 overflow-hidden">
-              <div className="flex items-center justify-center p-5 sm:w-32 bg-slate-50 dark:bg-black/20 border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-gray-700 transition-colors">
-                <span className="text-4xl group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">{calc.icon}</span>
+            <PremiumCard hoverEffect={true} borderColor={calc.color as any} className="flex flex-row p-0 overflow-hidden items-stretch">
+              <div className="flex items-center justify-center p-4 sm:p-5 w-24 sm:w-32 bg-slate-50 dark:bg-black/20 border-r border-gray-100 dark:border-gray-700 transition-colors shrink-0">
+                <span className="text-3xl sm:text-4xl group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">{calc.icon}</span>
               </div>
-              <div className="flex-1 p-5 sm:p-6 flex flex-col justify-center">
+              <div className="flex-1 p-4 sm:p-6 flex flex-col justify-center min-w-0">
                 <div className="flex items-center gap-3 mb-2">
                   <PremiumBadge color={calc.color as any}>{calc.tag}</PremiumBadge>
-                  <h2 className="text-lg sm:text-xl font-black text-[#202124] dark:text-[#e8eaed] transition-colors tracking-tight">
+                  <h2 className="text-base sm:text-xl font-black text-[#202124] dark:text-[#e8eaed] transition-colors tracking-tight truncate">
                     {calc.title}
                   </h2>
                 </div>
-                <p className="text-[#5f6368] dark:text-[#9aa0a6] text-xs leading-relaxed max-w-xl font-medium">
+                <p className="text-[#5f6368] dark:text-[#9aa0a6] text-[11px] sm:text-xs leading-relaxed max-w-xl font-medium break-keep">
                   {calc.description}
                 </p>
               </div>

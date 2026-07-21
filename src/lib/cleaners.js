@@ -15,6 +15,9 @@
 function cleanFssText(text) {
   if (!text) return '';
   return text
+    // 0. 불필요한 금감원 보도 요지 제목 제거
+    .replace(/■?\s*금감원\s*보도\s*요지/g, '')
+
     // 1. HTML 엔티티 및 기호 복원
     .replace(/&#39;/g, "'")
     .replace(/&quot;/g, '"')
@@ -32,18 +35,25 @@ function cleanFssText(text) {
     .replace(/""/g, '"')
     
     // 3. 깨진 개행 문자 복원 (nn, nnnn 등)
-    // 영어 단어 내부의 nn(예: planning, runner)을 파괴하지 않기 위해 전후방 탐색(Lookahead/Lookbehind) 적용
     .replace(/(?<![a-zA-Z])n{2,}(?![a-zA-Z])/g, '\n')
     
     // 4. 문단 기호 정돈 및 가독성 개선 (ㅁ -> ■, ㅇ -> •)
-    .replace(/(?:^|\n)\s*ㅁ\s*/g, '\n■ ')
+    .replace(/(?:^|\n)\s*ㅁ\s*/g, '\n\n■ ')
+    .replace(/(?:^|\n)\s*■\s*/g, '\n\n■ ')
     .replace(/(?:^|\n)\s*ㅇ\s*/g, '\n  • ')
     .replace(/(?:^|\n)\s*\*\s*/g, '\n  - ')
     
-    // 5. 불필요한 안내 멘트 정리
+    // 5. 특정 기호(▲, ①~⑳) 앞 줄바꿈
+    .replace(/(?<!\n)\s*▲/g, '\n▲ ')
+    .replace(/(?<!\n)\s*([①-⑳])/g, '\n$1 ')
+    
+    // 6. 예시) 앞 줄바꿈
+    .replace(/(?<!\n)\s*예시\)/g, '\n\n예시) ')
+    
+    // 7. 불필요한 안내 멘트 정리
     .replace(/※\s*자세한\s*내용은\s*첨부파일을\s*참고하시기\s*바랍니다\.?/g, '')
     
-    // 6. 빈 줄 정리 (과도한 줄바꿈 축소)
+    // 8. 빈 줄 정리 (과도한 줄바꿈 축소)
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }

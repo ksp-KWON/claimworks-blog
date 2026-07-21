@@ -365,7 +365,7 @@ export default function FssNewsPage() {
                           <span>📄 금융감독원 보도문/결정문 전문 (한글 HWP 대체 텍스트)</span>
                           <span>HWP 뷰어 무설치 열람 중</span>
                         </div>
-                        <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-a:text-amber-500 hover:prose-a:text-amber-600 prose-headings:font-bold prose-headings:text-gray-800 dark:prose-headings:text-gray-200">
+                        <div className="text-xs text-gray-800 dark:text-gray-200 leading-relaxed [&>p]:mb-3 [&_a]:text-amber-500 hover:[&_a]:text-amber-600 [&_h1]:font-bold [&_h1]:text-gray-800 dark:[&_h1]:text-gray-200">
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
                             {cleanFssText(item.fullContent)}
                           </ReactMarkdown>

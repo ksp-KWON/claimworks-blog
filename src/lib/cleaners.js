@@ -58,8 +58,7 @@ function cleanFssText(text) {
     .replace(/※\s*자세한\s*내용은\s*첨부파일을\s*참고하시기\s*바랍니다\.?/g, '')
     
     // 8. 빈 줄 정리 (과도한 줄바꿈 및 공백 축소)
-    .replace(/\n\s*\n/g, '\n\n') // 여러 공백이 섞인 빈 줄을 순수 빈 줄로 정규화
-    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\n(?:\s*\n)+/g, '\n\n') // 여러 빈 줄을 단 하나의 빈 줄로 강제 압축
     .trim();
 }
 

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import AiCommentBox from '@/components/AiCommentBox';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 
 interface FssNewsItem {
   id: string;
@@ -248,13 +249,11 @@ export default function FssNewsPage() {
               {tab.label}
             </button>
           ))}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-      </div>
-      </div>
-
+    
       {/* 실시간 로딩 피드백 안내창 */}
       {loading && (
         <div className="bg-white dark:bg-[#202124] rounded-none py-14 px-6 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4 animate-pulse">
@@ -366,7 +365,7 @@ export default function FssNewsPage() {
                           <span>HWP 뷰어 무설치 열람 중</span>
                         </div>
                         <div className="text-xs text-gray-800 dark:text-gray-200 leading-relaxed [&>p]:mb-3 [&_a]:text-amber-500 hover:[&_a]:text-amber-600 [&_h1]:font-bold [&_h1]:text-gray-800 dark:[&_h1]:text-gray-200">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
                             {cleanFssText(item.fullContent)}
                           </ReactMarkdown>
                         </div>
@@ -416,6 +415,7 @@ export default function FssNewsPage() {
           )}
         </>
       )}
+    </div>
     </>
   );
 }

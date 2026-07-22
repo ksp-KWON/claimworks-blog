@@ -123,10 +123,7 @@ async function fetchTrendingNews(queries) {
         const proxyHeaders = { ...headers };
         if (LAW_PROXY_TOKEN) proxyHeaders['X-Proxy-Token'] = LAW_PROXY_TOKEN.trim();
         res = await safeFetch(proxyUrl, { headers: proxyHeaders }, 10000);
-        if (!res.ok) {
-          console.warn(`    [프록시 실패/미설정 - HTTP ${res.status}] 직접 요청으로 Fallback 시도합니다...`);
-          res = await safeFetch(BASE + encodeURIComponent(query), { headers }, 10000);
-        }
+
       } else {
         res = await safeFetch(BASE + encodeURIComponent(query), { headers }, 10000);
       }

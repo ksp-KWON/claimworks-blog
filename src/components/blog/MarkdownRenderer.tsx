@@ -5,65 +5,49 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import type { Components } from 'react-markdown';
+import PremiumHeading from '../ui/PremiumHeading';
+import PremiumCard from '../ui/PremiumCard';
 
 const SCROLL_OFFSET = 140;
 
 const baseComponents: Components = {
   h1: ({ children, id }) => (
-    <h1
-      id={id}
-      style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
-      className="text-[24px] sm:text-[28px] font-black text-[#202124] dark:text-[#e8eaed] mt-16 mb-8 pb-4 border-b-4 border-[#1a73e8] dark:border-[#8ab4f8] tracking-tight break-keep"
-    >
+    <PremiumHeading level={1} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-16 mb-8 pb-4 border-b-4 border-[var(--google-blue)] dark:border-[#8ab4f8] break-keep">
       {children}
-    </h1>
+    </PremiumHeading>
   ),
   h2: ({ children, id }) => (
-    <h2
-      id={id}
-      style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
-      className="group flex items-center text-[20px] sm:text-[22px] font-black text-[#202124] dark:text-[#e8eaed] mt-14 mb-6 px-4 sm:px-5 py-3.5 bg-gradient-to-r from-gray-50 to-transparent dark:from-white/5 dark:to-transparent border-l-[6px] border-[#1a73e8] dark:border-[#8ab4f8] tracking-tight break-keep"
-    >
+    <PremiumHeading level={2} id={id} showLeftBorder gradient="blue" style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-14 mb-6 py-3 bg-gradient-to-r from-gray-50 to-transparent dark:from-white/5 dark:to-transparent break-keep">
       {children}
-    </h2>
+    </PremiumHeading>
   ),
   h3: ({ children, id }) => (
-    <h3
-      id={id}
-      style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
-      className="flex items-center gap-2 text-[17px] sm:text-[18px] font-bold text-[#3c4043] dark:text-[#e8eaed] mt-10 mb-4 px-1 tracking-tight break-keep"
-    >
-      <span className="text-[#1a73e8] dark:text-[#8ab4f8]">■</span>
+    <PremiumHeading level={3} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-10 mb-4 break-keep" icon={<span className="text-[var(--google-blue)]">■</span>}>
       {children}
-    </h3>
+    </PremiumHeading>
   ),
   h4: ({ children, id }) => (
-    <h4
-      id={id}
-      style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
-      className="flex items-center gap-2 text-[16px] sm:text-[17px] font-bold text-[#3c4043] dark:text-[#e8eaed] mt-8 mb-3 px-1 tracking-tight break-keep"
-    >
-      <span className="text-[#1a73e8]/70 dark:text-[#8ab4f8]/70">▸</span>
+    <PremiumHeading level={4} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-8 mb-3 break-keep text-gray-700 dark:text-gray-300" icon={<span className="text-[var(--google-blue)]/70">▸</span>}>
       {children}
-    </h4>
+    </PremiumHeading>
   ),
   h5: ({ children, id }) => (
-    <h5
-      id={id}
-      style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
-      className="text-[15px] sm:text-[16px] font-bold text-[#5f6368] dark:text-[#9aa0a6] mt-6 mb-2 px-1 tracking-tight break-keep"
-    >
+    <PremiumHeading level={5} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-6 mb-2 break-keep text-gray-500 dark:text-gray-400">
       {children}
-    </h5>
+    </PremiumHeading>
   ),
   blockquote: ({ children }) => (
-    <div className="my-7 px-5 py-4 bg-gradient-to-br from-yellow-50/80 to-orange-50/50 dark:from-[#fbbc04]/10 dark:to-[#ea4335]/5 border border-yellow-200/50 dark:border-white/5 border-l-4 border-l-[#fbbc04] dark:border-l-[#fbbc04] text-[15px] font-medium text-gray-800 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep shadow-sm">
-      {children}
-    </div>
+    <PremiumCard borderColor="yellow" hoverEffect={false} className="my-7 !p-5 border-l-4 !border-l-[#fbbc04] bg-gradient-to-br from-yellow-50/80 to-orange-50/50 dark:from-[#fbbc04]/10 dark:to-[#ea4335]/5 shadow-sm">
+      <div className="text-[15px] font-medium text-gray-800 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep">
+        {children}
+      </div>
+    </PremiumCard>
   ),
   table: ({ children }) => (
-    <div className="overflow-x-auto my-8 rounded-none border border-gray-200 dark:border-white/10 shadow-[0_4px_15px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.4)] bg-white dark:bg-[#202124]">
-      <table className="w-full text-[14px] border-collapse">{children}</table>
+    <div className="my-8">
+      <PremiumCard hoverEffect={false} className="!p-0 overflow-x-auto shadow-sm">
+        <table className="w-full text-[14px] border-collapse">{children}</table>
+      </PremiumCard>
     </div>
   ),
   th: ({ children }) => (
@@ -139,22 +123,21 @@ export const sharedComponents: any = {
   'bg-green': ({ children }: { children: React.ReactNode }) => <span className="bg-green-200/60 dark:bg-green-900/40 px-1 py-0.5 rounded">{children}</span>,
   
   relatedbox: ({ children }: any) => (
-    <div className="my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-[#1A73E8] transition-all duration-300 relative overflow-hidden group">
+    <PremiumCard borderColor="blue" hoverEffect={true} className="my-10 group">
       <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300">
         🔗
       </div>
       <div className="relative z-10">
         <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-4">
-          <h3 className="text-base font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 border-l-4 border-[#1A73E8] pl-2.5">
-            <span className="text-[#1A73E8] text-lg leading-none">🔗</span>
+          <PremiumHeading level={3} showLeftBorder gradient="blue" icon={<span className="text-[var(--google-blue)] text-lg leading-none">🔗</span>} className="!mb-0">
             함께 읽으면 도움이 되는 글
-          </h3>
+          </PremiumHeading>
         </div>
         <ul className="space-y-3">
           {children}
         </ul>
       </div>
-    </div>
+    </PremiumCard>
   ),
 
   calloutlink: ({ ...props }: any) => {

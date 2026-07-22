@@ -33,8 +33,15 @@ const baseComponents: Components = {
   ),
   h2: ({ children, id }) => {
     const tone = getToneColor(children);
+    const bgGradients: Record<string, string> = {
+      blue: 'bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent',
+      red: 'bg-gradient-to-r from-red-50/80 to-transparent dark:from-red-900/20 dark:to-transparent',
+      green: 'bg-gradient-to-r from-green-50/80 to-transparent dark:from-green-900/20 dark:to-transparent',
+      yellow: 'bg-gradient-to-r from-yellow-50/80 to-transparent dark:from-yellow-900/20 dark:to-transparent',
+      purple: 'bg-gradient-to-r from-purple-50/80 to-transparent dark:from-purple-900/20 dark:to-transparent',
+    };
     return (
-      <PremiumHeading level={2} id={id} showLeftBorder gradient={tone} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className={`mt-14 mb-6 py-3 bg-gradient-to-r from-${tone}-50/60 to-transparent dark:from-${tone}-900/10 dark:to-transparent break-keep`}>
+      <PremiumHeading level={2} id={id} showLeftBorder gradient={tone} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className={`mt-14 mb-6 py-3 pr-4 rounded-r-xl break-keep ${bgGradients[tone]}`}>
         {children}
       </PremiumHeading>
     );

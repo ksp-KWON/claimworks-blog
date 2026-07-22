@@ -33,7 +33,9 @@ export function formatDate(dateVal: unknown): string {
       d = new Date(String(dateVal));
     }
     if (!isNaN(d.getTime())) {
-      return d.toISOString().split('T')[0];
+      // 한국 시간(KST, UTC+9) 기준으로 정확한 '오늘 날짜' 계산
+      const kstTime = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+      return kstTime.toISOString().split('T')[0];
     }
   } catch {
     // 날짜 변환 실패 시 원본 문자열 반환
@@ -103,10 +105,14 @@ export function getSortedPostsData(includeUnpublished = false): Omit<PostData, '
 
   // 날짜 최신순 정렬
   return allPostsData.sort((a, b) => {
-    if (a.date < b.date) {
+    const timeA = a.isoDate || a.date;
+    const timeB = b.isoDate || b.date;
+    if (timeA < timeB) {
       return 1;
-    } else {
+    } else if (timeA > timeB) {
       return -1;
+    } else {
+      return 0;
     }
   });
 }

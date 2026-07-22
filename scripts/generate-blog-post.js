@@ -12,13 +12,9 @@ const { callGemini } = require('./gemini-helper');
 const { 
   STRICT_RULES, 
   getRandomAngle,
-  getBlogRole, 
-  getBlogObjective, 
-  getBlogMetaFirstLine, 
   getTopicPlanningPrompt, 
-  getBlogSkeleton,
   TOPIC_SCHEMA,
-  buildBlogPrompt
+  buildArticlePrompt
 } = require('../src/lib/prompt-rules.js');
 
 const {
@@ -58,7 +54,7 @@ async function main() {
 
   // 4. 본문 생성 (Gemini)
   console.log('[3] 블로그 본문 칼럼 작성 중...');
-  const rawOutput = await callGemini(buildBlogPrompt(topic, currentAngle, existingPosts));
+  const rawOutput = await callGemini(buildArticlePrompt(topic, currentAngle, existingPosts));
 
   // 5. 파싱 및 저장
   const { summary, content } = parseGeneratedContent(rawOutput);

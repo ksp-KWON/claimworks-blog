@@ -1,13 +1,4 @@
-import { 
-  STRICT_RULES, 
-  getRandomAngle,
-  getBlogRole, 
-  getBlogLengthRulesManual, 
-  getBlogLengthRulesSemiAuto, 
-  getBlogFrontmatter, 
-  getBlogSkeleton,
-  cleanAnalysisBlock
-} from '@/lib/prompt-rules';
+import { cleanAnalysisBlock, buildManualPrompt, getRandomAngle } from '@/lib/prompt-rules';
 import { callGeminiClient } from '@/lib/gemini-client';
 import { parseMarkdown, stringifyMarkdown } from './markdown-utils';
 
@@ -186,58 +177,18 @@ export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: st
   if (!geminiKey) throw new Error('Gemini API 키가 없습니다.');
   
   const existingPostsList = "- (없음)";
-  const strictRulesPrompt = `${STRICT_RULES}\n\n# 기존 글 블로그 목록:\n${existingPostsList}`;
-  const calcTag = '<calculator type="auto" />';
-  const currentDate = new Date().toISOString().split('T')[0];
   const angle = getRandomAngle();
-
+  
   let prompt = '';
-
-  if (mode === 'manual-preserve') {
-    prompt = `
-${getBlogRole()}
-# Objective
-사용자가 입력한 대본이나 초안의 디테일과 의도를 100% 보존하며 가독성이 극대화된 블로그 포스트 형태로 예쁘게 포장하십시오. (예시 부풀리게 살을 붙여 분량을 늘리지 마세요)
-${getBlogLengthRulesManual()}
-# 🚨 STRICT WRITING RULES
-${strictRulesPrompt}
-제시된 원문:
-${aiInput}
-${getBlogSkeleton(angle, calcTag, existingPostsList)}
-`;
-  } else if (mode === 'manual-expand') {
-    prompt = `
-${getBlogRole()}
-# Objective
-사용자가 입력한 대본이나 뼈대를 바탕으로, 전문가의 지식을 대거 추가하여 아주 상세하고 방대한 분량의 초고음질 전문 칼럼으로 새롭게 창작하십시오.
-${getBlogLengthRulesSemiAuto()}
-# 🚨 STRICT WRITING RULES
-${strictRulesPrompt}
-제시된 원문/뼈대:
-${aiInput}
-${getBlogSkeleton(angle, calcTag, existingPostsList)}
-`;
-  } else if (mode === 'auto-generate' || mode === 'keyword-extraction') {
+  
+  if (mode === 'auto-generate' || mode === 'keyword-extraction') {
     prompt = aiInput;
   } else {
-    prompt = `
-${getBlogRole()}
-# Objective
-제시된 주제/참고링크/키워드를 바탕으로 깊이 있는 전문 칼럼을 새롭게 기획하고 창작하십시오.
-${getBlogLengthRulesSemiAuto()}
-# 🚨 STRICT WRITING RULES
-${strictRulesPrompt}
-${getBlogFrontmatter('매력적인 제목 생성', currentDate)}
-제시된 참고자료:
-${aiInput}
-${getBlogSkeleton(angle, calcTag, existingPostsList)}
-`;
+    prompt = buildManualPrompt(mode, aiInput, angle, []);
   }
 
   // [핵심] gemini-client.ts 의 자동 탐색(Dynamic Discovery)으로 위임
-  // — 모델명 하드코딩 완전 제거. 최신 Stable 모델 자동 선택 + Pro→Flash→Lite 자동 폴백
   const rawText = await callGeminiClient(geminiKey, prompt, { schema });
-  // schema 있으면 callGeminiClient가 JSON 반환, 없으면 text 반환 → 문자열로 통일
   const resultText = typeof rawText === 'string' ? rawText : JSON.stringify(rawText);
   return cleanAnalysisBlock(resultText);
 }

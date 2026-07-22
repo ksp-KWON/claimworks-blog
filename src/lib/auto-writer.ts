@@ -1,11 +1,10 @@
 import { callGeminiAPI } from './admin-api';
-import {
-  getRandomAngle,
-  getTopicPlanningPrompt,
-  getPrecedentPlanningPrompt,
-  buildBlogPrompt,
-  buildPrecedentPrompt,
-  getManualPlanningPrompt,
+import { 
+  getRandomAngle, 
+  getTopicPlanningPrompt, 
+  getPrecedentPlanningPrompt, 
+  getManualPlanningPrompt, 
+  buildArticlePrompt, 
   TOPIC_SCHEMA
 } from './prompt-rules';
 import { parseGeneratedContent } from './content-parser';
@@ -192,9 +191,9 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
   
   let prompt = '';
   if (type === 'precedent' && precedentDetail) {
-    prompt = buildPrecedentPrompt(precedentDetail, topic, angle, existingPostsArr);
+    prompt = buildArticlePrompt(topic, angle, existingPostsArr, precedentDetail);
   } else {
-    prompt = buildBlogPrompt(topic, angle, existingPostsArr);
+    prompt = buildArticlePrompt(topic, angle, existingPostsArr);
   }
 
   const generated = await callGeminiAPI(geminiKey, prompt, 'auto-generate');

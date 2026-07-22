@@ -10,7 +10,6 @@ const STRICT_RULES = `
 ## 1. 사전 분석 및 분량 계획 (Chain-of-Thought) - 필수 수행
 - 본문을 작성하기 전에 반드시 아래 형식의 분석 블록을 출력의 최상단에 작성하십시오:
   [ANALYSIS_START]
-  - 부여된 타겟 모델 물리 스펙 및 권장량 : {{TARGET_MODEL_CAPACITY}}
   - 오늘의 글쓰기 관점(Angle) : {부여받은 앵글에 따른 핵심 쟁점 정의}
   - 필요한 보상 실무 지식 : {주제와 앵글에 맞는 실제 평가 기준 및 실무 지식 도출}
   - 목차(H2) 및 분량 설계 : 
@@ -18,7 +17,7 @@ const STRICT_RULES = `
     * {AI가 스스로 기획한 H2 제목 2} : {분량 계획}
     ...
   [ANALYSIS_END]
-- 위 분석을 바탕으로 지정된 타겟 모델 물리 스펙의 안전 허용 범위 이내에서 가장 알찬 고밀도의 전문 칼럼을 자율적으로 구성하십시오. 
+- 위 분석을 바탕으로 가장 알찬 고밀도의 전문 칼럼을 자율적으로 구성하십시오. 
 
 ## 2. Heading 규칙 (H1 사용 금지 및 H2 필수)
 - **H1 사용 금지** : frontmatter 외부 본문에는 절대 H1('# 제목')을 작성하지 마세요.
@@ -27,6 +26,8 @@ const STRICT_RULES = `
 ## 3. 공감 서론 및 저자 경험 박스 (필수 코어 모듈)
 - **도입부 오프닝** : 독자가 처한 구체적이고 억울한 상황에 깊이 공감하는 자연스럽고 따뜻한 톤의 2~3문장으로 서두를 시작하세요.
 - **저자 경험 박스** : 오프닝 문단 바로 다음, 아래 인용구를 그대로 출력하십시오.
+  > **저자 경험 박스**
+  > 본 칼럼은 손해사정 전문가의 실제 보상 처리 경험과 법원 판례 해석을 바탕으로 작성되었습니다. 피보험자의 권리 보호와 올바른 보험금 청구 방향을 제시합니다.
   
 ## 4. 강조 색상 태그 활용 규칙
 - 본문 텍스트 내에 아래의 HTML 컬러 강조 태그를 전후 맥락에 맞춰 사용하되, 고정된 문구를 기계적으로 넣지 마십시오. 문맥에 맞을 때만 자연스럽게 사용하며, 불필요한 경우 완전히 배제한다.
@@ -60,12 +61,11 @@ const STRICT_RULES = `
 ## 10. 관련 포스팅(링크) 삽입 규칙
 - 관련 글이나 추천 포스팅을 본문에 삽입할 때는 '관련 정보' 같은 소제목 없이, 반드시 단독 줄에 기호 없이 \`[링크 텍스트](URL)\` 형식으로만 작성하세요. (예: 불릿포인트 \`-\` 없이 단독 줄 작성)
 
-## 11. 시각적 포맷팅 및 가독성 최적화 통일 수칙 (레이아웃 필수 규칙)
-모든 포스팅(트렌드, 법률 판례 등)은 밋밋한 텍스트 나열을 피하고, 가독성과 시인성을 극대화하기 위해 다음 규칙을 반드시 적용합니다:
-- **다양한 시각적 요소 필수 활용**: 주요 내용 비교, 단계별 절차, 핵심 체크리스트 등을 설명할 때는 반드시 **마크다운 표(Table)**나 **불릿포인트 리스트(\`-\`)**를 적극적으로 활용하여 시각적으로 정돈하세요.
-- **텍스트 컬러 및 강조**: 핵심 쟁점, 중요 결론, 주의사항 등에는 마크다운의 HTML 태그 색상(<red>, <blue>, <orange>, <purple>) 및 볼드체(**텍스트**)를 입혀서 눈에 확 띄게 만드세요.
-- **리스트 문법 엄수**: 목록 나열 시 기호 없이 글머리를 시작하면 한 줄로 뭉개지는 버그가 발생합니다. 반드시 표준 마크다운 리스트 기호(\`-\` 또는 \`1. 2. 3.\`)를 사용하고, 리스트 블록 앞뒤로는 한 줄의 빈 줄(Enter)을 꼭 넣으세요.
-- **코드 블록(\`\`\`) 사용 전면 금지**: 블로그 본문은 코딩 블로그가 아니므로 어떤 상황에서도 백틱 3개(\`\`\`)로 감싸는 코드 블록을 절대 사용하지 마십시오. 강조나 박스가 필요하면 인용구(\`>\`)를 활용하세요.
+## 11. 가독성과 전문성의 완벽한 균형 수칙 (Visual & Narrative Balance)
+- **산문 서술과 구조화 블록의 조화**: 본문을 억지로 표나 리스트로만 채우려 하지 마십시오. 법리 해석, 인과관계 증명, 전문적인 판단 근거 등 깊이 있는 설명이 필요한 구간은 **전문가의 밀도 높은 산문형(Narrative) 서술**을 유지해야 합니다. 
+- **시각적 정돈(표/리스트)의 적재적소 활용**: 단, 독자가 한눈에 파악해야 하는 '핵심 요건 비교, 준비 서류, 단계별 가이드, 체크리스트' 같은 정보성 블록에서는 밋밋한 텍스트 나열을 피하고 **마크다운 표(Table)**나 **불릿포인트 리스트(\`-\`)**를 배치하여 시각적 가독성을 극대화하세요.
+- **텍스트 컬러 및 강조**: 핵심 쟁점이나 결론에는 마크다운 색상(<red>, <blue> 등)과 볼드체(**텍스트**)를 과하지 않게 자연스럽게 녹여내세요.
+- **포맷팅 버그 방지**: 리스트 작성 시 기호 없이 시작하면 줄바꿈이 뭉개집니다. 반드시 표준 기호(\`-\` 또는 \`1. 2. 3.\`)를 쓰고, 리스트 앞뒤로 한 줄 빈 줄(Enter)을 꼭 두세요. 코드 블록(\`\`\`)은 전면 금지하며, 인용구(\`>\`)만 허용합니다.
 
 ## 12. 🔴 [핵심 윤문 규칙] 궁극의 전문가 휴머나이징(Humanizing) 및 번역투 완전 제거
 (아래 규칙들은 글의 '톤앤매너'를 사람과 완벽히 동일하게 만들기 위한 절대 수칙입니다.)
@@ -123,32 +123,20 @@ function getRandomAngle() {
   return ANGLES[randomIndex];
 }
 
-function getBlogRole() {
+function getExpertRole() {
   return `# Role
-당신은 보상스쿨 소속 독립신체손해사정사입니다.
+당신은 보상스쿨 소속 독립신체손해사정사이자 판례 분석 전문가, 테크니컬 라이터입니다.
 
 ① 상해사고(교통사고·산재사고·일상생활 안전사고) 및 질병사고 조사 전문가
 ② 보험약관 및 관계 법규 적용 적정성 판단 법률 전문가
 ③ 손해액 및 보험금 사정 법률과 의학 전문가
 
-이 세 가지 전문성을 동시에 보유한 전문가의 관점으로 모든 글을 작성합니다.`;
+이 세 가지 전문성을 동시에 보유한 최고 전문가의 관점으로 모든 글을 작성합니다.`;
 }
 
-function getBlogObjective(keywords) {
+function getArticleObjective(keywords) {
   return `# Objective
-타겟 키워드 [${keywords}]를 기반으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 만족하며 구글 E-E-A-T 기준에 부합하는 전문가 칼럼을 작성합니다.`;
-}
-
-function getBlogMetaFirstLine() {
-  return `# 출력 첫 줄 (절대 필수)
-응답의 첫 번째 줄에 반드시 아래 형식으로 SEO 요약문을 출력하고, 빈 줄 하나를 두고 본문을 시작하십시오:
-SEO_META: 구글 검색 결과에 노출될 150자 이내의 매력적인 클릭 유도용 한글 요약문`;
-}
-
-function getPrecedentMetaFirstLine() {
-  return `# 출력 첫 줄 (절대 필수)
-응답의 첫 번째 줄에 반드시 아래 형식으로 SEO 요약문을 출력하고, 빈 줄 하나를 두고 본문을 시작하십시오:
-SEO_META: 구글 검색 결과에 노출될 150자 이내의 판례 분석 클릭 유도용 요약문`;
+타겟 키워드 [${keywords}] 및 주어진 기획안을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 만족하며 구글 E-E-A-T 기준에 부합하는 최고의 전문가 칼럼을 작성합니다.`;
 }
 
 function getTopicPlanningPrompt(keyword, trendTitle, existingPosts) {
@@ -160,11 +148,12 @@ function getTopicPlanningPrompt(keyword, trendTitle, existingPosts) {
 위 키워드와 맥락을 바탕으로 다음 항목들을 기획하십시오:
 1. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소 (예: daily-accident-compensation)
 2. title: SEO 최적화 제목 (일상 용어 + 혜택 결합)
-3. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
-4. specialtyCategory: 전문 진료과목 (예: 정형외과)
-5. tags: 관련 태그 5개
-6. keywords: 타겟 키워드 목록
-7. calculatorType: "auto" 또는 "medical" 지정.
+3. summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문
+4. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
+5. specialtyCategory: 전문 진료과목 (예: 정형외과)
+6. tags: 관련 태그 5개
+7. keywords: 타겟 키워드 목록
+8. calculatorType: "auto" 또는 "medical" 지정.
 
 JSON으로 반환하십시오.`;
 }
@@ -184,11 +173,12 @@ ${existingPosts}
 [기획 원칙]
 1. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
 2. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합)
-3. category: 무조건 "판례·법률 해석"
-4. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
-5. tags: 관련 태그 5개
-6. keywords: 타겟 키워드 목록
-7. calculatorType: "auto" 또는 "medical" 지정
+3. summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문 (판례번호 포함)
+4. category: 무조건 "판례·법률 해석"
+5. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
+6. tags: 관련 태그 5개
+7. keywords: 타겟 키워드 목록
+8. calculatorType: "auto" 또는 "medical" 지정
 
 JSON으로 반환하십시오.`;
 }
@@ -205,43 +195,59 @@ ${existingPosts}
 
 [기획 원칙]
 1. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
-2. title: SEO 최적화 제목 (원문의 의도를 살려 클릭을 유도하는 제목)
+2. title: SEO 최적화 제목 (원문의 의도를 살려 클릭 유도하는 제목)
 3. summary: 구글 검색 결과에 노출될 150자 이내의 매력적인 한글 요약문
 4. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 원문에 가장 알맞은 1개
 5. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
 6. tags: 원문과 관련된 태그 5개
 7. keywords: 타겟 키워드 목록
+8. calculatorType: "auto" 또는 "medical" 지정
 
 무조건 JSON 형식으로만 반환하십시오. 다른 설명은 붙이지 마십시오.`;
 }
 
-function getBlogSkeleton(angle, calcTag, postsCtx) {
+function getUniversalSkeleton(isPrecedent, angle, calcTag, postsCtx) {
+  let coreAnalysis = `  - 오늘의 글쓰기 관점(Angle) : [${angle.name}] ${angle.instruction}
+  - 필요한 보상 실무 지식 : {작성}
+  - 목차(H2) 및 분량 설계 : 
+    * {자율 생성 H2 제목 1} : {계획}
+    * {자율 생성 H2 제목 2} : {계획}`;
+
+  let coreBody = `주어진 관점(Angle)인 **[${angle.name}]**에 완벽하게 맞춰서, AI가 기획한 3~4개의 자율 H2 대제목(## 제목)으로 본문을 전개하십시오.`;
+  
+  if (isPrecedent) {
+    coreAnalysis = `  - 오늘의 글쓰기 관점(Angle) : [${angle.name}] 판례 해설을 이 관점에 맞추어 풀어냅니다.
+  - 판례 핵심 쟁점 : {작성}
+  - 목차(H2) 및 분량 설계 : 
+    * {사건 발단 관련 H2 제목} : {계획}
+    * {법원 판단 관련 H2 제목} : {계획}
+    * {실무 적용 관련 H2 제목} : {계획}`;
+    
+    coreBody = `주어진 관점(Angle)인 **[${angle.name}]**에 맞추어 판례를 해설하십시오.
+1. 사건의 발단과 배경을 스토리텔링식으로 해설.
+2. 법원의 판단 논리 해설.
+3. 손해사정 실무 관점에서의 해석 (이 판결이 일반 환자에게 미치는 영향).`;
+  }
+
   return `
 [ANALYSIS_START]
-- 부여된 타겟 모델 물리 스펙 및 권장량 : {{TARGET_MODEL_CAPACITY}}
-- 오늘의 글쓰기 관점(Angle) : [${angle.name}] ${angle.instruction}
-- 필요한 보상 실무 지식 : {작성}
-- 목차(H2) 및 분량 설계 : 
-  * {자율 생성 H2 제목 1} : {계획}
-  * {자율 생성 H2 제목 2} : {계획}
-  ...
+${coreAnalysis}
 [ANALYSIS_END]
 
 # ════════════════════════════════════════════════════════════════
-# 출력 뼈대 (OUTPUT SKELETON) — 코어 모듈(필수)과 다이나믹 모듈(자율) 결합
+# 출력 뼈대 (OUTPUT SKELETON)
 # ════════════════════════════════════════════════════════════════
 
-[코어 1: 오프닝 및 저자 박스]
-독자가 처한 상황에 공감하는 서두 2~3문장을 작성하고, 바로 아래에 반드시 다음 인용구를 출력하세요.
+[코어 1: 오프닝]
+${isPrecedent ? '실제 판례 사건과 유사한 고통을 겪는 독자에게 공감하며 시작합니다.' : '독자가 처한 상황에 공감하는 서두 2~3문장을 작성하세요.'}
 
 [코어 2: Key Points]
 ## 💡 Key Points
 - {이 글의 핵심 인사이트 3가지}
 
 [다이나믹 모듈 전개: 본론 파트]
-주어진 관점(Angle)인 **[${angle.name}]**에 완벽하게 맞춰서, AI가 기획한 3~4개의 자율 H2 대제목(## 제목)으로 본문을 전개하십시오.
-- 전개 중 독자의 이해를 돕기 위해 비교 표(Table), 단계별 가이드(Step), 용어 사전 등을 자유롭게 활용하십시오.
-- 기존 작성된 연관 글을 소개할 수 있는 문맥에서 아래 링크를 1~2개 자연스럽게 삽입하십시오. (형식: [텍스트](/blog/\${slug}))
+${coreBody}
+- 기존 작성된 연관 글을 소개할 수 있는 문맥에서 아래 링크를 1~2개 자연스럽게 삽입하십시오. (형식: [텍스트](/blog/${slug}))
 [기존 글 목록]
 ${postsCtx}
 
@@ -265,109 +271,66 @@ A: {팩트 기반 답변}
 `;
 }
 
-function getPrecedentSkeleton(detail, angle, calcTag, postsCtx) {
-  // 판례의 경우 기본적으로 LEGAL 앵글과 섞이게 되지만, 넘겨받은 angle 포커스를 우대함.
-  return `
-[ANALYSIS_START]
-- 부여된 타겟 모델 물리 스펙 및 권장량 : {{TARGET_MODEL_CAPACITY}}
-- 오늘의 글쓰기 관점(Angle) : [${angle.name}] 판례 해설을 이 관점에 맞추어 풀어냅니다.
-- 판례 핵심 쟁점 : {작성}
-- 목차(H2) 및 분량 설계 : 
-  * {사건 발단 관련 H2 제목} : {계획}
-  * {법원 판단 관련 H2 제목} : {계획}
-  * {실무 적용 관련 H2 제목} : {계획}
-  ...
-[ANALYSIS_END]
+const TOPIC_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    slug: { type: 'STRING', description: '하이픈 구분 영문 소문자 URL 슬러그' },
+    title: { type: 'STRING', description: 'SEO 최적화 포스팅 제목 (50자 내외)' },
+    summary: { type: 'STRING', description: '구글 검색 결과에 노출될 150자 이내의 클릭 유도용 SEO 요약문. 판례번호 또는 핵심 키워드 포함.' },
+    category: { type: 'STRING', description: '카테고리명. 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드|판례·법률 해석 중 1개' },
+    specialtyCategory: { type: 'STRING', description: '사건 관련 전문 진료과목 (정형외과, 신경과, 신경외과 등). 관련 없으면 빈 문자열.' },
+    tags: { type: 'ARRAY', items: { type: 'STRING' }, description: '핵심 검색 키워드 태그 5개' },
+    keywords: { type: 'STRING', description: '타겟 키워드 목록 (쉼표 구분)' },
+    calculatorType: { type: 'STRING', description: '"auto" 또는 "medical"' },
+  },
+  required: ['slug', 'title', 'summary', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
+};
 
-# ════════════════════════════════════════════════════════════════
-# 판례 출력 뼈대 (OUTPUT SKELETON)
-# ════════════════════════════════════════════════════════════════
+function buildArticlePrompt(topic, angle, existingPosts, precedentDetail = null) {
+  const postsCtx = existingPosts.length > 0
+    ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
+    : '- (없음)';
 
-[코어 1: 오프닝 및 저자 박스]
-실제 판례(${detail.caseNo}) 사건과 유사한 고통을 겪는 독자에게 공감하며 시작합니다.
-바로 아래에 다음 인용구를 출력하세요.
+  const calcTag = topic.calculatorType === 'medical'
+    ? '<calculator type="medical" />'
+    : '<calculator type="auto" />';
 
-[코어 2: Key Points]
-## 💡 Key Points
-- {판례에서 알아야 할 핵심 포인트 3가지}
+  const isPrecedent = !!precedentDetail;
 
-[다이나믹 모듈 전개: 사건 해설 및 실무 적용]
-주어진 관점(Angle)인 **[${angle.name}]**에 맞추어 판례를 해설하십시오.
-1. 사건의 발단과 배경을 스토리텔링식으로 해설.
-2. 법원(${detail.courtName})의 판단 논리 해설.
-3. 손해사정 실무 관점에서의 해석 (이 판결이 일반 환자에게 미치는 영향).
-- 내부 연관 글 링크 1~2개 삽입:
-[기존 글 목록]
-${postsCtx}
-
-[코어 3: 자가진단 체크리스트]
-## 🛡️ 지금 손해사정사가 필요한 상황인지 1분 체크
-☑️ {판례 쟁점과 연결된 자가진단 질문}
-...
-☑️ 위 항목 중 하나라도 해당된다면 전문가의 정확한 검토가 필요한 상황입니다.
-
-[코어 4: 상담 유도 마무리]
-전문가 조언의 중요성 안내 (텍스트로만).
-
-[코어 5: FAQ]
-## 💡 자주 묻는 질문 (FAQ)
-### Q: {질문 내용}
-A: {팩트 기반 답변}
-`;
-}
-
-function getPrecedentRole() {
-  return `# Role\n당신은 '보상스쿨' 블로그의 판례 분석 전문가이자 손해사정 테크니컬 라이터입니다.`;
-}
-
-function getPrecedentObjective() {
-  return `# Objective\n제시된 판례를 바탕으로, 공통 글쓰기 규칙을 완벽히 만족하며 구글 E-E-A-T 기준에 부합하는 전문가 칼럼을 작성합니다.`;
-}
-
-function getBlogLengthRulesManual() {
-  return `## 분량 및 형식 규칙 (수동 대본 포장)
-- 사용자가 입력한 대본이나 원문을 **최대한 보존**하되, 가독성을 극대화하기 위해 적절한 소제목(H2), 불릿 포인트, 강조 태그 등을 덧붙여 **고품질의 블로그 포스팅** 형태로 포장(Packaging)하십시오.
-- 불필요하게 내용을 덧붙여 분량을 부풀리지 말고, 원문의 밀도와 흐름을 살리는 데 집중하십시오.`;
-}
-
-function getBlogLengthRulesSemiAuto() {
-  return `## 분량 및 창작 규칙 (반자동 창작)
-- 사용자가 입력한 키워드, 개요 또는 참고 링크만을 바탕으로 **완전히 새로운 방대한 양의 전문 칼럼**을 창작하십시오.
-- 타겟 모델의 물리 한계 스펙 내에서 허용하는 최대 분량으로, 각 H2 섹션마다 매우 상세하고 깊이 있는 전문가적 해설과 예시를 풍부하게 작성하십시오.`;
-}
-
-function getBlogFrontmatter(titleGuide, currentDate) {
-  return `## Frontmatter (YAML) 형식
-결과물 최상단에 반드시 아래 형식의 Frontmatter를 포함하십시오. (값은 주제에 맞게 AI가 스스로 판단하여 작성하되, 카테고리는 반드시 지정된 목록에서만 선택하세요.)
-\`\`\`yaml
----
-title: "{${titleGuide}}"
-summary: "구글 검색 결과에 노출될 150자 이내의 매력적인 클릭 유도용 요약문"
-date: "${currentDate}"
-category: "{사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드|판례·법률 해석 중 1개 선택}"
-tags: ["키워드1", "키워드2", "키워드3", "키워드4"]
-slug: "{영어-소문자-하이픈-조합의-주소}"
-calculatorType: "auto"
----
-\`\`\``;
-}
-
-function calculateModelCapacity(maxTokens) {
-  const safetyLimitChar = Math.floor(maxTokens / 3.0);
-  const minRecommended = Math.floor(safetyLimitChar * 0.45);
-  const maxRecommended = Math.floor(safetyLimitChar * 0.85);
-  const minNoSpace = Math.floor(minRecommended * 0.7);
-  const maxNoSpace = Math.floor(maxRecommended * 0.7);
-
-  return `할당된 인공지능 모델 용량 스펙 (최대 출력 ${maxTokens.toLocaleString()} 토큰) | 권장량: 1회 생성 한계치인 한글 약 ${safetyLimitChar.toLocaleString()}자 내에서 끊김 방지를 위한 최적 작성 분량은 **공백 포함 약 ${minRecommended.toLocaleString()}자 ~ ${maxRecommended.toLocaleString()}자 (공백 제외 약 ${minNoSpace.toLocaleString()}자 ~ ${maxNoSpace.toLocaleString()}자)** 입니다.`;
-}
-
-function cleanAnalysisBlock(text) {
-  if (!text) return '';
-  if (text.includes('[ANALYSIS_START]')) {
-    return text.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
+  let precedentInfo = '';
+  if (isPrecedent) {
+    precedentInfo = `
+[원본 판례 정보]
+* 사건번호: ${precedentDetail.caseNo} (${precedentDetail.courtName || ''} ${precedentDetail.judgmentDate || ''})
+* 사건명: ${precedentDetail.caseName || ''}
+* 판결요지: 
+${precedentDetail.judgmentSummary}
+${(precedentDetail.caseContent || '').slice(0, 3000)} (본문 일부)`;
   }
-  return text.trim();
+
+  return `${getExpertRole()}
+
+# Objective
+${getArticleObjective(topic.keywords)}
+
+## 분량 및 창작 규칙
+- 타겟 모델의 물리적 한계 스펙 내에서 허용하는 최대 분량으로, 방대한 양의 전문 칼럼을 창작하십시오.
+- 각 H2 섹션마다 매우 상세하고 깊이 있는 전문가적 해설과 예시를 풍부하게 작성하여 가장 알찬 고밀도의 전문 칼럼을 완성하십시오.
+
+# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
+${STRICT_RULES}
+
+[기획안]
+* 제목: ${topic.title}
+* 카테고리: ${topic.category}
+* 전문 진료과목: ${topic.specialtyCategory || '(해당 없음)'}
+* 태그: ${(topic.tags || []).join(', ')}
+${precedentInfo}
+
+${getUniversalSkeleton(isPrecedent, angle, calcTag, postsCtx)}
+
+위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.
+`;
 }
 
 function getRenewalPrompt(currentTitle, query) {
@@ -390,103 +353,61 @@ function getRenewalPrompt(currentTitle, query) {
 }`;
 }
 
-const TOPIC_SCHEMA = {
-  type: 'OBJECT',
-  properties: {
-    slug: { type: 'STRING', description: '하이픈 구분 영문 소문자 URL 슬러그' },
-    title: { type: 'STRING', description: 'SEO 최적화 포스팅 제목 (50자 내외)' },
-    summary: { type: 'STRING', description: '구글 검색 결과에 노출될 150자 이내의 클릭 유도용 SEO 요약문. 판례번호 또는 핵심 키워드 포함.' },
-    category: { type: 'STRING', description: '카테고리명. 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드|판례·법률 해석 중 1개' },
-    specialtyCategory: { type: 'STRING', description: '사건 관련 전문 진료과목 (정형외과, 신경과, 신경외과 등). 관련 없으면 빈 문자열.' },
-    tags: { type: 'ARRAY', items: { type: 'STRING' }, description: '핵심 검색 키워드 태그 5개' },
-    keywords: { type: 'STRING', description: '타겟 키워드 목록 (쉼표 구분)' },
-    calculatorType: { type: 'STRING', description: '"auto" 또는 "medical"' },
-  },
-  required: ['slug', 'title', 'summary', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
-};
-
-function buildBlogPrompt(topic, angle, existingPosts) {
-  const postsCtx = existingPosts.length > 0
-    ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
-    : '- (없음)';
-
-  const calcTag = topic.calculatorType === 'medical'
-    ? '<calculator type="medical" />'
-    : '<calculator type="auto" />';
-
-  return `${getBlogRole()}
-
-${getBlogObjective(topic.keywords)}
-
-# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
-${STRICT_RULES}
-
-[기획안]
-* 제목: ${topic.title}
-* 카테고리: ${topic.category}
-* 전문 진료과목: ${topic.specialtyCategory || '(해당 없음)'}
-* 태그: ${(topic.tags || []).join(', ')}
-
-${getBlogSkeleton(angle, calcTag, postsCtx)}
-
-위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.
-`;
+function cleanAnalysisBlock(text) {
+  if (!text) return '';
+  if (text.includes('[ANALYSIS_START]')) {
+    return text.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
+  }
+  return text.trim();
 }
 
-function buildPrecedentPrompt(detail, topic, angle, existingPosts) {
+
+function buildManualPrompt(mode, aiInput, angle, existingPosts) {
   const postsCtx = existingPosts.length > 0
     ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
     : '- (없음)';
+  const calcTag = '<calculator type="auto" />';
+  
+  let objective = '';
+  let lengthRule = '';
+  
+  if (mode === 'manual-preserve') {
+    objective = '사용자가 입력한 대본이나 초안의 디테일과 의도를 100% 보존하며 가독성이 극대화된 블로그 포스트 형태로 예쁘게 포장하십시오. (예시 부풀리게 살을 붙여 분량을 늘리지 마세요)';
+    lengthRule = '사용자가 입력한 대본이나 원문을 **최대한 보존**하되, 가독성을 극대화하기 위해 적절한 소제목(H2), 불릿 포인트, 강조 태그 등을 덧붙여 **고품질의 블로그 포스팅** 형태로 포장(Packaging)하십시오.\n불필요하게 내용을 덧붙여 분량을 부풀리지 말고, 원문의 밀도와 흐름을 살리는 데 집중하십시오.';
+  } else if (mode === 'manual-expand') {
+    objective = '사용자가 입력한 대본이나 뼈대를 바탕으로, 전문가의 지식을 대거 추가하여 아주 상세하고 방대한 분량의 초고음질 전문 칼럼으로 새롭게 창작하십시오.';
+    lengthRule = '사용자가 입력한 키워드, 개요 또는 참고 링크만을 바탕으로 **완전히 새로운 방대한 양의 전문 칼럼**을 창작하십시오.\n타겟 모델의 물리 한계 스펙 내에서 허용하는 최대 분량으로, 각 H2 섹션마다 매우 상세하고 깊이 있는 전문가적 해설과 예시를 풍부하게 작성하십시오.';
+  } else {
+    objective = '제시된 주제/참고링크/키워드를 바탕으로 깊이 있는 전문 칼럼을 새롭게 기획하고 창작하십시오.';
+    lengthRule = '사용자가 입력한 키워드, 개요 또는 참고 링크만을 바탕으로 **완전히 새로운 방대한 양의 전문 칼럼**을 창작하십시오.\n타겟 모델의 물리 한계 스펙 내에서 허용하는 최대 분량으로, 각 H2 섹션마다 매우 상세하고 깊이 있는 전문가적 해설과 예시를 풍부하게 작성하십시오.';
+  }
 
-  const calcTag = topic.calculatorType === 'medical'
-    ? '<calculator type="medical" />'
-    : '<calculator type="auto" />';
+  return `${getExpertRole()}
 
-  return `${getPrecedentRole()}
+# Objective
+${objective}
 
-${getPrecedentObjective()}
+## 분량 및 창작 규칙
+${lengthRule}
 
 # ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
 ${STRICT_RULES}
 
-[원본 판례 정보]
-* 사건번호: ${detail.caseNo} (${detail.courtName || ''} ${detail.judgmentDate || ''})
-* 사건명: ${detail.caseName || ''}
-* 판결요지: 
-${detail.judgmentSummary}
-${(detail.caseContent || '').slice(0, 3000)} (본문 일부)
+제시된 원문/뼈대/참고자료:
+${aiInput}
 
-[기획안]
-* 제목: ${topic.title}
-* 요약: ${topic.summary}
-* 카테고리: ${topic.category}
-* 전문 진료과목: ${topic.specialtyCategory || '(해당 없음)'}
-* 태그: ${(topic.tags || []).join(', ')}
-
-${getPrecedentSkeleton(detail, angle, calcTag, postsCtx)}`;
+${getUniversalSkeleton(false, angle, calcTag, postsCtx)}`;
 }
 
 module.exports = {
   STRICT_RULES,
   getRandomAngle,
-  getBlogRole,
-  getPrecedentRole,
-  getBlogObjective,
-  getPrecedentObjective,
-  getBlogMetaFirstLine,
-  getPrecedentMetaFirstLine,
-  getBlogLengthRulesManual,
-  getBlogLengthRulesSemiAuto,
-  getBlogFrontmatter,
   getTopicPlanningPrompt,
   getPrecedentPlanningPrompt,
   getManualPlanningPrompt,
-  getBlogSkeleton,
-  getPrecedentSkeleton,
-  calculateModelCapacity,
-  cleanAnalysisBlock,
+  buildArticlePrompt,
+  buildManualPrompt,
   getRenewalPrompt,
-  TOPIC_SCHEMA,
-  buildBlogPrompt,
-  buildPrecedentPrompt
+  cleanAnalysisBlock,
+  TOPIC_SCHEMA
 };

@@ -8,33 +8,16 @@ export interface Angle {
 
 export function getRandomAngle(): Angle;
 
-export function getBlogRole(): string;
-export function getPrecedentRole(): string;
-export function getBlogObjective(keywords: string): string;
-export function getPrecedentObjective(): string;
-export function getBlogMetaFirstLine(): string;
-export function getPrecedentMetaFirstLine(): string;
-export function getBlogLengthRulesManual(): string;
-export function getBlogLengthRulesSemiAuto(): string;
-export function getBlogFrontmatter(titleGuide: string, currentDate: string): string;
 export function getTopicPlanningPrompt(keyword: string, trendTitle: string, existingPosts: string): string;
 export function getPrecedentPlanningPrompt(
   detail: { courtName: string; caseName: string; caseNo: string; judgmentDate: string; judgmentSummary: string },
   existingPosts: string
 ): string;
 export function getManualPlanningPrompt(aiInput: string, existingPosts: string): string;
-export function getBlogSkeleton(angle: Angle, calcTag: string, postsCtx: string): string;
-export function getPrecedentSkeleton(
-  detail: { caseNo: string; caseName: string; courtName: string },
-  angle: Angle,
-  calcTag: string,
-  postsCtx: string
-): string;
 
-export function calculateModelCapacity(maxTokens: number): string;
 export function cleanAnalysisBlock(text: string): string;
 export function getRenewalPrompt(currentTitle: string, query: string): string;
 
 export const TOPIC_SCHEMA: any;
-export function buildBlogPrompt(topic: any, angle: Angle, existingPosts: any[]): string;
-export function buildPrecedentPrompt(detail: any, topic: any, angle: Angle, existingPosts: any[]): string;
+export function buildArticlePrompt(topic: any, angle: Angle, existingPosts: any[], precedentDetail?: any): string;
+export function buildManualPrompt(mode: string, aiInput: string, angle: Angle, existingPosts: any[]): string;

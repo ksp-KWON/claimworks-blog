@@ -16,16 +16,14 @@ import PremiumHeading from '@/components/ui/PremiumHeading';
 interface SidebarContentProps {
   tags?: string[];
 }
-
-const INITIAL_TAG_COUNT = 4;
-
-type ThemeColor = 'blue' | 'red' | 'green' | 'yellow' | 'purple';
+import MenuCard from '@/components/ui/MenuCard';
+import type { MenuThemeColor } from '@/components/ui/MenuCard';
 
 interface SidebarItem {
   href: string;
   icon: string;
   title: string;
-  themeColor: ThemeColor;
+  themeColor: MenuThemeColor;
   badgeText: string;
   description: string;
   buttonText: string;
@@ -88,87 +86,17 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   }
 ];
 
-const THEME_STYLES: Record<ThemeColor, { textIcon: string; badgeBg: string; buttonHoverBg: string; buttonHoverText: string }> = {
-  blue: {
-    textIcon: 'text-[var(--google-blue)]',
-    badgeBg: 'bg-[#e8f0fe] dark:bg-[#174ea6]/20 text-[var(--google-blue)] dark:text-[#8ab4f8] border-[#d2e3fc]/30 dark:border-[#174ea6]/30',
-    buttonHoverBg: 'group-hover:bg-[#e8f0fe] dark:group-hover:bg-[#174ea6]/20',
-    buttonHoverText: 'group-hover:text-[var(--google-blue)] dark:group-hover:text-[#8ab4f8]'
-  },
-  red: {
-    textIcon: 'text-red-500',
-    badgeBg: 'bg-red-50 dark:bg-red-950/20 text-red-500 dark:text-red-400 border-red-100/30 dark:border-red-950/30',
-    buttonHoverBg: 'group-hover:bg-red-50 dark:group-hover:bg-red-950/20',
-    buttonHoverText: 'group-hover:text-red-500 dark:group-hover:text-red-400'
-  },
-  green: {
-    textIcon: 'text-[#137333]', // or text-[var(--google-green)]
-    badgeBg: 'bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] border-green-100/30 dark:border-green-950/30',
-    buttonHoverBg: 'group-hover:bg-green-50 dark:group-hover:bg-green-950/20',
-    buttonHoverText: 'group-hover:text-[#137333] dark:group-hover:text-[#81c995]'
-  },
-  yellow: {
-    textIcon: 'text-[var(--google-yellow)]',
-    badgeBg: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 border-yellow-100/30 dark:border-yellow-900/30',
-    buttonHoverBg: 'group-hover:bg-yellow-50 dark:group-hover:bg-yellow-900/20',
-    buttonHoverText: 'group-hover:text-yellow-600 dark:group-hover:text-yellow-500'
-  },
-  purple: {
-    textIcon: 'text-purple-500',
-    badgeBg: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100/30 dark:border-purple-900/30',
-    buttonHoverBg: 'group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20',
-    buttonHoverText: 'group-hover:text-purple-600 dark:group-hover:text-purple-400'
-  }
-};
+const INITIAL_TAG_COUNT = 4;
 
 export default function SidebarContent({ tags = [] }: SidebarContentProps) {
   const visibleTags = tags.slice(0, INITIAL_TAG_COUNT);
   const hiddenTags  = tags.slice(INITIAL_TAG_COUNT);
 
-  const bgGradients: Record<string, string> = {
-    blue: 'bg-gradient-to-r from-blue-100/80 to-transparent dark:from-blue-900/30 dark:to-transparent',
-    red: 'bg-gradient-to-r from-red-100/80 to-transparent dark:from-red-900/30 dark:to-transparent',
-    green: 'bg-gradient-to-r from-green-100/80 to-transparent dark:from-green-900/30 dark:to-transparent',
-    yellow: 'bg-gradient-to-r from-yellow-100/80 to-transparent dark:from-yellow-900/30 dark:to-transparent',
-    purple: 'bg-gradient-to-r from-purple-100/80 to-transparent dark:from-purple-900/30 dark:to-transparent',
-  };
-
   return (
     <div className="space-y-6">
-      {SIDEBAR_ITEMS.map((item, index) => {
-        const theme = THEME_STYLES[item.themeColor];
-        return (
-          <Link key={index} href={item.href} className="block group">
-            <PremiumCard borderColor={item.themeColor} hoverEffect className="!p-5 relative overflow-hidden">
-              <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
-                {item.icon}
-              </div>
-              <div className="relative z-10 space-y-2">
-                <div className="flex items-center justify-between">
-                  <PremiumHeading level={3} gradient={item.themeColor} showLeftBorder={true} className={`!mb-0 !text-sm pr-2 rounded-r-xl ${bgGradients[item.themeColor]}`}>
-                    <span className={`${theme.textIcon} text-lg leading-none mr-2`}>{item.icon}</span>
-                    {item.title}
-                  </PremiumHeading>
-                  <span className={`${theme.badgeBg} text-[10px] font-extrabold px-2 py-0.5 rounded-md border`}>
-                    {item.badgeText}
-                  </span>
-                </div>
-                <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
-                  {item.description}
-                </p>
-                <div className={`mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 ${theme.buttonHoverBg} ${theme.buttonHoverText}`}>
-                  <div className="flex items-center gap-2">
-                    {item.buttonText}
-                  </div>
-                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                  </svg>
-                </div>
-              </div>
-            </PremiumCard>
-          </Link>
-        );
-      })}
+      {SIDEBAR_ITEMS.map((item, index) => (
+        <MenuCard key={index} {...item} />
+      ))}
 
       {/* 인기 키워드 태그 (layout.tsx 서버에서 전달된 정적 데이터) */}
       {tags.length > 0 && (
@@ -177,7 +105,7 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
             level={3} 
             gradient="red" 
             showLeftBorder={true} 
-            className={`!mb-4 !text-sm pr-2 rounded-r-xl ${bgGradients['red']}`}
+            className={`!mb-4 !text-sm pr-2 rounded-r-xl bg-gradient-to-r from-red-100/80 to-transparent dark:from-red-900/30 dark:to-transparent`}
             icon={
               <svg className="w-4 h-4 text-[var(--google-red)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />

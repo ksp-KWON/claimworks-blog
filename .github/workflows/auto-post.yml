@@ -62,13 +62,13 @@ jobs:
           node scripts/select-daily-topic.js
           
           if [ "$POST_TYPE" = "all" ] || [ "$POST_TYPE" = "trend" ]; then
-            echo "🔥 트렌드 글쓰기 기동 (scripts/generate-blog-post.js)"
-            node scripts/generate-blog-post.js
+            echo "🔥 트렌드 글쓰기 기동 (npm run generate:trend)"
+            npm run generate:trend
           fi
           
           if [ "$POST_TYPE" = "all" ] || [ "$POST_TYPE" = "precedent" ]; then
-            echo "⚖️ 법률칼럼 글쓰기 기동 (scripts/generate-precedent-post.js)"
-            node scripts/generate-precedent-post.js
+            echo "⚖️ 법률칼럼 글쓰기 기동 (npm run generate:precedent)"
+            npm run generate:precedent
           fi
 
       - name: 변경사항 커밋 & 푸시

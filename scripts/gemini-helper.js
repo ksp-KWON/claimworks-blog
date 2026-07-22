@@ -12,7 +12,7 @@
 'use strict';
 
 const { sleep } = require('./pipeline-utils.js');
-const { calculateModelCapacity } = require('../src/lib/prompt-rules.js');
+
 
 // ── 모델 계열 정의 ────────────────────────────────────────────────────────────
 // 각 계열에 해당하는 이름 패턴을 우선순위 순서로 정의합니다.
@@ -156,8 +156,7 @@ async function callGemini(prompt, schema = null) {
     };
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    const capacityText   = calculateModelCapacity(maxTokens);
-    const finalizedPrompt = prompt.replace(/\{\{TARGET_MODEL_CAPACITY\}\}/g, capacityText);
+    const finalizedPrompt = prompt;
 
     for (let attempt = 0; attempt <= RETRY_CONFIG.maxRetries; attempt++) {
       const controller = new AbortController();

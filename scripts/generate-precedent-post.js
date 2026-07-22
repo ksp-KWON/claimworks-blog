@@ -12,13 +12,9 @@ const { callGemini } = require('./gemini-helper');
 const { 
   STRICT_RULES, 
   getRandomAngle,
-  getPrecedentRole, 
-  getPrecedentObjective, 
-  getPrecedentMetaFirstLine, 
   getPrecedentPlanningPrompt, 
-  getPrecedentSkeleton,
   TOPIC_SCHEMA,
-  buildPrecedentPrompt
+  buildArticlePrompt
 } = require('../src/lib/prompt-rules.js');
 
 const {
@@ -56,7 +52,7 @@ async function main() {
 
   // 4. 본문 생성 (Gemini)
   console.log('[3] 판례 분석 본문 작성 중...');
-  const rawOutput = await callGemini(buildPrecedentPrompt(detail, topic, currentAngle, existingPosts));
+  const rawOutput = await callGemini(buildArticlePrompt(topic, currentAngle, existingPosts, detail));
 
   // 4. 파싱 및 저장
   const { summary, content } = parseGeneratedContent(rawOutput);

@@ -6,6 +6,7 @@ export interface PostData {
   slug: string;
   title: string;
   date: string;
+  isoDate?: string;
   updatedAt?: string;         // 최종 수정일 (없으면 date와 동일하게 처리)
   summary: string;
   category: string;          // 기본 카테고리 (병원보상가이드 등)
@@ -59,6 +60,7 @@ function getAllPosts(): PostData[] {
           slug,
           title: data.title || '',
           date: formatDate(data.date),
+          isoDate: data.date ? new Date(data.date).toISOString() : '',
           updatedAt: data.updatedAt ? formatDate(data.updatedAt) : undefined,
           summary: data.summary || '',
           category: data.category || '',
@@ -85,6 +87,7 @@ export function getSortedPostsData(includeUnpublished = false): Omit<PostData, '
         slug: post.slug,
         title: post.title || '',
         date: post.date,
+        isoDate: post.isoDate,
         updatedAt: post.updatedAt,
         summary: post.summary || '',
         category: post.category || '',

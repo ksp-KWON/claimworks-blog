@@ -26,12 +26,16 @@ export default function BlogPageClient() {
 
   // 포스트 목록 로드 (API를 통해)
   useEffect(() => {
-    fetch('/api/posts')
+    fetch(`/api/posts?t=${new Date().getTime()}`)
       .then(r => r.ok ? r.json() : [])
       .then(data => {
         const list = Array.isArray(data) ? data : [];
-        // 날짜 최신순 정렬
-        list.sort((a: Post, b: Post) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+        // 날짜와 시간까지 포함된 isoDate로 정밀하게 최신순 정렬 (없으면 date)
+        list.sort((a: Post, b: Post) => {
+          const timeA = a.isoDate || a.date;
+          const timeB = b.isoDate || b.date;
+          return timeA < timeB ? 1 : timeA > timeB ? -1 : 0;
+        });
         setPosts(list);
       })
       .catch(() => setPosts([]));

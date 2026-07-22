@@ -37,8 +37,8 @@ const baseComponents: Components = {
     </PremiumHeading>
   ),
   blockquote: ({ children }) => (
-    <PremiumCard borderColor="yellow" hoverEffect={false} className="my-7 !p-5 border-l-4 !border-l-[#fbbc04] bg-gradient-to-br from-yellow-50/80 to-orange-50/50 dark:from-[#fbbc04]/10 dark:to-[#ea4335]/5 shadow-sm">
-      <div className="text-[15px] font-medium text-gray-800 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep">
+    <PremiumCard hoverEffect={false} className="my-7 !p-5 sm:!p-6 bg-gray-50/80 dark:bg-white/5 border-l-4 !border-l-[var(--google-blue)] shadow-sm">
+      <div className="text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep">
         {children}
       </div>
     </PremiumCard>

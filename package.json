@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "fetch-hira": "node scripts/fetch-hira-data.js",
-    "check-quality": "node scripts/check-quality.js"
+    "check-quality": "node scripts/check-quality.js",
+    "generate:trend": "node scripts/generate-post.js --type trend",
+    "generate:precedent": "node scripts/generate-post.js --type precedent"
   },
   "overrides": {
     "react": "$react",

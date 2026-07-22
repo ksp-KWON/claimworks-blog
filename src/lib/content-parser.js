@@ -39,6 +39,9 @@ function parseGeneratedContent(rawOutput) {
   content = content.replace(/^## #\s+/gm, '### ');
   content = content.replace(/^## ## /gm, '## ');
 
+  // ANALYSIS_START 블록 제거 (프론트엔드 노출 방지)
+  content = content.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]\s*/g, '');
+
   const summaryMarkerIdx = content.indexOf('[추천 제목 2개]');
   if (summaryMarkerIdx >= 0) {
     const beforeMarker = content.substring(0, summaryMarkerIdx).trimEnd();

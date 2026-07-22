@@ -28,12 +28,7 @@ const LAW_API_KEY        = process.env.LAW_API_KEY;
 const LAW_PROXY_ENDPOINT = process.env.LAW_PROXY_ENDPOINT;
 const LAW_PROXY_TOKEN    = process.env.LAW_PROXY_TOKEN;
 
-/** 구글 뉴스 RSS 검색 쿼리 — 보험·손해사정 도메인 특화 */
-const NEWS_QUERIES = [
-  '보험금 지급거절 분쟁',
-  '손해사정 교통사고 보상',
-  '실손보험 산재 후유장해',
-];
+
 
 // sleep 은 pipeline-utils.js 에서 공급됨
 
@@ -76,17 +71,66 @@ function extractXmlValues(xml, tag) {
   return out;
 }
 
+// ── [0단계] 트렌드 키워드 동적 창작 ──────────────────────────────────────
+async function generateTrendySearchKeywords(usedKeywordsSet) {
+  console.log('[0/5] AI가 최근 발행된 30개 포스트를 바탕으로 새로운 검색 키워드를 창작 중...');
+  const usedArray = Array.from(usedKeywordsSet);
+  
+  const prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+아래는 최근 우리 블로그에서 다루었던 최신 30개 포스트의 키워드 목록입니다.
+[최근 키워드 목록]
+${usedArray.join(', ')}
+
+이 키워드들과 겹치지 않으면서도, 현재 대중들이 가장 궁금해할 만한 '보험금 분쟁, 손해사정, 교통사고 보상, 산재 후유장해' 관련 핫 트렌드 검색 키워드 3개를 창작해 주세요.
+이 키워드는 구글 뉴스 검색에 사용될 것입니다.`;
+
+  const schema = {
+    type: 'OBJECT',
+    properties: {
+      queries: {
+        type: 'ARRAY',
+        items: { type: 'STRING' },
+        description: '구글 뉴스 검색용 키워드 3개'
+      }
+    },
+    required: ['queries']
+  };
+
+  try {
+    const res = await callGemini(prompt, schema);
+    if (!res.queries || res.queries.length === 0) throw new Error('생성된 쿼리가 없습니다.');
+    console.log('    ✨ AI 생성 검색 쿼리:', res.queries);
+    return res.queries;
+  } catch (err) {
+    console.warn('    ⚠️ AI 검색 키워드 생성 실패, 기본값 사용:', err.message);
+    return ['보험금 지급 분쟁', '교통사고 손해사정', '산재 보상금 판례'];
+  }
+}
+
 // ── [1단계] 구글 뉴스 RSS → 최신 이슈 헤드라인 수집 ─────────────────────
-async function fetchTrendingNews() {
+async function fetchTrendingNews(queries) {
   console.log('[1/5] 구글 뉴스 RSS에서 최신 보험·손해사정 이슈 수집 중...');
 
   const BASE    = 'https://news.google.com/rss/search?hl=ko&gl=KR&ceid=KR:ko&q=';
   const headers = { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' };
   const headlines = [];
 
-  for (const query of NEWS_QUERIES) {
+  for (const query of queries) {
     try {
-      const res = await safeFetch(BASE + encodeURIComponent(query), { headers }, 10000);
+      let res;
+      if (LAW_PROXY_ENDPOINT?.trim()) {
+        const proxyUrl = `${LAW_PROXY_ENDPOINT.trim()}/api/rss?query=${encodeURIComponent(query)}`;
+        const proxyHeaders = { ...headers };
+        if (LAW_PROXY_TOKEN) proxyHeaders['X-Proxy-Token'] = LAW_PROXY_TOKEN.trim();
+        res = await safeFetch(proxyUrl, { headers: proxyHeaders }, 10000);
+        if (!res.ok) {
+          console.warn(`    [프록시 실패/미설정 - HTTP ${res.status}] 직접 요청으로 Fallback 시도합니다...`);
+          res = await safeFetch(BASE + encodeURIComponent(query), { headers }, 10000);
+        }
+      } else {
+        res = await safeFetch(BASE + encodeURIComponent(query), { headers }, 10000);
+      }
+
       if (!res.ok) { console.warn(`    [경고] "${query}" (HTTP ${res.status})`); continue; }
 
       const xml = await res.text();
@@ -242,7 +286,8 @@ async function main() {
   console.log(`  [분석] 기발행 포스트 수: ${usedCaseNumbers.size}개 | 기사용 키워드 수: ${usedKeywords.size}개`);
 
   // 1. 구글 뉴스 RSS 수집
-  const headlines = await fetchTrendingNews();
+  const aiQueries = await generateTrendySearchKeywords(usedKeywords);
+  const headlines = await fetchTrendingNews(aiQueries);
 
   // 2. AI 키워드 추출 (자동 랭킹 포함)
   const rankedCandidates = await extractInsuranceKeywords(headlines);

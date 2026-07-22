@@ -10,39 +10,79 @@ import PremiumCard from '../ui/PremiumCard';
 
 const SCROLL_OFFSET = 140;
 
+const getToneColor = (node: React.ReactNode): 'red' | 'green' | 'yellow' | 'purple' | 'blue' => {
+  const getText = (n: any): string => {
+    if (typeof n === 'string') return n;
+    if (Array.isArray(n)) return n.map(getText).join('');
+    if (n?.props?.children) return getText(n.props.children);
+    return '';
+  };
+  const text = getText(node).trim().substring(0, 15);
+  if (/[⚠️🚨🛑❗❌⛔]/.test(text)) return 'red';
+  if (/[✅☑️🌿🌱💡🍀✔]/.test(text)) return 'green';
+  if (/[🔥⭐⚡🌟✨🏆]/.test(text)) return 'yellow';
+  if (/[🔮💎💜🟣]/.test(text)) return 'purple';
+  return 'blue';
+};
+
 const baseComponents: Components = {
   h1: ({ children, id }) => (
     <PremiumHeading level={1} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-16 mb-8 pb-4 border-b-4 border-[var(--google-blue)] dark:border-[#8ab4f8] break-keep">
       {children}
     </PremiumHeading>
   ),
-  h2: ({ children, id }) => (
-    <PremiumHeading level={2} id={id} showLeftBorder gradient="blue" style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-14 mb-6 py-3 bg-gradient-to-r from-gray-50 to-transparent dark:from-white/5 dark:to-transparent break-keep">
-      {children}
-    </PremiumHeading>
-  ),
-  h3: ({ children, id }) => (
-    <PremiumHeading level={3} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-10 mb-4 break-keep" icon={<span className="text-[var(--google-blue)]">■</span>}>
-      {children}
-    </PremiumHeading>
-  ),
-  h4: ({ children, id }) => (
-    <PremiumHeading level={4} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-8 mb-3 break-keep text-gray-700 dark:text-gray-300" icon={<span className="text-[var(--google-blue)]/70">▸</span>}>
-      {children}
-    </PremiumHeading>
-  ),
+  h2: ({ children, id }) => {
+    const tone = getToneColor(children);
+    return (
+      <PremiumHeading level={2} id={id} showLeftBorder gradient={tone} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className={`mt-14 mb-6 py-3 bg-gradient-to-r from-${tone}-50/60 to-transparent dark:from-${tone}-900/10 dark:to-transparent break-keep`}>
+        {children}
+      </PremiumHeading>
+    );
+  },
+  h3: ({ children, id }) => {
+    const tone = getToneColor(children);
+    const iconColors: Record<string, string> = {
+      blue: 'text-[var(--google-blue)]', red: 'text-red-500', green: 'text-green-500', yellow: 'text-yellow-500', purple: 'text-purple-500'
+    };
+    return (
+      <PremiumHeading level={3} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-10 mb-4 break-keep" icon={<span className={iconColors[tone]}>■</span>}>
+        {children}
+      </PremiumHeading>
+    );
+  },
+  h4: ({ children, id }) => {
+    const tone = getToneColor(children);
+    const iconColors: Record<string, string> = {
+      blue: 'text-[var(--google-blue)]/70', red: 'text-red-500/70', green: 'text-green-500/70', yellow: 'text-yellow-500/70', purple: 'text-purple-500/70'
+    };
+    return (
+      <PremiumHeading level={4} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-8 mb-3 break-keep text-gray-700 dark:text-gray-300" icon={<span className={iconColors[tone]}>▸</span>}>
+        {children}
+      </PremiumHeading>
+    );
+  },
   h5: ({ children, id }) => (
     <PremiumHeading level={5} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-6 mb-2 break-keep text-gray-500 dark:text-gray-400">
       {children}
     </PremiumHeading>
   ),
-  blockquote: ({ children }) => (
-    <PremiumCard hoverEffect={false} className="my-7 !p-5 sm:!p-6 bg-gray-50/80 dark:bg-white/5 border-l-4 !border-l-[var(--google-blue)] shadow-sm">
-      <div className="text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep">
-        {children}
-      </div>
-    </PremiumCard>
-  ),
+  blockquote: ({ children }) => {
+    const tone = getToneColor(children);
+    const bgColors: Record<string, string> = {
+      blue: 'bg-blue-50/50 dark:bg-blue-900/10 border-l-[var(--google-blue)]',
+      red: 'bg-red-50/50 dark:bg-red-900/10 border-l-red-500',
+      green: 'bg-green-50/50 dark:bg-green-900/10 border-l-green-500',
+      yellow: 'bg-yellow-50/50 dark:bg-yellow-900/10 border-l-yellow-500',
+      purple: 'bg-purple-50/50 dark:bg-purple-900/10 border-l-purple-500',
+    };
+    return (
+      <PremiumCard hoverEffect={false} className={`my-7 !p-5 sm:!p-6 border-l-4 shadow-sm ${bgColors[tone]}`}>
+        <div className="text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep">
+          {children}
+        </div>
+      </PremiumCard>
+    );
+  },
   table: ({ children }) => (
     <div className="my-8">
       <PremiumCard hoverEffect={false} className="!p-0 overflow-x-auto shadow-sm">

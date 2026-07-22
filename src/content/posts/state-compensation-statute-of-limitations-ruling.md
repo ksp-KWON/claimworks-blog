@@ -48,7 +48,8 @@ published: true
 * **3단계 : 기산점의 재설정**
   위헌결정일이나 관련 법령의 개정 등, 본인이 비로소 자신의 권리를 인지하고 행사할 수 있게 된 '객관적 시점'을 특정하십시오. 이 시점으로부터 3년 이내라면 시효 완성의 위험에서 벗어날 수 있습니다.
 
-[관련 연관 글]
+> **[관련 연관 글]**
+
 - [교통사고 책임보험금 한도, 치료비와 후유장해 보상 따로 계산해야 더 받는다](/blog/traffic-accident-liability-insurance-disability-limit)
 - [과로사 심장마비 우체국 파견직, 국가배상 가능? 실제 판례 분석과 쟁점](/blog/work-related-heart-attack-state-liability)
 

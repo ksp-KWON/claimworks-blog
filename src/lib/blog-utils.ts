@@ -196,7 +196,7 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   // 연달아 나오는 calloutlink들을 하나의 relatedbox로 묶기
   const groupRelatedLinks = (text: string) => {
     return text.replace(/(<calloutlink[^>]+>\s*<\/calloutlink>\s*)+/g, (match) => {
-      return `<relatedbox>\n${match.trim()}\n</relatedbox>`;
+      return `<relatedbox>\n${match.trim()}\n</relatedbox>\n\n`;
     });
   };
 

@@ -213,7 +213,7 @@ function getUniversalSkeleton(isPrecedent, angle, calcTag, postsCtx) {
     * {자율 생성 H2 제목 1} : {계획}
     * {자율 생성 H2 제목 2} : {계획}`;
 
-  let coreBody = `주어진 관점(Angle)인 **[${angle.name}]**에 완벽하게 맞춰서, AI가 기획한 3~4개의 자율 H2 대제목(## 제목)으로 본문을 전개하십시오.`;
+  let coreBody = `주어진 관점(Angle)인 **[${angle.name}]**에 완벽하게 맞춰서, AI가 자율적으로 판단한 최적의 개수의 H2 대제목(## 제목)들로 본문을 전개하십시오. (분량과 내용 깊이에 따라 유동적 구성)`;
   
   if (isPrecedent) {
     coreAnalysis = `  - 오늘의 글쓰기 관점(Angle) : [${angle.name}] 판례 해설을 이 관점에 맞추어 풀어냅니다.

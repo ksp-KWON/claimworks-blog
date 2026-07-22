@@ -37,6 +37,25 @@ const baseComponents: Components = {
       {children}
     </h3>
   ),
+  h4: ({ children, id }) => (
+    <h4
+      id={id}
+      style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
+      className="flex items-center gap-2 text-[16px] sm:text-[17px] font-bold text-[#3c4043] dark:text-[#e8eaed] mt-8 mb-3 px-1 tracking-tight break-keep"
+    >
+      <span className="text-[#1a73e8]/70 dark:text-[#8ab4f8]/70">▸</span>
+      {children}
+    </h4>
+  ),
+  h5: ({ children, id }) => (
+    <h5
+      id={id}
+      style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }}
+      className="text-[15px] sm:text-[16px] font-bold text-[#5f6368] dark:text-[#9aa0a6] mt-6 mb-2 px-1 tracking-tight break-keep"
+    >
+      {children}
+    </h5>
+  ),
   blockquote: ({ children }) => (
     <div className="my-7 px-5 py-4 bg-gradient-to-br from-yellow-50/80 to-orange-50/50 dark:from-[#fbbc04]/10 dark:to-[#ea4335]/5 border border-yellow-200/50 dark:border-white/5 border-l-4 border-l-[#fbbc04] dark:border-l-[#fbbc04] text-[15px] font-medium text-gray-800 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep shadow-sm">
       {children}

@@ -78,6 +78,22 @@ const baseComponents: Components = {
       <div className="w-24 h-px bg-gradient-to-l from-transparent to-gray-300 dark:to-gray-600" />
     </div>
   ),
+  pre: ({ children }) => (
+    <pre className="whitespace-pre-wrap break-words bg-gray-50 dark:bg-[#303134] p-4 sm:p-5 rounded-md border border-gray-200 dark:border-white/10 my-6 text-[#202124] dark:text-[#e8eaed] font-sans text-[14.5px] sm:text-[15.5px] leading-relaxed shadow-sm overflow-x-hidden">
+      {children}
+    </pre>
+  ),
+  code: ({ children, className }: any) => {
+    const isInline = !className;
+    if (isInline) {
+      return (
+        <code className="px-1.5 py-0.5 mx-0.5 rounded bg-gray-100 dark:bg-[#303134] text-[#d93025] dark:text-[#f28b82] text-[0.9em] font-sans font-bold">
+          {children}
+        </code>
+      );
+    }
+    return <code className="font-sans break-keep">{children}</code>;
+  },
 };
 
  

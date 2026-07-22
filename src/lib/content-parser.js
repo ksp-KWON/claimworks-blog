@@ -28,6 +28,12 @@ function parseGeneratedContent(rawOutput) {
   content = content.replace(/\[이미지 제안:.*?\]/g, '');
   content = content.replace(/\[관련 글 추천\]/g, '');
   
+  // AI가 불필요하게 감싸는 코드블록(```) 강제 해제 (가로 스크롤 오버플로우 방지)
+  content = content.replace(/```[a-z]*\n([\s\S]*?)\n```/gi, '$1\n');
+  
+  // 4칸 이상 들여쓰기로 인해 <pre> 태그로 변환(폰트 깨짐)되는 현상 방지: 2칸으로 축소
+  content = content.replace(/^( {4,})([└\-*])/gm, '  $2');
+  
   // 제목 교정
   content = content.replace(/^## #\s+Q\s*:/gm, '### Q :');
   content = content.replace(/^## #\s+/gm, '### ');

@@ -172,11 +172,6 @@ export function parseBlogPost(content: string): ParsedBlogPost {
         processedLine = `<calloutlink href="${href}" text="${text}"></calloutlink>`;
       }
       
-      processedLine = processedLine
-        .replace(/\[BLOCKS?-\d+[^\]]*\]/gi, '')
-        .replace(/<calculator\s+type="([^"]+)"\s*\/>/g, '<calculator type="$1"></calculator>')
-        .replace(/\[[^\]]*(?:카카오|상담)[^\]]*\]\([^)]*\)/g, '');
-
       currentSectionLines.push(processedLine);
     }
   }

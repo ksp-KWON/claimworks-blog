@@ -19,7 +19,7 @@ interface SidebarContentProps {
 
 const INITIAL_TAG_COUNT = 4;
 
-type ThemeColor = 'blue' | 'red' | 'green' | 'yellow';
+type ThemeColor = 'blue' | 'red' | 'green' | 'yellow' | 'purple';
 
 interface SidebarItem {
   href: string;
@@ -63,7 +63,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     href: '/calculator',
     icon: '🧮',
     title: '보상금·합의금 계산기',
-    themeColor: 'blue',
+    themeColor: 'purple',
     badgeText: '통합 계산',
     description: '약관 지급기준 및 법원 판례 기준을 적용한 예상 합의금과 소송가액을 한 번에 확인하세요.',
     buttonText: '계산기 시작하기'
@@ -112,12 +112,26 @@ const THEME_STYLES: Record<ThemeColor, { textIcon: string; badgeBg: string; butt
     badgeBg: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 border-yellow-100/30 dark:border-yellow-900/30',
     buttonHoverBg: 'group-hover:bg-yellow-50 dark:group-hover:bg-yellow-900/20',
     buttonHoverText: 'group-hover:text-yellow-600 dark:group-hover:text-yellow-500'
+  },
+  purple: {
+    textIcon: 'text-purple-500',
+    badgeBg: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100/30 dark:border-purple-900/30',
+    buttonHoverBg: 'group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20',
+    buttonHoverText: 'group-hover:text-purple-600 dark:group-hover:text-purple-400'
   }
 };
 
 export default function SidebarContent({ tags = [] }: SidebarContentProps) {
   const visibleTags = tags.slice(0, INITIAL_TAG_COUNT);
   const hiddenTags  = tags.slice(INITIAL_TAG_COUNT);
+
+  const bgGradients: Record<string, string> = {
+    blue: 'bg-gradient-to-r from-blue-100/80 to-transparent dark:from-blue-900/30 dark:to-transparent',
+    red: 'bg-gradient-to-r from-red-100/80 to-transparent dark:from-red-900/30 dark:to-transparent',
+    green: 'bg-gradient-to-r from-green-100/80 to-transparent dark:from-green-900/30 dark:to-transparent',
+    yellow: 'bg-gradient-to-r from-yellow-100/80 to-transparent dark:from-yellow-900/30 dark:to-transparent',
+    purple: 'bg-gradient-to-r from-purple-100/80 to-transparent dark:from-purple-900/30 dark:to-transparent',
+  };
 
   return (
     <div className="space-y-6">
@@ -131,7 +145,7 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
               </div>
               <div className="relative z-10 space-y-2">
                 <div className="flex items-center justify-between">
-                  <PremiumHeading level={3} gradient={item.themeColor} showLeftBorder={true} className="!mb-0 !text-sm">
+                  <PremiumHeading level={3} gradient={item.themeColor} showLeftBorder={true} className={`!mb-0 !text-sm pr-2 rounded-r-xl ${bgGradients[item.themeColor]}`}>
                     <span className={`${theme.textIcon} text-lg leading-none mr-2`}>{item.icon}</span>
                     {item.title}
                   </PremiumHeading>
@@ -163,7 +177,7 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
             level={3} 
             gradient="red" 
             showLeftBorder={true} 
-            className="!mb-4 !text-sm"
+            className={`!mb-4 !text-sm pr-2 rounded-r-xl ${bgGradients['red']}`}
             icon={
               <svg className="w-4 h-4 text-[var(--google-red)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />

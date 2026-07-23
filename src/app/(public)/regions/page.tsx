@@ -21,9 +21,6 @@ export default function RegionsIndex() {
             우리 지역에서 가장 가까운 보상 전문 협력 병원을 찾아보세요.
           </div>
         </div>
-        <div className="text-[10px] font-black uppercase tracking-wider bg-white text-[var(--google-green)] px-2.5 py-1 rounded-none border border-white opacity-90">
-          전국 매핑
-        </div>
       </div>
 
       <div className="text-center space-y-4">

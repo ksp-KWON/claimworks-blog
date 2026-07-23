@@ -310,7 +310,7 @@ export default function TrafficCarePage() {
   // 채팅 상담 열기
   const openChat = () => {
     if (typeof window !== 'undefined') {
-      window.open(KAKAO_OPEN_CHAT_URL, '_blank', 'noopener,noreferrer');
+      document.getElementById('chat-floating-btn')?.click();
     }
   };
 

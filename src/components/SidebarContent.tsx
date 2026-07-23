@@ -36,7 +36,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     title: '빅데이터 판례검색센터',
     themeColor: 'blue',
     badgeText: '실시간 연동',
-    description: '사고 경위나 보상 문제를 일상어로 검색하면, 법제처 공공데이터에서 나에게 가장 유리한 핵심 대법원 판례를 찾아드립니다.',
+    description: '일상어로 검색하여 나에게 가장 유리한 대법원 핵심 판례를 찾아보세요.',
     buttonText: '빅데이터 판례 검색 시작하기'
   },
   {

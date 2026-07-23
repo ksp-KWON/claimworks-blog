@@ -8,6 +8,7 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import PremiumButton from '@/components/ui/PremiumButton';
 import ConsultationAdminPanel from '@/components/admin/ConsultationAdminPanel';
+import ChatAdminPanel from '@/components/admin/ChatAdminPanel';
 const AiWritingStudio = dynamic(() => import('@/components/admin/posts/AiWritingStudio'), { ssr: false });
 const PostListPanel = dynamic(() => import('@/components/admin/posts/PostListPanel'), { ssr: false });
 const SettingsPanel = dynamic(() => import('@/components/admin/posts/SettingsPanel'), { ssr: false });
@@ -363,6 +364,15 @@ export default function AdminPage() {
           <div className="w-px h-3 bg-gray-300 dark:bg-zinc-700 mx-1" />
           
           <button 
+            onClick={() => setActiveApp('chat-manage')}
+            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'chat-manage' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+          >
+            채팅 관리
+          </button>
+          
+          <div className="w-px h-3 bg-gray-300 dark:bg-zinc-700 mx-1" />
+          
+          <button 
             onClick={() => setActiveApp('post-list')}
             className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-list' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
           >
@@ -405,6 +415,11 @@ export default function AdminPage() {
           {/* Consultations */}
           {activeApp === 'consult-manage' && (
             <ConsultationAdminPanel isSplitView={true} onNavigateToManage={() => {}} searchQuery={searchQuery} sortType={sortType} refreshCounter={refreshCounter} />
+          )}
+
+          {/* Chat Panel */}
+          {activeApp === 'chat-manage' && (
+            <ChatAdminPanel />
           )}
 
           {/* Posting Center Tools */}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-export type AdminAppType = 'post-ai' | 'post-list' | 'post-settings' | 'editor' | 'consult-manage';
+export type AdminAppType = 'post-ai' | 'post-list' | 'post-settings' | 'editor' | 'consult-manage' | 'chat-manage';
 import BottomSheet from '@/components/ui/BottomSheet';
 
 type ModalType = 'none' | 'posts' | 'settings';
@@ -19,12 +19,17 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
     setOpenModal('none');
   };
 
-  const handleNavClick = (id: 'posts' | 'settings' | 'consult') => {
+  const handleNavClick = (id: 'posts' | 'settings' | 'consult' | 'chat') => {
     if (id === 'consult') {
       setActiveApp('consult-manage');
       closeModals();
       // 상담 상세 바텀시트가 열려있다면 닫도록 이벤트를 보냅니다.
       window.dispatchEvent(new CustomEvent('close-consultation-detail'));
+      return;
+    }
+    if (id === 'chat') {
+      setActiveApp('chat-manage');
+      closeModals();
       return;
     }
     if (openModal === id) {
@@ -44,6 +49,16 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
         </svg>
       ),
       isActive: activeApp === 'consult-manage'
+    },
+    {
+      id: 'chat',
+      label: '채팅',
+      icon: (
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={activeApp === 'chat-manage' ? "2" : "1.5"} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+        </svg>
+      ),
+      isActive: activeApp === 'chat-manage'
     },
     {
       id: 'posts',

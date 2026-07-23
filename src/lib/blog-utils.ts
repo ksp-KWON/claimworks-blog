@@ -12,7 +12,7 @@ import GithubSlugger from 'github-slugger';
 const KEY_POINT_PATTERNS = /(?:핵심\s*요약|key\s*point)/i;
 const CHECKLIST_PATTERNS = /(?:자가진단|체크리스트|1분\s*체크|체크)/i;
 const FAQ_PATTERNS       = /(?:faq|자주\s*묻는)/i;
-const CTA_PATTERNS       = /(?:카카오톡|call\s*to\s*action|상담\s*신청)/i;
+const CTA_PATTERNS       = /(?:실시간 채팅|call\s*to\s*action|상담\s*신청)/i;
 
 // ─── 단일 통합 파서 (Single-pass Parser) ───────────────────────────────────
 export interface ParsedBlogPost {

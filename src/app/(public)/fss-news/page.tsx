@@ -22,7 +22,7 @@ interface FssNewsItem {
 }
 
 import { cleanFssText } from '@/lib/cleaners';
-import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
+// removed kakao import
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';
@@ -126,9 +126,7 @@ export default function FssNewsPage() {
   };
 
   const openChat = () => {
-    if (typeof window !== 'undefined') {
-      window.open(KAKAO_OPEN_CHAT_URL, '_blank', 'noopener,noreferrer');
-    }
+    document.getElementById('chat-floating-btn')?.click();
   };
 
   const getCategoryBadgeClass = (category: string) => {
@@ -179,26 +177,15 @@ export default function FssNewsPage() {
     <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       
       {/* 🚨 실시간 소비자 이슈 브리핑 상단 띠 배너 */}
-      {latestAlert && (
-        <div className="bg-red-600 text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3 animate-pulse">
-          <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <span className="text-lg shrink-0">🚨</span>
-            <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
-              <span className="underline decoration-wavy mr-1.5">[긴급 소비자경보]</span>
-              {latestAlert.title}
-            </div>
+      <div className="bg-red-600 text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3 animate-pulse">
+        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+          <span className="text-lg shrink-0">🚨</span>
+          <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
+            <span className="underline decoration-wavy mr-1.5">[금감원 실시간 브리핑]</span>
+            금융감독원 최신 소비자경보 및 분쟁조정사례를 확인하세요.
           </div>
-          <button 
-            onClick={() => {
-              const el = document.getElementById(latestAlert.id);
-              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }}
-            className="text-[10px] font-black uppercase tracking-wider bg-white text-red-600 px-2.5 py-1 rounded-none border border-white hover:bg-red-50 transition-colors cursor-pointer"
-          >
-            경보보기
-          </button>
         </div>
-      )}
+      </div>
 
       {/* 헤더 영역 */}
       <div className="text-center space-y-4">

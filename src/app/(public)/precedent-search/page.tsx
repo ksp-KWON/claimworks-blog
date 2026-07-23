@@ -293,7 +293,7 @@ export default function PrecedentSearchPage() {
 
   const openChatWithContext = () => {
     if (typeof window !== 'undefined') {
-      window.open(KAKAO_OPEN_CHAT_URL, '_blank', 'noopener,noreferrer');
+      document.getElementById('chat-floating-btn')?.click();
     }
   };
 
@@ -308,12 +308,6 @@ export default function PrecedentSearchPage() {
             법원의 실시간 대법원 판례 기준을 파악하면 보험사의 삭감 주장을 방어할 수 있습니다.
           </div>
         </div>
-        <button 
-          onClick={() => document.getElementById('search-box-area')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-          className="text-[10px] font-black uppercase tracking-wider bg-white text-[var(--google-blue)] px-2.5 py-1 rounded-none border border-white hover:bg-blue-50 transition-colors cursor-pointer"
-        >
-          검색하기
-        </button>
       </div>
 
       <div className="text-center space-y-4">

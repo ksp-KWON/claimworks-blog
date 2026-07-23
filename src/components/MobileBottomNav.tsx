@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { KAKAO_OPEN_CHAT_URL, GOOGLE_FORM_URL } from '@/lib/constants';
+import { GOOGLE_FORM_URL } from '@/lib/constants';
 import BottomSheet from '@/components/ui/BottomSheet';
 import MenuCard from '@/components/ui/MenuCard';
 import type { MenuCardProps } from '@/components/ui/MenuCard';
@@ -71,9 +71,9 @@ const HOSPITAL_ITEMS: MenuCardProps[] = [
 
 const CONSULT_ITEMS: MenuCardProps[] = [
   {
-    onClick: () => { window.open(KAKAO_OPEN_CHAT_URL, '_blank', 'noopener,noreferrer'); },
+    onClick: () => { document.getElementById('chat-floating-btn')?.click(); },
     icon: '💬',
-    title: '카카오톡 채팅 상담',
+    title: '실시간 채팅 상담',
     themeColor: 'blue',
     description: '보상스쿨 1:1 실시간 상담'
   },

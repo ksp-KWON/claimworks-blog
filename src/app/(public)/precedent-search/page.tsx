@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AiCommentBox from '@/components/AiCommentBox';
-import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
+
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';

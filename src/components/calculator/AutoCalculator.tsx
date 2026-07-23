@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useCalculatorExport } from "@/hooks/useCalculatorExport";
 import { AutoInsuranceData, initialAutoData, INJURY_ALIMONY_TABLE } from './auto/calculator-types';
 import { INJURY_DB } from './auto/injury-db';
-import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
+
 
 export default function AutoCalculator() {
   const [data, setData] = useState<AutoInsuranceData>(initialAutoData);

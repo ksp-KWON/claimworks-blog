@@ -14,7 +14,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import PostCard from '@/components/ui/PostCard';
-import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
+
 import { PostData as Post } from '@/lib/posts';
 
 export default function BlogPageClient() {
@@ -180,15 +180,16 @@ export default function BlogPageClient() {
               궁금하신 사항은 아래 버튼을 통해 언제든 실시간 상담을 이용해 주세요.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href={KAKAO_OPEN_CHAT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.dispatchEvent(new CustomEvent('open-chat'));
+                }}
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-white font-bold rounded-none text-sm transition-colors"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-5.5 0-10 3.5-10 7.8 0 2.7 1.7 5.1 4.2 6.5l-1.1 4.1c-.1.3.2.5.4.4l4.8-3.2c.5.1 1.1.1 1.7.1 5.5 0 10-3.5 10-7.8s-4.5-7.8-10-7.8z"/></svg>
-                카톡 실시간 상담
-              </a>
+                실시간 채팅상담
+              </button>
               <Link
                 href="/consultation"
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[var(--google-blue)] hover:bg-[#1557b0] text-white font-bold rounded-none text-sm transition-colors"

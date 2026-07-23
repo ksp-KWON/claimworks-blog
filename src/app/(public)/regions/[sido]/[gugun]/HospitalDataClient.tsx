@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import standardData from '../../../../../../functions/api/taas-standard-data.json';
-import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
+
 
 interface HospitalDataClientProps {
   sido: string;
@@ -171,14 +171,15 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
               <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] mb-6 font-medium leading-relaxed max-w-lg">
                 수술/입원 후 보험금 지급 거절, 후유장해 진단서 발급 문제 등 전문가의 도움이 필요하다면 실시간 무료 상담을 신청하세요.
               </p>
-              <a 
-                href={KAKAO_OPEN_CHAT_URL} 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.dispatchEvent(new CustomEvent('open-chat'));
+                }}
                 className="w-full sm:w-auto px-8 py-3.5 bg-amber-400 hover:bg-amber-500 text-black font-extrabold text-sm transition-all duration-300 shadow-[0_4px_15px_rgba(251,191,36,0.4)] hover:shadow-[0_6px_25px_rgba(251,191,36,0.6)] hover:-translate-y-1 active:translate-y-0 text-center"
               >
-                보상스쿨 카톡 실시간 상담하기
-              </a>
+                보상스쿨 실시간 채팅상담
+              </button>
             </div>
           </div>
         </div>

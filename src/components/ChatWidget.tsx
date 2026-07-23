@@ -113,7 +113,14 @@ export default function ChatWidget() {
 
   useEffect(() => {
     checkExistingSession();
-    return () => { if (channelRef.current) supabase.removeChannel(channelRef.current); };
+    
+    const handleOpenChat = () => handleOpen();
+    window.addEventListener('open-chat', handleOpenChat);
+    
+    return () => { 
+      if (channelRef.current) supabase.removeChannel(channelRef.current); 
+      window.removeEventListener('open-chat', handleOpenChat);
+    };
   }, [checkExistingSession]);
 
   const handleOpen = () => {

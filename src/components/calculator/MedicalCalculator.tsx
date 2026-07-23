@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useCalculatorExport } from "@/hooks/useCalculatorExport";
-import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
+
 
 // ── 데이터 타입 정의 ──
 export type MedicalInsuranceData = {

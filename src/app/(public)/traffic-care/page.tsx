@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AiCommentBox from '@/components/AiCommentBox';
 import standardData from '../../../../functions/api/taas-standard-data.json';
-import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
+
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';
@@ -686,7 +686,7 @@ export default function TrafficCarePage() {
                 onClick={(e) => { e.preventDefault(); openChat(); }}
                 className="flex-1 text-center py-2.5 bg-[#137333] hover:bg-[#0b6623] text-white text-xs font-bold rounded-none shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                💬 내 과실·보상 무료 상담 (카톡)
+                💬 내 과실·보상 무료 상담 (실시간 채팅)
               </a>
             </div>
           </article>

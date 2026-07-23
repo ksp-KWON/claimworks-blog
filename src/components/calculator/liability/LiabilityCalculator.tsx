@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useCalculatorExport } from "@/hooks/useCalculatorExport";
-import { KAKAO_OPEN_CHAT_URL } from '@/lib/constants';
+
 
 export interface LiabilityData {
   ageAtAccident: number;

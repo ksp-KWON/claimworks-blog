@@ -28,16 +28,10 @@ function formatTime(isoString: string) {
   const ampm = h >= 12 ? '오후' : '오전';
   if (h > 12) h -= 12;
   if (h === 0) h = 12;
-  return `${ampm} ${h}:${m < 10 ? '0' + m : m}`;
+  return `${ampm} ${h < 10 ? '0' + h : h}:${m < 10 ? '0' + m : m}`;
 }
 
-const GREETING = "안녕하세요! 보상스쿨의 친절한 정보 가이드입니다. 궁금하신 내용을 질문해주시면 자세히 답변해 드릴게요!";
-
-const FAQS = [
-  "교통사고 합의금은 어떻게 계산되나요?",
-  "실손보험 청구 시 주의할 점이 있나요?",
-  "근로중 다쳤는데 산재 처리가 유리한가요?",
-];
+const GREETING = "안녕하세요! 보상스쿨의 친절한 정보 가이드입니다.\n궁금하신 내용을 질문해주시면 자세히 답변해 드릴게요!";
 
 export default function ChatWidget() {
   const pathname = usePathname();
@@ -46,6 +40,11 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
+  
+  // 기능 상태
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // 'idle' | 'checking' | 'connecting' | 'connected' | 'error'
   const [status, setStatus] = useState<'idle' | 'checking' | 'connecting' | 'connected' | 'error'>('idle');
@@ -78,7 +77,7 @@ export default function ChatWidget() {
         }
         await loadMessages(data.id);
       } else {
-        setStatus('connected'); // 세션이 없으면 첫 메시지를 보낼 때 생성함
+        setStatus('connected');
       }
     } catch (err) {
       console.error('Session error:', err);
@@ -124,7 +123,6 @@ export default function ChatWidget() {
           if (!isOpen && newMsg.sender === 'admin') {
             setUnreadCount((prev) => prev + 1);
           } else if (isOpen && newMsg.sender === 'admin') {
-            // 안 읽은 메시지 초기화 로직 (여기서는 단순화)
             supabase.from('chat_sessions').update({ unread_count: 0 }).eq('id', sid).then();
           }
           scrollToBottom();
@@ -156,6 +154,8 @@ export default function ChatWidget() {
 
   const handleClose = () => {
     setIsOpen(false);
+    setIsSearching(false);
+    setIsMenuOpen(false);
   };
 
   const scrollToBottom = () => {
@@ -179,7 +179,7 @@ export default function ChatWidget() {
       if (!currentSid) {
         const { data: sessionData, error: sessionError } = await supabase
           .from('chat_sessions')
-          .insert([{ visitor_id: vid, status: 'active' }])
+          .insert([{ visitor_id: vid, status: 'active', visitor_nickname: '방문자' }])
           .select()
           .single();
           
@@ -203,7 +203,7 @@ export default function ChatWidget() {
     } catch (err) {
       console.error('Send error:', err);
       alert('메시지 전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
-      setInputText(sendText); // 복구
+      setInputText(sendText);
     } finally {
       setIsSending(false);
       inputRef.current?.focus();
@@ -217,9 +217,10 @@ export default function ChatWidget() {
     }
   };
 
-  const handleConnectAgent = () => {
-    sendMessage('상담원과 실시간 연결을 요청합니다.');
-  };
+  // 표시할 메시지 필터링
+  const displayMessages = isSearching && searchQuery.trim() !== ''
+    ? messages.filter(m => m.content.toLowerCase().includes(searchQuery.toLowerCase()))
+    : messages;
 
   return (
     <>
@@ -229,67 +230,141 @@ export default function ChatWidget() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95, transition: { duration: 0.2 } }}
-            className="fixed bottom-0 sm:bottom-[90px] right-0 sm:right-6 w-full sm:w-[380px] h-[100dvh] sm:h-[600px] max-h-[100dvh] sm:max-h-[85vh] bg-[#BACEE0] sm:rounded-lg shadow-2xl z-[300] flex flex-col overflow-hidden border border-[#BACEE0]"
+            className="fixed bottom-0 sm:bottom-[90px] right-0 sm:right-6 w-full sm:w-[380px] h-[100dvh] sm:h-[620px] max-h-[100dvh] sm:max-h-[85vh] bg-[#BACEE0] sm:rounded-md shadow-2xl z-[300] flex flex-col overflow-hidden border border-gray-300 font-sans"
           >
-            {/* Header - Kakao Style */}
-            <div className="bg-[#BACEE0] px-4 py-3 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-[14px] bg-white overflow-hidden shadow-sm flex items-center justify-center">
-                  <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain p-1" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-800 text-[15px] flex items-center gap-1.5 leading-tight">
-                    보상스쿨
-                  </h3>
-                  <p className="text-[12px] text-gray-600 flex items-center gap-1 mt-0.5">
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                    2
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3 text-gray-600">
-                {/* Search Icon */}
-                <button aria-label="검색">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                </button>
-                {/* Phone Icon -> Connect to agent */}
-                <button aria-label="실시간 상담원 연결" onClick={handleConnectAgent} title="실시간 상담원 연결">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                </button>
-                {/* Video Icon */}
-                <button aria-label="화상">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                </button>
-                {/* Menu / Close */}
-                <button 
-                  onClick={handleClose}
-                  aria-label="닫기"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                </button>
-              </div>
+            {/* Windows Title Bar (Minimize, Maximize, Close) */}
+            <div className="bg-[#BACEE0] flex justify-end items-center px-1 py-1 h-[28px] shrink-0 border-b border-black/5">
+              <button onClick={handleClose} className="w-8 h-full flex items-center justify-center hover:bg-black/10 transition-colors text-gray-700" title="최소화">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16"><path d="M2 7.5h12v1H2z"/></svg>
+              </button>
+              <button className="w-8 h-full flex items-center justify-center hover:bg-black/10 transition-colors text-gray-700" title="최대화">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" strokeWidth="1"/></svg>
+              </button>
+              <button onClick={handleClose} className="w-8 h-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors text-gray-700" title="닫기">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 16 16"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" d="M3 3l10 10M13 3L3 13"/></svg>
+              </button>
             </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              
-              {/* Default Welcome Message */}
-              <div className="flex items-start gap-2">
-                <div className="w-9 h-9 rounded-[12px] bg-white overflow-hidden shrink-0 flex items-center justify-center shadow-sm">
+            {/* Header - Kakao Profile & Tools */}
+            <div className="bg-[#BACEE0] px-4 py-3 flex items-center justify-between shrink-0 relative">
+              <div className="flex items-center gap-3">
+                <div className="w-[42px] h-[42px] rounded-[14px] bg-white overflow-hidden shadow-sm flex items-center justify-center shrink-0">
                   <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain p-1" />
                 </div>
                 <div>
-                  <p className="text-[12px] text-gray-700 mb-1 ml-1">보상스쿨</p>
-                  <div className="bg-white rounded-lg rounded-tl-none px-3 py-2 shadow-sm max-w-[240px]">
-                    <p className="text-[13px] text-gray-800 leading-[1.4] break-keep whitespace-pre-wrap">
-                      {GREETING}
-                    </p>
+                  <h3 className="font-bold text-[#333333] text-[15px] flex items-center gap-1.5 leading-tight">
+                    보상스쿨
+                  </h3>
+                  <div className="text-[12px] text-gray-600 flex items-center gap-1 mt-0.5">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                    2
                   </div>
                 </div>
               </div>
+              
+              <div className="flex items-center gap-3.5 text-gray-700">
+                {/* Search Icon */}
+                <button aria-label="검색" onClick={() => setIsSearching(!isSearching)}>
+                  <svg className="w-[20px] h-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </button>
+                {/* Phone Icon -> Call */}
+                <a href="tel:01092842955" aria-label="전화 연결" title="전화 연결" className="hover:text-black">
+                  <svg className="w-[20px] h-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                </a>
+                {/* SMS Icon -> Send SMS */}
+                <a href="sms:01092842955" aria-label="문자 메시지" title="문자 메시지" className="hover:text-black">
+                  <svg className="w-[20px] h-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                </a>
+                {/* Menu / Hamburger */}
+                <button 
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  aria-label="메뉴"
+                  className="hover:text-black"
+                >
+                  <svg className="w-[22px] h-[22px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Hamburger Menu Popup */}
+              <AnimatePresence>
+                {isMenuOpen && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="absolute top-14 right-4 bg-white shadow-lg rounded-md border border-gray-200 py-1 w-40 z-50"
+                  >
+                    <button 
+                      onClick={() => {
+                        sendMessage("예약 상담 신청합니다.");
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-[13px] text-gray-800 hover:bg-gray-100 transition-colors"
+                    >
+                      예약 상담 신청
+                    </button>
+                    <a 
+                      href="tel:01092842955"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block w-full text-left px-4 py-2 text-[13px] text-gray-800 hover:bg-gray-100 transition-colors"
+                    >
+                      전화 상담 연결
+                    </a>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Search Bar (Overlay) */}
+            <AnimatePresence>
+              {isSearching && (
+                <motion.div 
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="bg-white border-b border-gray-200 px-3 py-2 flex items-center gap-2 overflow-hidden shrink-0"
+                >
+                  <input 
+                    type="text" 
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="채팅방 검색" 
+                    className="flex-1 bg-gray-100 rounded-sm px-2 py-1 text-[13px] outline-none"
+                    autoFocus
+                  />
+                  <button onClick={() => { setIsSearching(false); setSearchQuery(''); }} className="text-[12px] text-gray-500 hover:text-black">
+                    취소
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" onClick={() => setIsMenuOpen(false)}>
+              
+              {/* Default Welcome Message */}
+              {!isSearching && (
+                <div className="flex items-start gap-2">
+                  <div className="w-[40px] h-[40px] rounded-[14px] bg-white overflow-hidden shrink-0 flex items-center justify-center shadow-sm border border-black/5">
+                    <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain p-1" />
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-[12px] text-gray-700 mb-1 ml-1 font-medium">보상스쿨</p>
+                    <div className="flex items-end gap-1.5">
+                      <div className="bg-white rounded-lg rounded-tl-sm px-3 py-2 shadow-sm max-w-[240px] border border-black/5">
+                        <p className="text-[13px] text-[#111111] leading-[1.5] break-keep whitespace-pre-wrap font-medium">
+                          {GREETING}
+                        </p>
+                      </div>
+                      <span className="text-[10px] text-gray-500 mb-0.5 shrink-0 select-none">
+                        {formatTime(new Date().toISOString())}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Status Display */}
               {status === 'error' && (
@@ -300,62 +375,43 @@ export default function ChatWidget() {
               )}
 
               {/* Dynamic Messages */}
-              {messages.map(msg => {
+              {displayMessages.map((msg, index) => {
                 const isVisitor = msg.sender === 'visitor';
+                const showTime = true; // In a real app, logic to group times could be here.
                 return (
                   <div key={msg.id} className={`flex items-start gap-2 ${isVisitor ? 'flex-row-reverse' : 'flex-row'}`}>
                     {!isVisitor && (
-                      <div className="w-9 h-9 rounded-[12px] bg-white flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                      <div className="w-[40px] h-[40px] rounded-[14px] bg-white flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-black/5">
                         <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain p-1" />
                       </div>
                     )}
                     <div className={`flex flex-col ${isVisitor ? 'items-end' : 'items-start'}`}>
-                      {!isVisitor && <p className="text-[12px] text-gray-700 mb-1 ml-1">보상스쿨</p>}
-                      <div className="flex items-end gap-1.5">
-                        {isVisitor && <span className="text-[10px] text-gray-500 mb-0.5">{formatTime(msg.created_at)}</span>}
-                        <div className={`px-3 py-2 shadow-sm max-w-[240px] ${
+                      {!isVisitor && <p className="text-[12px] text-gray-700 mb-1 ml-1 font-medium">보상스쿨</p>}
+                      <div className={`flex items-end gap-1.5 ${isVisitor ? 'flex-row-reverse' : 'flex-row'}`}>
+                        <div className={`px-3 py-2 shadow-sm max-w-[240px] border border-black/5 ${
                           isVisitor 
-                            ? 'bg-[#FEE500] text-[#371D1E] rounded-lg rounded-tr-none' 
-                            : 'bg-white text-gray-800 rounded-lg rounded-tl-none'
+                            ? 'bg-[#FEE500] text-[#333333] rounded-lg rounded-tr-sm' 
+                            : 'bg-white text-[#111111] rounded-lg rounded-tl-sm'
                         }`}>
-                          <p className="text-[13px] leading-[1.4] whitespace-pre-wrap">{msg.content}</p>
+                          <p className="text-[13px] leading-[1.5] whitespace-pre-wrap font-medium">{msg.content}</p>
                         </div>
-                        {!isVisitor && <span className="text-[10px] text-gray-500 mb-0.5">{formatTime(msg.created_at)}</span>}
+                        {showTime && (
+                          <span className="text-[10px] text-gray-500 mb-0.5 shrink-0 select-none">
+                            {formatTime(msg.created_at)}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
                 );
               })}
 
-              {/* Quick Actions (Kakao style list) */}
-              {messages.length === 0 && (
-                <div className="flex items-start gap-2 mt-2">
-                  <div className="w-9 h-9 shrink-0"></div>
-                  <div className="bg-white rounded-lg px-0 py-2 shadow-sm w-[240px]">
-                    <div className="px-3 pb-2 border-b border-gray-100">
-                      <p className="text-[13px] text-gray-800 font-bold">자주 묻는 질문</p>
-                    </div>
-                    <div className="flex flex-col divide-y divide-gray-50">
-                      {FAQS.map((faq, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => sendMessage(faq)}
-                          className="w-full text-left px-3 py-2 text-[13px] text-[#371D1E] hover:bg-gray-50 transition-colors"
-                        >
-                          {faq}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <div ref={messagesEndRef} />
             </div>
 
             {/* Input Area */}
             <div className="bg-white p-3 shrink-0 flex flex-col gap-2">
-              <div className="flex gap-2 items-end">
+              <div className="flex gap-2 items-end h-full">
                 <textarea
                   ref={inputRef}
                   value={inputText}
@@ -364,14 +420,15 @@ export default function ChatWidget() {
                   placeholder="메시지 입력"
                   rows={2}
                   disabled={status === 'error'}
-                  className="flex-1 bg-transparent text-[13px] text-gray-900 placeholder-gray-400 resize-none outline-none leading-[1.4] max-h-[80px] overflow-y-auto disabled:opacity-50"
+                  className="flex-1 bg-transparent text-[14px] text-gray-900 placeholder-gray-400 resize-none outline-none leading-[1.4] max-h-[80px] overflow-y-auto disabled:opacity-50"
+                  style={{ minHeight: '44px' }}
                 />
                 <button
                   onClick={() => sendMessage(inputText)}
                   disabled={!inputText.trim() || isSending || status === 'error'}
-                  className={`px-4 py-1.5 rounded-sm text-[12px] transition-colors border ${
+                  className={`px-4 py-[6px] rounded-[3px] text-[12px] transition-colors border shadow-sm font-medium h-[32px] mb-1 shrink-0 ${
                     inputText.trim() && !isSending 
-                      ? 'bg-[#FEE500] border-[#FEE500] text-[#371D1E] hover:bg-[#fada0a]' 
+                      ? 'bg-[#FEE500] border-[#FEE500] text-[#333333] hover:bg-[#F9E000]' 
                       : 'bg-white border-gray-200 text-gray-400'
                   }`}
                 >
@@ -401,10 +458,10 @@ export default function ChatWidget() {
             }}
             aria-label="실시간 채팅 열기"
           >
-            <div className="w-7 h-7 flex items-center justify-center text-[#371D1E]">
-              {/* Kakao-style Speech Bubble Icon */}
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-                <path d="M12 4C6.48 4 2 7.58 2 12c0 2.45 1.25 4.63 3.23 6.14-.24 1.16-.88 2.8-.93 2.92-.09.22.04.44.27.4.26-.05 1.25-.26 2.97-1.04C8.95 20.8 10.43 21 12 21c5.52 21 10-3.58 10-8s-4.48-8-10-8z"/>
+            {/* Kakao-style Speech Bubble Icon (Solid perfect vector) */}
+            <div className="w-[26px] h-[26px] flex items-center justify-center text-[#371D1E] mr-0.5 mt-0.5">
+              <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
+                <path d="M50,11C23.5,11,2,28.5,2,50c0,13.7,8.6,25.8,21.8,32.4c-0.8,3.1-3,11.2-3.1,11.7c-0.3,1.3,0.5,1.5,1.2,1c0.9-0.6,11.7-8.1,16.2-11.2c3.8,0.7,7.8,1.1,11.9,1.1c26.5,0,48-17.5,48-39S76.5,11,50,11z"/>
               </svg>
             </div>
 

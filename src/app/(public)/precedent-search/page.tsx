@@ -300,10 +300,10 @@ export default function PrecedentSearchPage() {
   return (
     <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* 상단 띠 배너 */}
-      <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-2.5">
+      <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3">
+        <div className="flex items-center gap-2.5 flex-1 min-w-0">
           <span className="text-lg shrink-0">💡</span>
-          <div className="text-xs sm:text-sm font-extrabold tracking-tight">
+          <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
             <span className="underline decoration-wavy mr-1.5">[보상 트렌드]</span>
             법원의 실시간 대법원 판례 기준을 파악하면 보험사의 삭감 주장을 방어할 수 있습니다.
           </div>

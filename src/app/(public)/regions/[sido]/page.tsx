@@ -29,8 +29,8 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
       <div className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] transition-all duration-300 overflow-hidden">
         
         {/* 🗺️ 상단 정보성 띠 배너 */}
-        <div className="bg-[var(--google-green)] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-2.5">
+        <div className="bg-[var(--google-green)] text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3">
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <Link href="/regions" className="hover:underline flex items-center gap-1 text-sm font-bold opacity-80 hover:opacity-100">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
               전국 매핑

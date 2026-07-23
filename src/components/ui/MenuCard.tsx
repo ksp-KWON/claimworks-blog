@@ -77,7 +77,7 @@ export default function MenuCard({ href, onClick, icon, title, description, badg
             </span>
           )}
         </div>
-        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed truncate">
+        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed truncate sm:whitespace-normal">
           {description}
         </p>
         {buttonText && (

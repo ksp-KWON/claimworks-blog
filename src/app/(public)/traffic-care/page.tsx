@@ -323,10 +323,10 @@ export default function TrafficCarePage() {
     <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       
       {/* 🚗 교통사고 로컬 안심케어 센터 상단 띠 배너 */}
-      <div className="bg-[#137333] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3 rounded-t-none">
-        <div className="flex items-center gap-2.5">
+      <div className="bg-[#137333] text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3 rounded-t-none">
+        <div className="flex items-center gap-2.5 flex-1 min-w-0">
           <span className="text-lg shrink-0">🚗</span>
-          <div className="text-xs sm:text-sm font-extrabold tracking-tight">
+          <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
             <span className="underline decoration-wavy mr-1.5">[지역 안내]</span>
             도로교통공단 안전 통계와 우수 추천 병원, 보상 지식을 통합 안내해 드립니다.
           </div>

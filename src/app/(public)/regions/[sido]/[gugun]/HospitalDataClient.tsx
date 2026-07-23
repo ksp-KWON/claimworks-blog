@@ -154,11 +154,11 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-5 bg-gray-50 dark:bg-[#303134] border border-gray-200 dark:border-gray-700 rounded-none shadow-[4px_4px_0px_rgba(0,0,0,0.05)]">
               <div className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">📍 주소</div>
-              <div className="text-[#202124] dark:text-[#e8eaed] font-medium leading-relaxed">{deepLinkedHospitalData.address}</div>
+              <div className="text-sm text-[#202124] dark:text-[#e8eaed] font-medium leading-relaxed">{deepLinkedHospitalData.address}</div>
             </div>
             <div className="p-5 bg-gray-50 dark:bg-[#303134] border border-gray-200 dark:border-gray-700 rounded-none shadow-[4px_4px_0px_rgba(0,0,0,0.05)]">
               <div className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">📞 전화번호</div>
-              <div className="text-[#202124] dark:text-[#e8eaed] font-medium text-lg">{deepLinkedHospitalData.tel || '정보 없음'}</div>
+              <div className="text-sm text-[#202124] dark:text-[#e8eaed] font-medium">{deepLinkedHospitalData.tel || '정보 없음'}</div>
             </div>
           </div>
 
@@ -190,8 +190,8 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
   return (
     <div className="space-y-6">
       {/* 🗺️ 상단 정보성 띠 배너 */}
-      <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3 rounded-none shadow-[0_4px_20px_rgba(26,115,232,0.3)]">
-        <div className="flex items-center gap-2.5">
+      <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3 rounded-none shadow-[0_4px_20px_rgba(26,115,232,0.3)]">
+        <div className="flex items-center gap-2.5 flex-1 min-w-0">
           <Link href={`/regions/${encodeURIComponent(sido)}`} className="hover:underline flex items-center gap-1 text-sm font-bold opacity-80 hover:opacity-100">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
             {sido}

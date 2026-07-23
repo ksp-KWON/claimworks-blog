@@ -180,10 +180,10 @@ export default function FssNewsPage() {
       
       {/* 🚨 실시간 소비자 이슈 브리핑 상단 띠 배너 */}
       {latestAlert && (
-        <div className="bg-red-600 text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3 animate-pulse">
-          <div className="flex items-center gap-2.5">
+        <div className="bg-red-600 text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3 animate-pulse">
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <span className="text-lg shrink-0">🚨</span>
-            <div className="text-xs sm:text-sm font-extrabold tracking-tight">
+            <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
               <span className="underline decoration-wavy mr-1.5">[긴급 소비자경보]</span>
               {latestAlert.title}
             </div>

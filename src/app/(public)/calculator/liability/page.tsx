@@ -29,10 +29,10 @@ export default function LiabilityCalculatorPage() {
       <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
         {/* 🧮 배상책임 소송가액 계산기 상단 띠 배너 */}
-        <div className="bg-[var(--google-red)] text-white px-5 py-3 flex items-center justify-between flex-wrap gap-3 rounded-t-none">
-          <div className="flex items-center gap-2.5">
+        <div className="bg-[var(--google-red)] text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3 rounded-t-none">
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <span className="text-lg shrink-0">🧮</span>
-            <div className="text-xs sm:text-sm font-extrabold tracking-tight">
+            <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
               <span className="underline decoration-wavy mr-1.5">[통합 계산]</span>
               보상스쿨 빅데이터 알고리즘으로 예상 보상금을 미리 산출해보세요.
             </div>

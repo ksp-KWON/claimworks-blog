@@ -238,7 +238,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
       {/* 왼쪽: 세션 리스트 (모바일에서는 선택된 세션이 없을 때만 표시) */}
       <PremiumCard className={`w-full md:w-1/3 md:min-w-[320px] md:max-w-[400px] flex-1 md:flex-none min-h-0 p-0 overflow-hidden relative ${selectedId ? 'hidden md:block' : 'block'}`}>
         <div className="absolute inset-0 flex flex-col w-full">
-          <div className="p-4 border-b border-gray-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center z-10 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+          <div className="h-[76px] px-4 border-b border-gray-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center z-10 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
             <h2 className="font-bold text-gray-800 dark:text-gray-100">채팅 목록</h2>
             <span className="text-xs text-gray-500 font-medium bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded-full">{sortedAndFilteredSessions.length}건</span>
           </div>
@@ -318,7 +318,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
         {selectedId && selectedSession ? (
           <>
             {/* 채팅 헤더 */}
-            <div className="p-4 border-b border-gray-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-[0_1px_0_rgba(0,0,0,0.02)] z-10">
+            <div className="h-[76px] px-4 border-b border-gray-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-[0_1px_0_rgba(0,0,0,0.02)] z-10">
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setSelectedId(null)}

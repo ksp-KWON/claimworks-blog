@@ -98,40 +98,44 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
     const channel = supabase
       .channel('admin_global')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages' }, (payload) => {
-        if (payload.eventType !== 'INSERT') return; // 삭제/업데이트는 무시
+        if (payload.eventType !== 'INSERT') return;
         
-        // 새 메시지가 오면
         const newMsg = payload.new as ChatMessage;
+        const isFromVisitor = newMsg.sender === 'visitor';
         
         // 현재 보고 있는 세션이면 메시지 리스트에 추가
         if (selectedId === newMsg.session_id) {
           setMessages(prev => [...prev, newMsg]);
           scrollToBottom();
           // 방문자가 보낸거면 바로 읽음 처리
-          if (newMsg.sender === 'visitor') {
+          if (isFromVisitor) {
             supabase.from('chat_sessions').update({ unread_count: 0 }).eq('id', selectedId).then();
           }
         }
         
-        // 세션 목록 갱신
+        // 세션 목록 갱신 및 알림 발생
         setSessions(prev => {
-          let found = false;
-          let updated = prev.map(s => {
-            if (s.id === newMsg.session_id) {
-              found = true;
-              return {
-                ...s,
-                last_content: newMsg.content,
-                last_message_at: newMsg.created_at,
-                unread_count: (newMsg.sender === 'visitor' && selectedId !== newMsg.session_id) ? (s.unread_count || 0) + 1 : s.unread_count
-              };
+          const exists = prev.find(s => s.id === newMsg.session_id);
+          if (exists) {
+            if (isFromVisitor && selectedId !== newMsg.session_id) {
+              playNotificationSound();
+              showBrowserNotification('새로운 메시지 도착', newMsg.content || '채팅 메시지가 왔습니다.');
             }
-            return s;
-          });
-          if (!found) {
+            return prev.map(s => s.id === exists.id ? { 
+              ...s, 
+              last_content: newMsg.content,
+              last_message_at: newMsg.created_at, 
+              unread_count: (isFromVisitor && selectedId !== newMsg.session_id) ? (s.unread_count || 0) + 1 : s.unread_count 
+            } : s).sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
+          } else {
+            // 새 세션인 경우 다시 fetch
             fetchSessions();
+            if (isFromVisitor) {
+              playNotificationSound();
+              showBrowserNotification('새로운 상담 채팅 시작', newMsg.content || '새 채팅방이 열렸습니다.');
+            }
+            return prev;
           }
-          return updated.sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
         });
       })
       .subscribe();
@@ -149,6 +153,28 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
     const unsubscribe = subscribeToGlobalChanges();
     return () => unsubscribe();
   }, [subscribeToGlobalChanges]);
+
+  // 알림 권한 요청 및 사운드 초기화
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  const playNotificationSound = () => {
+    try {
+      const audio = new Audio('/notification.ogg');
+      audio.play().catch(e => console.warn('Audio play blocked:', e));
+    } catch (e) {
+      console.error('Audio initialization error:', e);
+    }
+  };
+
+  const showBrowserNotification = (title: string, body: string) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, { body, icon: '/logo.png' });
+    }
+  };
 
   const handleSelectSession = (sid: string) => {
     setSelectedId(sid);

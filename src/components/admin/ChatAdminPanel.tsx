@@ -98,6 +98,8 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
     const channel = supabase
       .channel('admin_global')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages' }, (payload) => {
+        if (payload.eventType !== 'INSERT') return; // 삭제/업데이트는 무시
+        
         // 새 메시지가 오면
         const newMsg = payload.new as ChatMessage;
         

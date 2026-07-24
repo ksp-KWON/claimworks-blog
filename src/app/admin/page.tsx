@@ -314,7 +314,7 @@ export default function AdminPage() {
 
         {/* 중앙 헤더 컨트롤 영역 (상담 관리, 원고 관리 탭에서만 보임) */}
         <div className="flex-1 flex items-center justify-center px-4">
-          {(activeApp === 'consult-manage' || activeApp === 'post-list') && (
+          {(activeApp === 'consult-manage' || activeApp === 'post-list' || activeApp === 'chat-manage') && (
             <div className="flex items-center gap-2">
               <div className="relative">
                 <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -419,7 +419,7 @@ export default function AdminPage() {
 
           {/* Chat Panel */}
           {activeApp === 'chat-manage' && (
-            <ChatAdminPanel />
+            <ChatAdminPanel searchQuery={searchQuery} sortType={sortType} refreshCounter={refreshCounter} />
           )}
 
           {/* Posting Center Tools */}

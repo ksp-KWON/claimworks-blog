@@ -31,7 +31,7 @@ function formatTime(isoString: string) {
   return `${ampm} ${h}:${m < 10 ? '0' + m : m}`;
 }
 
-const GREETING = "안녕하세요! 보상스쿨 실시간 채팅상담입니다.\n궁금하신 점을 남겨주시면 담당자가 빠르고 친절하게 답변해 드립니다.";
+const GREETING = "안녕하세요, 보상스쿨 손해사정사입니다.\n사건 내용과 궁금하신 점을 남겨주시면 꼼꼼히 확인하여 답변드리겠습니다.\n(외근이나 상담 중일 경우 답변이 조금 지연될 수 있으나, 남겨주신 질문은 하나도 빠짐없이 100% 답변드리고 있으니 잠시만 기다려주세요!)";
 
 const QUICK_ACTIONS = [
   { id: 'connect', label: '👨‍💼 실시간 상담원 연결' },
@@ -343,8 +343,8 @@ export default function ChatWidget() {
                   
                   {/* Default Welcome Message */}
                   <div className="flex items-start gap-2">
-                    <div className="w-8 h-8 rounded-full bg-[var(--google-blue)] flex items-center justify-center shrink-0 mt-1 shadow-sm">
-                      <span className="text-white text-[11px] font-black">보상</span>
+                    <div className="w-8 h-8 rounded-full bg-white border border-gray-200 dark:border-white/10 flex items-center justify-center shrink-0 mt-1 shadow-sm overflow-hidden p-1">
+                      <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain" />
                     </div>
                     <div className="max-w-[85%]">
                       <div className="bg-white dark:bg-[#2a2b2e] border border-gray-100 dark:border-white/5 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
@@ -380,8 +380,8 @@ export default function ChatWidget() {
                     return (
                       <div key={msg.id} className={`flex items-end gap-2 ${isVisitor ? 'flex-row-reverse' : 'flex-row'}`}>
                         {!isVisitor && (
-                          <div className="w-8 h-8 rounded-full bg-[var(--google-blue)] flex items-center justify-center shrink-0 overflow-hidden mb-5">
-                            <span className="text-white text-[11px] font-black">보상</span>
+                          <div className="w-8 h-8 rounded-full bg-white border border-gray-200 dark:border-white/10 flex items-center justify-center shrink-0 overflow-hidden mb-5 shadow-sm p-1">
+                            <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain" />
                           </div>
                         )}
                         <div className={`max-w-[75%] flex flex-col ${isVisitor ? 'items-end' : 'items-start'}`}>

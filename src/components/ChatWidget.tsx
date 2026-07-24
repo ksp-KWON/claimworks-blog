@@ -51,6 +51,8 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isNicknameSet, setIsNicknameSet] = useState(false);
+  const [nicknameInput, setNicknameInput] = useState('');
   
   // 'idle' | 'checking' | 'connecting' | 'connected' | 'error'
   const [status, setStatus] = useState<'idle' | 'checking' | 'connecting' | 'connected' | 'error'>('idle');
@@ -60,7 +62,41 @@ export default function ChatWidget() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const channelRef = useRef<any>(null);
 
-  // 1. 기존 세션 확인 및 새 세션 생성
+  // 1. 닉네임 설정 및 확인
+  useEffect(() => {
+    const savedNickname = localStorage.getItem('cw_nickname');
+    if (savedNickname) {
+      setIsNicknameSet(true);
+    }
+  }, []);
+
+  const handleSetNickname = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nicknameInput.trim()) return;
+    const name = nicknameInput.trim();
+    localStorage.setItem('cw_nickname', name);
+    setIsNicknameSet(true);
+    
+    try {
+      setStatus('connecting');
+      const vid = getVisitorId();
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .insert([{ visitor_id: vid, status: '대기', visitor_nickname: name }])
+        .select()
+        .single();
+        
+      if (error) throw error;
+      setSessionId(data.id);
+      setStatus('connected');
+      subscribeToMessages(data.id);
+    } catch (err) {
+      console.error(err);
+      setStatus('error');
+    }
+  };
+
+  // 2. 기존 세션 확인 및 새 세션 생성
   const checkExistingSession = useCallback(async () => {
     try {
       setStatus('checking');
@@ -189,7 +225,7 @@ export default function ChatWidget() {
       if (!currentSid) {
         const { data: sessionData, error: sessionError } = await supabase
           .from('chat_sessions')
-          .insert([{ visitor_id: vid, status: 'active' }])
+          .insert([{ visitor_id: vid, status: '대기', visitor_nickname: localStorage.getItem('cw_nickname') || '익명' }])
           .select()
           .single();
           
@@ -272,125 +308,134 @@ export default function ChatWidget() {
               </button>
             </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              
-              {/* Default Welcome Message */}
-              <div className="flex items-start gap-2">
-                <div className="w-8 h-8 rounded-full border border-gray-200 dark:border-white/10 bg-white overflow-hidden shrink-0 flex items-center justify-center mt-1">
-                  <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain p-1" />
+            {!isNicknameSet ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-[#111111]">
+                <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-6">
+                  <span className="text-[var(--google-blue)] font-black text-2xl">상담</span>
                 </div>
-                <div className="bg-white dark:bg-[#2a2b2e] border border-gray-100 dark:border-white/5 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm max-w-[85%]">
-                  <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed break-keep">
-                    {GREETING}
-                  </p>
-                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">실시간 채팅 상담</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-8">
+                  원활한 상담을 위해<br/>닉네임을 먼저 입력해주세요.
+                </p>
+                <form onSubmit={handleSetNickname} className="w-full max-w-[240px] space-y-3">
+                  <input
+                    type="text"
+                    value={nicknameInput}
+                    onChange={e => setNicknameInput(e.target.value)}
+                    placeholder="사용하실 닉네임"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#303134] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--google-blue)] transition-all"
+                    maxLength={10}
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={!nicknameInput.trim()}
+                    className="w-full bg-[var(--google-blue)] hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold py-3 rounded-xl text-sm transition-colors shadow-md disabled:shadow-none"
+                  >
+                    대화 시작하기
+                  </button>
+                </form>
               </div>
-
-              {/* Status Display */}
-              {status === 'error' && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-xs text-red-600 dark:text-red-400 text-center">
-                  ⚠️ 서버 연결에 실패했습니다.
-                  <button onClick={checkExistingSession} className="ml-2 underline font-bold">다시 시도</button>
-                </div>
-              )}
-              
-              {(status === 'checking' || status === 'connecting') && (
-                <div className="flex justify-center py-2">
-                  <div className="flex gap-1">
-                    {[0, 1, 2].map(i => (
-                      <div key={i} className="w-2 h-2 rounded-full bg-[var(--google-blue)]/40 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Dynamic Messages */}
-              {messages.map(msg => {
-                const isVisitor = msg.sender === 'visitor';
-                return (
-                  <div key={msg.id} className={`flex items-end gap-2 ${isVisitor ? 'flex-row-reverse' : 'flex-row'}`}>
-                    {!isVisitor && (
-                      <div className="w-8 h-8 rounded-full border border-gray-200 dark:border-white/10 bg-white flex items-center justify-center shrink-0 overflow-hidden mb-5">
-                        <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain p-1" />
+            ) : (
+              <>
+                {/* Messages Area */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  
+                  {/* Default Welcome Message */}
+                  <div className="flex items-start gap-2">
+                    <div className="w-8 h-8 rounded-full bg-[var(--google-blue)] flex items-center justify-center shrink-0 mt-1 shadow-sm">
+                      <span className="text-white text-[11px] font-black">보상</span>
+                    </div>
+                    <div className="max-w-[85%]">
+                      <div className="bg-white dark:bg-[#2a2b2e] border border-gray-100 dark:border-white/5 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
+                        <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed break-keep">
+                          {GREETING}
+                        </p>
                       </div>
-                    )}
-                    <div className={`max-w-[75%] flex flex-col ${isVisitor ? 'items-end' : 'items-start'}`}>
-                      <div className={`rounded-2xl px-4 py-2.5 shadow-sm ${
-                        isVisitor 
-                          ? 'bg-[var(--google-blue)] text-white rounded-br-sm' 
-                          : 'bg-white dark:bg-[#2a2b2e] text-gray-800 dark:text-gray-200 rounded-bl-sm border border-gray-100 dark:border-white/5'
-                      }`}>
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                      </div>
-                      <p className="text-[10px] text-gray-400 mt-1 mx-1">{formatTime(msg.created_at)}</p>
+                      <p className="text-[10px] text-gray-400 mt-1 mx-1">보상스쿨</p>
                     </div>
                   </div>
-                );
-              })}
 
-              {/* Quick Actions & FAQs (Shown at the bottom of messages if no session or just to encourage interaction) */}
-              <div className="pt-2">
-                <div className="bg-white dark:bg-[#2a2b2e] border border-orange-200 dark:border-orange-900/50 rounded-xl overflow-hidden shadow-sm">
-                  <button
-                    onClick={() => handleQuickAction('connect')}
-                    className="w-full flex items-center justify-center py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm transition-colors"
-                  >
-                    {QUICK_ACTIONS[0].label}
-                  </button>
-                  <div className="bg-gray-50 dark:bg-black/20 px-3 py-2 border-b border-gray-100 dark:border-white/5">
-                    <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400">자주 묻는 질문</p>
-                  </div>
-                  <div className="divide-y divide-gray-100 dark:divide-white/5">
-                    {FAQS.map((faq, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => sendMessage(faq)}
-                        className="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                      >
-                        {faq}
-                      </button>
-                    ))}
+                  {/* Status Display */}
+                  {status === 'error' && (
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-xs text-red-600 dark:text-red-400 text-center">
+                      ⚠️ 서버 연결에 실패했습니다.
+                      <button onClick={checkExistingSession} className="ml-2 underline font-bold">다시 시도</button>
+                    </div>
+                  )}
+                  
+                  {(status === 'checking' || status === 'connecting') && (
+                    <div className="flex justify-center py-2">
+                      <div className="flex gap-1">
+                        {[0, 1, 2].map(i => (
+                          <div key={i} className="w-2 h-2 rounded-full bg-[var(--google-blue)]/40 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Dynamic Messages */}
+                  {messages.map(msg => {
+                    const isVisitor = msg.sender === 'visitor';
+                    return (
+                      <div key={msg.id} className={`flex items-end gap-2 ${isVisitor ? 'flex-row-reverse' : 'flex-row'}`}>
+                        {!isVisitor && (
+                          <div className="w-8 h-8 rounded-full bg-[var(--google-blue)] flex items-center justify-center shrink-0 overflow-hidden mb-5">
+                            <span className="text-white text-[11px] font-black">보상</span>
+                          </div>
+                        )}
+                        <div className={`max-w-[75%] flex flex-col ${isVisitor ? 'items-end' : 'items-start'}`}>
+                          <div className={`rounded-2xl px-4 py-2.5 shadow-sm ${
+                            isVisitor 
+                              ? 'bg-[var(--google-blue)] text-white rounded-br-sm' 
+                              : 'bg-white dark:bg-[#2a2b2e] text-gray-800 dark:text-gray-200 rounded-bl-sm border border-gray-100 dark:border-white/5'
+                          }`}>
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                          </div>
+                          <p className="text-[10px] text-gray-400 mt-1 mx-1">{formatTime(msg.created_at)}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input Area */}
+                <div className="p-3 border-t border-gray-100 dark:border-white/10 bg-white dark:bg-[#202124] shrink-0">
+                  <div className="flex items-end gap-2 bg-gray-50 dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-white/10 px-3 py-2.5 focus-within:border-[var(--google-blue)] focus-within:ring-1 focus-within:ring-[var(--google-blue)] transition-all">
+                    <textarea
+                      ref={inputRef}
+                      value={inputText}
+                      onChange={e => setInputText(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="보상스쿨 챗봇에게 무엇이든 물어보세요..."
+                      rows={1}
+                      disabled={status === 'error'}
+                      className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 resize-none outline-none leading-relaxed max-h-24 overflow-y-auto disabled:opacity-50 py-1"
+                      style={{ minHeight: '28px' }}
+                    />
+                    <button
+                      onClick={() => sendMessage(inputText)}
+                      disabled={!inputText.trim() || isSending || status === 'error'}
+                      className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                        inputText.trim() && !isSending 
+                          ? 'bg-[var(--google-blue)] text-white hover:bg-blue-700 shadow-md' 
+                          : 'bg-gray-200 dark:bg-zinc-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                      }`}
+                    >
+                      {isSending ? (
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <svg className="w-4 h-4 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                      )}
+                    </button>
                   </div>
                 </div>
-              </div>
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Area */}
-            <div className="p-3 border-t border-gray-100 dark:border-white/10 bg-white dark:bg-[#202124] shrink-0">
-              <div className="flex items-end gap-2 bg-gray-50 dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-white/10 px-3 py-2.5 focus-within:border-[var(--google-blue)] focus-within:ring-1 focus-within:ring-[var(--google-blue)] transition-all">
-                <textarea
-                  ref={inputRef}
-                  value={inputText}
-                  onChange={e => setInputText(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="보상스쿨 챗봇에게 무엇이든 물어보세요..."
-                  rows={1}
-                  disabled={status === 'error'}
-                  className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 resize-none outline-none leading-relaxed max-h-24 overflow-y-auto disabled:opacity-50 py-1"
-                  style={{ minHeight: '28px' }}
-                />
-                <button
-                  onClick={() => sendMessage(inputText)}
-                  disabled={!inputText.trim() || isSending || status === 'error'}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                    inputText.trim() && !isSending 
-                      ? 'bg-[var(--google-blue)] text-white hover:bg-blue-700 shadow-md' 
-                      : 'bg-gray-200 dark:bg-zinc-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                  }`}
-                >
-                  {isSending ? (
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <svg className="w-4 h-4 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -407,15 +452,33 @@ export default function ChatWidget() {
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-full flex items-center justify-center transition-colors focus:outline-none bg-white shadow-xl border border-gray-100"
+            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-full flex items-center justify-center transition-colors focus:outline-none bg-blue-50 focus:ring-4 focus:ring-blue-300"
             style={{ 
-              boxShadow: '0 8px 30px rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.06)'
+              boxShadow: '0 8px 30px rgba(26,115,232,0.25), inset 0 -3px 6px rgba(0,0,0,0.06), inset 0 3px 6px rgba(255,255,255,1)',
+              border: '1px solid rgba(229,231,235,0.5)'
             }}
             aria-label="실시간 채팅 열기"
           >
-            <div className="w-8 h-8 flex items-center justify-center">
-              <img src="/logo.png" alt="보상스쿨 로고" className="w-full h-full object-contain" />
-            </div>
+            <svg className="w-7 h-7 text-[#1a73e8]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3C6.48 3 2 6.58 2 11C2 13.56 3.42 15.86 5.6 17.26C5.4 18.06 4.8 19.86 4.8 19.86C4.8 19.86 6.8 19.56 8.6 18.36C9.6 18.76 10.8 19 12 19C17.52 19 22 15.42 22 11C22 6.58 17.52 3 12 3Z"/>
+            </svg>
+
+            {/* Red Glow (Dimmer) */}
+            <motion.div 
+              className="absolute inset-0 rounded-full pointer-events-none"
+              animate={{ 
+                boxShadow: [
+                  '0 0 0px 0px rgba(239,68,68,0)', 
+                  '0 0 25px 8px rgba(239,68,68,0.4)', 
+                  '0 0 0px 0px rgba(239,68,68,0)'
+                ] 
+              }}
+              transition={{ 
+                duration: 4, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
+            />
 
             {/* Unread Badge */}
             <AnimatePresence>
@@ -425,7 +488,7 @@ export default function ChatWidget() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md border-2 border-white"
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md border-2 border-white z-10"
                 >
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </motion.span>

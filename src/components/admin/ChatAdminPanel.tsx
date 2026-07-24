@@ -190,17 +190,25 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
   };
 
   const updateStatus = async (id: string, newStatus: string) => {
-    const { error } = await supabase
-      .from('chat_sessions')
-      .update({ status: newStatus })
-      .eq('id', id);
-    if (error) {
-      alert('상태 업데이트 중 오류가 발생했습니다.');
-    } else {
+    try {
+      const res = await fetch(`/api/chat?id=${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const data = await res.json();
+      
+      if (!data.success) {
+        alert(`상태 업데이트 실패: ${data.message}`);
+        return;
+      }
+
       setSessions(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s));
       if (newStatus === '삭제' && selectedId === id) {
         setSelectedId(null);
       }
+    } catch (err: any) {
+      alert(`상태 업데이트 중 오류 발생: ${err.message}`);
     }
   };
 

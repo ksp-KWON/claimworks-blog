@@ -209,22 +209,22 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
         return;
     }
     
-    // 1. 하위 메시지 먼저 삭제 (Foreign Key 무결성 에러 방지)
-    const { error: msgError } = await supabase.from('chat_messages').delete().eq('session_id', id);
-    if (msgError) {
-      alert(`메시지 삭제 실패: ${msgError.message}`);
-      return;
+    try {
+      const res = await fetch(`/api/chat?id=${id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      
+      if (!data.success) {
+        alert(`세션 삭제 실패: ${data.message}`);
+        return;
+      }
+      
+      if (selectedId === id) setSelectedId(null);
+      setSessions(prev => prev.filter(c => c.id !== id));
+    } catch (err: any) {
+      alert(`삭제 중 오류 발생: ${err.message}`);
     }
-
-    // 2. 세션 삭제
-    const { error } = await supabase.from('chat_sessions').delete().eq('id', id);
-    if (error) {
-      alert(`세션 삭제 실패: ${error.message}`);
-      return;
-    }
-
-    if (selectedId === id) setSelectedId(null);
-    setSessions(prev => prev.filter(c => c.id !== id));
   };
 
 

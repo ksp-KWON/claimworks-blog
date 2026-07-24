@@ -149,9 +149,44 @@ function getArticleObjective(keywords) {
 타겟 키워드 [${keywords}] 및 주어진 기획안을 바탕으로, 아래의 공통 글쓰기 헌법 규칙을 완벽히 만족하며 구글 E-E-A-T 기준에 부합하는 최고의 전문가 칼럼을 작성합니다.`;
 }
 
-function getTopicPlanningPrompt(keyword, trendTitle, existingPosts) {
+function getQueryGenerationPrompt(targetCategory, existingTitles) {
+  return `당신은 대한민국 최고의 손해사정 블로그 편집장입니다.
+최근 블로그에 아래와 같은 주제의 글들이 발행되었습니다.
+[최근 발행 글]
+${existingTitles}
+
+이 주제들과 겹치지 않는, 오늘 구글 뉴스에서 탐색해 볼 만한 새롭고 실질적인 **[${targetCategory}]** 카테고리 관련 검색어 3개를 창작하세요.
+반드시 아래 JSON 형식으로만 출력하세요.
+{"queries": ["검색어1", "검색어2", "검색어3"]}
+`;
+}
+
+function getKeywordExtractionPrompt(targetCategory, existingTitles, headlines) {
+  return `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+아래 뉴스 헤드라인 목록에서 **[${targetCategory}]** 분야와 직접 연관된 이슈를 분석하여, 법제처 판례 API 검색에 활용할 구체적인 키워드를 추출하세요.
+
+[최근 발행 글 (이 주제들과 겹치는 키워드는 피할 것!)]
+${existingTitles}
+
+[헤드라인 목록]
+${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
+
+아래와 같은 JSON 형식으로만 응답하세요. 백틱이나 마크다운 없이 순수 JSON만 출력하세요.
+{"candidates": [{"newsTitle": "기사원문", "searchKeyword": "검색용키워드"}]}`;
+}
+
+function getHealingPrompt(keywords) {
+  return `뉴스에서 추출된 키워드 "${keywords}" 로 대법원 판례를 찾지 못했습니다.
+이 사건들의 맥락에 적용할 수 있는 더 상위 개념의 보편적인 법률 용어(예: "안전배려의무", "인과관계", "설명의무", "면책사유" 등) 3가지를 제안하세요.
+반드시 아래 JSON 형식으로만 출력하세요.
+{"keywords": ["용어1", "용어2", "용어3"]}
+`;
+}
+
+function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCategory) {
   return `당신은 '보상스쿨'의 콘텐츠 기획자입니다.
 오늘 확정된 대표 키워드는 [${keyword}] 이며, 관련된 오늘의 이슈는 [${trendTitle}] 입니다.
+반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
 
 기존 슬러그 (중복 금지) : [${existingPosts}]
 
@@ -168,9 +203,10 @@ function getTopicPlanningPrompt(keyword, trendTitle, existingPosts) {
 JSON으로 반환하십시오.`;
 }
 
-function getPrecedentPlanningPrompt(detail, existingPosts) {
+function getPrecedentPlanningPrompt(detail, existingPosts, targetCategory) {
   return `당신은 '보상스쿨'의 콘텐츠 기획자입니다.
 아래의 법제처 수집 판례 데이터를 바탕으로 포스팅 기획 정보를 생성해 주세요.
+반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
 
 [판례 데이터]
 - 사건명: ${detail.caseName}
@@ -418,6 +454,9 @@ module.exports = {
   buildArticlePrompt,
   buildManualPrompt,
   getRenewalPrompt,
+  getQueryGenerationPrompt,
+  getKeywordExtractionPrompt,
+  getHealingPrompt,
   cleanAnalysisBlock,
   TOPIC_SCHEMA
 };

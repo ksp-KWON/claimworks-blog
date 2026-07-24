@@ -173,7 +173,7 @@ export async function deletePost(githubToken: string, filename: string, sha: str
 }
 
 
-export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: string, schema?: any) {
+export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: string, schema?: any, tierLimit?: ('pro'|'flash'|'lite')[]) {
   if (!geminiKey) throw new Error('Gemini API 키가 없습니다.');
   
   const existingPostsList = "- (없음)";
@@ -188,7 +188,7 @@ export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: st
   }
 
   // [핵심] gemini-client.ts 의 자동 탐색(Dynamic Discovery)으로 위임
-  const rawText = await callGeminiClient(geminiKey, prompt, { schema });
+  const rawText = await callGeminiClient(geminiKey, prompt, { schema, tierLimit });
   const resultText = typeof rawText === 'string' ? rawText : JSON.stringify(rawText);
   return cleanAnalysisBlock(resultText);
 }

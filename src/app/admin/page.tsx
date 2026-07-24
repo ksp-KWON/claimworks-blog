@@ -229,6 +229,39 @@ export default function AdminPage() {
     setAutoProgress('');
   };
 
+  const handleRunAutoBatch = async (category: string): Promise<boolean> => {
+    if (!geminiKey) { alert('Gemini API 키를 먼저 설정하세요.'); return false; }
+    try {
+      const type = category === '판례·법률 해석' ? 'precedent' : 'trend';
+      const generated = await runAutoGenerationWorkflow(type, geminiKey, (msg) => {
+        setAutoProgress(msg);
+      }, category);
+      
+      if (generated) {
+        const parsed = parseMarkdown(generated);
+        const metaData = {
+          title: parsed.data.title || '새 문서',
+          summary: parsed.data.summary || '',
+          date: parsed.data.date || new Date().toISOString().split('T')[0],
+          category: normalizeCategory(parsed.data.category) || category,
+          tags: Array.isArray(parsed.data.tags) ? parsed.data.tags.join(', ') : parsed.data.tags,
+          specialtyCategory: parsed.data.specialtyCategory || '',
+          caseNumber: parsed.data.caseNumber || '',
+          currentFilename: parsed.data.slug ? `${parsed.data.slug}.md` : null,
+          content: parsed.content,
+          published: true // 즉시 발행
+        };
+        await savePost(githubToken, metaData);
+        handleFetchList(); // 목록 새로고침
+        return true;
+      }
+      return false;
+    } catch (e: any) {
+      console.error(`[AutoBatch Error - ${category}]`, e);
+      return false;
+    }
+  };
+
   const handleCreateBlankPost = () => {
     setPostMeta({
       title: '', summary: '', date: '', category: '', tags: '',
@@ -433,6 +466,7 @@ export default function AdminPage() {
               onSavePost={handleSavePost}
               onCreateBlank={handleCreateBlankPost}
               autoProgress={autoProgress}
+              onRunAutoBatch={handleRunAutoBatch}
             />
           )}
           {activeApp === 'post-list' && (

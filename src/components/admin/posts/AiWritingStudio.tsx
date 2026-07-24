@@ -12,7 +12,19 @@ interface AiWritingStudioProps {
   onSavePost: (isDraft?: boolean) => void;
   onCreateBlank: () => void;
   autoProgress?: string;
+  onRunAutoBatch?: (category: string) => Promise<boolean>;
 }
+
+const CATEGORIES = [
+  '판례·법률 해석',
+  '사망·자살 보험금',
+  '질병진단·실손',
+  '교통사고 보상',
+  '배상책임·의료',
+  '근재·산재 사고',
+  '장해평가·면책',
+  '보상가이드'
+];
 
 const MANUAL_MODES = [
   {
@@ -46,7 +58,8 @@ const AUTO_TYPES = [
 export default function AiWritingStudio({
   isLoading, onRunAi, onRunAuto,
   postMeta, setPostMeta, onSavePost, onCreateBlank,
-  autoProgress
+  autoProgress,
+  onRunAutoBatch
 }: AiWritingStudioProps) {
   
   // AI Controls State
@@ -57,6 +70,10 @@ export default function AiWritingStudio({
   // Mobile Bottom Sheet State
   const [isMobileAiOpen, setIsMobileAiOpen] = useState(false);
 
+  // Batch Auto State
+  const [isBatchRunning, setIsBatchRunning] = useState(false);
+  const [batchStatus, setBatchStatus] = useState<Record<string, 'pending' | 'running' | 'success' | 'failed'>>({});
+
   const handleRunAi = () => {
     onRunAi(aiMode, postMeta.content || '');
     setIsMobileAiOpen(false); // 실행 후 모바일 서랍 닫기
@@ -65,6 +82,40 @@ export default function AiWritingStudio({
   const handleRunAuto = () => {
     onRunAuto(autoType);
     setIsMobileAiOpen(false); // 실행 후 모바일 서랍 닫기
+  };
+
+  const handleRunBatch = async () => {
+    if (!window.confirm('8개 카테고리에 대해 자동으로 기사를 생성하고 즉시 발행합니다. 계속하시겠습니까?')) return;
+    setIsBatchRunning(true);
+    
+    // 초기화
+    const initStatus: Record<string, any> = {};
+    CATEGORIES.forEach(c => initStatus[c] = 'pending');
+    setBatchStatus(initStatus);
+
+    for (const category of CATEGORIES) {
+      setBatchStatus(prev => ({ ...prev, [category]: 'running' }));
+      try {
+        // Here we trigger the parent's generic logic. But since we need to save and loop, 
+        // it's easier to expose a new prop to the parent or trigger an event.
+        // For simplicity, we will emit a CustomEvent or pass a callback.
+        // Actually, we can just call `onRunAutoBatch` if we add it to props.
+        if (onRunAutoBatch) {
+          const res = await onRunAutoBatch(category);
+          if (res) {
+            setBatchStatus(prev => ({ ...prev, [category]: 'success' }));
+          } else {
+            setBatchStatus(prev => ({ ...prev, [category]: 'failed' }));
+          }
+        } else {
+          setBatchStatus(prev => ({ ...prev, [category]: 'failed' }));
+        }
+      } catch (e) {
+        setBatchStatus(prev => ({ ...prev, [category]: 'failed' }));
+      }
+    }
+    
+    setIsBatchRunning(false);
   };
 
   // 공통으로 사용될 AI 어시스턴트 컨트롤 패널 (데스크톱/모바일 공용)
@@ -148,10 +199,30 @@ export default function AiWritingStudio({
                 </div>
               ) : (
                 <p className="text-xs text-gray-500 text-center break-keep">
-                  Vercel 타임아웃 걱정 없는 프론트엔드 오케스트레이션 방식으로 에디터에 결과를 렌더링합니다. (자동 Push 안 됨)
+                  Vercel 타임아웃 걱정 없는 프론트엔드 오케스트레이션 방식으로 에디터에 결과를 렌더링합니다.
                 </p>
               )}
             </div>
+
+            {/* Batch Status Dashboard */}
+            {isBatchRunning && (
+              <div className="mt-4 p-4 border border-blue-200 dark:border-blue-900 bg-white dark:bg-zinc-900 rounded-xl shadow-sm">
+                <h3 className="text-xs font-bold text-gray-900 dark:text-white mb-2">일괄 생성 대시보드</h3>
+                <div className="space-y-1.5">
+                  {CATEGORIES.map(cat => (
+                    <div key={cat} className="flex items-center justify-between text-xs">
+                      <span className="text-gray-600 dark:text-gray-300">{cat}</span>
+                      <span>
+                        {batchStatus[cat] === 'pending' && <span className="text-gray-400">⏳ 대기</span>}
+                        {batchStatus[cat] === 'running' && <span className="text-blue-500 animate-pulse">🔄 진행중</span>}
+                        {batchStatus[cat] === 'success' && <span className="text-green-500">✅ 완료</span>}
+                        {batchStatus[cat] === 'failed' && <span className="text-red-500">❌ 스킵</span>}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -159,7 +230,6 @@ export default function AiWritingStudio({
       {/* ── 하단 공통 액션 영역 (Sticky) ── */}
       <div className="shrink-0 p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 relative z-20 space-y-4 shadow-[0_-4px_15px_rgba(0,0,0,0.02)]">
         
-        {/* 1. AI 실행 버튼 (현재 탭에 따라 렌더링) */}
         {activePanelTab === 'manual' ? (
           <PremiumButton 
             onClick={handleRunAi} 
@@ -170,14 +240,24 @@ export default function AiWritingStudio({
             {isLoading ? '창작 중...' : '창작 시작'}
           </PremiumButton>
         ) : (
-          <PremiumButton 
-            onClick={handleRunAuto} 
-            disabled={isLoading} 
-            variant="primary" 
-            className="w-full !py-3 !rounded-xl text-[15px] shadow-[0_4px_15px_rgba(225,29,72,0.2)] !bg-rose-600 hover:!bg-rose-700 border-none"
-          >
-            {isLoading ? '실행 중...' : '자동 엔진 가동'}
-          </PremiumButton>
+          <div className="space-y-2">
+            <PremiumButton 
+              onClick={handleRunAuto} 
+              disabled={isLoading || isBatchRunning} 
+              variant="secondary" 
+              className="w-full !py-2.5 !rounded-xl text-sm border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200"
+            >
+              단일 생성 테스트
+            </PremiumButton>
+            <PremiumButton 
+              onClick={handleRunBatch} 
+              disabled={isLoading || isBatchRunning} 
+              variant="primary" 
+              className="w-full !py-3 !rounded-xl text-[15px] shadow-[0_4px_15px_rgba(225,29,72,0.2)] !bg-rose-600 hover:!bg-rose-700 border-none"
+            >
+              {isBatchRunning ? '일괄 자동 가동 중...' : '🔥 8개 카테고리 일괄 발행'}
+            </PremiumButton>
+          </div>
         )}
 
         {/* 2. 문서 관리 액션 (새문서, 임시저장, 발행) */}

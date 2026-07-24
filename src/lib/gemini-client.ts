@@ -47,8 +47,8 @@ function compareDesc(a: { name: string }, b: { name: string }) {
 // ── 내장 기본값 (탐색 실패 시 폴백) ─────────────────────────────────────────
 const FALLBACK_MODELS = [
   { name: 'gemini-2.5-pro',        maxTokens: 32768, tier: 'pro'   as const },
-  { name: 'gemini-2.5-flash',      maxTokens: 32768, tier: 'flash' as const },
-  { name: 'gemini-2.0-flash-lite', maxTokens: 16384, tier: 'lite'  as const },
+  { name: 'gemini-3.6-flash',      maxTokens: 32768, tier: 'flash' as const },
+  { name: 'gemini-3.5-flash-lite', maxTokens: 16384, tier: 'lite'  as const },
 ];
 
 // ── 세션 내 캐시 (동일 세션에서는 탐색 1회만) ────────────────────────────────

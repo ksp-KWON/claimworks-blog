@@ -197,7 +197,7 @@ export default function AdminPage() {
   };
 
 
-  const handleRunAutoBatch = async (category: string): Promise<boolean> => {
+  const handleRunAutoBatch = async (category: string, autoPublish: boolean = false): Promise<boolean> => {
     if (!geminiKey) { alert('Gemini API 키를 먼저 설정하세요.'); return false; }
     try {
       const type = category === '판례·법률 해석' ? 'precedent' : 'trend';
@@ -217,10 +217,29 @@ export default function AdminPage() {
           caseNumber: parsed.data.caseNumber || '',
           currentFilename: parsed.data.slug ? `${parsed.data.slug}.md` : null,
           content: parsed.content,
-          published: true // 즉시 발행
+          published: autoPublish // 일괄 발행일 땐 즉시 발행
         };
-        await savePost(githubToken, metaData);
-        handleFetchList(); // 목록 새로고침
+        
+        if (autoPublish) {
+          await savePost(githubToken, metaData);
+          handleFetchList(); // 목록 새로고침
+        } else {
+          // 개별 카테고리 발행 시 에디터에 로드
+          setPostMeta(prev => ({
+            ...prev,
+            title: metaData.title,
+            summary: metaData.summary,
+            date: metaData.date,
+            category: metaData.category,
+            tags: metaData.tags,
+            specialtyCategory: metaData.specialtyCategory,
+            caseNumber: metaData.caseNumber,
+            currentFilename: metaData.currentFilename,
+            content: metaData.content
+          }));
+          setActiveApp('post-ai');
+        }
+        
         return true;
       }
       return false;

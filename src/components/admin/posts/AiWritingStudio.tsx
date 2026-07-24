@@ -11,7 +11,7 @@ interface AiWritingStudioProps {
   onSavePost: (isDraft?: boolean) => void;
   onCreateBlank: () => void;
   autoProgress?: string;
-  onRunAutoBatch?: (category: string) => Promise<boolean>;
+  onRunAutoBatch?: (category: string, autoPublish?: boolean) => Promise<boolean>;
 }
 
 const CATEGORIES = [
@@ -82,7 +82,7 @@ export default function AiWritingStudio({
     setIsBatchRunning(true);
     setBatchStatus({ [selectedCategory]: 'running' });
     try {
-      const res = await onRunAutoBatch(selectedCategory);
+      const res = await onRunAutoBatch(selectedCategory, false);
       setBatchStatus({ [selectedCategory]: res ? 'success' : 'failed' });
     } catch (e) {
       setBatchStatus({ [selectedCategory]: 'failed' });
@@ -108,7 +108,7 @@ export default function AiWritingStudio({
         // For simplicity, we will emit a CustomEvent or pass a callback.
         // Actually, we can just call `onRunAutoBatch` if we add it to props.
         if (onRunAutoBatch) {
-          const res = await onRunAutoBatch(category);
+          const res = await onRunAutoBatch(category, true);
           if (res) {
             setBatchStatus(prev => ({ ...prev, [category]: 'success' }));
           } else {

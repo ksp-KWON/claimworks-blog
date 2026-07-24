@@ -178,3 +178,10 @@ body.hide-footer footer {
   display: none !important;
 }
 
+/* 강제 패밀리룩 톤 매칭 (노란색 덮어쓰기) */
+.mdxeditor-toolbar, .admin-table-header, thead.sticky {
+  background-color: #f8f9fa !important;
+}
+.dark .mdxeditor-toolbar, .dark .admin-table-header, .dark thead.sticky {
+  background-color: #18181b !important;
+}

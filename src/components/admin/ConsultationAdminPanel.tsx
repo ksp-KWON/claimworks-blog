@@ -306,39 +306,17 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   className={`flex flex-col gap-4 cursor-pointer overflow-hidden ${selectedId === item.id ? 'ring-2 ring-blue-500/50' : ''}`}
                 >
                   <div className="flex justify-between items-center pl-2">
-                    <div className="flex items-center gap-2">
-                      <select
-                        value={item.status === '상담완료' || item.status === '상담 완료' ? '완료' : item.status}
-                        onClick={e => e.stopPropagation()}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val === 'delete') {
-                            e.target.value = item.status; // revert visual selection temporarily
-                            deleteConsultation(item.id);
-                          } else {
-                            updateStatus(item.id, val);
-                          }
-                        }}
-                        className={`text-sm font-bold px-2.5 py-0.5 outline-none border-0 cursor-pointer shadow-sm ${
-                          item.status === '대기' ? 'bg-red-50 text-red-600' :
-                          item.status === '상담' ? 'bg-blue-50 text-blue-600' :
-                          (item.status === '완료' || item.status === '상담완료' || item.status === '상담 완료') ? 'bg-green-50 text-green-600' :
-                          item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
-                          'bg-gray-50 text-gray-600'
-                        }`}
-                      >
-                        <option value="대기" className="text-gray-900 bg-white font-medium">대기</option>
-                        <option value="상담" className="text-gray-900 bg-white font-medium">상담</option>
-                        <option value="완료" className="text-gray-900 bg-white font-medium">완료</option>
-                        <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
-                        <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
-                      </select>
-                      <span className="text-xs font-medium text-gray-400 font-mono">{formatDateTime(item.created_at)}</span>
-                    </div>
-                  </div>
-                  <div className="pl-2">
-                    <div className="text-[17px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                      {item.name} <span className="text-[13px] font-medium text-blue-500">{item.phone}</span>
+                    <div className="flex items-center gap-2 flex-wrap w-full">
+                      <AdminStatusSelect
+                        status={item.status}
+                        onStatusChange={(val) => updateStatus(item.id, val)}
+                        onDelete={() => deleteConsultation(item.id)}
+                        className="text-xs px-2.5 py-0.5"
+                      />
+                      <span className="text-xs font-medium text-gray-400 font-mono shrink-0">{formatDateTime(item.created_at)}</span>
+                      <div className="text-[16px] font-bold text-gray-900 dark:text-white flex items-center gap-2 ml-1">
+                        {item.name} <span className="text-[13px] font-medium text-blue-500">{item.phone}</span>
+                      </div>
                     </div>
                   </div>
                   <div className="bg-gray-50 dark:bg-zinc-950 p-2.5 rounded-none text-xs text-gray-600 dark:text-gray-400">

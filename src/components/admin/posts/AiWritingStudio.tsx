@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PremiumButton from '@/components/ui/PremiumButton';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import BottomSheet from '@/components/ui/BottomSheet';
+import AdminPanelLayout from '../AdminPanelLayout';
 
 interface AiWritingStudioProps {
   isLoading: boolean;
@@ -293,7 +294,7 @@ export default function AiWritingStudio({
   );
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row bg-[#f8f9fa] dark:bg-zinc-950 relative w-full min-h-0">
+    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-[#f8f9fa] dark:bg-zinc-950 relative w-full min-h-0">
       
       {/* ── 좌측/중앙: 메인 에디터 (항상 노출) ── */}
       <div className="flex-1 flex flex-col min-w-0 border-r border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-y-auto">
@@ -335,6 +336,6 @@ export default function AiWritingStudio({
           {renderAiControls()}
         </div>
       </BottomSheet>
-    </div>
+    </AdminPanelLayout>
   );
 }

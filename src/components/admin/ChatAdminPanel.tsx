@@ -236,9 +236,9 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
   return (
     <div className="flex-1 min-h-0 flex flex-col md:flex-row p-4 md:p-8 bg-gray-50 dark:bg-zinc-950 gap-4">
       {/* 왼쪽: 세션 리스트 (모바일에서는 선택된 세션이 없을 때만 표시) */}
-      <PremiumCard className={`w-full md:w-1/3 md:min-w-[320px] md:max-w-[400px] p-0 overflow-hidden ${selectedId ? 'hidden md:flex' : 'block'}`}>
-        <div className="h-full flex flex-col w-full">
-          <div className="p-4 border-b border-gray-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center z-10 sticky top-0 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+      <PremiumCard className={`w-full md:w-1/3 md:min-w-[320px] md:max-w-[400px] flex-1 md:flex-none min-h-0 p-0 overflow-hidden relative ${selectedId ? 'hidden md:block' : 'block'}`}>
+        <div className="absolute inset-0 flex flex-col w-full">
+          <div className="p-4 border-b border-gray-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center z-10 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
             <h2 className="font-bold text-gray-800 dark:text-gray-100">채팅 목록</h2>
             <span className="text-xs text-gray-500 font-medium bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded-full">{sortedAndFilteredSessions.length}건</span>
           </div>
@@ -313,8 +313,8 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
       </PremiumCard>
 
       {/* 오른쪽: 채팅 화면 (모바일에서는 선택된 세션이 있을 때만 표시) */}
-      <PremiumCard className={`flex-1 p-0 overflow-hidden ${!selectedId ? 'hidden md:flex' : 'block'} border-0 md:border md:border-gray-200 dark:md:border-zinc-800`}>
-        <div className="h-full flex flex-col w-full">
+      <PremiumCard className={`flex-1 min-h-0 p-0 overflow-hidden relative ${!selectedId ? 'hidden md:block' : 'block'} border-0 md:border md:border-gray-200 dark:md:border-zinc-800`}>
+        <div className="absolute inset-0 flex flex-col w-full bg-white dark:bg-[#111111]">
         {selectedId && selectedSession ? (
           <>
             {/* 채팅 헤더 */}

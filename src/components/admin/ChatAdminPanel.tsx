@@ -266,14 +266,14 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
                               onClick={e => e.stopPropagation()}
                               onChange={(e) => {
                                 const val = e.target.value;
-                                if (val === 'db_delete') {
+                                if (val === 'delete') {
                                   e.target.value = status;
                                   deleteSession(sess.id);
                                 } else {
                                   updateStatus(sess.id, val);
                                 }
                               }}
-                              className={`text-xs font-bold px-2 py-0.5 rounded outline-none border-0 cursor-pointer shadow-sm shrink-0 ${
+                              className={`appearance-none text-center text-xs font-bold px-2 py-0.5 rounded outline-none border-0 cursor-pointer shadow-sm shrink-0 ${
                                 status === '대기' ? 'bg-red-50 text-red-600' :
                                 status === '상담' ? 'bg-blue-50 text-blue-600' :
                                 (status === '완료') ? 'bg-green-50 text-green-600' :
@@ -285,8 +285,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
                               <option value="상담" className="text-gray-900 bg-white font-medium">상담</option>
                               <option value="완료" className="text-gray-900 bg-white font-medium">완료</option>
                               <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
-                              <option value="삭제" className="text-red-600 bg-white font-bold">삭제(숨김)</option>
-                              <option value="db_delete" className="text-red-600 bg-white font-bold">DB삭제</option>
+                              <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
                             </select>
                             <span className="font-bold text-[15px] text-gray-900 dark:text-gray-100 truncate flex-1">
                               {sess.visitor_nickname || '익명 방문자'}

@@ -250,7 +250,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                               updateStatus(item.id, val);
                             }
                           }}
-                          className={`text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
+                          className={`appearance-none text-center text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
                             item.status === '대기' ? 'bg-red-50 text-red-600' :
                             item.status === '상담' ? 'bg-blue-50 text-blue-600' :
                             (item.status === '완료' || item.status === '상담완료' || item.status === '상담 완료') ? 'bg-green-50 text-green-600' :

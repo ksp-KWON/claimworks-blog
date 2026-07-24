@@ -4,6 +4,7 @@ import ConsultationDetailCard from './ConsultationDetailCard';
 import BottomSheet from '@/components/ui/BottomSheet';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import { AdminStatusSelect } from './AdminStatusSelect';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumButton from '@/components/ui/PremiumButton';
 import AdminPanelLayout from './AdminPanelLayout';
@@ -239,31 +240,12 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                       className={`cursor-pointer transition-colors ${selectedId === item.id ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-center" onClick={e => e.stopPropagation()}>
-                        <select
-                          value={item.status === '상담완료' || item.status === '상담 완료' ? '완료' : item.status}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            if (val === 'delete') {
-                              e.target.value = item.status; // revert visual selection temporarily
-                              deleteConsultation(item.id);
-                            } else {
-                              updateStatus(item.id, val);
-                            }
-                          }}
-                          className={`appearance-none text-center text-sm font-bold px-3 py-1 outline-none border-0 cursor-pointer shadow-sm ${
-                            item.status === '대기' ? 'bg-red-50 text-red-600' :
-                            item.status === '상담' ? 'bg-blue-50 text-blue-600' :
-                            (item.status === '완료' || item.status === '상담완료' || item.status === '상담 완료') ? 'bg-green-50 text-green-600' :
-                            item.status === '보류' ? 'bg-yellow-50 text-yellow-600' :
-                            'bg-gray-50 text-gray-600'
-                          }`}
-                        >
-                          <option value="대기" className="text-gray-900 bg-white font-medium">대기</option>
-                          <option value="상담" className="text-gray-900 bg-white font-medium">상담</option>
-                          <option value="완료" className="text-gray-900 bg-white font-medium">완료</option>
-                          <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
-                          <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
-                        </select>
+                        <AdminStatusSelect
+                          status={item.status}
+                          onStatusChange={(val) => updateStatus(item.id, val)}
+                          onDelete={() => deleteConsultation(item.id)}
+                          className="text-sm px-3 py-1"
+                        />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600 dark:text-gray-400 font-mono text-center">
                         {formatDateTime(item.created_at)}

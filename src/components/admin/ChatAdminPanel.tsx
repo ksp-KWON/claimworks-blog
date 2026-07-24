@@ -8,6 +8,7 @@ import AdminPanelLayout from './AdminPanelLayout';
 import { AdminHeaderBar } from './AdminHeader';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
+import { AdminStatusSelect } from './AdminStatusSelect';
 
 interface SessionWithMeta extends ChatSession {
   last_content?: string;
@@ -202,14 +203,24 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
   };
 
   const deleteSession = async (id: string) => {
-    if (!window.confirm('정말로 이 채팅 세션을 삭제하시겠습니까? (DB에서 완전 삭제됩니다)')) {
+    if (!window.confirm('정말로 이 채팅 세션을 삭제하시겠습니까? (관련 메시지도 함께 DB에서 완전 삭제됩니다)')) {
         return;
     }
-    const { error } = await supabase.from('chat_sessions').delete().eq('id', id);
-    if (error) {
-      alert(`삭제 실패: ${error.message}`);
+    
+    // 1. 하위 메시지 먼저 삭제 (Foreign Key 무결성 에러 방지)
+    const { error: msgError } = await supabase.from('chat_messages').delete().eq('session_id', id);
+    if (msgError) {
+      alert(`메시지 삭제 실패: ${msgError.message}`);
       return;
     }
+
+    // 2. 세션 삭제
+    const { error } = await supabase.from('chat_sessions').delete().eq('id', id);
+    if (error) {
+      alert(`세션 삭제 실패: ${error.message}`);
+      return;
+    }
+
     if (selectedId === id) setSelectedId(null);
     setSessions(prev => prev.filter(c => c.id !== id));
   };
@@ -261,32 +272,12 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
                       >
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center gap-2 overflow-hidden w-full">
-                            <select
-                              value={status}
-                              onClick={e => e.stopPropagation()}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                if (val === 'delete') {
-                                  e.target.value = status;
-                                  deleteSession(sess.id);
-                                } else {
-                                  updateStatus(sess.id, val);
-                                }
-                              }}
-                              className={`appearance-none text-center text-xs font-bold px-2 py-0.5 rounded outline-none border-0 cursor-pointer shadow-sm shrink-0 ${
-                                status === '대기' ? 'bg-red-50 text-red-600' :
-                                status === '상담' ? 'bg-blue-50 text-blue-600' :
-                                (status === '완료') ? 'bg-green-50 text-green-600' :
-                                status === '보류' ? 'bg-yellow-50 text-yellow-600' :
-                                'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-300'
-                              }`}
-                            >
-                              <option value="대기" className="text-gray-900 bg-white font-medium">대기</option>
-                              <option value="상담" className="text-gray-900 bg-white font-medium">상담</option>
-                              <option value="완료" className="text-gray-900 bg-white font-medium">완료</option>
-                              <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
-                              <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
-                            </select>
+                            <AdminStatusSelect
+                              status={status}
+                              onStatusChange={(val) => updateStatus(sess.id, val)}
+                              onDelete={() => deleteSession(sess.id)}
+                              className="text-xs px-2 py-0.5 rounded"
+                            />
                             <span className="font-bold text-[15px] text-gray-900 dark:text-gray-100 truncate flex-1">
                               {sess.visitor_nickname || '익명 방문자'}
                             </span>

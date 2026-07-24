@@ -6,7 +6,6 @@ import BottomSheet from '@/components/ui/BottomSheet';
 interface AiWritingStudioProps {
   isLoading: boolean;
   onRunAi: (mode: 'manual-preserve' | 'manual-expand' | 'semi-auto', inputText: string) => void;
-  onRunAuto: (type: 'precedent' | 'trend') => void;
   postMeta: any;
   setPostMeta: any;
   onSavePost: (isDraft?: boolean) => void;
@@ -44,28 +43,27 @@ const MANUAL_MODES = [
   }
 ];
 
-const AUTO_TYPES = [
-  {
-    id: 'precedent', icon: '⚖️', label: '전문 법률 칼럼', desc: '판례·심결례 기반 보상 분석',
-    accentClass: 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/10', iconBg: 'from-indigo-500 to-blue-600', textColor: 'text-indigo-600 dark:text-indigo-400'
-  },
-  {
-    id: 'trend', icon: '📈', label: '일간 트렌드', desc: '실시간 이슈 기반 트래픽 포스팅',
-    accentClass: 'border-teal-500 bg-teal-50/50 dark:bg-teal-900/10', iconBg: 'from-teal-500 to-emerald-500', textColor: 'text-teal-600 dark:text-teal-400'
-  }
-];
+const CATEGORY_UI: Record<string, { icon: string; bg: string }> = {
+  '판례·법률 해석': { icon: '⚖️', bg: 'border-indigo-200 bg-indigo-50/30 text-indigo-700 dark:border-indigo-900/50 dark:bg-indigo-900/20 dark:text-indigo-400' },
+  '사망·자살 보험금': { icon: '🕊️', bg: 'border-slate-200 bg-slate-50/30 text-slate-700 dark:border-slate-800 dark:bg-slate-900/20 dark:text-slate-400' },
+  '질병진단·실손': { icon: '🏥', bg: 'border-emerald-200 bg-emerald-50/30 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:text-emerald-400' },
+  '교통사고 보상': { icon: '🚗', bg: 'border-blue-200 bg-blue-50/30 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400' },
+  '배상책임·의료': { icon: '🧑‍⚖️', bg: 'border-orange-200 bg-orange-50/30 text-orange-700 dark:border-orange-900/50 dark:bg-orange-900/20 dark:text-orange-400' },
+  '근재·산재 사고': { icon: '👷', bg: 'border-amber-200 bg-amber-50/30 text-amber-700 dark:border-amber-900/50 dark:bg-amber-900/20 dark:text-amber-400' },
+  '장해평가·면책': { icon: '📉', bg: 'border-purple-200 bg-purple-50/30 text-purple-700 dark:border-purple-900/50 dark:bg-purple-900/20 dark:text-purple-400' },
+  '보상가이드': { icon: '🧭', bg: 'border-teal-200 bg-teal-50/30 text-teal-700 dark:border-teal-900/50 dark:bg-teal-900/20 dark:text-teal-400' }
+};
 
 export default function AiWritingStudio({
-  isLoading, onRunAi, onRunAuto,
+  isLoading, onRunAi,
   postMeta, setPostMeta, onSavePost, onCreateBlank,
   autoProgress,
   onRunAutoBatch
 }: AiWritingStudioProps) {
   
-  // AI Controls State
   const [activePanelTab, setActivePanelTab] = useState<'manual' | 'auto'>('manual');
   const [aiMode, setAiMode] = useState<'manual-preserve' | 'manual-expand' | 'semi-auto'>('manual-preserve');
-  const [autoType, setAutoType] = useState<'precedent' | 'trend'>('precedent');
+  const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0]);
 
   // Mobile Bottom Sheet State
   const [isMobileAiOpen, setIsMobileAiOpen] = useState(false);
@@ -79,8 +77,17 @@ export default function AiWritingStudio({
     setIsMobileAiOpen(false); // 실행 후 모바일 서랍 닫기
   };
 
-  const handleRunAuto = () => {
-    onRunAuto(autoType);
+  const handleRunSingleCategory = async () => {
+    if (!onRunAutoBatch) return;
+    setIsBatchRunning(true);
+    setBatchStatus({ [selectedCategory]: 'running' });
+    try {
+      const res = await onRunAutoBatch(selectedCategory);
+      setBatchStatus({ [selectedCategory]: res ? 'success' : 'failed' });
+    } catch (e) {
+      setBatchStatus({ [selectedCategory]: 'failed' });
+    }
+    setIsBatchRunning(false);
     setIsMobileAiOpen(false); // 실행 후 모바일 서랍 닫기
   };
 
@@ -174,22 +181,29 @@ export default function AiWritingStudio({
           </>
         ) : (
           <>
-            <div className="grid grid-cols-1 gap-2">
-              {AUTO_TYPES.map(type => (
-                <button
-                  key={type.id}
-                  onClick={() => setAutoType(type.id as any)}
-                  className={`flex items-start gap-3 p-3 rounded-xl border text-left transition-all ${autoType === type.id ? type.accentClass + ' border-2 shadow-sm' : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-gray-300'}`}
-                >
-                  <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${type.iconBg} flex items-center justify-center shrink-0`}>
-                    {type.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-0.5">{type.label}</div>
-                    <p className="text-[11px] text-gray-500 leading-snug truncate">{type.desc}</p>
-                  </div>
-                </button>
-              ))}
+            <div className="grid grid-cols-2 gap-2">
+              {CATEGORIES.map(cat => {
+                const ui = CATEGORY_UI[cat] || { icon: '📄', bg: 'border-gray-200 bg-gray-50' };
+                const isSelected = selectedCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`flex items-center gap-2 p-2.5 rounded-xl border transition-all text-left ${
+                      isSelected 
+                        ? 'border-blue-500 shadow-sm bg-blue-50/30 dark:bg-blue-900/20' 
+                        : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className={`w-7 h-7 rounded flex items-center justify-center shrink-0 border ${ui.bg}`}>
+                      {ui.icon}
+                    </div>
+                    <span className={`text-xs font-bold leading-tight ${isSelected ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                      {cat}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="mt-6 p-4 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl">
@@ -242,12 +256,12 @@ export default function AiWritingStudio({
         ) : (
           <div className="space-y-2">
             <PremiumButton 
-              onClick={handleRunAuto} 
+              onClick={handleRunSingleCategory} 
               disabled={isLoading || isBatchRunning} 
               variant="secondary" 
               className="w-full !py-2.5 !rounded-xl text-sm border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200"
             >
-              단일 생성 테스트
+              선택 카테고리 개별 발행 ({selectedCategory})
             </PremiumButton>
             <PremiumButton 
               onClick={handleRunBatch} 

@@ -196,38 +196,6 @@ export default function AdminPage() {
     setAutoProgress('');
   };
 
-  const handleRunAuto = async (type: 'precedent' | 'trend') => {
-    if (!geminiKey) { alert('Gemini API 키를 먼저 설정하세요.'); return; }
-    setIsLoading(true);
-    setAutoProgress('자동글쓰기 시작 대기 중...');
-    try {
-      const generated = await runAutoGenerationWorkflow(type, geminiKey, (msg) => {
-        setAutoProgress(msg);
-      });
-      
-      if (generated) {
-        const parsed = parseMarkdown(generated);
-        setPostMeta(prev => ({
-          ...prev,
-          title: parsed.data.title || prev.title,
-          summary: parsed.data.summary || prev.summary,
-          date: parsed.data.date || prev.date,
-          category: normalizeCategory(parsed.data.category) || prev.category,
-          tags: Array.isArray(parsed.data.tags) ? parsed.data.tags.join(', ') : (parsed.data.tags || prev.tags),
-          specialtyCategory: parsed.data.specialtyCategory || prev.specialtyCategory,
-          caseNumber: parsed.data.caseNumber || prev.caseNumber,
-          currentFilename: parsed.data.slug ? `${parsed.data.slug}.md` : prev.currentFilename,
-          content: parsed.content
-        }));
-        alert('자동 생성이 완료되었습니다. 에디터에서 내용을 검토 후 [저장 및 발행] 버튼을 눌러주세요.');
-        setActiveApp('post-ai');
-      }
-    } catch (e: any) {
-      alert(`자동 생성 실패: ${e.message}`);
-    }
-    setIsLoading(false);
-    setAutoProgress('');
-  };
 
   const handleRunAutoBatch = async (category: string): Promise<boolean> => {
     if (!geminiKey) { alert('Gemini API 키를 먼저 설정하세요.'); return false; }
@@ -459,8 +427,7 @@ export default function AdminPage() {
           {activeApp === 'post-ai' && (
             <AiWritingStudio 
               isLoading={isLoading} 
-              onRunAi={handleRunAi} 
-              onRunAuto={handleRunAuto}
+              onRunAi={handleRunAi}
               postMeta={postMeta}
               setPostMeta={setPostMeta}
               onSavePost={handleSavePost}

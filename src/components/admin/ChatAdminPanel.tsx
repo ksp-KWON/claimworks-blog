@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { supabase } from '@/lib/supabase';
 import type { ChatSession, ChatMessage } from '@/lib/supabase';
 import PremiumCard from '@/components/ui/PremiumCard';
+import AdminPanelLayout from './AdminPanelLayout';
+import { AdminHeaderBar } from './AdminHeader';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
 
@@ -234,17 +236,15 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
   const selectedSession = sessions.find(s => s.id === selectedId);
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col p-4 md:p-8 bg-gray-50 dark:bg-zinc-950">
-      <PremiumCard className="flex-1 min-h-0 p-0 overflow-hidden relative block border-0 md:border md:border-gray-200 dark:md:border-zinc-800">
-        <div className="absolute inset-0 flex flex-col md:flex-row w-full bg-white dark:bg-[#111111]">
-          
-          {/* 왼쪽: 세션 리스트 (모바일에서는 선택된 세션이 없을 때만 표시) */}
-          <div className={`w-full md:w-1/3 md:min-w-[320px] md:max-w-[400px] flex-1 md:flex-none min-h-0 flex flex-col border-r-0 md:border-r border-gray-100 dark:border-zinc-800 ${selectedId ? 'hidden md:flex' : 'flex'}`}>
-            <div className="h-[76px] px-4 border-b border-gray-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center z-10 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
-              <h2 className="font-bold text-gray-800 dark:text-gray-100">채팅 목록</h2>
-              <span className="text-xs text-gray-500 font-medium bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded-full">{sortedAndFilteredSessions.length}건</span>
-            </div>
-            <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/50 dark:bg-zinc-950/50">
+    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-white dark:bg-[#111111]">
+      
+      {/* 왼쪽: 세션 리스트 (모바일에서는 선택된 세션이 없을 때만 표시) */}
+      <div className={`w-full md:w-1/3 md:min-w-[320px] md:max-w-[400px] flex-1 md:flex-none min-h-0 flex flex-col border-r-0 md:border-r border-gray-200 dark:border-zinc-800 ${selectedId ? 'hidden md:flex' : 'flex'}`}>
+        <AdminHeaderBar 
+          title="채팅 목록" 
+          rightContent={<span className="text-xs text-gray-500 font-medium bg-gray-200/50 dark:bg-zinc-800 px-2 py-1 rounded-full">{sortedAndFilteredSessions.length}건</span>} 
+        />
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/50 dark:bg-zinc-950/50">
               {isLoading ? (
                 <div className="p-8 text-center text-sm text-gray-500 font-medium">로딩 중...</div>
               ) : sortedAndFilteredSessions.length === 0 ? (
@@ -319,25 +319,30 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
             {selectedId && selectedSession ? (
               <>
                 {/* 채팅 헤더 */}
-                <div className="h-[76px] px-4 border-b border-gray-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900 flex justify-between items-center shadow-[0_1px_0_rgba(0,0,0,0.02)] z-10">
-                  <div className="flex items-center gap-3">
-                    <button 
-                      onClick={() => setSelectedId(null)}
-                      className="md:hidden p-2 -ml-2 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                    </button>
-                    <div>
-                      <h3 className="font-bold text-gray-900 dark:text-white text-lg">
-                        {selectedSession.visitor_nickname || '익명 방문자'}
-                      </h3>
-                      <p className="text-xs text-gray-400 font-mono font-medium">ID: {selectedId.split('-')[0]}</p>
+                <AdminHeaderBar 
+                  title={
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => setSelectedId(null)}
+                        className="md:hidden p-1.5 -ml-1.5 mr-1 text-gray-500 hover:bg-gray-200 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                      </button>
+                      <div className="flex items-center gap-2">
+                        <span className="truncate">{selectedSession.visitor_nickname || '익명 방문자'}</span>
+                        <span className="text-[10px] text-gray-400 font-mono font-medium hidden sm:inline-block">ID: {selectedId.split('-')[0]}</span>
+                      </div>
+                      {selectedSession.status === '대기' && <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-sm bg-red-100 text-red-600">대기중</span>}
                     </div>
-                  </div>
-                  <PremiumBadge color={selectedSession.status === '상담' ? 'blue' : selectedSession.status === '완료' ? 'green' : 'gray'} className="px-2 py-1 shadow-sm font-bold text-xs">
-                    {selectedSession.status || '대기'}
-                  </PremiumBadge>
-                </div>
+                  }
+                  rightContent={
+                    <div className="flex items-center gap-2">
+                      <PremiumBadge color={selectedSession.status === '상담' ? 'blue' : selectedSession.status === '완료' ? 'green' : 'gray'} className="px-2 py-0.5 text-[10px]">
+                        {selectedSession.status || '대기'}
+                      </PremiumBadge>
+                    </div>
+                  }
+                />
                 
                 {/* 메시지 영역 */}
                 <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-[#f8f9fa] dark:bg-zinc-950/80 custom-scrollbar">
@@ -418,8 +423,6 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
               </div>
             )}
           </div>
-        </div>
-      </PremiumCard>
-    </div>
+    </AdminPanelLayout>
   );
 }

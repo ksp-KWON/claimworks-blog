@@ -6,6 +6,8 @@ import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumButton from '@/components/ui/PremiumButton';
+import AdminPanelLayout from './AdminPanelLayout';
+import { AdminTableHeader } from './AdminHeader';
 
 interface ConsultationAdminPanelProps {
   isSplitView: boolean;
@@ -207,22 +209,21 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
     );
   }
 
+  const tableColumns = [
+    { label: '상태', width: 'w-20' },
+    { label: '접수시간', width: 'w-36' },
+    { label: '이름', width: 'w-56' },
+    { label: '문의내용', align: 'left' as const }
+  ];
+
   return (
-    <div className="flex-1 min-h-0 flex flex-col p-4 md:p-8 bg-gray-50 dark:bg-zinc-950">
-      <div className="flex-1 min-h-0 flex flex-col">
-          {/* 데스크탑 버전 (Table) */}
-          <PremiumCard className="hidden md:block p-0 sm:p-0 border-0 flex-1 min-h-0 overflow-hidden">
-            <div className="h-full flex flex-col">
-              <div className="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
-                <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
-              <thead className="sticky top-0 z-10 bg-slate-100 dark:bg-zinc-800 shadow-[0_1px_0_rgba(0,0,0,0.05)] dark:shadow-[0_1px_0_rgba(255,255,255,0.05)]">
-                <tr>
-                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-20">상태</th>
-                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-36">접수시간</th>
-                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-56">이름</th>
-                  <th scope="col" className="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">문의내용</th>
-                </tr>
-              </thead>
+    <AdminPanelLayout innerClassName="flex flex-col w-full h-full bg-white dark:bg-[#111111]">
+      <div className="flex-1 min-h-0 flex flex-col w-full">
+        {/* 데스크탑 버전 (Table) */}
+        <div className="hidden md:flex flex-1 min-h-0 flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
+            <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
+              <AdminTableHeader columns={tableColumns} />
               <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-50 dark:divide-zinc-800/50">
               {sortedAndFilteredConsultations.length === 0 ? (
                 <tr>
@@ -303,15 +304,14 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                 ))
               )}
               </tbody>
-                </table>
-              </div>
-            </div>
-          </PremiumCard>
+            </table>
+          </div>
+        </div>
 
-          {/* 모바일 뷰 */}
-          <div className="md:hidden flex-1 overflow-y-auto space-y-3 mt-4 custom-scrollbar">
+        {/* 모바일 뷰 */}
+        <div className="md:hidden flex-1 overflow-y-auto space-y-3 p-4 bg-gray-50/50 dark:bg-zinc-950/50 custom-scrollbar">
 
-            {sortedAndFilteredConsultations.length === 0 ? (
+          {sortedAndFilteredConsultations.length === 0 ? (
               <div className="text-center py-8 text-sm text-gray-500 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800">
                 {searchQuery ? '검색 결과가 없습니다.' : '아직 접수된 상담 내역이 없습니다.'}
               </div>
@@ -377,9 +377,9 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
                   )}
                 </PremiumCard>
               ))
-            )}
-          </div>
+          )}
+        </div>
       </div>
-    </div>
+    </AdminPanelLayout>
   );
 }

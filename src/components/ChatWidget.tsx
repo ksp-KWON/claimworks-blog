@@ -162,7 +162,10 @@ export default function ChatWidget() {
         { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `session_id=eq.${sid}` },
         (payload) => {
           const newMsg = payload.new as ChatMessage;
-          setMessages((prev) => [...prev, newMsg]);
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === newMsg.id)) return prev;
+            return [...prev, newMsg];
+          });
           if (!isOpen && newMsg.sender === 'admin') {
             setUnreadCount((prev) => prev + 1);
           } else if (isOpen && newMsg.sender === 'admin') {
@@ -242,11 +245,19 @@ export default function ChatWidget() {
       }
 
       // 메시지 저장
-      const { error: msgError } = await supabase
+      const { data: insertedMsg, error: msgError } = await supabase
         .from('chat_messages')
-        .insert([{ session_id: currentSid, sender: 'visitor', content: sendText }]);
+        .insert([{ session_id: currentSid, sender: 'visitor', content: sendText }])
+        .select()
+        .single();
 
       if (msgError) throw msgError;
+
+      // 실시간 웹소켓(채널) 연결이 완료되기 전에 발생한 첫 메시지 INSERT 이벤트 누락(Race condition) 방지
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === insertedMsg.id)) return prev;
+        return [...prev, insertedMsg];
+      });
       
       // last_message_at 업데이트
       await supabase.from('chat_sessions').update({ last_message_at: new Date().toISOString() }).eq('id', currentSid);

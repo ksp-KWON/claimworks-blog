@@ -1,16 +1,54 @@
 import { getSortedPostsData } from "@/lib/posts";
 import YouTubeBriefing from "@/components/YouTubeBriefing";
 import HomePostList from "@/components/HomePostList";
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import PremiumHeading from "@/components/ui/PremiumHeading";
 
-export const metadata: Metadata = {
-  title: "지역별 병원추천 & 보상 실무 가이드 | 보상스쿨",
-  description: "건강보험심사평가원 공개 데이터를 기반으로 분석한 지역별 우수 병원 추천 및 손해사정 보상 실무 가이드를 제공합니다.",
-  alternates: {
-    canonical: "https://claim-works.com",
-  },
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 };
+
+export async function generateMetadata(
+  props: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const searchParams = await props.searchParams;
+  const isChatOpen = searchParams?.chat === 'open';
+
+  if (isChatOpen) {
+    return {
+      title: "보상스쿨 채팅 상담 신청",
+      description: "보험사의 억울한 거절과 삭감 주장에 맞서, 보상스쿨의 전문 손해사정사가 1:1 비공개 무료 채팅 상담을 실시간으로 진행해 드립니다.",
+      alternates: {
+        canonical: "https://claim-works.com/?chat=open",
+      },
+      openGraph: {
+        title: "보상스쿨 채팅 상담 신청",
+        description: "1:1 비공개 무료 채팅상담을 실시간으로 진행해 드립니다.",
+        url: "https://claim-works.com/?chat=open",
+        siteName: "보상스쿨",
+        images: [
+          {
+            url: "/logo.png",
+            width: 800,
+            height: 600,
+            alt: "보상스쿨 채팅 상담",
+          },
+        ],
+        locale: "ko_KR",
+        type: "website",
+      },
+    };
+  }
+
+  return {
+    title: "지역별 병원추천 & 보상 실무 가이드 | 보상스쿨",
+    description: "건강보험심사평가원 공개 데이터를 기반으로 분석한 지역별 우수 병원 추천 및 손해사정 보상 실무 가이드를 제공합니다.",
+    alternates: {
+      canonical: "https://claim-works.com",
+    },
+  };
+}
 
 export default function Home() {
   // 전체 최신 보상 가이드 블로그 목록 로드

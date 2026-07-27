@@ -131,7 +131,7 @@ const baseComponents: Components = {
     </div>
   ),
   pre: ({ children }) => (
-    <pre className="overflow-x-auto whitespace-pre bg-gray-50 dark:bg-[#303134] p-4 sm:p-5 rounded-md border border-gray-200 dark:border-white/10 my-6 text-[#202124] dark:text-[#e8eaed] font-mono text-[13.5px] sm:text-[14.5px] leading-relaxed shadow-sm">
+    <pre className="whitespace-pre-wrap break-words bg-gray-50 dark:bg-[#303134] p-4 sm:p-5 rounded-md border border-gray-200 dark:border-white/10 my-6 text-[#202124] dark:text-[#e8eaed] font-sans text-[14.5px] sm:text-[15.5px] leading-relaxed shadow-sm overflow-x-hidden">
       {children}
     </pre>
   ),

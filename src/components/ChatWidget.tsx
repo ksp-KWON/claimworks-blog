@@ -177,6 +177,14 @@ export default function ChatWidget() {
   };
 
   useEffect(() => {
+    // URL에 ?chat=open 파라미터가 있으면 자동으로 채팅창 열기
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('chat') === 'open') {
+        handleOpen();
+      }
+    }
+
     checkExistingSession();
     
     const handleOpenChat = () => handleOpen();

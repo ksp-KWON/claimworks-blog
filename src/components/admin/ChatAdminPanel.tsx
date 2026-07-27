@@ -247,7 +247,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
         return;
       }
 
-      setSessions(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s));
+      setSessions(prev => prev.map(s => s.id === id ? { ...s, status: newStatus as any } : s));
       if (newStatus === '삭제' && selectedId === id) {
         setSelectedId(null);
       }

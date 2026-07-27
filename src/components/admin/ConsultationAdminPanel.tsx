@@ -125,7 +125,7 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
         alert(`상태 업데이트 실패: ${data.message}`);
         return;
       }
-      setConsultations(prev => prev.map(c => c.id === id ? { ...c, status: newStatus } : c));
+      setConsultations(prev => prev.map(c => c.id === id ? { ...c, status: newStatus as Consultation['status'] } : c));
     } catch (err: any) {
       alert(`상태 업데이트 중 오류 발생: ${err.message}`);
     }

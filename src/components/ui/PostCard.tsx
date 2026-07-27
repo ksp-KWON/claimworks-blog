@@ -10,7 +10,9 @@ interface PostCardProps {
 
 export default function PostCard({ post, variant = 'grid' }: PostCardProps) {
   // Use first category for theme determination
-  const firstCategory = post.category ? post.category.split(',')[0].trim() : '보상가이드';
+  const firstCategory = post.category 
+    ? (Array.isArray(post.category) ? post.category[0] : post.category.split(',')[0].trim())
+    : '보상가이드';
   const theme = getCategoryTheme(firstCategory);
 
   // Safe-listed gradient colors for Tailwind JIT

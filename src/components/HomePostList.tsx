@@ -10,7 +10,11 @@ export default function HomePostList({ initialPosts }: { initialPosts: Omit<Post
   const categoriesWithPosts = CATEGORIES.map(category => {
     const posts = initialPosts.filter(post => {
       if (!post.category) return false;
-      const cats = post.category.split(',').map(x => x.trim()).filter(Boolean);
+      const cats = Array.isArray(post.category) 
+        ? post.category 
+        : typeof post.category === 'string'
+          ? post.category.split(',').map(x => x.trim()).filter(Boolean)
+          : [];
       return cats.some(cat => cat.includes(category) || category.includes(cat));
     });
     return { category, posts };

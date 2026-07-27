@@ -10,8 +10,12 @@ import {
   getHealingPrompt,
   TOPIC_SCHEMA
 } from './prompt-rules';
-import { parseGeneratedContent } from './content-parser';
 import { stringifyMarkdown } from './markdown-utils';
+
+function parseGeneratedContent(text: string) {
+  const content = text.replace(/^```(markdown)?/im, '').replace(/```$/im, '').trim();
+  return { content };
+}
 
 async function fetchProxy(action: string, payload: any = {}) {
   const res = await fetch('/api/ai-pipeline/proxy', {

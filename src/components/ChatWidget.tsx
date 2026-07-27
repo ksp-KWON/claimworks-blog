@@ -181,9 +181,12 @@ export default function ChatWidget() {
     channelRef.current = channel;
   };
 
+  const hasAutoOpened = useRef(false);
+
   useEffect(() => {
-    // URL에 ?chat=open 파라미터가 있으면 자동으로 채팅창 열기
-    if (searchParams?.get('chat') === 'open') {
+    // URL에 ?chat=open 파라미터가 있으면 자동으로 채팅창 열기 (최초 1회만)
+    if (searchParams?.get('chat') === 'open' && !hasAutoOpened.current) {
+      hasAutoOpened.current = true;
       handleOpen();
     }
 

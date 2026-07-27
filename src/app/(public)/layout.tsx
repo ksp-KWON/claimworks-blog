@@ -56,7 +56,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <div className="font-sans font-extrabold text-lg sm:text-xl min-w-0 tracking-tight">
               <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden">
                 <div className="relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-300 z-10 mr-1">
-                  <Image src="/logo.png" alt="보상스쿨 TV" width={120} height={28} className="object-contain transition-all duration-300" priority />
+                  <Image src="/logo.png" alt="보상스쿨 TV" width={100} height={24} className="object-contain transition-all duration-300" priority />
                 </div>
                 <span className="hidden sm:inline font-extrabold text-[#3c4043] dark:text-[#e8eaed] group-hover:opacity-80 transition-opacity truncate tracking-tight">
                   보상스쿨 헬스케어 &amp; 손해사정 보상가이드

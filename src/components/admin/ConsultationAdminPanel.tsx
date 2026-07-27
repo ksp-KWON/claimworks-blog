@@ -113,24 +113,41 @@ export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage
   }, []);
 
   const updateStatus = async (id: string, newStatus: string) => {
-    const { error } = await supabase
-      .from('consultations')
-      .update({ status: newStatus })
-      .eq('id', id);
-    if (error) {
-      alert('상태 업데이트 중 오류가 발생했습니다.');
+    try {
+      const res = await fetch(`/api/admin-manage?table=consultations&id=${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const data = await res.json();
+      
+      if (!data.success) {
+        alert(`상태 업데이트 실패: ${data.message}`);
+        return;
+      }
+      setConsultations(prev => prev.map(c => c.id === id ? { ...c, status: newStatus } : c));
+    } catch (err: any) {
+      alert(`상태 업데이트 중 오류 발생: ${err.message}`);
     }
   };
 
   const deleteConsultation = async (id: string) => {
     if (!window.confirm('정말로 이 접수 내역을 삭제하시겠습니까?')) return;
-    const { error } = await supabase.from('consultations').delete().eq('id', id);
-    if (error) {
-      alert(`삭제 실패: ${error.message}`);
-      return;
+    try {
+      const res = await fetch(`/api/admin-manage?table=consultations&id=${id}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      
+      if (!data.success) {
+        alert(`삭제 실패: ${data.message}`);
+        return;
+      }
+      if (selectedId === id) setSelectedId(null);
+      setConsultations(prev => prev.filter(c => c.id !== id));
+    } catch (err: any) {
+      alert(`삭제 중 오류 발생: ${err.message}`);
     }
-    if (selectedId === id) setSelectedId(null);
-    setConsultations(prev => prev.filter(c => c.id !== id));
   };
 
   const handleRowClick = (id: string) => {

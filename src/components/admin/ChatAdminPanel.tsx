@@ -235,7 +235,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch(`/api/chat?id=${id}`, {
+      const res = await fetch(`/api/admin-manage?table=chat_sessions&id=${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -262,7 +262,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
     }
     
     try {
-      const res = await fetch(`/api/chat?id=${id}`, {
+      const res = await fetch(`/api/admin-manage?table=chat_sessions&id=${id}`, {
         method: 'DELETE',
       });
       const data = await res.json();

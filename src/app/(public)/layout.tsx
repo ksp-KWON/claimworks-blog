@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -130,7 +130,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <MobileBottomNav />
 
       {/* 채팅 위젯 */}
-      <ChatWidget />
+      <Suspense fallback={null}>
+        <ChatWidget />
+      </Suspense>
     </>
   );
 }

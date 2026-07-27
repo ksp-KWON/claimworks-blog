@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import type { ChatMessage } from '@/lib/supabase';
 
@@ -46,6 +46,7 @@ const FAQS = [
 
 export default function ChatWidget() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -178,11 +179,8 @@ export default function ChatWidget() {
 
   useEffect(() => {
     // URL에 ?chat=open 파라미터가 있으면 자동으로 채팅창 열기
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('chat') === 'open') {
-        handleOpen();
-      }
+    if (searchParams?.get('chat') === 'open') {
+      handleOpen();
     }
 
     checkExistingSession();

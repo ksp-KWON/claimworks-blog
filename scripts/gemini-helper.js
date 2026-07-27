@@ -18,12 +18,7 @@ const { sleep } = require('./pipeline-utils.js');
 // 각 계열에 해당하는 이름 패턴을 우선순위 순서로 정의합니다.
 // 새로운 Gemini 4.x, 5.x 등이 출시되어도 패턴으로 자동 인식합니다.
 const MODEL_TIERS = [
-  {
-    tier: 'pro',
-    // "flash"나 "lite"가 포함되지 않는 gemini 모델 = Pro 계열
-    match: name => /gemini/i.test(name) && /pro/i.test(name) && !/lite/i.test(name),
-    maxTokensFallback: 32768,
-  },
+
   {
     tier: 'flash',
     // "flash"는 있으나 "lite"는 없는 모델 = Flash 계열
@@ -94,7 +89,7 @@ async function discoverModels() {
     console.warn(`  [경고] 모델 탐색 실패 (${err.message}). 내장 기본값으로 폴백합니다.`);
     // 탐색 실패 시 안전한 하드코딩 기본값으로 폴백
     _discoveredModels = [
-      { name: 'gemini-2.5-pro',       maxTokens: 32768 },
+
       { name: 'gemini-2.5-flash',     maxTokens: 32768 },
       { name: 'gemini-2.0-flash-lite', maxTokens: 16384 },
     ];

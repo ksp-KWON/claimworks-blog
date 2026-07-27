@@ -3,11 +3,9 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { ChatSession, ChatMessage } from '@/lib/supabase';
-import PremiumCard from '@/components/ui/PremiumCard';
 import AdminPanelLayout from './AdminPanelLayout';
 import { AdminHeaderBar } from './AdminHeader';
 import PremiumBadge from '@/components/ui/PremiumBadge';
-import PremiumButton from '@/components/ui/PremiumButton';
 import { AdminStatusSelect } from './AdminStatusSelect';
 
 interface SessionWithMeta extends ChatSession {

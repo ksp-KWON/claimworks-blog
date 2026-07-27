@@ -175,13 +175,7 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
 {"candidates": [{"newsTitle": "기사원문", "searchKeyword": "검색용키워드"}]}`;
 }
 
-function getHealingPrompt(keywords) {
-  return `뉴스에서 추출된 키워드 "${keywords}" 로 대법원 판례를 찾지 못했습니다.
-이 사건들의 맥락에 적용할 수 있는 더 상위 개념의 보편적인 법률 용어(예: "안전배려의무", "인과관계", "설명의무", "면책사유" 등) 3가지를 제안하세요.
-반드시 아래 JSON 형식으로만 출력하세요.
-{"keywords": ["용어1", "용어2", "용어3"]}
-`;
-}
+
 
 function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCategory) {
   return `당신은 '보상스쿨'의 콘텐츠 기획자입니다.
@@ -456,7 +450,7 @@ module.exports = {
   getRenewalPrompt,
   getQueryGenerationPrompt,
   getKeywordExtractionPrompt,
-  getHealingPrompt,
+
   cleanAnalysisBlock,
   TOPIC_SCHEMA
 };

@@ -28,37 +28,82 @@ const LAW_API_KEY        = process.env.LAW_API_KEY;
 const LAW_PROXY_ENDPOINT = process.env.LAW_PROXY_ENDPOINT;
 const LAW_PROXY_TOKEN    = process.env.LAW_PROXY_TOKEN;
 
+const TARGET_CATEGORIES = [
+  '사망·자살 보험금',
+  '질병진단·실손',
+  '교통사고 보상',
+  '배상책임·의료',
+  '근재·산재 사고',
+  '장해평가·면책',
+  '보상가이드',
+  '판례·법률 해석'
+];
 
+function determineCategory() {
+  const args = process.argv.slice(2);
+  const catIdx = args.indexOf('--category');
+  if (catIdx !== -1 && args[catIdx + 1]) {
+    return args[catIdx + 1];
+  }
+  const utcHour = new Date().getUTCHours();
+  if (utcHour >= 0 && utcHour <= 7) {
+    return TARGET_CATEGORIES[utcHour];
+  }
+  return TARGET_CATEGORIES[Math.floor(Math.random() * TARGET_CATEGORIES.length)];
+}
 
 // sleep 은 pipeline-utils.js 에서 공급됨
 
 // ── 기존 포스트 분석 (중복 방지) ─────────────────────────────────────────
-function getUsedMetadata() {
+function getUsedMetadata(targetCategory) {
   const usedCaseNumbers = new Set();
   const usedKeywords    = new Set();
 
   if (!fs.existsSync(POSTS_DIR)) return { usedCaseNumbers, usedKeywords };
 
+  const posts = [];
   for (const file of fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'))) {
     try {
-      const yaml = (fs.readFileSync(path.join(POSTS_DIR, file), 'utf8')
+      const filePath = path.join(POSTS_DIR, file);
+      const stat = fs.statSync(filePath);
+      const yaml = (fs.readFileSync(filePath, 'utf8')
         .match(/^---\r?\n([\s\S]*?)\r?\n---/) ?? [])[1] ?? '';
 
-      const caseNo = yaml.match(/caseNumber:\s*["']?(.*?)["']?\r?$/m)?.[1]?.trim();
-      if (caseNo) usedCaseNumbers.add(caseNo);
+      const catMatch = yaml.match(/category:\s*["']?(.*?)["']?\r?$/m);
+      const category = catMatch ? catMatch[1].trim() : '';
 
-      // 인라인: tags: ["a","b"] | 블록: tags:\n  - a
+      const caseNo = yaml.match(/caseNumber:\s*["']?(.*?)["']?\r?$/m)?.[1]?.trim();
+      
+      let tags = [];
       const inline = yaml.match(/tags:\s*\[(.*?)\]/)?.[1];
       if (inline) {
-        inline.split(',').forEach(t => { const v = t.replace(/['"]/g,'').trim(); if(v) usedKeywords.add(v); });
+        inline.split(',').forEach(t => { const v = t.replace(/['"]/g,'').trim(); if(v) tags.push(v); });
       } else {
         yaml.match(/tags:\r?\n((?:\s*-\s*.*?\r?\n)*)/)?.[1]?.split('\n').forEach(l => {
           const v = l.replace(/^\s*-\s*/,'').replace(/['"]/g,'').trim();
-          if (v) usedKeywords.add(v);
+          if (v) tags.push(v);
         });
       }
+      
+      posts.push({ category, caseNo, tags, mtime: stat.mtimeMs });
     } catch { /* 파싱 불가 파일 무시 */ }
   }
+
+  // 판례 번호는 기간, 카테고리 상관없이 블로그 전체 역사상 쓰인 모든 판례 번호를 영구 배제
+  for (const p of posts) {
+    if (p.caseNo) usedCaseNumbers.add(p.caseNo);
+  }
+
+  // 키워드는 타겟 카테고리에 해당하는 최신순 30개 글에서만 추출하여 단기 중복 방지
+  const filteredPosts = posts
+    .filter(p => p.category === targetCategory)
+    .sort((a, b) => b.mtime - a.mtime)
+    .slice(0, 30);
+
+  for (const p of filteredPosts) {
+    p.tags.forEach(t => usedKeywords.add(t));
+  }
+
   return { usedCaseNumbers, usedKeywords };
 }
 
@@ -72,17 +117,31 @@ function extractXmlValues(xml, tag) {
 }
 
 // ── [0단계] 트렌드 키워드 동적 창작 ──────────────────────────────────────
-async function generateTrendySearchKeywords(usedKeywordsSet) {
-  console.log('[0/5] AI가 최근 발행된 30개 포스트를 바탕으로 새로운 검색 키워드를 창작 중...');
+async function generateTrendySearchKeywords(usedKeywordsSet, targetCategory) {
+  console.log(`[0/5] AI가 최근 발행된 30개 포스트를 바탕으로 [${targetCategory}] 관련 새로운 검색 키워드 창작 중...`);
   const usedArray = Array.from(usedKeywordsSet);
-  
-  const prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
-아래는 최근 우리 블로그에서 다루었던 최신 30개 포스트의 키워드 목록입니다.
+  let prompt = '';
+
+  if (targetCategory === '판례·법률 해석') {
+    // 판례 카테고리는 카테고리 족쇄를 풀고 자율성을 부여 (과거 금요일 프롬프트 복원)
+    prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+아래는 최근 우리 블로그에서 다루었던 최신 포스트의 키워드 목록입니다.
 [최근 키워드 목록]
 ${usedArray.join(', ')}
 
-이 키워드들과 겹치지 않으면서도, 현재 대중들이 가장 궁금해할 만한 '보험금 분쟁, 손해사정, 교통사고 보상, 산재 후유장해' 관련 핫 트렌드 검색 키워드 3개를 창작해 주세요.
+이 키워드들과 겹치지 않으면서도, 현재 대중들이 가장 궁금해할 만한 **전체 보상/보험/손해사정 분야**의 핫 트렌드 검색 키워드 3개를 창작해 주세요.
+(특정 카테고리에 얽매이지 말고, 가장 굵직하고 보편적인 법률 및 실무 분쟁 이슈를 뽑아내야 합니다.)
 이 키워드는 구글 뉴스 검색에 사용될 것입니다.`;
+  } else {
+    // 일반 트렌드 카테고리는 카테고리에 맞게 정밀 타겟팅
+    prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+아래는 최근 우리 블로그의 [${targetCategory}] 카테고리에서 다루었던 최신 포스트의 키워드 목록입니다.
+[최근 키워드 목록]
+${usedArray.join(', ')}
+
+이 키워드들과 겹치지 않으면서도, 현재 대중들이 가장 궁금해할 만한 **[${targetCategory}]** 관련 핫 트렌드 검색 키워드 3개를 창작해 주세요.
+이 키워드는 구글 뉴스 검색에 사용될 것입니다.`;
+  }
 
   const schema = {
     type: 'OBJECT',
@@ -118,7 +177,8 @@ async function fetchTrendingNews(queries) {
   for (const query of queries) {
     try {
       let res;
-      if (LAW_PROXY_ENDPOINT?.trim()) {
+      // RSS 프록시 엔드포인트가 404 에러를 반환하므로 직접 가져옵니다.
+      if (false) {
         const proxyUrl = `${LAW_PROXY_ENDPOINT.trim()}/api/rss?query=${encodeURIComponent(query)}`;
         const proxyHeaders = { ...headers };
         if (LAW_PROXY_TOKEN) proxyHeaders['X-Proxy-Token'] = LAW_PROXY_TOKEN.trim();
@@ -147,12 +207,12 @@ async function fetchTrendingNews(queries) {
 }
 
 // ── [2단계] Gemini AI → 손해사정 키워드 추출 ────────────────────────────
-async function extractInsuranceKeywords(headlines) {
+async function extractInsuranceKeywords(headlines, targetCategory) {
   if (!headlines.length) return [];
-  console.log('[2/5] AI 분석 — 손해사정 연관 키워드 추출 중...');
+  console.log(`[2/5] AI 분석 — [${targetCategory}] 연관 키워드 추출 중...`);
 
   const prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
-아래 뉴스 헤드라인 목록에서 손해사정(교통사고·산재·질병·배상책임·보험금 분쟁)과
+아래 뉴스 헤드라인 목록에서 [${targetCategory}] 분야와
 직접 연관된 이슈를 분석하여, 법제처 판례 API 검색에 즉시 활용할 구체적인 법률·보험 용어 키워드를 추출하세요.
 
 [중요 지시사항]
@@ -190,6 +250,42 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}`;
   } catch (err) {
     console.warn('❌ Gemini AI 키워드 추출 실패:', err.message);
     throw new Error('뉴스 키워드 추출에 실패했습니다.');
+  }
+}
+
+// ── [2.5단계] Gemini AI → 상위 법률 용어 도출 (2차 탐색용) ─────────────────
+async function getGenericLegalKeywords(targetCategory) {
+  console.log(`[2.5/5] AI 분석 — [${targetCategory}] 상위 법률 용어(면책사유 등) 도출 중...`);
+  const prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+방금 뉴스 트렌드 기반으로 대법원 판례 검색을 시도했으나 너무 최신 유행어라서 판례를 찾지 못했습니다.
+따라서, **[${targetCategory}]** 분야의 대법원 판례에서 가장 자주 등장하는 보편적이고 핵심적인 상위 법률 용어(예: 면책사유, 인과관계, 설명의무, 안전배려의무 등) 3가지를 도출해 주세요.
+
+반드시 아래 뉴스 헤드라인과 연관된 용어일 필요는 없으며, 해당 카테고리를 관통하는 가장 본질적인 법률 키워드여야 합니다.`;
+
+  const schema = {
+    type: 'OBJECT',
+    properties: {
+      keywords: {
+        type: 'ARRAY',
+        items: {
+          type: 'OBJECT',
+          properties: {
+            searchKeyword: { type: 'STRING' },
+            newsTitle: { type: 'STRING', description: '빈 문자열 냅둡니다' }
+          },
+          required: ['searchKeyword']
+        }
+      }
+    },
+    required: ['keywords']
+  };
+
+  try {
+    const result = await callGemini(prompt, schema);
+    return result.keywords || [];
+  } catch (err) {
+    console.warn('⚠️ 상위 법률 용어 도출 실패:', err.message);
+    return [];
   }
 }
 
@@ -277,28 +373,49 @@ async function findPrecedent(keywords, usedCaseNumbers) {
 
 // ── 메인 ─────────────────────────────────────────────────────────────────
 async function main() {
-  console.log('=== 1단계: 오늘의 주제 및 판례 데이터 연쇄 탐색 시작 ===');
+  const targetCategory = determineCategory();
+  console.log(`=== 1단계: [${targetCategory}] 주제 및 판례 데이터 연쇄 탐색 시작 ===`);
 
-  const { usedCaseNumbers, usedKeywords } = getUsedMetadata();
-  console.log(`  [분석] 기발행 포스트 수: ${usedCaseNumbers.size}개 | 기사용 키워드 수: ${usedKeywords.size}개`);
+  const { usedCaseNumbers, usedKeywords } = getUsedMetadata(targetCategory);
+  console.log(`  [분석] 기발행 [${targetCategory}] 카테고리 포스트 30개 분석 | 기사용 키워드 수: ${usedKeywords.size}개`);
 
   // 1. 구글 뉴스 RSS 수집
-  const aiQueries = await generateTrendySearchKeywords(usedKeywords);
+  const aiQueries = await generateTrendySearchKeywords(usedKeywords, targetCategory);
   const headlines = await fetchTrendingNews(aiQueries);
 
   // 2. AI 키워드 추출 (자동 랭킹 포함)
-  const rankedCandidates = await extractInsuranceKeywords(headlines);
+  const rankedCandidates = await extractInsuranceKeywords(headlines, targetCategory);
 
-  // 3. 트렌드 기반 판례 탐색
-  console.log('[3/4] 트렌드 키워드 기반 법제처 판례 탐색 중...');
-  let found = await findPrecedent(rankedCandidates, usedCaseNumbers);
+  let found = null;
 
-  if (!found) {
-    console.warn('⚠️ 모든 소스 탐색 실패 — 적절한 판례를 찾지 못했습니다.');
-    throw new Error('적절한 판례를 찾지 못했습니다.');
+  if (targetCategory === '판례·법률 해석') {
+    // 3. 1차 탐색망 (트렌드 기반 판례 검색)
+    console.log('[3/4] 1차 탐색망: 트렌드 키워드 기반 법제처 판례 탐색 중...');
+    found = await findPrecedent(rankedCandidates, usedCaseNumbers);
+
+    // 4. 2차 탐색망 (AI 상위 법률 용어)
+    if (!found) {
+      console.log('[3/4] ⚠️ 1차 탐색 실패. 2차 탐색망(상위 법률 용어) 가동...');
+      const genericKeywords = await getGenericLegalKeywords(targetCategory);
+      found = await findPrecedent(genericKeywords, usedCaseNumbers);
+    }
+
+    if (!found) {
+      console.warn('⚠️ 2중 탐색망 모두 실패 — 적절한 판례를 찾지 못했습니다.');
+      throw new Error('적절한 판례를 찾지 못했습니다.');
+    }
+  } else {
+    // 트렌드 포스팅인 경우 판례 검색 없이 즉시 1위 키워드 채택
+    console.log(`[3/4] 일반 트렌드 카테고리이므로 판례 탐색을 생략하고 즉시 1위 키워드를 채택합니다.`);
+    found = {
+      keyword: rankedCandidates[0].searchKeyword,
+      newsTitle: rankedCandidates[0].newsTitle,
+      detail: null
+    };
   }
 
   const output = {
+    category:   targetCategory,
     keyword:    found.keyword,
     source:     found.newsTitle ? 'trend' : 'backup',
     trendTitle: found.newsTitle,

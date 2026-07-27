@@ -5,8 +5,6 @@ import BottomSheet from '@/components/ui/BottomSheet';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import { AdminStatusSelect } from './AdminStatusSelect';
-import PremiumHeading from '@/components/ui/PremiumHeading';
-import PremiumButton from '@/components/ui/PremiumButton';
 import AdminPanelLayout from './AdminPanelLayout';
 import { AdminTableHeader } from './AdminHeader';
 

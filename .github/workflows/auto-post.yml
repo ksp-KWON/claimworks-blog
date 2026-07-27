@@ -1,9 +1,9 @@
 name: 보상스쿨 자동글쓰기
 
 on:
-  # 매일 오전 7시 (KST) = UTC 22:00 전날
+  # 매일 오전 9시 15분 ~ 오후 4시 15분 (KST) = UTC 00:15 ~ 07:15
   schedule:
-    - cron: '0 22 * * *'
+    - cron: '15 0-7 * * *'
   # 수동 실행 (테스트용 및 어드민 연동)
   workflow_dispatch:
     inputs:
@@ -20,7 +20,7 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     permissions:
       contents: write
     env:
@@ -61,15 +61,12 @@ jobs:
           echo "🔍 오늘의 주제 및 판례 사전 탐색 실행 (scripts/select-daily-topic.js)"
           node scripts/select-daily-topic.js
           
-          if [ "$POST_TYPE" = "all" ] || [ "$POST_TYPE" = "trend" ]; then
-            echo "🔥 트렌드 글쓰기 기동 (npm run generate:trend)"
-            npm run generate:trend
-          fi
+          # daily-topic.json에서 결정된 카테고리를 읽어옵니다.
+          TOPIC_CATEGORY=$(node -p "require('./scripts/daily-topic.json').category")
+          echo "🏷️ 현재 타겟 카테고리: $TOPIC_CATEGORY"
           
-          if [ "$POST_TYPE" = "all" ] || [ "$POST_TYPE" = "precedent" ]; then
-            echo "⚖️ 법률칼럼 글쓰기 기동 (npm run generate:precedent)"
-            npm run generate:precedent
-          fi
+          echo "✍️ 자동글쓰기 통합 엔진 기동 (npm run generate:post)"
+          npm run generate:post
 
       - name: 변경사항 커밋 & 푸시
         uses: stefanzweifel/git-auto-commit-action@v5

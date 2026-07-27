@@ -25,20 +25,7 @@ const {
 } = require('../src/lib/post-builder.js');
 
 async function main() {
-  const args = process.argv.slice(2);
-  const typeIndex = args.indexOf('--type');
-  if (typeIndex === -1 || !args[typeIndex + 1]) {
-    throw new Error('사용법: node scripts/generate-post.js --type <trend|precedent>');
-  }
-  const postType = args[typeIndex + 1];
-  const isPrecedent = postType === 'precedent';
-
-  console.log(`=== 자동글쓰기 (${isPrecedent ? '판례' : '트렌드'} 블로그) 시작 (${new Date().toISOString()}) ===`);
-
-  if (isPrecedent) {
-    console.log('  [쿨다운] API 과부하 방지를 위해 65초간 대기합니다...');
-    await sleep(65000);
-  }
+  console.log(`=== 자동글쓰기 통합 컴포넌트 시작 (${new Date().toISOString()}) ===`);
 
   // 1. Topic 로드
   const topicJsonPath = path.join(process.cwd(), 'scripts/daily-topic.json');
@@ -46,6 +33,14 @@ async function main() {
     throw new Error('daily-topic.json 파일이 존재하지 않습니다.');
   }
   const dailyTopic = JSON.parse(fs.readFileSync(topicJsonPath, 'utf8'));
+
+  // 단일 파이프라인 판단: 카테고리가 '판례'인 경우에만 예외 로직 활성화
+  const isPrecedent = dailyTopic.category === '판례·법률 해석';
+
+  if (isPrecedent) {
+    console.log('  [예외 처리] 판례 API 과부하 방지를 위해 65초간 대기합니다...');
+    await sleep(65000);
+  }
   
   if (isPrecedent) {
     console.log(`  [로드] 확정 판례: ${dailyTopic.precedent.caseNo} (${dailyTopic.precedent.caseName})`);
@@ -62,8 +57,8 @@ async function main() {
   const existingSlugsStr = existingPosts.map(p => p.slug).join(', ');
   
   const planPrompt = isPrecedent 
-    ? getPrecedentPlanningPrompt(dailyTopic.precedent, existingSlugsStr)
-    : getTopicPlanningPrompt(dailyTopic.keyword, dailyTopic.trendTitle || '없음', existingSlugsStr);
+    ? getPrecedentPlanningPrompt(dailyTopic.precedent, existingSlugsStr, dailyTopic.category)
+    : getTopicPlanningPrompt(dailyTopic.keyword, dailyTopic.trendTitle || '없음', existingSlugsStr, dailyTopic.category);
 
   const topic = await callGemini(planPrompt, TOPIC_SCHEMA);
   console.log(`    기획 완료 : ${topic.title} (${topic.slug})`);
@@ -91,7 +86,12 @@ async function main() {
 }
 
 main().catch(err => {
-  const isPrecedent = process.argv.includes('precedent');
-  console.error(`\n[⚠️ 자동글쓰기 빌드 경고] 외부 API 통신 실패로 인한 종료: ${err.message}`);
-  process.exit(isPrecedent ? 0 : 1);
+  console.error(`\n[⚠️ 자동글쓰기 빌드 경고] 통신 실패로 인한 종료: ${err.message}`);
+  // 트렌드는 에러 시 실패 처리(1), 판례는 우아한 종료(0)
+  try {
+    const dailyTopic = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'scripts/daily-topic.json'), 'utf8'));
+    process.exit(dailyTopic.category === '판례·법률 해석' ? 0 : 1);
+  } catch {
+    process.exit(1);
+  }
 });

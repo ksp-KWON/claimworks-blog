@@ -101,14 +101,18 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
         const newMsg = payload.new as ChatMessage;
         const isFromVisitor = newMsg.sender === 'visitor';
         
-        // 현재 보고 있는 세션이면 메시지 리스트에 추가
-        if (selectedId === newMsg.session_id) {
-          setMessages(prev => [...prev, newMsg]);
+        // 현재 보고 있는 세션이면 메시지 추가
+        if (newMsg.session_id === selectedId) {
+          setMessages(prev => {
+            if (prev.some(m => m.id === newMsg.id)) return prev;
+            return [...prev, newMsg];
+          });
           scrollToBottom();
-          // 방문자가 보낸거면 바로 읽음 처리
-          if (isFromVisitor) {
-            supabase.from('chat_sessions').update({ unread_count: 0 }).eq('id', selectedId).then();
-          }
+        }
+        
+        // 방문자가 보낸거면 바로 읽음 처리
+        if (isFromVisitor) {
+          supabase.from('chat_sessions').update({ unread_count: 0 }).eq('id', selectedId).then();
         }
         
         // 세션 목록 갱신 및 알림 발생
@@ -192,11 +196,20 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
     setIsSending(true);
 
     try {
-      const { error: msgErr } = await supabase
+      const { data: insertedMsg, error: msgErr } = await supabase
         .from('chat_messages')
-        .insert([{ session_id: selectedId, sender: 'admin', content: sendText }]);
+        .insert([{ session_id: selectedId, sender: 'admin', content: sendText }])
+        .select()
+        .single();
         
       if (msgErr) throw msgErr;
+      
+      // 관리자 패널에도 표준화된 낙관적 업데이트(Optimistic UI) 통합 적용 (레이스 컨디션 완벽 차단)
+      setMessages(prev => {
+        if (prev.some(m => m.id === insertedMsg.id)) return prev;
+        return [...prev, insertedMsg];
+      });
+      scrollToBottom();
       
       const sess = sessions.find(s => s.id === selectedId);
       await supabase.from('chat_sessions').update({ 

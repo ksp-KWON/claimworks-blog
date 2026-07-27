@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import type { ChatMessage } from '@/lib/supabase';
 
@@ -47,6 +47,7 @@ const FAQS = [
 export default function ChatWidget() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -211,6 +212,9 @@ export default function ChatWidget() {
 
   const handleClose = () => {
     setIsOpen(false);
+    if (searchParams?.get('chat') === 'open') {
+      router.replace(pathname, { scroll: false });
+    }
   };
 
   const scrollToBottom = () => {

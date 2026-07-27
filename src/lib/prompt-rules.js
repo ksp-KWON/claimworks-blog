@@ -8,16 +8,8 @@
 
 const STRICT_RULES = `
 ## 1. 사전 분석 및 분량 계획 (Chain-of-Thought) - 필수 수행
-- 본문을 작성하기 전에 반드시 아래 형식의 분석 블록을 출력의 최상단에 작성하십시오:
-  [ANALYSIS_START]
-  - 오늘의 글쓰기 관점(Angle) : {부여받은 앵글에 따른 핵심 쟁점 정의}
-  - 필요한 보상 실무 지식 : {주제와 앵글에 맞는 실제 평가 기준 및 실무 지식 도출}
-  - 목차(H2) 및 분량 설계 : 
-    * {AI가 앵글에 맞춰 스스로 기획한 H2 제목 1} : {분량 계획}
-    * {AI가 스스로 기획한 H2 제목 2} : {분량 계획}
-    ...
-  [ANALYSIS_END]
-- 위 분석을 바탕으로 가장 알찬 고밀도의 전문 칼럼을 자율적으로 구성하십시오. 
+- 본문 마크다운 작성을 시작하기 전에 반드시 JSON의 \`thoughtProcess\` 속성에 쟁점과 분석 내용을 먼저 서술하여 기획하십시오.
+- 분석을 바탕으로 가장 알찬 고밀도의 전문 칼럼을 자율적으로 구성하십시오. 
 
 ## 2. Heading 규칙 (H1 사용 금지, H2~H4 자율 계층화)
 - **H1 사용 금지** : frontmatter 외부 본문에는 절대 H1('# 제목')을 작성하지 마세요.
@@ -326,6 +318,21 @@ const TOPIC_SCHEMA = {
   required: ['slug', 'title', 'summary', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
 };
 
+const CONTENT_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    thoughtProcess: {
+      type: "STRING",
+      description: "본문을 작성하기 전의 사전 분석 및 기획안 (JSON 구조 내부이므로 자유롭게 작성 가능)"
+    },
+    markdownContent: {
+      type: "STRING",
+      description: "사전 분석을 바탕으로 작성된 고품질의 마크다운 본문 내용 (프론트매터 제외)"
+    }
+  },
+  required: ["thoughtProcess", "markdownContent"]
+};
+
 function buildArticlePrompt(topic, angle, existingPosts, precedentDetail = null) {
   const postsCtx = existingPosts.length > 0
     ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
@@ -441,6 +448,8 @@ ${getUniversalSkeleton(false, angle, calcTag, postsCtx)}`;
 
 module.exports = {
   STRICT_RULES,
+  TOPIC_SCHEMA,
+  CONTENT_SCHEMA,
   getRandomAngle,
   getTopicPlanningPrompt,
   getPrecedentPlanningPrompt,
@@ -451,6 +460,5 @@ module.exports = {
   getQueryGenerationPrompt,
   getKeywordExtractionPrompt,
 
-  cleanAnalysisBlock,
   TOPIC_SCHEMA
 };

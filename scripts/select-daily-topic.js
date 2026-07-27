@@ -177,14 +177,22 @@ async function fetchTrendingNews(queries) {
   for (const query of queries) {
     try {
       let res;
-      // RSS 프록시 엔드포인트가 404 에러를 반환하므로 직접 가져옵니다.
-      if (false) {
-        const proxyUrl = `${LAW_PROXY_ENDPOINT.trim()}/api/rss?query=${encodeURIComponent(query)}`;
-        const proxyHeaders = { ...headers };
-        if (LAW_PROXY_TOKEN) proxyHeaders['X-Proxy-Token'] = LAW_PROXY_TOKEN.trim();
-        res = await safeFetch(proxyUrl, { headers: proxyHeaders }, 10000);
+      // RSS 프록시 엔드포인트가 있으면 우선 시도합니다.
+      let usedProxy = false;
+      if (LAW_PROXY_ENDPOINT) {
+        try {
+          const proxyUrl = `${LAW_PROXY_ENDPOINT.trim()}/api/rss?query=${encodeURIComponent(query)}`;
+          const proxyHeaders = { ...headers };
+          if (LAW_PROXY_TOKEN) proxyHeaders['X-Proxy-Token'] = LAW_PROXY_TOKEN.trim();
+          res = await safeFetch(proxyUrl, { headers: proxyHeaders }, 10000);
+          if (res.ok) usedProxy = true;
+        } catch (proxyErr) {
+          console.warn(`    [프록시 경고] 프록시 실패 (${proxyErr.message}), 직접 호출로 Fallback...`);
+        }
+      }
 
-      } else {
+      // 프록시를 안 쓰거나 실패했을 경우 직접 호출
+      if (!usedProxy) {
         res = await safeFetch(BASE + encodeURIComponent(query), { headers }, 10000);
       }
 

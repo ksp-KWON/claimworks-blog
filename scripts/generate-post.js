@@ -14,13 +14,13 @@ const {
   getTopicPlanningPrompt,
   getPrecedentPlanningPrompt,
   TOPIC_SCHEMA,
+  CONTENT_SCHEMA,
   buildArticlePrompt
 } = require('../src/lib/prompt-rules.js');
 
 const {
   sleep,
   getExistingPosts,
-  parseGeneratedContent,
   saveMarkdownPost
 } = require('../src/lib/post-builder.js');
 
@@ -68,30 +68,27 @@ async function main() {
     await sleep(10000);
   }
 
-  // 3. 본문 생성 (Gemini)
+  // 3. 본문 생성 (Gemini JSON Mode)
   console.log('[3] 블로그 본문 칼럼 작성 중...');
-  const rawOutput = isPrecedent
-    ? await callGemini(buildArticlePrompt(topic, currentAngle, existingPosts, dailyTopic.precedent))
-    : await callGemini(buildArticlePrompt(topic, currentAngle, existingPosts));
+  const articlePrompt = isPrecedent
+    ? buildArticlePrompt(topic, currentAngle, existingPosts, dailyTopic.precedent)
+    : buildArticlePrompt(topic, currentAngle, existingPosts);
+    
+  const contentResult = await callGemini(articlePrompt, CONTENT_SCHEMA);
 
-  // 4. 파싱 및 저장
-  const { summary, content } = parseGeneratedContent(rawOutput);
-  console.log(`[4] 파싱 완료 (${content.length}자) | SEO : ${summary.slice(0, 30)}...`);
+  // 4. 파싱 및 저장 (이제 정규식 처리 없이 JSON에서 직접 추출)
+  const content = contentResult.markdownContent;
+  console.log(`[4] 파싱 완료 (${content.length}자) | 기획: ${topic.title}`);
 
   const additionalFm = isPrecedent ? { caseNumber: dailyTopic.precedent.caseNo } : {};
-  const saved = saveMarkdownPost(topic, summary, content, additionalFm);
+  const saved = saveMarkdownPost(topic, topic.summary, content, additionalFm);
   
   console.log(`[5] 저장 완료 : ${saved.filePath}`);
   console.log('=== 자동글쓰기 종료 ===');
 }
 
 main().catch(err => {
-  console.error(`\n[⚠️ 자동글쓰기 빌드 경고] 통신 실패로 인한 종료: ${err.message}`);
-  // 트렌드는 에러 시 실패 처리(1), 판례는 우아한 종료(0)
-  try {
-    const dailyTopic = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'scripts/daily-topic.json'), 'utf8'));
-    process.exit(dailyTopic.category === '판례·법률 해석' ? 0 : 1);
-  } catch {
-    process.exit(1);
-  }
+  console.error(`\n[⚠️ 자동글쓰기 빌드 경고] 통신 실패 또는 에러 발생: ${err.message}`);
+  // 에러 발생 시 CI/CD 환경에서 감지할 수 있도록 무조건 1(실패) 반환
+  process.exit(1);
 });

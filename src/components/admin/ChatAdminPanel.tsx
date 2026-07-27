@@ -18,6 +18,13 @@ interface ChatAdminPanelProps {
   refreshCounter?: number;
 }
 
+const MACRO_PHRASES = [
+  "안녕하세요, 보상스쿨 손해사정사입니다. 남겨주신 내용을 꼼꼼히 확인하고 답변드리겠습니다.",
+  "외근이나 상담 중일 경우 답변이 지연될 수 있으나, 잠시만 기다려주시면 100% 답변드립니다.",
+  "보다 정확한 상담을 위해 관련 서류(진단서 등)가 있다면 사진으로 남겨주시겠어요?",
+  "말씀하신 내용은 전문적인 검토가 필요합니다. 편하신 시간에 연락처를 남겨주시면 전화드리겠습니다."
+];
+
 export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', refreshCounter = 0 }: ChatAdminPanelProps) {
   const [sessions, setSessions] = useState<SessionWithMeta[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -434,6 +441,20 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
                       className="flex-1 resize-none bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl p-3.5 pr-14 text-[15px] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-600/50 transition-all custom-scrollbar"
                       rows={2}
                     />
+                    
+                    {/* 매크로 UI */}
+                    <div className="absolute left-3 -top-10 flex gap-2">
+                      {MACRO_PHRASES.map((phrase, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setReplyText(prev => prev + (prev ? '\n' : '') + phrase)}
+                          className="px-2.5 py-1 text-[11px] font-medium bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-zinc-700 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800 transition-colors shadow-sm"
+                        >
+                          매크로 {idx + 1}
+                        </button>
+                      ))}
+                    </div>
+
                     <button
                       onClick={handleSend}
                       disabled={!replyText.trim() || isSending}

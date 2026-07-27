@@ -1,16 +1,16 @@
 /**
  * post-builder.js
- * 블로그/판례 자동글쓰기 공용 유틸리티 및 파일 IO 모듈
+ * 블로그/판례 자동글쓰기 공용 유틸리티 및 파일 IO 모듈 (Zero-Regex 개편)
  */
 
 'use strict';
 
-const fs   = require('fs');
-const path = require('path');
+const fs     = require('fs');
+const path   = require('path');
+const matter = require('gray-matter');
 
 // ── 공통 유틸 (pipeline-utils.js 에서 단일 공급) ────────────────────────────
 const { POSTS_DIR, sleep } = require('../../scripts/pipeline-utils.js');
-const { yamlSafe, parseGeneratedContent, buildMarkdownFrontmatter } = require('./content-parser');
 
 // ── 공통 비즈니스 로직 ──────────────────────────────────────────────────────
 function getExistingPosts() {
@@ -26,8 +26,8 @@ function getExistingPosts() {
       const filePath = path.join(POSTS_DIR, file);
       const content  = fs.readFileSync(filePath, 'utf8');
       const slug     = file.replace(/\.md$/, '');
-      const titleMatch = content.match(/^title:\s*["']?(.*?)["']?\r?$/m);
-      const title    = titleMatch ? titleMatch[1].trim() : slug;
+      const m = matter(content);
+      const title = m.data.title || slug;
       posts.push({ slug, title });
     } catch { /* 스킵 */ }
   }
@@ -48,7 +48,26 @@ function saveMarkdownPost(topic, summary, content, additionalFrontmatter = {}) {
   const uniqueSlug = resolveUniqueSlug(topic.slug);
   topic.slug = uniqueSlug;
 
-  const fullContent = buildMarkdownFrontmatter(topic, summary, content, additionalFrontmatter);
+  const today = new Date();
+  const dateStr = today.toISOString().split('T')[0] + 'T' + 
+                  String(today.getHours()).padStart(2, '0') + ':' + 
+                  String(today.getMinutes()).padStart(2, '0') + ':00+09:00';
+
+  const fmData = {
+    title: topic.title,
+    date: dateStr,
+    summary: summary || topic.summary || '',
+    category: [topic.category],
+    tags: Array.isArray(topic.tags) ? topic.tags : [topic.tags],
+    ...additionalFrontmatter
+  };
+  
+  if (topic.specialtyCategory) {
+    fmData.category.push(topic.specialtyCategory);
+  }
+
+  // gray-matter를 이용한 직렬화
+  const fullContent = matter.stringify(content, fmData);
 
   const filePath = path.join(POSTS_DIR, `${uniqueSlug}.md`);
   if (!fs.existsSync(POSTS_DIR)) fs.mkdirSync(POSTS_DIR, { recursive: true });
@@ -60,9 +79,7 @@ function saveMarkdownPost(topic, summary, content, additionalFrontmatter = {}) {
 module.exports = {
   POSTS_DIR,
   sleep,
-  yamlSafe,
   getExistingPosts,
   resolveUniqueSlug,
-  parseGeneratedContent,
   saveMarkdownPost,
 };

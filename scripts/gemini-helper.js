@@ -147,7 +147,7 @@ async function callGemini(prompt, schema = null) {
   modelLoop: for (const { name: model, maxTokens } of models) {
     const generationConfig = {
       ...baseConfig,
-      maxOutputTokens: schema ? Math.min(4096, maxTokens) : maxTokens,
+      maxOutputTokens: maxTokens,
     };
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;

@@ -100,23 +100,28 @@ async function generateTrendySearchKeywords(targetCategory) {
     : `[${targetCategory}] 관련 분야`;
 
   const prompt = `${LOSS_ADJUSTER_CONTEXT}
-현재 대중들이 가장 궁금해할 만한 **${categoryContext}**의 구체적인 실무 핫 트렌드 검색 키워드 3개를 창작해 주세요.
-(구글 뉴스 검색에 사용될 것이므로, 검색량이 많을 만한 핵심 트렌드 위주로 도출하세요.)`;
+현재 대중들이 가장 궁금해할 만한 **${categoryContext}**의 구체적인 실무 핫 트렌드 검색 키워드를 창작해 주세요.
+수량(개수)에 얽매이지 말고, 당신의 전문적인 연쇄 사고(Chain-of-Thought) 분석을 통해 수임 가능성이 높은 핵심 트렌드라고 판단되는 키워드들을 모두 도출하세요. (구글 뉴스 검색용)`;
 
   const schema = {
     type: 'OBJECT',
     properties: {
+      thoughtProcess: {
+        type: 'STRING',
+        description: '어떤 손해사정 실무 및 수임 관점에서 이 트렌드를 분석하고 키워드를 도출했는지 단계별로 서술한 논리 (Chain-of-Thought)'
+      },
       queries: {
         type: 'ARRAY',
         items: { type: 'STRING' },
-        description: '구글 뉴스 검색용 키워드 3개'
+        description: '구글 뉴스 검색용 실무 키워드 배열 (개수 제한 없음)'
       }
     },
-    required: ['queries']
+    required: ['thoughtProcess', 'queries']
   };
 
   try {
     const res = await callGemini(prompt, schema, 'lite');
+    console.log(`    🧠 [AI 사고 과정]: ${res.thoughtProcess}`);
     if (!res.queries || res.queries.length === 0) throw new Error('생성된 쿼리가 없습니다.');
     console.log('    ✨ AI 생성 검색 쿼리:', res.queries);
     return res.queries;
@@ -231,12 +236,16 @@ async function getGenericLegalKeywords(targetCategory, rankedCandidates) {
   const prompt = `${LOSS_ADJUSTER_CONTEXT}
 방금 최신 뉴스 키워드(${context})를 기반으로 대법원 판례 검색을 시도했으나 너무 최신 유행어라서 판례를 찾지 못했습니다.
 
-따라서, 방금 추출했던 이슈 키워드들의 이면에 깔려있는, **[${targetCategory}]** 분야의 가장 본질적이고 손해사정 실무와 직결된 핵심 법률/의학 용어 3가지를 도출해 주세요.
-절대 프롬프트에 예시를 주지 않으니 스스로 해당 카테고리와 이슈를 관통하는 핵심 실무 키워드(특정 질병, 분쟁 유형 등)를 생각해서 반환하세요.`;
+따라서, 방금 추출했던 이슈 키워드들의 이면에 깔려있는, **[${targetCategory}]** 분야의 가장 본질적이고 손해사정 실무와 직결된 핵심 법률/의학 용어를 도출해 주세요.
+절대 프롬프트에 예시를 주지 않으니, 스스로 해당 카테고리와 이슈를 관통하는 핵심 실무 키워드(특정 질병, 분쟁 유형 등)를 심도 있게 사고(Chain-of-Thought)하여 수량에 상관없이 필요한 만큼 반환하세요.`;
 
   const schema = {
     type: 'OBJECT',
     properties: {
+      thoughtProcess: {
+        type: 'STRING',
+        description: '뉴스 트렌드 이면에 숨겨진 본질적인 법률/의학 분쟁 요소를 분석한 단계별 논리 (Chain-of-Thought)'
+      },
       keywords: {
         type: 'ARRAY',
         items: {
@@ -249,11 +258,12 @@ async function getGenericLegalKeywords(targetCategory, rankedCandidates) {
         }
       }
     },
-    required: ['keywords']
+    required: ['thoughtProcess', 'keywords']
   };
 
   try {
     const result = await callGemini(prompt, schema, 'lite');
+    console.log(`    🧠 [AI 사고 과정]: ${result.thoughtProcess}`);
     return result.keywords || [];
   } catch (err) {
     console.warn('⚠️ 상위 법률 용어 도출 실패:', err.message);
@@ -372,23 +382,32 @@ async function getFallbackAiKeyword(fallbackCategory) {
   console.log(`[2.8/5] 3차 안전장치 — [${fallbackCategory}] 맞춤형 AI 실무 키워드 도출 중...`);
   
   const prompt = `${LOSS_ADJUSTER_CONTEXT}
-지금 판례 검색을 위한 마지막 안전장치로, **[${fallbackCategory}]** 카테고리에서 가장 빈번하게 발생하는 구체적인 보험금 분쟁 또는 손해배상 사건 키워드 1개를 생성해야 합니다.
-단순한 단어가 아니라, "음주운전 자동차보험 면책", "협심증 진단비 부지급", "십자인대파열 후유장해 평가"와 같이 매우 구체적이고 실무적인 키워드 1개만 도출해 주세요.`;
+지금 판례 검색을 위한 마지막 안전장치로, **[${fallbackCategory}]** 카테고리에서 가장 빈번하게 발생하는 구체적인 보험금 분쟁 또는 손해배상 사건 키워드를 생성해야 합니다.
+개수에 얽매이지 말고, 연쇄 사고(Chain-of-Thought)를 통해 해당 카테고리에서 손해사정사 수임과 가장 직결되는 매우 구체적이고 실무적인 키워드들을 도출해 주세요.`;
 
   const schema = {
     type: 'OBJECT',
     properties: {
-      keyword: { type: 'STRING', description: '매우 구체적인 실무 분쟁 키워드 1개' }
+      thoughtProcess: {
+        type: 'STRING',
+        description: '해당 카테고리에서 발생할 수 있는 주요 분쟁 상황과 수임 포인트를 분석한 논리 (Chain-of-Thought)'
+      },
+      keywords: { 
+        type: 'ARRAY',
+        items: { type: 'STRING' },
+        description: '매우 구체적인 실무 분쟁 키워드 배열' 
+      }
     },
-    required: ['keyword']
+    required: ['thoughtProcess', 'keywords']
   };
 
   try {
     const res = await callGemini(prompt, schema, 'lite');
-    return res.keyword;
+    console.log(`    🧠 [AI 사고 과정]: ${res.thoughtProcess}`);
+    return res.keywords;
   } catch (err) {
     console.warn('⚠️ 3차 AI 키워드 도출 실패, 카테고리명으로 대체');
-    return fallbackCategory;
+    return [fallbackCategory];
   }
 }
 
@@ -426,9 +445,11 @@ async function main() {
       console.log('[3/4] ⚠️ 2차 탐색 실패. 3차 탐색망(마지막 안전장치: 카테고리 순환 검색) 가동...');
       const fallbackCategory = getNextFallbackCategory();
       console.log(`    선택된 3차 안전장치 카테고리: "${fallbackCategory}"`);
-      const fallbackKeyword = await getFallbackAiKeyword(fallbackCategory);
-      console.log(`    선택된 3차 안전장치 실무 키워드: "${fallbackKeyword}"`);
-      found = await findPrecedent([{ searchKeyword: fallbackKeyword, newsTitle: fallbackKeyword + ' 관련 주요 판례' }], usedCaseNumbers);
+      const fallbackKeywords = await getFallbackAiKeyword(fallbackCategory);
+      
+      console.log(`    선택된 3차 안전장치 실무 키워드들:`, fallbackKeywords);
+      const fallbackSearchQueries = fallbackKeywords.map(k => ({ searchKeyword: k, newsTitle: k + ' 관련 주요 판례' }));
+      found = await findPrecedent(fallbackSearchQueries, usedCaseNumbers);
     }
 
     if (!found) {

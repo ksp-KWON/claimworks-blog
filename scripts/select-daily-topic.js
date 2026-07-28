@@ -68,81 +68,40 @@ function determineCategory() {
 // sleep 은 pipeline-utils.js 에서 공급됨
 
 // ── 기존 포스트 분석 (중복 방지) ─────────────────────────────────────────
-function getUsedMetadata(targetCategory) {
+function getUsedMetadata() {
   const usedCaseNumbers = new Set();
-  const usedKeywords    = new Set();
-
-  if (!fs.existsSync(POSTS_DIR)) return { usedCaseNumbers, usedKeywords };
+  
+  if (!fs.existsSync(POSTS_DIR)) return { usedCaseNumbers };
 
   const posts = [];
   for (const file of fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'))) {
     try {
       const filePath = path.join(POSTS_DIR, file);
-      const stat = fs.statSync(filePath);
       const content = fs.readFileSync(filePath, 'utf8');
       const { data } = matter(content);
 
-      const category = data.category ? String(data.category).trim() : '';
       const caseNo = data.caseNumber ? String(data.caseNumber).trim() : '';
-      
-      let tags = [];
-      if (Array.isArray(data.tags)) {
-        tags = data.tags.map(t => String(t).trim()).filter(Boolean);
-      } else if (typeof data.tags === 'string') {
-        tags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
-      }
-      
-      posts.push({ category, caseNo, tags, mtime: stat.mtimeMs });
+      if (caseNo) usedCaseNumbers.add(caseNo);
     } catch { /* 파싱 불가 파일 무시 */ }
   }
 
-  // 판례 번호는 기간, 카테고리 상관없이 블로그 전체 역사상 쓰인 모든 판례 번호를 영구 배제
-  for (const p of posts) {
-    if (p.caseNo) usedCaseNumbers.add(p.caseNo);
-  }
-
-  // 키워드는 타겟 카테고리에 해당하는 최신순 30개 글에서만 추출하여 단기 중복 방지
-  const filteredPosts = posts
-    .filter(p => p.category === targetCategory)
-    .sort((a, b) => b.mtime - a.mtime)
-    .slice(0, 30);
-
-  for (const p of filteredPosts) {
-    p.tags.forEach(t => usedKeywords.add(t));
-  }
-
-  return { usedCaseNumbers, usedKeywords };
+  return { usedCaseNumbers };
 }
 
 // ── XML 파서 ─────────────────────────────────────────────────────────────
 const xmlParser = new XMLParser({ ignoreAttributes: false, parseTagValue: false });
 
 // ── [0단계] 트렌드 키워드 동적 창작 ──────────────────────────────────────
-async function generateTrendySearchKeywords(usedKeywordsSet, targetCategory) {
-  console.log(`[0/5] AI가 최근 발행된 30개 포스트를 바탕으로 [${targetCategory}] 관련 새로운 검색 키워드 창작 중...`);
-  const usedArray = Array.from(usedKeywordsSet);
-  let prompt = '';
+async function generateTrendySearchKeywords(targetCategory) {
+  console.log(`[0/5] AI가 [${targetCategory}] 관련 새로운 검색 키워드 창작 중...`);
+  
+  const categoryContext = targetCategory === '판례·법률 해석' 
+    ? '전체 보상/보험/손해사정 분야' 
+    : `[${targetCategory}] 관련 분야`;
 
-  if (targetCategory === '판례·법률 해석') {
-    // 판례 카테고리는 카테고리 족쇄를 풀고 자율성을 부여 (과거 금요일 프롬프트 복원)
-    prompt = `${LOSS_ADJUSTER_CONTEXT}
-아래는 최근 우리 블로그에서 다루었던 최신 포스트의 키워드 목록입니다.
-[최근 키워드 목록]
-${usedArray.join(', ')}
-
-이 키워드들과 겹치지 않으면서도, 현재 대중들이 가장 궁금해할 만한 **전체 보상/보험/손해사정 분야**의 구체적인 실무 핫 트렌드 검색 키워드 3개를 창작해 주세요.
-(특정 카테고리에 얽매이지 말고, 가장 굵직하고 보편적인 법률 및 실무 분쟁 이슈를 뽑아내야 합니다.)
-이 키워드는 구글 뉴스 검색에 사용될 것입니다.`;
-  } else {
-    // 일반 트렌드 카테고리는 카테고리에 맞게 정밀 타겟팅
-    prompt = `${LOSS_ADJUSTER_CONTEXT}
-아래는 최근 우리 블로그의 [${targetCategory}] 카테고리에서 다루었던 최신 포스트의 키워드 목록입니다.
-[최근 키워드 목록]
-${usedArray.join(', ')}
-
-이 키워드들과 겹치지 않으면서도, 현재 대중들이 가장 궁금해할 만한 **[${targetCategory}]** 관련 구체적인 실무 핫 트렌드 검색 키워드 3개를 창작해 주세요.
-이 키워드는 구글 뉴스 검색에 사용될 것입니다.`;
-  }
+  const prompt = `${LOSS_ADJUSTER_CONTEXT}
+현재 대중들이 가장 궁금해할 만한 **${categoryContext}**의 구체적인 실무 핫 트렌드 검색 키워드 3개를 창작해 주세요.
+(구글 뉴스 검색에 사용될 것이므로, 검색량이 많을 만한 핵심 트렌드 위주로 도출하세요.)`;
 
   const schema = {
     type: 'OBJECT',
@@ -409,17 +368,12 @@ function getNextFallbackCategory() {
 }
 
 // ── [2.8단계] AI로 3차 백업 키워드 추출 ───────────────────────────────────
-async function getFallbackAiKeyword(fallbackCategory, usedKeywordsSet) {
+async function getFallbackAiKeyword(fallbackCategory) {
   console.log(`[2.8/5] 3차 안전장치 — [${fallbackCategory}] 맞춤형 AI 실무 키워드 도출 중...`);
-  const usedArray = Array.from(usedKeywordsSet).slice(0, 30);
   
   const prompt = `${LOSS_ADJUSTER_CONTEXT}
-지금 [판례·법률 해석] 검색을 위한 마지막 안전장치로, **[${fallbackCategory}]** 카테고리에서 가장 빈번하게 발생하는 구체적인 보험금 분쟁 또는 손해배상 사건 키워드 1개를 생성해야 합니다.
-
-[기존에 사용된 키워드 (피해야 함)]
-${usedArray.join(', ')}
-
-단순한 카테고리명(예: 암, 교통사고)이 아니라, "음주운전 자동차보험 면책", "협심증 진단비 부지급", "십자인대파열 후유장해 평가"와 같이 매우 구체적이고 실무적인 키워드 1개만 도출해 주세요.`;
+지금 판례 검색을 위한 마지막 안전장치로, **[${fallbackCategory}]** 카테고리에서 가장 빈번하게 발생하는 구체적인 보험금 분쟁 또는 손해배상 사건 키워드 1개를 생성해야 합니다.
+단순한 단어가 아니라, "음주운전 자동차보험 면책", "협심증 진단비 부지급", "십자인대파열 후유장해 평가"와 같이 매우 구체적이고 실무적인 키워드 1개만 도출해 주세요.`;
 
   const schema = {
     type: 'OBJECT',
@@ -443,11 +397,11 @@ async function main() {
   const targetCategory = determineCategory();
   console.log(`=== 1단계: [${targetCategory}] 주제 및 판례 데이터 연쇄 탐색 시작 ===`);
 
-  const { usedCaseNumbers, usedKeywords } = getUsedMetadata(targetCategory);
-  console.log(`  [분석] 기발행 [${targetCategory}] 카테고리 포스트 30개 분석 | 기사용 키워드 수: ${usedKeywords.size}개`);
+  const { usedCaseNumbers } = getUsedMetadata();
+  console.log(`  [분석] 기발행 포스트 판례 번호 로드 완료`);
 
   // 1. 구글 뉴스 RSS 수집
-  const aiQueries = await generateTrendySearchKeywords(usedKeywords, targetCategory);
+  const aiQueries = await generateTrendySearchKeywords(targetCategory);
   const headlines = await fetchTrendingNews(aiQueries);
 
   // 2. AI 키워드 추출 (자동 랭킹 포함)
@@ -472,7 +426,7 @@ async function main() {
       console.log('[3/4] ⚠️ 2차 탐색 실패. 3차 탐색망(마지막 안전장치: 카테고리 순환 검색) 가동...');
       const fallbackCategory = getNextFallbackCategory();
       console.log(`    선택된 3차 안전장치 카테고리: "${fallbackCategory}"`);
-      const fallbackKeyword = await getFallbackAiKeyword(fallbackCategory, usedKeywords);
+      const fallbackKeyword = await getFallbackAiKeyword(fallbackCategory);
       console.log(`    선택된 3차 안전장치 실무 키워드: "${fallbackKeyword}"`);
       found = await findPrecedent([{ searchKeyword: fallbackKeyword, newsTitle: fallbackKeyword + ' 관련 주요 판례' }], usedCaseNumbers);
     }

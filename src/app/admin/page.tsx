@@ -198,54 +198,39 @@ export default function AdminPage() {
 
 
   const handleRunAutoBatch = async (category: string, autoPublish: boolean = false): Promise<boolean> => {
-    if (!geminiKey) { alert('Gemini API 키를 먼저 설정하세요.'); return false; }
+    if (!githubToken) { alert('GitHub API 토큰(PAT)을 환경설정에서 먼저 입력하세요.'); return false; }
     try {
-      const type = category === '판례·법률 해석' ? 'precedent' : 'trend';
-      const generated = await runAutoGenerationWorkflow(type, geminiKey, (msg) => {
-        setAutoProgress(msg);
-      }, category);
+      setAutoProgress('GitHub Actions 자동글쓰기를 트리거하는 중...');
       
-      if (generated) {
-        const parsed = parseMarkdown(generated);
-        const metaData = {
-          title: parsed.data.title || '새 문서',
-          summary: parsed.data.summary || '',
-          date: parsed.data.date || new Date().toISOString().split('T')[0],
-          category: normalizeCategory(parsed.data.category) || category,
-          tags: Array.isArray(parsed.data.tags) ? parsed.data.tags.join(', ') : parsed.data.tags,
-          specialtyCategory: parsed.data.specialtyCategory || '',
-          caseNumber: parsed.data.caseNumber || '',
-          currentFilename: parsed.data.slug ? `${parsed.data.slug}.md` : null,
-          content: parsed.content,
-          published: autoPublish // 일괄 발행일 땐 즉시 발행
-        };
-        
-        if (autoPublish) {
-          await savePost(githubToken, metaData);
-          handleFetchList(); // 목록 새로고침
-        } else {
-          // 개별 카테고리 발행 시 에디터에 로드
-          setPostMeta(prev => ({
-            ...prev,
-            title: metaData.title,
-            summary: metaData.summary,
-            date: metaData.date,
-            category: metaData.category,
-            tags: metaData.tags,
-            specialtyCategory: metaData.specialtyCategory,
-            caseNumber: metaData.caseNumber,
-            currentFilename: metaData.currentFilename,
-            content: metaData.content
-          }));
-          setActiveApp('post-ai');
-        }
-        
+      const res = await fetch('https://api.github.com/repos/ksp-KWON/claimworks-blog/actions/workflows/auto-post.yml/dispatches', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/vnd.github.v3+json',
+          'Authorization': `token ${githubToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ref: 'main',
+          inputs: {
+            post_type: category
+          }
+        })
+      });
+
+      if (res.ok) {
+        alert(`${category} 카테고리로 GitHub Actions 자동글쓰기를 시작했습니다!\n약 1~2분 뒤 저장소에 반영됩니다.`);
         return true;
+      } else {
+        const errorText = await res.text();
+        alert(`트리거 실패: ${res.status} - ${errorText}`);
+        return false;
       }
-      return false;
     } catch (e: any) {
       console.error(`[AutoBatch Error - ${category}]`, e);
+      alert('네트워크 오류가 발생했습니다.');
       return false;
+    } finally {
+      setAutoProgress('');
     }
   };
 

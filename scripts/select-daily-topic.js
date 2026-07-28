@@ -15,6 +15,8 @@
 const fs   = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const matter = require('gray-matter');
+const { XMLParser } = require('fast-xml-parser');
 
 // ── 공통 유틸 (pipeline-utils.js 에서 단일 공급 — .env.local 로드 포함) ────
 const { POSTS_DIR: _POSTS_DIR, sleep, safeFetch } = require('./pipeline-utils.js');
@@ -65,23 +67,17 @@ function getUsedMetadata(targetCategory) {
     try {
       const filePath = path.join(POSTS_DIR, file);
       const stat = fs.statSync(filePath);
-      const yaml = (fs.readFileSync(filePath, 'utf8')
-        .match(/^---\r?\n([\s\S]*?)\r?\n---/) ?? [])[1] ?? '';
+      const content = fs.readFileSync(filePath, 'utf8');
+      const { data } = matter(content);
 
-      const catMatch = yaml.match(/category:\s*["']?(.*?)["']?\r?$/m);
-      const category = catMatch ? catMatch[1].trim() : '';
-
-      const caseNo = yaml.match(/caseNumber:\s*["']?(.*?)["']?\r?$/m)?.[1]?.trim();
+      const category = data.category ? String(data.category).trim() : '';
+      const caseNo = data.caseNumber ? String(data.caseNumber).trim() : '';
       
       let tags = [];
-      const inline = yaml.match(/tags:\s*\[(.*?)\]/)?.[1];
-      if (inline) {
-        inline.split(',').forEach(t => { const v = t.replace(/['"]/g,'').trim(); if(v) tags.push(v); });
-      } else {
-        yaml.match(/tags:\r?\n((?:\s*-\s*.*?\r?\n)*)/)?.[1]?.split('\n').forEach(l => {
-          const v = l.replace(/^\s*-\s*/,'').replace(/['"]/g,'').trim();
-          if (v) tags.push(v);
-        });
+      if (Array.isArray(data.tags)) {
+        tags = data.tags.map(t => String(t).trim()).filter(Boolean);
+      } else if (typeof data.tags === 'string') {
+        tags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
       }
       
       posts.push({ category, caseNo, tags, mtime: stat.mtimeMs });
@@ -106,14 +102,8 @@ function getUsedMetadata(targetCategory) {
   return { usedCaseNumbers, usedKeywords };
 }
 
-// ── XML 값 추출 헬퍼 ─────────────────────────────────────────────────────
-function extractXmlValues(xml, tag) {
-  const re = new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>|([^<]*?))</${tag}>`, 'g');
-  const out = [];
-  let m;
-  while ((m = re.exec(xml)) !== null) out.push((m[1] ?? m[2] ?? '').trim());
-  return out;
-}
+// ── XML 파서 ─────────────────────────────────────────────────────────────
+const xmlParser = new XMLParser({ ignoreAttributes: false, parseTagValue: false });
 
 // ── [0단계] 트렌드 키워드 동적 창작 ──────────────────────────────────────
 async function generateTrendySearchKeywords(usedKeywordsSet, targetCategory) {
@@ -198,8 +188,9 @@ async function fetchTrendingNews(queries) {
       if (!res.ok) { console.warn(`    [경고] "${query}" (HTTP ${res.status})`); continue; }
 
       const xml = await res.text();
-      const titles = extractXmlValues(xml, 'title')
-        .filter(t => t && !t.startsWith('"') && !t.includes('Google 뉴스'));
+      const doc = xmlParser.parse(xml);
+      const items = [].concat(doc?.rss?.channel?.item || []);
+      const titles = items.map(i => i.title).filter(t => t && !t.startsWith('"') && !t.includes('Google 뉴스')).slice(0, 10);
 
       headlines.push(...titles);
       console.log(`    "${query}" → ${titles.length}건`);
@@ -321,23 +312,28 @@ async function fetchLawAPI(type, params) {
 async function searchPrecedents(query) {
   const xml = await fetchLawAPI('list', { query });
   if (xml.includes('사용자 정보 검증에 실패하였습니다')) throw new Error('법제처 인증 실패');
-  const ids     = extractXmlValues(xml, '판례일련번호');
-  const titles  = extractXmlValues(xml, '사건명');
-  const caseNos = extractXmlValues(xml, '사건번호');
-  return ids.map((id, i) => ({ id, title: titles[i], caseNo: caseNos[i] }));
+  const doc = xmlParser.parse(xml);
+  const precs = [].concat(doc?.PrecSearch?.prec || []);
+  return precs.map(p => ({
+    id: String(p['판례일련번호'] || ''),
+    title: String(p['사건명'] || ''),
+    caseNo: String(p['사건번호'] || '')
+  }));
 }
 
 async function getPrecedentDetail(id) {
   const xml = await fetchLawAPI('detail', { id });
+  const doc = xmlParser.parse(xml);
+  const p = doc?.PrecDetail || {};
   return {
     id,
-    caseName:        extractXmlValues(xml, '사건명')[0]     ?? '',
-    caseNo:          extractXmlValues(xml, '사건번호')[0]   ?? '',
-    judgmentDate:    extractXmlValues(xml, '선고일자')[0]   ?? '',
-    courtName:       extractXmlValues(xml, '법원명')[0]     ?? '',
-    judgmentSummary: extractXmlValues(xml, '판결요지')[0]   ?? '',
-    caseContent:     extractXmlValues(xml, '판례내용')[0]   ?? '',
-    caseType:        extractXmlValues(xml, '사건종류명')[0] ?? '',
+    caseName:        String(p['사건명'] || ''),
+    caseNo:          String(p['사건번호'] || ''),
+    judgmentDate:    String(p['선고일자'] || ''),
+    courtName:       String(p['법원명'] || ''),
+    judgmentSummary: String(p['판결요지'] || ''),
+    caseContent:     String(p['판례내용'] || ''),
+    caseType:        String(p['사건종류명'] || ''),
   };
 }
 

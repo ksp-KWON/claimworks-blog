@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const matter = require('gray-matter');
 
 const postsDirectory = path.join(process.cwd(), 'src/content/posts');
 
@@ -17,6 +18,7 @@ function checkQuality() {
 
     const fullPath = path.join(postsDirectory, fileName);
     const content = fs.readFileSync(fullPath, 'utf8');
+    const { data } = matter(content);
 
     let errorsInFile = [];
 
@@ -29,12 +31,9 @@ function checkQuality() {
     }
 
     // 2. Meta description bracket checks (Summary in frontmatter)
-    const summaryMatch = content.match(/^summary:\s*"(.*)"$/m);
-    if (summaryMatch) {
-      const summaryText = summaryMatch[1];
-      if (summaryText.startsWith('[') && summaryText.endsWith(']')) {
-        errorsInFile.push('Summary frontmatter contains brackets [...] which harms SEO.');
-      }
+    const summaryText = data.summary ? String(data.summary) : '';
+    if (summaryText.startsWith('[') && summaryText.endsWith(']')) {
+      errorsInFile.push('Summary frontmatter contains brackets [...] which harms SEO.');
     }
 
     // 3. Embedded CTA checks

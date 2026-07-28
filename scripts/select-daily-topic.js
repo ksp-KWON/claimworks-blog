@@ -252,13 +252,16 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}`;
 }
 
 // ── [2.5단계] Gemini AI → 상위 법률 용어 도출 (2차 탐색용) ─────────────────
-async function getGenericLegalKeywords(targetCategory) {
-  console.log(`[2.5/5] AI 분석 — [${targetCategory}] 상위 법률 용어(면책사유 등) 도출 중...`);
-  const prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
-방금 뉴스 트렌드 기반으로 대법원 판례 검색을 시도했으나 너무 최신 유행어라서 판례를 찾지 못했습니다.
-따라서, **[${targetCategory}]** 분야의 대법원 판례에서 가장 자주 등장하는 보편적이고 핵심적인 상위 법률 용어(예: 면책사유, 인과관계, 설명의무, 안전배려의무 등) 3가지를 도출해 주세요.
+async function getGenericLegalKeywords(targetCategory, rankedCandidates) {
+  console.log(`[2.5/5] AI 분석 — [${targetCategory}] 상위 법률 용어 도출 중...`);
+  
+  const context = rankedCandidates ? rankedCandidates.slice(0, 5).map(c => c.searchKeyword).join(', ') : '';
 
-반드시 아래 뉴스 헤드라인과 연관된 용어일 필요는 없으며, 해당 카테고리를 관통하는 가장 본질적인 법률 키워드여야 합니다.`;
+  const prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+방금 최신 뉴스 키워드(${context})를 기반으로 대법원 판례 검색을 시도했으나 너무 최신 유행어라서 판례를 찾지 못했습니다.
+
+따라서, 방금 추출했던 이슈 키워드들의 이면에 깔려있는, **[${targetCategory}]** 분야의 가장 본질적인 상위 법률 용어 3가지를 도출해 주세요.
+절대 프롬프트에 예시를 주지 않으니 스스로 해당 카테고리와 이슈를 관통하는 핵심 법률 용어를 생각해서 반환하세요.`;
 
   const schema = {
     type: 'OBJECT',
@@ -374,6 +377,33 @@ async function findPrecedent(keywords, usedCaseNumbers) {
   return null;
 }
 
+// ── 3차 탐색망 유틸리티 (카테고리 순환) ───────────────────────────────────
+function getNextFallbackKeyword() {
+  const fallbacks = [
+    '자살',             // 사망·자살 보험금 대체
+    '암',               // 질병진단·실손 대체
+    '교통사고',         // 교통사고 보상 대체
+    '의료과실',         // 배상책임·의료 대체
+    '산재',             // 근재·산재 사고 대체
+    '장해',             // 장해평가·면책 대체
+    '손해배상'          // 보상가이드 대체
+  ];
+  const statePath = path.join(process.cwd(), 'scripts/.fallback-state.json');
+  let idx = 0;
+  
+  try {
+    if (fs.existsSync(statePath)) {
+      const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+      if (typeof state.index === 'number') {
+        idx = (state.index + 1) % fallbacks.length;
+      }
+    }
+  } catch(e) {}
+  
+  fs.writeFileSync(statePath, JSON.stringify({ index: idx }), 'utf8');
+  return fallbacks[idx];
+}
+
 // ── 메인 ─────────────────────────────────────────────────────────────────
 async function main() {
   const targetCategory = determineCategory();
@@ -399,12 +429,20 @@ async function main() {
     // 4. 2차 탐색망 (AI 상위 법률 용어)
     if (!found) {
       console.log('[3/4] ⚠️ 1차 탐색 실패. 2차 탐색망(상위 법률 용어) 가동...');
-      const genericKeywords = await getGenericLegalKeywords(targetCategory);
+      const genericKeywords = await getGenericLegalKeywords(targetCategory, rankedCandidates);
       found = await findPrecedent(genericKeywords, usedCaseNumbers);
     }
 
+    // 5. 3차 탐색망 (마지막 안전장치 - 7개 카테고리명 순환 검색)
     if (!found) {
-      console.warn('⚠️ 2중 탐색망 모두 실패 — 적절한 판례를 찾지 못했습니다.');
+      console.log('[3/4] ⚠️ 2차 탐색 실패. 3차 탐색망(마지막 안전장치: 카테고리 순환 검색) 가동...');
+      const fallbackKeyword = getNextFallbackKeyword();
+      console.log(`    선택된 3차 안전장치 키워드: "${fallbackKeyword}"`);
+      found = await findPrecedent([{ searchKeyword: fallbackKeyword, newsTitle: fallbackKeyword + ' 주요 판례' }], usedCaseNumbers);
+    }
+
+    if (!found) {
+      console.warn('⚠️ 3중 탐색망 모두 실패 — 적절한 판례를 찾지 못했습니다.');
       throw new Error('적절한 판례를 찾지 못했습니다.');
     }
   } else {

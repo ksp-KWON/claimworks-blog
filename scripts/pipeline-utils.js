@@ -26,4 +26,19 @@ const POSTS_DIR = path.join(process.cwd(), 'src/content/posts');
 // ── 공통 유틸 ────────────────────────────────────────────────────────────────
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-module.exports = { POSTS_DIR, sleep };
+async function safeFetch(url, options = {}, timeoutMs = 10000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error(`Fetch timeout after ${timeoutMs}ms: ${url}`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(id);
+  }
+}
+
+module.exports = { POSTS_DIR, sleep, safeFetch };

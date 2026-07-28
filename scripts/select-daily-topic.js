@@ -15,10 +15,9 @@
 const fs   = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { safeFetch } = require('./fetch-utils.js');
 
 // ── 공통 유틸 (pipeline-utils.js 에서 단일 공급 — .env.local 로드 포함) ────
-const { POSTS_DIR: _POSTS_DIR, sleep } = require('./pipeline-utils.js');
+const { POSTS_DIR: _POSTS_DIR, sleep, safeFetch } = require('./pipeline-utils.js');
 const { callGemini } = require('./gemini-helper');
 
 // ── 상수 ─────────────────────────────────────────────────────────────────

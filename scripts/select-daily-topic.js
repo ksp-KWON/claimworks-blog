@@ -18,6 +18,16 @@ const crypto = require('crypto');
 const matter = require('gray-matter');
 const { XMLParser } = require('fast-xml-parser');
 
+const LOSS_ADJUSTER_CONTEXT = `
+당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+우리 블로그는 손해사정사가 업무와 관련된 정보, 청구 방법, 진행 과정, 처리 사례 등을 일반인에게 알려주고 수임을 유도하는 것을 목적으로 합니다.
+따라서 모든 키워드는 다음의 '손해사정 및 보험금 분쟁 실무'와 직결되어야 합니다:
+- 질병/상해: 협심증, 심근경색, 뇌출혈, 뇌졸중, 각종 암(위암, 혈액암 등) 진단비 분쟁, 후유장해(십자인대파열, 고관절골절 등)
+- 실손/배상책임: 실손보험 면책사유 분쟁, 일상생활배상책임보험, 산재/교통사고 실손 청구
+- 교통사고/산재: 단독사고 자동차보험, 음주운전/무단횡단 면책, 근재보험, 요양불승인 취소 등
+단순한 단어가 아닌, "무단횡단 자동차보험처리", "뇌졸중 진단비 분쟁", "십자인대파열 후유장해" 와 같이 사건화되고 구체적인 실무 키워드를 지향하세요.
+`;
+
 // ── 공통 유틸 (pipeline-utils.js 에서 단일 공급 — .env.local 로드 포함) ────
 const { POSTS_DIR: _POSTS_DIR, sleep, safeFetch } = require('./pipeline-utils.js');
 const { callGemini } = require('./gemini-helper');
@@ -113,22 +123,22 @@ async function generateTrendySearchKeywords(usedKeywordsSet, targetCategory) {
 
   if (targetCategory === '판례·법률 해석') {
     // 판례 카테고리는 카테고리 족쇄를 풀고 자율성을 부여 (과거 금요일 프롬프트 복원)
-    prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+    prompt = `${LOSS_ADJUSTER_CONTEXT}
 아래는 최근 우리 블로그에서 다루었던 최신 포스트의 키워드 목록입니다.
 [최근 키워드 목록]
 ${usedArray.join(', ')}
 
-이 키워드들과 겹치지 않으면서도, 현재 대중들이 가장 궁금해할 만한 **전체 보상/보험/손해사정 분야**의 핫 트렌드 검색 키워드 3개를 창작해 주세요.
+이 키워드들과 겹치지 않으면서도, 현재 대중들이 가장 궁금해할 만한 **전체 보상/보험/손해사정 분야**의 구체적인 실무 핫 트렌드 검색 키워드 3개를 창작해 주세요.
 (특정 카테고리에 얽매이지 말고, 가장 굵직하고 보편적인 법률 및 실무 분쟁 이슈를 뽑아내야 합니다.)
 이 키워드는 구글 뉴스 검색에 사용될 것입니다.`;
   } else {
     // 일반 트렌드 카테고리는 카테고리에 맞게 정밀 타겟팅
-    prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+    prompt = `${LOSS_ADJUSTER_CONTEXT}
 아래는 최근 우리 블로그의 [${targetCategory}] 카테고리에서 다루었던 최신 포스트의 키워드 목록입니다.
 [최근 키워드 목록]
 ${usedArray.join(', ')}
 
-이 키워드들과 겹치지 않으면서도, 현재 대중들이 가장 궁금해할 만한 **[${targetCategory}]** 관련 핫 트렌드 검색 키워드 3개를 창작해 주세요.
+이 키워드들과 겹치지 않으면서도, 현재 대중들이 가장 궁금해할 만한 **[${targetCategory}]** 관련 구체적인 실무 핫 트렌드 검색 키워드 3개를 창작해 주세요.
 이 키워드는 구글 뉴스 검색에 사용될 것입니다.`;
   }
 
@@ -209,9 +219,9 @@ async function extractInsuranceKeywords(headlines, targetCategory) {
   if (!headlines.length) return [];
   console.log(`[2/5] AI 분석 — [${targetCategory}] 연관 키워드 추출 중...`);
 
-  const prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+  const prompt = `${LOSS_ADJUSTER_CONTEXT}
 아래 뉴스 헤드라인 목록에서 [${targetCategory}] 분야와
-직접 연관된 이슈를 분석하여, 법제처 판례 API 검색에 즉시 활용할 구체적인 법률·보험 용어 키워드를 추출하세요.
+직접 연관된 이슈를 분석하여, 법제처 판례 API 검색에 즉시 활용할 구체적인 실무 키워드를 추출하세요.
 
 [중요 지시사항]
 반드시 아래 뉴스 헤드라인에서 가장 자주 언급된 빈도수(Frequency)와 사회적 파급력을 분석하여, 
@@ -257,11 +267,11 @@ async function getGenericLegalKeywords(targetCategory, rankedCandidates) {
   
   const context = rankedCandidates ? rankedCandidates.slice(0, 5).map(c => c.searchKeyword).join(', ') : '';
 
-  const prompt = `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+  const prompt = `${LOSS_ADJUSTER_CONTEXT}
 방금 최신 뉴스 키워드(${context})를 기반으로 대법원 판례 검색을 시도했으나 너무 최신 유행어라서 판례를 찾지 못했습니다.
 
-따라서, 방금 추출했던 이슈 키워드들의 이면에 깔려있는, **[${targetCategory}]** 분야의 가장 본질적인 상위 법률 용어 3가지를 도출해 주세요.
-절대 프롬프트에 예시를 주지 않으니 스스로 해당 카테고리와 이슈를 관통하는 핵심 법률 용어를 생각해서 반환하세요.`;
+따라서, 방금 추출했던 이슈 키워드들의 이면에 깔려있는, **[${targetCategory}]** 분야의 가장 본질적이고 손해사정 실무와 직결된 핵심 법률/의학 용어 3가지를 도출해 주세요.
+절대 프롬프트에 예시를 주지 않으니 스스로 해당 카테고리와 이슈를 관통하는 핵심 실무 키워드(특정 질병, 분쟁 유형 등)를 생각해서 반환하세요.`;
 
   const schema = {
     type: 'OBJECT',
@@ -378,16 +388,8 @@ async function findPrecedent(keywords, usedCaseNumbers) {
 }
 
 // ── 3차 탐색망 유틸리티 (카테고리 순환) ───────────────────────────────────
-function getNextFallbackKeyword() {
-  const fallbacks = [
-    '자살',             // 사망·자살 보험금 대체
-    '암',               // 질병진단·실손 대체
-    '교통사고',         // 교통사고 보상 대체
-    '의료과실',         // 배상책임·의료 대체
-    '산재',             // 근재·산재 사고 대체
-    '장해',             // 장해평가·면책 대체
-    '손해배상'          // 보상가이드 대체
-  ];
+function getNextFallbackCategory() {
+  const fallbacks = TARGET_CATEGORIES.filter(c => c !== '판례·법률 해석');
   const statePath = path.join(process.cwd(), 'scripts/.fallback-state.json');
   let idx = 0;
   
@@ -402,6 +404,36 @@ function getNextFallbackKeyword() {
   
   fs.writeFileSync(statePath, JSON.stringify({ index: idx }), 'utf8');
   return fallbacks[idx];
+}
+
+// ── [2.8단계] AI로 3차 백업 키워드 추출 ───────────────────────────────────
+async function getFallbackAiKeyword(fallbackCategory, usedKeywordsSet) {
+  console.log(`[2.8/5] 3차 안전장치 — [${fallbackCategory}] 맞춤형 AI 실무 키워드 도출 중...`);
+  const usedArray = Array.from(usedKeywordsSet).slice(0, 30);
+  
+  const prompt = `${LOSS_ADJUSTER_CONTEXT}
+지금 [판례·법률 해석] 검색을 위한 마지막 안전장치로, **[${fallbackCategory}]** 카테고리에서 가장 빈번하게 발생하는 구체적인 보험금 분쟁 또는 손해배상 사건 키워드 1개를 생성해야 합니다.
+
+[기존에 사용된 키워드 (피해야 함)]
+${usedArray.join(', ')}
+
+단순한 카테고리명(예: 암, 교통사고)이 아니라, "음주운전 자동차보험 면책", "협심증 진단비 부지급", "십자인대파열 후유장해 평가"와 같이 매우 구체적이고 실무적인 키워드 1개만 도출해 주세요.`;
+
+  const schema = {
+    type: 'OBJECT',
+    properties: {
+      keyword: { type: 'STRING', description: '매우 구체적인 실무 분쟁 키워드 1개' }
+    },
+    required: ['keyword']
+  };
+
+  try {
+    const res = await callGemini(prompt, schema, 'lite');
+    return res.keyword;
+  } catch (err) {
+    console.warn('⚠️ 3차 AI 키워드 도출 실패, 카테고리명으로 대체');
+    return fallbackCategory;
+  }
 }
 
 // ── 메인 ─────────────────────────────────────────────────────────────────
@@ -433,12 +465,14 @@ async function main() {
       found = await findPrecedent(genericKeywords, usedCaseNumbers);
     }
 
-    // 5. 3차 탐색망 (마지막 안전장치 - 7개 카테고리명 순환 검색)
+    // 5. 3차 탐색망 (마지막 안전장치 - 7개 카테고리명 순환 검색 기반 AI 키워드)
     if (!found) {
       console.log('[3/4] ⚠️ 2차 탐색 실패. 3차 탐색망(마지막 안전장치: 카테고리 순환 검색) 가동...');
-      const fallbackKeyword = getNextFallbackKeyword();
-      console.log(`    선택된 3차 안전장치 키워드: "${fallbackKeyword}"`);
-      found = await findPrecedent([{ searchKeyword: fallbackKeyword, newsTitle: fallbackKeyword + ' 주요 판례' }], usedCaseNumbers);
+      const fallbackCategory = getNextFallbackCategory();
+      console.log(`    선택된 3차 안전장치 카테고리: "${fallbackCategory}"`);
+      const fallbackKeyword = await getFallbackAiKeyword(fallbackCategory, usedKeywords);
+      console.log(`    선택된 3차 안전장치 실무 키워드: "${fallbackKeyword}"`);
+      found = await findPrecedent([{ searchKeyword: fallbackKeyword, newsTitle: fallbackKeyword + ' 관련 주요 판례' }], usedCaseNumbers);
     }
 
     if (!found) {

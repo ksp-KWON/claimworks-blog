@@ -170,15 +170,15 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
 
 function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCategory) {
-  return `당신은 '보상스쿨'의 콘텐츠 기획자입니다.
+  return `당신은 '보상스쿨'의 최정상 콘텐츠 기획자이자 마케터입니다.
 오늘 확정된 대표 키워드는 [${keyword}] 이며, 관련된 오늘의 이슈는 [${trendTitle}] 입니다.
 반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
 
 기존 슬러그 (중복 금지) : [${existingPosts}]
 
-위 키워드와 맥락을 바탕으로 다음 항목들을 기획하십시오:
+위 키워드와 맥락을 바탕으로, 어떻게 하면 잠재 고객(보험 분쟁 중인 사람)이 검색 결과에서 클릭하지 않고는 못 배길지 연쇄 사고(Chain-of-Thought)를 거쳐 기획하십시오:
 1. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소 (예: daily-accident-compensation)
-2. title: SEO 최적화 제목 (일상 용어 + 혜택 결합)
+2. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
 3. summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문
 4. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
 5. specialtyCategory: 전문 진료과목 (예: 정형외과)
@@ -186,11 +186,11 @@ function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCatego
 7. keywords: 타겟 키워드 목록
 8. calculatorType: "auto" 또는 "medical" 지정.
 
-JSON으로 반환하십시오.`;
+반드시 JSON으로 반환하십시오.`;
 }
 
 function getPrecedentPlanningPrompt(detail, existingPosts, targetCategory) {
-  return `당신은 '보상스쿨'의 콘텐츠 기획자입니다.
+  return `당신은 '보상스쿨'의 최정상 콘텐츠 기획자이자 마케터입니다.
 아래의 법제처 수집 판례 데이터를 바탕으로 포스팅 기획 정보를 생성해 주세요.
 반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
 
@@ -203,8 +203,9 @@ function getPrecedentPlanningPrompt(detail, existingPosts, targetCategory) {
 ${existingPosts}
 
 [기획 원칙]
+어떻게 하면 이 딱딱한 판례가 일반인의 문제와 직결되어 클릭을 유도할 수 있을지 연쇄 사고(Chain-of-Thought)를 거쳐 기획하십시오:
 1. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
-2. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합)
+2. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
 3. summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문 (판례번호 포함)
 4. category: 무조건 "판례·법률 해석"
 5. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
@@ -212,7 +213,7 @@ ${existingPosts}
 7. keywords: 타겟 키워드 목록
 8. calculatorType: "auto" 또는 "medical" 지정
 
-JSON으로 반환하십시오.`;
+반드시 JSON으로 반환하십시오.`;
 }
 
 function getManualPlanningPrompt(aiInput, existingPosts) {
@@ -306,6 +307,7 @@ A: {팩트 기반 답변}
 const TOPIC_SCHEMA = {
   type: 'OBJECT',
   properties: {
+    thoughtProcess: { type: 'STRING', description: '잠재 고객의 클릭을 유도하기 위해 어떤 마케팅 관점에서 제목과 요약문 등을 기획했는지 서술한 논리 (Chain-of-Thought)' },
     slug: { type: 'STRING', description: '하이픈 구분 영문 소문자 URL 슬러그' },
     title: { type: 'STRING', description: 'SEO 최적화 포스팅 제목 (50자 내외)' },
     summary: { type: 'STRING', description: '구글 검색 결과에 노출될 150자 이내의 클릭 유도용 SEO 요약문. 판례번호 또는 핵심 키워드 포함.' },
@@ -315,7 +317,7 @@ const TOPIC_SCHEMA = {
     keywords: { type: 'STRING', description: '타겟 키워드 목록 (쉼표 구분)' },
     calculatorType: { type: 'STRING', description: '"auto" 또는 "medical"' },
   },
-  required: ['slug', 'title', 'summary', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
+  required: ['thoughtProcess', 'slug', 'title', 'summary', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
 };
 
 const CONTENT_SCHEMA = {

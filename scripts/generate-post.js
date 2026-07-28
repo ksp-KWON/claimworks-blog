@@ -61,7 +61,8 @@ async function main() {
     : getTopicPlanningPrompt(dailyTopic.keyword, dailyTopic.trendTitle || '없음', existingSlugsStr, dailyTopic.category);
 
   const topic = await callGemini(planPrompt, TOPIC_SCHEMA, 'flash');
-  console.log(`    기획 완료 : ${topic.title} (${topic.slug})`);
+  console.log(`    🧠 [기획 사고 과정] : ${topic.thoughtProcess}`);
+  console.log(`    ✅ 기획 완료 : ${topic.title} (${topic.slug})`);
 
   if (!isPrecedent) {
     console.log('  [대기] 10초 쿨다운...');
@@ -75,6 +76,7 @@ async function main() {
     : buildArticlePrompt(topic, currentAngle, existingPosts);
     
   const contentResult = await callGemini(articlePrompt, CONTENT_SCHEMA, 'flash');
+  console.log(`    🧠 [본문 집필 사고 과정] : \n${contentResult.thoughtProcess}`);
 
   // 4. 파싱 및 저장 (이제 정규식 처리 없이 JSON에서 직접 추출)
   const content = contentResult.markdownContent;

@@ -1,7 +1,7 @@
 import { getSortedPostsData } from "@/lib/posts";
 import YouTubeBriefing from "@/components/YouTubeBriefing";
 import HomePostList from "@/components/HomePostList";
-import type { Metadata, ResolvingMetadata } from "next";
+import type { Metadata } from "next";
 import PremiumHeading from "@/components/ui/PremiumHeading";
 
 export const metadata: Metadata = {
@@ -12,13 +12,58 @@ export const metadata: Metadata = {
   },
 };
 
+// ── 구글 지식그래프(Knowledge Graph) & AI Overview 인용 대응 스키마 ──────
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "보상스쿨",
+  "url": "https://claim-works.com",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://claim-works.com/favicon.ico",
+    "width": 48,
+    "height": 48
+  },
+  "description": "대한민국 손해사정 전문 정보 플랫폼. 사망·후유장해, 실손·질병 진단, 교통사고 보상, 근재·산재 등 분야별 전문가 실무 가이드를 제공합니다.",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer support",
+    "availableLanguage": "Korean"
+  },
+  "inLanguage": "ko-KR"
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "보상스쿨",
+  "url": "https://claim-works.com",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://claim-works.com/search?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+};
+
 export default function Home() {
   // 전체 최신 보상 가이드 블로그 목록 로드
   const posts = getSortedPostsData();
 
   return (
     <div className="space-y-12 sm:space-y-16 sm:px-0">
-      
+      {/* Organization & WebSite 구조화 데이터 (구글 지식그래프 & AI Overview 대응) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+
       {/* 유튜브 전문가 브리핑 섹션 (소개글 위쪽 배치) */}
       <YouTubeBriefing />
 
@@ -33,7 +78,7 @@ export default function Home() {
           </p>
         </div>
 
-        {/* 3. 본문 영역: 가이드 카드 격자(Grid) 배치 및 실시간 카테고리 필터링 */}
+        {/* 본문 영역: 가이드 카드 격자(Grid) 배치 및 실시간 카테고리 필터링 */}
         <HomePostList initialPosts={posts} />
       </section>
 

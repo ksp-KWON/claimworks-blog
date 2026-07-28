@@ -8,14 +8,20 @@ on:
   workflow_dispatch:
     inputs:
       post_type:
-        description: '발행할 글 종류 선택 (all: 전체, precedent: 법률칼럼, trend: 트렌드)'
+        description: '발행할 카테고리 선택 (all: 시간대 자동 배정)'
         required: true
         default: 'all'
         type: choice
         options:
           - all
-          - precedent
-          - trend
+          - 사망·자살 보험금
+          - 질병진단·실손
+          - 교통사고 보상
+          - 배상책임·의료
+          - 근재·산재 사고
+          - 장해평가·면책
+          - 보상가이드
+          - 판례·법률 해석
 
 jobs:
   generate:
@@ -57,9 +63,12 @@ jobs:
           
           echo "📊 선택된 발행 유형: $POST_TYPE"
           
-          # 모든 자동글쓰기에 공동 활용될 당일의 트렌드 및 법제처 판례를 선 수집 확정합니다.
           echo "🔍 오늘의 주제 및 판례 사전 탐색 실행 (scripts/select-daily-topic.js)"
-          node scripts/select-daily-topic.js
+          if [ "$POST_TYPE" != "all" ]; then
+            node scripts/select-daily-topic.js --category "$POST_TYPE"
+          else
+            node scripts/select-daily-topic.js
+          fi
           
           # daily-topic.json에서 결정된 카테고리를 읽어옵니다.
           TOPIC_CATEGORY=$(node -p "require('./scripts/daily-topic.json').category")

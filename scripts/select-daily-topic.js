@@ -145,7 +145,7 @@ ${usedArray.join(', ')}
   };
 
   try {
-    const res = await callGemini(prompt, schema);
+    const res = await callGemini(prompt, schema, 'lite');
     if (!res.queries || res.queries.length === 0) throw new Error('생성된 쿼리가 없습니다.');
     console.log('    ✨ AI 생성 검색 쿼리:', res.queries);
     return res.queries;
@@ -240,7 +240,7 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}`;
   };
 
   try {
-    const result = await callGemini(prompt, schema);
+    const result = await callGemini(prompt, schema, 'lite');
     if (!result.candidates || result.candidates.length === 0) {
       throw new Error('추출된 키워드가 없습니다.');
     }
@@ -279,7 +279,7 @@ async function getGenericLegalKeywords(targetCategory) {
   };
 
   try {
-    const result = await callGemini(prompt, schema);
+    const result = await callGemini(prompt, schema, 'lite');
     return result.keywords || [];
   } catch (err) {
     console.warn('⚠️ 상위 법률 용어 도출 실패:', err.message);

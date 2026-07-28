@@ -60,7 +60,7 @@ async function main() {
     ? getPrecedentPlanningPrompt(dailyTopic.precedent, existingSlugsStr, dailyTopic.category)
     : getTopicPlanningPrompt(dailyTopic.keyword, dailyTopic.trendTitle || '없음', existingSlugsStr, dailyTopic.category);
 
-  const topic = await callGemini(planPrompt, TOPIC_SCHEMA);
+  const topic = await callGemini(planPrompt, TOPIC_SCHEMA, 'flash');
   console.log(`    기획 완료 : ${topic.title} (${topic.slug})`);
 
   if (!isPrecedent) {
@@ -74,7 +74,7 @@ async function main() {
     ? buildArticlePrompt(topic, currentAngle, existingPosts, dailyTopic.precedent)
     : buildArticlePrompt(topic, currentAngle, existingPosts);
     
-  const contentResult = await callGemini(articlePrompt, CONTENT_SCHEMA);
+  const contentResult = await callGemini(articlePrompt, CONTENT_SCHEMA, 'flash');
 
   // 4. 파싱 및 저장 (이제 정규식 처리 없이 JSON에서 직접 추출)
   const content = contentResult.markdownContent;

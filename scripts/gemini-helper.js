@@ -128,15 +128,25 @@ async function discoverModels() {
 /**
  * @param {string} prompt - 보낼 프롬프트
  * @param {object|null} schema - JSON 출력용 스키마 (null이면 텍스트 반환)
+ * @param {string} targetTier - 'auto' (기본값: flash 우선), 'lite' (lite 전용), 'flash' (flash 전용)
  * @returns {Promise<string|object>} 응답 텍스트 또는 파싱된 JSON
  */
-async function callGemini(prompt, schema = null) {
+async function callGemini(prompt, schema = null, targetTier = 'auto') {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey.length < 10) {
     throw new Error('GEMINI_API_KEY가 등록되지 않았거나 유효하지 않습니다.');
   }
 
-  const models = await discoverModels();
+  let models = await discoverModels();
+  
+  // ── 타겟 티어 필터링 (토큰 절약 및 역할 분담) ──
+  if (targetTier === 'lite') {
+    const liteModels = models.filter(m => m.tier === 'lite');
+    if (liteModels.length > 0) models = liteModels;
+  } else if (targetTier === 'flash') {
+    const flashModels = models.filter(m => m.tier === 'flash');
+    if (flashModels.length > 0) models = flashModels;
+  }
 
   const baseConfig = { temperature: schema ? 0.2 : 0.75 };
   if (schema) {

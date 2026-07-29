@@ -161,7 +161,7 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
     };
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    const finalizedPrompt = prompt;
+
 
     for (let attempt = 0; attempt <= RETRY_CONFIG.maxRetries; attempt++) {
       const controller = new AbortController();
@@ -173,7 +173,7 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
         res = await fetch(url, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ contents: [{ parts: [{ text: finalizedPrompt }] }], generationConfig }),
+          body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig }),
           signal:  controller.signal,
         });
       } catch (networkErr) {

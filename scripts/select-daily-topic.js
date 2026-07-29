@@ -36,10 +36,7 @@ const { callGemini } = require('./gemini-helper');
 
 // ── 상수 ─────────────────────────────────────────────────────────────────
 const OUTPUT_JSON_PATH   = path.join(process.cwd(), 'scripts/daily-topic.json');
-const POSTS_DIR          = _POSTS_DIR; // pipeline-utils 에서 공급
-const LAW_API_KEY        = process.env.LAW_API_KEY;
-const LAW_PROXY_ENDPOINT = process.env.LAW_PROXY_ENDPOINT;
-const LAW_PROXY_TOKEN    = process.env.LAW_PROXY_TOKEN;
+const POSTS_DIR          = _POSTS_DIR;
 
 const TARGET_CATEGORIES = [
   '사망·자살 보험금',
@@ -65,7 +62,6 @@ function determineCategory() {
   return TARGET_CATEGORIES[Math.floor(Math.random() * TARGET_CATEGORIES.length)];
 }
 
-// sleep 은 pipeline-utils.js 에서 공급됨
 
 // ── 기존 포스트 분석 (중복 방지) ─────────────────────────────────────────
 function getUsedMetadata() {
@@ -141,25 +137,7 @@ async function fetchTrendingNews(queries) {
 
   for (const query of queries) {
     try {
-      let res;
-      // RSS 프록시 엔드포인트가 있으면 우선 시도합니다.
-      let usedProxy = false;
-      if (LAW_PROXY_ENDPOINT) {
-        try {
-          const proxyUrl = `${LAW_PROXY_ENDPOINT.trim()}/api/rss?query=${encodeURIComponent(query)}`;
-          const proxyHeaders = { ...headers };
-          if (LAW_PROXY_TOKEN) proxyHeaders['X-Proxy-Token'] = LAW_PROXY_TOKEN.trim();
-          res = await safeFetch(proxyUrl, { headers: proxyHeaders }, 10000);
-          if (res.ok) usedProxy = true;
-        } catch (proxyErr) {
-          console.warn(`    [프록시 경고] 프록시 실패 (${proxyErr.message}), 직접 호출로 Fallback...`);
-        }
-      }
-
-      // 프록시를 안 쓰거나 실패했을 경우 직접 호출
-      if (!usedProxy) {
-        res = await safeFetch(BASE + encodeURIComponent(query), { headers }, 10000);
-      }
+      const res = await safeFetch(BASE + encodeURIComponent(query), { headers }, 10000);
 
       if (!res.ok) { console.warn(`    [경고] "${query}" (HTTP ${res.status})`); continue; }
 
@@ -236,8 +214,9 @@ async function getGenericLegalKeywords(targetCategory, rankedCandidates) {
   const prompt = `${LOSS_ADJUSTER_CONTEXT}
 방금 최신 뉴스 키워드(${context})를 기반으로 대법원 판례 검색을 시도했으나 너무 최신 유행어라서 판례를 찾지 못했습니다.
 
-따라서, 방금 추출했던 이슈 키워드들의 이면에 깔려있는, **[${targetCategory}]** 분야의 가장 본질적이고 손해사정 실무와 직결된 핵심 법률/의학 용어를 도출해 주세요.
-절대 프롬프트에 예시를 주지 않으니, 스스로 해당 카테고리와 이슈를 관통하는 핵심 실무 키워드(특정 질병, 분쟁 유형 등)를 심도 있게 사고(Chain-of-Thought)하여 수량에 상관없이 필요한 만큼 반환하세요.`;
+따라서, 방금 추출했던 이슈 키워드들의 이면에 깔려있는, **[${targetCategory}]** 분야의 가장 본질적이고 손해사정 실무와 직결된 핵심 법률/의학 단어(명사)를 도출해 주세요.
+절대 프롬프트에 예시를 주지 않으니, 스스로 해당 카테고리와 이슈를 관통하는 단어를 심도 있게 사고(Chain-of-Thought)하여 수량에 상관없이 필요한 만큼 반환하세요.
+[중요] 이 키워드들은 법제처 판례 API 검색에 직접(Exact Match) 사용됩니다. 문장형태나 너무 긴 복합어("건설현장 추락사고 초과손해배상")를 쓰면 판례가 0건 나옵니다. 반드시 짧고 핵심적인 명사(예: "고지의무", "노동능력상실률", "추간판탈출증")로만 추출하세요.`;
 
   const schema = {
     type: 'OBJECT',
@@ -275,18 +254,9 @@ async function getGenericLegalKeywords(targetCategory, rankedCandidates) {
 async function fetchLawAPI(type, params) {
   const headers = { 'User-Agent': 'Mozilla/5.0' };
   let url;
-
-  if (LAW_PROXY_ENDPOINT?.trim()) {
-    url = type === 'list'
-      ? `${LAW_PROXY_ENDPOINT.trim()}/api/precedent?query=${encodeURIComponent(params.query)}`
-      : `${LAW_PROXY_ENDPOINT.trim()}/api/precedent-detail?ID=${params.id}`;
-    if (LAW_PROXY_TOKEN) headers['X-Proxy-Token'] = LAW_PROXY_TOKEN.trim();
-  } else {
-    if (!LAW_API_KEY) throw new Error('LAW_API_KEY 미설정');
-    url = type === 'list'
-      ? `https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=${LAW_API_KEY}&search=2&query=${encodeURIComponent(params.query)}`
-      : `https://www.law.go.kr/DRF/lawService.do?target=prec&type=XML&OC=${LAW_API_KEY}&ID=${params.id}`;
-  }
+  url = type === 'list'
+    ? `https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=test&search=2&display=100&query=${encodeURIComponent(params.query)}`
+    : `https://www.law.go.kr/DRF/lawService.do?target=prec&type=XML&OC=test&ID=${params.id}`;
 
   const res = await safeFetch(url, { headers }, 10000);
   if (!res.ok) throw new Error(`법제처 HTTP ${res.status}`);
@@ -308,7 +278,7 @@ async function searchPrecedents(query) {
 async function getPrecedentDetail(id) {
   const xml = await fetchLawAPI('detail', { id });
   const doc = xmlParser.parse(xml);
-  const p = doc?.PrecDetail || {};
+  const p = doc?.PrecService || {};
   return {
     id,
     caseName:        String(p['사건명'] || ''),
@@ -321,14 +291,14 @@ async function getPrecedentDetail(id) {
   };
 }
 
-/** 판례 목록에서 유효한 판례 1건을 반환 (최대 5건 탐색) */
+/** 판례 목록에서 유효한 판례 1건을 반환 (최대 30건 탐색) */
 async function scanPrecedentList(list, usedCaseNumbers) {
-  for (const { id, caseNo } of list.slice(0, 5)) {
+  for (const { id, caseNo } of list.slice(0, 100)) {
     if (usedCaseNumbers.has(caseNo)) { console.log(`    [-] 중복: ${caseNo}`); continue; }
     try {
       const detail = await getPrecedentDetail(id);
       if (usedCaseNumbers.has(detail.caseNo)) { console.log(`    [-] 중복: ${detail.caseNo}`); continue; }
-      if (detail.judgmentSummary?.length >= 40 && detail.caseContent) {
+      if (detail.caseContent && detail.caseContent.length >= 200) {
         console.log(`    [✓] 판례 확보: ${detail.caseNo} (${detail.caseName})`);
         return detail;
       }
@@ -382,8 +352,9 @@ async function getFallbackAiKeyword(fallbackCategory) {
   console.log(`[2.8/5] 3차 안전장치 — [${fallbackCategory}] 맞춤형 AI 실무 키워드 도출 중...`);
   
   const prompt = `${LOSS_ADJUSTER_CONTEXT}
-지금 판례 검색을 위한 마지막 안전장치로, **[${fallbackCategory}]** 카테고리에서 가장 빈번하게 발생하는 구체적인 보험금 분쟁 또는 손해배상 사건 키워드를 생성해야 합니다.
-개수에 얽매이지 말고, 연쇄 사고(Chain-of-Thought)를 통해 해당 카테고리에서 손해사정사 수임과 가장 직결되는 매우 구체적이고 실무적인 키워드들을 도출해 주세요.`;
+지금 판례 검색을 위한 마지막 안전장치로, **[${fallbackCategory}]** 카테고리에서 가장 빈번하게 발생하는 구체적인 보험금 분쟁 또는 손해배상 사건의 핵심 단어(명사)를 생성해야 합니다.
+개수에 얽매이지 말고, 연쇄 사고(Chain-of-Thought)를 통해 해당 카테고리에서 손해사정사 수임과 가장 직결되는 실무 단어들을 도출해 주세요.
+[중요] 이 키워드들은 법제처 판례 API 검색에 직접(Exact Match) 사용됩니다. 문장형태나 너무 긴 복합어를 쓰면 판례가 검색되지 않습니다. 반드시 짧고 핵심적인 법률/의학 명사(예: "일실수익", "장해진단", "면책약관")로만 추출하세요.`;
 
   const schema = {
     type: 'OBJECT',
@@ -444,12 +415,9 @@ async function main() {
     if (!found) {
       console.log('[3/4] ⚠️ 2차 탐색 실패. 3차 탐색망(마지막 안전장치: 카테고리 순환 검색) 가동...');
       const fallbackCategory = getNextFallbackCategory();
-      console.log(`    선택된 3차 안전장치 카테고리: "${fallbackCategory}"`);
+      console.log(`    3차 안전장치 카테고리: "${fallbackCategory}"`);
       const fallbackKeywords = await getFallbackAiKeyword(fallbackCategory);
-      
-      console.log(`    선택된 3차 안전장치 실무 키워드들:`, fallbackKeywords);
-      const fallbackSearchQueries = fallbackKeywords.map(k => ({ searchKeyword: k, newsTitle: k + ' 관련 주요 판례' }));
-      found = await findPrecedent(fallbackSearchQueries, usedCaseNumbers);
+      found = await findPrecedent(fallbackKeywords.map(k => ({ searchKeyword: k, newsTitle: '' })), usedCaseNumbers);
     }
 
     if (!found) {

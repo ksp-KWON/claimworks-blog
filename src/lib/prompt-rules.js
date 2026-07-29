@@ -155,7 +155,7 @@ ${existingTitles}
 
 function getKeywordExtractionPrompt(targetCategory, existingTitles, headlines) {
   return `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
-아래 뉴스 헤드라인 목록에서 **[${targetCategory}]** 분야와 직접 연관된 이슈를 분석하여, 법제처 판례 API 검색에 활용할 구체적인 키워드를 추출하세요.
+아래 뉴스 헤드라인 목록에서 **[${targetCategory}]** 분야와 직접 연관된 이슈를 분석하여, 법제처 판례 API 검색에 활용할 구체적인 실무 단어(명사)를 추출하세요.
 
 [최근 발행 글 (이 주제들과 겹치는 키워드는 피할 것!)]
 ${existingTitles}
@@ -163,8 +163,10 @@ ${existingTitles}
 [헤드라인 목록]
 ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
+[중요] 추출된 searchKeyword는 법제처 판례 API 검색에 직접(Exact Match) 사용됩니다. 문장형태나 너무 긴 복합어를 쓰면 판례가 0건 나옵니다. 반드시 짧고 핵심적인 명사(예: "일실수익", "면책약관", "추간판탈출증")로만 추출하세요.
+
 아래와 같은 JSON 형식으로만 응답하세요. 백틱이나 마크다운 없이 순수 JSON만 출력하세요.
-{"candidates": [{"newsTitle": "기사원문", "searchKeyword": "검색용키워드"}]}`;
+{"candidates": [{"newsTitle": "기사원문", "searchKeyword": "검색용키워드명사"}]}`;
 }
 
 
@@ -371,14 +373,6 @@ function getRenewalPrompt(currentTitle, query) {
 }`;
 }
 
-function cleanAnalysisBlock(text) {
-  if (!text) return '';
-  if (text.includes('[ANALYSIS_START]')) {
-    return text.replace(/\[ANALYSIS_START\][\s\S]*?\[ANALYSIS_END\]/, '').trim();
-  }
-  return text.trim();
-}
-
 
 function buildManualPrompt(mode, aiInput, angle, existingPosts) {
   const postsCtx = existingPosts.length > 0
@@ -430,6 +424,5 @@ module.exports = {
   getRenewalPrompt,
   getQueryGenerationPrompt,
   getKeywordExtractionPrompt,
-
-  TOPIC_SCHEMA
 };
+

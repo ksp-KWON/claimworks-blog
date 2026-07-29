@@ -18,11 +18,12 @@ const {
   buildArticlePrompt
 } = require('../src/lib/prompt-rules.js');
 
+const { sleep } = require('./pipeline-utils.js');
 const {
-  sleep,
   getExistingPosts,
   saveMarkdownPost
 } = require('../src/lib/post-builder.js');
+
 
 async function main() {
   console.log(`=== 자동글쓰기 통합 컴포넌트 시작 (${new Date().toISOString()}) ===`);
@@ -38,15 +39,13 @@ async function main() {
   const isPrecedent = dailyTopic.category === '판례·법률 해석';
 
   if (isPrecedent) {
-    console.log('  [예외 처리] 판례 API 과부하 방지를 위해 65초간 대기합니다...');
-    await sleep(65000);
-  }
-  
-  if (isPrecedent) {
     console.log(`  [로드] 확정 판례: ${dailyTopic.precedent.caseNo} (${dailyTopic.precedent.caseName})`);
+    console.log('  [대기] 법제처 API 과부하 방지를 위해 15초 대기합니다...');
+    await sleep(15000);
   } else {
     console.log(`  [로드] 확정 키워드: '${dailyTopic.keyword}'`);
   }
+
 
   const existingPosts = getExistingPosts();
   const currentAngle = getRandomAngle();

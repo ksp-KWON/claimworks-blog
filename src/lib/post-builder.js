@@ -77,8 +77,6 @@ function saveMarkdownPost(topic, summary, content, additionalFrontmatter = {}) {
 }
 
 module.exports = {
-  POSTS_DIR,
-  sleep,
   getExistingPosts,
   resolveUniqueSlug,
   saveMarkdownPost,

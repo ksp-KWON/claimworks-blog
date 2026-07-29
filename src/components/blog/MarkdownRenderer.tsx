@@ -19,7 +19,7 @@ const getToneColor = (node: React.ReactNode): 'red' | 'green' | 'yellow' | 'purp
   };
   const text = getText(node).trim().substring(0, 15);
   if (/[⚠️🚨🛑❗❌⛔]/.test(text)) return 'red';
-  if (/[✅☑️🌿🌱💡🍀✔]/.test(text)) return 'green';
+  if (/[✅☑️🌿🌱💡🍀✔📖]/.test(text)) return 'green';
   if (/[🔥⭐⚡🌟✨🏆]/.test(text)) return 'yellow';
   if (/[🔮💎💜🟣]/.test(text)) return 'purple';
   return 'blue';
@@ -51,8 +51,9 @@ const baseComponents: Components = {
     const iconColors: Record<string, string> = {
       blue: 'text-[var(--google-blue)]', red: 'text-red-500', green: 'text-green-500', yellow: 'text-yellow-500', purple: 'text-purple-500'
     };
+    const headingGradient = tone === 'yellow' ? 'red' : tone;
     return (
-      <PremiumHeading level={3} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-10 mb-4 break-keep" icon={<span className={iconColors[tone]}>■</span>}>
+      <PremiumHeading level={3} id={id} gradient={headingGradient} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-10 mb-4 break-keep" icon={<span className={iconColors[tone]}>■</span>}>
         {children}
       </PremiumHeading>
     );
@@ -84,7 +85,7 @@ const baseComponents: Components = {
     };
     return (
       <PremiumCard hoverEffect={false} className={`my-7 !p-5 sm:!p-6 border-l-4 shadow-sm ${bgColors[tone]}`}>
-        <div className="text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep [&_h3]:border-b [&_h3]:border-gray-200 dark:[&_h3]:border-white/10 [&_h3]:pb-3 [&_h3]:mb-3 [&_h3]:!mt-0">
+        <div className="text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep [&_h3]:text-base [&_h3]:border-b [&_h3]:border-gray-200 dark:[&_h3]:border-white/10 [&_h3]:pb-3 [&_h3]:mb-3 [&_h3]:!mt-0">
           {children}
         </div>
       </PremiumCard>

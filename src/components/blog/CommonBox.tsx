@@ -47,7 +47,7 @@ export default function CommonBox({ tone, emoji, title, children, headerRight, t
       <div className="relative z-10">
         {/* Full-width gradient header */}
         <div className={`-mt-5 sm:-mt-6 -mx-5 sm:-mx-6 px-5 sm:px-6 py-4 mb-4 flex items-center justify-between gap-3 flex-wrap ${headerGradients[tone]}`}>
-          <h3 className={`text-base font-bold flex items-center gap-1.5 border-l-4 pl-3 ${textStyles[tone]}`}>
+          <h3 className={`text-base font-bold flex items-center gap-1.5 ${textStyles[tone]}`}>
             <span className="text-lg leading-none">{emoji}</span>
             <span>{title}</span>
           </h3>

@@ -21,7 +21,7 @@ const getToneColor = (node: React.ReactNode): 'red' | 'green' | 'yellow' | 'purp
   if (/[⚠️🚨🛑❗❌⛔]/.test(text)) return 'red';
   if (/[✅☑️🌿🌱💡🍀✔📖]/.test(text)) return 'green';
   if (/[🔥⭐⚡🌟✨🏆]/.test(text)) return 'yellow';
-  if (/[🔮💎💜🟣]/.test(text)) return 'purple';
+  if (/[🔮💎💜🟣👨‍⚖️👨‍💼👩‍⚖️👩‍💼]/.test(text)) return 'purple';
   return 'blue';
 };
 
@@ -54,22 +54,22 @@ const baseComponents: Components = {
   blockquote: ({ children }) => {
     const tone = getToneColor(children);
     const boxHoverBorders: Record<string, string> = {
-      blue: 'hover:border-[var(--google-blue)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)]',
-      red: 'hover:border-[var(--google-red)] hover:shadow-[0_16px_50px_rgba(234,67,53,0.25)]',
-      green: 'hover:border-[var(--google-green)] hover:shadow-[0_16px_50px_rgba(52,168,83,0.25)]',
-      yellow: 'hover:border-yellow-500 hover:shadow-[0_16px_50px_rgba(234,179,8,0.25)]',
-      purple: 'hover:border-purple-500 hover:shadow-[0_16px_50px_rgba(168,85,247,0.25)]',
+      blue: 'border-blue-200 dark:border-blue-900/50 hover:border-[var(--google-blue)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)]',
+      red: 'border-red-200 dark:border-red-900/50 hover:border-[var(--google-red)] hover:shadow-[0_16px_50px_rgba(234,67,53,0.25)]',
+      green: 'border-green-200 dark:border-green-900/50 hover:border-[var(--google-green)] hover:shadow-[0_16px_50px_rgba(52,168,83,0.25)]',
+      yellow: 'border-yellow-300 dark:border-yellow-900/50 hover:border-yellow-500 hover:shadow-[0_16px_50px_rgba(234,179,8,0.25)]',
+      purple: 'border-purple-200 dark:border-purple-900/50 hover:border-purple-500 hover:shadow-[0_16px_50px_rgba(168,85,247,0.25)]',
     };
     const headerStyles: Record<string, string> = {
-      blue: '[&_h3]:!bg-gradient-to-r [&_h3]:!from-blue-50/80 [&_h3]:!to-transparent [&_h3]:dark:!from-blue-900/20 [&_h3]:dark:!to-transparent [&_h3_span:last-child]:text-[var(--google-blue)] [&_h3_span:last-child]:dark:text-blue-400 [&_h3_span:last-child]:border-l-[var(--google-blue)] [&_h3]:border-b-blue-100 [&_h3]:dark:border-b-blue-900/30',
-      red: '[&_h3]:!bg-gradient-to-r [&_h3]:!from-red-50/80 [&_h3]:!to-transparent [&_h3]:dark:!from-red-900/20 [&_h3]:dark:!to-transparent [&_h3_span:last-child]:text-[var(--google-red)] [&_h3_span:last-child]:dark:text-red-400 [&_h3_span:last-child]:border-l-[var(--google-red)] [&_h3]:border-b-red-100 [&_h3]:dark:border-b-red-900/30',
-      green: '[&_h3]:!bg-gradient-to-r [&_h3]:!from-green-50/80 [&_h3]:!to-transparent [&_h3]:dark:!from-green-900/20 [&_h3]:dark:!to-transparent [&_h3_span:last-child]:text-[var(--google-green)] [&_h3_span:last-child]:dark:text-green-400 [&_h3_span:last-child]:border-l-[var(--google-green)] [&_h3]:border-b-green-100 [&_h3]:dark:border-b-green-900/30',
-      yellow: '[&_h3]:!bg-gradient-to-r [&_h3]:!from-yellow-50/80 [&_h3]:!to-transparent [&_h3]:dark:!from-yellow-900/20 [&_h3]:dark:!to-transparent [&_h3_span:last-child]:text-yellow-600 [&_h3_span:last-child]:dark:text-yellow-400 [&_h3_span:last-child]:border-l-yellow-500 [&_h3]:border-b-yellow-200 [&_h3]:dark:border-b-yellow-900/30',
-      purple: '[&_h3]:!bg-gradient-to-r [&_h3]:!from-purple-50/80 [&_h3]:!to-transparent [&_h3]:dark:!from-purple-900/20 [&_h3]:dark:!to-transparent [&_h3_span:last-child]:text-purple-600 [&_h3_span:last-child]:dark:text-purple-400 [&_h3_span:last-child]:border-l-purple-500 [&_h3]:border-b-purple-100 [&_h3]:dark:border-b-purple-900/30',
+      blue: '[&_h3]:!bg-gradient-to-r [&_h3]:!from-blue-50/80 [&_h3]:!to-transparent [&_h3]:dark:!from-blue-900/20 [&_h3]:dark:!to-transparent [&_h3_span:last-child]:text-[var(--google-blue)] [&_h3_span:last-child]:dark:text-blue-400 [&_h3]:border-b-blue-100 [&_h3]:dark:border-b-blue-900/30',
+      red: '[&_h3]:!bg-gradient-to-r [&_h3]:!from-red-50/80 [&_h3]:!to-transparent [&_h3]:dark:!from-red-900/20 [&_h3]:dark:!to-transparent [&_h3_span:last-child]:text-[var(--google-red)] [&_h3_span:last-child]:dark:text-red-400 [&_h3]:border-b-red-100 [&_h3]:dark:border-b-red-900/30',
+      green: '[&_h3]:!bg-gradient-to-r [&_h3]:!from-green-50/80 [&_h3]:!to-transparent [&_h3]:dark:!from-green-900/20 [&_h3]:dark:!to-transparent [&_h3_span:last-child]:text-[var(--google-green)] [&_h3_span:last-child]:dark:text-green-400 [&_h3]:border-b-green-100 [&_h3]:dark:border-b-green-900/30',
+      yellow: '[&_h3]:!bg-gradient-to-r [&_h3]:!from-yellow-50/80 [&_h3]:!to-transparent [&_h3]:dark:!from-yellow-900/20 [&_h3]:dark:!to-transparent [&_h3_span:last-child]:text-yellow-600 [&_h3_span:last-child]:dark:text-yellow-400 [&_h3]:border-b-yellow-200 [&_h3]:dark:border-b-yellow-900/30',
+      purple: '[&_h3]:!bg-gradient-to-r [&_h3]:!from-purple-50/80 [&_h3]:!to-transparent [&_h3]:dark:!from-purple-900/20 [&_h3]:dark:!to-transparent [&_h3_span:last-child]:text-purple-600 [&_h3_span:last-child]:dark:text-purple-400 [&_h3]:border-b-purple-100 [&_h3]:dark:border-b-purple-900/30',
     };
     return (
       <div className={`my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden group border ${boxHoverBorders[tone]}`}>
-        <div className={`relative z-10 text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep [&_h3]:text-base [&_h3]:border-b [&_h3]:pb-3 [&_h3]:mb-4 [&_h3]:!-mt-5 sm:[&_h3]:!-mt-6 [&_h3]:-mx-5 sm:[&_h3]:-mx-6 [&_h3]:px-5 sm:[&_h3]:px-6 [&_h3]:pt-4 [&_h3]:flex [&_h3]:items-center [&_h3_span:last-child]:border-l-4 [&_h3_span:last-child]:pl-3 [&_h3_span:last-child]:flex [&_h3_span:last-child]:items-center [&_h3_span:last-child]:gap-1.5 ${headerStyles[tone]}`}>
+        <div className={`relative z-10 text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep [&_h3]:text-base [&_h3]:border-b [&_h3]:pb-3 [&_h3]:mb-4 [&_h3]:!-mt-5 sm:[&_h3]:!-mt-6 [&_h3]:-mx-5 sm:[&_h3]:-mx-6 [&_h3]:px-5 sm:[&_h3]:px-6 [&_h3]:pt-4 [&_h3]:flex [&_h3]:items-center [&_h3]:!border-l-0 [&_h3_span:last-child]:flex [&_h3_span:last-child]:items-center [&_h3_span:last-child]:gap-1.5 ${headerStyles[tone]}`}>
           {children}
         </div>
       </div>

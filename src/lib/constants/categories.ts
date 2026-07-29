@@ -165,5 +165,6 @@ export const SPECIALTIES: CategoryMeta[] = [
 export const ALL_CATEGORIES = [...COLUMN_CATEGORIES, ...SPECIALTIES];
 
 export function getCategoryBySlug(slug: string): CategoryMeta | undefined {
-  return ALL_CATEGORIES.find(c => c.slug === slug);
+  const decodedSlug = decodeURIComponent(slug);
+  return ALL_CATEGORIES.find(c => c.slug === decodedSlug);
 }

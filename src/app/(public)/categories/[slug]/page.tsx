@@ -52,8 +52,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   // 엄격한 필터링 로직 적용
   const filteredPosts = allPosts.filter(p => {
     // 1. 카테고리 또는 특수분류 완전 일치/포함
-    if (p.category && p.category.toLowerCase().includes(filterText)) return true;
-    if (p.specialtyCategory && p.specialtyCategory.toLowerCase().includes(filterText)) return true;
+    if (p.category && String(p.category).toLowerCase().includes(filterText)) return true;
+    if (p.specialtyCategory && String(p.specialtyCategory).toLowerCase().includes(filterText)) return true;
     
     // 2. 태그 매칭 (가장 중요) - 확장 키워드 포함
     if (p.tags && p.tags.length > 0) {
@@ -128,18 +128,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             궁금하신 사항은 아래 버튼을 통해 언제든 실시간 상담을 이용해 주세요.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
-              href="#chat"
-              onClick={(e) => {
-                e.preventDefault();
-                // @ts-ignore - 클라이언트 사이드 이벤트 트리거 (실제로는 a 태그의 onClick에서 발생)
-                if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('open-chat'));
-              }}
+            <Link
+              href="/chat"
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-white font-bold rounded-none text-sm transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-5.5 0-10 3.5-10 7.8 0 2.7 1.7 5.1 4.2 6.5l-1.1 4.1c-.1.3.2.5.4.4l4.8-3.2c.5.1 1.1.1 1.7.1 5.5 0 10-3.5 10-7.8s-4.5-7.8-10-7.8z"/></svg>
               실시간 채팅상담
-            </a>
+            </Link>
             <Link
               href="/consultation"
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[var(--google-blue)] hover:bg-[#1557b0] text-white font-bold rounded-none text-sm transition-colors"

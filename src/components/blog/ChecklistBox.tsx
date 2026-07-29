@@ -26,12 +26,11 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
         ☑️
       </div>
       <div className="relative z-10 pt-1">
-        <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="text-base font-bold flex items-center gap-1.5 border-l-4 border-[var(--google-green)] bg-gradient-to-r from-green-50 to-transparent dark:from-green-900/20 dark:to-transparent pl-3 pr-6 py-1.5 rounded-r-md">
-              <span className="text-[var(--google-green)] text-lg leading-none">☑️</span>
-              <span className="text-[var(--google-green)] dark:text-green-400">1분 자가진단 체크리스트</span>
-            </h3>
+        <div className="-mt-5 sm:-mt-6 -mx-5 sm:-mx-6 px-5 sm:px-6 py-4 mb-4 border-b border-gray-100 dark:border-white/5 bg-gradient-to-r from-green-50/80 to-transparent dark:from-green-900/20 dark:to-transparent flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-base font-bold flex items-center gap-1.5 border-l-4 border-[var(--google-green)] pl-3">
+            <span className="text-[var(--google-green)] text-lg leading-none">☑️</span>
+            <span className="text-[var(--google-green)] dark:text-green-400">1분 자가진단 체크리스트</span>
+          </h3>
             <div className="text-right flex items-center gap-2">
               <span className="text-xs text-[#5f6368] font-bold">해당 항목 클릭</span>
               <span className="text-lg font-black text-[var(--google-green)] dark:text-[#81c995]">
@@ -39,8 +38,6 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
               </span>
             </div>
           </div>
-        </div>
-
         {/* 항목들 */}
         <div className="divide-y divide-gray-100 dark:divide-white/5">
           {items.map((item, i) => (

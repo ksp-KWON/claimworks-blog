@@ -21,8 +21,8 @@ export default function TableOfContents({
         📑
       </div>
       <div className="relative z-10">
-        <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-4 flex items-end justify-between">
-          <h3 className="text-base font-bold flex items-center gap-1.5 border-l-4 border-[var(--google-blue)] bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-900/20 dark:to-transparent pl-3 pr-6 py-1.5 rounded-r-md">
+        <div className="-mt-5 sm:-mt-6 -mx-5 sm:-mx-6 px-5 sm:px-6 py-4 mb-4 border-b border-gray-100 dark:border-white/5 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent flex items-end justify-between">
+          <h3 className="text-base font-bold flex items-center gap-1.5 border-l-4 border-[var(--google-blue)] pl-3">
             <span className="text-[var(--google-blue)] text-lg leading-none">📑</span>
             <span className="text-[var(--google-blue)] dark:text-blue-400">이 글의 목차</span>
           </h3>

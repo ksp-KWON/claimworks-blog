@@ -47,13 +47,8 @@ const baseComponents: Components = {
     );
   },
   h3: ({ children, id }) => {
-    const tone = getToneColor(children);
-    const iconColors: Record<string, string> = {
-      blue: 'text-[var(--google-blue)]', red: 'text-red-500', green: 'text-green-500', yellow: 'text-yellow-500', purple: 'text-purple-500'
-    };
-    const headingGradient = tone === 'yellow' ? 'red' : tone;
     return (
-      <PremiumHeading level={3} id={id} gradient={headingGradient} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-10 mb-4 break-keep" icon={<span className={iconColors[tone]}>■</span>}>
+      <PremiumHeading level={3} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-10 mb-4 break-keep">
         {children}
       </PremiumHeading>
     );
@@ -77,15 +72,15 @@ const baseComponents: Components = {
   blockquote: ({ children }) => {
     const tone = getToneColor(children);
     const bgColors: Record<string, string> = {
-      blue: 'bg-blue-50/50 dark:bg-blue-900/10 border-l-[var(--google-blue)] [&_h3_span.bg-clip-text]:from-[#0d47a1] [&_h3_span.bg-clip-text]:to-[#669df6]',
-      red: 'bg-red-50/50 dark:bg-red-900/10 border-l-red-500 [&_h3_span.bg-clip-text]:from-red-600 [&_h3_span.bg-clip-text]:to-red-400',
-      green: 'bg-green-50/50 dark:bg-green-900/10 border-l-green-500 [&_h3_span.bg-clip-text]:from-green-600 [&_h3_span.bg-clip-text]:to-green-400',
-      yellow: 'bg-yellow-50/50 dark:bg-yellow-900/10 border-l-yellow-500 [&_h3_span.bg-clip-text]:from-red-600 [&_h3_span.bg-clip-text]:to-red-400', // user requested red gradient for yellow box title
-      purple: 'bg-purple-50/50 dark:bg-purple-900/10 border-l-purple-500 [&_h3_span.bg-clip-text]:from-purple-600 [&_h3_span.bg-clip-text]:to-purple-400',
+      blue: 'bg-blue-50/50 dark:bg-blue-900/10 border-l-[var(--google-blue)] [&_h3_span:last-child]:bg-gradient-to-r [&_h3_span:last-child]:from-blue-600 [&_h3_span:last-child]:to-blue-400 [&_h3_span:last-child]:dark:from-blue-500 [&_h3_span:last-child]:dark:to-blue-400',
+      red: 'bg-red-50/50 dark:bg-red-900/10 border-l-red-500 [&_h3_span:last-child]:bg-gradient-to-r [&_h3_span:last-child]:from-red-600 [&_h3_span:last-child]:to-red-400 [&_h3_span:last-child]:dark:from-red-500 [&_h3_span:last-child]:dark:to-red-400',
+      green: 'bg-green-50/50 dark:bg-green-900/10 border-l-green-500 [&_h3_span:last-child]:bg-gradient-to-r [&_h3_span:last-child]:from-green-600 [&_h3_span:last-child]:to-green-400 [&_h3_span:last-child]:dark:from-green-500 [&_h3_span:last-child]:dark:to-green-400',
+      yellow: 'bg-yellow-50/50 dark:bg-yellow-900/10 border-l-yellow-500 [&_h3_span:last-child]:bg-gradient-to-r [&_h3_span:last-child]:from-red-600 [&_h3_span:last-child]:to-red-400 [&_h3_span:last-child]:dark:from-red-500 [&_h3_span:last-child]:dark:to-red-400',
+      purple: 'bg-purple-50/50 dark:bg-purple-900/10 border-l-purple-500 [&_h3_span:last-child]:bg-gradient-to-r [&_h3_span:last-child]:from-purple-600 [&_h3_span:last-child]:to-purple-400 [&_h3_span:last-child]:dark:from-purple-500 [&_h3_span:last-child]:dark:to-purple-400',
     };
     return (
       <PremiumCard hoverEffect={false} className={`my-7 !p-5 sm:!p-6 border-l-4 shadow-sm ${bgColors[tone]}`}>
-        <div className="text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep [&_h3]:text-base [&_h3]:border-b [&_h3]:border-gray-200 dark:[&_h3]:border-white/10 [&_h3]:pb-3 [&_h3]:mb-3 [&_h3]:!mt-0">
+        <div className="text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep [&_h3]:text-base [&_h3]:border-b [&_h3]:border-gray-200 dark:[&_h3]:border-white/10 [&_h3]:pb-3 [&_h3]:mb-3 [&_h3]:!mt-0 [&_h3]:gap-0 [&_h3_span:last-child]:text-white [&_h3_span:last-child]:px-2.5 [&_h3_span:last-child]:py-1 [&_h3_span:last-child]:rounded-md [&_h3_span:last-child]:shadow-sm">
           {children}
         </div>
       </PremiumCard>

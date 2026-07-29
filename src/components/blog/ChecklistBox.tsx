@@ -28,9 +28,11 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
       <div className="relative z-10 pt-1">
         <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="text-base font-bold flex items-center gap-2 border-l-4 border-[var(--google-red)] pl-2.5">
-              <span className="text-[var(--google-red)] text-lg leading-none">☑️</span>
-              <span className="bg-gradient-to-r from-red-600 to-red-400 dark:from-red-400 dark:to-red-300 text-transparent bg-clip-text">1분 자가진단 체크리스트</span>
+            <h3 className="text-base font-bold flex items-center gap-0 border-l-4 border-[var(--google-red)] pl-2.5">
+              <span className="bg-gradient-to-r from-red-600 to-red-400 dark:from-red-500 dark:to-red-400 text-white px-2.5 py-1 rounded-md shadow-sm flex items-center gap-1.5">
+                <span className="text-sm">☑️</span>
+                <span>1분 자가진단 체크리스트</span>
+              </span>
             </h3>
             <div className="text-right flex items-center gap-2">
               <span className="text-xs text-[#5f6368] font-bold">해당 항목 클릭</span>

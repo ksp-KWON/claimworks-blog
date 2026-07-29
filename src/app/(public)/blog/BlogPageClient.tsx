@@ -48,7 +48,7 @@ export default function BlogPageClient() {
   } else if (categoryFilter) {
     const filterText = categoryFilter.toLowerCase();
     // 무분별한 매칭을 일으키는 일반 명사 금지어
-    const stopWords = ['보상', '분쟁', '실손', '보험', '수술', '치료', '가이드', '비급여', '진단비', '수술비', '청구', '손해사정'];
+    const stopWords = ['보상', '분쟁', '실손', '보험', '수술', '치료', '가이드', '비급여', '진단비', '수술비', '청구', '손해사정', '보험금', '사고', '보상금'];
     
     // 진료과목별 연관 키워드 매핑
     const SPECIALTY_KEYWORDS: Record<string, string[]> = {
@@ -61,7 +61,15 @@ export default function BlogPageClient() {
       '피부/성형외과': ['레이저', '흉터', '비급여', '미용'],
       '비뇨의학과': ['전립선', '요로결석'],
       '치과': ['치조골', '임플란트', '크라운'],
-      '한방의학과': ['첩약', '추나']
+      '한방의학과': ['첩약', '추나'],
+      '판례·법률 해석': ['판례', '대법원', '판결', '소송'],
+      '사망·자살 보험금': ['사망', '자살', '심신상실', '사인미상'],
+      '질병진단·실손': ['암', '뇌졸중', '심근경색', '질병'],
+      '교통사고 보상': ['교통사고', '대인배상', '무보험차', '합의금'],
+      '배상책임·의료': ['배상책임', '의료사고', '일배책', '영업배상', '낙상'],
+      '근재·산재 사고': ['산재', '근재', '산업재해', '업무상', '초과손해'],
+      '장해평가·면책': ['후유장해', '맥브라이드', 'ama', '면책', '고지의무', '장해'],
+      '보상가이드': ['꿀팁', '실무', '가이드']
     };
 
     displayPosts = displayPosts.filter(p => {
@@ -77,7 +85,7 @@ export default function BlogPageClient() {
         const hasMatchingTag = p.tags.some(t => {
           const tag = t.toLowerCase();
           return keywords.some(kw => {
-            if (kw.includes(tag) || tag.includes(kw)) {
+            if (tag.includes(kw) || tag === kw) {
               if (stopWords.includes(tag)) return false;
               return true;
             }

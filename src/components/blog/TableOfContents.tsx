@@ -63,6 +63,6 @@ export default function TableOfContents({
           })}
         </ul>
       </div>
-    </div>
+    </nav>
   );
 }

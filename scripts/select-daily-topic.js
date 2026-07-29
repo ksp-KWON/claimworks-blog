@@ -420,9 +420,18 @@ async function main() {
       found = await findPrecedent(fallbackKeywords.map(k => ({ searchKeyword: k, newsTitle: '' })), usedCaseNumbers);
     }
 
+    // 6. 4차 최종 안전장치 — 법제처 API 전체 불가 시 트렌드 기반 글로 우아하게 강등(Graceful Degradation)
+    // 판례 없이도 파이프라인이 완전히 멈추는 것을 방지합니다.
     if (!found) {
-      console.warn('⚠️ 3중 탐색망 모두 실패 — 적절한 판례를 찾지 못했습니다.');
-      throw new Error('적절한 판례를 찾지 못했습니다.');
+      const topCandidate = rankedCandidates[0] || { searchKeyword: '보험금 분쟁', newsTitle: '' };
+      console.warn('⚠️ 3중 탐색망 모두 실패 (법제처 API 서버 일시 불가 추정)');
+      console.warn(`   → 4차 최종 안전장치 발동: 판례 없이 트렌드 기반 포스팅으로 전환합니다.`);
+      console.warn(`   → 채택 키워드: "${topCandidate.searchKeyword}" (이슈: ${topCandidate.newsTitle || 'N/A'})`);
+      found = {
+        keyword:   topCandidate.searchKeyword,
+        newsTitle: topCandidate.newsTitle || '',
+        detail:    null
+      };
     }
   } else {
     // 트렌드 포스팅인 경우 판례 검색 없이 즉시 1위 키워드 채택

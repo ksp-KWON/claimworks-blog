@@ -76,15 +76,15 @@ const baseComponents: Components = {
   blockquote: ({ children }) => {
     const tone = getToneColor(children);
     const bgColors: Record<string, string> = {
-      blue: 'bg-blue-50/50 dark:bg-blue-900/10 border-l-[var(--google-blue)]',
-      red: 'bg-red-50/50 dark:bg-red-900/10 border-l-red-500',
-      green: 'bg-green-50/50 dark:bg-green-900/10 border-l-green-500',
-      yellow: 'bg-yellow-50/50 dark:bg-yellow-900/10 border-l-yellow-500',
-      purple: 'bg-purple-50/50 dark:bg-purple-900/10 border-l-purple-500',
+      blue: 'bg-blue-50/50 dark:bg-blue-900/10 border-l-[var(--google-blue)] [&_h3_span.bg-clip-text]:from-[#0d47a1] [&_h3_span.bg-clip-text]:to-[#669df6]',
+      red: 'bg-red-50/50 dark:bg-red-900/10 border-l-red-500 [&_h3_span.bg-clip-text]:from-red-600 [&_h3_span.bg-clip-text]:to-red-400',
+      green: 'bg-green-50/50 dark:bg-green-900/10 border-l-green-500 [&_h3_span.bg-clip-text]:from-green-600 [&_h3_span.bg-clip-text]:to-green-400',
+      yellow: 'bg-yellow-50/50 dark:bg-yellow-900/10 border-l-yellow-500 [&_h3_span.bg-clip-text]:from-red-600 [&_h3_span.bg-clip-text]:to-red-400', // user requested red gradient for yellow box title
+      purple: 'bg-purple-50/50 dark:bg-purple-900/10 border-l-purple-500 [&_h3_span.bg-clip-text]:from-purple-600 [&_h3_span.bg-clip-text]:to-purple-400',
     };
     return (
       <PremiumCard hoverEffect={false} className={`my-7 !p-5 sm:!p-6 border-l-4 shadow-sm ${bgColors[tone]}`}>
-        <div className="text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep">
+        <div className="text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.7] tracking-tight [&>p]:m-0 break-keep [&_h3]:border-b [&_h3]:border-gray-200 dark:[&_h3]:border-white/10 [&_h3]:pb-3 [&_h3]:mb-3 [&_h3]:!mt-0">
           {children}
         </div>
       </PremiumCard>
@@ -150,10 +150,8 @@ const baseComponents: Components = {
     );
   },
   hr: () => (
-    <div className="my-16 flex items-center justify-center gap-4">
-      <div className="w-24 h-px bg-gradient-to-r from-transparent to-gray-300 dark:to-gray-600" />
-      <span className="w-1.5 h-1.5 rounded-full bg-[#d93025]" />
-      <div className="w-24 h-px bg-gradient-to-l from-transparent to-gray-300 dark:to-gray-600" />
+    <div className="my-16 flex justify-center">
+      <div className="w-full h-px bg-gray-200 dark:bg-white/10"></div>
     </div>
   ),
   pre: ({ children }) => (

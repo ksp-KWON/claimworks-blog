@@ -120,9 +120,35 @@ const baseComponents: Components = {
   ul: ({ children }) => <ul className="list-disc ml-5 sm:ml-6 my-5 space-y-2.5 text-[15.5px] sm:text-[16px] text-gray-800 dark:text-[#e8eaed] marker:text-[#1A73E8] dark:marker:text-[#8ab4f8]">{children}</ul>,
   ol: ({ children }) => <ol className="list-decimal ml-5 sm:ml-6 my-5 space-y-2.5 text-[15.5px] sm:text-[16px] text-gray-800 dark:text-[#e8eaed] marker:font-bold marker:text-[#1A73E8] dark:marker:text-[#8ab4f8]">{children}</ol>,
   li: ({ children }) => <li className="pl-1 leading-[1.8] break-keep">{children}</li>,
-  strong: ({ children }) => (
-    <strong className="font-bold text-[#1A73E8] dark:text-[#8ab4f8]">{children}</strong>
-  ),
+  strong: ({ children }) => {
+    const getText = (n: any): string => {
+      if (typeof n === 'string') return n;
+      if (Array.isArray(n)) return n.map(getText).join('');
+      if (n?.props?.children) return getText(n.props.children);
+      return '';
+    };
+    const text = getText(children).trim();
+    
+    // 키워드 기반 동적 색상 매핑
+    let colorClass = 'text-gray-900 dark:text-gray-100'; // 기본 검정/흰색 볼드
+    
+    if (/(거절|면책|부지급|삭감|주의|경고|위험|금지|불리|과실|기왕증|불가|제한|악용|분쟁|소송|실패|거부)/.test(text)) {
+      colorClass = 'text-[#d93025] dark:text-[#f28b82]'; // Red
+    } else if (/(지급|보상|합의|성공|가능|해결|유리|승소|안전|권리|인정|전액|확보)/.test(text)) {
+      colorClass = 'text-[#137333] dark:text-[#81c995]'; // Green
+    } else if (/(핵심|중요|필수|확인|점검|기준|원칙|주의사항|팁|노하우|명심)/.test(text)) {
+      colorClass = 'text-[#e37400] dark:text-[#fde293]'; // Orange/Yellow
+    } else if (/(전문가|손해사정사|의학|법률|판례|자문|소견)/.test(text)) {
+      colorClass = 'text-[#9333ea] dark:text-[#c084fc]'; // Purple
+    } else {
+      // 일반적인 키워드는 기존처럼 파란색으로 하되 너무 남용되지 않도록 파란색 유지
+      colorClass = 'text-[#1A73E8] dark:text-[#8ab4f8]'; // Blue
+    }
+
+    return (
+      <strong className={`font-bold ${colorClass}`}>{children}</strong>
+    );
+  },
   hr: () => (
     <div className="my-16 flex items-center justify-center gap-4">
       <div className="w-24 h-px bg-gradient-to-r from-transparent to-gray-300 dark:to-gray-600" />

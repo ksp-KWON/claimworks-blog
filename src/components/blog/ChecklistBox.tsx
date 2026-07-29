@@ -13,7 +13,7 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
   const pct = Math.round((count / items.length) * 100);
 
   return (
-    <div className="my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(52,168,83,0.25)] hover:border-[var(--google-green)] transition-all duration-300 relative overflow-hidden group">
+    <div className="my-10 bg-white dark:bg-[#202124] p-5 sm:p-6 border border-green-200 dark:border-green-900/50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] relative overflow-hidden group">
       {/* 진행 바 (박스 최상단) */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100 dark:bg-white/5 z-20">
         <div
@@ -21,12 +21,11 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
           style={{ width: `${pct}%` }}
         />
       </div>
-
       <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
         ☑️
       </div>
       <div className="relative z-10 pt-1">
-        <div className="-mt-5 sm:-mt-6 -mx-5 sm:-mx-6 px-5 sm:px-6 py-4 mb-4 border-b border-gray-100 dark:border-white/5 bg-gradient-to-r from-green-50/80 to-transparent dark:from-green-900/20 dark:to-transparent flex flex-wrap items-center justify-between gap-3">
+        <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-4 flex flex-wrap items-center justify-between gap-3">
           <h3 className="text-base font-bold flex items-center gap-1.5 border-l-4 border-[var(--google-green)] pl-3">
             <span className="text-[var(--google-green)] text-lg leading-none">☑️</span>
             <span className="text-[var(--google-green)] dark:text-green-400">1분 자가진단 체크리스트</span>

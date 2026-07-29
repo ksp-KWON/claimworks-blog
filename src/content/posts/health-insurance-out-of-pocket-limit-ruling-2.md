@@ -35,7 +35,7 @@ published: true
 
 관련하여 실손보험 청구와 관련된 기초 지식이 필요하시다면 아래 내용을 참고해 보시기 바랍니다.
 - [실비보험 청구 완벽 가이드 : 서류부터 절차까지 한 번에!](/blog/silbi-insurance-claim-guide)
-- [도수치료 실손보험금 지급 거절 대처법: 횟수 제한과 과잉치료 기준 총정리](/blog/manual-therapy-silbi-rejection-cases)
+- [도수치료 실손보험금 지급 거절 대처법 : 횟수 제한과 과잉치료 기준 총정리](/blog/manual-therapy-silbi-rejection-cases)
 
 ## 실무적 관점 : 보험금 청구 시 주의사항 및 대응 전략
 

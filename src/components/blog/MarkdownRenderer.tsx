@@ -18,10 +18,10 @@ const getToneColor = (node: React.ReactNode): 'red' | 'green' | 'yellow' | 'purp
     return '';
   };
   const text = getText(node).trim().substring(0, 15);
-  if (/[⚠️🚨🛑❗❌⛔]/.test(text)) return 'red';
-  if (/[✅☑️🌿🌱🍀✔📖]/.test(text)) return 'green';
-  if (/[🔥⭐⚡🌟✨🏆💡]/.test(text)) return 'yellow';
-  if (/[🔮💎💜🟣👨‍⚖️👨‍💼👩‍⚖️👩‍💼]/.test(text)) return 'purple';
+  if (/(⚠️|🚨|🛑|❗|❌|⛔)/.test(text)) return 'red';
+  if (/(✅|☑️|🌿|🌱|🍀|✔|📖)/.test(text)) return 'green';
+  if (/(🔥|⭐|⚡|🌟|✨|🏆|💡)/.test(text)) return 'yellow';
+  if (/(🔮|💎|💜|🟣|👨‍⚖️|👨‍💼|👩‍⚖️|👩‍💼)/.test(text)) return 'purple';
   return 'blue';
 };
 

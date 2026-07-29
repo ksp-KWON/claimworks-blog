@@ -35,20 +35,15 @@ async function main() {
   }
   const dailyTopic = JSON.parse(fs.readFileSync(topicJsonPath, 'utf8'));
 
-  // 단일 파이프라인 판단: 카테고리가 '판례'이고 실제 판례 데이터가 존재할 때만 판례 경로 활성화
-  // (법제처 API 전체 불가 시 4차 안전장치에 의해 precedent=null로 강등될 수 있음)
-  const isPrecedent = dailyTopic.category === '판례·법률 해석' && !!dailyTopic.precedent;
+  // 단일 파이프라인 판단: 카테고리가 '판례'인 경우에만 예외 로직 활성화
+  const isPrecedent = dailyTopic.category === '판례·법률 해석';
 
   if (isPrecedent) {
     console.log(`  [로드] 확정 판례: ${dailyTopic.precedent.caseNo} (${dailyTopic.precedent.caseName})`);
     console.log('  [대기] 법제처 API 과부하 방지를 위해 15초 대기합니다...');
     await sleep(15000);
   } else {
-    if (dailyTopic.category === '판례·법률 해석') {
-      console.log(`  [로드] 확정 키워드: '${dailyTopic.keyword}' (판례 강등 → 트렌드 방식으로 전환)`);
-    } else {
-      console.log(`  [로드] 확정 키워드: '${dailyTopic.keyword}'`);
-    }
+    console.log(`  [로드] 확정 키워드: '${dailyTopic.keyword}'`);
   }
 
 

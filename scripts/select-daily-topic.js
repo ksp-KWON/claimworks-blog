@@ -37,6 +37,9 @@ const { callGemini } = require('./gemini-helper');
 // ── 상수 ─────────────────────────────────────────────────────────────────
 const OUTPUT_JSON_PATH   = path.join(process.cwd(), 'scripts/daily-topic.json');
 const POSTS_DIR          = _POSTS_DIR;
+const LAW_API_KEY        = process.env.LAW_API_KEY;
+const LAW_PROXY_ENDPOINT = process.env.LAW_PROXY_ENDPOINT;
+const LAW_PROXY_TOKEN    = process.env.LAW_PROXY_TOKEN;
 
 const TARGET_CATEGORIES = [
   '사망·자살 보험금',
@@ -137,7 +140,25 @@ async function fetchTrendingNews(queries) {
 
   for (const query of queries) {
     try {
-      const res = await safeFetch(BASE + encodeURIComponent(query), { headers }, 10000);
+      let res;
+      // RSS 프록시 엔드포인트가 있으면 우선 시도합니다.
+      let usedProxy = false;
+      if (LAW_PROXY_ENDPOINT) {
+        try {
+          const proxyUrl = `${LAW_PROXY_ENDPOINT.trim()}/api/rss?query=${encodeURIComponent(query)}`;
+          const proxyHeaders = { ...headers };
+          if (LAW_PROXY_TOKEN) proxyHeaders['X-Proxy-Token'] = LAW_PROXY_TOKEN.trim();
+          res = await safeFetch(proxyUrl, { headers: proxyHeaders }, 10000);
+          if (res.ok) usedProxy = true;
+        } catch (proxyErr) {
+          console.warn(`    [프록시 경고] 프록시 실패 (${proxyErr.message}), 직접 호출로 Fallback...`);
+        }
+      }
+
+      // 프록시를 안 쓰거나 실패했을 경우 직접 호출
+      if (!usedProxy) {
+        res = await safeFetch(BASE + encodeURIComponent(query), { headers }, 10000);
+      }
 
       if (!res.ok) { console.warn(`    [경고] "${query}" (HTTP ${res.status})`); continue; }
 
@@ -254,9 +275,18 @@ async function getGenericLegalKeywords(targetCategory, rankedCandidates) {
 async function fetchLawAPI(type, params) {
   const headers = { 'User-Agent': 'Mozilla/5.0' };
   let url;
-  url = type === 'list'
-    ? `https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=test&search=2&display=100&query=${encodeURIComponent(params.query)}`
-    : `https://www.law.go.kr/DRF/lawService.do?target=prec&type=XML&OC=test&ID=${params.id}`;
+
+  if (LAW_PROXY_ENDPOINT?.trim()) {
+    url = type === 'list'
+      ? `${LAW_PROXY_ENDPOINT.trim()}/api/precedent?query=${encodeURIComponent(params.query)}`
+      : `${LAW_PROXY_ENDPOINT.trim()}/api/precedent-detail?ID=${params.id}`;
+    if (LAW_PROXY_TOKEN) headers['X-Proxy-Token'] = LAW_PROXY_TOKEN.trim();
+  } else {
+    if (!LAW_API_KEY) throw new Error('LAW_API_KEY 미설정');
+    url = type === 'list'
+      ? `https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=${LAW_API_KEY}&search=2&query=${encodeURIComponent(params.query)}`
+      : `https://www.law.go.kr/DRF/lawService.do?target=prec&type=XML&OC=${LAW_API_KEY}&ID=${params.id}`;
+  }
 
   const res = await safeFetch(url, { headers }, 10000);
   if (!res.ok) throw new Error(`법제처 HTTP ${res.status}`);
@@ -420,18 +450,9 @@ async function main() {
       found = await findPrecedent(fallbackKeywords.map(k => ({ searchKeyword: k, newsTitle: '' })), usedCaseNumbers);
     }
 
-    // 6. 4차 최종 안전장치 — 법제처 API 전체 불가 시 트렌드 기반 글로 우아하게 강등(Graceful Degradation)
-    // 판례 없이도 파이프라인이 완전히 멈추는 것을 방지합니다.
     if (!found) {
-      const topCandidate = rankedCandidates[0] || { searchKeyword: '보험금 분쟁', newsTitle: '' };
-      console.warn('⚠️ 3중 탐색망 모두 실패 (법제처 API 서버 일시 불가 추정)');
-      console.warn(`   → 4차 최종 안전장치 발동: 판례 없이 트렌드 기반 포스팅으로 전환합니다.`);
-      console.warn(`   → 채택 키워드: "${topCandidate.searchKeyword}" (이슈: ${topCandidate.newsTitle || 'N/A'})`);
-      found = {
-        keyword:   topCandidate.searchKeyword,
-        newsTitle: topCandidate.newsTitle || '',
-        detail:    null
-      };
+      console.warn('⚠️ 3중 탐색망 모두 실패 — 적절한 판례를 찾지 못했습니다.');
+      throw new Error('적절한 판례를 찾지 못했습니다.');
     }
   } else {
     // 트렌드 포스팅인 경우 판례 검색 없이 즉시 1위 키워드 채택

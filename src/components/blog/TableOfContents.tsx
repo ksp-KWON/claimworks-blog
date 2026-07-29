@@ -22,11 +22,9 @@ export default function TableOfContents({
       </div>
       <div className="relative z-10">
         <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-4 flex items-end justify-between">
-          <h3 className="text-base font-bold flex items-center gap-0 border-l-4 border-gray-400 group-hover:border-[var(--google-blue)] pl-2.5 transition-colors">
-            <span className="bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-500 dark:to-blue-400 text-white px-2.5 py-1 rounded-md shadow-sm flex items-center gap-1.5">
-              <span>📑</span>
-              <span>이 글의 목차</span>
-            </span>
+          <h3 className="text-base font-bold flex items-center gap-1.5 border-l-4 border-[var(--google-blue)] bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-900/20 dark:to-transparent pl-3 pr-6 py-1.5 rounded-r-md">
+            <span className="text-[var(--google-blue)] text-lg leading-none">📑</span>
+            <span className="text-[var(--google-blue)] dark:text-blue-400">이 글의 목차</span>
           </h3>
           <span className="text-[11px] font-medium text-gray-400">항목 클릭 시 이동</span>
         </div>

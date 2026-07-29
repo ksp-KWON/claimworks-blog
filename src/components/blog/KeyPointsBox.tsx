@@ -12,11 +12,9 @@ export default function KeyPointsBox({ points }: KeyPointsBoxProps) {
       </div>
       <div className="relative z-10">
         <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-4">
-          <h3 className="text-base font-bold flex items-center gap-0 border-l-4 border-[var(--google-red)] pl-2.5">
-            <span className="bg-gradient-to-r from-red-600 to-red-400 dark:from-red-500 dark:to-red-400 text-white px-2.5 py-1 rounded-md shadow-sm flex items-center gap-1.5">
-              <span className="text-sm">💡</span>
-              <span>핵심 요약 포인트</span>
-            </span>
+          <h3 className="text-base font-bold flex items-center gap-1.5 border-l-4 border-[var(--google-red)] bg-gradient-to-r from-red-50 to-transparent dark:from-red-900/20 dark:to-transparent pl-3 pr-6 py-1.5 rounded-r-md">
+            <span className="text-[var(--google-red)] text-lg leading-none">💡</span>
+            <span className="text-[var(--google-red)] dark:text-red-400">핵심 요약 포인트</span>
           </h3>
         </div>
         <ul className="space-y-3">

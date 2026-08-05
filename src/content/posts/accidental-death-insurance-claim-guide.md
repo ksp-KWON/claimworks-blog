@@ -3,7 +3,7 @@ title: "사망보험금 지급 거절 방지법: 일반사망과 상해·재해�
 slug: "accidental-death-insurance-claim-guide"
 date: "2026-06-23"
 updatedAt: "2026-06-23"
-summary: 사망보험금 지급거절로 고통받고 계신가요? 외인사 입증부터 재해사망보험금 분쟁까지, 손해사정사가 직접 알려드리는 보험금 사정 전략과 대응 매뉴얼을 확인하세요.
+summary: "사망보험금 지급거절로 고통받고 계신가요? 외인사 입증부터 재해사망보험금 분쟁까지, 손해사정사가 직접 알려드리는 보험금 사정 전략과 대응 매뉴얼을 확인하세요."
 category: "사망·자살 보험금"
 regionCategory: ""
 specialtyCategory: "법의학과"

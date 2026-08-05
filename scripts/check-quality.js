@@ -16,10 +16,15 @@ function autoFixContent(content, data) {
     let frontmatter = frontmatterMatch[1];
     const summaryMatch = frontmatter.match(/summary:\s*(?:>-\s*)?([^\n]+(?:\n\s+[^\n]+)*)/);
     if (summaryMatch) {
-      let originalSummary = summaryMatch[1];
-      let newSummary = originalSummary.replace(/["'\[\]]/g, '');
-      if (newSummary !== originalSummary) {
-        content = content.replace(originalSummary, newSummary);
+      let originalSummaryLine = summaryMatch[0]; // e.g., 'summary: "text"' or 'summary: text'
+      let originalSummaryValue = summaryMatch[1];
+      
+      let cleanText = originalSummaryValue.replace(/["'\[\]]/g, '').trim();
+      let newSummaryLine = `summary: "${cleanText}"`;
+      
+      if (originalSummaryLine !== newSummaryLine) {
+         let newFrontmatter = frontmatter.replace(originalSummaryLine, newSummaryLine);
+         content = content.replace(frontmatter, newFrontmatter);
       }
     }
   }

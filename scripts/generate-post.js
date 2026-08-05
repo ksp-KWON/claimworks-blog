@@ -26,7 +26,7 @@ const {
 } = require('../src/lib/post-builder.js');
 
 
-async function main() {
+async function generateSinglePost() {
   console.log(`=== 자동글쓰기 통합 컴포넌트 시작 (${new Date().toISOString()}) ===`);
 
   // 1. Topic 로드 (직접 모듈 호출로 통합)
@@ -88,8 +88,22 @@ async function main() {
   console.log('=== 자동글쓰기 종료 ===');
 }
 
-main().catch(err => {
-  console.error(`\n[⚠️ 자동글쓰기 빌드 경고] 통신 실패 또는 에러 발생: ${err.message}`);
-  // 에러 발생 시 CI/CD 환경에서 감지할 수 있도록 무조건 1(실패) 반환
-  process.exit(1);
-});
+async function main() {
+  const MAX_RETRIES = 3;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      await generateSinglePost();
+      return; // 성공 시 즉시 종료
+    } catch (err) {
+      console.error(`\n[⚠️ 자동글쓰기 빌드 에러] (시도: ${attempt}/${MAX_RETRIES}) ${err.message}`);
+      if (attempt === MAX_RETRIES) {
+        console.error('❌ 최대 재시도 횟수 초과. 스크립트를 강제 종료합니다.');
+        process.exit(1);
+      }
+      console.log('🔄 15초 대기 후 전체 파이프라인을 초기화하고 다시 시작합니다...');
+      await sleep(15000);
+    }
+  }
+}
+
+main();

@@ -7,6 +7,19 @@ const postsDirectory = path.join(process.cwd(), 'src/content/posts');
 // 파이프라인 배열 패턴: 각 Rule은 name과 fix 함수를 가짐
 const fixPipeline = [
   {
+    name: 'H1 헤딩 금지 (H2로 강제 변환)',
+    fix: (content) => {
+      const parts = content.split('---');
+      if (parts.length >= 3) {
+        const frontmatter = parts[0] + '---' + parts[1] + '---';
+        const body = parts.slice(2).join('---');
+        const newBody = body.replace(/^# (.*)$/gm, '## $1');
+        return frontmatter + newBody;
+      }
+      return content.replace(/^# (.*)$/gm, '## $1');
+    }
+  },
+  {
     name: '마크다운 표 코드블록 감싸기 해제',
     fix: (content) => {
       // ```markdown (또는 ```) 이 나오고 그 안에 | 가 포함된 표가 있을 경우 백틱을 벗겨냄

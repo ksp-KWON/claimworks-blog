@@ -33,6 +33,7 @@ const LOSS_ADJUSTER_CONTEXT = `
 // ── 공통 유틸 (pipeline-utils.js 에서 단일 공급 — .env.local 로드 포함) ────
 const { POSTS_DIR: _POSTS_DIR, sleep, safeFetch } = require('./pipeline-utils.js');
 const { callGemini } = require('./gemini-helper');
+const { getExistingPosts } = require('../src/lib/post-builder.js');
 
 // ── 상수 ─────────────────────────────────────────────────────────────────
 const POSTS_DIR          = _POSTS_DIR;
@@ -90,7 +91,7 @@ function getUsedMetadata() {
 const xmlParser = new XMLParser({ ignoreAttributes: false, parseTagValue: false });
 
 // ── [0단계] 트렌드 키워드 동적 창작 ──────────────────────────────────────
-async function generateTrendySearchKeywords(targetCategory) {
+async function generateTrendySearchKeywords(targetCategory, existingTitles) {
   console.log(`[0/5] AI가 [${targetCategory}] 관련 새로운 검색 키워드 창작 중...`);
   
   const categoryContext = targetCategory === '판례·법률 해석' 
@@ -98,8 +99,11 @@ async function generateTrendySearchKeywords(targetCategory) {
     : `[${targetCategory}] 관련 분야`;
 
   const prompt = `${LOSS_ADJUSTER_CONTEXT}
-현재 대중들이 가장 궁금해할 만한 **${categoryContext}**의 구체적인 실무 핫 트렌드 검색 키워드를 창작해 주세요.
-수량(개수)에 얽매이지 말고, 당신의 전문적인 연쇄 사고(Chain-of-Thought) 분석을 통해 수임 가능성이 높은 핵심 트렌드라고 판단되는 키워드들을 모두 도출하세요. (구글 뉴스 검색용)`;
+[최근 발행된 글 목록 - 중복 절대 금지]
+${existingTitles}
+
+위 목록에 있는 소재(예: 백내장, 요양병원 낙상 등)와 단어조차 겹치지 않는 완전히 새로운 마이너/최신 실무 분쟁을 발굴하십시오.
+현재 대중들이 가장 궁금해할 만한 **${categoryContext}**의 구체적인 실무 핫 트렌드 검색 키워드를 창작해 주세요.`;
 
   const schema = {
     type: 'OBJECT',
@@ -179,11 +183,15 @@ async function fetchTrendingNews(queries) {
 }
 
 // ── [2단계] Gemini AI → 손해사정 키워드 추출 ────────────────────────────
-async function extractInsuranceKeywords(headlines, targetCategory) {
+async function extractInsuranceKeywords(headlines, targetCategory, existingTitles) {
   if (!headlines.length) return [];
   console.log(`[2/5] AI 분석 — [${targetCategory}] 연관 키워드 추출 중...`);
 
   const prompt = `${LOSS_ADJUSTER_CONTEXT}
+[최근 발행된 글 목록 - 중복 절대 금지]
+${existingTitles}
+
+위 목록에 있는 소재와 중복되는 내용은 무조건 제외하십시오.
 아래 뉴스 헤드라인 목록에서 [${targetCategory}] 분야와
 직접 연관된 이슈를 분석하여, 법제처 판례 API 검색에 즉시 활용할 구체적인 실무 키워드를 추출하세요.
 
@@ -416,15 +424,17 @@ async function getDailyTopic(inputCategory) {
   let targetCategory = inputCategory || determineCategory();
   console.log(`=== 1단계: [${targetCategory}] 주제 및 판례 데이터 연쇄 탐색 시작 ===`);
 
-  const { usedCaseNumbers } = getUsedMetadata();
+  const existingPosts = getExistingPosts();
+  const usedCaseNumbers = new Set(existingPosts.map(p => p.caseNumber).filter(Boolean));
+  const existingTitles = existingPosts.map(p => p.title).join('\n');
   console.log(`  [분석] 기발행 포스트 판례 번호 로드 완료`);
 
   // 1. 구글 뉴스 RSS 수집
-  const aiQueries = await generateTrendySearchKeywords(targetCategory);
+  const aiQueries = await generateTrendySearchKeywords(targetCategory, existingTitles);
   const headlines = await fetchTrendingNews(aiQueries);
 
   // 2. AI 키워드 추출 (자동 랭킹 포함)
-  const rankedCandidates = await extractInsuranceKeywords(headlines, targetCategory);
+  const rankedCandidates = await extractInsuranceKeywords(headlines, targetCategory, existingTitles);
 
   let found = null;
 

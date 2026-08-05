@@ -18,7 +18,7 @@ function getExistingPosts() {
   const files = fs.readdirSync(POSTS_DIR)
     .filter(f => f.endsWith('.md'))
     .sort()
-    .slice(-25);
+    .slice(-50);
 
   const posts = [];
   for (const file of files) {
@@ -28,7 +28,8 @@ function getExistingPosts() {
       const slug     = file.replace(/\.md$/, '');
       const m = matter(content);
       const title = m.data.title || slug;
-      posts.push({ slug, title });
+      const caseNumber = m.data.caseNumber ? String(m.data.caseNumber).trim() : null;
+      posts.push({ slug, title, caseNumber });
     } catch { /* 스킵 */ }
   }
   return posts;

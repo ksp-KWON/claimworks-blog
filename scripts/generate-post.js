@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { callGemini } = require('./gemini-helper');
+const { getDailyTopic } = require('./select-daily-topic');
 const { 
   getRandomAngle,
   getTopicPlanningPrompt,
@@ -28,12 +29,10 @@ const {
 async function main() {
   console.log(`=== 자동글쓰기 통합 컴포넌트 시작 (${new Date().toISOString()}) ===`);
 
-  // 1. Topic 로드
-  const topicJsonPath = path.join(process.cwd(), 'scripts/daily-topic.json');
-  if (!fs.existsSync(topicJsonPath)) {
-    throw new Error('daily-topic.json 파일이 존재하지 않습니다.');
-  }
-  const dailyTopic = JSON.parse(fs.readFileSync(topicJsonPath, 'utf8'));
+  // 1. Topic 로드 (직접 모듈 호출로 통합)
+  const postTypeEnv = process.env.POST_TYPE || 'all';
+  const targetCategory = postTypeEnv === 'all' ? null : postTypeEnv;
+  const dailyTopic = await getDailyTopic(targetCategory);
 
   // 단일 파이프라인 판단: 카테고리가 '판례'인 경우에만 예외 로직 활성화
   const isPrecedent = dailyTopic.category === '판례·법률 해석';

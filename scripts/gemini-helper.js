@@ -139,13 +139,11 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
 
   let models = await discoverModels();
   
-  // ── 타겟 티어 필터링 (토큰 절약 및 역할 분담) ──
+  // ── 타겟 티어 우선 정렬 (토큰 절약 목적이되, 실패 시 타 계열로 Fallback) ──
   if (targetTier === 'lite') {
-    const liteModels = models.filter(m => m.tier === 'lite');
-    if (liteModels.length > 0) models = liteModels;
+    models = [...models].sort((a, b) => (a.tier === 'lite' ? -1 : b.tier === 'lite' ? 1 : 0));
   } else if (targetTier === 'flash') {
-    const flashModels = models.filter(m => m.tier === 'flash');
-    if (flashModels.length > 0) models = flashModels;
+    models = [...models].sort((a, b) => (a.tier === 'flash' ? -1 : b.tier === 'flash' ? 1 : 0));
   }
 
   const baseConfig = { temperature: schema ? 0.2 : 0.75 };

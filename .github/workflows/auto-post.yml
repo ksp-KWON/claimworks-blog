@@ -61,21 +61,8 @@ jobs:
             POST_TYPE="all"
           fi
           
-          echo "📊 선택된 발행 유형: $POST_TYPE"
-          
-          echo "🔍 오늘의 주제 및 판례 사전 탐색 실행 (scripts/select-daily-topic.js)"
-          if [ "$POST_TYPE" != "all" ]; then
-            node scripts/select-daily-topic.js --category "$POST_TYPE"
-          else
-            node scripts/select-daily-topic.js
-          fi
-          
-          # daily-topic.json에서 결정된 카테고리를 읽어옵니다.
-          TOPIC_CATEGORY=$(node -p "require('./scripts/daily-topic.json').category")
-          echo "🏷️ 현재 타겟 카테고리: $TOPIC_CATEGORY"
-          
-          echo "✍️ 자동글쓰기 통합 엔진 기동 (npm run generate:post)"
-          npm run generate:post
+          echo "✍️ 자동글쓰기 통합 엔진 기동 (카테고리: $POST_TYPE)"
+          POST_TYPE="$POST_TYPE" npm run generate:post
 
       - name: 변경사항 커밋 & 푸시
         uses: stefanzweifel/git-auto-commit-action@v5

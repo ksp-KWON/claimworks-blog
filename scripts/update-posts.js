@@ -13,7 +13,16 @@ function updatePosts() {
     const originalContent = content;
 
     // 1. 저자 경험 박스 -> 보상스쿨 실무쟁점 h3
-    content = content.replace(/> \*\*(?:👨‍⚖️ 15년 차 독립신체손해사정사의 실무 고백|저자 경험 박스)\*\*/g, '> ### 👨‍⚖️ 보상스쿨 실무쟁점');
+    content = content.replace(/> \*\*(?:👨‍⚖️\s*)?(?:15년 차 독립신체손해사정사의 실무 고백|저자 경험 박스|보상스쿨 손해사정사의 현장 노트|보상스쿨 실무쟁점)\*\*/g, '> ### 👨‍⚖️ 보상스쿨 실무쟁점');
+    content = content.replace(/> (?:👨‍⚖️\s*)?보상스쿨 손해사정사의 현장 노트/g, '> ### 👨‍⚖️ 보상스쿨 실무쟁점');
+    
+    // HTML div 형태의 현장 노트 처리
+    const htmlDivRegex = /<div[^>]*>\s*<strong>(?:👨‍⚖️\s*)?(?:15년 차 독립신체손해사정사의 실무 고백|저자 경험 박스|보상스쿨 손해사정사의 현장 노트|보상스쿨 실무쟁점)<\/strong>(?:<br\s*\/?>)?\s*"?([\s\S]*?)"?\s*<\/div>/g;
+    content = content.replace(htmlDivRegex, (match, p1) => {
+      // p1 is the text content inside the div. We need to wrap it in blockquote.
+      const blockquoted = p1.split('\n').map(line => `> ${line.trim()}`).join('\n');
+      return `> ### 👨‍⚖️ 보상스쿨 실무쟁점\n${blockquoted}`;
+    });
     
     // 2. 실무 조언 박스 -> h3
     content = content.replace(/> \*\*💡 손해사정사 실무 조언\*\*/g, '> ### 💡 손해사정사 실무 조언');

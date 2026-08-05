@@ -35,7 +35,6 @@ const { POSTS_DIR: _POSTS_DIR, sleep, safeFetch } = require('./pipeline-utils.js
 const { callGemini } = require('./gemini-helper');
 
 // ── 상수 ─────────────────────────────────────────────────────────────────
-const OUTPUT_JSON_PATH   = path.join(process.cwd(), 'scripts/daily-topic.json');
 const POSTS_DIR          = _POSTS_DIR;
 const LAW_API_KEY        = process.env.LAW_API_KEY;
 const LAW_PROXY_ENDPOINT = process.env.LAW_PROXY_ENDPOINT;
@@ -221,8 +220,8 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}`;
     }
     return result.candidates;
   } catch (err) {
-    console.warn('❌ Gemini AI 키워드 추출 실패:', err.message);
-    throw new Error('뉴스 키워드 추출에 실패했습니다.');
+    console.warn('❌ Gemini AI 키워드 추출 실패 (Fallback 반환):', err.message);
+    return [{ newsTitle: `${targetCategory} 주요 분쟁 이슈`, searchKeyword: '보험금 분쟁' }];
   }
 }
 
@@ -413,8 +412,8 @@ async function getFallbackAiKeyword(fallbackCategory) {
 }
 
 // ── 메인 ─────────────────────────────────────────────────────────────────
-async function main() {
-  const targetCategory = determineCategory();
+async function getDailyTopic(inputCategory) {
+  let targetCategory = inputCategory || determineCategory();
   console.log(`=== 1단계: [${targetCategory}] 주제 및 판례 데이터 연쇄 탐색 시작 ===`);
 
   const { usedCaseNumbers } = getUsedMetadata();
@@ -451,8 +450,13 @@ async function main() {
     }
 
     if (!found) {
-      console.warn('⚠️ 3중 탐색망 모두 실패 — 적절한 판례를 찾지 못했습니다.');
-      throw new Error('적절한 판례를 찾지 못했습니다.');
+      console.warn('⚠️ 3중 탐색망 모두 실패 — 적절한 판례를 찾지 못했습니다. 일반 포스트(보상가이드)로 Fallback 합니다.');
+      targetCategory = '보상가이드';
+      found = {
+        keyword: '보험금 청구 실무 가이드',
+        newsTitle: '보험금 분쟁 예방 및 대응법',
+        detail: null
+      };
     }
   } else {
     // 트렌드 포스팅인 경우 판례 검색 없이 즉시 1위 키워드 채택
@@ -473,12 +477,9 @@ async function main() {
     selectedAt: new Date().toISOString(),
   };
 
-  fs.writeFileSync(OUTPUT_JSON_PATH, JSON.stringify(output, null, 2), 'utf8');
-  console.log(`[완료] 오늘의 주제: "${found.keyword}" → ${OUTPUT_JSON_PATH}`);
+  console.log(`[완료] 오늘의 주제: "${found.keyword}"`);
   console.log('=== 1단계 프로세스 완료 ===\n');
+  return output;
 }
 
-main().catch(err => {
-  console.error('\n[⚠️ 1단계 오류] 치명적인 에러 발생:', err.message);
-  process.exit(1);
-});
+module.exports = { getDailyTopic, determineCategory };

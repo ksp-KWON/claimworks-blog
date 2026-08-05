@@ -22,27 +22,30 @@ function checkQuality() {
 
     let errorsInFile = [];
 
-    // 1. Placeholder checks
-    if (content.includes('[이미지 제안:')) {
-      errorsInFile.push('Found image placeholder: [이미지 제안: ...]');
-    }
-    if (content.includes('[관련 글 추천]')) {
-      errorsInFile.push('Found placeholder: [관련 글 추천]');
+    // 1. AI Memos / Placeholders
+    if (/\[(?:이미지 제안|관련 글 추천|이미지 삽입|관련 포스팅|추천 글).*?\]/g.test(content)) {
+      errorsInFile.push('Found AI memo placeholder (e.g., [이미지 제안: ...])');
     }
 
-    // 2. Meta description bracket checks (Summary in frontmatter)
+    // 2. Meta description quote/bracket checks (Summary in frontmatter)
     const summaryText = data.summary ? String(data.summary) : '';
-    if (summaryText.startsWith('[') && summaryText.endsWith(']')) {
-      errorsInFile.push('Summary frontmatter contains brackets [...] which harms SEO.');
+    if (summaryText.includes('"') || summaryText.includes('[') || summaryText.includes(']')) {
+      errorsInFile.push('Summary frontmatter contains brackets or quotes which harms SEO and breaks parsing.');
     }
 
-    // 3. Embedded CTA checks
-    // "보상스쿨에 문의하세요" embedded inside sentences (e.g., ends with "를 통해" or "라고")
-    if (/(보상스쿨에 문의하세요를|보상스쿨에 문의하세요라고|보상스쿨에 문의하세요가)/.test(content)) {
-      errorsInFile.push('CTA text "보상스쿨에 문의하세요" is unnaturally embedded in a sentence.');
+    // 3. CTA phrases embedded inside sentences
+    const ctaSentencesRegex = /[^.!?\n]*?(?:보상스쿨에 문의|상담을 받아보|상담하시기 바랍|전화주세요|연락주세요|전문가와 상담하|상담을 통해|도움을 받으시)[^.!?\n]*?[.!?]/g;
+    if (ctaSentencesRegex.test(content)) {
+      errorsInFile.push('CTA text is unnaturally embedded in a sentence (e.g. "보상스쿨에 문의하세요"). CTAs must only be buttons/components.');
     }
 
-    // 4. H2 Colon spacing checks
+    // 4. Tone checks (존댓말 통일, ~하시겠습니까? 금지)
+    const toneRegex = /하시겠습니까\?|십니까\?|하실까요\?/g;
+    if (toneRegex.test(content)) {
+      errorsInFile.push('Tone violation: Found inappropriate interrogative ending like "하시겠습니까?". Use "~합니다" or "~마세요".');
+    }
+
+    // 5. H2 Colon spacing checks
     const h2Regex = /^##\s+.*[^ ]:[^ ].*$/gm;
     let match;
     while ((match = h2Regex.exec(content)) !== null) {
@@ -57,10 +60,11 @@ function checkQuality() {
   });
 
   if (hasErrors) {
-    console.error('\n🚨 Quality checks failed. Please fix the above errors before publishing.');
+    console.error('\n🚨 Quality checks failed. (Violation of Content Quality Framework)');
+    console.error('Please run `node scripts/enforce-rules.js` to auto-fix most violations, or manually fix the above errors before committing/publishing.');
     process.exit(1);
   } else {
-    console.log('✅ All blog posts passed quality checks.');
+    console.log('✅ All blog posts passed quality checks (Content Quality Framework verified).');
   }
 }
 

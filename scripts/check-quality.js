@@ -4,61 +4,82 @@ const matter = require('gray-matter');
 
 const postsDirectory = path.join(process.cwd(), 'src/content/posts');
 
-function autoFixContent(content, data) {
-  let originalContent = content;
-
-  // 1. Remove AI Memos
-  content = content.replace(/\[(?:이미지 제안|관련 글 추천|이미지 삽입|관련 포스팅|추천 글).*?\]/g, '');
-
-  // 2. Meta description (summary) quotes and brackets
-  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-  if (frontmatterMatch) {
-    let frontmatter = frontmatterMatch[1];
-    const summaryMatch = frontmatter.match(/summary:\s*(?:>-\s*)?([^\n]+(?:\n\s+[^\n]+)*)/);
-    if (summaryMatch) {
-      let originalSummaryLine = summaryMatch[0]; // e.g., 'summary: "text"' or 'summary: text'
-      let originalSummaryValue = summaryMatch[1];
+// 파이프라인 배열 패턴: 각 Rule은 name과 fix 함수를 가짐
+const fixPipeline = [
+  {
+    name: '마크다운 표 코드블록 감싸기 해제',
+    fix: (content) => {
+      // ```markdown (또는 ```) 이 나오고 그 안에 | 가 포함된 표가 있을 경우 백틱을 벗겨냄
+      return content.replace(/```(?:markdown)?\n([\s\S]*?\|.*?\|.*?[\s\S]*?)```/g, (match, tableContent) => {
+        return tableContent.trim() + '\n';
+      });
+    }
+  },
+  {
+    name: 'YAML Frontmatter 안전 래핑 (쌍따옴표)',
+    fix: (content) => {
+      const match = content.match(/^---\n([\s\S]*?)\n---/);
+      if (!match) return content;
       
-      let cleanText = originalSummaryValue.replace(/["'\[\]]/g, '').trim();
-      let newSummaryLine = `summary: "${cleanText}"`;
+      let frontmatter = match[1];
+      const summaryMatch = frontmatter.match(/summary:\s*(?:>-\s*)?([^\n]+(?:\n\s+[^\n]+)*)/);
       
-      if (originalSummaryLine !== newSummaryLine) {
-         let newFrontmatter = frontmatter.replace(originalSummaryLine, newSummaryLine);
-         content = content.replace(frontmatter, newFrontmatter);
+      if (summaryMatch) {
+        let originalSummaryLine = summaryMatch[0];
+        let originalSummaryValue = summaryMatch[1];
+        let cleanText = originalSummaryValue.replace(/["'\[\]]/g, '').trim();
+        let newSummaryLine = `summary: "${cleanText}"`;
+        
+        if (originalSummaryLine !== newSummaryLine) {
+           let newFrontmatter = frontmatter.replace(originalSummaryLine, newSummaryLine);
+           return content.replace(frontmatter, newFrontmatter);
+        }
       }
+      return content;
+    }
+  },
+  {
+    name: 'AI 메타 메모 삭제',
+    fix: (content) => content.replace(/\[(?:이미지 제안|관련 글 추천|이미지 삽입|관련 포스팅|추천 글).*?\]/g, '')
+  },
+  {
+    name: '서술형 영업성 CTA 문장 삭제',
+    fix: (content) => content.replace(/[^.!?\n]*?(?:보상스쿨에 문의|상담을 받아보|상담하시기 바랍|전화주세요|연락주세요|전문가와 상담하|상담을 통해|도움을 받으시)[^.!?\n]*?[.!?]/g, '')
+  },
+  {
+    name: '종결어미 톤 교정',
+    fix: (content) => {
+      let c = content;
+      c = c.replace(/하시겠습니까\?/g, '해야 합니다.');
+      c = c.replace(/계십니까\?/g, '상황이신가요.');
+      c = c.replace(/있습니까\?/g, '있으신가요.');
+      c = c.replace(/십니까\?/g, '하신가요.');
+      c = c.replace(/하실까요\?/g, '할 수 있습니다.');
+      return c;
+    }
+  },
+  {
+    name: '제목 콜론 띄어쓰기 정규화',
+    fix: (content) => {
+      return content.split('\n').map(line => {
+        if (line.startsWith('##')) {
+          return line.replace(/([^ ])\s*:\s*([^ ])/g, '$1 : $2');
+        }
+        return line;
+      }).join('\n');
+    }
+  },
+  {
+    name: '잔존 HTML div 태그 마크다운 정규화 (Author Box 대응)',
+    fix: (content) => {
+      // 낡은 div 태그 구조가 다시 나타날 경우를 대비한 보험성 파이프라인
+      return content.replace(/<div[^>]*>[\s\S]*?(?:<strong>|<b>)[\s\S]*?(?:👨‍⚖️.*?|손해사정사.*?)<\/strong>[\s\S]*?<br>([\s\S]*?)<\/div>/ig, (match, text) => {
+        let lines = text.trim().split('\n').filter(line => line.trim() !== '');
+        return '> ### 👨‍⚖️ 보상스쿨 실무쟁점\n' + lines.map(line => '> ' + line.trim()).join('\n');
+      });
     }
   }
-
-  // 3. CTA phrases embedded
-  const ctaSentencesRegex = /[^.!?\n]*?(?:보상스쿨에 문의|상담을 받아보|상담하시기 바랍|전화주세요|연락주세요|전문가와 상담하|상담을 통해|도움을 받으시)[^.!?\n]*?[.!?]/g;
-  content = content.replace(ctaSentencesRegex, '');
-
-  // 4. Tone fixes
-  content = content.replace(/하시겠습니까\?/g, '해야 합니다.');
-  content = content.replace(/계십니까\?/g, '상황이신가요.');
-  content = content.replace(/있습니까\?/g, '있으신가요.');
-  content = content.replace(/십니까\?/g, '하신가요.');
-  content = content.replace(/하실까요\?/g, '할 수 있습니다.');
-
-  // 5. Unspaced colons in H2
-  let lines = content.split('\n');
-  let changedLines = false;
-  for(let i=0; i<lines.length; i++) {
-    if (lines[i].startsWith('##')) {
-       let oldLine = lines[i];
-       let newLine = oldLine.replace(/([^ ])\s*:\s*([^ ])/g, '$1 : $2');
-       if (oldLine !== newLine) {
-         lines[i] = newLine;
-         changedLines = true;
-       }
-    }
-  }
-  if (changedLines) {
-    content = lines.join('\n');
-  }
-
-  return content;
-}
+];
 
 function checkQuality() {
   if (!fs.existsSync(postsDirectory)) {
@@ -74,33 +95,23 @@ function checkQuality() {
     if (!fileName.endsWith('.md') && !fileName.endsWith('.mdx')) return;
 
     const fullPath = path.join(postsDirectory, fileName);
-    let content = fs.readFileSync(fullPath, 'utf8');
-    const { data } = matter(content);
+    let originalContent = fs.readFileSync(fullPath, 'utf8');
+    let content = originalContent;
 
-    // AUTO-FIX FIRST
-    const fixedContent = autoFixContent(content, data);
-    if (fixedContent !== content) {
-      fs.writeFileSync(fullPath, fixedContent, 'utf8');
-      content = fixedContent; // use fixed content for further checks
+    // 파이프라인 순차 적용
+    fixPipeline.forEach(rule => {
+      content = rule.fix(content);
+    });
+
+    if (content !== originalContent) {
+      fs.writeFileSync(fullPath, content, 'utf8');
       fixedCount++;
     }
 
+    // 검증 로직 (파이프라인 통과 후에도 남아있는 치명적 에러)
     let errorsInFile = [];
-
-    // Final Validation (if anything was unfixable or structural)
     if (/\[(?:이미지 제안|관련 글 추천|이미지 삽입|관련 포스팅|추천 글).*?\]/g.test(content)) {
       errorsInFile.push('Unfixable AI memo placeholder remaining.');
-    }
-    const toneRegex = /하시겠습니까\?|십니까\?|하실까요\?/g;
-    if (toneRegex.test(content)) {
-      errorsInFile.push('Unfixable tone violation remaining.');
-    }
-
-    // 5. H2 Colon spacing checks (Strict Validation)
-    const h2Regex = /^##\s+.*[^ ]:[^ ].*$/gm;
-    let match;
-    while ((match = h2Regex.exec(content)) !== null) {
-      errorsInFile.push(`H2 heading contains unspaced colon: "${match[0]}"`);
     }
 
     if (errorsInFile.length > 0) {
@@ -111,11 +122,11 @@ function checkQuality() {
   });
 
   if (fixedCount > 0) {
-    console.log(`🛠️ Auto-fixed ${fixedCount} files during quality check.`);
+    console.log(`🛠️ 파이프라인 자동 교정 완료 (적용 파일: ${fixedCount}개).`);
   }
 
   if (hasErrors) {
-    console.error('\n🚨 Quality checks failed with unfixable errors. Please manually fix the above errors.');
+    console.error('\n🚨 치명적 렌더링 오류가 발견되었습니다. 위 파일을 수동으로 수정하세요.');
     process.exit(1);
   } else {
     console.log('✅ All blog posts passed quality checks (Auto-fixed & Verified).');

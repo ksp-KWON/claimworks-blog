@@ -34,11 +34,11 @@ function SearchResults() {
           const filtered = allPosts.filter(post => {
             const query = q.toLowerCase();
             return (
-              post.title.toLowerCase().includes(query) || 
-              post.summary.toLowerCase().includes(query) ||
-              post.content.toLowerCase().includes(query) ||
-              (post.category && post.category.toLowerCase().includes(query)) ||
-              (post.tags && post.tags.some(tag => tag.toLowerCase().includes(query)))
+              post.title?.toLowerCase().includes(query) || 
+              post.summary?.toLowerCase().includes(query) ||
+              post.content?.toLowerCase().includes(query) ||
+              post.category?.toLowerCase().includes(query) ||
+              post.tags?.some(tag => tag.toLowerCase().includes(query))
             );
           });
           setResults(filtered);

@@ -90,12 +90,13 @@ export async function onRequestPost(context: any) {
 ${contextPrompt}
 반드시 존댓말로 작성하고, 전문 용어를 쉽게 풀어서 콤팩트하게 요약해.
 절대 없는 법령이나 사실을 지어내지 마(Hallucination 금지).
-[출력 규칙]
-1. 마크다운 볼드체(**)나 특수기호는 절대 쓰지 말고 순수 텍스트로만 작성해.
-2. 번호(1., 2.)를 매겨서 설명할 경우, 각 번호가 끝날 때마다 반드시 줄바꿈(\\n)을 넣어줘.
-3. 코멘트의 첫 문장은 반드시 아래 형식 중 하나로 시작해.
-   - 판례인 경우: "문의하신 판례는 [이 판례가 주는 핵심 인사이트 요약]이라는 중요한 기준을 제시하고 있습니다."
-   - 그 외 자료인 경우: "문의하신 데이터는 [이 데이터가 주는 핵심 인사이트 요약]이라는 중요한 기준을 제시하고 있습니다."
+
+[출력 규칙 (생각의 사슬 헌법)]
+반드시 아래 JSON 스키마를 엄격히 준수하여 응답하십시오. 일반 텍스트나 마크다운 블록(\`\`\`json)으로 감싸지 말고 오직 순수 JSON 객체만 출력하십시오.
+{
+  "thoughtProcess": "응답을 작성하기 전, 주어진 데이터에 대한 법리적/의학적 쟁점 분석, 기획, 그리고 손해사정 전략 등 논리적인 사고 과정을 먼저 서술하십시오. (일시적인 땜방이 아닌 근본 원인 파악 필수)",
+  "comment": "사용자에게 보여질 최종 코멘트 본문. 아래 세부 규칙을 엄수할 것:\\n1. 마크다운 볼드체(**)나 특수기호 절대 금지, 순수 텍스트 위주로 작성.\\n2. 번호(1., 2.) 나열 시 끝날 때마다 반드시 줄바꿈(\\n) 포함.\\n3. 첫 문장 고정 형식 -> 판례: '문의하신 판례는 [핵심 인사이트 요약]이라는 중요한 기준을 제시하고 있습니다.' / 기타: '문의하신 데이터는 [핵심 요약]이라는 중요한 기준을 제시하고 있습니다.'"
+}
 
 분석할 데이터:
 ${sourceText}`;
@@ -117,6 +118,7 @@ ${sourceText}`;
               generationConfig: {
                 temperature:      0.3,
                 maxOutputTokens:  Math.min(1024, maxTokens),
+                responseMimeType: "application/json"
               },
             }),
           }
@@ -133,7 +135,25 @@ ${sourceText}`;
 
         const data: any = await res.json();
         const text = (data.candidates?.[0]?.content?.parts ?? []).map((p: any) => p.text ?? '').join('');
-        if (text) { comment = text; break; }
+        
+        if (text) {
+          try {
+            // 마크다운 잔재(```json 등) 제거
+            const cleanText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+            const parsed = JSON.parse(cleanText);
+            
+            console.log(`[AI 사고 과정 (thoughtProcess)]:\n${parsed.thoughtProcess}`);
+            
+            if (parsed.comment) {
+              comment = parsed.comment;
+              break;
+            }
+          } catch (parseErr) {
+            console.warn('[JSON 파싱 실패, Fallback 평문 처리]', parseErr);
+            comment = text;
+            break;
+          }
+        }
 
       } catch (err: any) {
         console.error(`[Failover] ${modelName} 실패:`, err.message);

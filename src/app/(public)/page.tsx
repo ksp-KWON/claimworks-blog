@@ -6,7 +6,7 @@ import PremiumHeading from "@/components/ui/PremiumHeading";
 
 export const metadata: Metadata = {
   title: "보상스쿨 | 압도적 승인율의 전문 손해사정 그룹",
-  description: "숨은 보험금부터 까다로운 면책 분쟁까지, 유능한 손해사정 전문가 그룹 보상스쿨이 당신의 정당한 권리를 되찾아 드립니다. 심평원 의료 빅데이터 기반의 독보적인 보상 인사이트와 무료 1:1 상담을 지금 바로 경험해보세요.",
+  description: "숨은 보험금부터 까다로운 면책 분쟁까지, 유능한 손해사정 전문가 그룹 보상스쿨이 당신의 정당한 권리를 되찾아 드립니다. 오랜 업력과 방대한 보상 실무 경험에서 검증된 압도적인 성공 노하우와 무료 1:1 상담을 지금 바로 경험해보세요.",
   alternates: {
     canonical: "https://claim-works.com",
   },

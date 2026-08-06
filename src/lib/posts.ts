@@ -58,6 +58,14 @@ function getAllPosts(): PostData[] {
         const fileContents = fs.readFileSync(fullPath, 'utf8');
         const { data, content } = matter(fileContents);
 
+        // [근본 해결] YAML frontmatter에서 category가 문자열 또는 배열로 올 수 있어
+        // 반드시 문자열로 정규화합니다. 배열이면 콤마+공백으로 합칩니다.
+        const normalizeToString = (val: unknown): string => {
+          if (Array.isArray(val)) return val.filter(Boolean).join(', ');
+          if (typeof val === 'string') return val;
+          return val ? String(val) : '';
+        };
+
         return {
           slug,
           title: data.title || '',
@@ -65,11 +73,13 @@ function getAllPosts(): PostData[] {
           isoDate: data.date ? new Date(data.date).toISOString() : '',
           updatedAt: data.updatedAt ? formatDate(data.updatedAt) : undefined,
           summary: data.summary || '',
-          category: data.category || '',
+          category: normalizeToString(data.category),
           caseNumber: data.caseNumber || '',
-          regionCategory: data.regionCategory || '',
-          specialtyCategory: data.specialtyCategory || '',
-          tags: Array.isArray(data.tags) ? data.tags : [],
+          regionCategory: normalizeToString(data.regionCategory),
+          specialtyCategory: normalizeToString(data.specialtyCategory),
+          tags: Array.isArray(data.tags)
+            ? data.tags.filter((t): t is string => typeof t === 'string')
+            : [],
           published: data.published !== false,
           content: content,
         };

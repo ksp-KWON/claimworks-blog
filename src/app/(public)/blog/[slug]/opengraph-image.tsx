@@ -16,7 +16,7 @@ export const contentType = 'image/png';
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = getPostData(slug);
-  const title = post?.title || '보상스쿨 헬스케어 & 손해사정 보상가이드';
+  const title = post?.title || '보상스쿨 전문 손해사정 그룹';
 
   return new ImageResponse(
     (

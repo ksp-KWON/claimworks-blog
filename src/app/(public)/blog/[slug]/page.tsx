@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       publishedTime: post.date,
       modifiedTime: post.date,
       authors: ['보상스쿨 손해사정사'],
-      siteName: '보상스쿨 헬스케어 & 손해사정 보상가이드',
+      siteName: '보상스쿨 전문 손해사정 그룹',
       locale: 'ko_KR',
       url: `https://claim-works.com/blog/${slug}`,
       images: [

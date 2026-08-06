@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://claim-works.com"),
-  title: "보상스쿨 헬스케어 & 손해사정 보상가이드",
+  title: "보상스쿨 전문 손해사정 그룹",
   description: "건강보험심사평가원의 공개 정보를 기반으로 보상스쿨 손해사정사가 분석한 보상 노하우를 제공합니다.",
 };
 

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '개인정보처리방침 | 보상스쿨 헬스케어 & 손해사정 보상가이드',
-  description: '보상스쿨 헬스케어 & 손해사정 보상가이드의 개인정보처리방침입니다.',
+  title: '개인정보처리방침 | 보상스쿨 전문 손해사정 그룹',
+  description: '보상스쿨 전문 손해사정 그룹의 개인정보처리방침입니다.',
   alternates: {
     canonical: 'https://claim-works.com/privacy',
   },
@@ -16,7 +16,7 @@ export default function PrivacyPage() {
       </h1>
       <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none text-[#5f6368] dark:text-[#9aa0a6] space-y-6">
         <p>
-          &quot;보상스쿨 헬스케어 &amp; 손해사정 보상가이드&quot;(이하 &quot;사이트&quot;)는 이용자의 개인정보를 중요시하며, 「개인정보보호법」, 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 등 관련 법규를 준수하고 있습니다.
+          &quot;보상스쿨 전문 손해사정 그룹&quot;(이하 &quot;사이트&quot;)는 이용자의 개인정보를 중요시하며, 「개인정보보호법」, 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 등 관련 법규를 준수하고 있습니다.
         </p>
         <p>
           본 사이트는 기본적으로 별도의 회원가입 없이 콘텐츠 열람 및 계산기 이용이 가능하며, 이 과정에서 <strong>이용자를 식별할 수 있는 민감한 개인정보를 수집하거나 저장하지 않습니다.</strong>

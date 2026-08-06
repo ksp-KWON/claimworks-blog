@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '이용약관 | 보상스쿨 헬스케어 & 손해사정 보상가이드',
-  description: '보상스쿨 헬스케어 & 손해사정 보상가이드의 서비스 이용약관입니다.',
+  title: '이용약관 | 보상스쿨 전문 손해사정 그룹',
+  description: '보상스쿨 전문 손해사정 그룹의 서비스 이용약관입니다.',
   alternates: {
     canonical: 'https://claim-works.com/terms',
   },
@@ -19,7 +19,7 @@ export default function TermsPage() {
           <h2 className="text-lg font-bold text-[#202124] dark:text-[#e8eaed] mb-3">제 1 장 총칙</h2>
           <h3 className="font-bold text-[#202124] dark:text-[#e8eaed] mt-4 mb-2">제 1 조 (목적)</h3>
           <p>
-            본 약관은 &quot;보상스쿨 헬스케어 &amp; 손해사정 보상가이드&quot;(이하 &quot;사이트&quot;)가 제공하는 모든 서비스의 이용조건 및 절차, 이용자와 사이트의 권리, 의무, 책임사항과 기타 필요한 사항을 규정함을 목적으로 합니다.
+            본 약관은 &quot;보상스쿨 전문 손해사정 그룹&quot;(이하 &quot;사이트&quot;)가 제공하는 모든 서비스의 이용조건 및 절차, 이용자와 사이트의 권리, 의무, 책임사항과 기타 필요한 사항을 규정함을 목적으로 합니다.
           </p>
           <h3 className="font-bold text-[#202124] dark:text-[#e8eaed] mt-4 mb-2">제 2 조 (용어의 정의)</h3>
           <p>

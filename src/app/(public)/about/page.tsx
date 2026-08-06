@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "플랫폼 소개 | 보상스쿨 헬스케어 & 손해사정 보상가이드",
-  description: "보상스쿨 헬스케어 & 손해사정 보상가이드의 핵심 미션과 E-E-A-T 4대 가치를 소개합니다.",
+  title: "플랫폼 소개 | 보상스쿨 전문 손해사정 그룹",
+  description: "보상스쿨 전문 손해사정 그룹의 핵심 미션과 E-E-A-T 4대 가치를 소개합니다.",
   alternates: {
     canonical: "https://claim-works.com/about",
   },
@@ -112,7 +112,7 @@ export default function AboutPage() {
       <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-8 text-center border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)]">
         <svg className="w-8 h-8 text-[#dadce0] dark:text-[#5f6368] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
         <p className="text-[12px] sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] font-medium leading-relaxed break-keep max-w-2xl mx-auto">
-          보상스쿨 헬스케어 & 손해사정 보상가이드에서 제공하는 모든 포스팅 및 통계 정보는 일반적인 참고용 자료입니다. 당사는 사이트 내 정보만으로 직접적인 법률 대리나 의료 진단 행위를 수행하지 않습니다. 정확한 장해 산정 및 합의 절차는 반드시 공인된 독립손해사정사나 법률 전문가와의 1:1 상담을 통해 결정하시기 바랍니다.
+          보상스쿨 전문 손해사정 그룹에서 제공하는 모든 포스팅 및 통계 정보는 일반적인 참고용 자료입니다. 당사는 사이트 내 정보만으로 직접적인 법률 대리나 의료 진단 행위를 수행하지 않습니다. 정확한 장해 산정 및 합의 절차는 반드시 공인된 독립손해사정사나 법률 전문가와의 1:1 상담을 통해 결정하시기 바랍니다.
         </p>
       </div>
 

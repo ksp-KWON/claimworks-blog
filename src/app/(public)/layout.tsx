@@ -60,18 +60,18 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
           {/* 로고/제목 영역 */}
           <div className="flex items-center min-w-0 flex-1 mr-1 sm:mr-2">
-            <div className="font-sans font-extrabold text-lg sm:text-xl min-w-0 tracking-tight">
-              <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden">
-                <div className="relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-300 z-10 mr-1">
-                  <Image src="/logo.png" alt="보상스쿨 TV" width={100} height={24} className="object-contain transition-all duration-300" priority />
+            <div className="font-sans min-w-0 tracking-tight w-full">
+              <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden border-l-4 border-black dark:border-gray-300 pl-2.5 sm:pl-3 pr-4 py-1.5 rounded-r-xl bg-gradient-to-r from-gray-200/80 to-transparent dark:from-white/10 dark:to-transparent max-w-fit">
+                <div className="relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-300 z-10">
+                  <Image src="/logo.png" alt="보상스쿨 로고" width={24} height={24} className="object-contain transition-all duration-300" priority />
                 </div>
-                <span className={`hidden sm:inline font-extrabold text-[#3c4043] dark:text-[#e8eaed] group-hover:opacity-80 transition-opacity truncate tracking-tight ${gowunDodum.className}`}>
+                <span className={`hidden sm:inline font-bold text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 dark:from-white dark:to-gray-400 group-hover:opacity-80 transition-opacity truncate tracking-tight`}>
                   보상스쿨 전문 손해사정 그룹
                 </span>
-                <span className={`sm:hidden font-extrabold text-[15px] text-[#3c4043] dark:text-[#e8eaed] truncate tracking-tight ${gowunDodum.className}`}>
-                  보상스쿨 손해사정
+                <span className={`sm:hidden font-bold text-[15px] text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 dark:from-white dark:to-gray-400 truncate tracking-tight`}>
+                  보상스쿨 전문 손해사정 그룹
                 </span>
-                <span className={`hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-sm bg-gray-100 dark:bg-gray-800 text-[10px] font-bold text-gray-500 dark:text-gray-400 tracking-widest uppercase border border-gray-200 dark:border-gray-700 ${gowunDodum.className}`}>
+                <span className={`hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-sm bg-black/5 dark:bg-white/10 text-[10px] font-bold text-gray-600 dark:text-gray-300 tracking-widest uppercase border border-gray-300/50 dark:border-gray-600`}>
                   EXPERT GROUP
                 </span>
               </Link>

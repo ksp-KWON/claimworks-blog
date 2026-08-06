@@ -59,16 +59,16 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         <div className="mx-auto flex h-full w-[92vw] xl:w-[85vw] max-w-7xl items-center justify-between px-2 sm:px-5">
 
           {/* 로고/제목 영역 */}
-          <div className="flex items-center min-w-0 flex-1 mr-1 sm:mr-2">
-            <div className="font-sans min-w-0 tracking-tight w-full">
-              <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden border-l-4 border-black dark:border-gray-300 pl-2.5 sm:pl-3 pr-4 py-1.5 rounded-r-xl bg-gradient-to-r from-gray-200/80 to-transparent dark:from-white/10 dark:to-transparent max-w-fit">
-                <div className="relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-300 z-10">
-                  <Image src="/logo.png" alt="보상스쿨 로고" width={24} height={24} className="object-contain transition-all duration-300" priority />
+          <div className="flex items-center min-w-0 flex-1 mr-1 sm:mr-2 h-full">
+            <div className="font-sans min-w-0 tracking-tight w-full h-full">
+              <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden border-l-4 border-black dark:border-gray-300 pl-2.5 sm:pl-3 pr-4 h-full w-full bg-gradient-to-r from-gray-200/80 to-transparent dark:from-white/10 dark:to-transparent">
+                <div className="relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-300 z-10 mr-1.5 h-6 sm:h-7">
+                  <Image src="/logo.png" alt="보상스쿨 로고" width={120} height={28} className="h-full w-auto object-contain transition-all duration-300" priority />
                 </div>
-                <span className={`hidden sm:inline font-bold text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 dark:from-white dark:to-gray-400 group-hover:opacity-80 transition-opacity truncate tracking-tight`}>
+                <span className={`hidden sm:inline font-black text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 dark:from-white dark:to-gray-400 group-hover:opacity-80 transition-opacity truncate tracking-tight`}>
                   보상스쿨 전문 손해사정 그룹
                 </span>
-                <span className={`sm:hidden font-bold text-[15px] text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 dark:from-white dark:to-gray-400 truncate tracking-tight`}>
+                <span className={`sm:hidden font-black text-[15px] text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 dark:from-white dark:to-gray-400 truncate tracking-tight`}>
                   보상스쿨 전문 손해사정 그룹
                 </span>
                 <span className={`hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-sm bg-black/5 dark:bg-white/10 text-[10px] font-bold text-gray-600 dark:text-gray-300 tracking-widest uppercase border border-gray-300/50 dark:border-gray-600`}>

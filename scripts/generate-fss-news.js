@@ -23,7 +23,7 @@ function fetchFssBoard() {
       res.on('end', () => {
         const items = [];
         // 정규식으로 게시글 링크, 번호, 제목, 날짜 추출
-        const rowRegex = /<td class="num">(\d+)<\/td>[\s\S]*?<a href="\.\/view\.do\?nttId=(\d+)[^>]*>([^<]+)<\/a>[\s\S]*?<td>([^<]+)<\/td>/g;
+        const rowRegex = /<td class="num">\s*(\d+)\s*<\/td>[\s\S]*?<a href="[^"]*nttId=(\d+)[^"]*">([^<]+)<\/a>[\s\S]*?<td>\s*(\d{4}-\d{2}-\d{2})\s*<\/td>/g;
         let match;
         while ((match = rowRegex.exec(data)) !== null) {
           items.push({
@@ -45,11 +45,19 @@ function fetchFssArticle(url) {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
-        const bodyMatch = data.match(/<div class="b-cont-box">([\s\S]*?)<\/div>/);
-        if (bodyMatch) {
-          // HTML 태그 제거
-          let content = bodyMatch[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-          resolve(content.substring(0, 3000)); // AI 평가용으로 요약 부분만 발췌 (토큰 절약)
+        let contentStart = data.indexOf('b-viewer');
+        
+        if (contentStart !== -1) {
+          let contentEnd = data.indexOf('<!-- //bd-view-content -->', contentStart);
+          if (contentEnd === -1) contentEnd = data.indexOf('<div class="bd-view-file">', contentStart);
+          if (contentEnd === -1) contentEnd = data.indexOf('<div class="bd-view-nav">', contentStart);
+          if (contentEnd === -1) contentEnd = data.substring(contentStart).length;
+          
+          let content = data.substring(contentStart, contentEnd)
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+          resolve(content.substring(0, 3000));
         } else {
           resolve('');
         }

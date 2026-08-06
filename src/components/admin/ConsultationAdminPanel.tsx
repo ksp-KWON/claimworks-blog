@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { supabase, Consultation } from '@/lib/supabase';
-import ConsultationDetailCard from './ConsultationDetailCard';
-import BottomSheet from '@/components/ui/BottomSheet';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import { AdminStatusSelect } from './AdminStatusSelect';
@@ -16,12 +14,10 @@ interface ConsultationAdminPanelProps {
   refreshCounter: number;
 }
 
-export default function ConsultationAdminPanel({ isSplitView, onNavigateToManage, searchQuery, sortType, refreshCounter }: ConsultationAdminPanelProps) {
+export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery, sortType, refreshCounter }: ConsultationAdminPanelProps) {
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  
-  const [memoText, setMemoText] = useState('');
 
   const sortedAndFilteredConsultations = useMemo(() => {
     return [...consultations]

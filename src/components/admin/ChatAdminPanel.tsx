@@ -170,31 +170,31 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
     }
   }, []);
 
-  const playNotificationSound = () => {
+  function playNotificationSound() {
     try {
       const audio = new Audio('/notification.ogg');
       audio.play().catch(e => console.warn('Audio play blocked:', e));
     } catch (e) {
       console.error('Audio initialization error:', e);
     }
-  };
+  }
 
-  const showBrowserNotification = (title: string, body: string) => {
+  function showBrowserNotification(title: string, body: string) {
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(title, { body, icon: '/logo.png' });
     }
-  };
+  }
 
   const handleSelectSession = (sid: string) => {
     setSelectedId(sid);
     loadMessages(sid);
   };
 
-  const scrollToBottom = () => {
+  function scrollToBottom() {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
-  };
+  }
 
   const handleSend = async () => {
     if (!replyText.trim() || !selectedId || isSending) return;

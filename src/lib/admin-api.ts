@@ -148,7 +148,9 @@ export async function savePost(githubToken: string, data: any) {
       published: data.published !== false
     };
     localStorage.setItem('admin_recent_posts', JSON.stringify(cached));
-  } catch(e) {}
+  } catch {
+    // Ignored
+  }
 
   return true;
 }
@@ -176,7 +178,6 @@ export async function deletePost(githubToken: string, filename: string, sha: str
 export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: string, schema?: any, tierLimit?: ('pro'|'flash'|'lite')[]) {
   if (!geminiKey) throw new Error('Gemini API 키가 없습니다.');
   
-  const existingPostsList = "- (없음)";
   const angle = getRandomAngle();
   
   let prompt = '';

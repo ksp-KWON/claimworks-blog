@@ -71,7 +71,6 @@ export default function AiWritingStudio({
 
   // Batch Auto State
   const [isBatchRunning, setIsBatchRunning] = useState(false);
-  const [batchStatus, setBatchStatus] = useState<Record<string, 'pending' | 'running' | 'success' | 'failed'>>({});
 
   const handleRunAi = () => {
     onRunAi(aiMode, postMeta.content || '');
@@ -81,12 +80,10 @@ export default function AiWritingStudio({
   const handleRunSingleCategory = async () => {
     if (!onRunAutoBatch) return;
     setIsBatchRunning(true);
-    setBatchStatus({ [selectedCategory]: 'running' });
     try {
-      const res = await onRunAutoBatch(selectedCategory, false);
-      setBatchStatus({ [selectedCategory]: res ? 'success' : 'failed' });
-    } catch (e) {
-      setBatchStatus({ [selectedCategory]: 'failed' });
+      await onRunAutoBatch(selectedCategory, false);
+    } catch {
+      // Ignored
     }
     setIsBatchRunning(false);
     setIsMobileAiOpen(false); // 실행 후 모바일 서랍 닫기

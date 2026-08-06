@@ -471,11 +471,19 @@ async function getDailyTopic(inputCategory) {
   } else {
     // 트렌드 포스팅인 경우 판례 검색 없이 즉시 1위 키워드 채택
     console.log(`[3/4] 일반 트렌드 카테고리이므로 판례 탐색을 생략하고 즉시 1위 키워드를 채택합니다.`);
-    found = {
-      keyword: rankedCandidates[0].searchKeyword,
-      newsTitle: rankedCandidates[0].newsTitle,
-      detail: null
-    };
+    if (rankedCandidates && rankedCandidates.length > 0) {
+      found = {
+        keyword: rankedCandidates[0].searchKeyword,
+        newsTitle: rankedCandidates[0].newsTitle,
+        detail: null
+      };
+    } else {
+      found = {
+        keyword: targetCategory + ' 핵심 분쟁 실무',
+        newsTitle: '손해사정 주요 실무 쟁점',
+        detail: null
+      };
+    }
   }
 
   const output = {

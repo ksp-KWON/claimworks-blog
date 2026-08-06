@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Gowun_Dodum } from 'next/font/google';
 import ThemeToggle from '@/components/ThemeToggle';
 import SearchBar from '@/components/SearchBar';
 import MobileBottomNav from '@/components/MobileBottomNav';
@@ -9,6 +10,12 @@ import ScrollProgressBar from '@/components/ScrollProgressBar';
 import SmartStickyLayout from '@/components/SmartStickyLayout';
 import SidebarContent from '@/components/SidebarContent';
 import { getSortedPostsData } from '@/lib/posts';
+
+const gowunDodum = Gowun_Dodum({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+});
 
 /**
  * 방문자용 공개 레이아웃. (서버 컴포넌트)
@@ -58,13 +65,13 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 <div className="relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-300 z-10 mr-1">
                   <Image src="/logo.png" alt="보상스쿨 TV" width={100} height={24} className="object-contain transition-all duration-300" priority />
                 </div>
-                <span className="hidden sm:inline font-extrabold text-[#3c4043] dark:text-[#e8eaed] group-hover:opacity-80 transition-opacity truncate tracking-tight">
+                <span className={`hidden sm:inline font-extrabold text-[#3c4043] dark:text-[#e8eaed] group-hover:opacity-80 transition-opacity truncate tracking-tight ${gowunDodum.className}`}>
                   보상스쿨 헬스케어 &amp; 손해사정 보상가이드
                 </span>
-                <span className="sm:hidden font-extrabold text-[15px] text-[#3c4043] dark:text-[#e8eaed] truncate tracking-tight">
+                <span className={`sm:hidden font-extrabold text-[15px] text-[#3c4043] dark:text-[#e8eaed] truncate tracking-tight ${gowunDodum.className}`}>
                   보상스쿨&apos;s 보상가이드
                 </span>
-                <span className="hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-sm bg-gray-100 dark:bg-gray-800 text-[9px] font-black text-gray-500 dark:text-gray-400 tracking-widest uppercase border border-gray-200 dark:border-gray-700">
+                <span className={`hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-sm bg-gray-100 dark:bg-gray-800 text-[10px] font-bold text-gray-500 dark:text-gray-400 tracking-widest uppercase border border-gray-200 dark:border-gray-700 ${gowunDodum.className}`}>
                   Integrated Hub
                 </span>
               </Link>

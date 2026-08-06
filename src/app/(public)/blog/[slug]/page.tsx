@@ -29,14 +29,14 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
   if (!post) {
     return {
-      title: '포스트를 찾을 수 없습니다 | 보상스쿨 손해사정 보상가이드',
+      title: '포스트를 찾을 수 없습니다 | 보상스쿨 전문 손해사정 그룹',
     };
   }
 
   const ogImageUrl = `https://claim-works.com/blog/${slug}/opengraph-image`;
 
   return {
-    title: `${post.title} | 보상스쿨 손해사정 보상가이드`,
+    title: `${post.title} | 보상스쿨 전문 손해사정 그룹`,
     description: post.summary,
     openGraph: {
       title: post.title,

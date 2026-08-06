@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
   if (!category) {
     return {
-      title: '카테고리를 찾을 수 없습니다 | 보상스쿨 손해사정 보상가이드',
+      title: '카테고리를 찾을 수 없습니다 | 보상스쿨 전문 손해사정 그룹',
     };
   }
 

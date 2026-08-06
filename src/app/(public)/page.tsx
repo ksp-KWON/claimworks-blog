@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 import PremiumHeading from "@/components/ui/PremiumHeading";
 
 export const metadata: Metadata = {
-  title: "지역별 병원추천 & 보상 실무 가이드 | 보상스쿨",
-  description: "건강보험심사평가원 공개 데이터를 기반으로 분석한 지역별 우수 병원 추천 및 손해사정 보상 실무 가이드를 제공합니다.",
+  title: "보상스쿨 | 압도적 승인율의 전문 손해사정 그룹",
+  description: "숨은 보험금부터 까다로운 면책 분쟁까지, 유능한 손해사정 전문가 그룹 보상스쿨이 당신의 정당한 권리를 되찾아 드립니다. 심평원 의료 빅데이터 기반의 독보적인 보상 인사이트와 무료 1:1 상담을 지금 바로 경험해보세요.",
   alternates: {
     canonical: "https://claim-works.com",
   },

@@ -155,8 +155,10 @@ function getQueryGenerationPrompt(targetCategory, existingTitles) {
 ${existingTitles}
 
 이 주제들과 겹치지 않는, 오늘 구글 뉴스에서 탐색해 볼 만한 새롭고 실질적인 **[${targetCategory}]** 카테고리 관련 검색어 3개를 창작하세요.
+[헌법 제8조: 생각의 사슬] 단순히 단어만 나열하지 말고, 어떤 손해사정 실무 및 수임 관점에서 이 트렌드를 분석하고 키워드를 도출했는지 단계별 논리를 'thoughtProcess'에 서술하세요.
+
 반드시 아래 JSON 형식으로만 출력하세요.
-{"queries": ["검색어1", "검색어2", "검색어3"]}
+{"thoughtProcess": "사고 과정 서술", "queries": ["검색어1", "검색어2", "검색어3"]}
 `;
 }
 
@@ -172,8 +174,24 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
 [중요] 추출된 searchKeyword는 법제처 판례 API 검색에 직접(Exact Match) 사용됩니다. 문장형태나 너무 긴 복합어를 쓰면 판례가 0건 나옵니다. 반드시 짧고 핵심적인 명사(예: "일실수익", "면책약관", "추간판탈출증")로만 추출하세요.
 
-아래와 같은 JSON 형식으로만 응답하세요. 백틱이나 마크다운 없이 순수 JSON만 출력하세요.
-{"candidates": [{"newsTitle": "기사원문", "searchKeyword": "검색용키워드명사"}]}`;
+[헌법 제8조: 생각의 사슬] 단순히 단어만 나열하지 말고, 각 뉴스 헤드라인의 빈도수와 사회적 파급력을 어떻게 분석했는지 논리를 'thoughtProcess'에 먼저 서술하세요.
+
+아래와 같은 JSON 형식으로만 응답하세요.
+{"thoughtProcess": "사고 과정 서술", "candidates": [{"newsTitle": "기사원문", "searchKeyword": "검색용키워드명사"}]}
+`;
+}
+
+function getFallbackLegalKeywordPrompt(targetCategory, context) {
+  return `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+방금 최신 뉴스 키워드(${context})를 기반으로 대법원 판례 검색을 시도했으나 판례를 찾지 못했습니다.
+
+따라서, 방금 추출했던 이슈 키워드들의 이면에 깔려있는, **[${targetCategory}]** 분야의 가장 본질적이고 손해사정 실무와 직결된 핵심 법률/의학 단어(명사)를 도출해 주세요.
+절대 프롬프트에 예시를 주지 않으니, 스스로 해당 카테고리와 이슈를 관통하는 단어를 심도 있게 사고(Chain-of-Thought)하여 반환하세요.
+[중요] 반드시 짧고 핵심적인 명사(예: "고지의무", "노동능력상실률", "추간판탈출증")로만 추출하세요.
+
+아래와 같은 JSON 형식으로만 응답하세요.
+{"candidates": [{"searchKeyword": "핵심법률명사"}]}
+`;
 }
 
 
@@ -422,6 +440,25 @@ ${aiInput}
 ${getUniversalSkeleton(false, angle, postsCtx)}`;
 }
 
+function getFssEvaluationPrompt(fssTitle, fssContent) {
+  return `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+아래 금감원 보도자료를 읽고, 우리 블로그의 목적(손해사정, 보상, 서민 금융 피해 구제, 보험금 분쟁)과 직결되는 내용인지 평가하십시오.
+
+[평가 기준 - 헌법 제8조: 생각의 사슬]
+반드시 다음 단계로 사고(thoughtProcess)하십시오:
+1. 해당 기사가 일반 금융 소비자의 구체적인 재산 피해 예방이나 보상 청구와 직접 관련이 있는가? (단순 기업 자금조달, 회계감리, 은행 시스템 개편 등의 뉴스는 기각)
+2. 보이스피싱, 불법사채, 불완전판매, 실손보험, 교통사고 등 손해사정사의 조력이나 금감원의 구제가 필요한 사안인가?
+
+[보도자료]
+- 제목: ${fssTitle}
+- 본문 요약: ${fssContent}
+
+[출력 요구사항]
+이 기사가 블로그에 적합하다면 decision을 "accept"로, 부적합하다면 "reject"로 설정하십시오.
+accept인 경우, 일반 소비자가 읽기 쉬운 3줄 요약(summary), 손해사정 실무 관점의 조언(comment), 그리고 5개의 키워드(keywords)를 생성하십시오.
+반드시 아래 JSON 스키마를 엄격히 준수하십시오.`;
+}
+
 module.exports = {
   STRICT_RULES,
   TOPIC_SCHEMA,
@@ -435,5 +472,7 @@ module.exports = {
   getRenewalPrompt,
   getQueryGenerationPrompt,
   getKeywordExtractionPrompt,
+  getFallbackLegalKeywordPrompt,
+  getFssEvaluationPrompt,
 };
 

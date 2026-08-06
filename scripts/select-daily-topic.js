@@ -18,22 +18,15 @@ const crypto = require('crypto');
 const matter = require('gray-matter');
 const { XMLParser } = require('fast-xml-parser');
 
-const LOSS_ADJUSTER_CONTEXT = `
-당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
-우리 블로그는 손해사정사가 업무와 관련된 정보, 청구 방법, 진행 과정, 처리 사례 등을 일반인에게 알려주고 수임을 유도하는 것을 목적으로 합니다.
-따라서 모든 추출 및 생성 키워드는 단순한 사전적 단어가 아니라, 반드시 '손해사정 및 보험금 분쟁 실무'와 직결된 사건화된 키워드여야 합니다.
-
-[키워드 도출 핵심 원칙 - 매우 중요]
-1. 단순한 포괄적 명사(예: 교통사고, 암, 실손보험, 산재)만 단독으로 사용하는 것을 절대 금지합니다.
-2. 반드시 [구체적인 사고원인/질병명/진단명] + [보험금/손해배상/분쟁유형(면책, 부지급, 과실비율, 후유장해 등)]이 결합된 '롱테일(Long-tail) 키워드' 형태로 도출하세요.
-3. 제가 특정 단어를 예시로 주지 않겠습니다. 제공된 뉴스 트렌드를 분석하거나 해당 카테고리의 본질을 스스로 파악하여, 매번 새롭고 창의적이면서도 손해사정 실무에 완벽히 부합하는 키워드를 자유롭게 뽑아내세요.
-4. 대중이 검색했을 때 '손해사정사의 도움이 필요하겠다'라고 느낄 수 있는, 분쟁성이 짙은 실무 키워드를 지향해야 합니다.
-`;
-
 // ── 공통 유틸 (pipeline-utils.js 에서 단일 공급 — .env.local 로드 포함) ────
 const { POSTS_DIR: _POSTS_DIR, sleep, safeFetch } = require('./pipeline-utils.js');
 const { callGemini } = require('./gemini-helper');
 const { getExistingPosts } = require('../src/lib/post-builder.js');
+const { 
+  getQueryGenerationPrompt, 
+  getKeywordExtractionPrompt, 
+  getFallbackLegalKeywordPrompt 
+} = require('../src/lib/prompt-rules.js');
 
 // ── 상수 ─────────────────────────────────────────────────────────────────
 const POSTS_DIR          = _POSTS_DIR;
@@ -98,12 +91,7 @@ async function generateTrendySearchKeywords(targetCategory, existingTitles) {
     ? '전체 보상/보험/손해사정 분야' 
     : `[${targetCategory}] 관련 분야`;
 
-  const prompt = `${LOSS_ADJUSTER_CONTEXT}
-[최근 발행된 글 목록 - 중복 절대 금지]
-${existingTitles}
-
-위 목록에 있는 소재(예: 백내장, 요양병원 낙상 등)와 단어조차 겹치지 않는 완전히 새로운 마이너/최신 실무 분쟁을 발굴하십시오.
-현재 대중들이 가장 궁금해할 만한 **${categoryContext}**의 구체적인 실무 핫 트렌드 검색 키워드를 창작해 주세요.`;
+  const prompt = getQueryGenerationPrompt(categoryContext, existingTitles);
 
   const schema = {
     type: 'OBJECT',
@@ -187,21 +175,7 @@ async function extractInsuranceKeywords(headlines, targetCategory, existingTitle
   if (!headlines.length) return [];
   console.log(`[2/5] AI 분석 — [${targetCategory}] 연관 키워드 추출 중...`);
 
-  const prompt = `${LOSS_ADJUSTER_CONTEXT}
-[최근 발행된 글 목록 - 중복 절대 금지]
-${existingTitles}
-
-위 목록에 있는 소재와 중복되는 내용은 무조건 제외하십시오.
-아래 뉴스 헤드라인 목록에서 [${targetCategory}] 분야와
-직접 연관된 이슈를 분석하여, 법제처 판례 API 검색에 즉시 활용할 구체적인 실무 키워드를 추출하세요.
-
-[중요 지시사항]
-반드시 아래 뉴스 헤드라인에서 가장 자주 언급된 빈도수(Frequency)와 사회적 파급력을 분석하여, 
-대중의 검색 수요와 화제성이 가장 높을 것으로 예상되는 순서대로 키워드 순위를 정렬하여 반환하세요.
-(1위 키워드가 가장 핫한 이슈가 되도록 정렬해야 합니다.)
-
-[헤드라인 목록]
-${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}`;
+  const prompt = getKeywordExtractionPrompt(targetCategory, existingTitles, headlines);
 
   const schema = {
     type: 'OBJECT',
@@ -239,12 +213,7 @@ async function getGenericLegalKeywords(targetCategory, rankedCandidates) {
   
   const context = rankedCandidates ? rankedCandidates.slice(0, 5).map(c => c.searchKeyword).join(', ') : '';
 
-  const prompt = `${LOSS_ADJUSTER_CONTEXT}
-방금 최신 뉴스 키워드(${context})를 기반으로 대법원 판례 검색을 시도했으나 너무 최신 유행어라서 판례를 찾지 못했습니다.
-
-따라서, 방금 추출했던 이슈 키워드들의 이면에 깔려있는, **[${targetCategory}]** 분야의 가장 본질적이고 손해사정 실무와 직결된 핵심 법률/의학 단어(명사)를 도출해 주세요.
-절대 프롬프트에 예시를 주지 않으니, 스스로 해당 카테고리와 이슈를 관통하는 단어를 심도 있게 사고(Chain-of-Thought)하여 수량에 상관없이 필요한 만큼 반환하세요.
-[중요] 이 키워드들은 법제처 판례 API 검색에 직접(Exact Match) 사용됩니다. 문장형태나 너무 긴 복합어("건설현장 추락사고 초과손해배상")를 쓰면 판례가 0건 나옵니다. 반드시 짧고 핵심적인 명사(예: "고지의무", "노동능력상실률", "추간판탈출증")로만 추출하세요.`;
+  const prompt = getFallbackLegalKeywordPrompt(targetCategory, context);
 
   const schema = {
     type: 'OBJECT',

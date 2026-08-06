@@ -25,3 +25,5 @@ export function getRenewalPrompt(currentTitle: string, query: string): string;
 export const TOPIC_SCHEMA: any;
 export function buildArticlePrompt(topic: any, angle: Angle, existingPosts: any[], precedentDetail?: any): string;
 export function buildManualPrompt(mode: string, aiInput: string, angle: Angle, existingPosts: any[]): string;
+export function getFssEvaluationPrompt(fssTitle: string, fssContent: string): string;
+export function getFallbackLegalKeywordPrompt(targetCategory: string, context: string): string;

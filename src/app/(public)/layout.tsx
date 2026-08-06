@@ -65,10 +65,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 <div className="relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-300 z-10 mr-1.5 h-12 sm:h-[56px]">
                   <Image src="/logo.png" alt="보상스쿨 로고" width={220} height={56} className="h-full w-auto object-contain transition-all duration-300" priority />
                 </div>
-                <span className={`hidden sm:inline font-black text-xl sm:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 dark:from-white dark:to-gray-400 group-hover:opacity-80 transition-opacity truncate tracking-tight`}>
+                <span className={`hidden sm:inline font-black text-xl sm:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 dark:from-white dark:to-gray-400 group-hover:opacity-80 transition-opacity truncate tracking-tighter`}>
                   보상스쿨 전문 손해사정 그룹
                 </span>
-                <span className={`sm:hidden font-black text-lg text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 dark:from-white dark:to-gray-400 truncate tracking-tight`}>
+                <span className={`sm:hidden font-black text-lg text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 dark:from-white dark:to-gray-400 truncate tracking-tighter`}>
                   보상스쿨 전문 손해사정 그룹
                 </span>
                 <span className={`hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-sm bg-black/5 dark:bg-white/10 text-[10px] font-bold text-gray-600 dark:text-gray-300 tracking-widest uppercase border border-gray-300/50 dark:border-gray-600`}>

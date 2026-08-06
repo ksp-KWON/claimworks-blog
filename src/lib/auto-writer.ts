@@ -8,13 +8,22 @@ import {
   getQueryGenerationPrompt,
   getKeywordExtractionPrompt,
   getHealingPrompt,
-  TOPIC_SCHEMA
+  TOPIC_SCHEMA,
+  CONTENT_SCHEMA
 } from './prompt-rules';
 import { stringifyMarkdown } from './markdown-utils';
 
 function parseGeneratedContent(text: string) {
+  try {
+    const parsed = typeof text === 'string' ? JSON.parse(text) : text;
+    if (parsed && parsed.markdownContent) {
+      return { content: parsed.markdownContent, thoughtProcess: parsed.thoughtProcess };
+    }
+  } catch (e) {
+    // JSON 파싱 실패 시 기존 마크다운 필터링 폴백
+  }
   const content = text.replace(/^```(markdown)?/im, '').replace(/```$/im, '').trim();
-  return { content };
+  return { content, thoughtProcess: '' };
 }
 
 async function fetchProxy(action: string, payload: any = {}) {
@@ -179,8 +188,11 @@ export async function runAutoGenerationWorkflow(
   onProgress('6/6: AI가 심층 전문 칼럼을 작성 중입니다. (약 30초 소요)...');
   const prompt = buildArticlePrompt(topic, angle, existingPostsArr, type === 'precedent' ? precedentDetail : null);
   
-  const generated = await callGeminiAPI(geminiKey, prompt, 'auto-generate', undefined, ['flash', 'pro']);
-  const { content } = parseGeneratedContent(generated);
+  const generated = await callGeminiAPI(geminiKey, prompt, 'auto-generate', CONTENT_SCHEMA, ['flash', 'pro']);
+  const { content, thoughtProcess } = parseGeneratedContent(generated);
+  if (thoughtProcess) {
+    onProgress(`🧠 [사고 과정] : ${thoughtProcess.substring(0, 150)}...`);
+  }
   
   const finalContent = buildPostFrontmatter(topic, content, type === 'precedent' ? precedentDetail : null);
   
@@ -220,8 +232,11 @@ export async function runManualGenerationWorkflow(
   const topic = safeJsonParse(topicPlanStr);
 
   onProgress('3/3: 전문 칼럼 창작 중 (약 30초 소요)...');
-  const generated = await callGeminiAPI(geminiKey, aiInput, mode, undefined, ['flash', 'pro']);
-  const { content } = parseGeneratedContent(generated);
+  const generated = await callGeminiAPI(geminiKey, aiInput, mode, CONTENT_SCHEMA, ['flash', 'pro']);
+  const { content, thoughtProcess } = parseGeneratedContent(generated);
+  if (thoughtProcess) {
+    onProgress(`🧠 [사고 과정] : ${thoughtProcess.substring(0, 150)}...`);
+  }
   
   const finalContent = buildPostFrontmatter(topic, content);
   

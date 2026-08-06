@@ -1,4 +1,4 @@
-import { cleanAnalysisBlock, buildManualPrompt, getRandomAngle } from '@/lib/prompt-rules';
+import { buildManualPrompt, getRandomAngle } from '@/lib/prompt-rules';
 import { callGeminiClient } from '@/lib/gemini-client';
 import { parseMarkdown, stringifyMarkdown } from './markdown-utils';
 
@@ -191,5 +191,5 @@ export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: st
   // [핵심] gemini-client.ts 의 자동 탐색(Dynamic Discovery)으로 위임
   const rawText = await callGeminiClient(geminiKey, prompt, { schema, tierLimit });
   const resultText = typeof rawText === 'string' ? rawText : JSON.stringify(rawText);
-  return cleanAnalysisBlock(resultText);
+  return resultText;
 }

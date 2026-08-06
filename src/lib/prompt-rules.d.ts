@@ -18,11 +18,9 @@ export function getQueryGenerationPrompt(targetCategory: string, existingTitles:
 export function getKeywordExtractionPrompt(targetCategory: string, existingTitles: string, headlines: string[]): string;
 export function getHealingPrompt(keywords: string): string;
 export function getManualPlanningPrompt(aiInput: string, existingPosts: string): string;
-
-export function cleanAnalysisBlock(text: string): string;
 export function getRenewalPrompt(currentTitle: string, query: string): string;
-
 export const TOPIC_SCHEMA: any;
+export const CONTENT_SCHEMA: any;
 export function buildArticlePrompt(topic: any, angle: Angle, existingPosts: any[], precedentDetail?: any): string;
 export function buildManualPrompt(mode: string, aiInput: string, angle: Angle, existingPosts: any[]): string;
 export function getFssEvaluationPrompt(fssTitle: string, fssContent: string): string;

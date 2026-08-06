@@ -42,7 +42,7 @@ export default function SearchBar() {
               </button>
               <form onSubmit={handleSearch} className="flex-1 relative flex items-center">
                 <input
-                  type="text"
+                  type="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="무엇을 찾으시나요?"
@@ -54,6 +54,8 @@ export default function SearchBar() {
                     <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                   </button>
                 )}
+                {/* 모바일 키보드에서 '검색' 버튼 처리를 위한 숨김 서브밋 버튼 추가 */}
+                <button type="submit" className="hidden">검색</button>
               </form>
               <button 
                 onClick={handleSearch} 

@@ -61,9 +61,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           {/* 로고/제목 영역 */}
           <div className="flex items-center min-w-0 flex-1 mr-1 sm:mr-2 h-full">
             <div className="font-sans min-w-0 tracking-tight w-full h-full">
-              <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden border-l-4 border-black dark:border-gray-300 pl-2.5 sm:pl-3 pr-4 h-full w-full bg-gradient-to-r from-gray-400/70 to-transparent dark:from-white/10 dark:to-transparent">
-                <div className="relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-300 z-10 mr-1.5 h-10 sm:h-12">
-                  <Image src="/logo.png" alt="보상스쿨 로고" width={180} height={48} className="h-full w-auto object-contain transition-all duration-300" priority />
+              <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 whitespace-nowrap overflow-hidden pr-4 h-full w-full">
+                <div className="relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-all duration-300 z-10 mr-1.5 h-12 sm:h-[56px]">
+                  <Image src="/logo.png" alt="보상스쿨 로고" width={220} height={56} className="h-full w-auto object-contain transition-all duration-300" priority />
                 </div>
                 <span className={`hidden sm:inline font-black text-xl sm:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-400 dark:from-white dark:to-gray-400 group-hover:opacity-80 transition-opacity truncate tracking-tight`}>
                   보상스쿨 전문 손해사정 그룹

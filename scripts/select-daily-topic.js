@@ -180,6 +180,10 @@ async function extractInsuranceKeywords(headlines, targetCategory, existingTitle
   const schema = {
     type: 'OBJECT',
     properties: {
+      thoughtProcess: {
+        type: 'STRING',
+        description: '각 뉴스 헤드라인의 빈도수와 사회적 파급력을 분석한 연쇄 사고 논리 (Chain-of-Thought)'
+      },
       candidates: {
         type: 'ARRAY',
         items: {
@@ -192,11 +196,12 @@ async function extractInsuranceKeywords(headlines, targetCategory, existingTitle
         },
       },
     },
-    required: ['candidates'],
+    required: ['thoughtProcess', 'candidates'],
   };
 
   try {
     const result = await callGemini(prompt, schema, 'lite');
+    console.log(`    🧠 [AI 사고 과정]: ${result.thoughtProcess}`);
     if (!result.candidates || result.candidates.length === 0) {
       throw new Error('추출된 키워드가 없습니다.');
     }

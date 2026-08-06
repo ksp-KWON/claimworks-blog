@@ -66,13 +66,13 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                   <Image src="/logo.png" alt="보상스쿨 TV" width={100} height={24} className="object-contain transition-all duration-300" priority />
                 </div>
                 <span className={`hidden sm:inline font-extrabold text-[#3c4043] dark:text-[#e8eaed] group-hover:opacity-80 transition-opacity truncate tracking-tight ${gowunDodum.className}`}>
-                  보상스쿨 헬스케어 &amp; 손해사정 보상가이드
+                  보상스쿨 전문 손해사정 그룹
                 </span>
                 <span className={`sm:hidden font-extrabold text-[15px] text-[#3c4043] dark:text-[#e8eaed] truncate tracking-tight ${gowunDodum.className}`}>
-                  보상스쿨&apos;s 보상가이드
+                  보상스쿨 손해사정
                 </span>
                 <span className={`hidden lg:inline-flex items-center px-1.5 py-0.5 ml-1 rounded-sm bg-gray-100 dark:bg-gray-800 text-[10px] font-bold text-gray-500 dark:text-gray-400 tracking-widest uppercase border border-gray-200 dark:border-gray-700 ${gowunDodum.className}`}>
-                  Integrated Hub
+                  EXPERT GROUP
                 </span>
               </Link>
             </div>

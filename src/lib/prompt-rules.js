@@ -204,14 +204,15 @@ function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCatego
 기존 슬러그 (중복 금지) : [${existingPosts}]
 
 위 키워드와 맥락을 바탕으로, 어떻게 하면 잠재 고객(보험 분쟁 중인 사람)이 검색 결과에서 클릭하지 않고는 못 배길지 연쇄 사고(Chain-of-Thought)를 거쳐 기획하십시오:
-1. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소 (예: daily-accident-compensation)
-2. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
-3. summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문
-4. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
-5. specialtyCategory: 전문 진료과목 (예: 정형외과)
-6. tags: 관련 태그 5개
-7. keywords: 타겟 키워드 목록
-8. calculatorType: "auto" 또는 "medical" 지정.
+1. thoughtProcess: 기획 및 마케팅 전략에 대한 연쇄 사고 논리 서술
+2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소 (예: daily-accident-compensation)
+3. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
+4. summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문
+5. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
+6. specialtyCategory: 전문 진료과목 (예: 정형외과)
+7. tags: 관련 태그 5개
+8. keywords: 타겟 키워드 목록
+9. calculatorType: "auto" 또는 "medical" 지정.
 
 반드시 JSON으로 반환하십시오.`;
 }
@@ -231,14 +232,15 @@ ${existingPosts}
 
 [기획 원칙]
 어떻게 하면 이 딱딱한 판례가 일반인의 문제와 직결되어 클릭을 유도할 수 있을지 연쇄 사고(Chain-of-Thought)를 거쳐 기획하십시오:
-1. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
-2. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
-3. summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문 (판례번호 포함)
-4. category: 무조건 "판례·법률 해석"
-5. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
-6. tags: 관련 태그 5개
-7. keywords: 타겟 키워드 목록
-8. calculatorType: "auto" 또는 "medical" 지정
+1. thoughtProcess: 기획 및 마케팅 전략에 대한 연쇄 사고 논리 서술
+2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
+3. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
+4. summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문 (판례번호 포함)
+5. category: 무조건 "판례·법률 해석"
+6. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
+7. tags: 관련 태그 5개
+8. keywords: 타겟 키워드 목록
+9. calculatorType: "auto" 또는 "medical" 지정
 
 반드시 JSON으로 반환하십시오.`;
 }
@@ -254,14 +256,16 @@ ${aiInput}
 ${existingPosts}
 
 [기획 원칙]
-1. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
-2. title: SEO 최적화 제목 (원문의 의도를 살려 클릭 유도하는 제목)
-3. summary: 구글 검색 결과에 노출될 150자 이내의 매력적인 한글 요약문
-4. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 원문에 가장 알맞은 1개
-5. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
-6. tags: 원문과 관련된 태그 5개
-7. keywords: 타겟 키워드 목록
-8. calculatorType: "auto" 또는 "medical" 지정
+[헌법 제8조: 생각의 사슬] 어떻게 하면 원문의 의도를 극대화하여 독자의 클릭을 유도할 수 있을지 연쇄 사고(Chain-of-Thought)를 거쳐 기획하십시오:
+1. thoughtProcess: 기획 및 마케팅 전략에 대한 연쇄 사고 논리 서술
+2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
+3. title: SEO 최적화 제목 (원문의 의도를 살려 클릭 유도하는 제목)
+4. summary: 구글 검색 결과에 노출될 150자 이내의 매력적인 한글 요약문
+5. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 원문에 가장 알맞은 1개
+6. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
+7. tags: 원문과 관련된 태그 5개
+8. keywords: 타겟 키워드 목록
+9. calculatorType: "auto" 또는 "medical" 지정
 
 무조건 JSON 형식으로만 반환하십시오. 다른 설명은 붙이지 마십시오.`;
 }
@@ -275,10 +279,9 @@ function getUniversalSkeleton(isPrecedent, angle, postsCtx) {
   - 수임 전환 타겟팅 : 독자가 이 판례를 자신의 상황에 대입하여 '나도 보험사에게 당하고 있었구나, 전문가에게 맡겨야겠다'고 깨닫게 만들 설득 논리 (Chain-of-Thought)`;
   }
 
-  return `
-[수임 전환(마케팅) 연쇄 사고 시작]
+  return `[수임 전환(마케팅) 연쇄 사고 지침]
+다음의 분석을 반드시 JSON 응답의 'thoughtProcess' 항목 안에 서술하십시오. (절대 마크다운 본문에 넣지 마십시오. AI 메모 및 대괄호 표기는 본문에서 엄격히 금지됩니다.)
 ${coreAnalysis}
-[수임 전환(마케팅) 연쇄 사고 끝]
 
 # ════════════════════════════════════════════════════════════════
 # 글쓰기 운동장 테두리 (출력 가이드라인 및 필수 포함 요소)

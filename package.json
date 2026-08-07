@@ -7,7 +7,6 @@
     "build": "npm run check-quality && next build",
     "start": "next start",
     "lint": "eslint",
-    "fetch-hira": "node scripts/fetch-hira-data.js",
     "check-quality": "node scripts/check-quality.js",
     "generate:post": "node scripts/generate-post.js",
     "generate:fss": "node scripts/generate-fss-news.js"

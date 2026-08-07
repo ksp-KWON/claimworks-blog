@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import fs from 'fs';
 import path from 'path';
+import SharedOGImage from '@/components/ui/SharedOGImage';
 
 export const dynamic = 'force-static';
 
@@ -23,40 +24,11 @@ export default async function Image() {
 
   return new ImageResponse(
     (
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#ffffff',
-          padding: '40px',
-        }}
-      >
-        {logoBase64 ? (
-          <img
-            src={logoBase64}
-            alt="보상스쿨"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              objectPosition: 'center',
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              fontSize: '80px',
-              fontWeight: '900',
-              color: '#111827',
-            }}
-          >
-            보상스쿨
-          </div>
-        )}
-      </div>
+      <SharedOGImage
+        title="전문 손해사정사의 확실한 보상 솔루션"
+        label="보상스쿨 공식 블로그"
+        logoBase64={logoBase64}
+      />
     ),
     {
       ...size,

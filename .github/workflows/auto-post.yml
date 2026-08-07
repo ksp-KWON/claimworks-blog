@@ -1,19 +1,27 @@
 name: 보상스쿨 자동글쓰기
 
 on:
-  # 매일 오전 9시 15분 ~ 오후 4시 15분 (KST) = UTC 00:15 ~ 07:15
+  # 매일 KST 09:15~16:15 (= UTC 00:15~07:15), 8개 카테고리 1:1 독립 실행
   schedule:
-    - cron: '15 0-7 * * *'
-  # 수동 실행 (테스트용 및 어드민 연동)
+    - cron: '15 0 * * *'   # KST 09:15 → 사망·자살 보험금
+    - cron: '15 1 * * *'   # KST 10:15 → 질병진단·실손
+    - cron: '15 2 * * *'   # KST 11:15 → 교통사고 보상
+    - cron: '15 3 * * *'   # KST 12:15 → 배상책임·의료
+    - cron: '15 4 * * *'   # KST 13:15 → 근재·산재 사고
+    - cron: '15 5 * * *'   # KST 14:15 → 장해평가·면책
+    - cron: '15 6 * * *'   # KST 15:15 → 보상가이드
+    - cron: '15 7 * * *'   # KST 16:15 → 판례·법률 해석
+  
+  # 수동 실행 (테스트 및 어드민 연동)
   workflow_dispatch:
     inputs:
       post_type:
-        description: '발행할 카테고리 선택 (all: 시간대 자동 배정)'
+        description: '카테고리 선택 (수동 실행용)'
         required: true
-        default: 'all'
-        type: choice
+        default: 'auto'     
+        type: choice        
         options:
-          - all
+          - auto
           - 사망·자살 보험금
           - 질병진단·실손
           - 교통사고 보상
@@ -47,7 +55,35 @@ jobs:
       - name: 의존성 설치
         run: npm ci
 
-      - name: 자동글쓰기 실행 (선택적)
+      - name: 정적 카테고리 배정 (Delay-Proof)
+        id: set_category
+        run: |
+          # 1. 수동 실행 시 'auto'가 아니면 수동 선택값 사용
+          MANUAL="${{ github.event.inputs.post_type }}"
+          if [ -n "$MANUAL" ] && [ "$MANUAL" != "auto" ]; then
+            echo "POST_TYPE=$MANUAL" >> "$GITHUB_ENV"
+            echo "category=$MANUAL" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          
+          # 2. Delay-Proof: 지연 실행과 무관하게 Trigger된 고유 Cron 문자열 매핑
+          CRON="${{ github.event.schedule }}"
+          case "$CRON" in
+            '15 0 * * *') CAT="사망·자살 보험금" ;;
+            '15 1 * * *') CAT="질병진단·실손" ;;
+            '15 2 * * *') CAT="교통사고 보상" ;;
+            '15 3 * * *') CAT="배상책임·의료" ;;
+            '15 4 * * *') CAT="근재·산재 사고" ;;
+            '15 5 * * *') CAT="장해평가·면책" ;;
+            '15 6 * * *') CAT="보상가이드" ;;
+            '15 7 * * *') CAT="판례·법률 해석" ;;
+            *) CAT="all" ;; 
+          esac
+          
+          echo "POST_TYPE=$CAT" >> "$GITHUB_ENV"
+          echo "category=$CAT" >> "$GITHUB_OUTPUT"
+
+      - name: 자동글쓰기 실행
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           LAW_API_KEY: ${{ secrets.LAW_API_KEY }}
@@ -56,18 +92,14 @@ jobs:
           NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
           NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
         run: |
-          POST_TYPE="${{ github.event.inputs.post_type }}"
-          if [ -z "$POST_TYPE" ]; then
-            POST_TYPE="all"
-          fi
-          
-          echo "✍️ 자동글쓰기 통합 엔진 기동 (카테고리: $POST_TYPE)"
-          POST_TYPE="$POST_TYPE" npm run generate:post
+          echo "✍️ 트리거된 스케줄: ${{ github.event.schedule }}"
+          echo "✍️ 확정 카테고리: $POST_TYPE"
+          npm run generate:post
 
       - name: 변경사항 커밋 & 푸시
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "auto: 자동글쓰기 콘텐츠 생성"
+          commit_message: "auto: [${{ steps.set_category.outputs.category }}] 자동글쓰기 콘텐츠 생성"
           file_pattern: 'src/content/posts/*.md'
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"

@@ -12,14 +12,6 @@ export const metadata: Metadata = {
     description: "1:1 비공개 무료 채팅상담을 실시간으로 진행해 드립니다.",
     url: "https://claim-works.com/chat",
     siteName: "보상스쿨",
-    images: [
-      {
-        url: "/logo.png",
-        width: 800,
-        height: 600,
-        alt: "보상스쿨 채팅 상담",
-      },
-    ],
     locale: "ko_KR",
     type: "website",
   },

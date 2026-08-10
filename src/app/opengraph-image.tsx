@@ -25,9 +25,10 @@ export default async function Image() {
   return new ImageResponse(
     (
       <SharedOGImage
-        title="전문 손해사정사의 확실한 보상 솔루션"
+        title=""
         label="보상스쿨 공식 블로그"
         logoBase64={logoBase64}
+        variant="brand"
       />
     ),
     {

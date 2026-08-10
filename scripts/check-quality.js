@@ -29,6 +29,13 @@ const fixPipeline = [
     }
   },
   {
+    name: '마크다운 표 정렬행 오타 자동 교정',
+    fix: (content) => {
+      // |---|---|---|> 또는 | :--- | :--- |> 등의 오타를 |---|---| 로 교정
+      return content.replace(/^(\|[\s\:\-\|]+)\|>[ \t]*$/gm, '$1|');
+    }
+  },
+  {
     name: 'YAML Frontmatter 안전 래핑 (쌍따옴표)',
     fix: (content) => {
       const match = content.match(/^---\n([\s\S]*?)\n---/);
@@ -125,6 +132,10 @@ function checkQuality() {
     let errorsInFile = [];
     if (/\[(?:이미지 제안|관련 글 추천|이미지 삽입|관련 포스팅|추천 글).*?\]/g.test(content)) {
       errorsInFile.push('Unfixable AI memo placeholder remaining.');
+    }
+
+    if (/\+-+\+-+/.test(content)) {
+      errorsInFile.push('ASCII Art Table detected (+---+). Must use standard markdown table.');
     }
 
     if (errorsInFile.length > 0) {

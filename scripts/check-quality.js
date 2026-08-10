@@ -22,8 +22,8 @@ const fixPipeline = [
   {
     name: '마크다운 표 코드블록 감싸기 해제',
     fix: (content) => {
-      // ```markdown (또는 ```) 이 나오고 그 안에 | 가 포함된 표가 있을 경우 백틱을 벗겨냄
-      return content.replace(/```(?:markdown)?\n([\s\S]*?\|.*?\|.*?[\s\S]*?)```/g, (match, tableContent) => {
+      // ```markdown (또는 ```) 이 나오고 그 안에 표준 표 구분선(|---|)이 포함된 경우에만 백틱을 벗겨냄 (누더기 정규식 최적화)
+      return content.replace(/```(?:markdown)?\n([\s\S]*?\|[-:\s]+\|[\s\S]*?)```/g, (match, tableContent) => {
         return tableContent.trim() + '\n';
       });
     }
@@ -134,8 +134,9 @@ function checkQuality() {
       errorsInFile.push('Unfixable AI memo placeholder remaining.');
     }
 
-    if (/\+-+\+-+/.test(content)) {
-      errorsInFile.push('ASCII Art Table detected (+---+). Must use standard markdown table.');
+    // 범용적 ASCII 박스(단일/다중 컬럼 포함) 원천 차단: +---+ 또는 ┌───┐ 형태의 테두리 라인이 하나라도 존재하면 치명적 에러
+    if (/^[ \t]*[\+┌][\-─=]{3,}[\+┐][ \t]*$/m.test(content)) {
+      errorsInFile.push('ASCII Art Table or Box detected. Must use standard markdown table or blockquote.');
     }
 
     if (errorsInFile.length > 0) {

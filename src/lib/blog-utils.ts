@@ -84,7 +84,14 @@ export function parseBlogPost(content: string): ParsedBlogPost {
     }
 
     // 1. Heading Detection (H2, H3 모두 섹션 분리 기준으로 확장)
-    const headingMatch = trimmed.match(/^(#{2,3})\s+(.+)$/);
+    let headingMatch = trimmed.match(/^(#{2,3})\s+(.+)$/);
+    
+    // [근본 해결: FAQ 내 H3 충돌 방어 룰]
+    // FAQ 수집 모드에서 ### Q: 또는 ### A: 형태를 만나면, 새로운 섹션 분기용 헤딩으로 취급하지 않고 무시합니다.
+    if (headingMatch && currentSectionType === 'FAQ' && /^(?:[*_💬✅☑️🛡️⭐\s]*[QA]\d*[*_]*\s*[:.-]?\s*)/i.test(headingMatch[2])) {
+      headingMatch = null;
+    }
+
     if (headingMatch && !inCodeBlock) {
       const rawText = headingMatch[2].trim();
       

@@ -4,14 +4,12 @@ interface SharedOGImageProps {
   title: string;
   label?: string;
   logoBase64?: string;
-  variant?: 'brand' | 'post';
 }
 
 export default function SharedOGImage({
   title,
   label = '보상스쿨 공식 블로그',
   logoBase64,
-  variant = 'post',
 }: SharedOGImageProps) {
   return (
     <div
@@ -41,96 +39,74 @@ export default function SharedOGImage({
           boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
         }}
       >
-        {variant === 'brand' ? (
-          <>
-            {logoBase64 ? (
-              <img
-                src={logoBase64}
-                alt="보상스쿨 로고"
-                width={500}
-                height={160}
-                style={{
-                  objectFit: 'contain',
-                }}
-              />
-            ) : (
-              <div style={{ fontSize: '64px', fontWeight: 'bold', color: '#1a73e8' }}>
-                {label}
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            {logoBase64 && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '30px',
-                }}
-              >
-                <img
-                  src={logoBase64}
-                  alt="보상스쿨 로고"
-                  width={250}
-                  height={80}
-                  style={{
-                    objectFit: 'contain',
-                  }}
-                />
-              </div>
-            )}
-            <div
+        {logoBase64 && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '30px',
+            }}
+          >
+            <img
+              src={logoBase64}
+              alt="보상스쿨 로고"
+              width={250}
+              height={80}
               style={{
-                fontSize: '32px',
-                fontWeight: 'bold',
-                color: '#1a73e8',
-                marginBottom: '40px',
-                letterSpacing: '-0.02em',
-                textTransform: 'uppercase',
+                objectFit: 'contain',
               }}
-            >
-              {label}
-            </div>
-            <div
-              style={{
-                fontSize: title.length > 30 ? '54px' : '64px',
-                fontWeight: '900',
-                color: '#111827',
-                textAlign: 'center',
-                lineHeight: 1.3,
-                wordBreak: 'keep-all',
-                letterSpacing: '-0.02em',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flex: 1,
-              }}
-            >
-              {title}
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '20px',
-                marginTop: '40px',
-              }}
-            >
-              <div
-                style={{
-                  fontSize: '24px',
-                  color: '#4b5563',
-                  fontWeight: '600',
-                }}
-              >
-                claim-works.com
-              </div>
-            </div>
-          </>
+            />
+          </div>
         )}
+        <div
+          style={{
+            fontSize: '32px',
+            fontWeight: 'bold',
+            color: '#1a73e8',
+            marginBottom: '40px',
+            letterSpacing: '-0.02em',
+            textTransform: 'uppercase',
+          }}
+        >
+          {label}
+        </div>
+        <div
+          style={{
+            fontSize: title.length > 30 ? '54px' : '64px',
+            fontWeight: '900',
+            color: '#111827',
+            textAlign: 'center',
+            lineHeight: 1.3,
+            wordBreak: 'keep-all',
+            letterSpacing: '-0.02em',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }}
+        >
+          {title}
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '20px',
+            marginTop: '40px',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '24px',
+              color: '#4b5563',
+              fontWeight: '600',
+            }}
+          >
+            claim-works.com
+          </div>
+        </div>
       </div>
     </div>
   );

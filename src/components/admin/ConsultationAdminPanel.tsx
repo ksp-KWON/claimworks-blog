@@ -93,10 +93,6 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
 
 
 
-  useEffect(() => {
-    // Wait, we don't have a customer_memo field in consultations table right now!
-    // I should use inquiry as a memo or add customer_memo. The user said: "항목관리 (채팅영역 우측의 고객정보 나오게 만들어줘)". So we should probably just use the right panel to show details.
-  }, [selectedId, consultations]);
 
   useEffect(() => {
     const handleCloseDetail = () => {

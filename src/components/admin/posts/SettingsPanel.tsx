@@ -1,5 +1,7 @@
 import React from 'react';
 import PremiumCard from '@/components/ui/PremiumCard';
+import AdminPanelLayout from '../AdminPanelLayout';
+import { AdminHeaderBar } from '../AdminHeader';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumButton from '@/components/ui/PremiumButton';
 
@@ -13,15 +15,15 @@ interface SettingsPanelProps {
 
 export default function SettingsPanel({ geminiKey, setGeminiKey, githubToken, setGithubToken, saveKeys }: SettingsPanelProps) {
   return (
-    <div className="flex-1 flex flex-col bg-[#f8f9fa] dark:bg-zinc-950 overflow-hidden relative">
-      <div className="h-14 px-4 sm:px-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center shrink-0 shadow-sm z-10 w-full overflow-x-auto">
-        <div className="flex items-center gap-3 shrink-0">
-          <PremiumHeading level={2} className="!text-lg !mb-0 flex items-center gap-2">
-            ⚙️ 환경 설정
-          </PremiumHeading>
-          <span className="text-[10px] md:text-xs text-gray-400 font-medium hidden sm:inline">안전한 AI 연동 및 블로그 데이터 관리를 위한 자격 증명 설정입니다.</span>
-        </div>
-      </div>
+    <AdminPanelLayout innerClassName="flex flex-col bg-[#f8f9fa] dark:bg-zinc-950 w-full h-full">
+      <AdminHeaderBar 
+        title={
+          <div className="flex items-center gap-2">
+            <span>⚙️ 환경 설정</span>
+            <span className="text-[10px] md:text-xs text-gray-400 font-medium hidden sm:inline ml-2 font-normal tracking-normal">안전한 AI 연동 및 블로그 데이터 관리를 위한 자격 증명 설정입니다.</span>
+          </div>
+        }
+      />
       
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 lg:p-10">
         <div className="max-w-3xl mx-auto w-full flex flex-col h-full space-y-6">
@@ -91,6 +93,6 @@ export default function SettingsPanel({ geminiKey, setGeminiKey, githubToken, se
           </PremiumCard>
         </div>
       </div>
-    </div>
+    </AdminPanelLayout>
   );
 }

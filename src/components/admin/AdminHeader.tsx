@@ -32,14 +32,16 @@ export function AdminTableHeader({ columns }: AdminTableHeaderProps) {
 interface AdminHeaderBarProps {
   title: string | React.ReactNode;
   rightContent?: React.ReactNode;
+  action?: React.ReactNode;
   className?: string;
 }
 
-export function AdminHeaderBar({ title, rightContent, className = '' }: AdminHeaderBarProps) {
+export function AdminHeaderBar({ title, rightContent, action, className = '' }: AdminHeaderBarProps) {
+  const finalAction = action || rightContent;
   return (
     <div className={`h-[64px] px-4 md:px-6 flex justify-between items-center z-10 ${adminHeaderClasses} ${className}`}>
       <div className="text-[14px] font-bold text-gray-800 dark:text-gray-200 tracking-wider">{title}</div>
-      {rightContent && <div className="flex items-center gap-3">{rightContent}</div>}
+      {finalAction && <div className="flex items-center gap-3">{finalAction}</div>}
     </div>
   );
 }

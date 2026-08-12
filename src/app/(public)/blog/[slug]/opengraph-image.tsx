@@ -36,7 +36,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         title={title}
         label="보상스쿨 전문가 칼럼"
         logoBase64={logoBase64}
-        variant="post"
       />
     ),
     {

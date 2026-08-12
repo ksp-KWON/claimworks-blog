@@ -51,10 +51,26 @@ const fixPipeline = [
     name: '순차적 열거형 서술(첫째, 둘째...) 기호화 및 H4 변환',
     fix: (content) => {
       const numMap = { '첫째': '①', '둘째': '②', '셋째': '③', '넷째': '④', '다섯째': '⑤', '여섯째': '⑥', '일곱째': '⑦', '여덟째': '⑧', '아홉째': '⑨', '열째': '⑩' };
-      // 문단 맨 앞에 "첫째, OOO", "둘째 - OOO" 등으로 시작하는 줄을 탐지하여 "#### ① OOO" 포맷으로 강제 변환
-      // 정규식: 줄 시작, 공백 허용, 매핑 단어, 구분자(공백, 콤마, 마침표, 콜론, 대시 등), 나머지 텍스트
-      return content.replace(/^([ \t]*)(첫째|둘째|셋째|넷째|다섯째|여섯째|일곱째|여덟째|아홉째|열째)[\s,.:\-]+(.+)$/gm, (match, space, word, rest) => {
-        return `#### ${numMap[word]} ${rest.trim()}`;
+      // 문단 맨 앞에 "**첫째, OOO**", "*둘째 - OOO*" 등으로 볼드처리가 섞인 채 시작하는 줄까지 포괄적으로 탐지
+      return content.replace(/^([ \t]*)(?:\*\*?)?(첫째|둘째|셋째|넷째|다섯째|여섯째|일곱째|여덟째|아홉째|열째)[\s,.:\-]+(.*?)(?:\*\*?)?$/gm, (match, space, word, rest) => {
+        // 뒤쪽에 남아있을 수 있는 볼드체 기호 안전하게 한 번 더 제거
+        const cleanRest = rest.replace(/\*\*?/g, '').trim();
+        return `#### ${numMap[word]} ${cleanRest}`;
+      });
+    }
+  },
+  {
+    name: '숫자 열거형 서술(1. **제목** : 내용) 기호화 및 H4 변환',
+    fix: (content) => {
+      const numMap = ['⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫', '⑬', '⑭', '⑮', '⑯', '⑰', '⑱', '⑲', '⑳'];
+      // 패턴: 1. **제목** : 설명 또는 1. **제목 :** 설명 (AI가 즐겨 쓰는 설명형 리스트)
+      return content.replace(/^([ \t]*)(\d+)\.[ \t]*(?:\*\*?)?([^:\n*]+)(?:\*\*?)?[ \t]*:[ \t]*(?:\*\*?)?(.*)$/gm, (match, space, numStr, title, desc) => {
+        const num = parseInt(numStr, 10);
+        const circleNum = (num > 0 && num <= 20) ? numMap[num] : numStr + '.';
+        const cleanTitle = title.replace(/\*\*?/g, '').trim();
+        const cleanDesc = desc.replace(/\*\*?/g, '').trim();
+        // 헤딩과 본문 분리로 완벽한 가독성 확보
+        return `#### ${circleNum} ${cleanTitle}\n\n${cleanDesc}\n`;
       });
     }
   },

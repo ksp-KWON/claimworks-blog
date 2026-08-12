@@ -14,6 +14,25 @@ const CHECKLIST_PATTERNS = /(?:자가진단|체크리스트|1분\s*체크|체크
 const FAQ_PATTERNS       = /(?:faq|자주\s*묻는)/i;
 const CTA_PATTERNS       = /(?:실시간 채팅|call\s*to\s*action|상담\s*신청)/i;
 
+// ─── 유틸리티 함수 ───────────────────────────────────────────────────────────
+function cleanHeadingText(rawText: string, removeNumbering = false): string {
+  let cleaned = rawText
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/<[^>]+>/g, '')
+    .trim();
+
+  if (removeNumbering) {
+    cleaned = cleaned
+      .replace(/^\d+\.\s*/, '')
+      .replace(/\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu, '')
+      .replace(/\[\s*\]/g, '')
+      .trim();
+  }
+  return cleaned;
+}
+
 // ─── 단일 통합 파서 (Single-pass Parser) ───────────────────────────────────
 export interface ParsedBlogPost {
   opening: string;
@@ -92,16 +111,8 @@ export function parseBlogPost(content: string): ParsedBlogPost {
 
       currentSectionType = 'NONE';
       
-      const id = slugger.slug(rawText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/<[^>]+>/g, '').trim());
-      const text = rawText
-        .replace(/^\d+\.\s*/, '')
-        .replace(/\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu, '')
-        .replace(/\*\*(.*?)\*\*/g, '$1')
-        .replace(/`([^`]+)`/g, '$1')
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-        .replace(/\[\s*\]/g, '')
-        .replace(/<[^>]+>/g, '')
-        .trim();
+      const id = slugger.slug(cleanHeadingText(rawText));
+      const text = cleanHeadingText(rawText, true);
         
       if (text && headingMatch[1].length === 2) {
         result.toc.push({ id, text });

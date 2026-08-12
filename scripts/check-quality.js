@@ -34,11 +34,16 @@ const fixPipeline = [
     }
   },
   {
-    name: '마크다운 표 코드블록 감싸기 해제',
+    name: '무분별한 비코드 텍스트 박스 백틱 강제 해제 (헌법 제9조 확장)',
     fix: (content) => {
-      // ```markdown (또는 ```) 이 나오고 그 안에 표준 표 구분선(|---|)이 포함된 경우에만 백틱을 벗겨냄 (누더기 정규식 최적화)
-      return content.replace(/```(?:markdown)?\n([\s\S]*?\|[-:\s]+\|[\s\S]*?)```/g, (match, tableContent) => {
-        return tableContent.trim() + '\n';
+      // 표(|---|)뿐만 아니라 일반 리스트나 강조 박스 용도로 AI가 남용한 빈 백틱(```) 또는 ```markdown, ```text 를 강제로 벗겨냄
+      // 단, 프로그래밍 언어가 명시된 진짜 코드블록(javascript, ts, diff, bash, json 등)은 보호함
+      return content.replace(/^```(?:markdown|text)?\s*\n([\s\S]*?)\n```\s*$/gm, (match, innerContent) => {
+        // 내부에 진짜 코드(예: 함수 정의 등)가 있는지 휴리스틱으로 방어할 수도 있으나, 
+        // 본 블로그 콘텐츠 특성상 빈 백틱은 100% AI의 강조 텍스트박스 남용임.
+        // 일반 텍스트로 자연스럽게 흐르도록 인용구(>) 마크다운으로 변환하거나 그대로 텍스트로 노출
+        // 가독성을 위해 상단/하단 여백 추가
+        return `\n${innerContent.trim()}\n`;
       });
     }
   },

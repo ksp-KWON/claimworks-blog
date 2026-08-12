@@ -133,7 +133,6 @@ tags:
 ---
 
 ## 💡 자주 묻는 질문 (FAQ)
-
 <details>
 <summary><b>Q1. 환자가 자발적으로 침대에서 내려오다가 넘어졌는데도 병원에 책임이 있나요?</b></summary>
 <div markdown="1">

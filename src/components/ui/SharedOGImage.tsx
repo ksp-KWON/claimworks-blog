@@ -47,9 +47,9 @@ export default function SharedOGImage({
               <img
                 src={logoBase64}
                 alt="보상스쿨 로고"
+                width={500}
+                height={160}
                 style={{
-                  height: '160px',
-                  width: 'auto',
                   objectFit: 'contain',
                 }}
               />
@@ -73,9 +73,9 @@ export default function SharedOGImage({
                 <img
                   src={logoBase64}
                   alt="보상스쿨 로고"
+                  width={250}
+                  height={80}
                   style={{
-                    height: '80px',
-                    width: 'auto',
                     objectFit: 'contain',
                   }}
                 />

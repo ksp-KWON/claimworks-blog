@@ -122,15 +122,13 @@ export function parseBlogPost(content: string): ParsedBlogPost {
 
     // 2. Process Line based on currentSectionType
     // Stop early triggers
-    if (/^#{1,6}\s/.test(trimmed) && currentSectionType !== 'NONE') {
-      if (currentSectionType === 'FAQ' && /^#+\s*/.test(trimmed)) {
-        if (currentQ) result.faqItems.push({ q: currentQ, a: currentA.trim() });
-        currentQ = trimmed.replace(/^(?:#+\s*)+/, '').replace(/^[*_💬✅☑️🛡️⭐\s]*Q\d+[*_]*\s*[:.-]?\s*/i, '').trim();
-        currentA = '';
-        continue;
-      } else if (currentSectionType !== 'FAQ') {
-         currentSectionType = 'NONE';
-      }
+    if (currentSectionType === 'FAQ' && /^(?:#+\s*)?(?:[*_💬✅☑️🛡️⭐\s]*Q\d*[*_]*\s*[:.-]?\s*)/i.test(trimmed)) {
+      if (currentQ) result.faqItems.push({ q: currentQ, a: currentA.trim() });
+      currentQ = trimmed.replace(/^(?:#+\s*)?(?:[*_💬✅☑️🛡️⭐\s]*Q\d*[*_]*\s*[:.-]?\s*)/i, '').trim();
+      currentA = '';
+      continue;
+    } else if (currentSectionType !== 'FAQ' && /^#{1,6}\s/.test(trimmed)) {
+       currentSectionType = 'NONE';
     }
     
     if (/\[SEO_SUMMARY\]/.test(trimmed)) {
@@ -152,7 +150,11 @@ export function parseBlogPost(content: string): ParsedBlogPost {
       }
     } else if (currentSectionType === 'FAQ') {
       if (currentQ) {
-        if (trimmed !== '---') currentA += line + '\n';
+        if (trimmed !== '---') {
+          // 답변 앞의 'A :' 등 불필요한 접두사 자동 제거 (렌더링 폼 중복 방지)
+          const cleanLine = line.replace(/^\s*(?:[*_💬✅☑️🛡️⭐\s]*A\d*[*_]*\s*[:.-]?\s*)/i, '');
+          currentA += cleanLine + '\n';
+        }
       }
     } else if (currentSectionType === 'CTA') {
       // skip

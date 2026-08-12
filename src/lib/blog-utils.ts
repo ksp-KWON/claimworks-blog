@@ -13,8 +13,6 @@ const KEY_POINT_PATTERNS = /(?:핵심\s*요약|key\s*point)/i;
 const CHECKLIST_PATTERNS = /(?:자가진단|체크리스트|1분\s*체크|체크)/i;
 const FAQ_PATTERNS       = /(?:faq|자주\s*묻는)/i;
 const CTA_PATTERNS       = /(?:실시간 채팅|call\s*to\s*action|상담\s*신청)/i;
-const Q_PATTERN          = /^(?:#+\s*)?(?:[*_💬✅☑️🛡️⭐\s]*Q\d*[*_]*\s*[:.-]?\s*)/i;
-const A_PATTERN          = /^(?:#+\s*)?(?:[*_💬✅☑️🛡️⭐\s]*A\d*[*_]*\s*[:.-]?\s*)/i;
 
 // ─── 유틸리티 함수 ───────────────────────────────────────────────────────────
 function cleanHeadingText(rawText: string, removeNumbering = false): string {
@@ -85,18 +83,6 @@ export function parseBlogPost(content: string): ParsedBlogPost {
       continue;
     }
 
-    // 0. FAQ 파싱 선점 (헤딩 파서와의 충돌 방지 및 우선순위 확보)
-    if (currentSectionType === 'FAQ' && Q_PATTERN.test(trimmed)) {
-      if (currentQ) result.faqItems.push({ q: currentQ, a: currentA.trim() });
-      currentQ = trimmed.replace(Q_PATTERN, '').trim();
-      currentA = '';
-      continue;
-    }
-    if (currentSectionType === 'FAQ' && A_PATTERN.test(trimmed)) {
-      currentA += trimmed.replace(A_PATTERN, '').trim() + '\n';
-      continue;
-    }
-
     // 1. Heading Detection (H2, H3 모두 섹션 분리 기준으로 확장)
     const headingMatch = trimmed.match(/^(#{2,3})\s+(.+)$/);
     if (headingMatch && !inCodeBlock) {
@@ -147,7 +133,12 @@ export function parseBlogPost(content: string): ParsedBlogPost {
 
     // 2. Process Line based on currentSectionType
     // Stop early triggers
-    if (currentSectionType !== 'FAQ' && /^#{1,6}\s/.test(trimmed)) {
+    if (currentSectionType === 'FAQ' && /^(?:#+\s*)?(?:[*_💬✅☑️🛡️⭐\s]*Q\d*[*_]*\s*[:.-]?\s*)/i.test(trimmed)) {
+      if (currentQ) result.faqItems.push({ q: currentQ, a: currentA.trim() });
+      currentQ = trimmed.replace(/^(?:#+\s*)?(?:[*_💬✅☑️🛡️⭐\s]*Q\d*[*_]*\s*[:.-]?\s*)/i, '').trim();
+      currentA = '';
+      continue;
+    } else if (currentSectionType !== 'FAQ' && /^#{1,6}\s/.test(trimmed)) {
        currentSectionType = 'NONE';
     }
     

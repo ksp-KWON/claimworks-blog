@@ -64,10 +64,10 @@ export function parseBlogPost(content: string): ParsedBlogPost {
       continue;
     }
 
-    // 1. Heading Detection
-    const headingMatch = trimmed.match(/^##\s+(.+)$/);
+    // 1. Heading Detection (H2, H3 모두 섹션 분리 기준으로 확장)
+    const headingMatch = trimmed.match(/^(#{2,3})\s+(.+)$/);
     if (headingMatch && !inCodeBlock) {
-      const rawText = headingMatch[1].trim();
+      const rawText = headingMatch[2].trim();
       
       let isSpecial = false;
       if (KEY_POINT_PATTERNS.test(rawText)) {
@@ -103,7 +103,7 @@ export function parseBlogPost(content: string): ParsedBlogPost {
         .replace(/<[^>]+>/g, '')
         .trim();
         
-      if (text) {
+      if (text && headingMatch[1].length === 2) {
         result.toc.push({ id, text });
       }
 
@@ -200,5 +200,21 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   }
   result.sections = result.sections.map(groupRelatedLinks);
 
+  // [재발방지 Fallback 1]
+  // opening이 비어있고 sections가 1개 이상이면, sections[0]을 opening으로 복구한다.
+  // 이 마크다운이 ## 헤딩으로 시작하는 구조여서 opening이 비는 경우를 방어.
+  if (!result.opening && result.sections.length >= 1) {
+    result.opening = result.sections[0];
+    result.sections = result.sections.slice(1);
+  }
+
+  // [재발방지 Fallback 2]
+  // sections도 비어있고 opening도 비어있으면 (파서가 전혀 내용을 못 잡은 경우),
+  // 전체 raw content를 그대로 1개 섹션으로 넣어 본문이 완전히 사라지는 것을 방지.
+  if (!result.opening && result.sections.length === 0 && content.trim()) {
+    result.sections = [groupRelatedLinks(applyBold(content.trim()))];
+  }
+
   return result;
 }
+

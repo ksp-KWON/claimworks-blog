@@ -63,9 +63,12 @@ export default function BlogPostContent({ content, relatedPostsNode, authorBioNo
   };
 
   // 본문 섹션(sections) 분리
-  // sections의 마지막 요소가 '클로징 본문'이 되며, 그 외는 '중간 본문'입니다.
-  const middleSections = sections.length > 1 ? sections.slice(0, -1) : [];
-  const closingSection = sections.length > 0 ? sections[sections.length - 1] : '';
+  // [근본 수정] sections가 1개 이하일 때 middleSections가 비어 본문이 사라지는 버그 수정.
+  // sections가 2개 이상이면: 마지막을 closingSection으로 분리 (박스 배치 목적)
+  // sections가 1개이면: 해당 1개를 middleSections로 렌더링, closingSection = ''
+  // sections가 0개이면: opening도 확인 후 fallback 처리
+  const middleSections = sections.length > 1 ? sections.slice(0, -1) : sections;
+  const closingSection = sections.length > 1 ? sections[sections.length - 1] : '';
 
   return (
     <div>

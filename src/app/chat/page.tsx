@@ -7,14 +7,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://claim-works.com/chat",
   },
-  openGraph: {
-    title: "보상스쿨 채팅 상담 신청",
-    description: "1:1 비공개 무료 채팅상담을 실시간으로 진행해 드립니다.",
-    url: "https://claim-works.com/chat",
-    siteName: "보상스쿨",
-    locale: "ko_KR",
-    type: "website",
-  },
 };
 
 export default function ChatPage() {

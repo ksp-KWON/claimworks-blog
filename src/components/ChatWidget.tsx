@@ -84,25 +84,42 @@ export default function ChatWidget() {
       
       const formattedMessage = `[상담 접수 정보]\n이름: ${name}\n사고 종류: ${accidentType}\n문의 내용: ${inquiryText.trim()}`;
       
-      const { data: insertedMsg } = await supabase
+      const { data: insertedMsg, error: msgErr } = await supabase
         .from('chat_messages')
         .insert([{ session_id: data.id, sender: 'visitor', content: formattedMessage }])
         .select()
         .single();
         
+      if (msgErr) console.error('Visitor msg error:', msgErr);
+        
       const systemMessage = "접수가 완료되었습니다! 담당자가 배정되어 내용을 검토 중이며, 약 5~10분 내로 정확한 답변을 드릴 예정입니다.";
-      const { data: sysMsg } = await supabase
+      const { data: sysMsg, error: sysErr } = await supabase
         .from('chat_messages')
         .insert([{ session_id: data.id, sender: 'system', content: systemMessage }])
         .select()
         .single();
         
+      if (sysErr) console.error('System msg error:', sysErr);
+        
       setStatus('connected');
       subscribeToMessages(data.id);
       
-      if (insertedMsg && sysMsg) {
-        setMessages([insertedMsg, sysMsg]);
+      const newMessages = [];
+      if (insertedMsg) newMessages.push(insertedMsg);
+      if (sysMsg) {
+        newMessages.push(sysMsg);
+      } else {
+        // DB 제약(enum/RLS)으로 삽입 실패 시 로컬 화면에만 즉시 렌더링
+        newMessages.push({
+          id: 'local-sys-' + Date.now(),
+          session_id: data.id,
+          sender: 'system',
+          content: systemMessage,
+          created_at: new Date().toISOString()
+        } as ChatMessage);
       }
+      
+      setMessages(newMessages);
       scrollToBottom();
     } catch (err) {
       console.error(err);

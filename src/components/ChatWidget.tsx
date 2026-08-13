@@ -31,19 +31,6 @@ function formatTime(isoString: string) {
   return `${ampm} ${h}:${m < 10 ? '0' + m : m}`;
 }
 
-const GREETING = "안녕하세요, 보상스쿨 손해사정사입니다.\n사건 내용과 궁금하신 점을 남겨주시면 꼼꼼히 확인하여 답변드리겠습니다.\n(외근이나 상담 중일 경우 답변이 조금 지연될 수 있으나, 남겨주신 질문은 하나도 빠짐없이 100% 답변드리고 있으니 잠시만 기다려주세요!)";
-
-const QUICK_ACTIONS = [
-  { id: 'connect', label: '👨‍💼 실시간 상담원 연결' },
-  { id: 'reserve', label: '📅 예약 상담 신청' }
-];
-
-const FAQS = [
-  "교통사고 합의금은 어떻게 계산되나요?",
-  "실손보험 청구 시 주의할 점이 있나요?",
-  "근로중 다쳤는데 산재 처리가 유리한가요?",
-];
-
 export default function ChatWidget() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -54,7 +41,11 @@ export default function ChatWidget() {
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isNicknameSet, setIsNicknameSet] = useState(false);
+  
+  // 접수 폼 상태
   const [nicknameInput, setNicknameInput] = useState('');
+  const [accidentType, setAccidentType] = useState('자동차 사고');
+  const [inquiryText, setInquiryText] = useState('');
   
   // 'idle' | 'checking' | 'connecting' | 'connected' | 'error'
   const [status, setStatus] = useState<'idle' | 'checking' | 'connecting' | 'connected' | 'error'>('idle');
@@ -74,7 +65,7 @@ export default function ChatWidget() {
 
   const handleSetNickname = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nicknameInput.trim()) return;
+    if (!nicknameInput.trim() || !inquiryText.trim()) return;
     const name = nicknameInput.trim();
     localStorage.setItem('cw_nickname', name);
     setIsNicknameSet(true);
@@ -90,8 +81,29 @@ export default function ChatWidget() {
         
       if (error) throw error;
       setSessionId(data.id);
+      
+      const formattedMessage = `[상담 접수 정보]\n이름: ${name}\n사고 종류: ${accidentType}\n문의 내용: ${inquiryText.trim()}`;
+      
+      const { data: insertedMsg } = await supabase
+        .from('chat_messages')
+        .insert([{ session_id: data.id, sender: 'visitor', content: formattedMessage }])
+        .select()
+        .single();
+        
+      const systemMessage = "접수가 완료되었습니다! 담당자가 배정되어 내용을 검토 중이며, 약 5~10분 내로 정확한 답변을 드릴 예정입니다.";
+      const { data: sysMsg } = await supabase
+        .from('chat_messages')
+        .insert([{ session_id: data.id, sender: 'system', content: systemMessage }])
+        .select()
+        .single();
+        
       setStatus('connected');
       subscribeToMessages(data.id);
+      
+      if (insertedMsg && sysMsg) {
+        setMessages([insertedMsg, sysMsg]);
+      }
+      scrollToBottom();
     } catch (err) {
       console.error(err);
       setStatus('error');
@@ -170,7 +182,7 @@ export default function ChatWidget() {
           if (!isOpen && newMsg.sender === 'admin') {
             setUnreadCount((prev) => prev + 1);
           } else if (isOpen && newMsg.sender === 'admin') {
-            // 안 읽은 메시지 초기화 로직 (여기서는 단순화)
+            // 안 읽은 메시지 초기화
             supabase.from('chat_sessions').update({ unread_count: 0 }).eq('id', sid).then();
           }
           scrollToBottom();
@@ -184,12 +196,10 @@ export default function ChatWidget() {
   const hasAutoOpened = useRef(false);
 
   useEffect(() => {
-    // URL에 ?chat=open 파라미터가 있으면 자동으로 채팅창 열기 (최초 1회만)
     if (searchParams?.get('chat') === 'open' && !hasAutoOpened.current) {
       hasAutoOpened.current = true;
       handleOpen();
     }
-
     checkExistingSession();
     
     const handleOpenChat = () => handleOpen();
@@ -226,7 +236,6 @@ export default function ChatWidget() {
     }, 100);
   };
 
-  // 메시지 전송
   const sendMessage = async (text: string = inputText) => {
     if (!text.trim() || isSending) return;
     const sendText = text.trim();
@@ -237,7 +246,6 @@ export default function ChatWidget() {
       let currentSid = sessionId;
       const vid = getVisitorId();
 
-      // 세션이 없으면 먼저 생성
       if (!currentSid) {
         const { data: sessionData, error: sessionError } = await supabase
           .from('chat_sessions')
@@ -251,7 +259,6 @@ export default function ChatWidget() {
         subscribeToMessages(currentSid!);
       }
 
-      // 메시지 저장
       const { data: insertedMsg, error: msgError } = await supabase
         .from('chat_messages')
         .insert([{ session_id: currentSid, sender: 'visitor', content: sendText }])
@@ -260,20 +267,17 @@ export default function ChatWidget() {
 
       if (msgError) throw msgError;
 
-      // 실시간 웹소켓(채널) 연결이 완료되기 전에 발생한 첫 메시지 INSERT 이벤트 누락(Race condition) 방지
       setMessages((prev) => {
         if (prev.some((m) => m.id === insertedMsg.id)) return prev;
         return [...prev, insertedMsg];
       });
       
-      // last_message_at 업데이트
       await supabase.from('chat_sessions').update({ last_message_at: new Date().toISOString() }).eq('id', currentSid);
-
       scrollToBottom();
     } catch (err) {
       console.error('Send error:', err);
       alert('메시지 전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
-      setInputText(sendText); // 복구
+      setInputText(sendText);
     } finally {
       setIsSending(false);
       inputRef.current?.focus();
@@ -286,14 +290,8 @@ export default function ChatWidget() {
       sendMessage();
     }
   };
-
-  const handleQuickAction = (actionId: string) => {
-    if (actionId === 'reserve') {
-      window.location.href = '/consultation';
-    } else {
-      sendMessage('상담원과 실시간 연결을 요청합니다.');
-    }
-  };
+  
+  const hasAdminReplied = messages.some(m => m.sender === 'admin');
 
   return (
     <>
@@ -303,7 +301,7 @@ export default function ChatWidget() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95, transition: { duration: 0.2 } }}
-            className="fixed bottom-0 sm:bottom-[90px] right-0 sm:right-6 w-full sm:w-[380px] h-[100dvh] sm:h-[600px] max-h-[100dvh] sm:max-h-[85vh] bg-gray-50 dark:bg-[#111111] sm:rounded-2xl shadow-2xl z-[300] flex flex-col overflow-hidden border border-gray-200 dark:border-white/10"
+            className="fixed bottom-0 sm:bottom-[90px] right-0 sm:right-6 w-full sm:w-[380px] h-[100dvh] sm:h-[650px] max-h-[100dvh] sm:max-h-[85vh] bg-gray-50 dark:bg-[#111111] sm:rounded-2xl shadow-2xl z-[300] flex flex-col overflow-hidden border border-gray-200 dark:border-white/10"
           >
             {/* Header */}
             <div className="bg-white dark:bg-[#202124] border-b border-gray-100 dark:border-white/10 px-4 py-3 flex items-center justify-between shrink-0">
@@ -313,11 +311,11 @@ export default function ChatWidget() {
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-1.5">
-                    보상스쿨
+                    보상스쿨 빠른 접수처
                   </h3>
                   <p className="text-[11px] text-green-500 font-bold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                    온라인 · 실시간 답변
+                    담당자 상시 대기중
                   </p>
                 </div>
               </div>
@@ -333,30 +331,58 @@ export default function ChatWidget() {
             </div>
 
             {!isNicknameSet ? (
-              <div className="flex-1 flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-[#111111]">
-                <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-6">
+              <div className="flex-1 flex flex-col items-center justify-start overflow-y-auto p-6 bg-gray-50 dark:bg-[#111111]">
+                <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-4 mt-2 shrink-0">
                   <span className="text-[var(--google-blue)] font-black text-2xl">상담</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">실시간 채팅 상담</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-8">
-                  원활한 상담을 위해<br/>닉네임을 먼저 입력해주세요.
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">실시간 빠른 상담 접수</h3>
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 text-center mb-6 break-keep">
+                  신속하고 정확한 상담을 위해<br/>아래 3가지 항목만 작성해주세요.
                 </p>
-                <form onSubmit={handleSetNickname} className="w-full max-w-[240px] space-y-3">
-                  <input
-                    type="text"
-                    value={nicknameInput}
-                    onChange={e => setNicknameInput(e.target.value)}
-                    placeholder="사용하실 닉네임"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#303134] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--google-blue)] transition-all"
-                    maxLength={10}
-                    required
-                  />
+                
+                <form onSubmit={handleSetNickname} className="w-full max-w-[300px] space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">성함 / 닉네임</label>
+                    <input
+                      type="text"
+                      value={nicknameInput}
+                      onChange={e => setNicknameInput(e.target.value)}
+                      placeholder="예: 홍길동"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#303134] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--google-blue)] transition-all text-sm"
+                      maxLength={10}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">사고 종류</label>
+                    <select
+                      value={accidentType}
+                      onChange={e => setAccidentType(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#303134] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--google-blue)] transition-all text-sm cursor-pointer"
+                    >
+                      <option value="자동차 사고">🚗 자동차 사고</option>
+                      <option value="실손/질병/상해">🏥 실손/질병/상해</option>
+                      <option value="배상책임/산재">⚖️ 배상책임/산재</option>
+                      <option value="기타">기타</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">간단한 문의 내용</label>
+                    <textarea
+                      value={inquiryText}
+                      onChange={e => setInquiryText(e.target.value)}
+                      placeholder="예: 후방추돌 2주 진단 합의금 문의"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#303134] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--google-blue)] transition-all text-sm resize-none"
+                      rows={3}
+                      required
+                    />
+                  </div>
                   <button
                     type="submit"
-                    disabled={!nicknameInput.trim()}
-                    className="w-full bg-[var(--google-blue)] hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold py-3 rounded-xl text-sm transition-colors shadow-md disabled:shadow-none"
+                    disabled={!nicknameInput.trim() || !inquiryText.trim()}
+                    className="w-full bg-[var(--google-blue)] hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold py-3.5 rounded-xl text-sm transition-colors shadow-md disabled:shadow-none mt-2"
                   >
-                    대화 시작하기
+                    상담 접수 완료하기
                   </button>
                 </form>
               </div>
@@ -365,21 +391,6 @@ export default function ChatWidget() {
                 {/* Messages Area */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   
-                  {/* Default Welcome Message */}
-                  <div className="flex items-start gap-2">
-                    <div className="w-8 h-8 rounded-full bg-white border border-gray-200 dark:border-white/10 flex items-center justify-center shrink-0 mt-1 shadow-sm overflow-hidden p-1">
-                      <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain" />
-                    </div>
-                    <div className="max-w-[85%]">
-                      <div className="bg-white dark:bg-[#2a2b2e] border border-gray-100 dark:border-white/5 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
-                        <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed break-keep">
-                          {GREETING}
-                        </p>
-                      </div>
-                      <p className="text-[10px] text-gray-400 mt-1 mx-1">보상스쿨</p>
-                    </div>
-                  </div>
-
                   {/* Status Display */}
                   {status === 'error' && (
                     <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-xs text-red-600 dark:text-red-400 text-center">
@@ -398,9 +409,31 @@ export default function ChatWidget() {
                     </div>
                   )}
 
+                  {/* Status Bar for Waiting */}
+                  {messages.length > 0 && !hasAdminReplied && (
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 rounded-xl px-4 py-3 flex items-center justify-between text-xs mb-4 shadow-sm animate-in fade-in slide-in-from-top-2">
+                      <div className="flex flex-col items-center flex-1">
+                        <div className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold mb-1 text-[10px]">✓</div>
+                        <span className="text-blue-700 dark:text-blue-400 font-bold">접수 완료</span>
+                      </div>
+                      <div className="h-px bg-blue-200 dark:bg-blue-800/50 flex-1 mx-1"></div>
+                      <div className="flex flex-col items-center flex-1">
+                        <div className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold mb-1 text-[10px] animate-pulse">⏳</div>
+                        <span className="text-blue-700 dark:text-blue-400 font-bold">검토 중</span>
+                      </div>
+                      <div className="h-px bg-blue-200 dark:bg-blue-800/50 flex-1 mx-1"></div>
+                      <div className="flex flex-col items-center flex-1">
+                        <div className="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 flex items-center justify-center font-bold mb-1 text-[10px]">💬</div>
+                        <span className="text-gray-500 dark:text-gray-400 font-bold text-center">답변 대기</span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Dynamic Messages */}
                   {messages.map(msg => {
                     const isVisitor = msg.sender === 'visitor';
+                    const isSystem = msg.sender === 'system';
+                    
                     return (
                       <div key={msg.id} className={`flex items-end gap-2 ${isVisitor ? 'flex-row-reverse' : 'flex-row'}`}>
                         {!isVisitor && (
@@ -408,19 +441,57 @@ export default function ChatWidget() {
                             <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain" />
                           </div>
                         )}
-                        <div className={`max-w-[75%] flex flex-col ${isVisitor ? 'items-end' : 'items-start'}`}>
+                        <div className={`max-w-[85%] flex flex-col ${isVisitor ? 'items-end' : 'items-start'}`}>
                           <div className={`rounded-2xl px-4 py-2.5 shadow-sm ${
                             isVisitor 
                               ? 'bg-[var(--google-blue)] text-white rounded-br-sm' 
-                              : 'bg-white dark:bg-[#2a2b2e] text-gray-800 dark:text-gray-200 rounded-bl-sm border border-gray-100 dark:border-white/5'
+                              : isSystem
+                                ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-900 dark:text-orange-100 rounded-bl-sm border border-orange-200 dark:border-orange-800/30'
+                                : 'bg-white dark:bg-[#2a2b2e] text-gray-800 dark:text-gray-200 rounded-bl-sm border border-gray-100 dark:border-white/5'
                           }`}>
+                            {isSystem && <div className="text-[11px] font-bold text-orange-600 dark:text-orange-400 mb-1">시스템 안내</div>}
                             <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                           </div>
-                          <p className="text-[10px] text-gray-400 mt-1 mx-1">{formatTime(msg.created_at)}</p>
+                          {!isSystem && <p className="text-[10px] text-gray-400 mt-1 mx-1">{formatTime(msg.created_at)}</p>}
                         </div>
                       </div>
                     );
                   })}
+
+                  {/* Two-Track Action Cards (Shown during wait) */}
+                  {messages.length > 0 && !hasAdminReplied && (
+                    <div className="mt-6 mb-2 space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                      <div className="bg-white dark:bg-[#2a2b2e] border border-blue-100 dark:border-blue-800/30 p-4 rounded-2xl shadow-sm relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-[var(--google-blue)]" />
+                        <h4 className="text-[13px] font-bold text-gray-900 dark:text-white mb-3">
+                          담당자 배정 및 검토에 시간이 소요됩니다.<br/>아래 메뉴를 이용해 보세요!
+                        </h4>
+                        <div className="space-y-2.5">
+                          <button 
+                            onClick={() => window.location.href='/calculator/auto'}
+                            className="w-full text-left bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 p-3.5 rounded-xl transition-colors border border-blue-100 dark:border-blue-800/50 flex items-center gap-3 group"
+                          >
+                            <span className="text-2xl group-hover:scale-110 transition-transform">🎁</span>
+                            <div>
+                              <div className="text-[13px] font-bold text-[var(--google-blue)] dark:text-blue-400">내 진짜 보상금 시뮬레이션 해보기</div>
+                              <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">기다리시는 동안 정밀 계산기를 이용해보세요</div>
+                            </div>
+                          </button>
+                          
+                          <button 
+                            onClick={() => window.location.href='/consultation'}
+                            className="w-full text-left bg-gray-50 dark:bg-[#303134] hover:bg-gray-100 dark:hover:bg-[#3c3d40] p-3.5 rounded-xl transition-colors border border-gray-200 dark:border-white/10 flex items-center gap-3 group"
+                          >
+                            <span className="text-2xl group-hover:scale-110 transition-transform">📅</span>
+                            <div>
+                              <div className="text-[13px] font-bold text-gray-700 dark:text-gray-300">기다리기 힘드신가요? 예약상담 신청하기</div>
+                              <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">접수된 내용은 저장되며 이탈 없이 전화로 답변해드립니다</div>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div ref={messagesEndRef} />
                 </div>

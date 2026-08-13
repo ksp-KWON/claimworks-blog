@@ -19,7 +19,7 @@ export interface ChatSession {
 export interface ChatMessage {
   id: string;
   session_id: string;
-  sender: 'visitor' | 'admin';
+  sender: 'visitor' | 'admin' | 'system';
   content: string;
   created_at: string;
 }

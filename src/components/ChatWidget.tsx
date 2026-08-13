@@ -475,7 +475,7 @@ export default function ChatWidget() {
                         </h4>
                         <div className="space-y-2.5">
                           <button 
-                            onClick={() => window.location.href='/calculator/auto'}
+                            onClick={() => window.location.href='/calculator'}
                             className="w-full text-left bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 p-3.5 rounded-xl transition-colors border border-blue-100 dark:border-blue-800/50 flex items-center gap-3 group"
                           >
                             <span className="text-2xl group-hover:scale-110 transition-transform">🎁</span>

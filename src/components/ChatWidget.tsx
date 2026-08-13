@@ -484,37 +484,37 @@ export default function ChatWidget() {
 
                   {/* Two-Track Action Cards (Shown during wait) */}
                   {messages.length > 0 && !hasAdminReplied && (
-                    <div className="mt-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                      <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-900/10 dark:to-indigo-900/10 border border-blue-100/50 dark:border-blue-800/30 p-3 rounded-2xl shadow-sm backdrop-blur-sm">
-                        <div className="flex items-center justify-center gap-1.5 mb-3 px-1">
-                           <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                           <h4 className="text-[11px] font-extrabold text-blue-800 dark:text-blue-300 tracking-tight">
-                             답변을 기다리시는 동안 이용해 보세요
-                           </h4>
+                    <div className="mt-3 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                      <div className="flex flex-col gap-2 p-3 bg-gradient-to-r from-blue-50/40 to-gray-50/40 dark:from-blue-900/10 dark:to-gray-900/10 rounded-2xl border border-gray-200/60 dark:border-white/5 backdrop-blur-sm">
+                        <div className="flex items-center justify-between px-1">
+                           <div className="flex items-center gap-1.5">
+                             <span className="w-1.5 h-1.5 rounded-full bg-[var(--google-blue)] animate-pulse" />
+                             <h4 className="text-[11px] font-extrabold text-gray-800 dark:text-gray-200 tracking-tight">
+                               담당자 배정 중입니다
+                             </h4>
+                           </div>
+                           <span className="text-[10px] text-gray-500 font-medium">약 3~5분 소요</span>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <button 
                             onClick={() => window.location.href='/calculator'}
-                            className="flex flex-col items-center text-center bg-white/90 dark:bg-[#202124]/90 hover:bg-blue-50 hover:border-blue-200 dark:hover:bg-blue-900/30 p-2.5 rounded-xl transition-all border border-white dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] group backdrop-blur-md"
+                            className="flex items-center justify-center gap-1.5 bg-white dark:bg-[#2a2b2e] hover:bg-blue-50 hover:border-blue-200 dark:hover:bg-blue-900/30 px-1 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 shadow-[0_2px_4px_rgba(0,0,0,0.02)] transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                              <span className="text-base drop-shadow-sm">🧮</span>
-                            </div>
-                            <div className="text-[11px] font-extrabold text-gray-800 dark:text-gray-100">보상금 계산기</div>
-                            <div className="text-[9px] text-gray-500 dark:text-gray-400 mt-0.5 tracking-tight">내 예상 합의금은?</div>
+                            <span className="text-[14px] group-hover:scale-110 transition-transform">🧮</span>
+                            <span className="text-[11px] font-extrabold text-[var(--google-blue)] dark:text-blue-400 tracking-tight">예상 합의금 계산</span>
                           </button>
                           
                           <button 
                             onClick={() => window.location.href='/consultation'}
-                            className="flex flex-col items-center text-center bg-white/90 dark:bg-[#202124]/90 hover:bg-gray-50 hover:border-gray-200 dark:hover:bg-gray-800/50 p-2.5 rounded-xl transition-all border border-white dark:border-white/5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] group backdrop-blur-md"
+                            className="flex items-center justify-center gap-1.5 bg-white dark:bg-[#2a2b2e] hover:bg-gray-50 hover:border-gray-300 dark:hover:bg-gray-800/50 px-1 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 shadow-[0_2px_4px_rgba(0,0,0,0.02)] transition-all group"
                           >
-                            <div className="w-9 h-9 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                              <span className="text-base drop-shadow-sm">📞</span>
-                            </div>
-                            <div className="text-[11px] font-extrabold text-gray-800 dark:text-gray-100">예약 상담 신청</div>
-                            <div className="text-[9px] text-gray-500 dark:text-gray-400 mt-0.5 tracking-tight">원하는 시간에 통화</div>
+                            <span className="text-[14px] group-hover:scale-110 transition-transform">📞</span>
+                            <span className="text-[11px] font-bold text-gray-700 dark:text-gray-300 tracking-tight">빠른 예약 상담</span>
                           </button>
                         </div>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 text-center mt-0.5 tracking-tight px-1 font-medium break-keep leading-snug">
+                          기다리시는 동안 빅데이터가 분석하는 <strong className="text-[var(--google-blue)] dark:text-blue-400 font-extrabold">내 진짜 보상금</strong>을 미리 확인해보세요!
+                        </p>
                       </div>
                     </div>
                   )}

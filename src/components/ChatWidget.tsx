@@ -355,16 +355,23 @@ export default function ChatWidget() {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">사고 종류</label>
-                    <select
-                      value={accidentType}
-                      onChange={e => setAccidentType(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#303134] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--google-blue)] transition-all text-sm cursor-pointer"
-                    >
-                      <option value="자동차 사고">🚗 자동차 사고</option>
-                      <option value="실손/질병/상해">🏥 실손/질병/상해</option>
-                      <option value="배상책임/산재">⚖️ 배상책임/산재</option>
-                      <option value="기타">기타</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={accidentType}
+                        onChange={e => setAccidentType(e.target.value)}
+                        className="w-full pl-4 pr-10 py-2.5 appearance-none rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#303134] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--google-blue)] transition-all text-sm cursor-pointer"
+                      >
+                        <option value="자동차 사고">🚗 자동차 사고</option>
+                        <option value="실손/질병/상해">🏥 실손/질병/상해</option>
+                        <option value="배상책임/산재">⚖️ 배상책임/산재</option>
+                        <option value="기타">기타</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-gray-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                      </div>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">간단한 문의 내용</label>

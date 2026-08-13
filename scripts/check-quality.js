@@ -48,30 +48,44 @@ const fixPipeline = [
     }
   },
   {
-    name: '순차적 열거형 서술(첫째, 둘째...) 기호화 및 H4 변환',
+    name: '공문서 체계 자동 보정 엔진 (행정업무운영편람 지원)',
     fix: (content) => {
+      let c = content;
+      // 1단계 (H2) 승격: "1. 제목" -> "## 1. 제목" (앞에 #이나 불릿기호가 없어야 함)
+      c = c.replace(/^(?!\s*[#\-\*])\s*(\d+)\.\s+(.*)$/gm, (match, num, rest) => {
+        // 볼드체(**)가 포함되어 있다면 제거 (헤딩 태그 자체가 볼드를 포함하므로 중복 방지)
+        const cleanRest = rest.replace(/\*\*?/g, '').trim();
+        return `## ${num}. ${cleanRest}`;
+      });
+      // 2단계 (H3) 승격: "가. 제목" -> "### 가. 제목"
+      c = c.replace(/^(?!\s*[#\-\*])\s*([가-하])\.\s+(.*)$/gm, (match, char, rest) => {
+        const cleanRest = rest.replace(/\*\*?/g, '').trim();
+        return `### ${char}. ${cleanRest}`;
+      });
+      // 3단계 (H4) 승격: "1) 제목" -> "#### 1) 제목"
+      c = c.replace(/^(?!\s*[#\-\*])\s*(\d+)\)\s+(.*)$/gm, (match, num, rest) => {
+        const cleanRest = rest.replace(/\*\*?/g, '').trim();
+        return `#### ${num}) ${cleanRest}`;
+      });
+      // 4단계 (H5) 승격: "가) 제목" -> "##### 가) 제목"
+      c = c.replace(/^(?!\s*[#\-\*])\s*([가-하])\)\s+(.*)$/gm, (match, char, rest) => {
+        const cleanRest = rest.replace(/\*\*?/g, '').trim();
+        return `##### ${char}) ${cleanRest}`;
+      });
+      // 원문자 (H4 특수강조) 승격: "① 제목" -> "#### ① 제목"
+      c = c.replace(/^(?!\s*[#\-\*])\s*([①-⑳])\s+(.*)$/gm, (match, char, rest) => {
+        const cleanRest = rest.replace(/\*\*?/g, '').trim();
+        return `#### ${char} ${cleanRest}`;
+      });
+      
+      // 구식 "첫째, 둘째" 잔재 정리 (원문자로 치환하되 H4로 승격)
       const numMap = { '첫째': '①', '둘째': '②', '셋째': '③', '넷째': '④', '다섯째': '⑤', '여섯째': '⑥', '일곱째': '⑦', '여덟째': '⑧', '아홉째': '⑨', '열째': '⑩' };
-      // 문단 맨 앞에 "**첫째, OOO**", "*둘째 - OOO*" 등으로 볼드처리가 섞인 채 시작하는 줄까지 포괄적으로 탐지
-      return content.replace(/^([ \t]*)(?:\*\*?)?(첫째|둘째|셋째|넷째|다섯째|여섯째|일곱째|여덟째|아홉째|열째)[\s,.:\-]+(.*?)(?:\*\*?)?$/gm, (match, space, word, rest) => {
-        // 뒤쪽에 남아있을 수 있는 볼드체 기호 안전하게 한 번 더 제거
+      c = c.replace(/^([ \t]*)(?:\*\*?)?(첫째|둘째|셋째|넷째|다섯째|여섯째|일곱째|여덟째|아홉째|열째)[\s,.:\-]+(.*?)(?:\*\*?)?$/gm, (match, space, word, rest) => {
         const cleanRest = rest.replace(/\*\*?/g, '').trim();
         return `#### ${numMap[word]} ${cleanRest}`;
       });
-    }
-  },
-  {
-    name: '숫자 열거형 서술(1. **제목** : 내용) 기호화 및 H4 변환',
-    fix: (content) => {
-      const numMap = ['⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫', '⑬', '⑭', '⑮', '⑯', '⑰', '⑱', '⑲', '⑳'];
-      // 패턴: 1. **제목** : 설명 또는 1. **제목 :** 설명 (AI가 즐겨 쓰는 설명형 리스트)
-      return content.replace(/^([ \t]*)(\d+)\.[ \t]*(?:\*\*?)?([^:\n*]+)(?:\*\*?)?[ \t]*:[ \t]*(?:\*\*?)?(.*)$/gm, (match, space, numStr, title, desc) => {
-        const num = parseInt(numStr, 10);
-        const circleNum = (num > 0 && num <= 20) ? numMap[num] : numStr + '.';
-        const cleanTitle = title.replace(/\*\*?/g, '').trim();
-        const cleanDesc = desc.replace(/\*\*?/g, '').trim();
-        // 헤딩과 본문 분리로 완벽한 가독성 확보
-        return `#### ${circleNum} ${cleanTitle}\n\n${cleanDesc}\n`;
-      });
+
+      return c;
     }
   },
   {

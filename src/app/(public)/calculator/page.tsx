@@ -4,8 +4,13 @@ import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 
 export const metadata = {
-  title: '보상금 계산기 - 보상스쿨',
-  description: '자동차보험 합의금, 실손의료비 보상, 배상책임 소송가액 등 예상 보상금을 산출해보세요.',
+  title: '교통사고 합의금 · 실손 · 배상책임 통합 계산기 | 보상스쿨',
+  description: '복잡한 자동차사고 합의금부터 실손의료비, 배상책임 소송가액까지! 손해사정 실무 알고리즘을 적용한 1분 예상 보상금 계산기입니다.',
+  openGraph: {
+    title: '교통사고 합의금 · 실손 · 배상책임 통합 계산기 | 보상스쿨',
+    description: '복잡한 자동차사고 합의금부터 실손의료비, 배상책임 소송가액까지! 손해사정 실무 알고리즘을 적용한 1분 예상 보상금 계산기입니다.',
+    type: 'website',
+  }
 };
 
 const CALCULATORS = [

@@ -38,13 +38,9 @@ tags:
 
 > 📖 <green>척추압박골절(Spinal Compression Fracture)</green> : 외력에 의해 척추체의 전방부(Anterior Column)가 압축되면서 맷돌처럼 짓눌려 높이가 낮아지고 변형되는 상해.
 
-실무적으로 치료 방법은 크게 두 가지로 나뉩니다.
-
-1. **보존적 치료 (Conservative Treatment)**
+실무적으로 치료 방법은 크게 두 가지로 나뉩니다.## 1. 보존적 치료 (Conservative Treatment)
    * 절대 침상 안정(Acoustic Bed Rest), 척추 보조기(TLSO) 착용, 약물 치료.
-   * **경피적 척추성형술(Vertebroplasty/Kyphoplasty)**: 골절된 척추체 내부에 골시멘트(PMMA)를 주입하여 통증을 완화하고 추가 침하를 막는 시술. 보험사는 이 시술을 '수술'이 아닌 '단순 시술'로 치부하여 장해 평가를 박하게 하는 경향이 있습니다.
-
-2. **수술적 치료 (Surgical Treatment)**
+   * **경피적 척추성형술(Vertebroplasty/Kyphoplasty)**: 골절된 척추체 내부에 골시멘트(PMMA)를 주입하여 통증을 완화하고 추가 침하를 막는 시술. 보험사는 이 시술을 '수술'이 아닌 '단순 시술'로 치부하여 장해 평가를 박하게 하는 경향이 있습니다.## 2. 수술적 치료 (Surgical Treatment)
    * **척추 유합술 및 고정술(Fusion & Fixation)**: 나사못(Pedicle Screw)을 이용해 척추 마디를 고정하는 수술. 척추의 운동 기능이 제한되므로 개인보험 약관상 '유합 또는 고정된 상태'에 해당하여 높은 장해지급률이 인정됩니다.
 
 > ### 💡 손해사정사 실무 조언

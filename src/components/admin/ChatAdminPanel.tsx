@@ -25,6 +25,22 @@ const MACRO_PHRASES = [
   "말씀하신 내용은 전문적인 검토가 필요합니다. 편하신 시간에 연락처를 남겨주시면 전화드리겠습니다."
 ];
 
+function playNotificationSound() {
+  try {
+    const audio = new Audio('/notification.ogg');
+    audio.play().catch(e => console.warn('Audio play blocked:', e));
+  } catch (e) {
+    console.error('Audio initialization error:', e);
+  }
+}
+
+function showBrowserNotification(title: string, body: string) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '/logo.png' });
+  }
+}
+
+
 export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', refreshCounter = 0 }: ChatAdminPanelProps) {
   const [sessions, setSessions] = useState<SessionWithMeta[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -75,6 +91,13 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
       fetchSessions();
     }
   }, [refreshCounter, fetchSessions]);
+
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }, []);
+
 
   // Load messages and mark as read
   const loadMessages = async (sid: string) => {
@@ -170,31 +193,14 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
     }
   }, []);
 
-  function playNotificationSound() {
-    try {
-      const audio = new Audio('/notification.ogg');
-      audio.play().catch(e => console.warn('Audio play blocked:', e));
-    } catch (e) {
-      console.error('Audio initialization error:', e);
-    }
-  }
 
-  function showBrowserNotification(title: string, body: string) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(title, { body, icon: '/logo.png' });
-    }
-  }
 
   const handleSelectSession = (sid: string) => {
     setSelectedId(sid);
     loadMessages(sid);
   };
 
-  function scrollToBottom() {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  }
+
 
   const handleSend = async () => {
     if (!replyText.trim() || !selectedId || isSending) return;

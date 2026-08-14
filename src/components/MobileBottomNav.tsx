@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { GOOGLE_FORM_URL } from '@/lib/constants';
 import BottomSheet from '@/components/ui/BottomSheet';
 import MenuCard from '@/components/ui/MenuCard';
 import type { MenuCardProps } from '@/components/ui/MenuCard';
@@ -176,11 +174,8 @@ export default function MobileBottomNav() {
   }, [pathname]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setHasScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Scroll handling placeholder if needed later
+    return () => {};
   }, []);
 
   return (

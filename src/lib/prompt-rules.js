@@ -24,7 +24,8 @@ const STRICT_RULES = `
   - **8단계 (특수 강조)** : ㉮, ㉯, ㉰, ㉱ (원문자 한글)
 
 ## 3. 🛡️ 보상스쿨 9대 시각화 무기고 (표준화된 무기 활용)
-정보를 시각화할 때 산문형이나 조잡한 텍스트 기호(+, ┌ 등 ASCII 아트)를 직접 그리지 마십시오. HTML 태그(<div> 등)도 금지됩니다. 오직 아래의 허용된 무기만을 유기적으로 조합하여 가독성을 극대화하십시오.
+정보를 시각화할 때 산문형이나 조잡한 텍스트 기호(+, ┌ 등 ASCII 아트)를 직접 그리지 마십시오. HTML 태그(<div> 등)도 금지됩니다.
+**[중요]** 9대 무기 중 시스템 무기(7~9번)는 환경에 맡기고, AI가 직접 작성해야 하는 **능동 무기 6종(1~6번)**은 본문 작성 전 반드시 \`weaponDeploymentPlan\` 스키마에 모두 한 번씩 유기적으로 배치 기획(CoT)한 뒤, 그 기획에 따라 본문에 빠짐없이 적용하십시오.
 - **[무기 1] 1분 자가진단 박스** : \`## 1분 자가진단\` (글 중반부 이탈 방지용 초록색 체크박스)
 - **[무기 2] FAQ 아코디언 박스** : \`## 💡 자주 묻는 질문 (FAQ)\` 아래에 \`### Q:\` 와 \`A:\` (SEO 및 질의응답용)
 - **[무기 3] 실무쟁점 팁 박스** : \`> ### 💡 보상스쿨 실무쟁점\` 인용구 사용 (전문가의 팩트 기반 조언 강조)
@@ -301,12 +302,25 @@ const CONTENT_SCHEMA = {
       type: "STRING",
       description: "손해사정사 수임 및 계약 체결이라는 최종 목표를 달성하기 위해, 이 글을 읽는 잠재 고객의 심리를 어떻게 자극하고 어떤 흐름(서론-본론-결론)으로 설득할 것인지 기획하는 전략적 연쇄 사고 (Chain-of-Thought)"
     },
+    weaponDeploymentPlan: {
+      type: "ARRAY",
+      description: "본문 가독성을 극대화하기 위해 보상스쿨 핵심 능동 무기 6종(1분 자가진단, FAQ, 실무쟁점, 용어사전, 관련글, 핵심요약)을 본문 적재적소에 어떻게 유기적으로 배치할 것인지에 대한 설계도. 6종을 반드시 한 번씩 모두 사용해야 함.",
+      items: {
+        type: "OBJECT",
+        properties: {
+          weaponName: { type: "STRING", description: "사용할 능동 무기명 (1~6번 중 하나)" },
+          placement: { type: "STRING", description: "배치될 위치 및 타이밍 (예: 서론 직후, 본론 중간 등)" },
+          purpose: { type: "STRING", description: "해당 위치에 배치함으로써 얻는 가독성 및 설득력 향상 의도" }
+        },
+        required: ["weaponName", "placement", "purpose"]
+      }
+    },
     markdownContent: {
       type: "STRING",
       description: "사전 분석을 바탕으로 작성된 고품질의 마크다운 본문 내용 (프론트매터 제외)"
     }
   },
-  required: ["thoughtProcess", "markdownContent"]
+  required: ["thoughtProcess", "weaponDeploymentPlan", "markdownContent"]
 };
 
 function buildArticlePrompt(topic, angle, existingPosts, precedentDetail = null) {

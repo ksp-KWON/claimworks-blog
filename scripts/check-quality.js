@@ -158,7 +158,7 @@ const fixPipeline = [
   },
   {
     name: 'AI 메타 메모 삭제',
-    fix: (content) => content.replace(/\[(?:이미지 제안|관련 글 추천|이미지 삽입|관련 포스팅|추천 글).*?\]/g, '')
+    fix: (content) => content.replace(/\[(?:이미지 제안|관련 글 추천|이미지 삽입|관련 포스팅|추천 글|관련 연관 글).*?\]/g, '')
   },
   {
     name: '서술형 영업성 CTA 문장 삭제',

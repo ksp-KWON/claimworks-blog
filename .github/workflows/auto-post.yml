@@ -96,6 +96,9 @@ jobs:
           echo "✍️ 확정 카테고리: $POST_TYPE"
           npm run generate:post
 
+      - name: 원격 브랜치 최신화 (충돌 방지)
+        run: git pull origin main --autostash --rebase
+
       - name: 변경사항 커밋 & 푸시
         uses: stefanzweifel/git-auto-commit-action@v5
         with:

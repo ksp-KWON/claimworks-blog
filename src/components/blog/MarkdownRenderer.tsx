@@ -273,7 +273,8 @@ export default function MarkdownRenderer({ content, inline = false }: MarkdownRe
       };
       
       const fullText = getText(children);
-      const docMarkerMatch = fullText.match(/^([1-9]+\.|[가-하]\.|[1-9]+\)|[가-하]\)|\([1-9]+\)|\([가-하]\)|[①-⑳]|[㉮-㉻])\s/);
+      // 오직 원문자(①~⑳, ㉮-㉻)만 커스텀 박스로 렌더링되도록 제한. 1., 가., 1) 등은 일반 본문 텍스트로 렌더링.
+      const docMarkerMatch = fullText.match(/^([①-⑳]|[㉮-㉻])\s/);
 
       if (docMarkerMatch && React.Children.count(children) > 0) {
         const childrenArray = React.Children.toArray(children);

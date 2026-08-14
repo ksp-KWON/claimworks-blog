@@ -320,6 +320,40 @@ export default function MarkdownRenderer({ content, inline = false }: MarkdownRe
         }
       }
 
+      // 서술형 본문 목차 기호 컬러 볼드체 처리
+      const textMarkerMatch = fullText.match(/^(([1-9]+)\)|([가-하])\)|\(([1-9]+)\)|\(([가-하])\))(\s+)/);
+      if (textMarkerMatch && React.Children.count(children) > 0) {
+        let colorClass = 'text-[#1A73E8] dark:text-[#8ab4f8]';
+        if (textMarkerMatch[3]) colorClass = 'text-[#9333ea] dark:text-[#c084fc]';
+        else if (textMarkerMatch[4]) colorClass = 'text-[#137333] dark:text-[#81c995]';
+        else if (textMarkerMatch[5]) colorClass = 'text-[#e37400] dark:text-[#fde293]';
+
+        let markerProcessed = false;
+        const newChildren = React.Children.map(children, (child) => {
+          if (!markerProcessed && typeof child === 'string') {
+            const match = child.match(/^(([1-9]+)\)|([가-하])\)|\(([1-9]+)\)|\(([가-하])\))(\s+)/);
+            if (match) {
+              markerProcessed = true;
+              return (
+                <>
+                  <strong className={`font-bold ${colorClass} mr-1.5 text-[1.05em]`}>{match[1]}</strong>
+                  {child.substring(match[0].length)}
+                </>
+              );
+            }
+          }
+          return child;
+        });
+
+        if (markerProcessed) {
+          return (
+            <p className="mb-5 leading-[1.85] text-[#202124] dark:text-[#e8eaed] break-keep">
+              {newChildren}
+            </p>
+          );
+        }
+      }
+
       return (
         <p className="mb-5 leading-[1.85] text-[#202124] dark:text-[#e8eaed] break-keep">{children}</p>
       );

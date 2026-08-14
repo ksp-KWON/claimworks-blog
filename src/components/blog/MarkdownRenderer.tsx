@@ -38,7 +38,7 @@ const getHeadingBgClass = (tone: string) => {
   }
 };
 
-const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, children: React.ReactNode, id?: string }) => {
+const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, children?: React.ReactNode, id?: string }) => {
   const tone = getToneColor(children);
   const styles: Record<number, string> = {
     2: 'mt-14 mb-6 py-3',

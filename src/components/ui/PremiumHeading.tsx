@@ -1,6 +1,6 @@
 import React from 'react';
 
-type GradientColor = 'blue' | 'red' | 'rose' | 'green' | 'teal' | 'purple' | 'indigo' | 'yellow' | 'default';
+type GradientColor = 'blue' | 'red' | 'rose' | 'green' | 'teal' | 'purple' | 'indigo' | 'yellow' | 'gray' | 'default';
 
 interface PremiumHeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
   level?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -53,6 +53,7 @@ export default function PremiumHeading({
     purple: 'bg-gradient-to-r from-purple-700 to-purple-400 dark:from-purple-400 dark:to-purple-200 bg-clip-text text-transparent',
     indigo: 'bg-gradient-to-r from-indigo-700 to-indigo-400 dark:from-indigo-400 dark:to-indigo-200 bg-clip-text text-transparent',
     yellow: 'bg-gradient-to-r from-yellow-700 to-yellow-400 dark:from-yellow-400 dark:to-yellow-200 bg-clip-text text-transparent',
+    gray: 'bg-gradient-to-r from-gray-700 to-gray-400 dark:from-gray-400 dark:to-gray-200 bg-clip-text text-transparent',
   };
 
   if (gradient !== 'default' && gradientClasses[gradient]) {

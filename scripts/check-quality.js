@@ -228,8 +228,12 @@ function checkQuality() {
 
     // 검증 로직 (파이프라인 통과 후에도 남아있는 치명적 에러)
     let errorsInFile = [];
-    if (/\[(?:이미지 제안|관련 글 추천|이미지 삽입|관련 포스팅|추천 글).*?\]/g.test(content)) {
+    if (/\[(?:이미지 제안|관련 글 추천|이미지 삽입|관련 포스팅|추천 글|관련 연관 글).*?\]/g.test(content)) {
       errorsInFile.push('Unfixable AI memo placeholder remaining.');
+    }
+
+    if (/^##.*(?:용어\s*사전|핵심\s*보상\s*용어)/mi.test(content)) {
+      errorsInFile.push('Glossary fallback section detected (Rule 4 violation). Must be inline.');
     }
 
     // 범용적 ASCII 박스(단일/다중 컬럼 포함) 원천 차단: +---+ 또는 ┌───┐ 형태의 테두리 라인이 하나라도 존재하면 치명적 에러

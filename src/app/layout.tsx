@@ -32,6 +32,7 @@ export default function RootLayout({
     >
       <head>
         <meta name="naver-site-verification" content="2a1537523725cefaf7b77e00215e3ae0140f46a2" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" integrity="sha384-zh0CIslj+VczCZtlzBcjt5ppRcsAmDnE6yOqO8O/LIPQ7f/604/zYqGz+KNgA7u1" crossOrigin="anonymous" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

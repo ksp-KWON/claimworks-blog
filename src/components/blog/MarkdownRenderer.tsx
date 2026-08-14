@@ -278,8 +278,8 @@ export default function MarkdownRenderer({ content, inline = false }: MarkdownRe
 
       if (docMarkerMatch && React.Children.count(children) > 0) {
         const childrenArray = React.Children.toArray(children);
-        let titleElements: React.ReactNode[] = [];
-        let bodyElements: React.ReactNode[] = [];
+        const titleElements: React.ReactNode[] = [];
+        const bodyElements: React.ReactNode[] = [];
         let isBody = false;
 
         for (const child of childrenArray) {

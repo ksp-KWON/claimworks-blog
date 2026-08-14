@@ -34,12 +34,24 @@ const getHeadingBgClass = (tone: string) => {
     case 'green': return 'from-green-100/80 dark:from-green-900/30';
     case 'yellow': return 'from-yellow-100/80 dark:from-yellow-900/30';
     case 'purple': return 'from-purple-100/80 dark:from-purple-900/30';
+    case 'gray': return 'from-gray-100/80 dark:from-gray-800/30';
     default: return 'from-blue-100/80 dark:from-blue-900/30';
   }
 };
 
+const getHeadingTone = (level: number): 'blue' | 'purple' | 'green' | 'yellow' | 'gray' => {
+  switch (level) {
+    case 2: return 'blue';
+    case 3: return 'purple';
+    case 4: return 'green';
+    case 5: return 'yellow';
+    case 6: return 'gray';
+    default: return 'blue';
+  }
+};
+
 const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, children?: React.ReactNode, id?: string }) => {
-  const tone = getToneColor(children);
+  const tone = getHeadingTone(level);
   const styles: Record<number, string> = {
     2: 'mt-14 mb-6 py-3',
     3: 'mt-10 mb-5 py-2.5',
@@ -71,6 +83,7 @@ const baseComponents: Components = {
   h3: (props) => <UnifiedHeadingRenderer level={3} {...props} />,
   h4: (props) => <UnifiedHeadingRenderer level={4} {...props} />,
   h5: (props) => <UnifiedHeadingRenderer level={5} {...props} />,
+  h6: (props) => <UnifiedHeadingRenderer level={6} {...props} />,
   blockquote: ({ children }) => {
     const tone = getToneColor(children);
     const boxHoverBorders: Record<string, string> = {

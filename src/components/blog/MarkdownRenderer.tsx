@@ -66,7 +66,7 @@ const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, c
       showLeftBorder 
       gradient={tone} 
       style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} 
-      className={`${styles[level] || styles[5]} pr-4 rounded-r-xl break-keep bg-gradient-to-r ${getHeadingBgClass(tone)} to-transparent dark:to-transparent`}
+      className={`${styles[level] || styles[5]} pr-4 rounded-none break-keep bg-gradient-to-r ${getHeadingBgClass(tone)} to-transparent dark:to-transparent`}
     >
       {children}
     </PremiumHeading>
@@ -173,7 +173,7 @@ const baseComponents: Components = {
     </div>
   ),
   pre: ({ children }) => (
-    <pre className="whitespace-pre-wrap break-words bg-gray-50 dark:bg-[#303134] p-4 sm:p-5 rounded-md border border-gray-200 dark:border-white/10 my-6 text-[#202124] dark:text-[#e8eaed] font-sans text-[14.5px] sm:text-[15.5px] leading-relaxed shadow-sm overflow-x-hidden">
+    <pre className="whitespace-pre-wrap break-words bg-gray-50 dark:bg-[#303134] p-4 sm:p-5 rounded-none border border-gray-200 dark:border-white/10 my-6 text-[#202124] dark:text-[#e8eaed] font-sans text-[14.5px] sm:text-[15.5px] leading-relaxed shadow-sm overflow-x-hidden">
       {children}
     </pre>
   ),
@@ -319,7 +319,7 @@ export default function MarkdownRenderer({ content, inline = false }: MarkdownRe
 
         if (isBody && bodyElements.length > 0) {
           return (
-            <div className="my-8 bg-white dark:bg-[#202124] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-[#3c4043] overflow-hidden">
+            <div className="my-8 bg-white dark:bg-[#202124] rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-[#3c4043] overflow-hidden transition-all duration-300 hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-blue-300 dark:hover:border-blue-800 group">
               <div className="bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent px-5 py-3.5 border-b border-blue-100/50 dark:border-blue-900/30">
                 <div className="font-bold text-[15.5px] text-[#1A73E8] dark:text-[#8ab4f8] flex items-start gap-1.5 break-keep">
                   {titleElements}

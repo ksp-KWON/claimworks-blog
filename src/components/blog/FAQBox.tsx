@@ -45,7 +45,7 @@ export default function FAQBox({ items }: FAQBoxProps) {
               }`}
             >
               <div className="pl-[34px] pr-2 py-2">
-                <div className="bg-blue-50/50 dark:bg-blue-900/10 rounded-none p-4 text-[14px] leading-[1.7] text-gray-700 dark:text-gray-300 border-l-2 border-blue-200 dark:border-blue-800 break-keep">
+                <div className="bg-blue-50/50 dark:bg-blue-900/10 rounded-none p-4 text-[13.5px] leading-[1.7] text-gray-700 dark:text-gray-300 border-l-2 border-blue-200 dark:border-blue-800 break-keep">
                   <MarkdownRenderer content={item.a} inline={true} />
                 </div>
               </div>

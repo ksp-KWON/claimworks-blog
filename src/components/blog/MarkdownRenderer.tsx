@@ -246,25 +246,6 @@ export const sharedComponents: any = {
       </li>
     );
   },
-  hr1: () => (
-    <div className="my-16 flex items-center justify-center gap-4">
-      <span className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600"></span>
-      <span className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600"></span>
-      <span className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600"></span>
-    </div>
-  ),
-  hr2: () => (
-    <div className="my-16 flex justify-center">
-      <div className="w-24 h-px bg-gray-300 dark:bg-gray-600"></div>
-    </div>
-  ),
-  hr3: () => (
-    <div className="my-16 flex items-center justify-center gap-4">
-      <div className="w-24 h-px bg-gradient-to-r from-transparent to-gray-300 dark:to-gray-600" />
-      <span className="w-1.5 h-1.5 rounded-full bg-[#d93025]" />
-      <div className="w-24 h-px bg-gradient-to-l from-transparent to-gray-300 dark:to-gray-600" />
-    </div>
-  ),
 };
 
 interface MarkdownRendererProps {
@@ -273,7 +254,12 @@ interface MarkdownRendererProps {
 }
 
 export default function MarkdownRenderer({ content, inline = false }: MarkdownRendererProps) {
-   
+  // 공문서 목차 기호(1., 1) 등)가 일반 리스트(<ol>)로 강제 변환되는 것을 막고 단락(Paragraph)으로 유지하기 위한 전처리.
+  // 공문서 도메인에서는 1., 1) 등이 나열형 리스트가 아니라 섹션/위계 구분자이므로 Paragraph로 파싱하는 것이 시맨틱하게 옳습니다.
+  const preProcessedContent = content
+    .replace(/^([0-9]+)\.\s/gm, '$1\\. ')
+    .replace(/^([0-9]+)\)\s/gm, '$1\\) ');
+
   const rendererComponents: any = {
     ...sharedComponents,
     p: ({ children }: { children: React.ReactNode }) => {
@@ -345,7 +331,7 @@ export default function MarkdownRenderer({ content, inline = false }: MarkdownRe
       rehypePlugins={[rehypeRaw, rehypeSlug, rehypeKatex]}
       components={rendererComponents}
     >
-      {content}
+      {preProcessedContent}
     </ReactMarkdown>
   );
 }

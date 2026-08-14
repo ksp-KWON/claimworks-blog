@@ -17,7 +17,7 @@ export default function FAQBox({ items }: FAQBoxProps) {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <CommonBox tone="blue" emoji="💬" title={`자주 묻는 질문 FAQ TOP ${items.length}`}>
+    <CommonBox tone="blue" emoji="💡" title="자주 묻는 질문 (FAQ)">
       <div className="divide-y divide-gray-100 dark:divide-white/5">
         {items.map((item, i) => (
           <div key={i}>

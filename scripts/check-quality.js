@@ -48,32 +48,56 @@ const fixPipeline = [
     }
   },
   {
-    name: '공문서 체계 자동 보정 엔진 (행정업무운영편람 지원)',
+    name: '공문서 체계 자동 보정 엔진 (행정업무운영편람 지원) 및 서술형 헤딩 방어',
     fix: (content) => {
       let c = content;
-      // 1단계 (H2) 승격: "1. 제목" -> "## 1. 제목" (앞에 #이나 불릿기호가 없어야 함)
+
+      const isDescriptive = (text) => {
+        const trimmed = text.trim();
+        // 서술형 종결어미 (다., 요., 까?, 니다, 시오 등) 또는 글자 수 45자 초과 시 서술형으로 간주
+        if (/(다\.|요\.|까\?|니다|시오|습니다|합니다|바랍니다|말합니다)[^\w가-힣]*$/.test(trimmed)) return true;
+        if (trimmed.length > 45) return true;
+        return false;
+      };
+
+      // 1. 기존에 잘못 붙은 헤딩(#) 강등 (서술형인데 #이 붙은 경우)
+      // 정규식: #이 2~5개 있고, 공문서 기호가 있는 줄
+      const headingPattern = /^#{2,5}\s+(([1-9]+|[가-하])\.|([1-9]+|[가-하])\)|\([1-9]+\)|\([가-하]\)|[①-⑳])\s+(.*)$/gm;
+      c = c.replace(headingPattern, (match, marker, _1, _2, rest) => {
+        if (isDescriptive(rest)) {
+          return `${marker} ${rest}`; // # 제거 (강등)
+        }
+        return match; // 단답형 제목이면 유지
+      });
+
+      // 2. 헤딩 없는 줄 승격 (기존 로직 개선: 서술형이 아닐 때만 승격)
+      // 1단계 (H2) 승격: "1. 제목" -> "## 1. 제목"
       c = c.replace(/^(?!\s*[#\-\*])\s*(\d+)\.\s+(.*)$/gm, (match, num, rest) => {
-        // 볼드체(**)가 포함되어 있다면 제거 (헤딩 태그 자체가 볼드를 포함하므로 중복 방지)
+        if (isDescriptive(rest)) return match;
         const cleanRest = rest.replace(/\*\*?/g, '').trim();
         return `## ${num}. ${cleanRest}`;
       });
       // 2단계 (H3) 승격: "가. 제목" -> "### 가. 제목"
       c = c.replace(/^(?!\s*[#\-\*])\s*([가-하])\.\s+(.*)$/gm, (match, char, rest) => {
+        if (isDescriptive(rest)) return match;
         const cleanRest = rest.replace(/\*\*?/g, '').trim();
         return `### ${char}. ${cleanRest}`;
       });
       // 3단계 (H4) 승격: "1) 제목" -> "#### 1) 제목"
       c = c.replace(/^(?!\s*[#\-\*])\s*(\d+)\)\s+(.*)$/gm, (match, num, rest) => {
+        if (isDescriptive(rest)) return match;
         const cleanRest = rest.replace(/\*\*?/g, '').trim();
         return `#### ${num}) ${cleanRest}`;
       });
       // 4단계 (H5) 승격: "가) 제목" -> "##### 가) 제목"
       c = c.replace(/^(?!\s*[#\-\*])\s*([가-하])\)\s+(.*)$/gm, (match, char, rest) => {
+        if (isDescriptive(rest)) return match;
         const cleanRest = rest.replace(/\*\*?/g, '').trim();
         return `##### ${char}) ${cleanRest}`;
       });
       // 원문자 (H4 특수강조) 승격: "① 제목" -> "#### ① 제목"
       c = c.replace(/^(?!\s*[#\-\*])\s*([①-⑳])\s+(.*)$/gm, (match, char, rest) => {
+        if (isDescriptive(rest)) return match;
         const cleanRest = rest.replace(/\*\*?/g, '').trim();
         return `#### ${char} ${cleanRest}`;
       });
@@ -81,6 +105,9 @@ const fixPipeline = [
       // 구식 "첫째, 둘째" 잔재 정리 (원문자로 치환하되 H4로 승격)
       const numMap = { '첫째': '①', '둘째': '②', '셋째': '③', '넷째': '④', '다섯째': '⑤', '여섯째': '⑥', '일곱째': '⑦', '여덟째': '⑧', '아홉째': '⑨', '열째': '⑩' };
       c = c.replace(/^([ \t]*)(?:\*\*?)?(첫째|둘째|셋째|넷째|다섯째|여섯째|일곱째|여덟째|아홉째|열째)[\s,.:\-]+(.*?)(?:\*\*?)?$/gm, (match, space, word, rest) => {
+        if (isDescriptive(rest)) {
+            return `${space}${numMap[word]} ${rest}`;
+        }
         const cleanRest = rest.replace(/\*\*?/g, '').trim();
         return `#### ${numMap[word]} ${cleanRest}`;
       });

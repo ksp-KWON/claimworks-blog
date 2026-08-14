@@ -1,9 +1,12 @@
 'use client';
 
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import type { Components } from 'react-markdown';
 import PremiumHeading from '../ui/PremiumHeading';
 import PremiumCard from '../ui/PremiumCard';
@@ -25,32 +28,49 @@ const getToneColor = (node: React.ReactNode): 'red' | 'green' | 'yellow' | 'purp
   return 'blue';
 };
 
+const getHeadingBgClass = (tone: string) => {
+  switch (tone) {
+    case 'red': return 'from-red-100/80 dark:from-red-900/30';
+    case 'green': return 'from-green-100/80 dark:from-green-900/30';
+    case 'yellow': return 'from-yellow-100/80 dark:from-yellow-900/30';
+    case 'purple': return 'from-purple-100/80 dark:from-purple-900/30';
+    default: return 'from-blue-100/80 dark:from-blue-900/30';
+  }
+};
+
+const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, children: React.ReactNode, id?: string }) => {
+  const tone = getToneColor(children);
+  const styles: Record<number, string> = {
+    2: 'mt-14 mb-6 py-3',
+    3: 'mt-10 mb-5 py-2.5',
+    4: 'mt-8 mb-4 py-2',
+    5: 'mt-6 mb-3 py-1.5',
+    6: 'mt-4 mb-2 py-1'
+  };
+  return (
+    <PremiumHeading 
+      level={level as any} 
+      id={id} 
+      showLeftBorder 
+      gradient={tone} 
+      style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} 
+      className={`${styles[level] || styles[5]} pr-4 rounded-r-xl break-keep bg-gradient-to-r ${getHeadingBgClass(tone)} to-transparent dark:to-transparent`}
+    >
+      {children}
+    </PremiumHeading>
+  );
+};
+
 const baseComponents: Components = {
   h1: ({ children, id }) => (
     <PremiumHeading level={1} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-16 mb-8 pb-4 border-b-4 border-[var(--google-blue)] dark:border-[#8ab4f8] break-keep">
       {children}
     </PremiumHeading>
   ),
-  h2: ({ children, id }) => (
-    <PremiumHeading level={2} id={id} showLeftBorder gradient="blue" style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-14 mb-6 py-3 pr-4 rounded-r-xl break-keep bg-gradient-to-r from-blue-100/80 to-transparent dark:from-blue-900/30 dark:to-transparent">
-      {children}
-    </PremiumHeading>
-  ),
-  h3: ({ children, id }) => (
-    <PremiumHeading level={3} id={id} showLeftBorder gradient="green" style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-10 mb-5 py-2.5 pr-4 rounded-r-xl break-keep bg-gradient-to-r from-green-100/80 to-transparent dark:from-green-900/30 dark:to-transparent">
-      {children}
-    </PremiumHeading>
-  ),
-  h4: ({ children, id }) => (
-    <PremiumHeading level={4} id={id} showLeftBorder gradient="purple" style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-8 mb-4 py-2 pr-4 rounded-r-xl break-keep bg-gradient-to-r from-purple-100/80 to-transparent dark:from-purple-900/30 dark:to-transparent">
-      {children}
-    </PremiumHeading>
-  ),
-  h5: ({ children, id }) => (
-    <PremiumHeading level={5} id={id} showLeftBorder gradient="yellow" style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-6 mb-3 py-1.5 pr-4 rounded-r-xl break-keep bg-gradient-to-r from-yellow-100/80 to-transparent dark:from-yellow-900/30 dark:to-transparent">
-      {children}
-    </PremiumHeading>
-  ),
+  h2: (props) => <UnifiedHeadingRenderer level={2} {...props} />,
+  h3: (props) => <UnifiedHeadingRenderer level={3} {...props} />,
+  h4: (props) => <UnifiedHeadingRenderer level={4} {...props} />,
+  h5: (props) => <UnifiedHeadingRenderer level={5} {...props} />,
   blockquote: ({ children }) => {
     const tone = getToneColor(children);
     const boxHoverBorders: Record<string, string> = {
@@ -243,19 +263,73 @@ export default function MarkdownRenderer({ content, inline = false }: MarkdownRe
    
   const rendererComponents: any = {
     ...sharedComponents,
-    p: ({ children }: { children: React.ReactNode }) => (
-      inline ? (
-        <>{children}</>
-      ) : (
-        <p className="mb-5 leading-[1.85] text-[#202124] dark:text-[#e8eaed]">{children}</p>
-      )
-    ),
+    p: ({ children }: { children: React.ReactNode }) => {
+      if (inline) return <>{children}</>;
+
+      const getText = (n: any): string => {
+        if (typeof n === 'string') return n;
+        if (Array.isArray(n)) return n.map(getText).join('');
+        if (n?.props?.children) return getText(n.props.children);
+        return '';
+      };
+      
+      const fullText = getText(children);
+      const docMarkerMatch = fullText.match(/^([1-9]+\.|[가-하]\.|[1-9]+\)|[가-하]\)|\([1-9]+\)|\([가-하]\)|[①-⑳]|[㉮-㉻])\s/);
+
+      if (docMarkerMatch && React.Children.count(children) > 0) {
+        const childrenArray = React.Children.toArray(children);
+        let titleElements: React.ReactNode[] = [];
+        let bodyElements: React.ReactNode[] = [];
+        let isBody = false;
+
+        for (const child of childrenArray) {
+          if (isBody) {
+            bodyElements.push(child);
+            continue;
+          }
+          if (typeof child === 'string') {
+            if (child.includes('\n')) {
+              const parts = child.split('\n');
+              titleElements.push(parts[0]);
+              const rest = parts.slice(1).join('\n').trim();
+              if (rest) bodyElements.push(rest);
+              isBody = true;
+            } else {
+              titleElements.push(child);
+            }
+          } else if ((child as React.ReactElement)?.type === 'br') {
+            isBody = true;
+          } else {
+            titleElements.push(child);
+          }
+        }
+
+        if (isBody && bodyElements.length > 0) {
+          return (
+            <div className="my-8 bg-white dark:bg-[#202124] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-[#3c4043] overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent px-5 py-3.5 border-b border-blue-100/50 dark:border-blue-900/30">
+                <div className="font-bold text-[15.5px] text-[#1A73E8] dark:text-[#8ab4f8] flex items-start gap-1.5 break-keep">
+                  {titleElements}
+                </div>
+              </div>
+              <div className="px-5 py-4 text-[15px] leading-[1.8] text-gray-700 dark:text-[#e8eaed] break-keep [&>p]:mb-0">
+                {bodyElements}
+              </div>
+            </div>
+          );
+        }
+      }
+
+      return (
+        <p className="mb-5 leading-[1.85] text-[#202124] dark:text-[#e8eaed] break-keep">{children}</p>
+      );
+    },
   };
 
   return (
     <ReactMarkdown
-      remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
-      rehypePlugins={[rehypeRaw, rehypeSlug]}
+      remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkMath]}
+      rehypePlugins={[rehypeRaw, rehypeSlug, rehypeKatex]}
       components={rendererComponents}
     >
       {content}

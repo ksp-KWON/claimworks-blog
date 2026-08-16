@@ -29,21 +29,17 @@ const fixPipeline = [
   {
     name: '핵심 요약 박스(Blockquote) 자동 변환',
     fix: (content) => {
-      // '## 💡 핵심 요약' 또는 '## 1분 자가진단' 바로 아래에 있는 리스트(-)들을 blockquote(>)로 변환
-      // 정규식 설명: 헤딩 이후에 나오는 (빈 줄 또는 '-'로 시작하는 줄 또는 '>'로 시작하는 줄)의 덩어리를 매칭
-      const regex = /(##\s*(?:💡\s*)?(?:핵심\s*요약|1분\s*자가진단)\s*\r?\n+)((?:(?:-|>)[^\n]*\r?\n|\s*\r?\n)+)/g;
+      // '## 💡 핵심 요약' 또는 '## 1분 자가진단' (### 나. 1분 자가진단 포함) 바로 아래에 있는 내용들을 다음 '##' 전까지 모두 blockquote(>)로 변환
+      const regex = /(#{2,3}\s*(?:[가-하]\.\s*)?(?:💡\s*)?(?:핵심\s*요약|1분\s*자가진단(?:.*)?)\s*\r?\n+)([\s\S]*?)(?=\r?\n##|$)/g;
       return content.replace(regex, (match, heading, listBlock) => {
         const boxedList = listBlock.replace(/\s+$/, '').split(/\r?\n/).map(line => {
-          if (line.trim().startsWith('-') && !line.trim().startsWith('>')) {
-            return `> ${line}`;
-          }
           if (line.trim().startsWith('>')) {
             return line;
           }
           if (line.trim() === '') {
             return `>`;
           }
-          return line;
+          return `> ${line}`;
         }).join('\n');
         return heading + boxedList + '\n\n';
       });
@@ -71,6 +67,16 @@ const fixPipeline = [
     }
   },
   {
+    name: '3단계 맞춤형 솔루션 양식 통일',
+    fix: (content) => {
+      // "① **1단계 : 분석** : 내용" 또는 "① 분석 : 내용"을
+      // "① 분석\n\n내용"으로 분리하여 제목은 박스형(######)으로, 내용은 일반 텍스트로 렌더링되게 함
+      return content.replace(/^([ \t]*>+[ \t]*)?(?:#{1,6}[ \t]*)?(①|②|③|④)[ \t]*(?:\*\*?)?(?:[1-4]단계[ \t]*:?[ \t]*)?(.*?)(?:\*\*?)?[ \t]*:[ \t]*(.*)$/gm, (match, bq, marker, title, desc) => {
+        return `${bq || ''}${marker} ${title.trim()}\n\n${bq || ''}${desc.trim()}`;
+      });
+    }
+  },
+  {
     name: '공문서 체계 절대 매핑 및 형제 노드 동기화 엔진 (CQF 4원칙)',
     fix: (content) => {
       // 구식 "첫째, 둘째" 잔재를 먼저 원문자(①) 기호로 치환 (승격 아님)
@@ -78,6 +84,9 @@ const fixPipeline = [
       let normalized = content.replace(/^([ \t]*>+[ \t]*)?(?:#{1,6}[ \t]*)?(?:\*\*?)?(첫째|둘째|셋째|넷째|다섯째|여섯째|일곱째|여덟째|아홉째|열째)[\s,.:\-]+(.*?)(?:\*\*?)?$/gm, (match, bq, word, rest) => {
         return `${bq || ''}${numMap[word]} ${rest}`;
       });
+
+      // 단일 기호 라인들이 빈 줄을 두고 연속해서 나타나는 경우 (예: 1) ... \n\n 2) ...), 이를 하나의 문단으로 병합하여 빈 제목 방지
+      normalized = normalized.replace(/^((?:[ \t]*>+[ \t]*)?(?:#{1,6}[ \t]*)?(?:[1-9]+\.|[가-하]\.|[1-9]+\)|[가-하]\)|\([1-9]+\)|\([가-하]\)|[①-⑳]|[㉮-㉻])[ \t]+[^\n]*\r?\n)\r?\n(?=(?:[ \t]*>+[ \t]*)?(?:#{1,6}[ \t]*)?(?:[1-9]+\.|[가-하]\.|[1-9]+\)|[가-하]\)|\([1-9]+\)|\([가-하]\)|[①-⑳]|[㉮-㉻])[ \t]+)/gm, '$1');
 
       const parts = normalized.split('---');
       if (parts.length < 3) return normalized;
@@ -194,6 +203,13 @@ const fixPipeline = [
   {
     name: 'AI 메타 메모 삭제',
     fix: (content) => content.replace(/\[(?:이미지 제안|관련 글 추천|이미지 삽입|관련 포스팅|추천 글|관련 연관 글).*?\]/g, '')
+  },
+  {
+    name: '상투적 더미 실무쟁점 박스 제거',
+    fix: (content) => {
+      // "본 칼럼은 손해사정 전문가의 실제 보상 처리 경험과..." 같은 알맹이 없는 상투적 복붙 멘트 박스 원천 제거
+      return content.replace(/>\s*###\s*💡\s*보상스쿨\s*실무쟁점\s*\r?\n(?:>\s*[^\n]*\r?\n)*?>\s*.*?(?:실제 보상 처리 경험과 법원 판례 해석|피보험자의 권리 보호와 올바른 보험금)[^\n]*\r?\n?/g, '');
+    }
   },
   {
     name: '서술형 영업성 CTA 문장 삭제',

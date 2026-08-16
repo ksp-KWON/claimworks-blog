@@ -1,17 +1,23 @@
 ---
-title: "미용 목적 시술 중 사망, 상해사망보험금 받을 수 있을까? 대법원 판례 분석"
-slug: "medical-procedure-death-insurance-exemption-ruling"
-date: "2026-07-09"
-updatedAt: "2026-07-09"
-summary: "미용 목적 시술 중 발생한 사망 사고, 상해사망보험금 지급이 거절되는 이유는 무엇일까요? 대법원 판례(2016다258063)를 통해 면책 조항의 해석과 실무적 대응 방안을 상세히 분석합니다."
-category: "판례·법률 해석"
-regionCategory: ""
-specialtyCategory: "상해·질병보험"
-tags: ["상해사망보험금", "면책조항", "의료처치", "대법원판례", "보험금분쟁"]
-caseNumber: "2016다258063"
+title: '미용 목적 시술 중 사망, 상해사망보험금 받을 수 있을까? 대법원 판례 분석'
+slug: medical-procedure-death-insurance-exemption-ruling
+date: '2026-07-09'
+updatedAt: '2026-07-09'
+summary: >-
+  미용 목적 시술 중 발생한 사망 사고, 상해사망보험금 지급이 거절되는 이유는 무엇일까요? 대법원 판례(2016다258063)를 통해 면책
+  조항의 해석과 실무적 대응 방안을 상세히 분석합니다.
+category: 판례·법률 해석
+regionCategory: ''
+specialtyCategory: 상해·질병보험
+tags:
+  - 상해사망보험금
+  - 면책조항
+  - 의료처치
+  - 대법원판례
+  - 보험금분쟁
+caseNumber: 2016다258063
 published: true
 ---
-
 아름다워지기 위한 선택이었지만, 예상치 못한 의료 사고로 가족을 잃은 슬픔은 무엇으로도 위로하기 어렵습니다. 특히 보험사로부터 "면책 조항에 해당한다"는 통보를 받을 때의 당혹감은 이루 말할 수 없을 것입니다.
 
 ## 💡 핵심 요약

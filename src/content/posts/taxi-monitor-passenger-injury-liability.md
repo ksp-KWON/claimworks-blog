@@ -1,17 +1,21 @@
 ---
-title: "택시 뒷좌석 모니터에 부딪혀 다친 사고, 안전벨트 안 맸다면 보상은 어떻게 될까?"
-slug: "taxi-monitor-passenger-injury-liability"
-date: "2026-06-28"
-updatedAt: "2026-06-28"
-summary: "택시 뒷좌석 모니터에 부딪혀 다친 사고에서 안전벨트 미착용과 공작물 책임 인정 여부를 서울중앙지법 판례를 통해 상세히 분석해 드립니다."
-category: "판례·법률 해석"
-caseNumber: "2025가단75932"
-regionCategory: ""
-specialtyCategory: "신경외과"
-tags: ["택시사고", "공작물책임", "안전벨트미착용", "교통사고합의금", "구상금청구"]
+title: '택시 뒷좌석 모니터에 부딪혀 다친 사고, 안전벨트 안 맸다면 보상은 어떻게 될까?'
+slug: taxi-monitor-passenger-injury-liability
+date: '2026-06-28'
+updatedAt: '2026-06-28'
+summary: 택시 뒷좌석 모니터에 부딪혀 다친 사고에서 안전벨트 미착용과 공작물 책임 인정 여부를 서울중앙지법 판례를 통해 상세히 분석해 드립니다.
+category: 판례·법률 해석
+caseNumber: 2025가단75932
+regionCategory: ''
+specialtyCategory: 신경외과
+tags:
+  - 택시사고
+  - 공작물책임
+  - 안전벨트미착용
+  - 교통사고합의금
+  - 구상금청구
 published: true
 ---
-
 택시 뒷좌석 모니터에 부딪혀 다친 사고에서 안전벨트 미착용과 공작물 책임 인정 여부를 서울중앙지법 판례를 통해 상세히 분석해 드립니다.
 
 > 💡 **공작물 책임** : 공작물의 설치 또는 보존의 하자로 인하여 타인에게 손해를 가한 때에 그 공작물의 점유자 또는 소유자가 부담하는 배상책임입니다.

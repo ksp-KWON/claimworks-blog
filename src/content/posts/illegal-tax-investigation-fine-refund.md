@@ -1,17 +1,23 @@
 ---
-title: "잘못된 중복 세무조사로 낸 벌금 돌려받는 법: 대법원 부당이득반환 판결"
-slug: "illegal-tax-investigation-fine-refund"
-date: "2026-07-05"
-updatedAt: "2026-07-05"
-summary: "중복 세무조사로 납부한 벌금과 과세전적부심사가 누락된 세금 처분을 대법원 판례를 통해 무효로 돌리고 부당이득으로 반환받는 실무 절차를 가이드합니다."
-category: "판례·법률 해석"
-regionCategory: ""
-specialtyCategory: "행정소송"
-tags: ["중복세무조사", "통고처분무효", "부당이득반환청구", "세무조사벌금", "국세기본법"]
-caseNumber: "2025다210837"
+title: '잘못된 중복 세무조사로 낸 벌금 돌려받는 법: 대법원 부당이득반환 판결'
+slug: illegal-tax-investigation-fine-refund
+date: '2026-07-05'
+updatedAt: '2026-07-05'
+summary: >-
+  중복 세무조사로 납부한 벌금과 과세전적부심사가 누락된 세금 처분을 대법원 판례를 통해 무효로 돌리고 부당이득으로 반환받는 실무 절차를
+  가이드합니다.
+category: 판례·법률 해석
+regionCategory: ''
+specialtyCategory: 행정소송
+tags:
+  - 중복세무조사
+  - 통고처분무효
+  - 부당이득반환청구
+  - 세무조사벌금
+  - 국세기본법
+caseNumber: 2025다210837
 published: true
 ---
-
 중복 세무조사로 납부한 벌금과 과세전적부심사가 누락된 세금 처분을 대법원 판례를 통해 무효로 돌리고 부당이득으로 반환받는 실무 절차를 가이드합니다.
 
 ## 💡 핵심 요약

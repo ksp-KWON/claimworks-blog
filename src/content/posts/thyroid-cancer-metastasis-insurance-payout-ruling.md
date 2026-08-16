@@ -1,17 +1,23 @@
 ---
-title: "갑상선암 림프절 전이 보험금, 대법원 판결로 확인하는 암 진단비 전액 받는 법"
-slug: "thyroid-cancer-metastasis-insurance-payout-ruling"
-date: "2026-06-24"
-updatedAt: "2026-06-24"
-summary: "갑상선암 림프절 전이 시 보험사에서 소액암 지급만 고집하나요? 대법원 2023다250746 판결을 통해 확인된 보험약관 설명의무 위반과 암 진단비 전액 청구 전략을 상세히 분석합니다."
-category: "판례·법률 해석"
-caseNumber: "2023다250746"
-regionCategory: ""
-specialtyCategory: "암보험"
-tags: ["대법원판례", "갑상선암", "림프절전이", "암보험금", "설명의무위반"]
+title: '갑상선암 림프절 전이 보험금, 대법원 판결로 확인하는 암 진단비 전액 받는 법'
+slug: thyroid-cancer-metastasis-insurance-payout-ruling
+date: '2026-06-24'
+updatedAt: '2026-06-24'
+summary: >-
+  갑상선암 림프절 전이 시 보험사에서 소액암 지급만 고집하나요? 대법원 2023다250746 판결을 통해 확인된 보험약관 설명의무 위반과 암
+  진단비 전액 청구 전략을 상세히 분석합니다.
+category: 판례·법률 해석
+caseNumber: 2023다250746
+regionCategory: ''
+specialtyCategory: 암보험
+tags:
+  - 대법원판례
+  - 갑상선암
+  - 림프절전이
+  - 암보험금
+  - 설명의무위반
 published: true
 ---
-
 갑상선암 림프절 전이 시 보험사에서 소액암 지급만 고집하나요? 대법원 2023다250746 판결을 통해 확인된 보험약관 설명의무 위반과 암 진단비 전액 청구 전략을 상세히 분석합니다.
 
 > 💡 **소액암** : 일반암 진단비의 일부(보통 10~20%)만 지급되는 암으로, 갑상선암이 대표적입니다.

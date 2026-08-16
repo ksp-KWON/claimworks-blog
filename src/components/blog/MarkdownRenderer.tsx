@@ -64,19 +64,39 @@ const getHeadingBgClass = (tone: string) => {
   }
 };
 
-const getHeadingTone = (level: number): 'blue' | 'purple' | 'green' | 'yellow' | 'gray' => {
+const getHeadingTone = (level: number, node?: React.ReactNode): 'red' | 'blue' | 'yellow' | 'green' | 'purple' | 'gray' => {
+  const getText = (n: any): string => {
+    if (typeof n === 'string') return n;
+    if (Array.isArray(n)) return n.map(getText).join('');
+    if (n?.props?.children) return getText(n.props.children);
+    return '';
+  };
+  const text = node ? getText(node).trim() : '';
+
+  // 1. 특수 섹션 전용 컬러 매핑
+  if (/(1분\s*자가진단|자가진단|체크리스트|진단\s*체크)/i.test(text)) {
+    return 'green'; // 1분 자가진단: 초록
+  }
+  if (/(FAQ|자주\s*묻는\s*질문|자주묻는질문|질문과\s*답변|Q&A)/i.test(text)) {
+    return 'purple'; // 자주 묻는 질문(FAQ): 보라
+  }
+  if (/(핵심\s*요약|요약)/i.test(text)) {
+    return 'yellow'; // 핵심 요약: 노랑
+  }
+
+  // 2. 제목 영역 기본 색상 위계: 빨(H2) - 파(H3) - 노(H4/H5)
   switch (level) {
-    case 2: return 'blue';
-    case 3: return 'purple';
-    case 4: return 'green';
-    case 5: return 'yellow';
-    case 6: return 'gray';
-    default: return 'blue';
+    case 2: return 'red';    // H2: 빨강
+    case 3: return 'blue';   // H3: 파랑
+    case 4: return 'yellow'; // H4: 노랑
+    case 5: return 'yellow'; // H5: 노랑
+    case 6: return 'gray';   // H6: 그레이
+    default: return 'red';
   }
 };
 
 const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, children?: React.ReactNode, id?: string }) => {
-  const tone = getHeadingTone(level);
+  const tone = getHeadingTone(level, children);
   const styles: Record<number, string> = {
     2: 'mt-14 mb-6 py-3',
     3: 'mt-10 mb-5 py-2.5',

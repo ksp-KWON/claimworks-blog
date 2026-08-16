@@ -30,18 +30,22 @@ const fixPipeline = [
     name: '핵심 요약 박스(Blockquote) 자동 변환',
     fix: (content) => {
       // '## 💡 핵심 요약' 또는 '## 1분 자가진단' 바로 아래에 있는 리스트(-)들을 blockquote(>)로 변환
-      const regex = /(##\s*(?:💡\s*)?(?:핵심\s*요약|1분\s*자가진단)\s*\r?\n+)((?:-.*\r?\n?)+)/g;
+      // 정규식 설명: 헤딩 이후에 나오는 (빈 줄 또는 '-'로 시작하는 줄 또는 '>'로 시작하는 줄)의 덩어리를 매칭
+      const regex = /(##\s*(?:💡\s*)?(?:핵심\s*요약|1분\s*자가진단)\s*\r?\n+)((?:(?:-|>)[^\n]*\r?\n|\s*\r?\n)+)/g;
       return content.replace(regex, (match, heading, listBlock) => {
-        const boxedList = listBlock.split(/\r?\n/).map(line => {
-          if (line.trim().startsWith('-')) {
+        const boxedList = listBlock.replace(/\s+$/, '').split(/\r?\n/).map(line => {
+          if (line.trim().startsWith('-') && !line.trim().startsWith('>')) {
             return `> ${line}`;
+          }
+          if (line.trim().startsWith('>')) {
+            return line;
           }
           if (line.trim() === '') {
             return `>`;
           }
           return line;
         }).join('\n');
-        return heading + boxedList + '\n';
+        return heading + boxedList + '\n\n';
       });
     }
   },

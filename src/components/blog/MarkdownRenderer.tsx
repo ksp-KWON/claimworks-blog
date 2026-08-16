@@ -200,21 +200,21 @@ const baseComponents: Components = {
     };
     const text = getText(children).trim();
     
-    // 키워드별 세련된 폰트 컬러 강조 (조잡한 배경 박스 없이 깔끔한 프리미엄 타이포그래피)
-    let colorClass = 'text-[#1A73E8] dark:text-[#8ab4f8]'; // 기본 Google Blue
+    // 키워드별 동일 톤온톤(Tone-on-Tone) 파스텔 배경 및 폰트 컬러 매핑
+    let toneClass = 'text-[#1A73E8] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/20'; // Blue
     
     if (/(거절|면책|부지급|삭감|주의|경고|위험|금지|불리|과실|기왕증|불가|제한|악용|분쟁|소송|실패|거부)/.test(text)) {
-      colorClass = 'text-[#d93025] dark:text-[#f28b82]'; // Red
+      toneClass = 'text-[#d93025] dark:text-[#f28b82] bg-red-50 dark:bg-red-900/20'; // Red
     } else if (/(지급|보상|합의|성공|가능|해결|유리|승소|안전|권리|인정|전액|확보)/.test(text)) {
-      colorClass = 'text-[#137333] dark:text-[#81c995]'; // Green
+      toneClass = 'text-[#137333] dark:text-[#81c995] bg-emerald-50 dark:bg-emerald-900/20'; // Green
     } else if (/(핵심|중요|필수|확인|점검|기준|원칙|주의사항|팁|노하우|명심|포인트)/.test(text)) {
-      colorClass = 'text-[#b06000] dark:text-[#fde293]'; // Amber
+      toneClass = 'text-[#e37400] dark:text-[#fde293] bg-amber-50 dark:bg-amber-900/20'; // Amber/Orange
     } else if (/(전문가|손해사정사|의학|법률|판례|자문|소견)/.test(text)) {
-      colorClass = 'text-[#7e22ce] dark:text-[#c084fc]'; // Purple
+      toneClass = 'text-[#9333ea] dark:text-[#c084fc] bg-purple-50 dark:bg-purple-900/20'; // Purple
     }
 
     return (
-      <strong className={`font-bold ${colorClass}`}>
+      <strong className={`font-bold px-1.5 py-0.5 mx-0.5 rounded-md ${toneClass}`}>
         {children}
       </strong>
     );

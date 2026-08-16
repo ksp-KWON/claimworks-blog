@@ -27,7 +27,26 @@ const fixPipeline = [
     }
   },
   {
-    name: 'FAQ 헤딩 표준 양식 자동 교정',
+    name: '핵심 요약 박스(Blockquote) 자동 변환',
+    fix: (content) => {
+      // '## 💡 핵심 요약' 또는 '## 1분 자가진단' 바로 아래에 있는 리스트(-)들을 blockquote(>)로 변환
+      const regex = /(##\s*(?:💡\s*)?(?:핵심\s*요약|1분\s*자가진단)\s*\r?\n+)((?:-.*\r?\n?)+)/g;
+      return content.replace(regex, (match, heading, listBlock) => {
+        const boxedList = listBlock.split(/\r?\n/).map(line => {
+          if (line.trim().startsWith('-')) {
+            return `> ${line}`;
+          }
+          if (line.trim() === '') {
+            return `>`;
+          }
+          return line;
+        }).join('\n');
+        return heading + boxedList + '\n';
+      });
+    }
+  },
+  {
+    name: '빈 헤딩 및 기호 찌꺼기 청소',
     fix: (content) => {
       // "## 자주 묻는 질문", "## 자주 묻는 질문(FAQ)", "## 💡 자주 묻는 질문" 등 비표준 양식을 표준형으로 통일
       return content.replace(/^##\s*(?:💡\s*)?자주\s*묻는\s*질문(?:\s*\(FAQ\))?(?:\s*TOP\s*\d+)?\s*$/gm, '## 💡 자주 묻는 질문 (FAQ)');
@@ -111,7 +130,13 @@ const fixPipeline = [
           
           if (anyDescriptive) {
             // 서술형이 하나라도 있으면 모두 강등 (H태그 제거)
-            return `${pl.bq}${pl.marker} ${pl.text}`;
+            // 단, 마크다운 파서가 1. 이나 1) 을 리스트로 자동 변환하는 것을 막기 위해 백슬래시(\)로 이스케이프 처리
+            // (MarkdownRenderer의 P 태그 인터셉터에서 안전하게 기호를 잡고 스타일링하기 위함)
+            let escapedMarker = pl.marker;
+            if (/^[1-9]+[.)]$/.test(pl.marker)) {
+              escapedMarker = pl.marker.replace(/^([1-9]+)([.)])$/, '$1\\$2');
+            }
+            return `${pl.bq}${escapedMarker} ${pl.text}`;
           } else {
             // 서술형이 없으면 공문서 1:1 절대 매핑
             let prefix = '';

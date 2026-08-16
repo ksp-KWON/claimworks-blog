@@ -13,6 +13,31 @@ import PremiumCard from '../ui/PremiumCard';
 
 const SCROLL_OFFSET = 140;
 
+const parseMarker = (children: any) => {
+  const childrenArray = React.Children.toArray(children);
+  if (childrenArray.length > 0 && typeof childrenArray[0] === 'string') {
+    const firstText = childrenArray[0] as string;
+    const match = firstText.match(/^([1-9]+\.|[가-하]\.|[1-9]+\)|[가-하]\)|\([1-9]+\)|\([가-하]\)|[①-⑳]|[㉮-㉻])(?:[ \t]+)/);
+    if (match) {
+      const marker = match[1];
+      const restText = firstText.slice(match[0].length);
+      
+      let indentClass = '';
+      if (/^[1-9]+\.$/.test(marker)) indentClass = 'ml-0';
+      else if (/^[가-하]\.$/.test(marker)) indentClass = 'ml-4 sm:ml-5';
+      else if (/^[1-9]+\)$/.test(marker)) indentClass = 'ml-8 sm:ml-10';
+      else if (/^[가-하]\)$/.test(marker)) indentClass = 'ml-12 sm:ml-[60px]';
+      else if (/^\([1-9]+\)$/.test(marker)) indentClass = 'ml-16 sm:ml-[80px]';
+      else if (/^\([가-하]\)$/.test(marker)) indentClass = 'ml-20 sm:ml-[100px]';
+      else if (/^[①-⑳]$/.test(marker)) indentClass = 'ml-24 sm:ml-[120px]';
+      else if (/^[㉮-㉻]$/.test(marker)) indentClass = 'ml-28 sm:ml-[140px]';
+
+      return { matched: true, marker, restText, indentClass, remainingChildren: childrenArray.slice(1) };
+    }
+  }
+  return { matched: false };
+};
+
 const getToneColor = (node: React.ReactNode): 'red' | 'green' | 'yellow' | 'purple' | 'blue' => {
   const getText = (n: any): string => {
     if (typeof n === 'string') return n;
@@ -59,21 +84,52 @@ const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, c
     5: 'mt-6 mb-3 py-1.5',
     6: 'mt-4 mb-2 py-1'
   };
+
+  const parsed = parseMarker(children);
+  let finalChildren = children;
+  let indentClass = '';
+
+  if (parsed.matched) {
+    indentClass = parsed.indentClass || '';
+    finalChildren = (
+      <>
+        <span className="text-inherit opacity-90 mr-1.5">{parsed.marker}</span>
+        {parsed.restText}
+        {parsed.remainingChildren}
+      </>
+    );
+  }
+
   return (
-    <PremiumHeading 
-      level={level as any} 
-      id={id} 
-      showLeftBorder 
-      gradient={tone} 
-      style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} 
-      className={`${styles[level] || styles[5]} pr-4 rounded-none break-keep bg-gradient-to-r ${getHeadingBgClass(tone)} to-transparent dark:to-transparent`}
-    >
-      {children}
-    </PremiumHeading>
+    <div className={indentClass}>
+      <PremiumHeading 
+        level={level as any} 
+        id={id} 
+        showLeftBorder 
+        gradient={tone} 
+        style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} 
+        className={`${styles[level] || styles[5]} pr-4 rounded-none break-keep bg-gradient-to-r ${getHeadingBgClass(tone)} to-transparent dark:to-transparent`}
+      >
+        {finalChildren}
+      </PremiumHeading>
+    </div>
   );
 };
 
 const baseComponents: Components = {
+  p: ({ children }) => {
+    const parsed = parseMarker(children);
+    if (parsed.matched) {
+      return (
+        <p className={`${parsed.indentClass} mb-4 text-[15.5px] sm:text-[16px] leading-[1.8] text-gray-800 dark:text-[#e8eaed] break-keep`}>
+          <span className="text-[#1A73E8] dark:text-[#8ab4f8] font-bold mr-1.5">{parsed.marker}</span>
+          {parsed.restText}
+          {parsed.remainingChildren}
+        </p>
+      );
+    }
+    return <p className="mb-4 text-[15.5px] sm:text-[16px] leading-[1.8] text-gray-800 dark:text-[#e8eaed] break-keep">{children}</p>;
+  },
   h1: ({ children, id }) => (
     <PremiumHeading level={1} id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-16 mb-8 pb-4 border-b-4 border-[var(--google-blue)] dark:border-[#8ab4f8] break-keep">
       {children}

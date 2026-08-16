@@ -156,14 +156,16 @@ export function parseBlogPost(content: string): ParsedBlogPost {
 
     if (currentSectionType === 'KEY_POINTS') {
       if (/^---/.test(trimmed)) continue;
-      if (/^[-*]\s+/.test(trimmed) || /^[🛡️💡✅☑️⭐]/.test(trimmed)) {
-        const text = trimmed.replace(/^[-*]\s*/, '').replace(/^[🛡️💡✅☑️⭐]+\s*/, '').trim();
+      const cleanLine = trimmed.replace(/^[> \t]+/, '').trim();
+      if (/^[-*]\s+/.test(cleanLine) || /^[🛡️💡✅☑️⭐]/.test(cleanLine)) {
+        const text = cleanLine.replace(/^[-*]\s*/, '').replace(/^[🛡️💡✅☑️⭐]+\s*/, '').trim();
         if (text && result.keyPoints.length < 3) result.keyPoints.push(text);
       }
     } else if (currentSectionType === 'CHECKLIST') {
       if (/^---/.test(trimmed)) continue;
-      if (/^[-*]\s+/.test(trimmed) || /^[\u2611\u2705\uFE0F[\]]/.test(trimmed)) {
-        const text = trimmed.replace(/^[-*]\s*/, '').replace(/^\[[ x]\]\s*/i, '').replace(/^[\u2611\u2705\uFE0F]+\s*/gu, '').trim();
+      const cleanLine = trimmed.replace(/^[> \t]+/, '').trim();
+      if (/^[-*]\s+/.test(cleanLine) || /^\[[ xX]\]/.test(cleanLine) || /^[\u2611\u2705\uFE0F[\]]/.test(cleanLine)) {
+        const text = cleanLine.replace(/^[-*]\s*/, '').replace(/^\[[ xX]\]\s*/i, '').replace(/^[\u2611\u2705\uFE0F]+\s*/gu, '').trim();
         if (text) result.checklistItems.push(text);
       }
     } else if (currentSectionType === 'FAQ') {

@@ -3,7 +3,7 @@ title: "상해사망보험금 분쟁, 대법원이 말하는 '외래 사고' 입
 slug: "supreme-court-accidental-death-insurance-dispute"
 date: "2026-06-25"
 updatedAt: "2026-06-25"
-summary: "음식물 섭취 중 발생한 질식과 급성 심근경색의 경계에서 상해사망보험금의 '외래의 사고' 입증책임과 법원의 진료기록감정 판단 기준을 대법원 판례를 통해 상세히 분석합니다."
+summary: "음식물 섭취 중 발생한 질식과 급성 심근경색의 경계에서 상해사망보험금의 외래의 사고 입증책임과 법원의 진료기록감정 판단 기준을 대법원 판례를 통해 상세히 분석합니다."
 category: "판례·법률 해석"
 caseNumber: "2022다303216"
 regionCategory: ""

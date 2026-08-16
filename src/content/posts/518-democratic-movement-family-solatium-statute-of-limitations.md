@@ -1,4 +1,4 @@
-﻿---
+---
 title: "5·18 민주화운동 유족 위자료 청구, 소멸시효 걱정 없이 보상받는 법"
 slug: "518-democratic-movement-family-solatium-statute-of-limitations"
 date: "2026-07-03"

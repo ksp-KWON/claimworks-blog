@@ -3,7 +3,7 @@ title: "보험료 밀려 해지된 보험, '수익자' 다르면 보험금 돌�
 slug: "insurance-termination-notice-beneficiary-dispute"
 date: "2026-07-17"
 updatedAt: "2026-07-17"
-summary: "보험료 미납으로 인한 보험 해지, 수익자가 다르면 해지 효력도 다를까? 상법 제639조 '타인을 위한 보험' 판례를 통해 본 보험금 청구 가능 여부와 핵심 법리를 분석합니다."
+summary: "보험료 미납으로 인한 보험 해지, 수익자가 다르면 해지 효력도 다를까? 상법 제639조 타인을 위한 보험 판례를 통해 본 보험금 청구 가능 여부와 핵심 법리를 분석합니다."
 category: "판례·법률 해석"
 regionCategory: ""
 specialtyCategory: "보험금 청구"

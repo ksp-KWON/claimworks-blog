@@ -1,4 +1,4 @@
-﻿---
+---
 title: "보험금 거절 해결책, 보험 분쟁조정 신청 방법과 성공률 높이는 팁"
 slug: "insurance-dispute-mediation-application-guide"
 date: "2026-07-03"

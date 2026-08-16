@@ -1,4 +1,4 @@
-﻿---
+---
 title: "실비보험 본인부담상한액 초과금, 보험금 받을 수 있을까? 대법원 판례 분석"
 slug: "health-insurance-out-of-pocket-limit-ruling"
 date: "2026-07-04"

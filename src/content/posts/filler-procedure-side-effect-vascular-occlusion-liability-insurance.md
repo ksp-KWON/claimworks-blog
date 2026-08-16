@@ -3,9 +3,7 @@ title: '필러 시술 후 혈관 폐색 부작용, 배상책임 보험금 거절
 slug: filler-procedure-side-effect-vascular-occlusion-liability-insurance
 date: '2026-06-16'
 updatedAt: '2026-06-16'
-summary: >-
-  필러 부작용으로 인한 혈관 폐색, 의료과실 입증부터 성형외과 배상책임보험 청구까지. 보험사가 숨긴 보상금의 진실과 손해사정사 개입으로
-  달라지는 결과를 보상스쿨이 알려드립니다.
+summary: "필러 부작용으로 인한 혈관 폐색, 의료과실 입증부터 성형외과 배상책임보험 청구까지. 보험사가 숨긴 보상금의 진실과 손해사정사 개입으로 달라지는 결과를 보상스쿨이 알려드립니다."
 category: 배상책임·의료
 regionCategory: ''
 specialtyCategory: 피부과 / 성형외과

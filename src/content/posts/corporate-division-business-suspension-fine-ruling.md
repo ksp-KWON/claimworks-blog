@@ -1,4 +1,4 @@
-﻿---
+---
 title: "회사 쪼개기 했다고 영업정지 대신 과징금 폭탄? 대법원 판결로 본 부당한 행정처분 대응법"
 slug: "corporate-division-business-suspension-fine-ruling"
 date: "2026-07-06"

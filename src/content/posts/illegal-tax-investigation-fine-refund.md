@@ -1,4 +1,4 @@
-﻿---
+---
 title: "잘못된 중복 세무조사로 낸 벌금 돌려받는 법: 대법원 부당이득반환 판결"
 slug: "illegal-tax-investigation-fine-refund"
 date: "2026-07-05"

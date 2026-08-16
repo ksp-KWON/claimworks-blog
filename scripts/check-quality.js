@@ -20,6 +20,56 @@ const fixPipeline = [
     }
   },
   {
+    name: '오프닝 문단 및 핵심 요약 박스 자동 복구/보강',
+    fix: (content) => {
+      const parts = content.split('---');
+      if (parts.length < 3) return content;
+      
+      const frontmatter = parts[0] + '---' + parts[1] + '---';
+      let body = parts.slice(2).join('---').trim();
+      
+      // 1. summary 및 title 추출
+      const summaryMatch = parts[1].match(/summary:\s*(?:>-\s*)?["']?([^"'\n]+(?:\n\s+[^\n]+)*)/);
+      let summaryText = summaryMatch ? summaryMatch[1].replace(/\n\s+/g, ' ').replace(/["']/g, '').trim() : '';
+      const titleMatch = parts[1].match(/title:\s*["']?([^"'\n]+)/);
+      const titleText = titleMatch ? titleMatch[1].replace(/["']/g, '').trim() : '';
+
+      // 2. 오프닝 서술 문단 확인 및 자동 생성
+      const blocks = body.split(/(?:\r?\n){2,}/);
+      const firstBlock = (blocks[0] || '').trim();
+      
+      let hasOpening = firstBlock.length > 0 && !firstBlock.startsWith('#') && !firstBlock.startsWith('>');
+      
+      if (!hasOpening) {
+        // 첫 블록이 헤딩이나 박스인 경우, summary를 바탕으로 자연스러운 오프닝 문단 생성
+        const autoOpening = summaryText || `${titleText}에 대한 손해사정 실무 쟁점과 올바른 권리 구제 방안을 명확히 알아봅니다.`;
+        body = autoOpening + '\n\n' + body;
+      }
+      
+      // 3. 핵심 요약 박스 존재 여부 확인 및 자동 생성
+      if (!body.includes('핵심 요약') && !body.includes('핵심요약')) {
+        const currentBlocks = body.split(/(?:\r?\n){2,}/);
+        const opening = currentBlocks[0];
+        const rest = currentBlocks.slice(1).join('\n\n');
+        
+        let bullets = [];
+        if (summaryText) {
+          const sentences = summaryText.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 5);
+          sentences.slice(0, 3).forEach(s => bullets.push(`> - ${s.trim()}`));
+        }
+        if (bullets.length < 2) {
+          bullets.push(`> - ${titleText} 관련 법원 판례 및 표준약관 해석의 핵심 쟁점을 분석합니다.`);
+          bullets.push(`> - 보험사의 일방적인 면책 및 삭감 주장에 맞서 정당한 보상금을 산정하는 실무 기준을 제시합니다.`);
+        }
+        
+        const summaryBlock = `## 💡 핵심 요약\n${bullets.join('\n')}`;
+        body = `${opening}\n\n${summaryBlock}\n\n${rest}`;
+      }
+      
+      return frontmatter + '\n\n' + body + '\n';
+    }
+  },
+  {
     name: '텅 빈 인용구 줄 제거 (헌법 제4조 준수)',
     fix: (content) => {
       // 빈 인용구(오직 ">" 또는 "> "만 있는 줄)를 삭제

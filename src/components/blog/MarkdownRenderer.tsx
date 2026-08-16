@@ -90,7 +90,6 @@ const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, c
   let indentClass = '';
 
   if (parsed.matched) {
-    indentClass = parsed.indentClass || '';
     finalChildren = (
       <>
         <span className="text-inherit opacity-90 mr-1.5">{parsed.marker}</span>
@@ -101,18 +100,16 @@ const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, c
   }
 
   return (
-    <div className={indentClass}>
-      <PremiumHeading 
-        level={level as any} 
-        id={id} 
-        showLeftBorder 
-        gradient={tone} 
-        style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} 
-        className={`${styles[level] || styles[5]} pr-4 rounded-none break-keep bg-gradient-to-r ${getHeadingBgClass(tone)} to-transparent dark:to-transparent`}
-      >
-        {finalChildren}
-      </PremiumHeading>
-    </div>
+    <PremiumHeading 
+      level={level as any} 
+      id={id} 
+      showLeftBorder 
+      gradient={tone} 
+      style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} 
+      className={`${styles[level] || styles[5]} pr-4 rounded-none break-keep bg-gradient-to-r ${getHeadingBgClass(tone)} to-transparent dark:to-transparent`}
+    >
+      {finalChildren}
+    </PremiumHeading>
   );
 };
 

@@ -148,8 +148,7 @@ const fixPipeline = [
             else if (/^[가-하]\.$/.test(pl.marker)) prefix = '### ';
             else if (/^[1-9]+\)$/.test(pl.marker)) prefix = '#### ';
             else if (/^[가-하]\)$/.test(pl.marker)) prefix = '##### ';
-            else if (/^\([1-9]+\)$/.test(pl.marker)) prefix = '###### ';
-            // 하위 기호는 HTML 한계로 인해 H태그 미부여
+            else prefix = '###### '; // (1), (가), ①, ㉮ 등은 모두 H6로 매핑하여 PremiumHeading 발동
             return `${pl.bq}${prefix}${pl.marker} ${pl.text}`;
           }
         });

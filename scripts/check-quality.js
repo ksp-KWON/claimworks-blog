@@ -60,7 +60,14 @@ const fixPipeline = [
       if (parts.length < 3) return normalized;
       
       const frontmatter = parts[0] + '---' + parts[1] + '---';
-      const body = parts.slice(2).join('---');
+      let body = parts.slice(2).join('---');
+
+      // AI가 잘못 생성한 빈 헤딩(예: ##\n 또는 ###\n) 찌꺼기 제거
+      body = body.replace(/^[ \t]*#{1,6}[ \t]*\r?\n/gm, '');
+
+      // AI가 여러 기호를 한 줄에 몰아서 쓴 경우(예: 가. 블라블라 1) 어쩌고) 강제로 문단 분리(\n\n) 처리
+      // 단축 기호 앞뒤에 공백이 있을 때만 분리
+      body = body.replace(/ ([1-9]+\.|[가-하]\.|[1-9]+\)|[가-하]\)|\([1-9]+\)|\([가-하]\)|[①-⑳]|[㉮-㉻]) /g, '\n\n$1 ');
 
       const isDescriptive = (text) => {
         const trimmed = text.replace(/\*\*?/g, '').trim();
@@ -118,7 +125,7 @@ const fixPipeline = [
           }
         });
         
-        return mappedLines.join('\n');
+        return mappedLines.join('\n\n');
       };
 
       const blocks = body.split(/(?:\r?\n){2,}/);
@@ -239,6 +246,24 @@ function checkQuality() {
     // 범용적 ASCII 박스(단일/다중 컬럼 포함) 원천 차단: +---+ 또는 ┌───┐ 형태의 테두리 라인이 하나라도 존재하면 치명적 에러
     if (/^[ \t]*[\+┌][\-─=]{3,}[\+┐][ \t]*$/m.test(content)) {
       errorsInFile.push('ASCII Art Table or Box detected. Must use standard markdown table or blockquote.');
+    }
+
+    // 부적절하게 삽입된 CTA 검증 (파이프라인 누락분 방어)
+    if (/(?:보상스쿨에 문의|상담을 받아보|상담하시기 바랍|전화주세요|연락주세요|전문가와 상담하|상담을 통해 도움을 받으시)/.test(content)) {
+      errorsInFile.push('Descriptive CTA found (Rule 5 violation).');
+    }
+
+    // Meta description(summary) 대괄호/따옴표 중복 여부 검증
+    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (fmMatch) {
+      const summaryMatch = fmMatch[1].match(/summary:\s*(?:>-\s*)?([^\n]+(?:\n\s+[^\n]+)*)/);
+      if (summaryMatch) {
+        const summaryVal = summaryMatch[1];
+        // 파이프라인에서 이미 ""로 감쌌으므로, 내부 값에 다시 대괄호 [] 또는 추가 쌍따옴표가 있으면 중복
+        if (/\[.*\]/.test(summaryVal) || (summaryVal.match(/"/g) || []).length > 2) {
+          errorsInFile.push('Duplicate quotes or brackets in meta description (Rule 5 violation).');
+        }
+      }
     }
 
     if (errorsInFile.length > 0) {

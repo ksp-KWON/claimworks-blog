@@ -200,24 +200,27 @@ const baseComponents: Components = {
     };
     const text = getText(children).trim();
     
-    // 키워드 기반 동적 색상 매핑
-    let colorClass = 'text-gray-900 dark:text-gray-100'; // 기본 검정/흰색 볼드
+    // 키워드별 형광펜(Highlighter) 배경 마킹 스타일
+    let highlightClass = 'bg-blue-50 dark:bg-blue-950/40 text-[#1a73e8] dark:text-[#8ab4f8] border-b-2 border-blue-400/60 dark:border-blue-500/40';
     
     if (/(거절|면책|부지급|삭감|주의|경고|위험|금지|불리|과실|기왕증|불가|제한|악용|분쟁|소송|실패|거부)/.test(text)) {
-      colorClass = 'text-[#d93025] dark:text-[#f28b82]'; // Red
+      // Red 형광펜
+      highlightClass = 'bg-red-50 dark:bg-red-950/40 text-[#d93025] dark:text-[#f28b82] border-b-2 border-red-400/60 dark:border-red-500/40';
     } else if (/(지급|보상|합의|성공|가능|해결|유리|승소|안전|권리|인정|전액|확보)/.test(text)) {
-      colorClass = 'text-[#137333] dark:text-[#81c995]'; // Green
-    } else if (/(핵심|중요|필수|확인|점검|기준|원칙|주의사항|팁|노하우|명심)/.test(text)) {
-      colorClass = 'text-[#e37400] dark:text-[#fde293]'; // Orange/Yellow
+      // Green 형광펜
+      highlightClass = 'bg-emerald-50 dark:bg-emerald-950/40 text-[#137333] dark:text-[#81c995] border-b-2 border-emerald-400/60 dark:border-emerald-500/40';
+    } else if (/(핵심|중요|필수|확인|점검|기준|원칙|주의사항|팁|노하우|명심|포인트)/.test(text)) {
+      // Amber/Yellow 형광펜
+      highlightClass = 'bg-amber-50 dark:bg-amber-950/40 text-[#b06000] dark:text-[#fde293] border-b-2 border-amber-400/60 dark:border-amber-500/40';
     } else if (/(전문가|손해사정사|의학|법률|판례|자문|소견)/.test(text)) {
-      colorClass = 'text-[#9333ea] dark:text-[#c084fc]'; // Purple
-    } else {
-      // 일반적인 키워드는 기존처럼 파란색으로 하되 너무 남용되지 않도록 파란색 유지
-      colorClass = 'text-[#1A73E8] dark:text-[#8ab4f8]'; // Blue
+      // Purple 형광펜
+      highlightClass = 'bg-purple-50 dark:bg-purple-950/40 text-[#7e22ce] dark:text-[#c084fc] border-b-2 border-purple-400/60 dark:border-purple-500/40';
     }
 
     return (
-      <strong className={`font-bold ${colorClass}`}>{children}</strong>
+      <strong className={`font-bold px-1.5 py-0.5 mx-0.5 rounded-[3px] transition-colors inline-block ${highlightClass}`}>
+        {children}
+      </strong>
     );
   },
   hr: () => (

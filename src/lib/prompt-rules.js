@@ -276,30 +276,38 @@ function buildArticlePrompt(topic, arg2, arg3, arg4) {
   }
 
   const isPrecedent = !!precedent;
-  const precedentInfo = isPrecedent
+  const precedentInfo = isPrecedent && precedent
     ? `\n* 분석 대상 판례: ${precedent.caseName || precedent.title || ''} (${precedent.caseNumber || precedent.caseNo || precedent.id || ''})\n* 판례 판결 요지: ${precedent.summary || precedent.judgmentSummary || precedent.content || ''}\n`
     : '';
 
-  const postsCtx = existingPosts.length > 0
-    ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
+  const safeExistingPosts = Array.isArray(existingPosts) ? existingPosts : [];
+  const postsCtx = safeExistingPosts.length > 0
+    ? safeExistingPosts.map(p => `- [${p.title || p.slug}](/blog/${p.slug})`).join('\n')
     : '- (없음)';
+
+  const safeTopic = topic || {};
+  const topicTitle = safeTopic.title || safeTopic.keyword || '손해사정 핵심 실무 쟁점';
+  const topicCategory = safeTopic.category || '보상가이드';
+  const topicSpecialty = safeTopic.specialtyCategory || '(해당 없음)';
+  const topicTags = Array.isArray(safeTopic.tags) ? safeTopic.tags.join(', ') : (safeTopic.tags || '');
+  const topicKeywords = Array.isArray(safeTopic.keywords) ? safeTopic.keywords.join(', ') : (safeTopic.keywords || topicTitle);
 
   return `${getExpertRole()}
 
-${getArticleObjective(topic.keywords ? (Array.isArray(topic.keywords) ? topic.keywords.join(', ') : topic.keywords) : topic.title)}
+${getArticleObjective(topicKeywords)}
 
 ## 글 작성 포커스 (Angle)
-* **집필 앵글**: ${angle.name}
-* **앵글 지침**: ${angle.instruction}
+* **집필 앵글**: ${angle?.name || '실무 절차 가이드 포커스'}
+* **앵글 지침**: ${angle?.instruction || '실무자의 관점에서 명쾌한 해결책을 제시하십시오.'}
 
 # ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
 ${STRICT_RULES}
 
 [기획안]
-* 제목: ${topic.title}
-* 카테고리: ${topic.category}
-* 전문 진료과목: ${topic.specialtyCategory || '(해당 없음)'}
-* 태그: ${(topic.tags || []).join(', ')}
+* 제목: ${topicTitle}
+* 카테고리: ${topicCategory}
+* 전문 진료과목: ${topicSpecialty}
+* 태그: ${topicTags}
 ${precedentInfo}
 
 ${getUniversalSkeleton(isPrecedent, angle, postsCtx)}

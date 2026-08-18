@@ -98,7 +98,7 @@ async function main() {
       await generateSinglePost();
       return; // 성공 시 즉시 종료
     } catch (err) {
-      console.error(`\n[⚠️ 자동글쓰기 빌드 에러] (시도: ${attempt}/${MAX_RETRIES}) ${err.message}`);
+      console.error(`\n[⚠️ 자동글쓰기 빌드 에러] (시도: ${attempt}/${MAX_RETRIES})`, err.stack || err.message);
       if (attempt === MAX_RETRIES) {
         console.error('❌ 최대 재시도 횟수 초과. 스크립트를 강제 종료합니다.');
         process.exit(1);

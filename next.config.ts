@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   // 정적 사이트로 빌드 (Cloudflare Pages 배포용)
   // 로컬 개발(isDev)에서는 일반 서버 모드 사용 → Next.js API Routes 활성화
   output: isDev ? undefined : 'export',
+  trailingSlash: false,
   images: {
     // 정적 export 시 이미지 최적화 비활성화 필요
     unoptimized: true,

@@ -1,5 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getSortedPostsData } from '@/lib/posts';
+import { ALL_CATEGORIES } from '@/lib/constants/categories';
+import { REGIONS_DATA } from '@/lib/constants';
 
 export const dynamic = 'force-static';
 
@@ -8,18 +10,40 @@ const SITE_LAUNCH_DATE = '2026-01-01';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = 'https://claim-works.com';
-  const posts = getSortedPostsData();
+  const posts = getSortedPostsData(false);
 
-  // ── 블로그 포스팅: 실제 updatedAt(수정일) 또는 date(발행일) 사용 ───────
+  // ── 1. 블로그 포스팅 ───────────────────────────────────────────────
   const postsSitemap: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${siteUrl}/blog/${post.slug}`,
-    lastModified: post.updatedAt || post.date,
+    lastModified: post.updatedAt || post.date || SITE_LAUNCH_DATE,
   }));
 
-  // ── 정적 페이지: 마지막 실질적 콘텐츠 변경일 고정 ─────────────────────
-  // 주의: Google은 priority/changeFrequency를 공식적으로 무시함 (불필요 제거)
-  // 주의: /search는 robots.txt에서 Disallow 처리 중 → 사이트맵에서 제외
-  // 주의: /admin은 noindex → 사이트맵에서 제외
+  // ── 2. 카테고리 페이지 ─────────────────────────────────────────────
+  const categoriesSitemap: MetadataRoute.Sitemap = ALL_CATEGORIES.map((cat) => ({
+    url: `${siteUrl}/categories/${cat.slug}`,
+    lastModified: SITE_LAUNCH_DATE,
+  }));
+
+  // ── 3. 지역별 페이지 (시도 및 구군) ──────────────────────────────────
+  const regionsSitemap: MetadataRoute.Sitemap = [];
+  regionsSitemap.push({ url: `${siteUrl}/regions`, lastModified: SITE_LAUNCH_DATE });
+
+  for (const region of REGIONS_DATA) {
+    const encodedSido = encodeURIComponent(region.name);
+    regionsSitemap.push({
+      url: `${siteUrl}/regions/${encodedSido}`,
+      lastModified: SITE_LAUNCH_DATE,
+    });
+    for (const district of region.districts) {
+      const encodedDistrict = encodeURIComponent(district);
+      regionsSitemap.push({
+        url: `${siteUrl}/regions/${encodedSido}/${encodedDistrict}`,
+        lastModified: SITE_LAUNCH_DATE,
+      });
+    }
+  }
+
+  // ── 4. 주요 정적 페이지 ───────────────────────────────────────────
   const staticSitemap: MetadataRoute.Sitemap = [
     { url: `${siteUrl}`,                              lastModified: SITE_LAUNCH_DATE },
     { url: `${siteUrl}/blog`,                         lastModified: SITE_LAUNCH_DATE },
@@ -35,5 +59,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/terms`,                        lastModified: SITE_LAUNCH_DATE },
   ];
 
-  return [...staticSitemap, ...postsSitemap];
+  return [...staticSitemap, ...categoriesSitemap, ...regionsSitemap, ...postsSitemap];
 }

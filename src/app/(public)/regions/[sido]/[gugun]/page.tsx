@@ -25,6 +25,9 @@ export async function generateMetadata({ params }: { params: Promise<{ sido: str
   return {
     title: `${decodedSido} ${decodedGugun} 의료기관 네트워크 - 보상스쿨`,
     description: `${decodedSido} ${decodedGugun} 지역의 병원 및 의료기관 리스트입니다. 실손, 산재, 교통사고 등 전문 보상 상담을 받아보세요.`,
+    alternates: {
+      canonical: `https://claim-works.com/regions/${encodeURIComponent(decodedSido)}/${encodeURIComponent(decodedGugun)}`,
+    },
   };
 }
 

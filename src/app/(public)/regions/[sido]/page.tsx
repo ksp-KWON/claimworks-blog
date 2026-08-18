@@ -12,6 +12,9 @@ export async function generateMetadata({ params }: { params: Promise<{ sido: str
   return {
     title: `${decodedSido} 지역별 의료기관 - 보상스쿨`,
     description: `${decodedSido} 지역의 교통사고, 산재, 의료분쟁 등 보상 전문 협력 병원 정보를 제공합니다.`,
+    alternates: {
+      canonical: `https://claim-works.com/regions/${encodeURIComponent(decodedSido)}`,
+    },
   };
 }
 

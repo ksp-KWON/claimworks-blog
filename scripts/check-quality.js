@@ -47,9 +47,9 @@ function processPost(filePath) {
     body = `${fallbackOpening}\n\n${body.trim()}`;
   }
 
-  // ── [4. 3단계 솔루션(①, ②, ③) 콜론 분리 및 헤딩 승격] ────────────────────
+  // ── [4. 다단계 솔루션(①~⑳) 콜론 분리 및 헤딩 승격] ────────────────────
   body = body.replace(
-    /(?:^|\r?\n)(?:#{1,6}\s*)?([①②③])\s*(?:\*\*)?(?:[1-3]단계\s*:\s*)?([^\n:]+?)(?:\*\*)?\s*:\s*([^\n]+)/g,
+    /(?:^|\r?\n)(?:#{1,6}\s*)?([①-⑳])\s*(?:\*\*)?(?:[1-9]단계\s*:\s*)?([^\n:]+?)(?:\*\*)?\s*:\s*([^\n]+)/g,
     (m, num, title, desc) => {
       const cleanTitle = title.replace(/[*_#]/g, '').trim();
       const cleanDesc = desc.trim();

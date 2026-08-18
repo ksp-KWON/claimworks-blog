@@ -10,8 +10,8 @@ const STRICT_RULES = `
 ## 1. 🏛️ 글로벌 표준 마크다운(GFM) & W3C 시맨틱 위계 규칙 (절대 헌법)
 본문은 종이 공문서 기호가 아닌, 전 세계 웹 표준 마크다운(GFM)에 따라 구글 검색엔진 최적화(SEO)와 시맨틱 웹 위계를 엄격히 준수하여 작성해야 합니다.
 - **H1 ('# 제목') 본문 작성 절대 금지**: 포스트 제목은 Frontmatter title로 자동 렌더링되므로 본문에 H1을 절대 쓰지 마십시오.
-- **1단계 대주제 (H2, \`##\`)**: \`## 1. 뇌출혈 진단비 분쟁의 핵심 실무\`, \`## 2. 세대별 보장 기준 비교\` 등 숫자로 대주제를 전개하십시오.
-- **2단계 중주제 (H3, \`###\`)**: \`### 가. 질병분류코드와 보험사의 면책 논리\`, \`### 나. 의무기록 감정 쟁점\` 등 한글 자음으로 중주제를 전개하십시오.
+- **1단계 대주제 (H2, \`##\`)**: 사안의 깊이에 따라 2~5개의 대주제(\`## 1. 뇌출혈 진단비 분쟁의 핵심 실무\`, \`## 2. 세대별 보장 기준 비교\` 등)를 자율적으로 전개하십시오.
+- **2단계 중주제 (H3, \`###\`)**: 각 대주제 안에서 필요한 만큼 세부 소제목(\`### 가. 질병분류코드와 보험사의 면책 논리\`, \`### 나. 의무기록 감정 쟁점\`, \`### 다. ...\` 등)을 W3C & Google SEO 표준(GFM)에 따라 AI가 100% 자율적으로 유연하게 구성하십시오.
 - **3단계 하위 항목 열거 (Semantic Lists)**:
   - 순서 없는 나열: \`- \` 또는 \`* \` (불릿 포인트)
   - 순서 있는 절차: \`1. \`, \`2. \`, \`3. \` (순서 리스트)
@@ -35,6 +35,7 @@ const STRICT_RULES = `
   - 마지막 결론부 \`## [번호]. 결론 및 보상스쿨의 맞춤형 솔루션\` 아래에 사안의 복잡도와 성격에 맞추어 **\`###### ① [솔루션 1 제목]\` + 설명 문단**, **\`###### ② [솔루션 2 제목]\` + 설명 문단** (필요시 **\`###### ③\`**, **\`###### ④\`**, **\`###### ⑤\`**) 형태로 AI가 최적의 솔루션 단계(2~5단계)를 자율적으로 구성하여 전문성과 신뢰도를 극대화하십시오.
 
 ## 3. 문체 규칙 및 구글 E-E-A-T 지침
+- **키워드 및 인사이트 강조 (\`**볼드**\`)**: 중요한 법리, 핵심 키워드, 인사이트 문장에 \`**강조**\`를 적용하십시오. (문단당 1~2개로 절제). 시스템 렌더러가 키워드 의미에 맞추어 **컬러 볼드와 은은한 파스텔 배경색(Red, Green, Blue, Amber, Purple)**으로 자동 렌더링합니다.
 - **콜론(:) 띄어쓰기**: 콜론 앞뒤로 무조건 한 칸씩 공백을 둡니다. (예: \`분쟁의 실체 : 약관의 해석\`)
 - **문장 종결**: 정중한 존댓말로 통일합니다. (~합니다, ~바랍니다)
 - **CTA 문장 금지**: "보상스쿨에 문의하세요", "상담을 신청하세요" 등의 영업성 문구를 본문 줄글에 섞어 쓰지 마십시오. (하단에 시스템 자동 버튼 제공)
@@ -89,6 +90,112 @@ function getArticleObjective(keywords) {
 타겟 키워드 [${keywords}] 및 주어진 기획안을 바탕으로, 글로벌 마크다운 표준 체계(GFM)와 보상스쿨 글로벌 콘텐츠 헌법을 완벽히 만족하며 구글 E-E-A-T 기준에 부합하는 최고의 전문가 칼럼을 작성합니다.`;
 }
 
+function getUniversalSkeleton(isPrecedent, angle, postsCtx) {
+  return `## [글로벌 마크다운 & W3C 시맨틱 블로그 뼈대]
+
+[글의 시작]
+* 독자의 상황에 깊이 공감하고 현실적인 문제의식을 던지는 자연스러운 오프닝 서술 문단 (3~4문장)
+
+## 💡 핵심 요약
+> - **[핵심 쟁점 1]** : 가장 핵심이 되는 약관/법리 요약
+> - **[핵심 쟁점 2]** : 손해사정 실무 관점의 핵심 대응 전략 요약
+> - **[핵심 쟁점 3]** : 최종 해결 방안 및 권익 확보 팁 요약
+
+## 1. [사안의 성격에 맞는 대주제 1]
+- W3C & Google SEO 표준(GFM)에 따라 AI가 100% 자율적으로 필요한 만큼 H3(### 가. ..., ### 나. ...) 소제목과 본문, 인라인 용어사전(> 💡 **[용어]** : 설명), 리스트를 유연하게 구성하십시오.
+
+## 2. [사안의 성격에 맞는 대주제 2]
+- 법리 비교, 약관 해석 차이, 보험사 주장 vs 손해사정사 반박 등 구조화된 데이터는 반드시 깨끗한 표준 마크다운 표(| 구분 | 내용 |)로 정리하십시오.
+
+## 1분 자가진단 : [주제] 체크리스트
+> - [ ] 자가진단 체크 항목 1
+> - [ ] 자가진단 체크 항목 2
+> - [ ] 자가진단 체크 항목 3
+> - [ ] 자가진단 체크 항목 4
+> - [ ] 자가진단 체크 항목 5
+
+## [번호]. [추가 대주제 - 필요시 자유롭게 2~5개 대주제 구성]
+
+## 💡 자주 묻는 질문 (FAQ)
+### Q : [실제 피보험자가 가장 궁금해하는 핵심 질문 1]?
+A : [손해사정 전문가 관점의 명쾌하고 친절한 답변]
+
+### Q : [실제 피보험자가 가장 궁금해하는 핵심 질문 2]?
+A : [손해사정 전문가 관점의 명쾌하고 친절한 답변]
+
+### Q : [실제 피보험자가 가장 궁금해하는 핵심 질문 3]?
+A : [손해사정 전문가 관점의 명쾌하고 친절한 답변]
+
+## [번호]. 결론 및 보상스쿨의 맞춤형 솔루션
+###### ① [맞춤형 솔루션 1 제목]
+[전문적이고 구체적인 손해사정 실무 실행 방안 설명 문단]
+
+###### ② [맞춤형 솔루션 2 제목]
+[피보험자 권익 보호를 위한 선제적 대응 전략 설명 문단]
+
+(사안에 따라 필요시 ###### ③, ④, ⑤ 단계 추가 자율 구성)
+
+## 🔗 함께 읽으면 도움되는 보상 칼럼
+${postsCtx}
+`;
+}
+
+const TOPIC_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    thoughtProcess: {
+      type: "STRING",
+      description: "기획 및 마케팅 전략에 대한 연쇄 사고 논리 서술 (Chain-of-Thought)"
+    },
+    slug: {
+      type: "STRING",
+      description: "URL-friendly 영문 slug (예: traumatic-brain-injury-compensation)"
+    },
+    title: {
+      type: "STRING",
+      description: "SEO 최적화된 포스트 제목 (클릭을 유도하는 전문적이고 명확한 제목)"
+    },
+    summary: {
+      type: "STRING",
+      description: "150자 이내의 구글 검색 결과 노출용 매력적인 메타 디스크립션 요약문"
+    },
+    category: {
+      type: "STRING",
+      description: "사망·자살 보험금, 질병진단·실손, 교통사고 보상, 배상책임·의료, 근재·산재 사고, 장해평가·면책, 보상가이드 중 1개 선택"
+    },
+    specialtyCategory: {
+      type: "STRING",
+      description: "전문 진료과목 (예: 신경외과, 정형외과, 내과 등)"
+    },
+    tags: {
+      type: "ARRAY",
+      items: { type: "STRING" },
+      description: "관련 태그 5개"
+    },
+    keywords: {
+      type: "ARRAY",
+      items: { type: "STRING" },
+      description: "타겟 검색 키워드 목록"
+    }
+  },
+  required: ["thoughtProcess", "slug", "title", "summary", "category", "specialtyCategory", "tags", "keywords"]
+};
+
+const CONTENT_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    thoughtProcess: {
+      type: "STRING",
+      description: "콘텐츠 작성 시 고려한 W3C 시맨틱 마크다운 위계, 의학/법리 쟁점, E-E-A-T 최적화 전략 서술 (Chain-of-Thought)"
+    },
+    content: {
+      type: "STRING",
+      description: "글로벌 마크다운 헌법 규칙을 100% 준수한 블로그 본문 마크다운 전문 (Frontmatter 제외)"
+    }
+  },
+  required: ["thoughtProcess", "content"]
+};
+
 function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCategory) {
   return `당신은 '보상스쿨'의 최정상 콘텐츠 기획자이자 마케터입니다.
 오늘 확정된 대표 키워드는 [${keyword}] 이며, 관련된 오늘의 이슈는 [${trendTitle}] 입니다.
@@ -105,157 +212,72 @@ function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCatego
 6. specialtyCategory: 전문 진료과목 (예: 정형외과)
 7. tags: 관련 태그 5개
 8. keywords: 타겟 키워드 목록
-9. calculatorType: "auto" 또는 "medical" 지정.
 
-반드시 JSON으로 반환하십시오.`;
+반드시 지정된 JSON 스키마를 준수하여 출력하십시오.`;
 }
 
-function getPrecedentPlanningPrompt(detail, existingPosts, targetCategory) {
-  return `당신은 '보상스쿨'의 최정상 콘텐츠 기획자이자 마케터입니다.
-아래의 법제처 수집 판례 데이터를 바탕으로 포스팅 기획 정보를 생성해 주세요.
+function getPrecedentPlanningPrompt(courtCase, existingPosts, targetCategory) {
+  return `당신은 '보상스쿨'의 최정상 판례 기획자이자 테크니컬 라이터입니다.
+아래 판례 정보를 분석하여 일반 소비자가 이해하기 쉽고 SEO 유입 효과가 극대화된 블로그 포스팅을 기획하십시오.
 반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
 
-[판례 데이터]
-- 사건명: ${detail.caseName}
-- 사건번호: ${detail.caseNo}
-- 요지: ${detail.judgmentSummary}
+판례 사건명: ${courtCase.caseName || courtCase.title}
+판례 사건번호: ${courtCase.caseNumber || courtCase.id}
+판례 내용 요약: ${courtCase.summary || courtCase.content}
 
-[기존 슬러그 (중복 금지)]
-${existingPosts}
+기존 슬러그 (중복 금지) : [${existingPosts}]
 
-[기획 원칙]
-어떻게 하면 이 딱딱한 판례가 일반인의 문제와 직결되어 클릭을 유도할 수 있을지 연쇄 사고(Chain-of-Thought)를 거쳐 기획하십시오:
-1. thoughtProcess: 기획 및 마케팅 전략에 대한 연쇄 사고 논리 서술
+1. thoughtProcess: 판례의 핵심 쟁점을 일반인이 공감할 스토리로 전환하는 연쇄 사고 논리
 2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
-3. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
-4. summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문 (판례번호 포함)
-5. category: 무조건 "판례·법률 해석"
-6. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
+3. title: SEO 최적화 판례 제목 (예: "골절 수술 후 발생한 합병증, 법원은 왜 보험사의 손을 들어주지 않았을까?")
+4. summary: 150자 이내의 메타 디스크립션 요약문
+5. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
+6. specialtyCategory: 전문 진료과목
 7. tags: 관련 태그 5개
 8. keywords: 타겟 키워드 목록
-9. calculatorType: "auto" 또는 "medical" 지정
 
-반드시 JSON으로 반환하십시오.`;
+반드시 지정된 JSON 스키마를 준수하여 출력하십시오.`;
 }
 
-function getManualPlanningPrompt(aiInput, existingPosts) {
-  return `당신은 '보상스쿨'의 콘텐츠 기획자입니다.
-사용자가 작성한 아래의 원문/초안 데이터를 바탕으로 포스팅 기획 정보를 생성해 주세요.
+function getManualPlanningPrompt(topicTitle, rawInput, existingPosts, targetCategory) {
+  return `당신은 '보상스쿨'의 최정상 콘텐츠 기획자이자 수석 에디터입니다.
+사용자가 제공한 원문/주제/자료를 바탕으로 블로그 포스팅 기획안을 수립하십시오.
+반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
 
-[사용자 원문]
-${aiInput}
+사용자 입력 주제/제목: ${topicTitle}
+사용자 입력 원문/자료 요약: ${rawInput.slice(0, 500)}
 
-[기존 슬러그 (중복 금지)]
-${existingPosts}
+기존 슬러그 (중복 금지) : [${existingPosts}]
 
-[기획 원칙]
-어떻게 하면 원문의 의도를 극대화하여 독자의 클릭을 유도할 수 있을지 연쇄 사고(Chain-of-Thought)를 거쳐 기획하십시오:
-1. thoughtProcess: 기획 및 마케팅 전략에 대한 연쇄 사고 논리 서술
+1. thoughtProcess: 원문의 핵심 메시지를 살려 최상의 SEO 칼럼으로 기획하는 논리
 2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
-3. title: SEO 최적화 제목 (원문의 의도를 살려 클릭 유도하는 제목)
-4. summary: 구글 검색 결과에 노출될 150자 이내의 매력적인 한글 요약문
-5. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 원문에 가장 알맞은 1개
-6. specialtyCategory: 사건과 연관된 전문 진료과목 (예: 정형외과, 신경과 등. 없으면 빈 문자열)
-7. tags: 원문과 관련된 태그 5개
+3. title: 매력적인 최종 포스트 제목
+4. summary: 150자 이내의 메타 디스크립션 요약문
+5. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
+6. specialtyCategory: 전문 진료과목
+7. tags: 관련 태그 5개
 8. keywords: 타겟 키워드 목록
-9. calculatorType: "auto" 또는 "medical" 지정
 
-무조건 JSON 형식으로만 반환하십시오.`;
+반드시 지정된 JSON 스키마를 준수하여 출력하십시오.`;
 }
 
-function getUniversalSkeleton(isPrecedent, angle, postsCtx) {
-  let coreAnalysis = `  - 오늘의 글쓰기 관점(Angle) : [${angle.name}] ${angle.instruction}
-  - 수임 전환 타겟팅 : 잠재 고객이 이 글을 읽고 '전문가(손해사정사)의 도움이 절실하다'고 느끼게 만들 핵심 설득 논리 (Chain-of-Thought)`;
+function buildArticlePrompt(topic, precedent, angle, existingPosts) {
+  const isPrecedent = !!precedent;
+  const precedentInfo = isPrecedent
+    ? `\n* 분석 대상 판례: ${precedent.caseName || precedent.title} (${precedent.caseNumber || precedent.id})\n* 판례 판결 요지: ${precedent.summary || precedent.content}\n`
+    : '';
 
-  if (isPrecedent) {
-    coreAnalysis = `  - 오늘의 글쓰기 관점(Angle) : [${angle.name}] 판례 해설을 이 관점에 맞추어 풀어냅니다.
-  - 수임 전환 타겟팅 : 독자가 이 판례를 자신의 상황에 대입하여 '나도 보험사에게 당하고 있었구나, 전문가에게 맡겨야겠다'고 깨닫게 만들 설득 논리 (Chain-of-Thought)`;
-  }
-
-  return `[수임 전환(마케팅) 연쇄 사고 지침]
-다음의 분석을 반드시 JSON 응답의 'thoughtProcess' 항목 안에 서술하십시오. (절대 마크다운 본문에 넣지 마십시오. AI 메모 및 대괄호 표기는 본문에서 엄격히 금지됩니다.)
-${coreAnalysis}
-
-# ════════════════════════════════════════════════════════════════
-# 🌐 글쓰기 표준 프레임워크 (W3C & Google SEO 글로벌 표준)
-# ════════════════════════════════════════════════════════════════
-
-본문은 기승전결(起承轉結)의 완결성과 W3C 시맨틱 위계에 맞추어 유연하고 풍부하게 작성되어야 합니다:
-
-1. **기 (起 - 공감 도입부)** : 독자가 처한 억울한 상황에 깊이 공감하는 자연스럽고 따뜻한 톤의 도입 문단 ➔ \`## 💡 핵심 요약\` (3개 불릿 포인트, \`> - \`)
-2. **승·전 (承·轉 - 팩트 및 심층 실무 쟁점 전개 - AI 자율 챕터 설계)** :
-   - 사안의 난이도와 법률/의학적 복잡도에 따라 대주제(\`## 1.\`, \`## 2.\`, \`## 3.\`...)와 세부절(\`### 가.\`, \`### 나.\`...)의 개수 및 깊이를 AI가 가장 설득력 있는 스토리텔링으로 자유롭게 설계하십시오. (토큰 한도 내에서 최대한 깊이 있게 전개)
-   - 필수 시각화 무기:
-     - 1개 이상의 마크다운 비교표 (\`| 구분 | 내용 |\`)
-     - 전문 용어 등장 시 인라인 사전 (\`> 💡 **용어명** : 설명\`)
-     - 1분 자가진단 (\`## 1분 자가진단 : [주제] 체크리스트\` ➔ \`> - [ ] \` 4~5개)
-     - 자주 묻는 질문 (\`## 💡 자주 묻는 질문 (FAQ)\` ➔ \`### Q : [질문]\` / \`A : [답변]\`)
-3. **결 (結 - 종결 및 맞춤형 솔루션)** :
-   - 마지막 결론부 \`## [번호]. 결론 및 보상스쿨의 맞춤형 솔루션\` 아래에:
-   - 사안의 성격에 맞추어 AI가 기획한 다단계 맞춤 솔루션 카드(\`###### ① [솔루션 1 제목]\` + 설명 문단, \`###### ② [솔루션 2 제목]\` + 설명 문단, 필요시 \`###### ③\`, \`###### ④\`, \`###### ⑤\`...)로 완벽하게 종결하십시오.
-
-[기존 글 목록 (링크 참조용)]
-\${postsCtx}
-`;
-}
-
-const TOPIC_SCHEMA = {
-  type: 'OBJECT',
-  properties: {
-    thoughtProcess: { type: 'STRING', description: '잠재 고객의 클릭을 유도하기 위해 어떤 마케팅 관점에서 제목과 요약문 등을 기획했는지 서술한 논리 (Chain-of-Thought)' },
-    slug: { type: 'STRING', description: '하이픈 구분 영문 소문자 URL 슬러그' },
-    title: { type: 'STRING', description: 'SEO 최적화 포스팅 제목 (50자 내외)' },
-    summary: { type: 'STRING', description: '구글 검색 결과에 노출될 150자 이내의 클릭 유도용 SEO 요약문. 판례번호 또는 핵심 키워드 포함.' },
-    category: { type: 'STRING', description: '카테고리명. 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드|판례·법률 해석 중 1개' },
-    specialtyCategory: { type: 'STRING', description: '사건 관련 전문 진료과목 (정형외과, 신경과, 신경외과 등). 관련 없으면 빈 문자열.' },
-    tags: { type: 'ARRAY', items: { type: 'STRING' }, description: '핵심 검색 키워드 태그 5개' },
-    keywords: { type: 'STRING', description: '타겟 키워드 목록 (쉼표 구분)' },
-    calculatorType: { type: 'STRING', description: '"auto" 또는 "medical"' },
-  },
-  required: ['thoughtProcess', 'slug', 'title', 'summary', 'category', 'specialtyCategory', 'tags', 'keywords', 'calculatorType'],
-};
-
-const CONTENT_SCHEMA = {
-  type: 'OBJECT',
-  properties: {
-    thoughtProcess: {
-      type: 'STRING',
-      description: '손해사정사 수임 및 계약 체결이라는 최종 목표를 달성하기 위해, 이 글을 읽는 잠재 고객의 심리를 어떻게 자극하고 어떤 흐름(서론-본론-FAQ-3단계솔루션)으로 설득할 것인지 기획하는 전략적 연쇄 사고 (Chain-of-Thought)'
-    },
-    markdownContent: {
-      type: 'STRING',
-      description: '사전 분석을 바탕으로 작성된 W3C 글로벌 표준 마크다운 본문 내용 (프론트매터 제외)'
-    }
-  },
-  required: ['thoughtProcess', 'markdownContent']
-};
-
-function buildArticlePrompt(topic, angle, existingPosts, precedentDetail = null) {
   const postsCtx = existingPosts.length > 0
     ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
     : '- (없음)';
 
-  const isPrecedent = !!precedentDetail;
-
-  let precedentInfo = '';
-  if (isPrecedent) {
-    precedentInfo = `
-[원본 판례 정보]
-* 사건번호: ${precedentDetail.caseNo} (${precedentDetail.courtName || ''} ${precedentDetail.judgmentDate || ''})
-* 사건명: ${precedentDetail.caseName || ''}
-* 판결요지: 
-${precedentDetail.judgmentSummary}
-${(precedentDetail.caseContent || '').slice(0, 3000)} (본문 일부)`;
-  }
-
   return `${getExpertRole()}
 
-# Objective
-${getArticleObjective(topic.keywords)}
+${getArticleObjective(topic.keywords ? topic.keywords.join(', ') : topic.title)}
 
-## 분량 및 창작 규칙
-- 글이 길어지다가 중간에 끊기는 현상(Truncation)을 철저히 방지하십시오.
-- 무조건 물리적 한계까지 길게 쓰는 것보다, **출력 토큰 한계를 스스로 계산하여 글의 뼈대(공감서론 - 핵심요약 - 본론 - 표 - 자가진단 - FAQ - 결론 3단계 솔루션)가 완벽하게 종결되는 것**이 최우선입니다.
+## 글 작성 포커스 (Angle)
+* **집필 앵글**: ${angle.name}
+* **앵글 지침**: ${angle.instruction}
 
 # ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
 ${STRICT_RULES}

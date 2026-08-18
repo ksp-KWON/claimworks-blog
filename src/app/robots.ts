@@ -10,13 +10,14 @@ export const dynamic = 'force-static';
  *   /admin  - admin panel (also has noindex metadata)
  *   /search - search results (also has noindex metadata)
  *   /api/   - server endpoints, no crawl value
+ *   /*opengraph-image* - prevent 404 indexing of raw og endpoints
  */
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin', '/search', '/api/'],
+      disallow: ['/admin', '/search', '/api/', '/*opengraph-image*'],
     },
     sitemap: 'https://claim-works.com/sitemap.xml',
   };

@@ -1,2 +1,8 @@
+# Cloudflare Pages 301 Redirect Rules
 /blog/guide-premises-liability-no-fault /blog/guide-slip-fall-compensation 301
 /blog/private-health-insurance-claim-guide /blog/guide-private-health-insurance-non-reimbursable 301
+
+# Google Search Console 404 Resolution: Redirect legacy/raw opengraph-image URLs to the main post
+/blog/:slug/opengraph-image /blog/:slug 301
+/blog/:slug/opengraph-image/ /blog/:slug 301
+/blog/*/opengraph-image /blog 301

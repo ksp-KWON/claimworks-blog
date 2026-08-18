@@ -33,8 +33,6 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     };
   }
 
-  const ogImageUrl = `https://claim-works.com/blog/${slug}/opengraph-image`;
-
   return {
     title: `${post.title} | 보상스쿨 전문 손해사정 그룹`,
     description: post.summary,
@@ -43,19 +41,11 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       description: post.summary,
       type: 'article',
       publishedTime: post.date,
-      modifiedTime: post.date,
+      modifiedTime: post.updatedAt || post.date,
       authors: ['보상스쿨 손해사정사'],
       siteName: '보상스쿨 전문 손해사정 그룹',
       locale: 'ko_KR',
       url: `https://claim-works.com/blog/${slug}`,
-      images: [
-        {
-          url: ogImageUrl,
-          width: 1200,
-          height: 630,
-          alt: post.title,
-        },
-      ],
     },
     alternates: {
       canonical: `https://claim-works.com/blog/${slug}`,
@@ -64,7 +54,6 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       card: 'summary_large_image',
       title: post.title,
       description: post.summary,
-      images: [ogImageUrl],
     },
   };
 }
@@ -80,9 +69,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // FAQ 파싱 — 단일 파서 사용
   const { faqItems: faqs } = parseBlogPost(post.content);
 
-
   const postUrl = `https://claim-works.com/blog/${slug}`;
-  const ogImageUrl = `https://claim-works.com/blog/${slug}/opengraph-image`;
 
   // 1. BlogPosting 구조화 데이터 (구글 리치결과 완전 자격 요건 충족)
   const articleJsonLd = {
@@ -99,7 +86,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     },
     "image": {
       "@type": "ImageObject",
-      "url": ogImageUrl,
+      "url": "https://claim-works.com/profile_banner.png",
       "width": 1200,
       "height": 630
     },

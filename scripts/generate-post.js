@@ -78,7 +78,10 @@ async function generateSinglePost() {
   console.log(`    🧠 [본문 집필 사고 과정] : \n${contentResult.thoughtProcess}`);
 
   // 4. 파싱 및 저장 (이제 정규식 처리 없이 JSON에서 직접 추출)
-  const content = contentResult.markdownContent;
+  const content = contentResult.markdownContent || contentResult.content;
+  if (!content) {
+    throw new Error('본문 내용(markdownContent)이 비어 있습니다.');
+  }
   console.log(`[4] 파싱 완료 (${content.length}자) | 기획: ${topic.title}`);
 
   const additionalFm = isPrecedent ? { caseNumber: dailyTopic.precedent.caseNo } : {};

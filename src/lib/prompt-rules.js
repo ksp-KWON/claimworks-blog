@@ -188,12 +188,12 @@ const CONTENT_SCHEMA = {
       type: "STRING",
       description: "콘텐츠 작성 시 고려한 W3C 시맨틱 마크다운 위계, 의학/법리 쟁점, E-E-A-T 최적화 전략 서술 (Chain-of-Thought)"
     },
-    content: {
+    markdownContent: {
       type: "STRING",
       description: "글로벌 마크다운 헌법 규칙을 100% 준수한 블로그 본문 마크다운 전문 (Frontmatter 제외)"
     }
   },
-  required: ["thoughtProcess", "content"]
+  required: ["thoughtProcess", "markdownContent"]
 };
 
 function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCategory) {
@@ -222,7 +222,7 @@ function getPrecedentPlanningPrompt(courtCase, existingPosts, targetCategory) {
 반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
 
 판례 사건명: ${courtCase.caseName || courtCase.title}
-판례 사건번호: ${courtCase.caseNumber || courtCase.id}
+판례 사건번호: ${courtCase.caseNumber || courtCase.caseNo || courtCase.id}
 판례 내용 요약: ${courtCase.summary || courtCase.content}
 
 기존 슬러그 (중복 금지) : [${existingPosts}]
@@ -261,10 +261,23 @@ function getManualPlanningPrompt(topicTitle, rawInput, existingPosts, targetCate
 반드시 지정된 JSON 스키마를 준수하여 출력하십시오.`;
 }
 
-function buildArticlePrompt(topic, precedent, angle, existingPosts) {
+function buildArticlePrompt(topic, arg2, arg3, arg4) {
+  // 인자 순서 자동 호환: (topic, angle, existingPosts, precedent) 또는 (topic, precedent, angle, existingPosts)
+  let angle, existingPosts, precedent;
+
+  if (arg2 && typeof arg2 === 'object' && arg2.name && arg2.instruction) {
+    angle = arg2;
+    existingPosts = Array.isArray(arg3) ? arg3 : [];
+    precedent = arg4 || null;
+  } else {
+    precedent = arg2 || null;
+    angle = (arg3 && typeof arg3 === 'object' && arg3.name) ? arg3 : getRandomAngle();
+    existingPosts = Array.isArray(arg4) ? arg4 : [];
+  }
+
   const isPrecedent = !!precedent;
   const precedentInfo = isPrecedent
-    ? `\n* 분석 대상 판례: ${precedent.caseName || precedent.title} (${precedent.caseNumber || precedent.id})\n* 판례 판결 요지: ${precedent.summary || precedent.content}\n`
+    ? `\n* 분석 대상 판례: ${precedent.caseName || precedent.title || ''} (${precedent.caseNumber || precedent.caseNo || precedent.id || ''})\n* 판례 판결 요지: ${precedent.summary || precedent.judgmentSummary || precedent.content || ''}\n`
     : '';
 
   const postsCtx = existingPosts.length > 0
@@ -273,7 +286,7 @@ function buildArticlePrompt(topic, precedent, angle, existingPosts) {
 
   return `${getExpertRole()}
 
-${getArticleObjective(topic.keywords ? topic.keywords.join(', ') : topic.title)}
+${getArticleObjective(topic.keywords ? (Array.isArray(topic.keywords) ? topic.keywords.join(', ') : topic.keywords) : topic.title)}
 
 ## 글 작성 포커스 (Angle)
 * **집필 앵글**: ${angle.name}
@@ -398,6 +411,15 @@ ${existingTitles}
 {"candidates": [{"searchKeyword": "핵심법률명사"}]}`;
 }
 
+function getHealingPrompt(keywords) {
+  return `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
+방금 키워드(${keywords})로 판례 검색에 실패했습니다.
+이를 대체할 수 있는 가장 본질적이고 손해사정 실무와 직결된 핵심 법률/의학 단어(명사) 3개를 도출해 주세요.
+
+반드시 아래 JSON 형식으로만 응답하세요:
+{"keywords": ["핵심법률명사1", "핵심법률명사2", "핵심법률명사3"]}`;
+}
+
 function getFssEvaluationPrompt(fssTitle, fssContent) {
   return `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
 아래 금감원 보도자료를 읽고, 우리 블로그의 목적(손해사정, 보상, 서민 금융 피해 구제, 보험금 분쟁)과 직결되는 내용인지 평가하십시오.
@@ -430,5 +452,6 @@ module.exports = {
   getQueryGenerationPrompt,
   getKeywordExtractionPrompt,
   getFallbackLegalKeywordPrompt,
+  getHealingPrompt,
   getFssEvaluationPrompt,
 };

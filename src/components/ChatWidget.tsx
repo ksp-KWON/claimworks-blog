@@ -111,7 +111,7 @@ export default function ChatWidget() {
       } else {
         // DB 제약(enum/RLS)으로 삽입 실패 시 로컬 화면에만 즉시 렌더링
         newMessages.push({
-          id: 'local-sys-' + Date.now(),
+          id: 'local-sys-' + crypto.randomUUID(),
           session_id: data.id,
           sender: 'system',
           content: systemMessage,
@@ -127,7 +127,65 @@ export default function ChatWidget() {
     }
   };
 
-  // 2. 기존 세션 확인 및 새 세션 생성
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
+  // 실시간 구독
+  const subscribeToMessages = useCallback((sid: string) => {
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+    }
+
+    const channel = supabase
+      .channel(`chat_${sid}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `session_id=eq.${sid}` },
+        (payload) => {
+          const newMsg = payload.new as ChatMessage;
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === newMsg.id)) return prev;
+            return [...prev, newMsg];
+          });
+          if (!isOpen && newMsg.sender === 'admin') {
+            setUnreadCount((prev) => prev + 1);
+          } else if (isOpen && newMsg.sender === 'admin') {
+            // 안 읽은 메시지 초기화
+            supabase.from('chat_sessions').update({ unread_count: 0 }).eq('id', sid).then();
+          }
+          scrollToBottom();
+        }
+      )
+      .subscribe();
+
+    channelRef.current = channel;
+  }, [isOpen]);
+
+  // 메시지 로드
+  const loadMessages = useCallback(async (sid: string) => {
+    try {
+      setStatus('connecting');
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('session_id', sid)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setMessages(data || []);
+      setStatus('connected');
+      scrollToBottom();
+      subscribeToMessages(sid);
+    } catch (err) {
+      console.error('Load messages error:', err);
+      setStatus('error');
+    }
+  }, [subscribeToMessages]);
+
+  // 기존 세션 확인 및 새 세션 생성
   const checkExistingSession = useCallback(async () => {
     try {
       setStatus('checking');
@@ -156,58 +214,25 @@ export default function ChatWidget() {
       console.error('Session error:', err);
       setStatus('error');
     }
-  }, [isOpen]);
+  }, [isOpen, loadMessages]);
 
-  // 2. 메시지 로드
-  const loadMessages = async (sid: string) => {
-    try {
-      setStatus('connecting');
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('session_id', sid)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      setMessages(data || []);
-      setStatus('connected');
+  const handleOpen = useCallback(() => {
+    setIsOpen(true);
+    setUnreadCount(0);
+    if (sessionId) {
+      supabase.from('chat_sessions').update({ unread_count: 0 }).eq('id', sessionId).then();
+    }
+    setTimeout(() => {
+      inputRef.current?.focus();
       scrollToBottom();
-      subscribeToMessages(sid);
-    } catch (err) {
-      console.error('Load messages error:', err);
-      setStatus('error');
+    }, 100);
+  }, [sessionId]);
+
+  const handleClose = () => {
+    setIsOpen(false);
+    if (searchParams?.get('chat') === 'open') {
+      router.replace(pathname, { scroll: false });
     }
-  };
-
-  // 3. 실시간 구독
-  const subscribeToMessages = (sid: string) => {
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current);
-    }
-
-    const channel = supabase
-      .channel(`chat_${sid}`)
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `session_id=eq.${sid}` },
-        (payload) => {
-          const newMsg = payload.new as ChatMessage;
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === newMsg.id)) return prev;
-            return [...prev, newMsg];
-          });
-          if (!isOpen && newMsg.sender === 'admin') {
-            setUnreadCount((prev) => prev + 1);
-          } else if (isOpen && newMsg.sender === 'admin') {
-            // 안 읽은 메시지 초기화
-            supabase.from('chat_sessions').update({ unread_count: 0 }).eq('id', sid).then();
-          }
-          scrollToBottom();
-        }
-      )
-      .subscribe();
-
-    channelRef.current = channel;
   };
 
   const hasAutoOpened = useRef(false);
@@ -226,32 +251,7 @@ export default function ChatWidget() {
       if (channelRef.current) supabase.removeChannel(channelRef.current);
       window.removeEventListener('open-chat', handleOpenChat);
     };
-  }, [checkExistingSession]);
-
-  const handleOpen = () => {
-    setIsOpen(true);
-    setUnreadCount(0);
-    if (sessionId) {
-      supabase.from('chat_sessions').update({ unread_count: 0 }).eq('id', sessionId).then();
-    }
-    setTimeout(() => {
-      inputRef.current?.focus();
-      scrollToBottom();
-    }, 100);
-  };
-
-  const handleClose = () => {
-    setIsOpen(false);
-    if (searchParams?.get('chat') === 'open') {
-      router.replace(pathname, { scroll: false });
-    }
-  };
-
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
+  }, [checkExistingSession, handleOpen, searchParams]);
 
   const sendMessage = async (text: string = inputText) => {
     if (!text.trim() || isSending) return;

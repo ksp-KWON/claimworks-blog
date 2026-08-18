@@ -16,10 +16,13 @@ export async function onRequest(context: any) {
 
     const allData: any[] = await response.json();
 
-    // 1. 카테고리 필터링
+    // 1. 카테고리 필터링 (warn과 alert 상호 호환)
     let filtered = allData;
     if (type !== 'all') {
-      filtered = filtered.filter(item => item.category === type);
+      filtered = filtered.filter(item => {
+        const itemCat = item.category === 'warn' ? 'alert' : item.category;
+        return itemCat === type;
+      });
     }
 
     // 2. 키워드 검색 필터링
@@ -30,7 +33,8 @@ export async function onRequest(context: any) {
         const contentMatch = item.content?.toLowerCase().includes(q);
         const keywordMatch = item.keywords?.some((k: string) => k.toLowerCase().includes(q));
         const commentMatch = item.comment?.toLowerCase().includes(q);
-        return titleMatch || contentMatch || keywordMatch || commentMatch;
+        const summaryMatch = item.summary?.some((s: string) => s.toLowerCase().includes(q));
+        return titleMatch || contentMatch || keywordMatch || commentMatch || summaryMatch;
       });
     }
 

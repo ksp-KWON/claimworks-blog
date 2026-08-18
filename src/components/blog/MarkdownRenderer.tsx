@@ -102,12 +102,10 @@ const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, c
     3: 'mt-10 mb-5 py-2.5',
     4: 'mt-8 mb-4 py-2',
     5: 'mt-6 mb-3 py-1.5',
-    6: 'mt-4 mb-2 py-1'
   };
 
   const parsed = parseMarker(children);
   let finalChildren = children;
-  let indentClass = '';
 
   if (parsed.matched) {
     finalChildren = (

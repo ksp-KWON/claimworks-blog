@@ -15,11 +15,20 @@ export const metadata: Metadata = {
     siteName: '보상스쿨 전문 손해사정 그룹',
     locale: 'ko_KR',
     type: 'website',
+    images: [
+      {
+        url: 'https://claim-works.com/logo.png',
+        width: 1200,
+        height: 630,
+        alt: '보상스쿨 공식 블로그 칼럼',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: '보상 칼럼 & 실무 가이드 | 보상스쿨 전문 손해사정 그룹',
     description: '손해사정 실무 판례 및 보험금 분쟁 해결 보상스쿨 공식 칼럼',
+    images: ['https://claim-works.com/logo.png'],
   },
 };
 

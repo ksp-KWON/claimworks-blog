@@ -14,11 +14,20 @@ export const metadata: Metadata = {
     siteName: "보상스쿨 전문 손해사정 그룹",
     locale: "ko_KR",
     type: "website",
+    images: [
+      {
+        url: "https://claim-works.com/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "보상스쿨 실시간 채팅 상담",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "보상스쿨 채팅 상담 신청",
     description: "1:1 비공개 무료 채팅 상담을 실시간으로 진행해 드립니다.",
+    images: ["https://claim-works.com/logo.png"],
   },
 };
 

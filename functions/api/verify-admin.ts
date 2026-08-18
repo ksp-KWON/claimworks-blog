@@ -4,11 +4,11 @@ export async function onRequestPost(context: any) {
     const body = await request.json();
     const { password } = body;
     
-    const userPw = String(password).trim();
-    const adminPw = env.ADMIN_PASSWORD ? String(env.ADMIN_PASSWORD).trim() : '9913006';
+    const userPw = String(password || '').trim();
+    const adminPw = env.ADMIN_PASSWORD ? String(env.ADMIN_PASSWORD).trim() : '991300';
 
-    // 단순 비밀번호 검증 (.env 설정이 안 되어있을 경우를 대비해 기본값 폴백 추가)
-    if (userPw === adminPw || userPw === '9913006') {
+    // 관리자 비밀번호 검증 (환경변수 및 기본값 991300)
+    if (userPw === adminPw || userPw === '991300') {
       return new Response(JSON.stringify({ success: true }), {
         headers: { 'Content-Type': 'application/json' },
       });
@@ -18,7 +18,7 @@ export async function onRequestPost(context: any) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-  } catch (err) {
+  } catch {
     return new Response(JSON.stringify({ success: false, message: 'Server error' }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }

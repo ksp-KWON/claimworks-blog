@@ -101,6 +101,10 @@ function processPost(filePath) {
   // ── [6. 마크다운 표(Table) 구분선 및 행 오타 자동 교정] ─────────────────
   body = body.replace(/(\|(?:\s*:?-+:?\s*\|)+)\s*>[ \t]*/g, '$1\n');
   body = body.replace(/(\|.*\|)\s*>[ \t]*/g, '$1');
+  // 표 구분선과 행 사이, 또는 행들 사이의 불필요한 빈 줄을 제거하여 테이블 결합 보장
+  body = body.replace(/(\|.*\|)\r?\n\s*\r?\n+(\s*\|)/g, '$1\n$2');
+  body = body.replace(/(\|.*\|)\r?\n\s*\r?\n+(\s*\|)/g, '$1\n$2');
+  body = body.replace(/(\|.*\|)\r?\n\s*\r?\n+(\s*\|)/g, '$1\n$2');
 
   // ── [7. 다중 빈 줄 정리] ──────────────────────────────────────────────
   body = body.replace(/(?:\r?\n){3,}/g, '\n\n').trim();

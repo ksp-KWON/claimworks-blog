@@ -66,8 +66,12 @@ function processPost(filePath) {
         .map((l) => l.trim())
         .filter(Boolean)
         .map((l) => {
-          const text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').trim();
-          return `> - ${text}`;
+          let text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').trim();
+          // [핵심 쟁점 1] 등 기계적인 대괄호 라벨 및 파손된 볼드 기호 제거
+          text = text.replace(/^(?:\*\*)?\[?\s*핵심\s*쟁점\s*\d+\s*\]?(?:\*\*)?\s*\*+\s*:\s*/gi, '');
+          text = text.replace(/^\[?\s*핵심\s*쟁점\s*\d+\s*\]?\s*:\s*/gi, '');
+          text = text.replace(/^\[[^\n\]]+\]\s*\*+\s*:\s*/, '');
+          return `> - ${text.trim()}`;
         })
         .join('\n');
       return `## 💡 핵심 요약\n${cleanBullets}\n\n`;
@@ -98,7 +102,17 @@ function processPost(filePath) {
     }
   );
 
-  // ── [6. 마크다운 표(Table) 구분선 및 행 오타 자동 교정] ─────────────────
+  // ── [6. 인라인 용어사전 표준화 (대괄호 완전 제거 및 볼드 통일)] ─────────
+  body = body.replace(/>\s*💡\s*(?:\*\*)?\[([^\n\]]+)\](?:\*\*)?\s*:\s*/g, '> 💡 **$1** : ');
+  body = body.replace(/>\s*💡\s*([^:\n*]+?)\s*:\s*/g, (m, term) => {
+    const cleanTerm = term.replace(/[*_\[\]]/g, '').trim();
+    return `> 💡 **${cleanTerm}** : `;
+  });
+
+  // ── [7. 중복 관련 글 추천 헤더 및 링크 목록 삭제 (시스템 자동 컴포넌트 제공)] ─
+  body = body.replace(/##\s*🔗?\s*함께\s*읽으면\s*(?:도움이\s*되는|도움되는|좋은)\s*보상\s*(?:칼럼|글)[\s\S]*?(?=\r?\n\r?\n#|$)/gi, '');
+
+  // ── [8. 마크다운 표(Table) 구분선 및 행 오타 자동 교정] ─────────────────
   body = body.replace(/(\|(?:\s*:?-+:?\s*\|)+)\s*>[ \t]*/g, '$1\n');
   body = body.replace(/(\|.*\|)\s*>[ \t]*/g, '$1');
   // 표 내부(구분선과 행 사이, 또는 행들 사이)의 불필요한 빈 줄을 완전 제거하여 단일 표준 테이블로 결합
@@ -106,7 +120,7 @@ function processPost(filePath) {
     body = body.replace(/(\|.*\|)\r?\n\s*\r?\n+(\s*\|)/g, '$1\n$2');
   }
 
-  // ── [7. 다중 빈 줄 정리] ──────────────────────────────────────────────
+  // ── [9. 다중 빈 줄 정리] ──────────────────────────────────────────────
   body = body.replace(/(?:\r?\n){3,}/g, '\n\n').trim();
 
   // gray-matter stringify로 안전하게 재결합

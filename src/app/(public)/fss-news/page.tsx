@@ -296,13 +296,13 @@ export default function FssNewsPage() {
                       {item.title}
                     </h3>
 
-                    {/* 핵심 요약 가이드 (기존 요약 박스 통합 및 지저분한 프리뷰 텍스트 삭제) */}
+                    {/* 핵심 요약 가이드 */}
                     <div className="bg-gray-50 dark:bg-white/2 p-4 rounded-none border border-gray-150/50 dark:border-white/2 space-y-2.5">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
-                        {getSummaryBoxTitle(item.category)}
+                        {getSummaryBoxTitle(item.category || 'press')}
                       </div>
                       <ul className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium space-y-1.5 list-disc pl-4">
-                        {item.summary.map((sumLine, idx) => (
+                        {(Array.isArray(item.summary) ? item.summary : (typeof item.summary === 'string' && item.summary ? [item.summary] : ['핵심 내용이 정리 중입니다.'])).map((sumLine, idx) => (
                           <li key={idx}>{sumLine}</li>
                         ))}
                       </ul>
@@ -316,7 +316,7 @@ export default function FssNewsPage() {
 
                     {/* 태그 */}
                     <div className="flex flex-wrap gap-1.5 pt-2">
-                      {item.keywords.map((kw, idx) => (
+                      {(Array.isArray(item.keywords) ? item.keywords : []).map((kw, idx) => (
                         <span key={idx} className="text-[10px] font-bold text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-white/2 px-2 py-0.5 rounded-none">
                           #{kw}
                         </span>

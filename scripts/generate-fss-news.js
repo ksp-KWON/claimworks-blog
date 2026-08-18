@@ -98,11 +98,12 @@ async function main() {
     const schema = {
       type: 'OBJECT',
       properties: {
-        thoughtProcess: { type: 'STRING', description: '생각의 사슬 서술' },
+        thoughtProcess: { type: 'STRING', description: '손해사정 및 보상 관점의 연쇄 사고 (Chain-of-Thought)' },
         decision: { type: 'STRING', enum: ['accept', 'reject'] },
-        summary: { type: 'STRING' },
-        comment: { type: 'STRING' },
-        keywords: { type: 'ARRAY', items: { type: 'STRING' } }
+        category: { type: 'STRING', enum: ['alert', 'case', 'tip', 'press'], description: '카테고리' },
+        summary: { type: 'ARRAY', items: { type: 'STRING' }, description: '핵심 3줄 요약 배열' },
+        comment: { type: 'STRING', description: '손해사정사 전문 조언' },
+        keywords: { type: 'ARRAY', items: { type: 'STRING' }, description: '핵심 키워드 5개' }
       },
       required: ['thoughtProcess', 'decision']
     };
@@ -113,14 +114,27 @@ async function main() {
       
       if (result.decision === 'accept') {
         console.log(`  ✅ [채택] ${item.title}`);
+        
+        let safeSummary = Array.isArray(result.summary) ? result.summary : [];
+        if (typeof result.summary === 'string' && result.summary) {
+          safeSummary = result.summary.split(/(?<=[.?!])\s+/).filter(Boolean);
+        }
+        if (safeSummary.length === 0) {
+          safeSummary = [item.title];
+        }
+
         existingData.unshift({
           id: item.id,
+          category: result.category || 'press',
           title: item.title,
           date: item.date,
-          url: item.url,
-          summary: result.summary || '',
+          content: content.slice(0, 300) + '...',
+          summary: safeSummary,
           comment: result.comment || '',
-          keywords: result.keywords || []
+          keywords: Array.isArray(result.keywords) ? result.keywords : ['금융감독원', '손해사정'],
+          relColumn: '/blog',
+          officialUrl: item.url,
+          fullContent: `■ 금감원 보도 요지\n\n${content}`
         });
         newAdded++;
       } else {

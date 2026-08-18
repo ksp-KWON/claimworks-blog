@@ -15,10 +15,7 @@ const { POSTS_DIR, sleep } = require('../../scripts/pipeline-utils.js');
 // ── 공통 비즈니스 로직 ──────────────────────────────────────────────────────
 function getExistingPosts() {
   if (!fs.existsSync(POSTS_DIR)) return [];
-  const files = fs.readdirSync(POSTS_DIR)
-    .filter(f => f.endsWith('.md'))
-    .sort()
-    .slice(-50);
+  const files = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'));
 
   const posts = [];
   for (const file of files) {
@@ -27,11 +24,18 @@ function getExistingPosts() {
       const content  = fs.readFileSync(filePath, 'utf8');
       const slug     = file.replace(/\.md$/, '');
       const m = matter(content);
-      const title = m.data.title || slug;
-      const caseNumber = m.data.caseNumber ? String(m.data.caseNumber).trim() : null;
-      posts.push({ slug, title, caseNumber });
+      const data = m.data || {};
+      const title = data.title || slug;
+      const caseNumber = data.caseNumber ? String(data.caseNumber).trim() : null;
+      const category = Array.isArray(data.category) ? data.category.join(', ') : String(data.category || '');
+      const tags = Array.isArray(data.tags) ? data.tags : (data.tags ? [data.tags] : []);
+      const date = String(data.date || '');
+      posts.push({ slug, title, caseNumber, category, tags, date });
     } catch { /* 스킵 */ }
   }
+
+  // 최신 발행일 기준 내림차순 정렬
+  posts.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   return posts;
 }
 

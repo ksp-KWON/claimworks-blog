@@ -26,7 +26,6 @@ function processPost(filePath) {
 
   let data = parsed.data;
   let body = parsed.content;
-  let originalBody = body;
 
   // ── [1. Frontmatter summary 정규화] ──────────────────────────────────
   if (data.summary) {
@@ -48,7 +47,7 @@ function processPost(filePath) {
     body = `${fallbackOpening}\n\n${body.trim()}`;
   }
 
-  // ── [4. 3단계 솔루션(①, ②, ③) 콜론 분리 정돈] ─────────────────────────
+  // ── [4. 3단계 솔루션(①, ②, ③) 콜론 분리 및 헤딩 승격] ────────────────────
   body = body.replace(
     /(?:^|\r?\n)(?:#{1,6}\s*)?([①②③])\s*(?:\*\*)?(?:[1-3]단계\s*:\s*)?([^\n:]+?)(?:\*\*)?\s*:\s*([^\n]+)/g,
     (m, num, title, desc) => {
@@ -78,7 +77,10 @@ function processPost(filePath) {
   body = body.replace(
     /(##\s*(?:💡\s*)?(?:1분\s*자가진단[^\n]*)\s*\r?\n+)((?:[ \t]*>?[ \t]*[-*+\[\]xX☑️✅✔].*\r?\n*)+)/g,
     (m, head, bullets) => {
-      const cleanHead = head.trim();
+      let cleanHead = head.trim();
+      if (!cleanHead.includes(':') && !cleanHead.includes('체크리스트')) {
+        cleanHead = '## 1분 자가진단 : 체크리스트';
+      }
       const cleanBullets = bullets
         .split(/\r?\n/)
         .map((l) => l.trim())

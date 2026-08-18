@@ -92,18 +92,24 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     },
     "author": {
       "@type": "Person",
-      "name": "보상스쿨 손해사정사",
+      "name": "보상스쿨 공인 손해사정사",
+      "jobTitle": "신체손해사정사",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "보상스쿨 전문 손해사정 그룹",
+        "url": "https://claim-works.com"
+      },
       "url": "https://claim-works.com/about"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "보상스쿨",
+      "name": "보상스쿨 전문 손해사정 그룹",
       "url": "https://claim-works.com",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://claim-works.com/favicon.ico",
-        "width": 32,
-        "height": 32
+        "url": "https://claim-works.com/profile_banner.png",
+        "width": 1200,
+        "height": 630
       }
     },
     "inLanguage": "ko-KR",

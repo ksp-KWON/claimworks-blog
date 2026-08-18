@@ -45,8 +45,6 @@ async function generateSinglePost() {
     console.log(`  [로드] 확정 키워드: '${dailyTopic.keyword}'`);
   }
 
-
-
   const existingPosts = getExistingPosts();
   const currentAngle = getRandomAngle();
   console.log(`  [설정] 오늘의 글쓰기 관점(Angle): ${currentAngle.name}`);

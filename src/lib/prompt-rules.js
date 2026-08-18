@@ -239,7 +239,20 @@ function getPrecedentPlanningPrompt(courtCase, existingPosts, targetCategory) {
 반드시 지정된 JSON 스키마를 준수하여 출력하십시오.`;
 }
 
-function getManualPlanningPrompt(topicTitle, rawInput, existingPosts, targetCategory) {
+function getManualPlanningPrompt(arg1, arg2, arg3, arg4) {
+  let topicTitle, rawInput, existingPosts, targetCategory;
+  if (arguments.length <= 2) {
+    rawInput = String(arg1 || '');
+    topicTitle = rawInput.slice(0, 60);
+    existingPosts = arg2 || '- (없음)';
+    targetCategory = '보상가이드';
+  } else {
+    topicTitle = arg1 || '';
+    rawInput = String(arg2 || '');
+    existingPosts = arg3 || '- (없음)';
+    targetCategory = arg4 || '보상가이드';
+  }
+
   return `당신은 '보상스쿨'의 최정상 콘텐츠 기획자이자 수석 에디터입니다.
 사용자가 제공한 원문/주제/자료를 바탕으로 블로그 포스팅 기획안을 수립하십시오.
 반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.

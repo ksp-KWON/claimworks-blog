@@ -6,11 +6,22 @@ import PremiumBadge from '@/components/ui/PremiumBadge';
 export const metadata = {
   title: '교통사고 합의금 · 실손 · 배상책임 통합 계산기 | 보상스쿨',
   description: '복잡한 자동차사고 합의금부터 실손의료비, 배상책임 소송가액까지! 손해사정 실무 알고리즘을 적용한 1분 예상 보상금 계산기입니다.',
+  alternates: {
+    canonical: 'https://claim-works.com/calculator',
+  },
   openGraph: {
     title: '교통사고 합의금 · 실손 · 배상책임 통합 계산기 | 보상스쿨',
     description: '복잡한 자동차사고 합의금부터 실손의료비, 배상책임 소송가액까지! 손해사정 실무 알고리즘을 적용한 1분 예상 보상금 계산기입니다.',
+    url: 'https://claim-works.com/calculator',
+    siteName: '보상스쿨 전문 손해사정 그룹',
+    locale: 'ko_KR',
     type: 'website',
-  }
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '교통사고 합의금 · 실손 · 배상책임 통합 계산기 | 보상스쿨',
+    description: '복잡한 자동차사고 합의금부터 실손의료비, 배상책임 소송가액까지! 손해사정 실무 알고리즘 적용 1분 계산기',
+  },
 };
 
 const CALCULATORS = [

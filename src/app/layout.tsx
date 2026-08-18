@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://claim-works.com"),
   title: {
-    default: "보상스쿨 | 전문 손해사정 그룹",
+    default: "보상스쿨 전문 손해사정 그룹",
     template: "%s | 보상스쿨"
   },
   description: "건강보험심사평가원의 공개 정보를 기반으로 공인 손해사정사가 분석한 실무 보상 노하우와 무료 상담 가이드를 제공합니다.",
@@ -35,28 +35,6 @@ export const metadata: Metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
-  },
-  openGraph: {
-    type: 'website',
-    locale: 'ko_KR',
-    url: 'https://claim-works.com',
-    siteName: '보상스쿨 전문 손해사정 그룹',
-    title: '보상스쿨 | 전문 손해사정 그룹',
-    description: '건강보험심사평가원의 공개 정보를 기반으로 공인 손해사정사가 분석한 실무 보상 노하우와 무료 상담 가이드를 제공합니다.',
-    images: [
-      {
-        url: 'https://claim-works.com/profile_banner.png',
-        width: 1200,
-        height: 630,
-        alt: '보상스쿨 전문 손해사정 그룹',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: '보상스쿨 | 전문 손해사정 그룹',
-    description: '건강보험심사평가원 공개 정보 기반 손해사정 실무 가이드',
-    images: ['https://claim-works.com/profile_banner.png'],
   },
   alternates: {
     canonical: 'https://claim-works.com',
@@ -80,9 +58,9 @@ export default function RootLayout({
         "url": "https://claim-works.com",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://claim-works.com/profile_banner.png",
-          "width": 1200,
-          "height": 630
+          "url": "https://claim-works.com/logo.png",
+          "width": 550,
+          "height": 550
         },
         "description": "교통사고, 질병진단비, 실손보험, 산재·근재, 배상책임 분야 공인 손해사정 전문 그룹",
         "contactPoint": {

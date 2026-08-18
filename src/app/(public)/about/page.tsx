@@ -7,6 +7,19 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://claim-works.com/about",
   },
+  openGraph: {
+    title: "플랫폼 소개 | 보상스쿨 전문 손해사정 그룹",
+    description: "보상스쿨 전문 손해사정 그룹의 핵심 미션과 E-E-A-T 4대 가치를 소개합니다.",
+    url: "https://claim-works.com/about",
+    siteName: "보상스쿨 전문 손해사정 그룹",
+    locale: "ko_KR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "플랫폼 소개 | 보상스쿨 전문 손해사정 그룹",
+    description: "보상스쿨 전문 손해사정 그룹의 핵심 미션과 E-E-A-T 4대 가치 소개",
+  },
 };
 
 export default function AboutPage() {

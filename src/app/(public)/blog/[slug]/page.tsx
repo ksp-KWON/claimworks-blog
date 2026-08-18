@@ -86,7 +86,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     },
     "image": {
       "@type": "ImageObject",
-      "url": "https://claim-works.com/profile_banner.png",
+      "url": `https://claim-works.com/blog/${slug}/opengraph-image`,
       "width": 1200,
       "height": 630
     },
@@ -107,9 +107,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       "url": "https://claim-works.com",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://claim-works.com/profile_banner.png",
-        "width": 1200,
-        "height": 630
+        "url": "https://claim-works.com/logo.png",
+        "width": 550,
+        "height": 550
       }
     },
     "inLanguage": "ko-KR",

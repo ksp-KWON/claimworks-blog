@@ -3,10 +3,23 @@ import { Suspense } from 'react';
 import BlogPageClient from './BlogPageClient';
 
 export const metadata: Metadata = {
-  title: '건강 정보 블로그 | 심평원 의료 통계 기반 전문 건강 가이드',
-  description: '심평원 공공데이터를 기반으로 최신 건강 및 질병 정보를 알아보기 쉽게 정리하여 전해드리는 전문 건강 블로그입니다.',
+  title: '보상 칼럼 & 실무 가이드 | 보상스쿨 전문 손해사정 그룹',
+  description: '손해사정 실무 판례, 보험금 분쟁 해결 노하우, 의학 및 법률 보상 가이드를 알기 쉽게 전해드리는 보상스쿨 공식 칼럼입니다.',
   alternates: {
     canonical: 'https://claim-works.com/blog',
+  },
+  openGraph: {
+    title: '보상 칼럼 & 실무 가이드 | 보상스쿨 전문 손해사정 그룹',
+    description: '손해사정 실무 판례, 보험금 분쟁 해결 노하우, 의학 및 법률 보상 가이드를 알기 쉽게 전해드리는 보상스쿨 공식 칼럼입니다.',
+    url: 'https://claim-works.com/blog',
+    siteName: '보상스쿨 전문 손해사정 그룹',
+    locale: 'ko_KR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '보상 칼럼 & 실무 가이드 | 보상스쿨 전문 손해사정 그룹',
+    description: '손해사정 실무 판례 및 보험금 분쟁 해결 보상스쿨 공식 칼럼',
   },
 };
 

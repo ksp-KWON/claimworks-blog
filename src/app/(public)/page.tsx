@@ -5,10 +5,23 @@ import type { Metadata } from "next";
 import PremiumHeading from "@/components/ui/PremiumHeading";
 
 export const metadata: Metadata = {
-  title: "보상스쿨 | 압도적 승소율의 전문 손해사정 그룹",
-  description: "숨은 보험금부터 까다로운 면책 분쟁까지, 유능한 손해사정 전문가 그룹 보상스쿨이 정당한 권리를 되찾아 드립니다. 다년간 축적된 방대한 실무 경험과 수많은 성공 사례로 검증된 압도적인 보상 노하우를 지금 무료 1:1 상담으로 확인해 보세요.",
+  title: "보상스쿨 | 정도와 승소율의 전문 손해사정 그룹",
+  description: "단순 보험금부터 까다로운 면책 분쟁까지, 유능한 손해사정 전문가 그룹 보상스쿨이 정당한 권리를 되찾아 드립니다. 수년간 축적된 방대한 실무 경험과 수많은 성공 사례로 검증된 압도적인 보상 노하우를 지금 무료 1:1 상담으로 확인해 보세요.",
   alternates: {
     canonical: "https://claim-works.com",
+  },
+  openGraph: {
+    title: "보상스쿨 | 정도와 승소율의 전문 손해사정 그룹",
+    description: "단순 보험금부터 까다로운 면책 분쟁까지, 유능한 손해사정 전문가 그룹 보상스쿨이 정당한 권리를 되찾아 드립니다. 수년간 축적된 방대한 실무 경험과 수많은 성공 사례로 검증된 압도적인 보상 노하우를 지금 무료 1:1 상담으로 확인해 보세요.",
+    url: "https://claim-works.com",
+    siteName: "보상스쿨 전문 손해사정 그룹",
+    locale: "ko_KR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "보상스쿨 | 정도와 승소율의 전문 손해사정 그룹",
+    description: "수년간 축적된 방대한 실무 경험과 수많은 성공 사례로 검증된 압도적인 보상 노하우를 지금 무료 1:1 상담으로 확인해 보세요.",
   },
 };
 

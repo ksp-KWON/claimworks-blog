@@ -49,14 +49,14 @@ export const metadata: Metadata = {
     images: [
       {
         url: 'https://claim-works.com/logo.png',
-        width: 1200,
-        height: 630,
+        width: 500,
+        height: 500,
         alt: '보상스쿨 전문 손해사정 그룹',
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary',
     title: '보상스쿨 전문 손해사정 그룹',
     description: '건강보험심사평가원의 공개 정보 기반 손해사정 실무 보상 가이드',
     images: ['https://claim-works.com/logo.png'],

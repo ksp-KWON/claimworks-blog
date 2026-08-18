@@ -17,14 +17,14 @@ export const metadata: Metadata = {
     images: [
       {
         url: "https://claim-works.com/logo.png",
-        width: 1200,
-        height: 630,
+        width: 500,
+        height: 500,
         alt: "보상스쿨 플랫폼 소개",
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "플랫폼 소개 | 보상스쿨 전문 손해사정 그룹",
     description: "보상스쿨 전문 손해사정 그룹의 핵심 미션과 E-E-A-T 4대 가치 소개",
     images: ["https://claim-works.com/logo.png"],

@@ -20,14 +20,14 @@ export const metadata: Metadata = {
     images: [
       {
         url: "https://claim-works.com/logo.png",
-        width: 1200,
-        height: 630,
+        width: 500,
+        height: 500,
         alt: "보상스쿨 전문 손해사정 그룹",
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "보상스쿨 | 정도와 승소율의 전문 손해사정 그룹",
     description: "수년간 축적된 방대한 실무 경험과 수많은 성공 사례로 검증된 압도적인 보상 노하우를 지금 무료 1:1 상담으로 확인해 보세요.",
     images: ["https://claim-works.com/logo.png"],

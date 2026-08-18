@@ -18,14 +18,14 @@ export const metadata: Metadata = {
     images: [
       {
         url: 'https://claim-works.com/logo.png',
-        width: 1200,
-        height: 630,
+        width: 500,
+        height: 500,
         alt: '보상스쿨 공식 블로그 칼럼',
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary',
     title: '보상 칼럼 & 실무 가이드 | 보상스쿨 전문 손해사정 그룹',
     description: '손해사정 실무 판례 및 보험금 분쟁 해결 보상스쿨 공식 칼럼',
     images: ['https://claim-works.com/logo.png'],

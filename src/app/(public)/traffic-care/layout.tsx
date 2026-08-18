@@ -16,14 +16,14 @@ export const metadata: Metadata = {
     images: [
       {
         url: "https://claim-works.com/logo.png",
-        width: 1200,
-        height: 630,
+        width: 500,
+        height: 500,
         alt: "보상스쿨 교통사고 로컬 안심케어",
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "교통사고 로컬 안심케어 - 보상스쿨",
     description: "도로교통공단 안전 통계 기반 지역별 교통사고 맞춤형 보상 케어 가이드",
     images: ["https://claim-works.com/logo.png"],

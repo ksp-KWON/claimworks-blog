@@ -66,7 +66,7 @@ function processPost(filePath) {
         .map((l) => l.trim())
         .filter(Boolean)
         .map((l) => {
-          const text = l.replace(/^[> \t*+-]+/, '').trim();
+          const text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').trim();
           return `> - ${text}`;
         })
         .join('\n');
@@ -86,7 +86,7 @@ function processPost(filePath) {
         .map((l) => l.trim())
         .filter(Boolean)
         .map((l) => {
-          let text = l.replace(/^[> \t*+-]+/, '').trim();
+          let text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').trim();
           if (!text.startsWith('[ ]') && !text.startsWith('[-]') && !text.startsWith('[x]')) {
             text = text.replace(/^[☑️✅✔]+\s*/, '');
             text = `[ ] ${text}`;

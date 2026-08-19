@@ -1,19 +1,21 @@
 /**
  * naver-formatter.ts
- * 네이버 블로그 스마트에디터 ONE(SmartEditor ONE) 전용 네이티브 완벽 호환 HTML 변환 엔진
+ * 네이버 블로그 스마트에디터 ONE(SmartEditor ONE) 전용 무결점 테이블 & 인용구 변환 엔진
  *
- * [대표님 실무 피드백 기반 100% 정밀 최적화]
- * 1. 불필요한 기계적 라벨 제거:
- *    - 상단 서브라벨("보상스쿨 손해사정 실무 칼럼...") 및 본문 "📌 💡 핵심 요약" 텍스트 완전 제거.
- *    - 솔루션에서 상투적인 "핵심 솔루션" 문구 삭제 ➔ "① 제목", "② 제목" 번호 중심 간결화.
- * 2. 시각적 호흡 및 위계 완벽 확립:
- *    - 섹션 구분선(<hr>): 대제목 '앞'에 배치하여 챕터 간 시각적 경계감 극대화.
- *    - 대제목(H2): 안정적인 라인형 인용구 박스 + 19px 대형 볼드 폰트.
- *    - 중제목(H3): 네이버 포인트 불릿(■) + 17px 중형 볼드 폰트.
- *    - 소제목/솔루션(H6): 15.5px 포인트 볼드 + 넘버링(①, ②...).
- * 3. FAQ(Q&A) 문단 호흡 최적화:
- *    - Q와 A를 한 줄씩 띄우고 질문은 파란색/볼드, 답변은 부드러운 들여쓰기로 독자 가독성 극대화.
- * 4. 따옴표 인용구 & 노란색 형광펜 하이라이트 & 완벽한 표준 표(Table) 유지.
+ * [핵심 아키텍처: 오류 없는 표(Table) 기반 카드 레이아웃]
+ * 1. 무결점 표(Table) 기반 레이아웃:
+ *    - 네이버 에디터에서 왜곡이나 서식 깨짐이 전혀 없는 <table>을 핵심 컨테이너로 채택.
+ *    - FAQ: 상하 2단 파스텔 카드 테이블 (Q: #eff6ff 연파랑 배경 / A: #ffffff 화이트 배경).
+ *    - 1분 자가진단: 헤더(#f1f5f9) + 내용(#f8fafc)의 단일 라운드 체크 카드 테이블.
+ *    - 용어사전/요약: 좌측 초록 라인 + 연초록(#f0fdf4) 배경의 안전한 카드 테이블.
+ *    - 하단 CTA 배너: 2px 초록 테두리 공식 배너 테이블.
+ * 2. 인용구 툴 기반 헤딩 위계:
+ *    - 대제목(H2): 상단 구분선(<hr>) + 좌측 초록 라인 인용구 박스 + 19px 대형 볼드.
+ *    - 중제목(H3): 17px 중형 볼드 + 포인트 불릿(■).
+ *    - 소제목/솔루션(H6): 15.5px 포인트 볼드 + 넘버링(✔ ①, ②...).
+ * 3. 형광펜 및 호흡:
+ *    - 노란색 형광펜(#fef08a) 키워드 하이라이트.
+ *    - 2~3줄 단위의 부드러운 줄간격(1.85) 유지.
  */
 
 export interface NaverFormatOptions {
@@ -59,7 +61,7 @@ function applyNaverHighlighter(text: string): string {
 }
 
 /**
- * 마크다운 텍스트를 네이버 스마트에디터 ONE 전용 플랫 HTML로 변환
+ * 마크다운 텍스트를 네이버 스마트에디터 ONE 전용 HTML로 정밀 변환
  */
 export function convertMarkdownToNaverHtml(markdown: string, options: NaverFormatOptions = {}): string {
   const blogType = options.targetBlog || 'default';
@@ -70,7 +72,6 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     .replace(/^---[\s\S]*?---\n*/, '')
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/\r\n/g, '\n')
-    // 상투적인 [핵심 요약] 헤더 라인 제거
     .replace(/^##\s*💡\s*핵심\s*요약\s*$/gm, '')
     .replace(/^##\s*핵심\s*요약\s*$/gm, '')
     .trim();
@@ -84,7 +85,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     section = section.trim();
     if (!section) continue;
 
-    // A. 마크다운 테이블 (| 구분 | 내용 | ...)
+    // A. 마크다운 비교표 (| 구분 | 내용 | ...)
     if (section.includes('|') && section.split('\n').filter(l => l.includes('|')).length >= 2) {
       const lines = section.split('\n').map(l => l.trim()).filter(l => l.startsWith('|') && l.endsWith('|'));
       if (lines.length >= 2) {
@@ -139,10 +140,10 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       continue;
     }
 
-    // D. 솔루션 단계 H6 (###### ...) -> '핵심 솔루션' 문구 제거하고 번호 중심(①, ②...) 간결화
+    // D. 솔루션 단계 H6 (###### ...) -> 번호 중심(✔ ①, ②...) 간결화
     if (section.startsWith('###### ')) {
       let titleText = section.replace(/^######\s+/, '').trim();
-      titleText = titleText.replace(/^핵심\s*솔루션\s*/, ''); // 상투적 문구 삭제
+      titleText = titleText.replace(/^핵심\s*솔루션\s*/, '');
 
       formattedSections.push(
         `<p style="font-size: 15.5px; font-weight: bold; color: #065f46; margin-top: 22px; margin-bottom: 8px; line-height: 1.4;"><span style="color: #059669; margin-right: 4px;">✔</span><strong>${titleText}</strong></p>`
@@ -150,25 +151,51 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       continue;
     }
 
-    // E. FAQ (Q&A) 문단 자동 감지 및 넉넉한 호흡 분리 (Q와 A 사이에 빈 줄 적용)
+    // E. FAQ (Q&A) -> [상하 2단 파스텔 카드 테이블] 렌더링
     if (section.includes('Q :') || section.includes('Q:') || section.startsWith('■Q') || section.startsWith('Q.')) {
       const lines = section.split('\n').map(l => l.trim()).filter(Boolean);
-      let faqHtml = '';
-      
+      let currentQ = '';
+      let currentA = '';
+      let faqTables = '';
+
+      const flushQA = () => {
+        if (currentQ) {
+          const qText = applyNaverHighlighter(currentQ);
+          const aText = applyNaverHighlighter(currentA);
+          faqTables += `
+            <table style="width: 100%; border: 1px solid #bfdbfe; border-collapse: collapse; margin: 16px 0; font-size: 14px; border-radius: 6px;">
+              <tr>
+                <td style="padding: 12px 16px; background-color: #eff6ff; border-bottom: 1px solid #bfdbfe; font-weight: bold; color: #1e40af; line-height: 1.5;">
+                  ❓ ${qText}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 14px 16px; background-color: #ffffff; color: #334155; line-height: 1.8;">
+                  💡 ${aText}
+                </td>
+              </tr>
+            </table>
+          `;
+          currentQ = '';
+          currentA = '';
+        }
+      };
+
       for (const line of lines) {
         if (line.includes('Q :') || line.includes('Q:') || line.startsWith('■Q') || line.startsWith('Q.')) {
-          const qText = applyNaverHighlighter(line);
-          faqHtml += `<p style="font-size: 15.5px; font-weight: bold; color: #1d4ed8; margin-top: 20px; margin-bottom: 6px; line-height: 1.5;">${qText}</p>`;
+          flushQA();
+          currentQ = line.replace(/^[■\s]*Q\s*[:.]\s*/, '');
         } else if (line.startsWith('A :') || line.startsWith('A:') || line.startsWith('A.')) {
-          const aText = applyNaverHighlighter(line);
-          faqHtml += `<p style="font-size: 14.5px; color: #334155; line-height: 1.8; margin-bottom: 20px; padding-left: 6px; word-break: keep-all;">${aText}</p>`;
-        } else {
-          const normalText = applyNaverHighlighter(line);
-          faqHtml += `<p style="font-size: 14.5px; color: #334155; line-height: 1.8; margin-bottom: 12px; word-break: keep-all;">${normalText}</p>`;
+          currentA = line.replace(/^A\s*[:.]\s*/, '');
+        } else if (currentA) {
+          currentA += '<br/>' + line;
+        } else if (currentQ) {
+          currentQ += ' ' + line;
         }
       }
-      
-      formattedSections.push(faqHtml);
+      flushQA();
+
+      formattedSections.push(faqTables);
       continue;
     }
 
@@ -176,26 +203,41 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     if (section.startsWith('>')) {
       const quoteLines = section.split('\n').map(l => l.replace(/^>\s?/, '').trim()).filter(Boolean);
       
-      // 체크리스트인 경우
+      // 체크리스트인 경우 -> 단일 라운드 체크 카드 테이블
       if (quoteLines.some(l => l.startsWith('- [ ]') || l.startsWith('- [x]'))) {
         const checkItems = quoteLines.map(l => {
           const itemText = l.replace(/^- \[( |x)\]\s*/, '');
           const highlighted = applyNaverHighlighter(itemText);
-          return `<p style="margin: 6px 0; font-size: 14px; color: #334155; line-height: 1.6;"><span style="color: #059669; font-weight: bold; margin-right: 6px;">☑️</span>${highlighted}</p>`;
+          return `<div style="margin: 6px 0; font-size: 14px; color: #334155; line-height: 1.6;"><span style="color: #059669; font-weight: bold; margin-right: 6px;">☑️</span>${highlighted}</div>`;
         }).join('');
 
-        formattedSections.push(
-          `<blockquote style="margin: 18px 0; padding: 14px 18px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">` +
-          `<p style="font-size: 14px; font-weight: bold; color: #0f172a; margin: 0 0 10px 0;">📋 <strong>1분 자가진단 체크리스트</strong></p>` +
-          `${checkItems}</blockquote>`
-        );
+        formattedSections.push(`
+          <table style="width: 100%; border: 1px solid #cbd5e1; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
+            <tr>
+              <td style="padding: 10px 16px; background-color: #f1f5f9; border-bottom: 1px solid #cbd5e1; font-weight: bold; color: #0f172a;">
+                📋 <strong>1분 자가진단 체크리스트</strong>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 14px 16px; background-color: #f8fafc; color: #334155; line-height: 1.8;">
+                ${checkItems}
+              </td>
+            </tr>
+          </table>
+        `);
       } else {
-        // 일반 인용구 / 핵심 요약 / 용어 사전 -> 네이버 따옴표형 인용구
+        // 일반 인용구 / 핵심 요약 / 용어 사전 -> [견고한 초록 라인 카드 테이블]
         const quoteContent = quoteLines.join('<br/>');
         const highlighted = applyNaverHighlighter(quoteContent);
-        formattedSections.push(
-          `<blockquote style="margin: 18px 0; padding: 14px 20px; font-size: 15px; line-height: 1.8; color: #334155;">${highlighted}</blockquote>`
-        );
+        formattedSections.push(`
+          <table style="width: 100%; border-left: 5px solid #03c75a; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; border-collapse: collapse; margin: 18px 0; font-size: 14.5px; background-color: #f0fdf4;">
+            <tr>
+              <td style="padding: 14px 18px; color: #166534; line-height: 1.75;">
+                ${highlighted}
+              </td>
+            </tr>
+          </table>
+        `);
       }
       continue;
     }
@@ -222,15 +264,19 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     );
   }
 
-  // 11. 하단 보상스쿨 스마트 링크 카드 (네이버 클릭 유도 퍼널)
+  // 11. 하단 보상스쿨 스마트 링크 배너 (무결점 공식 테이블 배너)
   const footerHtml = `
     <hr style="border: 0; height: 1px; background-color: #e2e8f0; margin: 40px 0 24px 0;" />
-    <blockquote style="margin-top: 24px; padding: 20px; background-color: #f8fafc; border: 2px solid #03c75a; border-radius: 10px; text-align: center;">
-      <p style="font-size: 12px; font-weight: bold; color: #03c75a; margin: 0 0 6px 0;">${linkCard.badge}</p>
-      <p style="font-size: 16.5px; font-weight: bold; color: #0f172a; margin: 0 0 6px 0;"><strong>${linkCard.title}</strong></p>
-      <p style="font-size: 13.5px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">${linkCard.desc}</p>
-      <p style="margin: 0;"><a href="${linkCard.url}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 10px 24px; background-color: #03c75a; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: bold; border-radius: 6px;">👉 ${linkCard.url.replace('https://', '')} 바로가기</a></p>
-    </blockquote>
+    <table style="width: 100%; border: 2px solid #03c75a; border-collapse: collapse; margin-top: 24px; background-color: #f8fafc; text-align: center;">
+      <tr>
+        <td style="padding: 22px 20px;">
+          <p style="font-size: 12px; font-weight: bold; color: #03c75a; margin: 0 0 6px 0;">${linkCard.badge}</p>
+          <p style="font-size: 17px; font-weight: bold; color: #0f172a; margin: 0 0 6px 0;"><strong>${linkCard.title}</strong></p>
+          <p style="font-size: 13.5px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">${linkCard.desc}</p>
+          <p style="margin: 0;"><a href="${linkCard.url}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 10px 24px; background-color: #03c75a; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: bold; border-radius: 6px;">👉 ${linkCard.url.replace('https://', '')} 바로가기</a></p>
+        </td>
+      </tr>
+    </table>
   `;
 
   formattedSections.push(footerHtml);

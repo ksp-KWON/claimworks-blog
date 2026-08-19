@@ -1,18 +1,19 @@
 /**
  * naver-formatter.ts
- * 네이버 블로그 스마트에디터 ONE(SmartEditor ONE) 전용 파워블로그급 네이티브 서식 변환 엔진
+ * 네이버 블로그 스마트에디터 ONE(SmartEditor ONE) 전용 네이티브 완벽 호환 HTML 변환 엔진
  *
- * [근본적인 네이버 네이티브 표준화 설계]
- * 1. 이질적인 웹 컴포넌트 박스(초록 사각박스 5연타 등) 완전 제거:
- *    - 솔루션(H6)은 깔끔한 번호 뱃지(솔루션 ①)와 본문 문단으로 부드럽게 연결.
- *    - 자가진단 체크리스트는 하나의 단정하고 일체화된 체크 박스로 통합 렌더링.
- * 2. 네이버 파워블로그 시그니처 가독성 적용:
- *    - 키워드 강조: 노란색 형광펜 하이라이트(Yellow Highlighter: #fef08a) 적용.
- *    - 대주제(H2) 전환 시 깔끔한 수평 구분선(<hr>) 자동 삽입.
- *    - 소제목(H3): 직관적인 네이버 포인트 불릿(■ 📌) 적용.
- * 3. 표(Table) 100% 밀착 정렬:
- *    - `vertical-align: middle; border-collapse: collapse;`로 늘어남 완전 차단.
- * 4. 2~3줄 단위 숨쉬는 여백과 모바일 최적화 호흡 유지.
+ * [대표님 실무 피드백 기반 100% 정밀 최적화]
+ * 1. 불필요한 기계적 라벨 제거:
+ *    - 상단 서브라벨("보상스쿨 손해사정 실무 칼럼...") 및 본문 "📌 💡 핵심 요약" 텍스트 완전 제거.
+ *    - 솔루션에서 상투적인 "핵심 솔루션" 문구 삭제 ➔ "① 제목", "② 제목" 번호 중심 간결화.
+ * 2. 시각적 호흡 및 위계 완벽 확립:
+ *    - 섹션 구분선(<hr>): 대제목 '앞'에 배치하여 챕터 간 시각적 경계감 극대화.
+ *    - 대제목(H2): 안정적인 라인형 인용구 박스 + 19px 대형 볼드 폰트.
+ *    - 중제목(H3): 네이버 포인트 불릿(■) + 17px 중형 볼드 폰트.
+ *    - 소제목/솔루션(H6): 15.5px 포인트 볼드 + 넘버링(①, ②...).
+ * 3. FAQ(Q&A) 문단 호흡 최적화:
+ *    - Q와 A를 한 줄씩 띄우고 질문은 파란색/볼드, 답변은 부드러운 들여쓰기로 독자 가독성 극대화.
+ * 4. 따옴표 인용구 & 노란색 형광펜 하이라이트 & 완벽한 표준 표(Table) 유지.
  */
 
 export interface NaverFormatOptions {
@@ -65,22 +66,17 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
   const linkCard = LINK_CARDS[blogType] || LINK_CARDS.default;
 
   // Frontmatter 및 주석 제거
-  const cleanMd = markdown
+  let cleanMd = markdown
     .replace(/^---[\s\S]*?---\n*/, '')
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/\r\n/g, '\n')
+    // 상투적인 [핵심 요약] 헤더 라인 제거
+    .replace(/^##\s*💡\s*핵심\s*요약\s*$/gm, '')
+    .replace(/^##\s*핵심\s*요약\s*$/gm, '')
     .trim();
 
   const rawSections = cleanMd.split(/\n{2,}/);
   const formattedSections: string[] = [];
-
-  // 1. 상단 제목 (옵션)
-  if (options.title) {
-    formattedSections.push(
-      `<p style="font-size: 22px; font-weight: bold; color: #111827; line-height: 1.35; margin: 0 0 12px 0; padding-bottom: 12px; border-bottom: 3px solid #03c75a;"><strong>${options.title}</strong></p>` +
-      `<p style="font-size: 13px; color: #6b7280; margin: 0 0 28px 0;">보상스쿨 손해사정 실무 칼럼 · 네이버 공식 배포판</p>`
-    );
-  }
 
   let isFirstH2 = true;
 
@@ -92,7 +88,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     if (section.includes('|') && section.split('\n').filter(l => l.includes('|')).length >= 2) {
       const lines = section.split('\n').map(l => l.trim()).filter(l => l.startsWith('|') && l.endsWith('|'));
       if (lines.length >= 2) {
-        let tableHtml = `<table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; margin: 20px 0; font-size: 13.5px; line-height: 1.5;">`;
+        let tableHtml = `<table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; margin: 24px 0; font-size: 13.5px; line-height: 1.5;">`;
         
         // 헤더 행
         const headers = lines[0].split('|').map(s => s.trim()).filter(s => s.length > 0);
@@ -122,41 +118,65 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       }
     }
 
-    // B. 대주제 H2 (## ...)
+    // B. 대주제 H2 (## ...) -> 구분선을 제목 '앞'에 배치 + 안정적인 라인형 인용구 헤딩
     if (section.startsWith('## ')) {
       const titleText = section.replace(/^##\s+/, '').trim();
-      const divider = isFirstH2 ? '' : `<hr style="border: 0; height: 1px; background-color: #e2e8f0; margin: 36px 0 24px 0;" />`;
+      const divider = isFirstH2 ? '' : `<hr style="border: 0; height: 1px; background-color: #e2e8f0; margin: 40px 0 24px 0;" />`;
       isFirstH2 = false;
 
       formattedSections.push(
-        `${divider}<p style="font-size: 19px; font-weight: bold; color: #0f172a; margin-top: 16px; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid #03c75a;"><strong>📌 ${titleText}</strong></p>`
+        `${divider}<blockquote style="margin: 0 0 16px 0; padding: 12px 18px; border-left: 5px solid #03c75a; background-color: #f8fafc;"><p style="font-size: 19px; font-weight: bold; color: #0f172a; margin: 0; line-height: 1.4;">📌 <strong>${titleText}</strong></p></blockquote>`
       );
       continue;
     }
 
-    // C. 중주제 H3 (### ...)
+    // C. 중주제 H3 (### ...) -> 네이버 포인트 불릿(■) + 17px 중형 볼드 폰트
     if (section.startsWith('### ')) {
       const titleText = section.replace(/^###\s+/, '').trim();
       formattedSections.push(
-        `<p style="font-size: 16.5px; font-weight: bold; color: #1e293b; margin-top: 24px; margin-bottom: 10px;"><span style="color: #03c75a; margin-right: 6px;">■</span><strong>${titleText}</strong></p>`
+        `<p style="font-size: 17px; font-weight: bold; color: #1e293b; margin-top: 28px; margin-bottom: 10px; line-height: 1.4;"><span style="color: #03c75a; margin-right: 6px;">■</span><strong>${titleText}</strong></p>`
       );
       continue;
     }
 
-    // D. 솔루션 단계 H6 (###### ...) -> 세련된 뱃지 + 볼드 타이틀 (박스 도배 방지)
+    // D. 솔루션 단계 H6 (###### ...) -> '핵심 솔루션' 문구 제거하고 번호 중심(①, ②...) 간결화
     if (section.startsWith('###### ')) {
-      const titleText = section.replace(/^######\s+/, '').trim();
+      let titleText = section.replace(/^######\s+/, '').trim();
+      titleText = titleText.replace(/^핵심\s*솔루션\s*/, ''); // 상투적 문구 삭제
+
       formattedSections.push(
-        `<p style="font-size: 15px; font-weight: bold; color: #065f46; margin-top: 20px; margin-bottom: 6px;"><span style="display: inline-block; background-color: #059669; color: #ffffff; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-right: 6px; font-weight: bold;">핵심 솔루션</span><strong>${titleText}</strong></p>`
+        `<p style="font-size: 15.5px; font-weight: bold; color: #065f46; margin-top: 22px; margin-bottom: 8px; line-height: 1.4;"><span style="color: #059669; margin-right: 4px;">✔</span><strong>${titleText}</strong></p>`
       );
       continue;
     }
 
-    // E. 인용구 / 용어사전 / 체크리스트 (> ...)
+    // E. FAQ (Q&A) 문단 자동 감지 및 넉넉한 호흡 분리 (Q와 A 사이에 빈 줄 적용)
+    if (section.includes('Q :') || section.includes('Q:') || section.startsWith('■Q') || section.startsWith('Q.')) {
+      const lines = section.split('\n').map(l => l.trim()).filter(Boolean);
+      let faqHtml = '';
+      
+      for (const line of lines) {
+        if (line.includes('Q :') || line.includes('Q:') || line.startsWith('■Q') || line.startsWith('Q.')) {
+          const qText = applyNaverHighlighter(line);
+          faqHtml += `<p style="font-size: 15.5px; font-weight: bold; color: #1d4ed8; margin-top: 20px; margin-bottom: 6px; line-height: 1.5;">${qText}</p>`;
+        } else if (line.startsWith('A :') || line.startsWith('A:') || line.startsWith('A.')) {
+          const aText = applyNaverHighlighter(line);
+          faqHtml += `<p style="font-size: 14.5px; color: #334155; line-height: 1.8; margin-bottom: 20px; padding-left: 6px; word-break: keep-all;">${aText}</p>`;
+        } else {
+          const normalText = applyNaverHighlighter(line);
+          faqHtml += `<p style="font-size: 14.5px; color: #334155; line-height: 1.8; margin-bottom: 12px; word-break: keep-all;">${normalText}</p>`;
+        }
+      }
+      
+      formattedSections.push(faqHtml);
+      continue;
+    }
+
+    // F. 인용구 / 용어사전 / 체크리스트 (> ...)
     if (section.startsWith('>')) {
       const quoteLines = section.split('\n').map(l => l.replace(/^>\s?/, '').trim()).filter(Boolean);
       
-      // 체크리스트인 경우 -> 단일 통합 체크 카드 렌더링
+      // 체크리스트인 경우
       if (quoteLines.some(l => l.startsWith('- [ ]') || l.startsWith('- [x]'))) {
         const checkItems = quoteLines.map(l => {
           const itemText = l.replace(/^- \[( |x)\]\s*/, '');
@@ -170,17 +190,17 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
           `${checkItems}</blockquote>`
         );
       } else {
-        // 일반 인용구 / 용어 사전 -> 네이버 표준 라인 인용구
+        // 일반 인용구 / 핵심 요약 / 용어 사전 -> 네이버 따옴표형 인용구
         const quoteContent = quoteLines.join('<br/>');
         const highlighted = applyNaverHighlighter(quoteContent);
         formattedSections.push(
-          `<blockquote style="margin: 16px 0; padding: 12px 18px; background-color: #f0fdf4; border-left: 4px solid #03c75a; font-size: 14px; line-height: 1.7; color: #166534;">${highlighted}</blockquote>`
+          `<blockquote style="margin: 18px 0; padding: 14px 20px; font-size: 15px; line-height: 1.8; color: #334155;">${highlighted}</blockquote>`
         );
       }
       continue;
     }
 
-    // F. 리스트 (- 항목)
+    // G. 리스트 (- 항목)
     if (section.startsWith('- ') || section.startsWith('* ')) {
       const listItems = section.split('\n')
         .map(l => l.replace(/^[-*]\s+/, '').trim())
@@ -193,7 +213,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       continue;
     }
 
-    // G. 일반 본문 문단 (2~3줄 단위 부드러운 줄간격)
+    // H. 일반 본문 문단 (2~3줄 단위 부드러운 줄간격)
     let pContent = applyNaverHighlighter(section)
       .replace(/\n/g, '<br/>');
 

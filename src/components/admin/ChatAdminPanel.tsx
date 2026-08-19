@@ -49,7 +49,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
   const [isSending, setIsSending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<any>(null);
 
   const fetchSessions = useCallback(async () => {
@@ -92,10 +92,15 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
     }
   }, [refreshCounter, fetchSessions]);
 
-  const scrollToBottom = useCallback(() => {
+  const scrollToBottom = useCallback((smooth = true) => {
     setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTo({
+          top: messagesContainerRef.current.scrollHeight,
+          behavior: smooth ? 'smooth' : 'auto'
+        });
+      }
+    }, 50);
   }, []);
 
 
@@ -307,10 +312,10 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
   const selectedSession = sessions.find(s => s.id === selectedId);
 
   return (
-    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-white dark:bg-[#111111]">
+    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-white dark:bg-[#111111] overflow-hidden min-w-0">
       
       {/* 왼쪽: 세션 리스트 (모바일에서는 선택된 세션이 없을 때만 표시) */}
-      <div className={`w-full md:w-1/3 md:min-w-[320px] md:max-w-[400px] flex-1 md:flex-none min-h-0 flex flex-col border-r-0 md:border-r border-gray-200 dark:border-zinc-800 ${selectedId ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`w-full md:w-[320px] lg:w-[360px] shrink-0 min-h-0 flex flex-col border-r border-gray-200 dark:border-zinc-800 ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <AdminHeaderBar 
           title="채팅 목록" 
           rightContent={<span className="text-xs text-gray-500 font-medium bg-gray-200/50 dark:bg-zinc-800 px-2 py-1 rounded-full">{sortedAndFilteredSessions.length}건</span>} 
@@ -365,28 +370,28 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
           </div>
           
           {/* 오른쪽: 채팅 화면 (모바일에서는 선택된 세션이 있을 때만 표시) */}
-          <div className={`flex-1 min-h-0 flex flex-col relative bg-[#f8f9fa] dark:bg-zinc-950/80 ${!selectedId ? 'hidden md:flex' : 'flex'}`}>
+          <div className={`flex-1 min-w-0 min-h-0 h-full flex flex-col relative bg-[#f8f9fa] dark:bg-zinc-950/80 ${!selectedId ? 'hidden md:flex' : 'flex'} overflow-hidden`}>
             {selectedId && selectedSession ? (
               <>
                 {/* 채팅 헤더 */}
                 <AdminHeaderBar 
                   title={
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0 overflow-hidden">
                       <button 
                         onClick={() => setSelectedId(null)}
-                        className="md:hidden p-1.5 -ml-1.5 mr-1 text-gray-500 hover:bg-gray-200 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                        className="md:hidden p-1.5 -ml-1.5 mr-1 text-gray-500 hover:bg-gray-200 dark:hover:bg-zinc-800 rounded-lg transition-colors shrink-0"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                       </button>
-                      <div className="flex items-center gap-2">
-                        <span className="truncate">{selectedSession.visitor_nickname || '익명 방문자'}</span>
-                        <span className="text-[10px] text-gray-400 font-mono font-medium hidden sm:inline-block">ID: {selectedId.split('-')[0]}</span>
+                      <div className="flex items-center gap-2 min-w-0 truncate">
+                        <span className="truncate font-bold">{selectedSession.visitor_nickname || '익명 방문자'}</span>
+                        <span className="text-[10px] text-gray-400 font-mono font-medium hidden sm:inline-block shrink-0">ID: {selectedId.split('-')[0]}</span>
                       </div>
-                      {selectedSession.status === '대기' && <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-sm bg-red-100 text-red-600">대기중</span>}
+                      {selectedSession.status === '대기' && <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-sm bg-red-100 text-red-600 shrink-0">대기중</span>}
                     </div>
                   }
                   rightContent={
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <PremiumBadge color={selectedSession.status === '상담' ? 'blue' : selectedSession.status === '완료' ? 'green' : 'gray'} className="px-2 py-0.5 text-[10px]">
                         {selectedSession.status || '대기'}
                       </PremiumBadge>
@@ -395,13 +400,13 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
                 />
                 
                 {/* 메시지 영역 */}
-                <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-[#f8f9fa] dark:bg-zinc-950/80 custom-scrollbar">
+                <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 md:p-6 space-y-4 bg-[#f8f9fa] dark:bg-zinc-950/80 custom-scrollbar">
                   {messages.map((msg, index) => {
                     const isAdmin = msg.sender === 'admin';
                     const showAvatar = index === 0 || messages[index - 1].sender !== msg.sender;
                     
                     return (
-                      <div key={msg.id} className={`flex items-end gap-3 ${isAdmin ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <div key={msg.id} className={`w-full flex items-end gap-2.5 ${isAdmin ? 'flex-row-reverse' : 'flex-row'}`}>
                         {/* 아바타 (방문자일 경우만) */}
                         {!isAdmin && (
                           <div className={`w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0 ${!showAvatar && 'opacity-0'}`}>
@@ -409,17 +414,17 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
                           </div>
                         )}
                         
-                        <div className={`max-w-[70%] flex flex-col ${isAdmin ? 'items-end' : 'items-start'}`}>
+                        <div className={`max-w-[85%] md:max-w-[75%] min-w-0 flex flex-col ${isAdmin ? 'items-end ml-auto' : 'items-start mr-auto'}`}>
                           {showAvatar && !isAdmin && (
                             <span className="text-xs text-gray-500 mb-1 ml-1">{selectedSession.visitor_nickname || '방문자'}</span>
                           )}
                           
-                          <div className={`rounded-2xl px-4 py-3 shadow-sm ${
+                          <div className={`rounded-2xl px-4 py-3 shadow-sm max-w-full ${
                             isAdmin 
                               ? 'bg-blue-600 text-white rounded-br-sm shadow-blue-600/20' 
                               : 'bg-white dark:bg-zinc-800 text-gray-800 dark:text-gray-100 rounded-bl-sm border border-gray-100 dark:border-zinc-700/50'
                           }`}>
-                            <p className="text-[15px] whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                            <p className="text-[15px] whitespace-pre-wrap break-words [overflow-wrap:anywhere] leading-relaxed">{msg.content}</p>
                           </div>
                           <span className={`text-[11px] text-gray-400 mt-1.5 mx-1 font-mono font-medium ${isAdmin ? 'text-right' : 'text-left'}`}>
                             {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
@@ -428,12 +433,11 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
                       </div>
                     );
                   })}
-                  <div ref={messagesEndRef} />
                 </div>
 
                 {/* 입력창 */}
-                <div className="p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
-                  <div className="flex gap-3 relative">
+                <div className="p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 w-full min-w-0">
+                  <div className="flex gap-3 relative w-full min-w-0">
                     <textarea
                       value={replyText}
                       onChange={e => setReplyText(e.target.value)}
@@ -444,17 +448,17 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
                         }
                       }}
                       placeholder="메시지를 입력하세요 (Shift+Enter로 줄바꿈)"
-                      className="flex-1 resize-none bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl p-3.5 pr-14 text-[15px] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-600/50 transition-all custom-scrollbar"
+                      className="w-full min-w-0 resize-none bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl p-3.5 pr-14 text-[15px] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-600/50 transition-all custom-scrollbar"
                       rows={2}
                     />
                     
                     {/* 매크로 UI */}
-                    <div className="absolute left-3 -top-10 flex gap-2">
+                    <div className="absolute left-3 -top-10 flex gap-2 overflow-x-auto max-w-[calc(100%-20px)] custom-scrollbar pb-1">
                       {MACRO_PHRASES.map((phrase, idx) => (
                         <button
                           key={idx}
                           onClick={() => setReplyText(prev => prev + (prev ? '\n' : '') + phrase)}
-                          className="px-2.5 py-1 text-[11px] font-medium bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-zinc-700 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800 transition-colors shadow-sm"
+                          className="shrink-0 px-2.5 py-1 text-[11px] font-medium bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-zinc-700 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800 transition-colors shadow-sm"
                         >
                           매크로 {idx + 1}
                         </button>

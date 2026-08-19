@@ -3,6 +3,7 @@ import PremiumButton from '@/components/ui/PremiumButton';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import BottomSheet from '@/components/ui/BottomSheet';
 import AdminPanelLayout from '../AdminPanelLayout';
+import { copyToNaverClipboard } from '@/lib/naver-formatter';
 
 interface AiWritingStudioProps {
   isLoading: boolean;
@@ -71,6 +72,35 @@ export default function AiWritingStudio({
 
   // Batch Auto State
   const [isBatchRunning, setIsBatchRunning] = useState(false);
+
+  // Naver Copy State
+  const [isCopiedNaver, setIsCopiedNaver] = useState(false);
+
+  const handleCopyNaver = async () => {
+    if (!postMeta.content || !(postMeta.content || '').trim()) {
+      alert('복사할 본문 내용이 없습니다. 먼저 글을 작성하거나 AI 창작을 완료해 주세요.');
+      return;
+    }
+    
+    // Auto-detect target blog based on category
+    const cat = postMeta.category || selectedCategory || '';
+    let target: 'default' | 'traffic' | 'medical' | 'accident' = 'default';
+    if (cat.includes('교통')) target = 'traffic';
+    else if (cat.includes('질병') || cat.includes('판례')) target = 'medical';
+    else if (cat.includes('산재') || cat.includes('배상') || cat.includes('사망')) target = 'accident';
+
+    const success = await copyToNaverClipboard(postMeta.content, {
+      title: postMeta.title,
+      targetBlog: target
+    });
+
+    if (success) {
+      setIsCopiedNaver(true);
+      setTimeout(() => setIsCopiedNaver(false), 3500);
+    } else {
+      alert('클립보드 복사에 실패했습니다.');
+    }
+  };
 
   const handleRunAi = () => {
     onRunAi(aiMode, postMeta.content || '');
@@ -212,8 +242,24 @@ export default function AiWritingStudio({
           </div>
         )}
 
-        {/* 2. 문서 관리 액션 (새문서, 임시저장, 발행) */}
-        <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 space-y-2">
+        {/* 2. 네이버 블로그 D.I.A.+ 원클릭 복사 */}
+        <div className="pt-2">
+          <button
+            onClick={handleCopyNaver}
+            disabled={!postMeta.content || !(postMeta.content || '').trim()}
+            className={`w-full py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition-all shadow-sm ${
+              isCopiedNaver 
+                ? 'bg-emerald-600 text-white shadow-emerald-200 ring-2 ring-emerald-300' 
+                : 'bg-[#03c75a] hover:bg-[#02b351] text-white shadow-green-100 hover:shadow-md'
+            } disabled:opacity-40 disabled:cursor-not-allowed`}
+          >
+            <span>{isCopiedNaver ? '✅' : '📋'}</span>
+            <span>{isCopiedNaver ? '네이버 서식 복사 완료! (Ctrl+V)' : '네이버 스마트에디터 복사 (D.I.A.+)'}</span>
+          </button>
+        </div>
+
+        {/* 3. 문서 관리 액션 (새문서, 임시저장, 발행) */}
+        <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 space-y-2">
           <div className="flex gap-2">
             <PremiumButton onClick={onCreateBlank} variant="secondary" className="flex-1 !py-2.5 !text-xs !rounded-xl border-gray-200 dark:border-zinc-700">
               새 문서

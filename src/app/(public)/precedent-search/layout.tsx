@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://claim-works.com/opengraph-image",
+        url: "https://claim-works.com/og-image.png",
         width: 1200,
         height: 630,
         alt: "보상스쿨 빅데이터 판례검색센터",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "빅데이터 판례검색센터 - 보상스쿨",
     description: "어려운 보상 판례, 일상어로 쉽게 검색하세요. 대법원 핵심 판례 빅데이터 검색 서비스",
-    images: ["https://claim-works.com/opengraph-image"],
+    images: ["https://claim-works.com/og-image.png"],
   },
 };
 

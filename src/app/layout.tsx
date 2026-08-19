@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     description: '건강보험심사평가원의 공개 정보를 기반으로 공인 손해사정사가 분석한 실무 보상 노하우와 무료 상담 가이드를 제공합니다.',
     images: [
       {
-        url: 'https://claim-works.com/opengraph-image',
+        url: 'https://claim-works.com/og-image.png',
         width: 1200,
         height: 630,
         alt: '보상스쿨 전문 손해사정 그룹',
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: '보상스쿨 전문 손해사정 그룹',
     description: '건강보험심사평가원의 공개 정보 기반 손해사정 실무 보상 가이드',
-    images: ['https://claim-works.com/opengraph-image'],
+    images: ['https://claim-works.com/og-image.png'],
   },
 };
 

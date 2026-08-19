@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://claim-works.com/opengraph-image',
+        url: 'https://claim-works.com/og-image.png',
         width: 1200,
         height: 630,
         alt: '보상스쿨 무료 상담 신청',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: '보상스쿨 무료 상담 신청',
     description: '보험사의 억울한 거절과 삭감 주장, 전문 손해사정사가 직접 명쾌한 해결책을 드립니다.',
-    images: ['https://claim-works.com/opengraph-image'],
+    images: ['https://claim-works.com/og-image.png'],
   },
 };
 

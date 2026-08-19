@@ -66,13 +66,19 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
         .select('*')
         .order('date', { ascending: true });
 
-      if (error) {
-        // 테이블 미생성 또는 에러 시 로컬스토리지 폴백
+      if (error || !data || data.length === 0) {
+        // 테이블 미생성, 에러, 또는 Supabase가 비어있을 때 로컬스토리지 폴백
         const local = localStorage.getItem('local_calendar_events');
         if (local) {
-          setEvents(JSON.parse(local));
+          try {
+            setEvents(JSON.parse(local));
+          } catch {
+            setEvents([]);
+          }
+        } else {
+          setEvents([]);
         }
-      } else if (data) {
+      } else if (data && data.length > 0) {
         const parsed = data.map((d: any) => {
           let extra: any = {};
           try {
@@ -95,10 +101,17 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
           };
         });
         setEvents(parsed);
+        localStorage.setItem('local_calendar_events', JSON.stringify(parsed));
       }
     } catch {
       const local = localStorage.getItem('local_calendar_events');
-      if (local) setEvents(JSON.parse(local));
+      if (local) {
+        try {
+          setEvents(JSON.parse(local));
+        } catch {
+          setEvents([]);
+        }
+      }
     } finally {
       setIsLoading(false);
     }
@@ -222,22 +235,31 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
       })
     };
 
+    let generatedId = editingEventId;
+
     try {
       if (editingEventId) {
         // 수정
         await supabase.from('admin_calendar_events').update(eventPayload).eq('id', editingEventId);
       } else {
         // 신규 추가
-        await supabase.from('admin_calendar_events').insert([eventPayload]);
+        const { data } = await supabase.from('admin_calendar_events').insert([eventPayload]).select();
+        if (data && data[0]?.id) {
+          generatedId = data[0].id;
+        }
       }
-    } catch {
-      // 로컬 스토리지에 동기화
-      const localEvents = [...events];
+    } catch (err) {
+      console.warn('Supabase save note:', err);
+    }
+
+    // 로컬 스토리지 & State 즉시 동기화
+    setEvents(prev => {
+      let next = [...prev];
       if (editingEventId) {
-        const idx = localEvents.findIndex(e => e.id === editingEventId);
+        const idx = next.findIndex(e => e.id === editingEventId);
         if (idx >= 0) {
-          localEvents[idx] = {
-            ...localEvents[idx],
+          next[idx] = {
+            ...next[idx],
             date: modalForm.date,
             title: modalForm.title,
             time: modalForm.time,
@@ -246,8 +268,8 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
           };
         }
       } else {
-        localEvents.push({
-          id: Date.now().toString(),
+        next.push({
+          id: generatedId || Date.now().toString(),
           date: modalForm.date,
           title: modalForm.title,
           time: modalForm.time,
@@ -258,8 +280,9 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
           created_at: new Date().toISOString()
         });
       }
-      localStorage.setItem('local_calendar_events', JSON.stringify(localEvents));
-    }
+      localStorage.setItem('local_calendar_events', JSON.stringify(next));
+      return next;
+    });
 
     setIsModalOpen(false);
     fetchEvents();
@@ -268,13 +291,20 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
   // 일정 삭제
   const handleDeleteEvent = async (id: string) => {
     if (!window.confirm('정말 이 일정을 삭제하시겠습니까?')) return;
+    
+    // 1) React State 및 로컬스토리지에서 즉시 삭제 (반응속도 0ms)
+    setEvents(prev => {
+      const next = prev.filter(e => e.id !== id);
+      localStorage.setItem('local_calendar_events', JSON.stringify(next));
+      return next;
+    });
+
+    // 2) Supabase 테이블에서도 삭제 시도
     try {
       await supabase.from('admin_calendar_events').delete().eq('id', id);
-    } catch {
-      const local = events.filter(e => e.id !== id);
-      localStorage.setItem('local_calendar_events', JSON.stringify(local));
+    } catch (err) {
+      console.warn('Supabase delete error:', err);
     }
-    fetchEvents();
   };
 
   // 특정 일정 클릭하여 원본 상담/채팅으로 점프

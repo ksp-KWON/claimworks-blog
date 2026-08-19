@@ -2,10 +2,16 @@
  * prompt-rules.js
  * 보상스쿨 글로벌 콘텐츠 헌법 (Content Quality Framework - Global Standard) 정의 모듈.
  * W3C & Google SEO 글로벌 표준 마크다운(GFM) 체계 적용.
+ *
+ * [핵심 아키텍처: 단일 통합 프롬프트 엔진 (Unified Prompt Factory)]
+ * — 표준, 범용, 콤팩트, 통합, 공유, 공통 원칙 100% 준수
+ * — 자동 모드(8개 카테고리)와 창작 모드 3개 탭(초안다듬기/초안확장/링크키워드)이 단 1개의 공통 헌법 팩토리 공유
+ * — 운동장의 테두리(6대 무기 필수 규격)는 견고하게 표준화, 그 안에서 AI 창작 자유도 최대 보장
  */
 
 'use strict';
 
+// ── 🏛️ 1. 절대 헌법 규칙 (STRICT WRITING RULES) ───────────────────────────
 const STRICT_RULES = `
 ## 1. 🏛️ 글로벌 표준 마크다운(GFM) & W3C 시맨틱 위계 규칙 (절대 헌법)
 본문은 종이 공문서 기호가 아닌, 전 세계 웹 표준 마크다운(GFM)에 따라 구글 검색엔진 최적화(SEO)와 시맨틱 웹 위계를 엄격히 준수하여 작성해야 합니다.
@@ -31,7 +37,7 @@ const STRICT_RULES = `
 - **[무기 4] 1분 자가진단 체크리스트**:
   - 글 중반부에 \`## 1분 자가진단 : [주제] 체크리스트\` 제목을 작성하고, 그 아래 \`> - [ ] \` 형식의 체크박스 4~5개를 배치하십시오.
 - **[무기 5] 자주 묻는 질문 (FAQ)**:
-  - 글 후반부에 \`## 💡 자주 묻는 질문 (FAQ)\` 제목을 작성하고, 질의응답은 \`### Q : [질문]\` 과 \`A : [답변]\` 포맷으로 구성하십시오.
+  - 글 후반부에 \`## 💡 자주 묻는 질문 (FAQ)\` 제목을 반드시 작성하고, 실무 관점의 핵심 Q&A 3개를 \`### Q : [질문]\` 과 \`A : [답변]\` 포맷으로 구성하십시오.
 - **[무기 6] E-E-A-T 클로징 맞춤형 다단계 솔루션**:
   - 마지막 결론부 \`## [번호]. 결론 및 보상스쿨의 맞춤형 솔루션\` 아래에 사안의 복잡도와 성격에 맞추어 **\`###### ① [솔루션 1 제목]\` + 설명 문단**, **\`###### ② [솔루션 2 제목]\` + 설명 문단** (필요시 **\`###### ③\`**, **\`###### ④\`**, **\`###### ⑤\`**, **\`###### ⑥\`** 등) 형태로 AI가 최적의 솔루션 단계(2단계 이상 자율적 다단계 확장)를 자유롭게 구성하여 전문성과 신뢰도를 극대화하십시오.
 
@@ -52,6 +58,7 @@ const STRICT_RULES = `
   - 쟁취하다 / 강력히 권고 → 확보하다 / 면밀한 검토를 권합니다
 `;
 
+// ── ⚖️ 2. 집필 관점 (Angles) ───────────────────────────────────────────
 const ANGLES = [
   {
     id: 'MEDICAL',
@@ -86,13 +93,9 @@ function getExpertRole() {
 이 세 가지 전문성을 동시에 보유한 최고 전문가의 관점으로 모든 글을 작성합니다.`;
 }
 
-function getArticleObjective(keywords) {
-  return `# Objective
-타겟 키워드 [${keywords}] 및 주어진 기획안을 바탕으로, 글로벌 마크다운 표준 체계(GFM)와 보상스쿨 글로벌 콘텐츠 헌법을 완벽히 만족하며 구글 E-E-A-T 기준에 부합하는 최고의 전문가 칼럼을 작성합니다.`;
-}
-
-function getUniversalSkeleton(isPrecedent, angle, postsCtx) {
-  return `## [글로벌 마크다운 & W3C 시맨틱 블로그 뼈대]
+// ── 🏛️ 3. 불변의 6대 헌법 테두리 뼈대 (Universal Skeleton) ─────────────
+function getUniversalSkeleton() {
+  return `## [글로벌 마크다운 & W3C 시맨틱 블로그 뼈대 (필수 구성)]
 
 [글의 시작]
 * 독자의 상황에 깊이 공감하고 현실적인 문제의식을 던지는 자연스러운 오프닝 서술 문단 (3~4문장)
@@ -104,7 +107,7 @@ function getUniversalSkeleton(isPrecedent, angle, postsCtx) {
 (주의: '[핵심 쟁점 1]' 같은 기계적 대괄호 라벨은 붙이지 마십시오)
 
 ## 1. [사안의 성격에 맞는 대주제 1]
-- W3C & Google SEO 표준(GFM)에 따라 AI가 100% 자율적으로 필요한 만큼 H3(### 가. ..., ### 나. ...) 소제목과 본문, 인라인 용어사전(> 💡 **용어명** : 설명), 리스트를 유연하게 구성하십시오.
+- W3C & Google SEO 표준(GFM)에 따라 AI가 100% 자율적으로 필요한 만큼 H3(### ...) 소제목과 본문, 인라인 용어사전(> 💡 **용어명** : 설명), 리스트를 유연하게 구성하십시오.
 
 ## 2. [사안의 성격에 맞는 대주제 2]
 - 법리 비교, 약관 해석 차이, 보험사 주장 vs 손해사정사 반박 등 구조화된 데이터는 반드시 깨끗한 표준 마크다운 표(| 구분 | 내용 |)로 정리하십시오.
@@ -139,6 +142,103 @@ A : [손해사정 전문가 관점의 명쾌하고 친절한 답변]
 `;
 }
 
+// ── 🏭 4. [단일 통합 프롬프트 팩토리] (Unified Prompt Factory) ───────────
+/**
+ * 모든 글쓰기 모드(자동 모드, 초안 다듬기, 초안 확장, 링크/키워드)의 단일 통합 진입점.
+ */
+function assembleArticlePrompt({
+  mode = 'auto-generate',
+  topic = null,
+  rawInput = '',
+  angle = null,
+  precedent = null,
+  existingPosts = []
+}) {
+  const chosenAngle = (angle && angle.name) ? angle : getRandomAngle();
+  const safeTopic = topic || {};
+  const topicTitle = safeTopic.title || safeTopic.keyword || rawInput.slice(0, 60) || '손해사정 실무 가이드';
+  const topicCategory = safeTopic.category || '보상가이드';
+  const topicSpecialty = safeTopic.specialtyCategory || '(해당 없음)';
+  const topicTags = Array.isArray(safeTopic.tags) ? safeTopic.tags.join(', ') : (safeTopic.tags || '');
+
+  // 모드별 AI 행동 지침 정의
+  let modeInstruction = '';
+  if (mode === 'manual-preserve') {
+    modeInstruction = `[초안 다듬기 모드 특명]
+1. 사용자가 제공한 원문의 핵심 사실관계, 데이터, 논리, 의도를 100% 충실히 반영하십시오.
+2. 원문의 엉성하거나 거친 문장을 W3C 마크다운 헌법 6대 무기(공감 오프닝, 핵심 요약, 인라인 용어사전, 마크다운 표, 1분 자가진단, FAQ 3개, 결론 맞춤형 솔루션)의 틀에 완벽히 담아내십시오.
+3. 원문에 FAQ나 다단계 솔루션이 없더라도, 원문 내용을 기반으로 AI가 스스로 분석하여 **[## 💡 자주 묻는 질문 (FAQ)] 3개**와 **[## 결론 및 보상스쿨의 맞춤형 솔루션 (###### ①, ###### ②...)]**을 의무적으로 완벽하게 창작하여 장착하십시오.`;
+  } else if (mode === 'manual-expand') {
+    modeInstruction = `[초안 확장 모드 특명]
+1. 사용자가 제공한 원문/아이디어를 씨앗으로 삼아, 최신 대법원 판례, 의학 장해평가 기준(맥브라이드/AMA), 약관 면책 방어 논리를 대폭 보강하여 5,000자 이상의 심층 전문 칼럼으로 완성하십시오.
+2. 6대 헌법 무기를 빠짐없이 100% 배치하십시오.`;
+  } else {
+    modeInstruction = `[전문 칼럼 창작 모드 특명]
+1. 타겟 기획안과 쟁점을 바탕으로, 구글 E-E-A-T 기준을 완벽히 충족하는 최고 권위의 전문 손해사정 칼럼을 작성하십시오.
+2. 6대 헌법 무기를 100% 의무 배치하십시오.`;
+  }
+
+  const precedentInfo = precedent
+    ? `\n* 분석 대상 판례: ${precedent.caseName || precedent.title || ''} (${precedent.caseNumber || precedent.caseNo || precedent.id || ''})\n* 판례 요지: ${precedent.summary || precedent.judgmentSummary || precedent.content || ''}\n`
+    : '';
+
+  const rawSection = rawInput ? `\n[사용자 원문 / 참고 자료]\n${rawInput}\n` : '';
+
+  return `${getExpertRole()}
+
+# Objective
+${modeInstruction}
+
+## 집필 포커스 (Angle)
+* **집필 앵글**: ${chosenAngle.name}
+* **앵글 지침**: ${chosenAngle.instruction}
+
+# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
+${STRICT_RULES}
+
+[기획안 메타데이터]
+* 제목: ${topicTitle}
+* 카테고리: ${topicCategory}
+* 전문 진료과목: ${topicSpecialty}
+* 태그: ${topicTags}
+${precedentInfo}${rawSection}
+${getUniversalSkeleton()}
+
+위 불변의 6대 헌법 뼈대와 규칙을 100% 엄격히 준수하여 본문 마크다운을 완성하십시오.`;
+}
+
+// ── 🔄 기존 함수 인터페이스 100% 하위 호환 매핑 ──────────────────────────
+function buildArticlePrompt(topic, arg2, arg3, arg4) {
+  let angle, existingPosts, precedent;
+  if (arg2 && typeof arg2 === 'object' && arg2.name && arg2.instruction) {
+    angle = arg2;
+    existingPosts = Array.isArray(arg3) ? arg3 : [];
+    precedent = arg4 || null;
+  } else {
+    precedent = arg2 || null;
+    angle = (arg3 && typeof arg3 === 'object' && arg3.name) ? arg3 : getRandomAngle();
+    existingPosts = Array.isArray(arg4) ? arg4 : [];
+  }
+
+  return assembleArticlePrompt({
+    mode: precedent ? 'precedent' : 'trend',
+    topic,
+    angle,
+    precedent,
+    existingPosts
+  });
+}
+
+function buildManualPrompt(mode, aiInput, angle, existingPosts) {
+  return assembleArticlePrompt({
+    mode,
+    rawInput: aiInput,
+    angle,
+    existingPosts
+  });
+}
+
+// ── 📦 5. JSON 스키마 정의 (TOPIC_SCHEMA & CONTENT_SCHEMA) ───────────────
 const TOPIC_SCHEMA = {
   type: "OBJECT",
   properties: {
@@ -195,6 +295,7 @@ const CONTENT_SCHEMA = {
   required: ["thoughtProcess", "markdownContent"]
 };
 
+// ── 🧠 6. 기획 프롬프트 헬퍼들 ──────────────────────────────────────────
 function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCategory) {
   return `당신은 '보상스쿨'의 최정상 콘텐츠 기획자이자 마케터입니다.
 오늘 확정된 대표 키워드는 [${keyword}] 이며, 관련된 오늘의 이슈는 [${trendTitle}] 입니다.
@@ -273,61 +374,6 @@ function getManualPlanningPrompt(arg1, arg2, arg3, arg4) {
 반드시 지정된 JSON 스키마를 준수하여 출력하십시오.`;
 }
 
-function buildArticlePrompt(topic, arg2, arg3, arg4) {
-  // 인자 순서 자동 호환: (topic, angle, existingPosts, precedent) 또는 (topic, precedent, angle, existingPosts)
-  let angle, existingPosts, precedent;
-
-  if (arg2 && typeof arg2 === 'object' && arg2.name && arg2.instruction) {
-    angle = arg2;
-    existingPosts = Array.isArray(arg3) ? arg3 : [];
-    precedent = arg4 || null;
-  } else {
-    precedent = arg2 || null;
-    angle = (arg3 && typeof arg3 === 'object' && arg3.name) ? arg3 : getRandomAngle();
-    existingPosts = Array.isArray(arg4) ? arg4 : [];
-  }
-
-  const isPrecedent = !!precedent;
-  const precedentInfo = isPrecedent && precedent
-    ? `\n* 분석 대상 판례: ${precedent.caseName || precedent.title || ''} (${precedent.caseNumber || precedent.caseNo || precedent.id || ''})\n* 판례 판결 요지: ${precedent.summary || precedent.judgmentSummary || precedent.content || ''}\n`
-    : '';
-
-  const safeExistingPosts = Array.isArray(existingPosts) ? existingPosts : [];
-  const postsCtx = safeExistingPosts.length > 0
-    ? safeExistingPosts.map(p => `- [${p.title || p.slug}](/blog/${p.slug})`).join('\n')
-    : '- (없음)';
-
-  const safeTopic = topic || {};
-  const topicTitle = safeTopic.title || safeTopic.keyword || '손해사정 핵심 실무 쟁점';
-  const topicCategory = safeTopic.category || '보상가이드';
-  const topicSpecialty = safeTopic.specialtyCategory || '(해당 없음)';
-  const topicTags = Array.isArray(safeTopic.tags) ? safeTopic.tags.join(', ') : (safeTopic.tags || '');
-  const topicKeywords = Array.isArray(safeTopic.keywords) ? safeTopic.keywords.join(', ') : (safeTopic.keywords || topicTitle);
-
-  return `${getExpertRole()}
-
-${getArticleObjective(topicKeywords)}
-
-## 글 작성 포커스 (Angle)
-* **집필 앵글**: ${angle?.name || '실무 절차 가이드 포커스'}
-* **앵글 지침**: ${angle?.instruction || '실무자의 관점에서 명쾌한 해결책을 제시하십시오.'}
-
-# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
-${STRICT_RULES}
-
-[기획안]
-* 제목: ${topicTitle}
-* 카테고리: ${topicCategory}
-* 전문 진료과목: ${topicSpecialty}
-* 태그: ${topicTags}
-${precedentInfo}
-
-${getUniversalSkeleton(isPrecedent, angle, postsCtx)}
-
-위 뼈대와 규칙을 엄격히 준수하여 본문을 작성해 주세요.
-`;
-}
-
 function getRenewalPrompt(currentTitle, query) {
   return `당신은 '보상스쿨'의 최고 SEO 카피라이터이자 지식 전문가입니다.
 현재 블로그의 한 글이 구글 상위 노출은 잘 되고 있으나 클릭(CTR)이 저조합니다.
@@ -348,39 +394,6 @@ function getRenewalPrompt(currentTitle, query) {
 }`;
 }
 
-function buildManualPrompt(mode, aiInput, angle, existingPosts) {
-  const postsCtx = existingPosts.length > 0
-    ? existingPosts.map(p => `- [${p.title}](/blog/${p.slug})`).join('\n')
-    : '- (없음)';
-
-  let objective = '';
-  let lengthRule = '';
-
-  if (mode === 'manual-preserve') {
-    objective = '사용자가 입력한 대본이나 초안의 디테일과 의도를 100% 보존하며 가독성이 극대화된 블로그 포스트 형태로 예쁘게 포장하십시오.';
-    lengthRule = '사용자가 입력한 대본이나 원문을 최대한 보존하되, 가독성을 극대화하기 위해 적절한 소제목(H2, H3), 불릿 포인트, 표, 3단계 솔루션 등을 덧붙여 고품질의 블로그 포스팅 형태로 포장하십시오.';
-  } else {
-    objective = '제시된 주제/참고링크/키워드를 바탕으로 깊이 있는 전문 칼럼을 새롭게 기획하고 창작하십시오.';
-    lengthRule = '사용자가 입력한 키워드, 개요 또는 참고 링크를 바탕으로 W3C 글로벌 마크다운 표준에 부합하는 고품질의 전문 칼럼을 창작하십시오.';
-  }
-
-  return `${getExpertRole()}
-
-# Objective
-${objective}
-
-## 분량 및 창작 규칙
-${lengthRule}
-
-# ⚖️ 공통 글쓰기 헌법 규칙 (STRICT WRITING RULES)
-${STRICT_RULES}
-
-제시된 원문/뼈대/참고자료:
-${aiInput}
-
-${getUniversalSkeleton(false, angle, postsCtx)}`;
-}
-
 function getQueryGenerationPrompt(targetCategory, existingTitles) {
   return `당신은 대한민국 최고의 손해사정 블로그 편집장이자 검색 트렌드 분석가입니다.
 최근 **[${targetCategory}]** 카테고리 및 블로그에 아래와 같은 주제의 글들이 발행되었습니다.
@@ -390,7 +403,7 @@ ${existingTitles}
 
 [키워드 창작 원칙]
 1. 위 최근 발행 글에 이미 등장한 흔한 주제(예: 도수치료, 백내장, 캠핑장 배상, 자율주행 등)는 완전히 배제하십시오.
-2. **[${targetCategory}]** 분야에서 피보험자/피해자가 겪는 완전히 새로운 세부 질환, 특수 사고, 최신 판례, 미개척 분쟁 영역(예: 체외충격파, 비급여 주사제, 뇌경색 코드 분쟁, 치아보철치료, 킥보드 사고, 스키장 낙상, 감정노동 산재, 급성심근경색 등)을 발굴하십시오.
+2. **[${targetCategory}]** 분야에서 피보험자/피해자가 겪는 완전히 새로운 세부 질환, 특수 사고, 최신 판례, 미개척 분쟁 영역을 발굴하십시오.
 3. 오늘 구글 뉴스에서 탐색해 볼 만한 참신하고 실질적인 검색어 3개를 창작하세요.
 
 반드시 아래 JSON 형식으로만 출력하세요:
@@ -408,7 +421,7 @@ ${existingTitles}
 ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
 [중요 필터링 규칙]
-1. 최근 발행 글에 이미 다루어진 주제(도수치료, 백내장, 자율주행, 캠핑장 등)와 유사한 키워드는 반드시 탈락시키십시오.
+1. 최근 발행 글에 이미 다루어진 주제와 유사한 키워드는 반드시 탈락시키십시오.
 2. 아직 블로그에서 다루지 않은 새로운 의학/법률/손해사정 실무 명사(예: "체외충격파", "일실수익", "추간판탈출증", "골절후유장해", "면책약관", "고지의무")만 추출하십시오.
 3. 반드시 짧고 핵심적인 명사로만 추출하세요.
 
@@ -444,10 +457,6 @@ function getFssEvaluationPrompt(fssTitle, fssContent) {
   return `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
 아래 금감원 보도자료를 읽고, 우리 블로그의 목적(손해사정, 보상, 서민 금융 피해 구제, 보험금 분쟁)과 직결되는 내용인지 평가하십시오.
 
-[평가 기준]
-1. 해당 기사가 일반 금융 소비자의 구체적인 재산 피해 예방이나 보상 청구와 직접 관련이 있는가?
-2. 보이스피싱, 불법사채, 불완전판매, 실손보험, 교통사고 등 손해사정사의 조력이나 금감원의 구제가 필요한 사안인가?
-
 [보도자료]
 - 제목: ${fssTitle}
 - 본문 요약: ${fssContent}
@@ -463,11 +472,13 @@ module.exports = {
   TOPIC_SCHEMA,
   CONTENT_SCHEMA,
   getRandomAngle,
+  getUniversalSkeleton,
+  assembleArticlePrompt,
+  buildArticlePrompt,
+  buildManualPrompt,
   getTopicPlanningPrompt,
   getPrecedentPlanningPrompt,
   getManualPlanningPrompt,
-  buildArticlePrompt,
-  buildManualPrompt,
   getRenewalPrompt,
   getQueryGenerationPrompt,
   getKeywordExtractionPrompt,

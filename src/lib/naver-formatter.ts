@@ -1,17 +1,18 @@
 /**
  * naver-formatter.ts
- * 네이버 블로그 스마트에디터 ONE(SmartEditor ONE) 전용 완벽 호환 HTML 변환 엔진
+ * 네이버 블로그 스마트에디터 ONE(SmartEditor ONE) 전용 파워블로그급 네이티브 서식 변환 엔진
  *
- * [스마트에디터 ONE 핵심 호환 규칙]
- * 1. <div> 중첩 래퍼 제거: 스마트에디터 ONE은 <div> 중첩 시 빈 위젯을 무한 생성하므로, 순수 <p>, <blockquote>, <table> 플랫 구조로 렌더링.
- * 2. 표(Table) 세로 늘어남(Height Distortion) 방지:
- *    - 외곽 <div> 제거
- *    - `vertical-align: middle;` 및 `table-layout: auto; border-collapse: collapse;` 필수 적용.
- *    - 모든 <th>, <td>에 명시적 border, padding, text-align 인라인 선언.
- * 3. 맞춤법 검사기 오작동 방지:
- *    - 불필요한 줄바꿈(<br/>)과 공백 태그를 완전히 제거하고 깔끔한 문단(<p>) 단위로 분할.
- * 4. 인용구 및 체크리스트:
- *    - 네이버 에디터가 좋아하는 <blockquote> 및 간결한 <p> 박스 서식 적용.
+ * [근본적인 네이버 네이티브 표준화 설계]
+ * 1. 이질적인 웹 컴포넌트 박스(초록 사각박스 5연타 등) 완전 제거:
+ *    - 솔루션(H6)은 깔끔한 번호 뱃지(솔루션 ①)와 본문 문단으로 부드럽게 연결.
+ *    - 자가진단 체크리스트는 하나의 단정하고 일체화된 체크 박스로 통합 렌더링.
+ * 2. 네이버 파워블로그 시그니처 가독성 적용:
+ *    - 키워드 강조: 노란색 형광펜 하이라이트(Yellow Highlighter: #fef08a) 적용.
+ *    - 대주제(H2) 전환 시 깔끔한 수평 구분선(<hr>) 자동 삽입.
+ *    - 소제목(H3): 직관적인 네이버 포인트 불릿(■ 📌) 적용.
+ * 3. 표(Table) 100% 밀착 정렬:
+ *    - `vertical-align: middle; border-collapse: collapse;`로 늘어남 완전 차단.
+ * 4. 2~3줄 단위 숨쉬는 여백과 모바일 최적화 호흡 유지.
  */
 
 export interface NaverFormatOptions {
@@ -47,6 +48,16 @@ const LINK_CARDS = {
 };
 
 /**
+ * 키워드 강조를 네이버 시그니처 노란색 형광펜으로 변환
+ */
+function applyNaverHighlighter(text: string): string {
+  return text.replace(
+    /\*\*(.*?)\*\*/g,
+    '<strong style="background-color: #fef08a; padding: 2px 4px; border-radius: 2px; color: #111827; font-weight: bold;">$1</strong>'
+  );
+}
+
+/**
  * 마크다운 텍스트를 네이버 스마트에디터 ONE 전용 플랫 HTML로 변환
  */
 export function convertMarkdownToNaverHtml(markdown: string, options: NaverFormatOptions = {}): string {
@@ -54,23 +65,24 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
   const linkCard = LINK_CARDS[blogType] || LINK_CARDS.default;
 
   // Frontmatter 및 주석 제거
-  let cleanMd = markdown
+  const cleanMd = markdown
     .replace(/^---[\s\S]*?---\n*/, '')
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/\r\n/g, '\n')
     .trim();
 
-  // 문단 단위로 분리하여 처리
   const rawSections = cleanMd.split(/\n{2,}/);
   const formattedSections: string[] = [];
 
   // 1. 상단 제목 (옵션)
   if (options.title) {
     formattedSections.push(
-      `<p style="font-size: 22px; font-weight: bold; color: #111827; line-height: 1.35; margin: 0 0 16px 0; padding-bottom: 12px; border-bottom: 3px solid #03c75a;"><strong>${options.title}</strong></p>` +
-      `<p style="font-size: 13px; color: #6b7280; margin: 0 0 24px 0;">보상스쿨 손해사정 실무 칼럼 · 네이버 블로그 공식 배포판</p>`
+      `<p style="font-size: 22px; font-weight: bold; color: #111827; line-height: 1.35; margin: 0 0 12px 0; padding-bottom: 12px; border-bottom: 3px solid #03c75a;"><strong>${options.title}</strong></p>` +
+      `<p style="font-size: 13px; color: #6b7280; margin: 0 0 28px 0;">보상스쿨 손해사정 실무 칼럼 · 네이버 공식 배포판</p>`
     );
   }
+
+  let isFirstH2 = true;
 
   for (let section of rawSections) {
     section = section.trim();
@@ -80,7 +92,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     if (section.includes('|') && section.split('\n').filter(l => l.includes('|')).length >= 2) {
       const lines = section.split('\n').map(l => l.trim()).filter(l => l.startsWith('|') && l.endsWith('|'));
       if (lines.length >= 2) {
-        let tableHtml = `<table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; margin: 18px 0; font-size: 13px; line-height: 1.5;">`;
+        let tableHtml = `<table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; margin: 20px 0; font-size: 13.5px; line-height: 1.5;">`;
         
         // 헤더 행
         const headers = lines[0].split('|').map(s => s.trim()).filter(s => s.length > 0);
@@ -98,7 +110,8 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
           tableHtml += `<tr style="background-color: ${bg};">`;
           cells.forEach((c, cIdx) => {
             const align = cIdx === 0 ? 'center' : 'left';
-            tableHtml += `<td style="padding: 9px 12px; color: #334155; border: 1px solid #cbd5e1; text-align: ${align}; vertical-align: middle; line-height: 1.5;">${c}</td>`;
+            const cellText = applyNaverHighlighter(c);
+            tableHtml += `<td style="padding: 10px 12px; color: #334155; border: 1px solid #cbd5e1; text-align: ${align}; vertical-align: middle; line-height: 1.5;">${cellText}</td>`;
           });
           tableHtml += `</tr>`;
         });
@@ -112,8 +125,11 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     // B. 대주제 H2 (## ...)
     if (section.startsWith('## ')) {
       const titleText = section.replace(/^##\s+/, '').trim();
+      const divider = isFirstH2 ? '' : `<hr style="border: 0; height: 1px; background-color: #e2e8f0; margin: 36px 0 24px 0;" />`;
+      isFirstH2 = false;
+
       formattedSections.push(
-        `<p style="font-size: 18px; font-weight: bold; color: #0f172a; margin-top: 32px; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid #03c75a;"><strong>${titleText}</strong></p>`
+        `${divider}<p style="font-size: 19px; font-weight: bold; color: #0f172a; margin-top: 16px; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid #03c75a;"><strong>📌 ${titleText}</strong></p>`
       );
       continue;
     }
@@ -122,16 +138,16 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     if (section.startsWith('### ')) {
       const titleText = section.replace(/^###\s+/, '').trim();
       formattedSections.push(
-        `<p style="font-size: 16px; font-weight: bold; color: #1e293b; margin-top: 24px; margin-bottom: 8px;"><strong>📌 ${titleText}</strong></p>`
+        `<p style="font-size: 16.5px; font-weight: bold; color: #1e293b; margin-top: 24px; margin-bottom: 10px;"><span style="color: #03c75a; margin-right: 6px;">■</span><strong>${titleText}</strong></p>`
       );
       continue;
     }
 
-    // D. 솔루션 단계 H6 (###### ...)
+    // D. 솔루션 단계 H6 (###### ...) -> 세련된 뱃지 + 볼드 타이틀 (박스 도배 방지)
     if (section.startsWith('###### ')) {
       const titleText = section.replace(/^######\s+/, '').trim();
       formattedSections.push(
-        `<p style="font-size: 14px; font-weight: bold; color: #065f46; background-color: #ecfdf5; padding: 8px 12px; border-left: 4px solid #059669; margin-top: 18px; margin-bottom: 8px;"><strong>${titleText}</strong></p>`
+        `<p style="font-size: 15px; font-weight: bold; color: #065f46; margin-top: 20px; margin-bottom: 6px;"><span style="display: inline-block; background-color: #059669; color: #ffffff; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-right: 6px; font-weight: bold;">핵심 솔루션</span><strong>${titleText}</strong></p>`
       );
       continue;
     }
@@ -140,19 +156,25 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     if (section.startsWith('>')) {
       const quoteLines = section.split('\n').map(l => l.replace(/^>\s?/, '').trim()).filter(Boolean);
       
-      // 체크리스트인 경우
+      // 체크리스트인 경우 -> 단일 통합 체크 카드 렌더링
       if (quoteLines.some(l => l.startsWith('- [ ]') || l.startsWith('- [x]'))) {
         const checkItems = quoteLines.map(l => {
           const itemText = l.replace(/^- \[( |x)\]\s*/, '');
-          return `<p style="margin: 4px 0; padding: 6px 12px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #334155;">☑️ ${itemText}</p>`;
+          const highlighted = applyNaverHighlighter(itemText);
+          return `<p style="margin: 6px 0; font-size: 14px; color: #334155; line-height: 1.6;"><span style="color: #059669; font-weight: bold; margin-right: 6px;">☑️</span>${highlighted}</p>`;
         }).join('');
-        formattedSections.push(checkItems);
-      } else {
-        // 일반 인용구 / 용어 사전
-        const quoteContent = quoteLines.join('<br/>')
-          .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1e40af; background-color: #eff6ff; padding: 1px 4px;">$1</strong>');
+
         formattedSections.push(
-          `<blockquote style="margin: 14px 0; padding: 12px 16px; background-color: #f0fdf4; border-left: 4px solid #03c75a; font-size: 14px; line-height: 1.6; color: #166534;">${quoteContent}</blockquote>`
+          `<blockquote style="margin: 18px 0; padding: 14px 18px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">` +
+          `<p style="font-size: 14px; font-weight: bold; color: #0f172a; margin: 0 0 10px 0;">📋 <strong>1분 자가진단 체크리스트</strong></p>` +
+          `${checkItems}</blockquote>`
+        );
+      } else {
+        // 일반 인용구 / 용어 사전 -> 네이버 표준 라인 인용구
+        const quoteContent = quoteLines.join('<br/>');
+        const highlighted = applyNaverHighlighter(quoteContent);
+        formattedSections.push(
+          `<blockquote style="margin: 16px 0; padding: 12px 18px; background-color: #f0fdf4; border-left: 4px solid #03c75a; font-size: 14px; line-height: 1.7; color: #166534;">${highlighted}</blockquote>`
         );
       }
       continue;
@@ -164,32 +186,30 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
         .map(l => l.replace(/^[-*]\s+/, '').trim())
         .filter(Boolean)
         .map(l => {
-          const formatted = l.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1e40af; background-color: #eff6ff; padding: 1px 4px;">$1</strong>');
-          return `<li style="margin-bottom: 6px; color: #334155; line-height: 1.6; font-size: 14.5px;">${formatted}</li>`;
+          const highlighted = applyNaverHighlighter(l);
+          return `<li style="margin-bottom: 6px; color: #334155; line-height: 1.7; font-size: 14.5px;">${highlighted}</li>`;
         }).join('');
-      formattedSections.push(`<ul style="margin: 10px 0 14px 20px; padding: 0;">${listItems}</ul>`);
+      formattedSections.push(`<ul style="margin: 10px 0 16px 20px; padding: 0;">${listItems}</ul>`);
       continue;
     }
 
-    // G. 일반 본문 문단
-    let pContent = section
-      // 볼드 처리
-      .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1e40af; background-color: #eff6ff; padding: 1px 4px; border-radius: 3px;">$1</strong>')
-      // 줄바꿈 처리
+    // G. 일반 본문 문단 (2~3줄 단위 부드러운 줄간격)
+    let pContent = applyNaverHighlighter(section)
       .replace(/\n/g, '<br/>');
 
     formattedSections.push(
-      `<p style="font-size: 15px; line-height: 1.8; color: #27272a; margin-bottom: 14px; word-break: keep-all;">${pContent}</p>`
+      `<p style="font-size: 15px; line-height: 1.85; color: #27272a; margin-bottom: 16px; word-break: keep-all;">${pContent}</p>`
     );
   }
 
-  // 11. 하단 보상스쿨 스마트 링크 카드 (스마트에디터에 최적화된 심플 박스)
+  // 11. 하단 보상스쿨 스마트 링크 카드 (네이버 클릭 유도 퍼널)
   const footerHtml = `
-    <blockquote style="margin-top: 36px; padding: 18px 20px; background-color: #f8fafc; border: 2px solid #03c75a; border-radius: 10px; text-align: center;">
+    <hr style="border: 0; height: 1px; background-color: #e2e8f0; margin: 40px 0 24px 0;" />
+    <blockquote style="margin-top: 24px; padding: 20px; background-color: #f8fafc; border: 2px solid #03c75a; border-radius: 10px; text-align: center;">
       <p style="font-size: 12px; font-weight: bold; color: #03c75a; margin: 0 0 6px 0;">${linkCard.badge}</p>
-      <p style="font-size: 16px; font-weight: bold; color: #0f172a; margin: 0 0 6px 0;"><strong>${linkCard.title}</strong></p>
-      <p style="font-size: 13px; color: #64748b; margin: 0 0 14px 0; line-height: 1.5;">${linkCard.desc}</p>
-      <p style="margin: 0;"><a href="${linkCard.url}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 9px 20px; background-color: #03c75a; color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: bold; border-radius: 6px;">👉 ${linkCard.url.replace('https://', '')} 바로가기</a></p>
+      <p style="font-size: 16.5px; font-weight: bold; color: #0f172a; margin: 0 0 6px 0;"><strong>${linkCard.title}</strong></p>
+      <p style="font-size: 13.5px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">${linkCard.desc}</p>
+      <p style="margin: 0;"><a href="${linkCard.url}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 10px 24px; background-color: #03c75a; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: bold; border-radius: 6px;">👉 ${linkCard.url.replace('https://', '')} 바로가기</a></p>
     </blockquote>
   `;
 

@@ -24,6 +24,18 @@ export interface ChatMessage {
   created_at: string;
 }
 
+export interface ConsultationProgressLog {
+  id: string;
+  consultation_id?: string;
+  client_name?: string;
+  client_phone?: string;
+  date: string; // YYYY-MM-DD
+  time?: string;
+  stage: '접수대기' | '서류검토' | '현장실사' | '보험사절충' | '종결완료' | '기타';
+  content: string;
+  created_at: string;
+}
+
 export interface Consultation {
   id: string;
   name: string;
@@ -37,6 +49,7 @@ export interface Consultation {
   inquiry?: string;
   status: '대기' | '상담' | '완료' | '보류' | '상담완료' | '상담 완료' | '삭제';
   created_at: string;
+  customer_memo?: string;
 }
 
 export interface AdminCalendarEvent {

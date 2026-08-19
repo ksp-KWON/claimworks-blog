@@ -218,7 +218,7 @@ export default function ChatWidget() {
         
       if (msgErr) console.error('Visitor msg error:', msgErr);
         
-      const systemMessage = "접수가 완료되었습니다. 담당 손해사정사가 배정되어 내용을 검토 중이며 약 3~5분 내로 정확한 답변을 드릴 예정입니다.";
+      const systemMessage = "상담 접수가 정상적으로 완료되었습니다. 전담 손해사정사가 의학 및 법리 내용을 면밀히 검토 중이며, 약 3~5분 내로 명쾌한 실무 답변을 드리겠습니다.";
       const { data: sysMsg, error: sysErr } = await supabase
         .from('chat_messages')
         .insert([{ session_id: data.id, sender: 'system', content: systemMessage }])
@@ -317,27 +317,31 @@ export default function ChatWidget() {
             initial={{ opacity: 0, y: 15, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 15, scale: 0.98, transition: { duration: 0.2 } }}
-            className="fixed bottom-0 sm:bottom-[80px] right-0 sm:right-6 w-full sm:w-[390px] h-[100dvh] sm:h-[640px] max-h-[100dvh] sm:max-h-[85vh] bg-gray-50 dark:bg-[#121214] sm:rounded-none shadow-2xl z-[300] flex flex-col overflow-hidden border border-gray-300 dark:border-zinc-800"
+            className="fixed bottom-0 sm:bottom-[76px] right-0 sm:right-6 w-full sm:w-[400px] h-[100dvh] sm:h-[660px] max-h-[100dvh] sm:max-h-[86vh] bg-white dark:bg-[#1a1a1e] rounded-none shadow-[0_16px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] z-[300] flex flex-col overflow-hidden border border-gray-200 dark:border-zinc-800"
           >
-            {/* Header (Square Family Look) */}
-            <div className="bg-white dark:bg-[#1a1a1c] border-b border-gray-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2.5">
+            {/* Header (보상스쿨 패밀리룩 헤더) */}
+            <div className="bg-white dark:bg-[#202124] border-b border-gray-200 dark:border-zinc-800 px-4 py-3.5 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-none border border-gray-200 dark:border-zinc-700 bg-white overflow-hidden flex items-center justify-center p-1 shadow-sm">
                   <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-1.5">
-                    보상스쿨 빠른 접수처
-                  </h3>
-                  <p className="text-[11px] text-green-600 dark:text-green-400 font-bold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-none bg-green-500 animate-pulse inline-block"></span>
-                    담당자 상시 대기중
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="font-extrabold text-gray-900 dark:text-white text-sm tracking-tight">
+                      보상스쿨 빠른 접수처
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="inline-flex items-center gap-1 text-[10.5px] font-bold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/40 px-1.5 py-0.2 border border-green-200/60 dark:border-green-800/40">
+                      <span className="w-1.5 h-1.5 rounded-none bg-green-500 animate-pulse"></span>
+                      손해사정사 실시간 대기중
+                    </span>
+                  </div>
                 </div>
               </div>
               <button 
                 onClick={handleClose}
-                className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
+                className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800"
                 aria-label="닫기"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -346,61 +350,70 @@ export default function ChatWidget() {
               </button>
             </div>
 
-            {/* Compact Status Indicator (Header Attached, Ultra-Slim 26px) */}
+            {/* Slim Status Bar (보상스쿨 프리미엄 스텝 게이지) */}
             {isNicknameSet && (
-              <div className="bg-blue-50/90 dark:bg-blue-950/30 border-b border-blue-100 dark:border-blue-900/30 px-4 py-1.5 flex items-center justify-between text-[11px] shrink-0">
-                <div className="flex items-center gap-1 font-bold text-blue-700 dark:text-blue-400">
-                  <span className="w-1.5 h-1.5 rounded-none bg-blue-600 dark:bg-blue-400 inline-block"></span>
-                  접수 완료
+              <div className="bg-slate-50 dark:bg-[#16161a] border-b border-gray-200 dark:border-zinc-800/80 px-4 py-2 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-4 h-4 bg-blue-600 text-white text-[9.5px] font-black flex items-center justify-center">✓</span>
+                  <span className="text-[11.5px] font-extrabold text-blue-700 dark:text-blue-400">접수 완료</span>
                 </div>
-                <div className="h-px bg-blue-200 dark:bg-blue-800/60 w-8"></div>
-                <div className={`flex items-center gap-1 font-bold ${!hasAdminReplied ? 'text-blue-700 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`}>
-                  <span className={`w-1.5 h-1.5 rounded-none ${!hasAdminReplied ? 'bg-amber-500 animate-pulse' : 'bg-gray-300 dark:bg-zinc-700'} inline-block`}></span>
-                  검토 중
+                <div className="h-px bg-gray-300 dark:bg-zinc-700 w-6"></div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`w-4 h-4 text-[9.5px] font-black flex items-center justify-center ${!hasAdminReplied ? 'bg-amber-500 text-white animate-pulse' : 'bg-gray-200 dark:bg-zinc-800 text-gray-500'}`}>
+                    {!hasAdminReplied ? '⏳' : '✓'}
+                  </span>
+                  <span className={`text-[11.5px] font-bold ${!hasAdminReplied ? 'text-amber-700 dark:text-amber-400 font-extrabold' : 'text-gray-400 dark:text-zinc-500'}`}>
+                    전문 검토
+                  </span>
                 </div>
-                <div className="h-px bg-blue-200 dark:bg-blue-800/60 w-8"></div>
-                <div className={`flex items-center gap-1 font-bold ${hasAdminReplied ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>
-                  <span className={`w-1.5 h-1.5 rounded-none ${hasAdminReplied ? 'bg-green-500' : 'bg-gray-300 dark:bg-zinc-700'} inline-block`}></span>
-                  {hasAdminReplied ? '답변 완료' : '답변 대기'}
+                <div className="h-px bg-gray-300 dark:bg-zinc-700 w-6"></div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`w-4 h-4 text-[9.5px] font-black flex items-center justify-center ${hasAdminReplied ? 'bg-green-600 text-white' : 'bg-gray-200 dark:bg-zinc-800 text-gray-500'}`}>
+                    💬
+                  </span>
+                  <span className={`text-[11.5px] font-bold ${hasAdminReplied ? 'text-green-700 dark:text-green-400 font-extrabold' : 'text-gray-400 dark:text-zinc-500'}`}>
+                    {hasAdminReplied ? '답변 완료' : '답변 대기'}
+                  </span>
                 </div>
               </div>
             )}
 
             {!isNicknameSet ? (
-              <div className="flex-1 flex flex-col items-center justify-start overflow-y-auto p-6 bg-gray-50 dark:bg-[#121214]">
-                <div className="w-14 h-14 rounded-none bg-white dark:bg-[#1a1a1c] border border-gray-200 dark:border-zinc-700 shadow-sm flex items-center justify-center mb-4 mt-2 shrink-0">
+              <div className="flex-1 flex flex-col items-center justify-start overflow-y-auto p-6 bg-slate-50/50 dark:bg-[#16161a]">
+                <div className="w-14 h-14 bg-white dark:bg-[#202124] border border-gray-200 dark:border-zinc-700 shadow-sm flex items-center justify-center mb-3.5 mt-1 shrink-0">
                   <span className="text-[var(--google-blue)] font-black text-xl">상담</span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1.5">실시간 빠른 상담 접수</h3>
+                <h3 className="text-lg font-black text-gray-900 dark:text-gray-100 mb-1 tracking-tight">실시간 손해사정 상담 접수</h3>
                 <p className="text-[12px] text-gray-500 dark:text-gray-400 text-center mb-5 break-keep">
-                  신속하고 정확한 검토를 위해<br/>아래 3가지 항목을 작성해 주세요.
+                  정확하고 유리한 보상 검토를 위해<br/>아래 3가지 항목을 작성해 주세요.
                 </p>
                 
-                <form onSubmit={handleSetNickname} className="w-full max-w-[310px] space-y-3.5">
+                <form onSubmit={handleSetNickname} className="w-full max-w-[320px] space-y-3.5 bg-white dark:bg-[#202124] p-5 border border-gray-200 dark:border-zinc-800 shadow-sm">
                   <div>
-                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">성함 / 닉네임</label>
+                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">성함 / 의뢰인명</label>
                     <input
                       type="text"
                       value={nicknameInput}
                       onChange={e => setNicknameInput(e.target.value)}
                       placeholder="예: 홍길동"
-                      className="w-full px-3.5 py-2.5 rounded-none border border-gray-300 dark:border-zinc-700 bg-white dark:bg-[#1e1e22] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[var(--google-blue)] transition-all text-sm"
+                      className="w-full px-3.5 py-2.5 rounded-none border border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-[#16161a] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[var(--google-blue)] focus:bg-white dark:focus:bg-[#202124] transition-all text-sm"
                       maxLength={10}
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">사고 종류</label>
+                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">사고 및 분쟁 유형</label>
                     <div className="relative">
                       <select
                         value={accidentType}
                         onChange={e => setAccidentType(e.target.value)}
-                        className="w-full pl-3.5 pr-9 py-2.5 appearance-none rounded-none border border-gray-300 dark:border-zinc-700 bg-white dark:bg-[#1e1e22] text-gray-900 dark:text-white focus:outline-none focus:border-[var(--google-blue)] transition-all text-sm cursor-pointer"
+                        className="w-full pl-3.5 pr-9 py-2.5 appearance-none rounded-none border border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-[#16161a] text-gray-900 dark:text-white focus:outline-none focus:border-[var(--google-blue)] focus:bg-white dark:focus:bg-[#202124] transition-all text-sm cursor-pointer"
                       >
-                        <option value="자동차 사고">🚗 자동차 사고</option>
-                        <option value="실손/질병/상해">🏥 실손/질병/상해</option>
-                        <option value="배상책임/산재">⚖️ 배상책임/산재</option>
-                        <option value="기타">기타</option>
+                        <option value="자동차 사고">🚗 자동차 사고 합의금/과실</option>
+                        <option value="실손/질병/상해">🏥 실손의료비/질병진단비 분쟁</option>
+                        <option value="배상책임/산재">⚖️ 일상생활배상/산재·근재</option>
+                        <option value="후유장해/사망">🛡️ 후유장해/사망보험금</option>
+                        <option value="기타">기타 보험 분쟁</option>
                       </select>
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -410,12 +423,12 @@ export default function ChatWidget() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">간단한 문의 내용</label>
+                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">상담 문의 내용</label>
                     <textarea
                       value={inquiryText}
                       onChange={e => setInquiryText(e.target.value)}
-                      placeholder="예: 후방추돌 2주 진단 합의금 문의"
-                      className="w-full px-3.5 py-2.5 rounded-none border border-gray-300 dark:border-zinc-700 bg-white dark:bg-[#1e1e22] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[var(--google-blue)] transition-all text-sm resize-none"
+                      placeholder="예: 후방추돌 2주 진단 합의금 산정 기준 문의"
+                      className="w-full px-3.5 py-2.5 rounded-none border border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-[#16161a] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[var(--google-blue)] focus:bg-white dark:focus:bg-[#202124] transition-all text-sm resize-none"
                       rows={3}
                       required
                     />
@@ -423,7 +436,7 @@ export default function ChatWidget() {
                   <button
                     type="submit"
                     disabled={!nicknameInput.trim() || !inquiryText.trim()}
-                    className="w-full bg-[var(--google-blue)] hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-zinc-800 text-white font-bold py-3 rounded-none text-sm transition-colors shadow-sm disabled:shadow-none mt-1"
+                    className="w-full bg-[var(--google-blue)] hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-zinc-800 text-white font-black py-3 rounded-none text-sm transition-all shadow-md hover:shadow-lg disabled:shadow-none mt-1"
                   >
                     상담 접수 완료하기
                   </button>
@@ -431,14 +444,14 @@ export default function ChatWidget() {
               </div>
             ) : (
               <>
-                {/* Messages Area (Maximized Space) */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
+                {/* Messages Area (단정하고 깔끔한 메시지 영역) */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/40 dark:bg-[#141416]">
                   
                   {/* Status Error Display */}
                   {status === 'error' && (
-                    <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-none p-2.5 text-xs text-red-600 dark:text-red-400 text-center">
+                    <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-3 text-xs text-red-600 dark:text-red-400 text-center font-bold">
                       ⚠️ 서버 연결에 실패했습니다.
-                      <button onClick={checkExistingSession} className="ml-2 underline font-bold">다시 시도</button>
+                      <button onClick={checkExistingSession} className="ml-2 underline font-black">다시 시도</button>
                     </div>
                   )}
                   
@@ -446,31 +459,63 @@ export default function ChatWidget() {
                     <div className="flex justify-center py-2">
                       <div className="flex gap-1.5">
                         {[0, 1, 2].map(i => (
-                          <div key={i} className="w-1.5 h-1.5 rounded-none bg-[var(--google-blue)]/60 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+                          <div key={i} className="w-1.5 h-1.5 bg-[var(--google-blue)]/70 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {/* Dynamic Messages (Unified Professional Theme) */}
+                  {/* Dynamic Messages */}
                   {messages.map(msg => {
                     const isVisitor = msg.sender === 'visitor';
                     const isSystem = msg.sender === 'system';
+                    const isReceipt = isVisitor && msg.content.startsWith('[상담 접수 정보]');
                     
+                    if (isReceipt) {
+                      const lines = msg.content.split('\n');
+                      const name = lines.find(l => l.startsWith('이름:'))?.replace('이름:', '').trim() || '';
+                      const type = lines.find(l => l.startsWith('사고 종류:'))?.replace('사고 종류:', '').trim() || '';
+                      const text = lines.find(l => l.startsWith('문의 내용:'))?.replace('문의 내용:', '').trim() || '';
+
+                      return (
+                        <div key={msg.id} className="flex flex-col items-end w-full">
+                          <div className="w-full max-w-[320px] bg-white dark:bg-[#202124] border border-blue-200 dark:border-blue-900/60 shadow-sm p-4 text-left">
+                            <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-2 mb-3">
+                              <span className="text-[11px] font-black text-[var(--google-blue)] bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 border border-blue-200/60 dark:border-blue-800/40">
+                                📋 상담 접수 정보
+                              </span>
+                              <span className="text-[10px] text-gray-400">{formatTime(msg.created_at)}</span>
+                            </div>
+                            <div className="space-y-1.5 text-xs text-gray-700 dark:text-gray-300">
+                              <div className="flex"><span className="w-16 font-bold text-gray-400 shrink-0">의뢰인</span><span className="font-extrabold text-gray-900 dark:text-white">{name}</span></div>
+                              <div className="flex"><span className="w-16 font-bold text-gray-400 shrink-0">사고유형</span><span className="font-extrabold text-gray-900 dark:text-white">{type}</span></div>
+                              <div className="flex flex-col pt-1 border-t border-gray-100 dark:border-zinc-800/60 mt-2">
+                                <span className="font-bold text-gray-400 mb-1">문의 내용</span>
+                                <span className="font-medium text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-[#16161a] p-2.5 border border-gray-100 dark:border-zinc-800 whitespace-pre-wrap leading-relaxed">{text}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+
                     return (
-                      <div key={msg.id} className={`flex items-end gap-2 ${isVisitor ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <div key={msg.id} className={`flex items-end gap-2.5 ${isVisitor ? 'flex-row-reverse' : 'flex-row'}`}>
                         {!isVisitor && (
-                          <div className="w-7 h-7 rounded-none bg-white dark:bg-[#1e1e22] border border-gray-200 dark:border-zinc-700 flex items-center justify-center shrink-0 overflow-hidden mb-4 shadow-sm p-0.5">
+                          <div className="w-7 h-7 bg-white dark:bg-[#202124] border border-gray-200 dark:border-zinc-700 flex items-center justify-center shrink-0 overflow-hidden mb-4 shadow-sm p-0.5">
                             <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain" />
                           </div>
                         )}
-                        <div className={`max-w-[85%] flex flex-col ${isVisitor ? 'items-end' : 'items-start'}`}>
-                          <div className={`rounded-none px-3.5 py-2.5 shadow-sm text-sm leading-relaxed whitespace-pre-wrap border ${
+                        <div className={`max-w-[82%] flex flex-col ${isVisitor ? 'items-end' : 'items-start'}`}>
+                          {!isVisitor && (
+                            <span className="text-[10.5px] font-bold text-gray-500 dark:text-gray-400 mb-1 ml-0.5 flex items-center gap-1">
+                              보상스쿨 수석 손해사정사
+                            </span>
+                          )}
+                          <div className={`px-3.5 py-2.5 shadow-sm text-sm leading-relaxed whitespace-pre-wrap border ${
                             isVisitor 
-                              ? 'bg-[var(--google-blue)] text-white border-[var(--google-blue)]' 
-                              : isSystem
-                                ? 'bg-white dark:bg-[#1a1a1c] text-gray-800 dark:text-gray-100 border-gray-200 dark:border-zinc-800'
-                                : 'bg-white dark:bg-[#1e1e22] text-gray-800 dark:text-gray-100 border-gray-200 dark:border-zinc-700'
+                              ? 'bg-[var(--google-blue)] text-white border-[var(--google-blue)] font-medium' 
+                              : 'bg-white dark:bg-[#202124] text-gray-900 dark:text-gray-100 border-gray-200 dark:border-zinc-800'
                           }`}>
                             <p>{msg.content}</p>
                           </div>
@@ -483,52 +528,53 @@ export default function ChatWidget() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Quick Action Chips (Always Pinned Above Input) */}
-                <div className="px-3 pt-2 pb-1 bg-white dark:bg-[#1a1a1c] border-t border-gray-200 dark:border-zinc-800 shrink-0">
-                  <div className="grid grid-cols-2 gap-1.5">
+                {/* Quick Action Chips (패밀리룩 퀵 액션 바) */}
+                <div className="px-3.5 py-2 bg-white dark:bg-[#202124] border-t border-gray-200 dark:border-zinc-800 shrink-0">
+                  <div className="grid grid-cols-2 gap-2">
                     <button 
                       onClick={() => router.push('/calculator')}
-                      className="flex items-center justify-center gap-1.5 bg-gray-50 dark:bg-[#141416] hover:bg-blue-50 dark:hover:bg-blue-950/40 py-2 rounded-none border border-gray-200 dark:border-zinc-700 transition-colors group"
+                      className="flex items-center justify-center gap-1.5 bg-blue-50/60 dark:bg-blue-950/20 hover:bg-blue-50 dark:hover:bg-blue-900/40 py-2.5 px-2 border border-blue-200/80 dark:border-blue-800/40 transition-all group shadow-sm"
                     >
-                      <span className="text-xs">🧮</span>
-                      <span className="text-[11.5px] font-bold text-[var(--google-blue)] dark:text-blue-400">예상 합의금 계산기</span>
+                      <span className="text-sm group-hover:scale-110 transition-transform">🧮</span>
+                      <span className="text-xs font-black text-[var(--google-blue)] dark:text-blue-400 tracking-tight">예상 합의금 계산기</span>
                     </button>
                     
                     <button 
                       onClick={() => router.push('/consultation')}
-                      className="flex items-center justify-center gap-1.5 bg-gray-50 dark:bg-[#141416] hover:bg-gray-100 dark:hover:bg-zinc-800 py-2 rounded-none border border-gray-200 dark:border-zinc-700 transition-colors group"
+                      className="flex items-center justify-center gap-1.5 bg-gray-50 dark:bg-[#16161a] hover:bg-gray-100 dark:hover:bg-zinc-800 py-2.5 px-2 border border-gray-200 dark:border-zinc-700 transition-all group shadow-sm"
                     >
-                      <span className="text-xs">📞</span>
-                      <span className="text-[11.5px] font-bold text-gray-700 dark:text-gray-300">예약상담 신청하기</span>
+                      <span className="text-sm group-hover:scale-110 transition-transform">📞</span>
+                      <span className="text-xs font-bold text-gray-800 dark:text-gray-200 tracking-tight">전화 예약상담 신청</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Input Area (Square Family Look) */}
-                <div className="p-3 bg-white dark:bg-[#1a1a1c] shrink-0 border-t border-gray-100 dark:border-zinc-900">
-                  <div className="flex items-end gap-2 bg-gray-50 dark:bg-[#121214] rounded-none border border-gray-300 dark:border-zinc-700 px-3 py-2 focus-within:border-[var(--google-blue)] transition-all">
+                {/* Input Area (보상스쿨 프리미엄 인풋 바) */}
+                <div className="p-3 bg-slate-50 dark:bg-[#16161a] shrink-0 border-t border-gray-200 dark:border-zinc-800">
+                  <div className="flex items-end gap-2 bg-white dark:bg-[#202124] border border-gray-300 dark:border-zinc-700 px-3 py-2 focus-within:border-[var(--google-blue)] focus-within:ring-1 focus-within:ring-[var(--google-blue)]/20 transition-all shadow-inner">
                     <textarea
                       ref={inputRef}
                       value={inputText}
                       onChange={e => setInputText(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="보상스쿨 챗봇에게 무엇이든 물어보세요..."
+                      placeholder="궁금한 내용을 입력하세요..."
                       rows={1}
                       disabled={status === 'error'}
                       className="flex-1 bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 resize-none outline-none leading-relaxed max-h-24 overflow-y-auto disabled:opacity-50 py-1"
-                      style={{ minHeight: '28px' }}
+                      style={{ minHeight: '26px' }}
                     />
                     <button
                       onClick={() => sendMessage(inputText)}
                       disabled={!inputText.trim() || isSending || status === 'error'}
-                      className={`w-8 h-8 rounded-none flex items-center justify-center shrink-0 transition-all ${
+                      className={`w-8 h-8 flex items-center justify-center shrink-0 transition-all ${
                         inputText.trim() && !isSending 
-                          ? 'bg-[var(--google-blue)] text-white hover:bg-blue-700 shadow-sm' 
-                          : 'bg-gray-200 dark:bg-zinc-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                          ? 'bg-[var(--google-blue)] text-white hover:bg-blue-700 shadow-md' 
+                          : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
                       }`}
+                      aria-label="메시지 전송"
                     >
                       {isSending ? (
-                        <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-none animate-spin" />
+                        <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent animate-spin" />
                       ) : (
                         <svg className="w-4 h-4 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -543,7 +589,7 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* Floating Button (Square Family Look with Glow) */}
+      {/* Floating Button (보상스쿨 패밀리룩 스퀘어 런처) */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -555,20 +601,20 @@ export default function ChatWidget() {
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-none flex items-center justify-center transition-colors focus:outline-none bg-white dark:bg-[#1a1a1c] border-2 border-[var(--google-blue)] shadow-xl"
+            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-none flex items-center justify-center transition-all focus:outline-none bg-white dark:bg-[#202124] border-2 border-[var(--google-blue)] shadow-[0_8px_30px_rgba(26,115,232,0.3)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.8)]"
             aria-label="실시간 채팅 열기"
           >
             <svg className="w-7 h-7 text-[var(--google-blue)]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 3C6.48 3 2 6.58 2 11C2 13.56 3.42 15.86 5.6 17.26C5.4 18.06 4.8 19.86 4.8 19.86C4.8 19.86 6.8 19.56 8.6 18.36C9.6 18.76 10.8 19 12 19C17.52 19 22 15.42 22 11C22 6.58 17.52 3 12 3Z"/>
             </svg>
 
-            {/* Red Glow (Dimmer) */}
+            {/* Blue Glow Pulse */}
             <motion.div 
               className="absolute inset-0 rounded-none pointer-events-none"
               animate={{ 
                 boxShadow: [
                   '0 0 0px 0px rgba(26,115,232,0)', 
-                  '0 0 20px 4px rgba(26,115,232,0.35)', 
+                  '0 0 22px 6px rgba(26,115,232,0.4)', 
                   '0 0 0px 0px rgba(26,115,232,0)'
                 ] 
               }}
@@ -579,7 +625,7 @@ export default function ChatWidget() {
               }}
             />
 
-            {/* Unread Badge (Square Chip) */}
+            {/* Unread Badge */}
             <AnimatePresence>
               {unreadCount > 0 && (
                 <motion.span

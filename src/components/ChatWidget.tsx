@@ -589,7 +589,7 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* Floating Button (보상스쿨 패밀리룩 스퀘어 런처) */}
+      {/* Floating Button (Original Premium Circular 3D Launcher) */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -601,31 +601,35 @@ export default function ChatWidget() {
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-none flex items-center justify-center transition-all focus:outline-none bg-white dark:bg-[#202124] border-2 border-[var(--google-blue)] shadow-[0_8px_30px_rgba(26,115,232,0.3)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.8)]"
+            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-full flex items-center justify-center transition-colors focus:outline-none bg-blue-50 dark:bg-[#202124] focus:ring-4 focus:ring-blue-300 shadow-[0_8px_30px_rgba(26,115,232,0.3)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.8)]"
+            style={{ 
+              boxShadow: '0 8px 30px rgba(26,115,232,0.25), inset 0 -3px 6px rgba(0,0,0,0.06), inset 0 3px 6px rgba(255,255,255,1)',
+              border: '1px solid rgba(229,231,235,0.8)'
+            }}
             aria-label="실시간 채팅 열기"
           >
-            <svg className="w-7 h-7 text-[var(--google-blue)]" viewBox="0 0 24 24" fill="currentColor">
+            <svg className="w-7 h-7 text-[#1a73e8]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 3C6.48 3 2 6.58 2 11C2 13.56 3.42 15.86 5.6 17.26C5.4 18.06 4.8 19.86 4.8 19.86C4.8 19.86 6.8 19.56 8.6 18.36C9.6 18.76 10.8 19 12 19C17.52 19 22 15.42 22 11C22 6.58 17.52 3 12 3Z"/>
             </svg>
 
-            {/* Blue Glow Pulse */}
+            {/* Red Glow Pulse */}
             <motion.div 
-              className="absolute inset-0 rounded-none pointer-events-none"
+              className="absolute inset-0 rounded-full pointer-events-none"
               animate={{ 
                 boxShadow: [
-                  '0 0 0px 0px rgba(26,115,232,0)', 
-                  '0 0 22px 6px rgba(26,115,232,0.4)', 
-                  '0 0 0px 0px rgba(26,115,232,0)'
+                  '0 0 0px 0px rgba(239,68,68,0)', 
+                  '0 0 22px 6px rgba(239,68,68,0.35)', 
+                  '0 0 0px 0px rgba(239,68,68,0)'
                 ] 
               }}
               transition={{ 
-                duration: 3, 
+                duration: 4, 
                 repeat: Infinity, 
                 ease: "easeInOut" 
               }}
             />
 
-            {/* Unread Badge */}
+            {/* Unread Badge (Circular Badge) */}
             <AnimatePresence>
               {unreadCount > 0 && (
                 <motion.span
@@ -633,7 +637,7 @@ export default function ChatWidget() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
-                  className="absolute -top-1.5 -right-1.5 min-w-5 h-5 bg-red-600 text-white text-[10px] font-black rounded-none flex items-center justify-center px-1 shadow-md border border-white dark:border-zinc-900 z-10"
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-zinc-900 z-10"
                 >
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </motion.span>

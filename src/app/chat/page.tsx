@@ -16,18 +16,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://claim-works.com/logo.png",
-        width: 500,
-        height: 500,
+        url: "https://claim-works.com/opengraph-image",
+        width: 1200,
+        height: 630,
         alt: "보상스쿨 실시간 채팅 상담",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "보상스쿨 채팅 상담 신청",
     description: "1:1 비공개 무료 채팅 상담을 실시간으로 진행해 드립니다.",
-    images: ["https://claim-works.com/logo.png"],
+    images: ["https://claim-works.com/opengraph-image"],
   },
 };
 

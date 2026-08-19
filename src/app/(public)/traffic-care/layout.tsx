@@ -15,18 +15,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://claim-works.com/logo.png",
-        width: 500,
-        height: 500,
+        url: "https://claim-works.com/opengraph-image",
+        width: 1200,
+        height: 630,
         alt: "보상스쿨 교통사고 로컬 안심케어",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "교통사고 로컬 안심케어 - 보상스쿨",
     description: "도로교통공단 안전 통계 기반 지역별 교통사고 맞춤형 보상 케어 가이드",
-    images: ["https://claim-works.com/logo.png"],
+    images: ["https://claim-works.com/opengraph-image"],
   },
 };
 

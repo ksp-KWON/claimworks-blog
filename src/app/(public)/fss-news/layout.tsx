@@ -15,18 +15,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://claim-works.com/logo.png",
-        width: 500,
-        height: 500,
+        url: "https://claim-works.com/opengraph-image",
+        width: 1200,
+        height: 630,
         alt: "보상스쿨 금감원 소비자경보센터",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "금감원 소비자경보센터 - 보상스쿨",
     description: "금융감독원 공식 API 연동 소비자경보 및 분쟁조정사례 실시간 가이드",
-    images: ["https://claim-works.com/logo.png"],
+    images: ["https://claim-works.com/opengraph-image"],
   },
 };
 

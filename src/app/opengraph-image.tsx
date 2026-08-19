@@ -4,7 +4,7 @@ import path from 'path';
 
 export const dynamic = 'force-static';
 
-export const alt = '보상스쿨 공식 블로그';
+export const alt = '보상스쿨 전문 손해사정 그룹';
 export const size = {
   width: 1200,
   height: 630,
@@ -34,15 +34,26 @@ export default async function Image() {
         }}
       >
         {logoBase64 ? (
-          <img
-            src={logoBase64}
-            alt="보상스쿨"
-            width={550}
-            height={550}
+          <div
             style={{
-              objectFit: 'contain',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '460px',
+              height: '460px',
+              backgroundColor: '#ffffff',
             }}
-          />
+          >
+            <img
+              src={logoBase64}
+              alt="보상스쿨"
+              width={400}
+              height={400}
+              style={{
+                objectFit: 'contain',
+              }}
+            />
+          </div>
         ) : (
           <div
             style={{

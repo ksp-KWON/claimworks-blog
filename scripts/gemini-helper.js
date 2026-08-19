@@ -1,47 +1,45 @@
 /**
  * gemini-helper.js
- * Gemini API 호출 공통 유틸리티
+ * Gemini API 호출 공통 유틸리티 (백엔드 / GitHub Actions용)
  *
- * [핵심 설계] 모델 자동 탐색 (Dynamic Discovery)
- * — 스크립트 시작 시 Gemini models.list API를 호출하여
- *   현재 실제로 사용 가능한 최신 Stable 모델을 계열별로 자동 선택합니다.
- * — 모델이 업그레이드되어도 코드·환경변수 수정 없이 자동 반영됩니다.
- * — 존재하지 않는 모델명으로 404 에러가 발생하는 문제를 근본적으로 해결합니다.
+ * [핵심 설계] 3단계 무중단 릴레이 & 최신 Google AI Studio 공식 Alias 완벽 지원
+ * — models.list API를 호출하여 현재 실제로 사용 가능한 최신 모델들을 실시간 자동 탐색
+ * — Lite(기획/키워드) + Flash(전문 칼럼 집필) 2단계 최적 분업
+ * — 429(할당량) / 404(구버전 중단) 발생 시 지체 없이 차순위 모델로 릴레이 전환
  */
 
 'use strict';
 
 const { sleep } = require('./pipeline-utils.js');
 
-
 // ── 모델 계열 정의 ────────────────────────────────────────────────────────────
-// 각 계열에 해당하는 이름 패턴을 우선순위 순서로 정의합니다.
-// 새로운 Gemini 4.x, 5.x 등이 출시되어도 패턴으로 자동 인식합니다.
 const MODEL_TIERS = [
-
   {
     tier: 'flash',
-    // "flash"는 있으나 "lite"는 없는 모델 = Flash 계열
     match: name => /gemini/i.test(name) && /flash/i.test(name) && !/lite/i.test(name),
     maxTokensFallback: 32768,
   },
   {
     tier: 'lite',
-    // "flash"와 "lite" 모두 포함 = Flash-Lite 계열
     match: name => /gemini/i.test(name) && /flash/i.test(name) && /lite/i.test(name),
     maxTokensFallback: 16384,
+  },
+  {
+    tier: 'pro',
+    match: name => /gemini/i.test(name) && /pro/i.test(name) && !/lite/i.test(name),
+    maxTokensFallback: 32768,
   },
 ];
 
 // ── 재시도 설정 ───────────────────────────────────────────────────────────────
 const RETRY_CONFIG = {
-  maxRetries: 2,
-  retryOn: [429, 500, 503, 529],
+  maxRetries: 1,
+  retryOn: [500, 503, 529],
 };
 
 // ── 버전 파싱: 모델명에서 숫자 버전 추출 (정렬용) ─────────────────────────────
-// 예) "gemini-2.5-flash" → [2, 5, 0], "gemini-2.0-flash-lite" → [2, 0, 0]
 function parseVersion(modelName) {
+  if (/latest/i.test(modelName)) return [999, 999]; // latest alias는 최우선
   const match = modelName.match(/(\d+)\.(\d+)/);
   if (!match) return [0, 0];
   return [parseInt(match[1], 10), parseInt(match[2], 10)];
@@ -53,17 +51,22 @@ function compareVersionsDesc(a, b) {
   return bMaj !== aMaj ? bMaj - aMaj : bMin - aMin;
 }
 
-// ── Stable 모델 필터 ──────────────────────────────────────────────────────────
-// preview, exp(erimental), latest 접미사가 없는 모델 = Stable GA 채널
-function isStable(modelName) {
-  return !/preview|exp(erimental)?|latest/i.test(modelName);
-}
+// ── 내장 기본값 폴백 (탐색 실패 시 안전망) ───────────────────────────────────
+const FALLBACK_MODELS = [
+  { name: 'gemini-flash-latest',   maxTokens: 32768, tier: 'flash' },
+  { name: 'gemini-3.6-flash',      maxTokens: 32768, tier: 'flash' },
+  { name: 'gemini-3.5-flash',      maxTokens: 32768, tier: 'flash' },
+  { name: 'gemini-2.5-flash',      maxTokens: 32768, tier: 'flash' },
+  { name: 'gemini-flash-lite-latest', maxTokens: 16384, tier: 'lite' },
+  { name: 'gemini-3.5-flash-lite', maxTokens: 16384, tier: 'lite' },
+  { name: 'gemini-3.1-flash-lite', maxTokens: 16384, tier: 'lite' },
+  { name: 'gemini-pro-latest',     maxTokens: 32768, tier: 'pro' },
+];
 
-// ── [핵심] 사용 가능한 최신 모델 자동 탐색 ────────────────────────────────────
-let _discoveredModels = null; // 프로세스 내 1회만 탐색 (메모이제이션)
+let _discoveredModels = null;
 
 async function discoverModels() {
-  if (_discoveredModels) return _discoveredModels;
+  if (_discoveredModels && _discoveredModels.length > 0) return _discoveredModels;
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey.length < 10) {
@@ -72,7 +75,6 @@ async function discoverModels() {
 
   console.log('  [모델 탐색] Gemini API에서 최신 사용 가능 모델을 자동 탐색 중...');
 
-  let allModels = [];
   try {
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models?pageSize=100&key=${apiKey}`,
@@ -80,56 +82,44 @@ async function discoverModels() {
     );
     if (!res.ok) throw new Error(`models.list HTTP ${res.status}`);
     const data = await res.json();
-    allModels = (data.models ?? [])
-      // generateContent를 지원하는 모델만 필터
+    
+    const allModels = (data.models ?? [])
       .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
-      // 모델 ID만 추출 ("models/gemini-2.5-pro" → "gemini-2.5-pro")
       .map(m => ({ name: m.name.replace('models/', ''), maxTokens: m.outputTokenLimit ?? null }));
-  } catch (err) {
-    console.warn(`  [경고] 모델 탐색 실패 (${err.message}). 내장 기본값으로 폴백합니다.`);
-    // 탐색 실패 시 안전한 하드코딩 기본값으로 폴백
-    _discoveredModels = [
 
-      { name: 'gemini-2.5-flash',     maxTokens: 32768 },
-      { name: 'gemini-2.0-flash-lite', maxTokens: 16384 },
-    ];
-    return _discoveredModels;
-  }
+    const selected = [];
+    for (const { tier, match, maxTokensFallback } of MODEL_TIERS) {
+      const candidates = allModels
+        .filter(m => match(m.name) && !/experimental/i.test(m.name))
+        .sort(compareVersionsDesc);
 
-  // 계열별로 최신 Stable 모델 1개씩 선택
-  const selected = [];
-  for (const { tier, match, maxTokensFallback } of MODEL_TIERS) {
-    const candidates = allModels
-      .filter(m => match(m.name) && isStable(m.name))
-      .sort(compareVersionsDesc);
-
-    if (candidates.length > 0) {
-      const best = candidates[0];
-      selected.push({
-        name: best.name,
-        maxTokens: best.maxTokens ?? maxTokensFallback,
-        tier,
-      });
-      console.log(`  [탐색 완료] ${tier.padEnd(5)} → ${best.name} (maxTokens: ${best.maxTokens ?? maxTokensFallback})`);
-    } else {
-      console.warn(`  [경고] '${tier}' 계열 Stable 모델을 찾지 못했습니다. 해당 계열을 건너뜁니다.`);
+      for (const cand of candidates) {
+        selected.push({
+          name: cand.name,
+          maxTokens: cand.maxTokens ?? maxTokensFallback,
+          tier,
+        });
+      }
     }
+
+    if (selected.length > 0) {
+      _discoveredModels = selected;
+      console.log(`  [탐색 완료] 총 ${selected.length}개 유효 모델 릴레이 큐 등록 완료.`);
+      return _discoveredModels;
+    }
+  } catch (err) {
+    console.warn(`  [경고] 모델 탐색 실패 (${err.message}). 내장 기본 릴레이로 폴백합니다.`);
   }
 
-  if (selected.length === 0) {
-    throw new Error('사용 가능한 Gemini Stable 모델을 하나도 찾지 못했습니다.');
-  }
-
-  _discoveredModels = selected;
+  _discoveredModels = FALLBACK_MODELS;
   return _discoveredModels;
 }
 
-// ── Gemini API 호출 (모델 자동 탐색 + 지능형 폴백) ───────────────────────────
 /**
  * @param {string} prompt - 보낼 프롬프트
- * @param {object|null} schema - JSON 출력용 스키마 (null이면 텍스트 반환)
- * @param {string} targetTier - 'auto' (기본값: flash 우선), 'lite' (lite 전용), 'flash' (flash 전용)
- * @returns {Promise<string|object>} 응답 텍스트 또는 파싱된 JSON
+ * @param {object|null} schema - JSON 출력용 스키마
+ * @param {string} targetTier - 'auto' (flash 우선), 'lite' (lite 우선), 'flash' (flash 우선)
+ * @returns {Promise<string|object>}
  */
 async function callGemini(prompt, schema = null, targetTier = 'auto') {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -137,13 +127,18 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
     throw new Error('GEMINI_API_KEY가 등록되지 않았거나 유효하지 않습니다.');
   }
 
-  let models = await discoverModels();
+  const allModels = await discoverModels();
   
-  // ── 타겟 티어 우선 정렬 (토큰 절약 목적이되, 실패 시 타 계열로 Fallback) ──
+  // 타겟 티어 우선 정렬
+  let prioritizedModels = allModels;
   if (targetTier === 'lite') {
-    models = [...models].sort((a, b) => (a.tier === 'lite' ? -1 : b.tier === 'lite' ? 1 : 0));
+    const preferred = allModels.filter(m => m.tier === 'lite');
+    const backup = allModels.filter(m => m.tier !== 'lite');
+    prioritizedModels = [...preferred, ...backup];
   } else if (targetTier === 'flash') {
-    models = [...models].sort((a, b) => (a.tier === 'flash' ? -1 : b.tier === 'flash' ? 1 : 0));
+    const preferred = allModels.filter(m => m.tier === 'flash');
+    const backup = allModels.filter(m => m.tier !== 'flash');
+    prioritizedModels = [...preferred, ...backup];
   }
 
   const baseConfig = { temperature: schema ? 0.2 : 0.75 };
@@ -152,7 +147,9 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
     baseConfig.responseSchema   = schema;
   }
 
-  modelLoop: for (const { name: model, maxTokens } of models) {
+  let lastError = '';
+
+  modelLoop: for (const { name: model, maxTokens } of prioritizedModels) {
     const generationConfig = {
       ...baseConfig,
       maxOutputTokens: maxTokens,
@@ -160,14 +157,13 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-
     for (let attempt = 0; attempt <= RETRY_CONFIG.maxRetries; attempt++) {
       const controller = new AbortController();
       const timeoutId  = setTimeout(() => controller.abort(), 90000);
       let res;
 
       try {
-        console.log(`  [API] ${model} 호출 중... (시도: ${attempt + 1}/${RETRY_CONFIG.maxRetries + 1}, maxTokens: ${generationConfig.maxOutputTokens})`);
+        console.log(`  [API] ${model} 호출 중... (시도: ${attempt + 1}/${RETRY_CONFIG.maxRetries + 1})`);
         res = await fetch(url, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -175,63 +171,49 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
           signal:  controller.signal,
         });
       } catch (networkErr) {
+        lastError = `[${model}] 네트워크 에러: ${networkErr.message}`;
         console.error(`  [실패] ${model} 네트워크 오류: ${networkErr.message.slice(0, 60)}.`);
-        if (attempt < RETRY_CONFIG.maxRetries) { await sleep(5000); continue; }
+        if (attempt < RETRY_CONFIG.maxRetries) { await sleep(2000); continue; }
         continue modelLoop;
       } finally {
         clearTimeout(timeoutId);
       }
 
-      // ── 에러 처리 ───────────────────────────────────────────────────────────
       if (!res.ok) {
         const errorText = await res.text().catch(() => '');
+        lastError = `[${model}] HTTP ${res.status}: ${errorText.slice(0, 100)}`;
 
-        // 할당량 초과 → 즉각 다음 모델로
-        if (res.status === 429 && errorText.toLowerCase().includes('quota')) {
-          console.error(`  [할당량 초과] ${model} — 즉각 다음 계열로 전환합니다.`);
+        // 429(할당량) 또는 404(모델 중단) → 지체 없이 다음 차선책 모델로 즉시 바통 터치
+        if (res.status === 429 || res.status === 404) {
+          console.warn(`  [전환] ${model} 상태 ${res.status} — 즉각 다음 차선책 모델로 릴레이 전환합니다.`);
           continue modelLoop;
         }
 
         const shouldRetry = RETRY_CONFIG.retryOn.includes(res.status) && attempt < RETRY_CONFIG.maxRetries;
         if (!shouldRetry) {
-          console.error(`  [실패] ${model} HTTP ${res.status} — 다음 계열로 전환합니다.`);
+          console.warn(`  [전환] ${model} HTTP ${res.status} — 다음 모델로 전환합니다.`);
           continue modelLoop;
         }
 
-        // Retry-After 헤더 우선, 없으면 지수 백오프
-        const retryAfter = res.headers.get('retry-after');
-        let delaySec;
-        if (retryAfter && !isNaN(parseInt(retryAfter, 10))) {
-          delaySec = parseInt(retryAfter, 10);
-          console.error(`  [재시도] ${model} — 서버 지시 ${delaySec}초 대기 후 재시도...`);
-        } else {
-          const base   = res.status >= 500 ? 5 : 10;
-          const jitter = Math.floor(Math.random() * 3) + 1;
-          delaySec     = base * Math.pow(2, attempt) + jitter;
-          const type   = res.status >= 500 ? '서버 과부하' : '트래픽 제한';
-          console.error(`  [백오프] ${model} HTTP ${res.status} (${type}) — ${delaySec}초 대기...`);
-        }
-        await sleep(delaySec * 1000);
+        await sleep(2000);
         continue;
       }
 
-      // ── 정상 응답 처리 ───────────────────────────────────────────────────────
       let data;
       try {
         data = await res.json();
       } catch {
-        console.error(`  [실패] ${model} JSON 파싱 오류.`);
-        if (attempt < RETRY_CONFIG.maxRetries) { await sleep(2000); continue; }
+        lastError = `[${model}] JSON 파싱 오류`;
+        if (attempt < RETRY_CONFIG.maxRetries) { await sleep(1500); continue; }
         continue modelLoop;
       }
 
       const candidate    = data?.candidates?.[0];
-      const finishReason = candidate?.finishReason ?? 'UNKNOWN';
       const text         = (candidate?.content?.parts ?? []).map(p => p.text ?? '').join('');
 
       if (!text) {
-        console.error(`  [실패] ${model} 빈 응답 (finishReason: ${finishReason}).`);
-        if (attempt < RETRY_CONFIG.maxRetries) { await sleep(2000); continue; }
+        lastError = `[${model}] 빈 응답 수신`;
+        if (attempt < RETRY_CONFIG.maxRetries) { await sleep(1500); continue; }
         continue modelLoop;
       }
 
@@ -239,8 +221,8 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
         try {
           return JSON.parse(text.trim());
         } catch {
-          console.error(`  [실패] ${model} JSON 스키마 파싱 실패.`);
-          if (attempt < RETRY_CONFIG.maxRetries) { await sleep(2000); continue; }
+          lastError = `[${model}] JSON 스키마 파싱 오류`;
+          if (attempt < RETRY_CONFIG.maxRetries) { await sleep(1500); continue; }
           continue modelLoop;
         }
       }
@@ -248,7 +230,7 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
     }
   }
 
-  throw new Error('모든 Gemini 모델이 응답하지 않았습니다. 잠시 후 다시 실행해 주세요.');
+  throw new Error(`모든 Gemini 모델 통신에 실패했습니다. (마지막 에러: ${lastError})`);
 }
 
 module.exports = { callGemini, discoverModels };

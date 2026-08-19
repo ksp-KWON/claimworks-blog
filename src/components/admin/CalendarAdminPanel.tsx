@@ -7,11 +7,55 @@ import AdminPanelLayout from './AdminPanelLayout';
 import { AdminHeaderBar } from './AdminHeader';
 import PremiumButton from '@/components/ui/PremiumButton';
 
+export interface ClaimsProgressEntry {
+  id: string;
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm
+  tag?: string; // 통화, 서류, 병원, 절충, 종결, 일반
+  text: string;
+}
+
+export interface ClaimsLedgerData {
+  // 1. 기본 인적 및 접수 정보
+  phone?: string;
+  inflowPath?: string; // 홈페이지, 1:1채팅, 블로그, 전화, 지인소개
+  birthDate?: string;
+  gender?: '남' | '여';
+  incomeNote?: string;
+  
+  // 2. 사고 및 보험 정보
+  accidentDate?: string;
+  accidentType?: string; // 교통사고, 산재사고, 안전사고, 질병사고, 기타
+  insuranceCompany?: string;
+  faultRatio?: string; // 0:100, 차대차, 차대인, 차대이륜차
+  hasDashcam?: boolean;
+  hasPhotos?: boolean;
+  insuranceTypes?: string[]; // 대인, 자상, 배책, 장기
+  
+  // 3. 의료 및 치료 정보
+  diagnosis?: string;
+  hasPreExisting?: boolean;
+  preExistingNote?: string;
+  hasHospitalization?: boolean;
+  hospitalizationPeriod?: string;
+  
+  // 4. 날짜별 상담일지 & 진행사항
+  progressLogs?: ClaimsProgressEntry[];
+  
+  // 기타/호환 필드
+  text?: string;
+  time?: string;
+  category?: '상담' | '실사' | '미팅' | '기타';
+  sourceApp?: 'consultations' | 'chat';
+  sourceId?: string;
+}
+
 interface ExtendedCalendarEvent extends AdminCalendarEvent {
   time?: string;
   category?: '상담' | '실사' | '미팅' | '기타';
   sourceApp?: 'consultations' | 'chat';
   sourceId?: string;
+  ledger?: ClaimsLedgerData;
 }
 
 interface CalendarAdminPanelProps {
@@ -27,16 +71,33 @@ const CATEGORY_COLORS: Record<string, { badge: string; dot: string; bg: string }
   기타: { badge: 'bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-gray-300 border-gray-200', dot: 'bg-gray-400', bg: 'hover:bg-gray-50/50' }
 };
 
+const TAG_STYLES: Record<string, string> = {
+  통화: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400',
+  서류: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400',
+  병원: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400',
+  절충: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400',
+  종결: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400',
+  일반: 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-zinc-800 dark:text-gray-300'
+};
+
 export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 0 }: CalendarAdminPanelProps) {
   const today = useMemo(() => new Date(), []);
+  const todayStr = useMemo(() => {
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  }, [today]);
+
   const [currentYear, setCurrentYear] = useState<number>(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState<number>(today.getMonth()); // 0 ~ 11
-  const [selectedDate, setSelectedDate] = useState<string>(
-    `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
-  );
+  const [selectedDate, setSelectedDate] = useState<string>(todayStr);
 
   const [events, setEvents] = useState<ExtendedCalendarEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // 펼쳐진 대장 상세 카드 ID 목록 (아코디언 토글)
+  const [expandedLedgerIds, setExpandedLedgerIds] = useState<Record<string, boolean>>({});
+
+  // 인라인 업무일지 작성 상태 (이벤트 ID별)
+  const [inlineLogInputs, setInlineLogInputs] = useState<Record<string, { tag: string; text: string }>>({});
 
   // 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,18 +107,23 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     time: string;
     title: string;
     category: '상담' | '실사' | '미팅' | '기타';
-    content: string;
-    sourceApp?: 'consultations' | 'chat';
-    sourceId?: string;
+    ledger: ClaimsLedgerData;
   }>({
     date: selectedDate,
     time: '14:00',
     title: '',
     category: '상담',
-    content: ''
+    ledger: {
+      phone: '',
+      inflowPath: '홈페이지',
+      accidentType: '교통사고',
+      hasPreExisting: false,
+      hasHospitalization: false,
+      progressLogs: []
+    }
   });
 
-  // Supabase 또는 로컬 캐시에서 일정 데이터 로드
+  // ─── 1. 데이터 로드 & 파싱 ───
   const fetchEvents = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -67,7 +133,6 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
         .order('date', { ascending: true });
 
       if (error || !data || data.length === 0) {
-        // 테이블 미생성, 에러, 또는 Supabase가 비어있을 때 로컬스토리지 폴백
         const local = localStorage.getItem('local_calendar_events');
         if (local) {
           try {
@@ -82,21 +147,41 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
         const parsed = data.map((d: any) => {
           let extra: any = {};
           try {
-            if (d.content && d.content.startsWith('{')) {
+            if (d.content && (d.content.startsWith('{') || d.content.startsWith('['))) {
               extra = JSON.parse(d.content);
             }
           } catch {
             // Ignored
           }
+
+          // 구버전 평문 text 호환 파싱
+          const ledgerData: ClaimsLedgerData = extra.ledger || {
+            phone: extra.phone || '',
+            inflowPath: extra.inflowPath || '홈페이지',
+            accidentType: extra.accidentType || '교통사고',
+            accidentDate: extra.accidentDate || '',
+            insuranceCompany: extra.insuranceCompany || '',
+            faultRatio: extra.faultRatio || '',
+            diagnosis: extra.diagnosis || '',
+            hasPreExisting: extra.hasPreExisting || false,
+            preExistingNote: extra.preExistingNote || '',
+            hasHospitalization: extra.hasHospitalization || false,
+            hospitalizationPeriod: extra.hospitalizationPeriod || '',
+            incomeNote: extra.incomeNote || '',
+            progressLogs: extra.progressLogs || [],
+            text: extra.text !== undefined ? extra.text : d.content
+          };
+
           return {
             id: d.id,
             date: d.date,
             title: d.title,
-            content: extra.text !== undefined ? extra.text : d.content,
-            time: extra.time || '10:00',
-            category: extra.category || '상담',
-            sourceApp: extra.sourceApp,
-            sourceId: extra.sourceId,
+            content: typeof d.content === 'string' ? d.content : JSON.stringify(d.content),
+            time: extra.time || ledgerData.time || '10:00',
+            category: extra.category || ledgerData.category || '상담',
+            sourceApp: extra.sourceApp || ledgerData.sourceApp,
+            sourceId: extra.sourceId || ledgerData.sourceId,
+            ledger: ledgerData,
             created_at: d.created_at
           };
         });
@@ -121,21 +206,47 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     fetchEvents();
   }, [fetchEvents, refreshCounter]);
 
-  // 상담/채팅에서 넘어온 pending_calendar_event 확인 및 모달 자동 열기
+  // ─── 2. 상담/채팅에서 넘어온 pending_calendar_event 자동 연동 ───
   useEffect(() => {
     const pending = sessionStorage.getItem('pending_calendar_event');
     if (pending) {
       try {
         const payload = JSON.parse(pending);
         sessionStorage.removeItem('pending_calendar_event');
+
+        // payload 내용에서 필드 자동 추출
+        const rawText = payload.text || '';
+        const phoneMatch = rawText.match(/연락처:\s*([0-9-]+)/);
+        const accidentTypeMatch = rawText.match(/사고유형:\s*([^\n]+)/);
+        const accidentDateMatch = rawText.match(/사고일자:\s*([0-9.-]+)/);
+        const diagnosisMatch = rawText.match(/진단명:\s*([^\n]+)/);
+
         setModalForm({
           date: selectedDate,
           time: '14:00',
           title: payload.title || '',
           category: '상담',
-          content: payload.text || '',
-          sourceApp: payload.sourceApp,
-          sourceId: payload.sourceId
+          ledger: {
+            phone: phoneMatch ? phoneMatch[1].trim() : '',
+            inflowPath: payload.sourceApp === 'chat' ? '1:1채팅' : '홈페이지',
+            accidentType: accidentTypeMatch ? accidentTypeMatch[1].trim() : '교통사고',
+            accidentDate: accidentDateMatch ? accidentDateMatch[1].trim() : '',
+            diagnosis: diagnosisMatch ? diagnosisMatch[1].trim() : '',
+            hasPreExisting: false,
+            hasHospitalization: false,
+            text: rawText,
+            sourceApp: payload.sourceApp,
+            sourceId: payload.sourceId,
+            progressLogs: [
+              {
+                id: Date.now().toString(),
+                date: selectedDate,
+                time: '14:00',
+                tag: '일반',
+                text: '최초 상담 접수 등록 완료.'
+              }
+            ]
+          }
         });
         setEditingEventId(null);
         setIsModalOpen(true);
@@ -145,15 +256,14 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     }
   }, [selectedDate]);
 
-  // 달력 날짜 계산 (월간 그리드)
+  // 달력 날짜 그리드 계산
   const calendarDays = useMemo(() => {
-    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0(일) ~ 6(토)
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
 
     const days: { dateStr: string; dayNum: number; isCurrentMonth: boolean }[] = [];
 
-    // 이전 달 날짜 채우기
     for (let i = firstDayOfMonth - 1; i >= 0; i--) {
       const d = daysInPrevMonth - i;
       const prevM = currentMonth === 0 ? 12 : currentMonth;
@@ -165,7 +275,6 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
       });
     }
 
-    // 이번 달 날짜
     for (let d = 1; d <= daysInMonth; d++) {
       days.push({
         dateStr: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`,
@@ -174,7 +283,6 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
       });
     }
 
-    // 다음 달 날짜 채우기 (총 35 or 42 그리드 맞춤)
     const remaining = 42 - days.length;
     if (remaining < 7) {
       for (let d = 1; d <= remaining; d++) {
@@ -191,7 +299,6 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     return days;
   }, [currentYear, currentMonth]);
 
-  // 이전달 / 다음달 / 오늘 이동
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
       setCurrentMonth(11);
@@ -213,36 +320,37 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
   const handleGoToday = () => {
     setCurrentYear(today.getFullYear());
     setCurrentMonth(today.getMonth());
-    setSelectedDate(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`);
+    setSelectedDate(todayStr);
   };
 
-  // 일정 저장 (생성 or 수정)
+  // ─── 3. 대장 데이터 저장 (생성 / 수정 / 다음 업무일로 이동) ───
   const handleSaveEvent = async () => {
     if (!modalForm.title.trim()) {
-      alert('일정 제목을 입력해주세요.');
+      alert('일정 제목(고객명)을 입력해주세요.');
       return;
     }
+
+    const fullPayload = {
+      text: modalForm.ledger.text || '',
+      time: modalForm.time,
+      category: modalForm.category,
+      sourceApp: modalForm.ledger.sourceApp,
+      sourceId: modalForm.ledger.sourceId,
+      ledger: modalForm.ledger
+    };
 
     const eventPayload = {
       date: modalForm.date,
       title: modalForm.title,
-      content: JSON.stringify({
-        text: modalForm.content,
-        time: modalForm.time,
-        category: modalForm.category,
-        sourceApp: modalForm.sourceApp,
-        sourceId: modalForm.sourceId
-      })
+      content: JSON.stringify(fullPayload)
     };
 
     let generatedId = editingEventId;
 
     try {
       if (editingEventId) {
-        // 수정
         await supabase.from('admin_calendar_events').update(eventPayload).eq('id', editingEventId);
       } else {
-        // 신규 추가
         const { data } = await supabase.from('admin_calendar_events').insert([eventPayload]).select();
         if (data && data[0]?.id) {
           generatedId = data[0].id;
@@ -264,7 +372,8 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
             title: modalForm.title,
             time: modalForm.time,
             category: modalForm.category,
-            content: modalForm.content
+            ledger: modalForm.ledger,
+            content: JSON.stringify(fullPayload)
           };
         }
       } else {
@@ -274,9 +383,10 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
           title: modalForm.title,
           time: modalForm.time,
           category: modalForm.category,
-          content: modalForm.content,
-          sourceApp: modalForm.sourceApp,
-          sourceId: modalForm.sourceId,
+          ledger: modalForm.ledger,
+          content: JSON.stringify(fullPayload),
+          sourceApp: modalForm.ledger.sourceApp,
+          sourceId: modalForm.ledger.sourceId,
           created_at: new Date().toISOString()
         });
       }
@@ -288,18 +398,118 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     fetchEvents();
   };
 
-  // 일정 삭제
+  // ─── 4. 인라인 업무일지 추가 (가로바 구분 누적) ───
+  const handleAddInlineLog = async (eventItem: ExtendedCalendarEvent) => {
+    const inputState = inlineLogInputs[eventItem.id] || { tag: '통화', text: '' };
+    if (!inputState.text.trim()) {
+      alert('진행사항 메모를 입력해주세요.');
+      return;
+    }
+
+    const now = new Date();
+    const curTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const newEntry: ClaimsProgressEntry = {
+      id: Date.now().toString(),
+      date: todayStr,
+      time: curTime,
+      tag: inputState.tag || '통화',
+      text: inputState.text.trim()
+    };
+
+    const currentLedger = eventItem.ledger || {};
+    const updatedLogs = [...(currentLedger.progressLogs || []), newEntry];
+    const updatedLedger: ClaimsLedgerData = {
+      ...currentLedger,
+      progressLogs: updatedLogs
+    };
+
+    const fullPayload = {
+      text: updatedLedger.text || eventItem.content,
+      time: eventItem.time || '10:00',
+      category: eventItem.category || '상담',
+      sourceApp: eventItem.sourceApp,
+      sourceId: eventItem.sourceId,
+      ledger: updatedLedger
+    };
+
+    const dbPayload = {
+      content: JSON.stringify(fullPayload)
+    };
+
+    // 1) State & LocalStorage 즉시 업데이트 (0ms 지연)
+    setEvents(prev => {
+      const next = prev.map(e => {
+        if (e.id === eventItem.id) {
+          return {
+            ...e,
+            ledger: updatedLedger,
+            content: JSON.stringify(fullPayload)
+          };
+        }
+        return e;
+      });
+      localStorage.setItem('local_calendar_events', JSON.stringify(next));
+      return next;
+    });
+
+    // 2) 입력창 초기화
+    setInlineLogInputs(prev => ({
+      ...prev,
+      [eventItem.id]: { tag: '통화', text: '' }
+    }));
+
+    // 3) Supabase DB 비동기 저장
+    try {
+      await supabase.from('admin_calendar_events').update(dbPayload).eq('id', eventItem.id);
+    } catch (err) {
+      console.warn('Supabase log update:', err);
+    }
+  };
+
+  // ─── 5. 인라인 업무일지 삭제 ───
+  const handleDeleteInlineLog = async (eventItem: ExtendedCalendarEvent, logId: string) => {
+    if (!window.confirm('이 진행일지 기록을 삭제하시겠습니까?')) return;
+
+    const currentLedger = eventItem.ledger || {};
+    const updatedLogs = (currentLedger.progressLogs || []).filter(l => l.id !== logId);
+    const updatedLedger: ClaimsLedgerData = {
+      ...currentLedger,
+      progressLogs: updatedLogs
+    };
+
+    const fullPayload = {
+      text: updatedLedger.text || eventItem.content,
+      time: eventItem.time || '10:00',
+      category: eventItem.category || '상담',
+      sourceApp: eventItem.sourceApp,
+      sourceId: eventItem.sourceId,
+      ledger: updatedLedger
+    };
+
+    setEvents(prev => {
+      const next = prev.map(e => e.id === eventItem.id ? { ...e, ledger: updatedLedger, content: JSON.stringify(fullPayload) } : e);
+      localStorage.setItem('local_calendar_events', JSON.stringify(next));
+      return next;
+    });
+
+    try {
+      await supabase.from('admin_calendar_events').update({ content: JSON.stringify(fullPayload) }).eq('id', eventItem.id);
+    } catch (err) {
+      console.warn('Supabase log delete:', err);
+    }
+  };
+
+  // ─── 6. 일정 카드 삭제 ───
   const handleDeleteEvent = async (id: string) => {
-    if (!window.confirm('정말 이 일정을 삭제하시겠습니까?')) return;
+    if (!window.confirm('정말 이 손해사정 일정을 삭제하시겠습니까?')) return;
     
-    // 1) React State 및 로컬스토리지에서 즉시 삭제 (반응속도 0ms)
     setEvents(prev => {
       const next = prev.filter(e => e.id !== id);
       localStorage.setItem('local_calendar_events', JSON.stringify(next));
       return next;
     });
 
-    // 2) Supabase 테이블에서도 삭제 시도
     try {
       await supabase.from('admin_calendar_events').delete().eq('id', id);
     } catch (err) {
@@ -307,7 +517,6 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     }
   };
 
-  // 특정 일정 클릭하여 원본 상담/채팅으로 점프
   const handleJumpToSource = (event: ExtendedCalendarEvent) => {
     if (event.sourceApp === 'consultations' && event.sourceId) {
       sessionStorage.setItem('pending_select_id', event.sourceId);
@@ -321,18 +530,19 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
   const selectedDateEvents = useMemo(() => {
     return events.filter(e => {
       const matchesDate = e.date === selectedDate;
-      const matchesSearch = !searchQuery || e.title.toLowerCase().includes(searchQuery.toLowerCase()) || (e.content || '').toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = !searchQuery || 
+        e.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        (e.ledger?.phone || '').includes(searchQuery) ||
+        (e.ledger?.diagnosis || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (e.content || '').toLowerCase().includes(searchQuery.toLowerCase());
       return matchesDate && matchesSearch;
     }).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
   }, [events, selectedDate, searchQuery]);
 
-  // 오늘 날짜 문자열
-  const todayStr = useMemo(() => `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`, [today]);
-
   return (
     <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-white dark:bg-[#111111] overflow-hidden min-w-0">
       
-      {/* ── 좌측/상단: 월간 캘린더 그리드 ── */}
+      {/* ── 좌측: 월간 캘린더 그리드 ── */}
       <div className="flex-1 min-w-0 min-h-0 flex flex-col border-b md:border-b-0 md:border-r border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-y-auto custom-scrollbar">
         
         {/* 캘린더 네비게이션 헤더 */}
@@ -398,7 +608,6 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     : 'hover:bg-white dark:hover:bg-zinc-900 bg-white/60 dark:bg-zinc-950/60'
                 } ${!day.isCurrentMonth ? 'opacity-35' : ''}`}
               >
-                {/* 일자 번호 */}
                 <div className="flex items-center justify-between">
                   <span className={`text-xs md:text-sm font-bold w-6 h-6 flex items-center justify-center rounded-full ${
                     isToday 
@@ -418,7 +627,6 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   )}
                 </div>
 
-                {/* 일정 뱃지 목록 (최대 2개 표시) */}
                 <div className="space-y-1 mt-1 overflow-hidden">
                   {dayEvents.slice(0, 2).map(ev => {
                     const style = CATEGORY_COLORS[ev.category || '상담'] || CATEGORY_COLORS.상담;
@@ -444,14 +652,14 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
         </div>
       </div>
 
-      {/* ── 우측: 선택된 날짜의 일정 상세 및 등록 패널 ── */}
-      <div className="w-full md:w-[340px] lg:w-[380px] shrink-0 min-h-0 flex flex-col bg-[#f8f9fa] dark:bg-zinc-900/60 overflow-hidden">
+      {/* ── 우측: 손해사정 실무 표준 대장 & 날짜별 진행일지 패널 ── */}
+      <div className="w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex flex-col bg-[#f8f9fa] dark:bg-zinc-900/60 overflow-hidden">
         
         <AdminHeaderBar 
           title={
             <div className="flex items-center gap-2">
               <span>📋</span>
-              <span className="font-bold text-[15px] text-gray-900 dark:text-white">{selectedDate} 일정</span>
+              <span className="font-bold text-[15px] text-gray-900 dark:text-white">{selectedDate} 대장 ({selectedDateEvents.length}건)</span>
             </div>
           }
           rightContent={
@@ -462,38 +670,50 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   time: '14:00',
                   title: '',
                   category: '상담',
-                  content: ''
+                  ledger: {
+                    phone: '',
+                    inflowPath: '홈페이지',
+                    accidentType: '교통사고',
+                    hasPreExisting: false,
+                    hasHospitalization: false,
+                    progressLogs: []
+                  }
                 });
                 setEditingEventId(null);
                 setIsModalOpen(true);
               }}
               className="px-2.5 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all shadow-sm flex items-center gap-1"
             >
-              <span>➕</span> 일정 추가
+              <span>➕</span> 신규 대장 등록
             </button>
           }
         />
 
-        {/* 일정 리스트 */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+        {/* 대장 카드 목록 */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
           {isLoading ? (
-            <div className="p-8 text-center text-sm text-gray-400">일정을 불러오는 중...</div>
+            <div className="p-8 text-center text-sm text-gray-400">대장 데이터를 불러오는 중...</div>
           ) : selectedDateEvents.length === 0 ? (
             <div className="p-12 text-center text-gray-400 space-y-3">
               <div className="text-3xl">☕</div>
               <p className="text-xs font-medium leading-relaxed">
-                이 날짜에 등록된 일정이 없습니다.<br/>
-                상단의 <b>[+ 일정 추가]</b> 버튼을 눌러보세요.
+                이 날짜에 등록된 손해사정 대장이 없습니다.<br/>
+                상단의 <b>[+ 신규 대장 등록]</b> 버튼을 눌러보세요.
               </p>
             </div>
           ) : (
             selectedDateEvents.map(ev => {
               const style = CATEGORY_COLORS[ev.category || '상담'] || CATEGORY_COLORS.상담;
+              const ledger = ev.ledger || {};
+              const isExpanded = !!expandedLedgerIds[ev.id];
+              const logInput = inlineLogInputs[ev.id] || { tag: '통화', text: '' };
+
               return (
                 <div
                   key={ev.id}
-                  className="p-3.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm space-y-2.5"
+                  className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm space-y-3"
                 >
+                  {/* 카드 상단: 상태, 시간, 버튼 */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full border ${style.badge}`}>
@@ -513,16 +733,18 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                             time: ev.time || '10:00',
                             title: ev.title,
                             category: ev.category || '상담',
-                            content: ev.content || '',
-                            sourceApp: ev.sourceApp,
-                            sourceId: ev.sourceId
+                            ledger: {
+                              ...ledger,
+                              sourceApp: ev.sourceApp,
+                              sourceId: ev.sourceId
+                            }
                           });
                           setIsModalOpen(true);
                         }}
-                        className="text-xs text-gray-400 hover:text-blue-600 p-1"
-                        title="수정"
+                        className="text-xs text-gray-400 hover:text-blue-600 p-1 font-bold"
+                        title="대장 수정 / 날짜 이동"
                       >
-                        ✏️
+                        ✏️ 수정
                       </button>
                       <button
                         onClick={() => handleDeleteEvent(ev.id)}
@@ -534,21 +756,165 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-sm text-gray-900 dark:text-white leading-snug">
-                    {ev.title}
-                  </h3>
+                  {/* 고객명 및 핵심 요약 */}
+                  <div>
+                    <h3 className="font-bold text-base text-gray-900 dark:text-white leading-snug">
+                      {ev.title}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-gray-600 dark:text-gray-300">
+                      {ledger.phone && (
+                        <span className="font-mono font-bold text-blue-600 dark:text-blue-400">
+                          📞 {ledger.phone}
+                        </span>
+                      )}
+                      {ledger.accidentType && (
+                        <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 rounded text-[11px] font-medium">
+                          {ledger.accidentType}
+                        </span>
+                      )}
+                      {ledger.diagnosis && (
+                        <span className="truncate text-gray-500 text-[11px]">
+                          진단: {ledger.diagnosis}
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-                  {ev.content && (
-                    <p className="text-xs text-gray-600 dark:text-gray-300 whitespace-pre-wrap leading-relaxed bg-gray-50 dark:bg-zinc-950 p-2.5 rounded-lg border border-gray-100 dark:border-zinc-800/60 max-h-32 overflow-y-auto custom-scrollbar">
-                      {ev.content}
-                    </p>
+                  {/* 실무 대장 상세 아코디언 토글 버튼 */}
+                  <button
+                    onClick={() => setExpandedLedgerIds(prev => ({ ...prev, [ev.id]: !prev[ev.id] }))}
+                    className="w-full py-1 px-2.5 bg-gray-50 dark:bg-zinc-950 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-lg border border-gray-100 dark:border-zinc-800/80 flex items-center justify-between transition-colors"
+                  >
+                    <span>📑 실무 대장 상세 정보</span>
+                    <span>{isExpanded ? '▲ 접기' : '▼ 펼치기'}</span>
+                  </button>
+
+                  {/* 실무 대장 세부 정보 (펼쳤을 때) */}
+                  {isExpanded && (
+                    <div className="bg-gray-50/70 dark:bg-zinc-950/70 p-3 rounded-xl border border-gray-200/80 dark:border-zinc-800 space-y-2 text-xs">
+                      <div className="grid grid-cols-2 gap-2 text-gray-700 dark:text-gray-300">
+                        <div><b>문의경로:</b> {ledger.inflowPath || '미지정'}</div>
+                        <div><b>사고일자:</b> {ledger.accidentDate || '미상'}</div>
+                        <div><b>보험회사:</b> {ledger.insuranceCompany || '미지정'}</div>
+                        <div><b>과실/유형:</b> {ledger.faultRatio || '미상'}</div>
+                        <div><b>소득사항:</b> {ledger.incomeNote || '미기재'}</div>
+                        <div><b>기왕병력:</b> {ledger.hasPreExisting ? `유 (${ledger.preExistingNote || ''})` : '무'}</div>
+                        <div className="col-span-2"><b>입원치료:</b> {ledger.hasHospitalization ? `입원 (${ledger.hospitalizationPeriod || ''})` : '통원/무'}</div>
+                      </div>
+                      {ledger.text && (
+                        <div className="pt-1 border-t border-gray-200 dark:border-zinc-800 text-[11px] text-gray-500 whitespace-pre-wrap">
+                          <b>접수원문:</b> {ledger.text}
+                        </div>
+                      )}
+                    </div>
                   )}
 
-                  {/* 원본 상담/채팅 바로가기 링크 */}
+                  {/* ────────────────────────────────────────── */}
+                  {/* 4. 날짜별 상담일지 & 진행사항 타임라인 */}
+                  {/* ────────────────────────────────────────── */}
+                  <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 space-y-2">
+                    <div className="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
+                      <span>📌</span>
+                      <span>날짜별 진행사항 (업무일지)</span>
+                    </div>
+
+                    {/* 누적된 업무일지 목록 (가로바 구분) */}
+                    <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-0.5">
+                      {(ledger.progressLogs || []).length === 0 ? (
+                        <div className="p-2.5 bg-gray-50 dark:bg-zinc-950 rounded-lg text-center text-[11px] text-gray-400">
+                          아직 기록된 진행사항이 없습니다. 아래에서 업무를 기록해 보세요.
+                        </div>
+                      ) : (
+                        (ledger.progressLogs || []).map((log, lIdx) => {
+                          const tagStyle = TAG_STYLES[log.tag || '일반'] || TAG_STYLES.일반;
+                          return (
+                            <React.Fragment key={log.id}>
+                              {lIdx > 0 && <div className="border-t border-dashed border-gray-200 dark:border-zinc-800 my-1" />}
+                              <div className="text-xs space-y-0.5">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded border ${tagStyle}`}>
+                                      {log.tag || '일반'}
+                                    </span>
+                                    <span className="font-mono font-bold text-gray-700 dark:text-gray-300 text-[11px]">
+                                      [{log.date} {log.time}]
+                                    </span>
+                                  </div>
+                                  <button
+                                    onClick={() => handleDeleteInlineLog(ev, log.id)}
+                                    className="text-gray-400 hover:text-red-500 text-[11px] p-0.5"
+                                    title="일지 삭제"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                                <p className="text-gray-800 dark:text-gray-200 leading-relaxed pl-1 font-medium text-[11.5px] whitespace-pre-wrap">
+                                  {log.text}
+                                </p>
+                              </div>
+                            </React.Fragment>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    {/* 인라인 업무일지 추가 폼 */}
+                    <div className="p-2.5 bg-gray-50 dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 space-y-2">
+                      {/* 퀵 태그 버튼 */}
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <span className="text-[11px] font-bold text-gray-500 mr-1">태그:</span>
+                        {(['통화', '서류', '병원', '절충', '종결'] as const).map(t => (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => setInlineLogInputs(prev => ({
+                              ...prev,
+                              [ev.id]: { ...(prev[ev.id] || { text: '' }), tag: t }
+                            }))}
+                            className={`px-2 py-0.5 text-[10px] font-bold rounded border transition-all ${
+                              logInput.tag === t 
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-xs' 
+                                : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-zinc-700'
+                            }`}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-1.5">
+                        <input
+                          type="text"
+                          value={logInput.text}
+                          onChange={e => setInlineLogInputs(prev => ({
+                            ...prev,
+                            [ev.id]: { ...(prev[ev.id] || { tag: '통화' }), text: e.target.value }
+                          }))}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddInlineLog(ev);
+                            }
+                          }}
+                          placeholder="오늘 진행사항 입력 (예: 담당자 통화, 추가 서류 요청)"
+                          className="flex-1 p-2 text-xs bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleAddInlineLog(ev)}
+                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors shrink-0 shadow-sm"
+                        >
+                          기록
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 원본 접수/채팅 바로가기 링크 */}
                   {ev.sourceApp && (
                     <button
                       onClick={() => handleJumpToSource(ev)}
-                      className="w-full mt-1 py-1.5 px-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1"
+                      className="w-full py-1.5 px-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1"
                     >
                       <span>🔗</span>
                       <span>{ev.sourceApp === 'consultations' ? '원본 상담 접수내역 보기' : '채팅방 바로가기'}</span>
@@ -561,13 +927,15 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
         </div>
       </div>
 
-      {/* ── 일정 등록/수정 모달 ── */}
+      {/* ── 손해사정 실무 대장 등록 / 수정 모달 ── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 dark:border-zinc-800 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-gray-200 dark:border-zinc-800 space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            
             <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
-              <h3 className="text-base font-bold text-gray-900 dark:text-white">
-                {editingEventId ? '✏️ 일정 수정' : '➕ 새 일정 등록'}
+              <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <span>📑</span>
+                <span>{editingEventId ? '손해사정 대장 수정 / 다음 예정일 이동' : '신규 손해사정 대장 등록'}</span>
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -577,72 +945,225 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
               </button>
             </div>
 
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">일정 제목 *</label>
-                <input
-                  type="text"
-                  value={modalForm.title}
-                  onChange={e => setModalForm(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="예: [상담] 김철수 고객 후유장해 면담"
-                  className="w-full p-2.5 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
-                />
+            <div className="space-y-4 text-xs">
+              
+              {/* 1. 기본 일정 및 고객명 */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="md:col-span-2">
+                  <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">고객명 / 대장 제목 *</label>
+                  <input
+                    type="text"
+                    value={modalForm.title}
+                    onChange={e => setModalForm(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="예: [예약접수] 박선미"
+                    className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs font-bold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">전화번호</label>
+                  <input
+                    type="text"
+                    value={modalForm.ledger.phone || ''}
+                    onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, phone: e.target.value } }))}
+                    placeholder="010-0000-0000"
+                    className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs font-mono text-gray-900 dark:text-white outline-none"
+                  />
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              {/* 2. 업무예정일(캘린더 날짜) 및 시간 */}
+              <div className="p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-xl border border-blue-100 dark:border-blue-900/40 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">날짜</label>
+                  <label className="block font-bold text-blue-900 dark:text-blue-300 mb-1">
+                    📅 업무 예정일 (캘린더 등록일)
+                  </label>
                   <input
                     type="date"
                     value={modalForm.date}
                     onChange={e => setModalForm(prev => ({ ...prev, date: e.target.value }))}
-                    className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none"
+                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-bold text-gray-900 dark:text-white outline-none"
                   />
+                  <span className="text-[10px] text-blue-600 dark:text-blue-400 mt-1 block">
+                    * 날짜를 바꾸면 해당 일자 캘린더로 카드가 이동합니다.
+                  </span>
                 </div>
                 <div>
-                  <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">시간</label>
+                  <label className="block font-bold text-blue-900 dark:text-blue-300 mb-1">시간</label>
                   <input
                     type="time"
                     value={modalForm.time}
                     onChange={e => setModalForm(prev => ({ ...prev, time: e.target.value }))}
-                    className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none"
+                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-mono text-gray-900 dark:text-white outline-none"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">일정 구분</label>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {(['상담', '실사', '미팅', '기타'] as const).map(cat => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setModalForm(prev => ({ ...prev, category: cat }))}
-                      className={`py-1.5 rounded-lg font-bold border transition-all ${
-                        modalForm.category === cat 
-                          ? 'bg-blue-600 text-white border-blue-600 shadow-sm' 
-                          : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-zinc-700'
-                      }`}
+              {/* 3. 사고 및 보험 정보 */}
+              <div className="p-3 bg-gray-50 dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 space-y-2.5">
+                <div className="font-bold text-gray-800 dark:text-gray-200 text-xs">🚗 사고 및 보험 정보</div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-gray-500 text-[11px] mb-1">사고유형</label>
+                    <select
+                      value={modalForm.ledger.accidentType || '교통사고'}
+                      onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, accidentType: e.target.value } }))}
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs font-bold"
                     >
-                      {cat}
-                    </button>
-                  ))}
+                      <option value="교통사고">교통사고</option>
+                      <option value="산재사고">산재사고</option>
+                      <option value="안전사고">안전·배책사고</option>
+                      <option value="질병사고">질병·실손사고</option>
+                      <option value="기타">기타</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-500 text-[11px] mb-1">사고일자</label>
+                    <input
+                      type="date"
+                      value={modalForm.ledger.accidentDate || ''}
+                      onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, accidentDate: e.target.value } }))}
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-500 text-[11px] mb-1">상대 보험회사</label>
+                    <input
+                      type="text"
+                      value={modalForm.ledger.insuranceCompany || ''}
+                      onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, insuranceCompany: e.target.value } }))}
+                      placeholder="예: 현대해상, 삼성화재"
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                    />
+                  </div>
+                </div>
+
+                {/* 과실비율 및 세부 메모 */}
+                <div>
+                  <label className="block text-gray-500 text-[11px] mb-1">과실비율 / 사고형태 메모</label>
+                  <input
+                    type="text"
+                    value={modalForm.ledger.faultRatio || ''}
+                    onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, faultRatio: e.target.value } }))}
+                    placeholder="예: 0:100 차대차, 블랙박스 영상 확보 완료"
+                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                  />
                 </div>
               </div>
 
+              {/* 4. 의료 및 병력 정보 */}
+              <div className="p-3 bg-gray-50 dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 space-y-2.5">
+                <div className="font-bold text-gray-800 dark:text-gray-200 text-xs">🏥 의료 및 치료 정보</div>
+                
+                <div>
+                  <label className="block text-gray-500 text-[11px] mb-1">진단병명</label>
+                  <input
+                    type="text"
+                    value={modalForm.ledger.diagnosis || ''}
+                    onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, diagnosis: e.target.value } }))}
+                    placeholder="예: 비골신경마비, 요추 4-5번 추간판탈출증"
+                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                  />
+                </div>
+
+                {/* 기왕병력 유/무 토글 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-gray-500 text-[11px] mb-1">기왕병력 (기여도 분쟁)</label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, hasPreExisting: false } }))}
+                        className={`flex-1 py-1.5 rounded-lg font-bold border transition-colors ${
+                          !modalForm.ledger.hasPreExisting ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-zinc-900 text-gray-600 border-gray-200 dark:border-zinc-700'
+                        }`}
+                      >
+                        무 (없음)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, hasPreExisting: true } }))}
+                        className={`flex-1 py-1.5 rounded-lg font-bold border transition-colors ${
+                          modalForm.ledger.hasPreExisting ? 'bg-amber-600 text-white border-amber-600' : 'bg-white dark:bg-zinc-900 text-gray-600 border-gray-200 dark:border-zinc-700'
+                        }`}
+                      >
+                        유 (있음)
+                      </button>
+                    </div>
+                  </div>
+
+                  {modalForm.ledger.hasPreExisting && (
+                    <div>
+                      <label className="block text-gray-500 text-[11px] mb-1">기왕증 세부 메모</label>
+                      <input
+                        type="text"
+                        value={modalForm.ledger.preExistingNote || ''}
+                        onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, preExistingNote: e.target.value } }))}
+                        placeholder="예: 2018년 디스크 시술 이력 있음"
+                        className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* 입원치료 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-gray-500 text-[11px] mb-1">입원치료 여부</label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, hasHospitalization: false } }))}
+                        className={`flex-1 py-1.5 rounded-lg font-bold border transition-colors ${
+                          !modalForm.ledger.hasHospitalization ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-zinc-900 text-gray-600 border-gray-200 dark:border-zinc-700'
+                        }`}
+                      >
+                        통원치료만 (입원 무)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, hasHospitalization: true } }))}
+                        className={`flex-1 py-1.5 rounded-lg font-bold border transition-colors ${
+                          modalForm.ledger.hasHospitalization ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-zinc-900 text-gray-600 border-gray-200 dark:border-zinc-700'
+                        }`}
+                      >
+                        입원치료 있음
+                      </button>
+                    </div>
+                  </div>
+
+                  {modalForm.ledger.hasHospitalization && (
+                    <div>
+                      <label className="block text-gray-500 text-[11px] mb-1">입원기간 / 일수</label>
+                      <input
+                        type="text"
+                        value={modalForm.ledger.hospitalizationPeriod || ''}
+                        onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, hospitalizationPeriod: e.target.value } }))}
+                        placeholder="예: 2024.10.06 ~ 10.20 (14일간)"
+                        className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* 5. 소득사항 / 직업 */}
               <div>
-                <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">상세 내용 및 고객 정보</label>
-                <textarea
-                  value={modalForm.content}
-                  onChange={e => setModalForm(prev => ({ ...prev, content: e.target.value }))}
-                  placeholder="상담 메모, 연락처, 장소 등을 자유롭게 입력하세요."
-                  rows={4}
-                  className="w-full p-2.5 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 resize-none custom-scrollbar"
+                <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">소득사항 / 직업 (휴업손해 산정용)</label>
+                <input
+                  type="text"
+                  value={modalForm.ledger.incomeNote || ''}
+                  onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, incomeNote: e.target.value } }))}
+                  placeholder="예: 급여소득자 월 350만 원 (원천징수 영수증 확보)"
+                  className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
                 />
               </div>
+
             </div>
 
-            <div className="flex gap-2 pt-2">
+            <div className="flex gap-2 pt-2 border-t border-gray-100 dark:border-zinc-800">
               <PremiumButton
                 onClick={() => setIsModalOpen(false)}
                 variant="secondary"
@@ -655,7 +1176,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                 variant="primary"
                 className="flex-1 !py-2.5 !text-xs !rounded-xl shadow-md"
               >
-                {editingEventId ? '수정 완료' : '일정 저장'}
+                {editingEventId ? '대장 수정 / 예정일 이동 완료' : '대장 등록'}
               </PremiumButton>
             </div>
           </div>

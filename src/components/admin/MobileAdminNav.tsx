@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-export type AdminAppType = 'post-ai' | 'post-list' | 'post-settings' | 'editor' | 'consult-manage' | 'chat-manage';
+export type AdminAppType = 'post-ai' | 'post-list' | 'post-settings' | 'editor' | 'consult-manage' | 'chat-manage' | 'calendar';
 import BottomSheet from '@/components/ui/BottomSheet';
 
 type ModalType = 'none' | 'posts' | 'settings';
@@ -19,7 +19,7 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
     setOpenModal('none');
   };
 
-  const handleNavClick = (id: 'posts' | 'settings' | 'consult' | 'chat') => {
+  const handleNavClick = (id: 'posts' | 'settings' | 'consult' | 'chat' | 'calendar') => {
     if (id === 'consult') {
       setActiveApp('consult-manage');
       closeModals();
@@ -29,6 +29,11 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
     }
     if (id === 'chat') {
       setActiveApp('chat-manage');
+      closeModals();
+      return;
+    }
+    if (id === 'calendar') {
+      setActiveApp('calendar');
       closeModals();
       return;
     }
@@ -59,6 +64,16 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
         </svg>
       ),
       isActive: activeApp === 'chat-manage'
+    },
+    {
+      id: 'calendar',
+      label: '일정',
+      icon: (
+        <svg className="w-7 h-7 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={activeApp === 'calendar' ? "2" : "1.5"} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+      isActive: activeApp === 'calendar'
     },
     {
       id: 'posts',

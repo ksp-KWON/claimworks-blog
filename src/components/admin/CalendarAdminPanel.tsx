@@ -123,28 +123,15 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     }
   });
 
-  // ─── 1. 데이터 로드 & 파싱 ───
+  // ─── 1. 데이터 로드 & 파싱 (서버 API 통신) ───
   const fetchEvents = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('admin_calendar_events')
-        .select('*')
-        .order('date', { ascending: true });
-
-      if (error || !data || data.length === 0) {
-        const local = localStorage.getItem('local_calendar_events');
-        if (local) {
-          try {
-            setEvents(JSON.parse(local));
-          } catch {
-            setEvents([]);
-          }
-        } else {
-          setEvents([]);
-        }
-      } else if (data && data.length > 0) {
-        const parsed = data.map((d: any) => {
+      const res = await fetch('/api/admin-manage?table=admin_calendar_events');
+      const json = await res.json();
+      
+      if (json.success && Array.isArray(json.data)) {
+        const parsed = json.data.map((d: any) => {
           let extra: any = {};
           try {
             if (d.content && (d.content.startsWith('{') || d.content.startsWith('['))) {
@@ -173,7 +160,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
           };
 
           return {
-            id: d.id,
+            id: String(d.id),
             date: d.date,
             title: d.title,
             content: typeof d.content === 'string' ? d.content : JSON.stringify(d.content),
@@ -188,7 +175,8 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
         setEvents(parsed);
         localStorage.setItem('local_calendar_events', JSON.stringify(parsed));
       }
-    } catch {
+    } catch (err) {
+      console.error('Fetch error:', err);
       const local = localStorage.getItem('local_calendar_events');
       if (local) {
         try {
@@ -345,54 +333,35 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
       content: JSON.stringify(fullPayload)
     };
 
-    let generatedId = editingEventId;
-
     try {
       if (editingEventId) {
-        await supabase.from('admin_calendar_events').update(eventPayload).eq('id', editingEventId);
-      } else {
-        const { data } = await supabase.from('admin_calendar_events').insert([eventPayload]).select();
-        if (data && data[0]?.id) {
-          generatedId = data[0].id;
-        }
-      }
-    } catch (err) {
-      console.warn('Supabase save note:', err);
-    }
-
-    // 로컬 스토리지 & State 즉시 동기화
-    setEvents(prev => {
-      let next = [...prev];
-      if (editingEventId) {
-        const idx = next.findIndex(e => e.id === editingEventId);
-        if (idx >= 0) {
-          next[idx] = {
-            ...next[idx],
+        const res = await fetch(`/api/admin-manage?table=admin_calendar_events&id=${encodeURIComponent(editingEventId)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
             date: modalForm.date,
             title: modalForm.title,
-            time: modalForm.time,
-            category: modalForm.category,
-            ledger: modalForm.ledger,
             content: JSON.stringify(fullPayload)
-          };
-        }
-      } else {
-        next.push({
-          id: generatedId || Date.now().toString(),
-          date: modalForm.date,
-          title: modalForm.title,
-          time: modalForm.time,
-          category: modalForm.category,
-          ledger: modalForm.ledger,
-          content: JSON.stringify(fullPayload),
-          sourceApp: modalForm.ledger.sourceApp,
-          sourceId: modalForm.ledger.sourceId,
-          created_at: new Date().toISOString()
+          })
         });
+        const json = await res.json();
+        if (!json.success) alert('저장 실패: ' + (json.message || '오류 발생'));
+      } else {
+        const res = await fetch('/api/admin-manage?table=admin_calendar_events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date: modalForm.date,
+            title: modalForm.title,
+            content: JSON.stringify(fullPayload)
+          })
+        });
+        const json = await res.json();
+        if (!json.success) alert('등록 실패: ' + (json.message || '오류 발생'));
       }
-      localStorage.setItem('local_calendar_events', JSON.stringify(next));
-      return next;
-    });
+    } catch (err: any) {
+      console.warn('API save warning:', err);
+    }
 
     setIsModalOpen(false);
     fetchEvents();
@@ -433,14 +402,10 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
       ledger: updatedLedger
     };
 
-    const dbPayload = {
-      content: JSON.stringify(fullPayload)
-    };
-
     // 1) State & LocalStorage 즉시 업데이트 (0ms 지연)
     setEvents(prev => {
       const next = prev.map(e => {
-        if (e.id === eventItem.id) {
+        if (String(e.id) === String(eventItem.id)) {
           return {
             ...e,
             ledger: updatedLedger,
@@ -459,11 +424,17 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
       [eventItem.id]: { tag: '통화', text: '' }
     }));
 
-    // 3) Supabase DB 비동기 저장
+    // 3) 서버 API 영구 저장
     try {
-      await supabase.from('admin_calendar_events').update(dbPayload).eq('id', eventItem.id);
+      await fetch(`/api/admin-manage?table=admin_calendar_events&id=${encodeURIComponent(eventItem.id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: JSON.stringify(fullPayload)
+        })
+      });
     } catch (err) {
-      console.warn('Supabase log update:', err);
+      console.warn('API log update error:', err);
     }
   };
 
@@ -488,33 +459,50 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     };
 
     setEvents(prev => {
-      const next = prev.map(e => e.id === eventItem.id ? { ...e, ledger: updatedLedger, content: JSON.stringify(fullPayload) } : e);
+      const next = prev.map(e => String(e.id) === String(eventItem.id) ? { ...e, ledger: updatedLedger, content: JSON.stringify(fullPayload) } : e);
       localStorage.setItem('local_calendar_events', JSON.stringify(next));
       return next;
     });
 
     try {
-      await supabase.from('admin_calendar_events').update({ content: JSON.stringify(fullPayload) }).eq('id', eventItem.id);
+      await fetch(`/api/admin-manage?table=admin_calendar_events&id=${encodeURIComponent(eventItem.id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: JSON.stringify(fullPayload)
+        })
+      });
     } catch (err) {
-      console.warn('Supabase log delete:', err);
+      console.warn('API log delete error:', err);
     }
   };
 
-  // ─── 6. 일정 카드 삭제 ───
+  // ─── 6. 일정 카드 영구 삭제 (서버 API 통신) ───
   const handleDeleteEvent = async (id: string) => {
-    if (!window.confirm('정말 이 손해사정 일정을 삭제하시겠습니까?')) return;
+    if (!window.confirm('정말 이 손해사정 일정을 영구 삭제하시겠습니까?')) return;
     
+    // 1) React State 및 로컬스토리지에서 즉시 삭제 (화면 반응속도 0ms)
     setEvents(prev => {
-      const next = prev.filter(e => e.id !== id);
+      const next = prev.filter(e => String(e.id) !== String(id));
       localStorage.setItem('local_calendar_events', JSON.stringify(next));
       return next;
     });
 
+    // 2) 서버 API를 통해 DB에서 영구 삭제
     try {
-      await supabase.from('admin_calendar_events').delete().eq('id', id);
+      const res = await fetch(`/api/admin-manage?table=admin_calendar_events&id=${encodeURIComponent(id)}`, {
+        method: 'DELETE'
+      });
+      const json = await res.json();
+      if (!json.success) {
+        console.warn('Delete notice:', json.message);
+      }
     } catch (err) {
-      console.warn('Supabase delete error:', err);
+      console.error('Delete API error:', err);
     }
+
+    // 3) 최신 목록 재동기화
+    fetchEvents();
   };
 
   const handleJumpToSource = (event: ExtendedCalendarEvent) => {

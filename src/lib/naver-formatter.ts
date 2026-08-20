@@ -423,81 +423,87 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     }
   }
 
-  // 9. 하단 보상스쿨 공식 4대 CTA 프리미엄 박스 테이블 (2번 샷 100% 동일 디자인 + 단일 4열 무결점 링크 테이블)
+  // 9. 하단 보상스쿨 공식 4대 CTA 프리미엄 와이드 터치 바 (네이버 스마트에디터 완벽 호환 표준 아키텍처)
+  const ctaCards = [
+    {
+      icon: '💬',
+      title: '실시간 채팅상담',
+      sub: '1:1 실시간 비공개 손해사정 상담',
+      url: 'https://claim-works.com/chat',
+      badgeBg: '#eff6ff',
+      badgeBorder: '#bfdbfe',
+      titleColor: '#1d4ed8',
+    },
+    {
+      icon: '📞',
+      title: '전화상담 신청서',
+      sub: '전문 손해사정사 1:1 전화예약 접수',
+      url: 'https://claim-works.com/consultation',
+      badgeBg: '#ecfdf5',
+      badgeBorder: '#a7f3d0',
+      titleColor: '#047857',
+    },
+    {
+      icon: '🧮',
+      title: '예상 합의금 계산기',
+      sub: '1분 실시간 자동차사고 보상금 산정',
+      url: 'https://claim-works.com/calculator/auto',
+      badgeBg: '#eff6ff',
+      badgeBorder: '#bfdbfe',
+      titleColor: '#1d4ed8',
+    },
+    {
+      icon: '▶️',
+      title: '보상스쿨 TV',
+      sub: '공식 유튜브 채널 바로가기',
+      url: 'https://www.youtube.com/@bosangschool',
+      badgeBg: '#fef2f2',
+      badgeBorder: '#fecaca',
+      titleColor: '#b91c1c',
+    },
+  ];
+
+  const cardsHtml = ctaCards.map(c => `
+    <p style="margin: 0 0 10px 0; padding: 0;">
+      <a href="${c.url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none !important; display: block; background-color: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+        <table style="width: 100%; border-collapse: collapse; border: 0; margin: 0; padding: 0;">
+          <tr>
+            <td style="width: 38px; vertical-align: middle; text-align: center; padding: 0;">
+              <span style="display: inline-block; width: 34px; height: 34px; line-height: 34px; background-color: ${c.badgeBg}; border: 1px solid ${c.badgeBorder}; border-radius: 6px; font-size: 18px; text-align: center;">${c.icon}</span>
+            </td>
+            <td style="vertical-align: middle; text-align: left; padding-left: 12px;">
+              <span style="font-size: 15px; font-weight: bold; color: ${c.titleColor}; display: inline-block; margin-right: 8px; line-height: 1.3;">${c.title} ↗</span>
+              <span style="font-size: 12px; color: #64748b; display: inline-block; line-height: 1.3;">${c.sub}</span>
+            </td>
+          </tr>
+        </table>
+      </a>
+    </p>
+  `).join('');
+
   const footerHtml = `
     <table style="width: 100%; border: 0; border-collapse: collapse; margin: 40px 0 24px 0;">
       <tr><td style="border-top: 1px solid #cbd5e1; height: 1px; padding: 0;"></td></tr>
     </table>
 
-    <table style="width: 100%; max-width: 680px; margin: 28px auto 20px auto; border: 1.5px solid #3b82f6; border-collapse: collapse; border-radius: 8px; background-color: #ffffff; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.08);">
-      <!-- 1. 헤더 영역 (4열 병합) -->
-      <tr>
-        <td colspan="4" style="padding: 18px 18px 12px 18px; border-bottom: 1px solid #e2e8f0; background-color: #ffffff;">
-          <div style="border-left: 4px solid #2563eb; padding-left: 10px; margin-bottom: 6px;">
-            <p style="margin: 0; font-size: 16.5px; font-weight: bold; color: #0f172a; line-height: 1.4;">
+    <div style="max-width: 680px; margin: 28px auto 20px auto;">
+      <!-- 헤더 안내 영역 -->
+      <table style="width: 100%; border-collapse: collapse; border-left: 4px solid #2563eb; background-color: #f8fafc; margin-bottom: 16px;">
+        <tr>
+          <td style="padding: 14px 18px;">
+            <p style="margin: 0 0 4px 0; font-size: 16.5px; font-weight: bold; color: #0f172a; line-height: 1.4;">
               <span style="font-size: 17px; margin-right: 4px;">🤝</span><strong>정당한 권리, 보상스쿨과 함께라면 결과가 달라집니다.</strong>
             </p>
-          </div>
-          <p style="margin: 0 0 4px 14px; font-size: 13px; color: #64748b; line-height: 1.5;">
-            수많은 성공 사례로 증명된 전문 손해사정사가 최적의 해답을 제시해 드립니다.
-          </p>
-        </td>
-      </tr>
+            <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.5;">
+              수많은 성공 사례로 증명된 전문 손해사정사가 최적의 해답을 제시해 드립니다.
+            </p>
+          </td>
+        </tr>
+      </table>
 
-      <!-- 2. 카드 1 & 카드 2 (상단 행) -->
-      <tr>
-        <!-- 카드 1: 아이콘 뱃지 -->
-        <td style="width: 52px; background-color: #eff6ff; text-align: center; vertical-align: middle; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #dbeafe; padding: 12px 4px;">
-          <a href="https://claim-works.com/chat" target="_blank" rel="noopener noreferrer" style="text-decoration: none; font-size: 22px; display: block;">💬</a>
-        </td>
-        <!-- 카드 1: 텍스트 -->
-        <td style="width: 42%; background-color: #ffffff; vertical-align: middle; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 12px 14px;">
-          <a href="https://claim-works.com/chat" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block; color: inherit;">
-            <span style="font-size: 14.5px; font-weight: bold; color: #1e293b; display: block; line-height: 1.3; margin-bottom: 2px;">실시간 채팅상담</span>
-            <span style="font-size: 11.5px; color: #64748b; display: block; line-height: 1.3;">보상스쿨 실시간 상담</span>
-          </a>
-        </td>
-
-        <!-- 카드 2: 아이콘 뱃지 -->
-        <td style="width: 52px; background-color: #ecfdf5; text-align: center; vertical-align: middle; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #d1fae5; padding: 12px 4px;">
-          <a href="https://claim-works.com/consultation" target="_blank" rel="noopener noreferrer" style="text-decoration: none; font-size: 22px; display: block;">📞</a>
-        </td>
-        <!-- 카드 2: 텍스트 -->
-        <td style="width: 42%; background-color: #ffffff; vertical-align: middle; border-bottom: 1px solid #e2e8f0; padding: 12px 14px;">
-          <a href="https://claim-works.com/consultation" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block; color: inherit;">
-            <span style="font-size: 14.5px; font-weight: bold; color: #1e293b; display: block; line-height: 1.3; margin-bottom: 2px;">전화상담 신청서</span>
-            <span style="font-size: 11.5px; color: #64748b; display: block; line-height: 1.3;">전문 손해사정사 전화예약</span>
-          </a>
-        </td>
-      </tr>
-
-      <!-- 3. 카드 3 & 카드 4 (하단 행) -->
-      <tr>
-        <!-- 카드 3: 아이콘 뱃지 -->
-        <td style="width: 52px; background-color: #eff6ff; text-align: center; vertical-align: middle; border-right: 1px solid #dbeafe; padding: 12px 4px;">
-          <a href="https://claim-works.com/calculator/auto" target="_blank" rel="noopener noreferrer" style="text-decoration: none; font-size: 22px; display: block;">🧮</a>
-        </td>
-        <!-- 카드 3: 텍스트 -->
-        <td style="width: 42%; background-color: #ffffff; vertical-align: middle; border-right: 1px solid #e2e8f0; padding: 12px 14px;">
-          <a href="https://claim-works.com/calculator/auto" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block; color: inherit;">
-            <span style="font-size: 14.5px; font-weight: bold; color: #1e293b; display: block; line-height: 1.3; margin-bottom: 2px;">예상 합의금 계산기</span>
-            <span style="font-size: 11.5px; color: #64748b; display: block; line-height: 1.3;">1분 실시간 보상금 산정</span>
-          </a>
-        </td>
-
-        <!-- 카드 4: 아이콘 뱃지 -->
-        <td style="width: 52px; background-color: #fef2f2; text-align: center; vertical-align: middle; border-right: 1px solid #fee2e2; padding: 12px 4px;">
-          <a href="https://www.youtube.com/@bosangschool" target="_blank" rel="noopener noreferrer" style="text-decoration: none; font-size: 22px; display: block;">▶️</a>
-        </td>
-        <!-- 카드 4: 텍스트 -->
-        <td style="width: 42%; background-color: #ffffff; vertical-align: middle; padding: 12px 14px;">
-          <a href="https://www.youtube.com/@bosangschool" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block; color: inherit;">
-            <span style="font-size: 14.5px; font-weight: bold; color: #1e293b; display: block; line-height: 1.3; margin-bottom: 2px;">보상스쿨 TV</span>
-            <span style="font-size: 11.5px; color: #64748b; display: block; line-height: 1.3;">유튜브 바로가기</span>
-          </a>
-        </td>
-      </tr>
-    </table>
+      <!-- 4대 와이드 프리미엄 터치 바 카드 리스트 -->
+      ${cardsHtml}
+    </div>
   `;
 
   blocks.push(footerHtml);

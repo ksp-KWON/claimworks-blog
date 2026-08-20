@@ -423,83 +423,72 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     }
   }
 
-  // 9. 하단 보상스쿨 공식 4대 CTA 프리미엄 와이드 터치 바 (네이버 스마트에디터 완벽 호환 표준 아키텍처)
+  // 9. 하단 보상스쿨 공식 4대 CTA 프리미엄 와이드 카드 (순수 Zero-Table 무결점 아키텍처)
   const ctaCards = [
     {
       icon: '💬',
-      title: '실시간 채팅상담',
-      sub: '1:1 실시간 비공개 손해사정 상담',
+      title: '실시간 채팅상담 바로가기',
+      sub: '1:1 실시간 비공개 손해사정 무료 상담',
       url: 'https://claim-works.com/chat',
-      badgeBg: '#eff6ff',
-      badgeBorder: '#bfdbfe',
+      borderColor: '#bfdbfe',
+      leftBar: '#2563eb',
       titleColor: '#1d4ed8',
     },
     {
       icon: '📞',
-      title: '전화상담 신청서',
+      title: '전화상담 신청서 바로가기',
       sub: '전문 손해사정사 1:1 전화예약 접수',
       url: 'https://claim-works.com/consultation',
-      badgeBg: '#ecfdf5',
-      badgeBorder: '#a7f3d0',
+      borderColor: '#a7f3d0',
+      leftBar: '#059669',
       titleColor: '#047857',
     },
     {
       icon: '🧮',
-      title: '예상 합의금 계산기',
+      title: '예상 합의금 계산기 바로가기',
       sub: '1분 실시간 자동차사고 보상금 산정',
       url: 'https://claim-works.com/calculator/auto',
-      badgeBg: '#eff6ff',
-      badgeBorder: '#bfdbfe',
+      borderColor: '#bfdbfe',
+      leftBar: '#2563eb',
       titleColor: '#1d4ed8',
     },
     {
       icon: '▶️',
-      title: '보상스쿨 TV',
-      sub: '공식 유튜브 채널 바로가기',
+      title: '보상스쿨 TV 공식 유튜브',
+      sub: '손해사정 꿀팁 & 보상 노하우 영상 바로가기',
       url: 'https://www.youtube.com/@bosangschool',
-      badgeBg: '#fef2f2',
-      badgeBorder: '#fecaca',
+      borderColor: '#fecaca',
+      leftBar: '#dc2626',
       titleColor: '#b91c1c',
     },
   ];
 
   const cardsHtml = ctaCards.map(c => `
-    <p style="margin: 0 0 10px 0; padding: 0;">
-      <a href="${c.url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none !important; display: block; background-color: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
-        <table style="width: 100%; border-collapse: collapse; border: 0; margin: 0; padding: 0;">
-          <tr>
-            <td style="width: 38px; vertical-align: middle; text-align: center; padding: 0;">
-              <span style="display: inline-block; width: 34px; height: 34px; line-height: 34px; background-color: ${c.badgeBg}; border: 1px solid ${c.badgeBorder}; border-radius: 6px; font-size: 18px; text-align: center;">${c.icon}</span>
-            </td>
-            <td style="vertical-align: middle; text-align: left; padding-left: 12px;">
-              <span style="font-size: 15px; font-weight: bold; color: ${c.titleColor}; display: inline-block; margin-right: 8px; line-height: 1.3;">${c.title} ↗</span>
-              <span style="font-size: 12px; color: #64748b; display: inline-block; line-height: 1.3;">${c.sub}</span>
-            </td>
-          </tr>
-        </table>
+    <div style="margin: 10px 0; background-color: #f8fafc; border: 1.5px solid ${c.borderColor}; border-left: 6px solid ${c.leftBar}; border-radius: 8px; padding: 14px 18px;">
+      <a href="${c.url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: block;">
+        <p style="margin: 0 0 3px 0; font-size: 15.5px; font-weight: bold; color: ${c.titleColor}; line-height: 1.3;">
+          <span style="font-size: 19px; margin-right: 8px; vertical-align: middle;">${c.icon}</span><span style="vertical-align: middle;">${c.title} ↗</span>
+        </p>
+        <p style="margin: 0; font-size: 12.5px; color: #64748b; padding-left: 28px; line-height: 1.3;">
+          ${c.sub}
+        </p>
       </a>
-    </p>
+    </div>
   `).join('');
 
   const footerHtml = `
-    <table style="width: 100%; border: 0; border-collapse: collapse; margin: 40px 0 24px 0;">
-      <tr><td style="border-top: 1px solid #cbd5e1; height: 1px; padding: 0;"></td></tr>
-    </table>
+    <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 40px 0 24px 0;" />
 
-    <div style="max-width: 680px; margin: 28px auto 20px auto;">
+    <div style="margin: 28px 0 20px 0;">
       <!-- 헤더 안내 영역 -->
-      <table style="width: 100%; border-collapse: collapse; border-left: 4px solid #2563eb; background-color: #f8fafc; margin-bottom: 16px;">
-        <tr>
-          <td style="padding: 14px 18px;">
-            <p style="margin: 0 0 4px 0; font-size: 16.5px; font-weight: bold; color: #0f172a; line-height: 1.4;">
-              <span style="font-size: 17px; margin-right: 4px;">🤝</span><strong>정당한 권리, 보상스쿨과 함께라면 결과가 달라집니다.</strong>
-            </p>
-            <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.5;">
-              수많은 성공 사례로 증명된 전문 손해사정사가 최적의 해답을 제시해 드립니다.
-            </p>
-          </td>
-        </tr>
-      </table>
+      <blockquote style="margin: 0 0 16px 0; padding: 14px 18px; border-left: 5px solid #2563eb; background-color: #f8fafc; border-radius: 4px;">
+        <p style="margin: 0 0 4px 0; font-size: 16.5px; font-weight: bold; color: #0f172a; line-height: 1.4;">
+          🤝 정당한 권리, 보상스쿨과 함께라면 결과가 달라집니다.
+        </p>
+        <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.5;">
+          수많은 성공 사례로 증명된 전문 손해사정사가 최적의 해답을 제시해 드립니다.
+        </p>
+      </blockquote>
 
       <!-- 4대 와이드 프리미엄 터치 바 카드 리스트 -->
       ${cardsHtml}

@@ -41,10 +41,32 @@ function processPost(filePath) {
   body = body.replace(/\[\s*(?:이미지\s*제안|관련\s*글\s*추천|이미지제안|관련글추천)\s*:[^\]]*\]/gi, '');
 
   // ── [3. 오프닝 & 핵심 요약 배치 보장] ─────────────────────────────────
-  const hasOpening = !body.trim().startsWith('#') && !body.trim().startsWith('>');
-  if (!hasOpening) {
+  let hasOpeningText = false;
+  const trimmedBody = body.trim();
+
+  if (!trimmedBody.startsWith('#') && !trimmedBody.startsWith('>')) {
+    hasOpeningText = true;
+  } else if (/^##\s*(?:💡|🎯)?\s*핵심\s*요약/i.test(trimmedBody)) {
+    // 핵심 요약 블록 제거 후 첫 번째 ## H2 이전 영역에 일반 문단이 있는지 확인
+    const afterSummary = trimmedBody.replace(/^##\s*(?:💡|🎯)?\s*핵심\s*요약[^\n]*\r?\n+(?:[ \t]*>?[ \t]*[-*+].*\r?\n*)+/i, '').trim();
+    const firstH2Match = afterSummary.match(/^##\s+/m);
+    const introPart = firstH2Match && firstH2Match.index !== undefined ? afterSummary.slice(0, firstH2Match.index).trim() : afterSummary;
+    const hasParagraph = introPart.split(/\r?\n/).some(l => {
+      const t = l.trim();
+      return t && !t.startsWith('#') && !t.startsWith('>') && !t.startsWith('|') && !t.startsWith('[') && !t.startsWith('!');
+    });
+    if (hasParagraph) {
+      hasOpeningText = true;
+    }
+  }
+
+  if (!hasOpeningText) {
     const fallbackOpening = data.summary || '보험금 청구와 손해사정 실무에서 피보험자의 정당한 권익을 보호하기 위한 핵심 법리와 대응 전략을 상세히 안내해 드립니다.';
-    body = `${fallbackOpening}\n\n${body.trim()}`;
+    if (/^##\s*(?:💡|🎯)?\s*핵심\s*요약/i.test(trimmedBody)) {
+      body = body.replace(/(##\s*(?:💡|🎯)?\s*핵심\s*요약[^\n]*\r?\n+(?:[ \t]*>?[ \t]*[-*+].*\r?\n*)+)/i, `$1\n${fallbackOpening}\n\n`);
+    } else {
+      body = `${fallbackOpening}\n\n${body.trim()}`;
+    }
   }
 
   // ── [4. 다단계 솔루션(①~⑳) 콜론 분리 및 헤딩 승격] ────────────────────

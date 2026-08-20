@@ -158,16 +158,16 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       continue;
     }
 
-    // 3. 중제목 H3 (### ...) ➔ [포스트잇/박스형 인용구 툴 2]
-    if (trimmed.startsWith('### ')) {
+    // 3. 중제목 H3 (### ...) ➔ [포스트잇/박스형 인용구 툴 2] (FAQ Q 라인은 FAQ 파서로 위임)
+    if (trimmed.startsWith('### ') && !trimmed.includes('Q :') && !trimmed.includes('Q:') && !trimmed.startsWith('### Q')) {
       const titleText = trimmed.replace(/^###\s+/, '').trim();
       const h3Html = `
         <table style="width: 100%; border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; background-color: #f8fafc; border-collapse: collapse; margin: 26px 0 12px 0;">
           <tr>
-            <td style="padding: 10px 16px;">
-              <p style="font-size: 16.5px; font-weight: bold; color: #1e293b; margin: 0; line-height: 1.4;">
-                <span style="color: #3b82f6; margin-right: 6px;">■</span><strong>${titleText}</strong>
-              </p>
+            <td style="padding: 10px 15px;">
+              <span style="font-size: 16.5px; font-weight: bold; color: #1e3a8a;">
+                ■ <strong>${titleText}</strong>
+              </span>
             </td>
           </tr>
         </table>
@@ -199,8 +199,9 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     }
 
     // 5. FAQ (Q&A) 질문-답변 블록 ➔ [상하 2단 파스텔 카드 테이블]
-    if (trimmed.includes('Q :') || trimmed.includes('Q:') || trimmed.startsWith('■Q') || trimmed.startsWith('Q.')) {
-      let qText = trimmed.replace(/^[■\s]*Q\s*[:.]\s*/, '').trim();
+    const cleanQLine = trimmed.replace(/^###\s+/, '');
+    if (cleanQLine.includes('Q :') || cleanQLine.includes('Q:') || cleanQLine.startsWith('■Q') || cleanQLine.startsWith('Q.')) {
+      let qText = cleanQLine.replace(/^[■\s]*Q\s*[:.]\s*/, '').trim();
       let aText = '';
       i++;
 

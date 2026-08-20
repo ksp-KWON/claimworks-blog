@@ -423,76 +423,15 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     }
   }
 
-  // 9. 하단 보상스쿨 공식 4대 CTA 프리미엄 와이드 카드 (순수 Zero-Table 무결점 아키텍처)
-  const ctaCards = [
-    {
-      icon: '💬',
-      title: '실시간 채팅상담 바로가기',
-      sub: '1:1 실시간 비공개 손해사정 무료 상담',
-      url: 'https://claim-works.com/chat',
-      borderColor: '#bfdbfe',
-      leftBar: '#2563eb',
-      titleColor: '#1d4ed8',
-    },
-    {
-      icon: '📞',
-      title: '전화상담 신청서 바로가기',
-      sub: '전문 손해사정사 1:1 전화예약 접수',
-      url: 'https://claim-works.com/consultation',
-      borderColor: '#a7f3d0',
-      leftBar: '#059669',
-      titleColor: '#047857',
-    },
-    {
-      icon: '🧮',
-      title: '예상 합의금 계산기 바로가기',
-      sub: '1분 실시간 자동차사고 보상금 산정',
-      url: 'https://claim-works.com/calculator/auto',
-      borderColor: '#bfdbfe',
-      leftBar: '#2563eb',
-      titleColor: '#1d4ed8',
-    },
-    {
-      icon: '▶️',
-      title: '보상스쿨 TV 공식 유튜브',
-      sub: '손해사정 꿀팁 & 보상 노하우 영상 바로가기',
-      url: 'https://www.youtube.com/@bosangschool',
-      borderColor: '#fecaca',
-      leftBar: '#dc2626',
-      titleColor: '#b91c1c',
-    },
-  ];
-
-  const cardsHtml = ctaCards.map(c => `
-    <div style="margin: 10px 0; background-color: #f8fafc; border: 1.5px solid ${c.borderColor}; border-left: 6px solid ${c.leftBar}; border-radius: 8px; padding: 14px 18px;">
-      <a href="${c.url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: block;">
-        <p style="margin: 0 0 3px 0; font-size: 15.5px; font-weight: bold; color: ${c.titleColor}; line-height: 1.3;">
-          <span style="font-size: 19px; margin-right: 8px; vertical-align: middle;">${c.icon}</span><span style="vertical-align: middle;">${c.title} ↗</span>
-        </p>
-        <p style="margin: 0; font-size: 12.5px; color: #64748b; padding-left: 28px; line-height: 1.3;">
-          ${c.sub}
-        </p>
-      </a>
-    </div>
-  `).join('');
-
+  // 9. 하단 보상스쿨 공식 배너 이미지 CTA (네이버 스마트에디터 100% 호환 무결점 아키텍처)
   const footerHtml = `
     <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 40px 0 24px 0;" />
 
-    <div style="margin: 28px 0 20px 0;">
-      <!-- 헤더 안내 영역 -->
-      <blockquote style="margin: 0 0 16px 0; padding: 14px 18px; border-left: 5px solid #2563eb; background-color: #f8fafc; border-radius: 4px;">
-        <p style="margin: 0 0 4px 0; font-size: 16.5px; font-weight: bold; color: #0f172a; line-height: 1.4;">
-          🤝 정당한 권리, 보상스쿨과 함께라면 결과가 달라집니다.
-        </p>
-        <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.5;">
-          수많은 성공 사례로 증명된 전문 손해사정사가 최적의 해답을 제시해 드립니다.
-        </p>
-      </blockquote>
-
-      <!-- 4대 와이드 프리미엄 터치 바 카드 리스트 -->
-      ${cardsHtml}
-    </div>
+    <p style="text-align: center; margin: 30px auto 20px auto;">
+      <a href="https://claim-works.com/consultation" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
+        <img src="https://claim-works.com/images/bosangschool-cta-banner.png" alt="보상스쿨tv 보험금분쟁 손해사정 무료상담 신청하기" style="max-width: 100%; width: 620px; height: auto; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); display: block; margin: 0 auto;" />
+      </a>
+    </p>
   `;
 
   blocks.push(footerHtml);

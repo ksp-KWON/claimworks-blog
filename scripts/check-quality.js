@@ -101,7 +101,7 @@ function processPost(filePath) {
   );
 
   body = body.replace(
-    /(##\s*(?:💡\s*)?(?:1분\s*자가진단[^\n]*)\s*\r?\n+)((?:[ \t]*>?[ \t]*[-*+\[\]xX☑️✅✔].*\r?\n*)+)/g,
+    /(##\s*(?:💡\s*)?(?:1분\s*자가진단[^\n]*)\s*\r?\n+)((?:[ \t]*>?[ \t]*(?:[-*+](?!--)|\[[ xX-]\]|[☑️✅✔]).*\r?\n*)+)/g,
     (m, head, bullets) => {
       let cleanHead = head.trim();
       if (!cleanHead.includes(':') && !cleanHead.includes('체크리스트')) {
@@ -110,7 +110,7 @@ function processPost(filePath) {
       const cleanBullets = bullets
         .split(/\r?\n/)
         .map((l) => l.trim())
-        .filter(Boolean)
+        .filter((l) => l && !l.startsWith('---') && !l.startsWith('***'))
         .map((l) => {
           let text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').trim();
           if (!text.startsWith('[ ]') && !text.startsWith('[-]') && !text.startsWith('[x]')) {

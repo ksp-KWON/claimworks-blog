@@ -165,7 +165,7 @@ export default function AdminPage() {
     setIsLoading(false);
   };
 
-  const handleRunAi = async (mode: 'manual-preserve' | 'manual-expand' | 'semi-auto', inputText: string) => {
+  const handleRunAi = async (mode: 'manual-preserve' | 'manual-expand' | 'manual-naver' | 'naver-expand' | 'semi-auto', inputText: string) => {
     if (!geminiKey) { alert('Gemini API 키를 먼저 설정하세요.'); return; }
     setIsLoading(true);
     

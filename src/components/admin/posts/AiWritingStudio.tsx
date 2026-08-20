@@ -7,7 +7,7 @@ import { copyToNaverClipboard } from '@/lib/naver-formatter';
 
 interface AiWritingStudioProps {
   isLoading: boolean;
-  onRunAi: (mode: 'manual-preserve' | 'manual-expand' | 'semi-auto', inputText: string) => void;
+  onRunAi: (mode: 'manual-preserve' | 'manual-expand' | 'manual-naver' | 'naver-expand' | 'semi-auto', inputText: string) => void;
   postMeta: any;
   setPostMeta: any;
   onSavePost: (isDraft?: boolean) => void;
@@ -27,21 +27,34 @@ const CATEGORIES = [
   '보상가이드'
 ];
 
-const MANUAL_MODES = [
+const NAVER_MODES = [
+  {
+    id: 'manual-naver', icon: '🟢', label: '네이버 D.I.A.+ 각색', badge: '원고각색', badgeColor: 'green' as const,
+    desc: '원문을 네이버 친근한 대화체·스토리로 각색합니다.', accentClass: 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10',
+    iconBg: 'bg-emerald-100 dark:bg-emerald-900/30', textColor: 'text-emerald-700 dark:text-emerald-400'
+  },
+  {
+    id: 'naver-expand', icon: '🚀', label: '네이버 블로그 확장', badge: '신규창작', badgeColor: 'green' as const,
+    desc: '키워드로 풍부한 네이버 블로그 글을 창작합니다.', accentClass: 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10',
+    iconBg: 'bg-emerald-100 dark:bg-emerald-900/30', textColor: 'text-emerald-700 dark:text-emerald-400'
+  }
+];
+
+const GOOGLE_MODES = [
   {
     id: 'manual-preserve', icon: '💎', label: '초안 다듬기', badge: '보존형', badgeColor: 'blue' as const,
-    desc: '원문을 보존하며 포장합니다.', accentClass: 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10',
+    desc: '원문을 보존하며 E-E-A-T 칼럼으로 포장합니다.', accentClass: 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10',
     iconBg: 'bg-blue-100 dark:bg-blue-900/30', textColor: 'text-blue-700 dark:text-blue-400'
   },
   {
     id: 'manual-expand', icon: '🚀', label: '초안 확장', badge: '창작형', badgeColor: 'purple' as const,
-    desc: '전문 지식을 추가해 창작합니다.', accentClass: 'border-purple-500 bg-purple-50/50 dark:bg-purple-900/10',
+    desc: '전문 판례·의학 지식을 추가해 심층 창작합니다.', accentClass: 'border-purple-500 bg-purple-50/50 dark:bg-purple-900/10',
     iconBg: 'bg-purple-100 dark:bg-purple-900/30', textColor: 'text-purple-700 dark:text-purple-400'
   },
   {
-    id: 'semi-auto', icon: '🔗', label: '링크/키워드', badge: '반자동', badgeColor: 'green' as const,
-    desc: '키워드로 전체 기획·창작합니다.', accentClass: 'border-green-500 bg-green-50/50 dark:bg-green-900/10',
-    iconBg: 'bg-green-100 dark:bg-green-900/30', textColor: 'text-green-700 dark:text-green-400'
+    id: 'semi-auto', icon: '🔗', label: '링크/키워드 기획', badge: '반자동', badgeColor: 'indigo' as const,
+    desc: '키워드로 전체 기획·E-E-A-T 칼럼을 창작합니다.', accentClass: 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/10',
+    iconBg: 'bg-indigo-100 dark:bg-indigo-900/30', textColor: 'text-indigo-700 dark:text-indigo-400'
   }
 ];
 
@@ -64,7 +77,8 @@ export default function AiWritingStudio({
 }: AiWritingStudioProps) {
   
   const [activePanelTab, setActivePanelTab] = useState<'manual' | 'auto'>('manual');
-  const [aiMode, setAiMode] = useState<'manual-preserve' | 'manual-expand' | 'semi-auto'>('manual-preserve');
+  const [platform, setPlatform] = useState<'naver' | 'google'>('naver');
+  const [aiMode, setAiMode] = useState<'manual-preserve' | 'manual-expand' | 'manual-naver' | 'naver-expand' | 'semi-auto'>('manual-naver');
   const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0]);
 
   // Mobile Bottom Sheet State
@@ -119,8 +133,6 @@ export default function AiWritingStudio({
     setIsMobileAiOpen(false); // 실행 후 모바일 서랍 닫기
   };
 
-  // handleRunBatch is removed as requested
-
   // 공통으로 사용될 AI 어시스턴트 컨트롤 패널 (데스크톱/모바일 공용)
   const renderAiControls = () => (
     <div className="flex flex-col h-full overflow-hidden">
@@ -148,8 +160,41 @@ export default function AiWritingStudio({
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 pb-2 md:pb-2">
         {activePanelTab === 'manual' ? (
           <>
+            {/* 1. 플랫폼 타겟 투트랙 토글 탭 */}
+            <div className="bg-gray-100 dark:bg-zinc-950 p-1 rounded-xl flex gap-1">
+              <button
+                onClick={() => {
+                  setPlatform('naver');
+                  setAiMode('manual-naver');
+                }}
+                className={`flex-1 py-2 px-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                  platform === 'naver'
+                    ? 'bg-emerald-500 text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+                }`}
+              >
+                <span>🟢</span>
+                <span>네이버 D.I.A.+</span>
+              </button>
+              <button
+                onClick={() => {
+                  setPlatform('google');
+                  setAiMode('manual-preserve');
+                }}
+                className={`flex-1 py-2 px-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                  platform === 'google'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+                }`}
+              >
+                <span>🌐</span>
+                <span>구글 E-E-A-T</span>
+              </button>
+            </div>
+
+            {/* 2. 선택된 플랫폼별 맞춤 모드 카드 */}
             <div className="grid grid-cols-1 gap-2">
-              {MANUAL_MODES.map(mode => (
+              {(platform === 'naver' ? NAVER_MODES : GOOGLE_MODES).map(mode => (
                 <button
                   key={mode.id}
                   onClick={() => setAiMode(mode.id as any)}
@@ -161,6 +206,11 @@ export default function AiWritingStudio({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className={`text-sm font-bold ${aiMode === mode.id ? mode.textColor : 'text-gray-700 dark:text-gray-200'}`}>{mode.label}</span>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                        platform === 'naver' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
+                      }`}>
+                        {mode.badge}
+                      </span>
                     </div>
                     <p className="text-[11px] text-gray-500 leading-snug truncate">{mode.desc}</p>
                   </div>
@@ -168,10 +218,20 @@ export default function AiWritingStudio({
               ))}
             </div>
             
-            <div className="space-y-2 mt-4 p-3 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-xl">
-              <p className="text-xs text-blue-700 dark:text-blue-400 font-medium leading-relaxed">
-                💡 <b>작성 가이드</b><br/>
-                중앙의 에디터 창에 원문 데이터나 대본을 입력한 뒤, 하단의 창작 시작 버튼을 누르면 AI가 새로운 글을 완성해줍니다.
+            {/* 3. 플랫폼별 가이드 팁 */}
+            <div className={`space-y-1.5 p-3 border rounded-xl ${
+              platform === 'naver'
+                ? 'bg-emerald-50/60 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/30 text-emerald-800 dark:text-emerald-300'
+                : 'bg-blue-50/60 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/30 text-blue-800 dark:text-blue-300'
+            }`}>
+              <p className="text-xs font-bold flex items-center gap-1.5">
+                <span>{platform === 'naver' ? '🟢' : '🌐'}</span>
+                <span>{platform === 'naver' ? '네이버 블로그 D.I.A.+ 가이드' : '구글 E-E-A-T 웹사이트 가이드'}</span>
+              </p>
+              <p className="text-[11px] leading-relaxed opacity-90">
+                {platform === 'naver'
+                  ? '중앙 에디터에 원문을 넣고 [창작 시작]을 누르면 친근한 대화체와 공감 스토리텔링으로 본문 내용이 각색됩니다. 완료 후 아래 [네이버 복사]를 누르세요.'
+                  : '대법원 판례, 법리 대조표, W3C 시맨틱 마크다운을 갖춘 최고 권위의 공식 웹사이트용 칼럼을 작성합니다.'}
               </p>
             </div>
           </>
@@ -218,16 +278,20 @@ export default function AiWritingStudio({
       </div>
 
       {/* ── 하단 공통 액션 영역 (Sticky) ── */}
-      <div className="shrink-0 p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 relative z-20 space-y-4 shadow-[0_-4px_15px_rgba(0,0,0,0.02)]">
+      <div className="shrink-0 p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 relative z-20 space-y-3 shadow-[0_-4px_15px_rgba(0,0,0,0.02)]">
         
         {activePanelTab === 'manual' ? (
           <PremiumButton 
             onClick={handleRunAi} 
             disabled={isLoading || !(postMeta.content || '').trim()} 
             variant="primary" 
-            className="w-full !py-3 !rounded-xl text-[15px] shadow-[0_4px_15px_rgba(26,115,232,0.2)] border-none"
+            className={`w-full !py-3 !rounded-xl text-[15px] border-none ${
+              platform === 'naver'
+                ? '!bg-emerald-600 hover:!bg-emerald-700 shadow-[0_4px_15px_rgba(5,150,105,0.25)]'
+                : '!bg-blue-600 hover:!bg-blue-700 shadow-[0_4px_15px_rgba(37,99,235,0.25)]'
+            }`}
           >
-            {isLoading ? '창작 중...' : '창작 시작'}
+            {isLoading ? 'AI 각색/창작 중...' : platform === 'naver' ? '🟢 네이버 AI 각색 시작' : '🌐 구글 E-E-A-T 창작 시작'}
           </PremiumButton>
         ) : (
           <div className="space-y-2">
@@ -243,7 +307,7 @@ export default function AiWritingStudio({
         )}
 
         {/* 2. 네이버 블로그 D.I.A.+ 원클릭 복사 */}
-        <div className="pt-2">
+        <div>
           <button
             onClick={handleCopyNaver}
             disabled={!postMeta.content || !(postMeta.content || '').trim()}
@@ -269,7 +333,7 @@ export default function AiWritingStudio({
             </PremiumButton>
           </div>
           <PremiumButton onClick={() => onSavePost(false)} disabled={isLoading} variant="primary" className="w-full !py-2.5 !rounded-xl shadow-md !bg-gray-800 hover:!bg-gray-900 dark:!bg-white dark:text-gray-900 border-none">
-            {isLoading ? '처리 중...' : '발행하기'}
+            {isLoading ? '처리 중...' : '웹사이트 공식 발행하기'}
           </PremiumButton>
         </div>
       </div>
@@ -278,44 +342,37 @@ export default function AiWritingStudio({
 
   return (
     <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-[#f8f9fa] dark:bg-zinc-950 relative w-full min-h-0">
-      
-      {/* ── 좌측/중앙: 메인 에디터 (항상 노출) ── */}
-      <div className="flex-1 flex flex-col min-w-0 border-r border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-y-auto">
-        
-        {/* 에디터 캔버스 */}
-        <div className="flex-1">
-          <MarkdownEditor
-            title={postMeta.title} setTitle={(t: string) => setPostMeta((prev: any) => ({ ...prev, title: t }))}
-            content={postMeta.content} setContent={(c: any) => setPostMeta((prev: any) => ({ ...prev, content: typeof c === 'function' ? c(prev.content) : c }))}
-          />
-        </div>
+      {/* ── 좌측/중앙 메인 에디터 영역 ── */}
+      <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-zinc-950 overflow-y-auto">
+        <MarkdownEditor
+          title={postMeta.title || ''}
+          setTitle={(val) => setPostMeta((prev: any) => ({ ...prev, title: val }))}
+          content={postMeta.content || ''}
+          setContent={(val) => setPostMeta((prev: any) => ({ ...prev, content: typeof val === 'function' ? val(prev.content) : val }))}
+        />
       </div>
 
-      {/* ── 우측: AI 어시스턴트 사이드바 (데스크톱 전용) ── */}
-      <div className="hidden md:flex w-80 lg:w-[320px] shrink-0 flex-col bg-white dark:bg-zinc-900 overflow-hidden shadow-[-4px_0_15px_rgba(0,0,0,0.03)] z-10">
+      {/* ── 우측 AI 어시스턴트 사이드바 (데스크톱) ── */}
+      <div className="hidden md:block w-80 shrink-0 bg-white dark:bg-zinc-900 border-l border-gray-100 dark:border-zinc-800 flex flex-col h-full overflow-hidden">
         {renderAiControls()}
       </div>
 
-      {/* ── 모바일: 하단 플로팅 버튼 ── */}
-      <div className="md:hidden fixed bottom-[72px] right-4 z-40">
-        <button 
+      {/* ── 모바일 하단 플로팅 버튼 및 바텀시트 ── */}
+      <div className="md:hidden fixed bottom-6 right-4 z-40">
+        <button
           onClick={() => setIsMobileAiOpen(true)}
-          className="w-12 h-12 rounded-full bg-blue-600 text-white shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-xl flex items-center gap-2 text-sm font-bold"
         >
-          <span className="text-xl">✨</span>
+          <span>✨</span>
+          <span>AI 어시스턴트</span>
         </button>
       </div>
 
-      {/* ── 모바일: AI 서랍 (바텀 시트) ── */}
-      <BottomSheet 
-        isOpen={isMobileAiOpen} 
-        onClose={() => setIsMobileAiOpen(false)} 
-        showBackdrop={true} 
-        maxHeight="max-h-[85vh]"
-        padding="p-0"
-        zIndex="z-[100]"
+      <BottomSheet
+        isOpen={isMobileAiOpen}
+        onClose={() => setIsMobileAiOpen(false)}
       >
-        <div className="h-[75vh] flex flex-col bg-white dark:bg-zinc-900">
+        <div className="h-[75vh]">
           {renderAiControls()}
         </div>
       </BottomSheet>

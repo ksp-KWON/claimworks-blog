@@ -63,6 +63,14 @@ function applyNaverHighlighter(text: string): string {
 
 /**
  * 마크다운 텍스트를 네이버 스마트에디터 ONE 전용 HTML로 완벽 변환 (정밀 파서)
+ * 
+ * [출력 순서]
+ * 1. 최상단 시작 가로선 (<hr>)
+ * 2. 핵심 요약 박스 (연초록 카드 테이블)
+ * 3. 공감 오프닝 서술 문단
+ * 4. 중간 가로 구분선 (<hr>)
+ * 5. 본문 1번 (## H2 대제목)부터 순차적 본문 렌더링
+ * 6. 하단 보상스쿨 공식 4대 CTA 카드 배너
  */
 export function convertMarkdownToNaverHtml(markdown: string, options: NaverFormatOptions = {}): string {
   const blogType = options.targetBlog || 'default';
@@ -74,12 +82,105 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
-    .replace(/^##\s*💡\s*핵심\s*요약\s*$/gm, '')
-    .replace(/^##\s*핵심\s*요약\s*$/gm, '')
     .trim();
 
-  const lines = cleanMd.split('\n');
+  // 2. 핵심 요약 (Key Points) 추출
+  let keyPoints: string[] = [];
+  const keyPointsHeaderRegex = /##\s*(?:💡|🎯)?\s*핵심\s*요약(?:[^\n]*)\n+((?:[ \t]*>?[ \t]*[-*+].*\n*)+)/i;
+  const keyPointsMatch = cleanMd.match(keyPointsHeaderRegex);
+
+  if (keyPointsMatch) {
+    const rawBullets = keyPointsMatch[1];
+    keyPoints = rawBullets
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean)
+      .map(l => l.replace(/^(?:>\s*)?[-*+]\s*/, '').trim())
+      .filter(l => l.length > 0 && !l.startsWith('[ ]') && !l.startsWith('[x]'));
+
+    // cleanMd에서 해당 헤더와 불릿 블록 제거
+    cleanMd = cleanMd.replace(keyPointsMatch[0], '\n\n');
+  }
+
+  // 3. 첫 번째 본문 대제목(## H2) 찾기 (핵심 요약 헤더는 이미 제거됨)
+  const firstH2Match = cleanMd.match(/^##\s+.+$/m);
+  let openingText = '';
+  let bodyMd = cleanMd;
+
+  if (firstH2Match && firstH2Match.index !== undefined) {
+    const introPart = cleanMd.slice(0, firstH2Match.index).trim();
+    bodyMd = cleanMd.slice(firstH2Match.index).trim();
+
+    // introPart에서 혹시 keyPoints가 아직 안 뽑혔는데 `> - ...` 가 있다면 추출
+    if (keyPoints.length === 0) {
+      const quoteMatches = introPart.match(/^>[ \t]*[-*+](.+)$/gm);
+      if (quoteMatches) {
+        keyPoints = quoteMatches.map(m => m.replace(/^>[ \t]*[-*+]\s*/, '').trim());
+      }
+    }
+
+    // introPart에서 일반 오프닝 문단만 추출
+    const introLines = introPart.split('\n')
+      .map(l => l.trim())
+      .filter(l => {
+        if (!l) return false;
+        if (l.startsWith('>')) return false; // 인용구는 오프닝에서 제외
+        if (l.startsWith('#')) return false;
+        if (l.startsWith('|')) return false;
+        if (l.startsWith('[') && l.includes('](')) return false; // 단독 링크 줄 제외
+        if (l.startsWith('![')) return false; // 단독 이미지 줄 제외
+        return true;
+      });
+    openingText = introLines.join('<br/>');
+  } else {
+    // H2가 없는 경우
+    openingText = cleanMd;
+    bodyMd = '';
+  }
+
   const blocks: string[] = [];
+
+  // ── [1단계] 처음 시작할 때 최상단 가로선 ──
+  blocks.push(`
+    <table style="width: 100%; border: 0; border-collapse: collapse; margin: 10px 0 20px 0;">
+      <tr><td style="border-top: 1px solid #cbd5e1; height: 1px; padding: 0;"></td></tr>
+    </table>
+  `.trim());
+
+  // ── [2단계] 그 다음 핵심요약 박스 ──
+  if (keyPoints.length > 0) {
+    const itemsHtml = keyPoints.map(item => {
+      const highlighted = applyNaverHighlighter(item);
+      return `<div style="margin: 6px 0; font-size: 14.5px; color: #166534; line-height: 1.8;"><span style="color: #059669; font-weight: bold; margin-right: 8px;">•</span>${highlighted}</div>`;
+    }).join('');
+
+    const summaryBoxHtml = `
+      <table style="width: 100%; border: 1.5px solid #10b981; background-color: #f0fdf4; border-collapse: collapse; margin: 16px 0 20px 0; border-radius: 6px;">
+        <tr>
+          <td style="padding: 16px 20px;">
+            ${itemsHtml}
+          </td>
+        </tr>
+      </table>
+    `.trim();
+    blocks.push(summaryBoxHtml);
+  }
+
+  // ── [3단계] 그 다음 오프닝 문단 ──
+  if (openingText) {
+    const highlightedOpening = applyNaverHighlighter(openingText);
+    blocks.push(`<p style="font-size: 15.5px; line-height: 1.9; color: #27272a; margin: 20px 0; word-break: keep-all;">${highlightedOpening}</p>`);
+  }
+
+  // ── [4단계] 그 다음 가로선 (본문 1번 시작 직전) ──
+  blocks.push(`
+    <table style="width: 100%; border: 0; border-collapse: collapse; margin: 32px 0 24px 0;">
+      <tr><td style="border-top: 1px solid #cbd5e1; height: 1px; padding: 0;"></td></tr>
+    </table>
+  `.trim());
+
+  // ── [5단계] 그 다음 본문 1번 시작부터 나머지 본문 파싱 ──
+  const lines = bodyMd.split('\n');
   let i = 0;
   let isFirstH2 = true;
 

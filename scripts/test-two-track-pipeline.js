@@ -127,7 +127,7 @@ const checks = [
   { name: 'FAQ 상하 2단 파스텔 카드 테이블 (#eff6ff / #ffffff)', pass: naverHtml.includes('#eff6ff') && naverHtml.includes('❓') && naverHtml.includes('💡') },
   { name: '마크다운 비교표 (Table) 정상 렌더링', pass: naverHtml.includes('<table') && naverHtml.includes('심한 기형') },
   { name: '노란색 형광펜 하이라이트 (#fef08a)', pass: naverHtml.includes('#fef08a') },
-  { name: '하단 보상스쿨 공식 4대 CTA 프리미엄 박스 탑재', pass: naverHtml.includes('실시간 채팅상담') && naverHtml.includes('상담신청 양식') && naverHtml.includes('보상스쿨 홈페이지') && naverHtml.includes('보상스쿨 TV') },
+  { name: '하단 보상스쿨 공식 4대 CTA 프리미엄 박스 탑재', pass: naverHtml.includes('실시간 채팅상담') && naverHtml.includes('전화상담 신청서') && naverHtml.includes('예상 합의금 계산기') && naverHtml.includes('보상스쿨 TV') },
   { name: '체크리스트 마지막 줄 대시(--) 버그 없음', pass: !naverHtml.includes('☑️ --') && !naverHtml.includes('☑️ -') }
 ];
 

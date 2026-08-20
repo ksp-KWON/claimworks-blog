@@ -395,17 +395,17 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
                 </a>
               </td>
 
-              <!-- 카드 2: 상담신청 양식 -->
+              <!-- 카드 2: 전화상담 신청서 -->
               <td style="width: 50%; padding: 0; vertical-align: middle;">
                 <a href="https://claim-works.com/consultation" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
                   <table style="width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-collapse: collapse; border-radius: 6px;">
                     <tr>
                       <td style="width: 46px; padding: 12px 8px; background-color: #ecfdf5; text-align: center; vertical-align: middle; border-right: 1px solid #d1fae5;">
-                        <span style="font-size: 20px;">📝</span>
+                        <span style="font-size: 20px;">📞</span>
                       </td>
                       <td style="padding: 10px 14px; vertical-align: middle;">
-                        <div style="font-size: 14px; font-weight: bold; color: #059669; margin-bottom: 2px; line-height: 1.2;">상담신청 양식</div>
-                        <div style="font-size: 11.5px; color: #64748b; line-height: 1.2;">예약상담 신청서</div>
+                        <div style="font-size: 14px; font-weight: bold; color: #059669; margin-bottom: 2px; line-height: 1.2;">전화상담 신청서</div>
+                        <div style="font-size: 11.5px; color: #64748b; line-height: 1.2;">전문 손해사정사 전화예약</div>
                       </td>
                     </tr>
                   </table>
@@ -414,17 +414,17 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
             </tr>
 
             <tr>
-              <!-- 카드 3: 보상스쿨 홈페이지 -->
+              <!-- 카드 3: 예상 합의금 계산기 -->
               <td style="width: 50%; padding: 0; vertical-align: middle;">
-                <a href="https://claim-works.com" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
+                <a href="https://claim-works.com/calculator/auto" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
                   <table style="width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-collapse: collapse; border-radius: 6px;">
                     <tr>
                       <td style="width: 46px; padding: 12px 8px; background-color: #eff6ff; text-align: center; vertical-align: middle; border-right: 1px solid #dbeafe;">
-                        <span style="font-size: 20px;">🏛️</span>
+                        <span style="font-size: 20px;">🧮</span>
                       </td>
                       <td style="padding: 10px 14px; vertical-align: middle;">
-                        <div style="font-size: 14px; font-weight: bold; color: #2563eb; margin-bottom: 2px; line-height: 1.2;">보상스쿨 홈페이지</div>
-                        <div style="font-size: 11.5px; color: #64748b; line-height: 1.2;">공식 웹사이트 바로가기</div>
+                        <div style="font-size: 14px; font-weight: bold; color: #2563eb; margin-bottom: 2px; line-height: 1.2;">예상 합의금 계산기</div>
+                        <div style="font-size: 11.5px; color: #64748b; line-height: 1.2;">1분 실시간 보상금 산정</div>
                       </td>
                     </tr>
                   </table>

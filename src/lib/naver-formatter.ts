@@ -23,33 +23,6 @@ export interface NaverFormatOptions {
   targetBlog?: 'default' | 'traffic' | 'medical' | 'accident';
 }
 
-const LINK_CARDS = {
-  default: {
-    title: '보상스쿨 무료 상담 신청',
-    desc: '보험사의 억울한 거절과 삭감 주장, 보상스쿨의 전문 손해사정사가 직접 확인하고 명쾌한 답변과 해결책을 드립니다.',
-    url: 'https://claim-works.com/consultation',
-    image: 'https://claim-works.com/og-image.png',
-  },
-  traffic: {
-    title: '보상스쿨 1분 자동차사고 합의금 계산기',
-    desc: '과실비율, 입원/통원 치료비, 휴업손해, 향후치료비 손해사정 알고리즘 실시간 산정',
-    url: 'https://claim-works.com/calculator/auto',
-    image: 'https://claim-works.com/og-image.png',
-  },
-  medical: {
-    title: '보상스쿨 대법원 보험금 판례 & 분쟁 검색기',
-    desc: '실손의료비, 질병진단비, 고지의무, 부책 분쟁 대법원 리딩 판례 실시간 검색',
-    url: 'https://claim-works.com/precedent-search',
-    image: 'https://claim-works.com/og-image.png',
-  },
-  accident: {
-    title: '보상스쿨 1:1 실시간 비공개 손해사정 채팅 상담',
-    desc: '산재·근재·일상생활 배상책임 및 상해 후유장해 1:1 실시간 무료 법률·의학 검토',
-    url: 'https://claim-works.com/chat',
-    image: 'https://claim-works.com/og-image.png',
-  },
-};
-
 /**
  * 키워드 강조를 네이버 시그니처 노란색 형광펜으로 변환
  */
@@ -64,18 +37,15 @@ function applyNaverHighlighter(text: string): string {
 /**
  * 마크다운 텍스트를 네이버 스마트에디터 ONE 전용 HTML로 완벽 변환 (정밀 파서)
  * 
- * [출력 순서]
+ * [표준 출력 위계 (W3C & 네이버 스마트에디터 완벽 호환)]
  * 1. 최상단 시작 가로선 (<hr>)
  * 2. 핵심 요약 박스 (연초록 카드 테이블)
  * 3. 공감 오프닝 서술 문단
  * 4. 중간 가로 구분선 (<hr>)
  * 5. 본문 1번 (## H2 대제목)부터 순차적 본문 렌더링
- * 6. 하단 보상스쿨 공식 4대 CTA 카드 배너
+ * 6. 하단 보상스쿨 공식 4대 통합 CTA 카드 배너
  */
 export function convertMarkdownToNaverHtml(markdown: string, options: NaverFormatOptions = {}): string {
-  const blogType = options.targetBlog || 'default';
-  const linkCard = LINK_CARDS[blogType] || LINK_CARDS.default;
-
   // 1. Frontmatter 및 주석 제거, 줄바꿈 표준화
   let cleanMd = markdown
     .replace(/^---[\s\S]*?---\n*/, '')

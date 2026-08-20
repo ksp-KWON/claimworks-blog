@@ -155,18 +155,22 @@ export function parseBlogPost(content: string): ParsedBlogPost {
     }
 
     if (currentSectionType === 'KEY_POINTS') {
-      if (/^---/.test(trimmed)) continue;
       const cleanLine = trimmed.replace(/^[> \t]+/, '').trim();
+      if (!cleanLine || /^[-=_*]{2,}$/.test(cleanLine)) continue;
       if (/^[-*]\s+/.test(cleanLine) || /^[🛡️💡✅☑️⭐]/.test(cleanLine)) {
         const text = cleanLine.replace(/^[-*]\s*/, '').replace(/^[🛡️💡✅☑️⭐]+\s*/, '').trim();
-        if (text && result.keyPoints.length < 3) result.keyPoints.push(text);
+        if (text && !/^[-=_*~]{1,}$/.test(text) && result.keyPoints.length < 3) {
+          result.keyPoints.push(text);
+        }
       }
     } else if (currentSectionType === 'CHECKLIST') {
-      if (/^---/.test(trimmed)) continue;
       const cleanLine = trimmed.replace(/^[> \t]+/, '').trim();
+      if (!cleanLine || /^[-=_*]{2,}$/.test(cleanLine)) continue;
       if (/^[-*]\s+/.test(cleanLine) || /^\[[ xX]\]/.test(cleanLine) || /^[\u2611\u2705\uFE0F[\]]/.test(cleanLine)) {
         const text = cleanLine.replace(/^[-*]\s*/, '').replace(/^\[[ xX]\]\s*/i, '').replace(/^[\u2611\u2705\uFE0F]+\s*/gu, '').trim();
-        if (text) result.checklistItems.push(text);
+        if (text && !/^[-=_*~]{1,}$/.test(text)) {
+          result.checklistItems.push(text);
+        }
       }
     } else if (currentSectionType === 'FAQ') {
       if (currentQ) {

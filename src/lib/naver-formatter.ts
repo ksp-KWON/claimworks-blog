@@ -248,11 +248,13 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
 
       // 6-A. 1분 자가진단 체크리스트 ➔ [체크보드 카드 인용구 툴 6]
       if (quoteLines.some(l => l.startsWith('- [ ]') || l.startsWith('- [x]'))) {
-        const checkItems = quoteLines.map(l => {
-          const itemText = l.replace(/^- \[( |x)\]\s*/, '');
-          const highlighted = applyNaverHighlighter(itemText);
-          return `<div style="margin: 6px 0; font-size: 14px; color: #334155; line-height: 1.6;"><span style="color: #059669; font-weight: bold; margin-right: 6px;">☑️</span>${highlighted}</div>`;
-        }).join('');
+        const checkItems = quoteLines
+          .filter(l => (l.startsWith('- [ ]') || l.startsWith('- [x]')) && !/^[-=_*~]{2,}$/.test(l.replace(/^- \[( |x)\]\s*/, '').trim()))
+          .map(l => {
+            const itemText = l.replace(/^- \[( |x)\]\s*/, '');
+            const highlighted = applyNaverHighlighter(itemText);
+            return `<div style="margin: 6px 0; font-size: 14px; color: #334155; line-height: 1.6;"><span style="color: #059669; font-weight: bold; margin-right: 6px;">☑️</span>${highlighted}</div>`;
+          }).join('');
 
         const checklistTable = `
           <table style="width: 100%; border: 1px solid #cbd5e1; border-collapse: collapse; margin: 22px 0; font-size: 14px;">

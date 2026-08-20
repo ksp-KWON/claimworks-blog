@@ -317,22 +317,38 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       }
 
       const ulHtml = `<ul style="margin: 12px 0 16px 20px; padding: 0;">` +
-        listItems.map(l => `<li style="margin-bottom: 6px; color: #334155; line-height: 1.7; font-size: 14.5px;">${l}</li>`).join('') +
+        listItems.map(l => `<li style="margin-bottom: 6px; color: #334155; line-height: 1.8; font-size: 15px;">${l}</li>`).join('') +
         `</ul>`;
       blocks.push(ulHtml);
       continue;
     }
 
+    // 7-B. 순서 번호 리스트 (1. 항목, 2. 항목...)
+    if (/^\d+\.\s+/.test(trimmed)) {
+      const listItems: string[] = [];
+      while (i < lines.length && /^\d+\.\s+/.test(lines[i].trim())) {
+        const itemVal = lines[i].trim().replace(/^\d+\.\s+/, '');
+        listItems.push(applyNaverHighlighter(itemVal));
+        i++;
+      }
+
+      const olHtml = `<ol style="margin: 12px 0 16px 20px; padding: 0;">` +
+        listItems.map(l => `<li style="margin-bottom: 6px; color: #334155; line-height: 1.8; font-size: 15px;">${l}</li>`).join('') +
+        `</ol>`;
+      blocks.push(olHtml);
+      continue;
+    }
+
     // 8. 일반 본문 문단 (2~3줄 단위 부드러운 줄간격)
     const pLines: string[] = [];
-    while (i < lines.length && lines[i].trim() && !lines[i].trim().startsWith('#') && !lines[i].trim().startsWith('>') && !lines[i].trim().startsWith('|') && !lines[i].trim().startsWith('- ') && !lines[i].trim().startsWith('* ') && !lines[i].trim().includes('Q :') && !lines[i].trim().includes('Q:') && !lines[i].trim().startsWith('■Q') && !lines[i].trim().startsWith('Q.')) {
+    while (i < lines.length && lines[i].trim() && !lines[i].trim().startsWith('#') && !lines[i].trim().startsWith('>') && !lines[i].trim().startsWith('|') && !lines[i].trim().startsWith('- ') && !lines[i].trim().startsWith('* ') && !/^\d+\.\s+/.test(lines[i].trim()) && !lines[i].trim().includes('Q :') && !lines[i].trim().includes('Q:') && !lines[i].trim().startsWith('■Q') && !lines[i].trim().startsWith('Q.')) {
       pLines.push(lines[i].trim());
       i++;
     }
 
     if (pLines.length > 0) {
       const pText = applyNaverHighlighter(pLines.join('<br/>'));
-      blocks.push(`<p style="font-size: 15px; line-height: 1.85; color: #27272a; margin-bottom: 16px; word-break: keep-all;">${pText}</p>`);
+      blocks.push(`<p style="font-size: 15.5px; line-height: 1.9; color: #27272a; margin-bottom: 16px; word-break: keep-all;">${pText}</p>`);
     }
   }
 

@@ -2,27 +2,20 @@
  * naver-formatter.ts
  * 네이버 블로그 스마트에디터 ONE(SmartEditor ONE) 전용 6대 인용구 & 무결점 테이블 변환 엔진 2.0
  *
- * [근본적인 네이버 네이티브 6대 인용구 및 레이아웃 아키텍처]
- * 네이버 스마트에디터의 paste sanitizer에 100% 면역된 Table 기반 6대 인용구 툴 매핑:
- *
- * 1. 툴 1: [라인형 인용구 (대제목 H2)]
- *    - 챕터 시작 전 확실한 수평 가로줄(1px 구분선 테이블)
- *    - 좌측 6px 초록 포인트 라인 + #f8fafc 배경 + 19px 대형 볼드
- * 2. 툴 2: [포스트잇/박스형 인용구 (중제목 H3)]
- *    - 좌측 4px 파랑 포인트 라인 + #f8fafc 배경 + 16.5px 중형 볼드 + ■ 포인트
- * 3. 툴 3: [버블/뱃지형 인용구 (소제목 & 솔루션 H6)]
- *    - 연초록(#ecfdf5) 배경 + #a7f3d0 테두리 + 15px 볼드 + ✔ ①, ② 넘버링
- * 4. 툴 4: [따옴표/상하 라인 인용구 (핵심 요약 Summary)]
- *    - 상하 2px 초록 라인 + #f8fafc 배경 + 15px 요약 텍스트
- * 5. 툴 5: [메모/점선형 인용구 (용어사전 Glossary)]
- *    - 연초록(#f0fdf4) 배경 + 1px 초록 점선 테두리 + 💡 용어 설명
- * 6. 툴 6: [체크보드 카드 인용구 (1분 자가진단 Checklist)]
- *    - 헤더(#f1f5f9) + 본문(#f8fafc)의 단일 통합 체크보드 테이블
- *
- * [FAQ 및 비교표]
- * - FAQ Q&A: 상하 2단 파스텔 카드 테이블 (Q: #eff6ff 연파랑 / A: #ffffff 화이트)
- * - 비교표(Table): 표준 테두리 및 가운데 정렬 데이터 테이블
- * - 하단 CTA: 보상스쿨 공식 스마트 링크 배너 테이블
+ * [핵심 아키텍처: 오류 없는 표(Table) 기반 카드 레이아웃]
+ * 1. 무결점 표(Table) 기반 레이아웃:
+ *    - 네이버 에디터에서 왜곡이나 서식 깨짐이 전혀 없는 <table>을 핵심 컨테이너로 채택.
+ *    - FAQ: 상하 2단 파스텔 카드 테이블 (Q: #eff6ff 연파랑 / A: #ffffff 화이트).
+ *    - 1분 자가진단: 헤더(#f1f5f9) + 내용(#f8fafc)의 단일 통합 체크보드 테이블.
+ *    - 용어사전/요약: 좌측 초록 라인 + 연초록(#f0fdf4) 배경의 안전한 카드 테이블.
+ *    - 하단 CTA 배너: 스크린샷과 100% 동일한 [공식 썸네일 이미지 + 타이틀 + 설명 + 초록 URL]의 스마트 OG 프리뷰 카드 테이블.
+ * 2. 인용구 툴 기반 헤딩 위계:
+ *    - 대제목(H2): 상단 구분선(<hr>) + 좌측 초록 라인 인용구 박스 + 19px 대형 볼드.
+ *    - 중제목(H3): 16.5px 중형 볼드 + 포인트 불릿(■).
+ *    - 소제목/솔루션(H6): 15px 포인트 볼드 + 넘버링(✔ ①, ②...).
+ * 3. 형광펜 및 호흡:
+ *    - 노란색 형광펜(#fef08a) 키워드 하이라이트.
+ *    - 2~3줄 단위의 부드러운 줄간격(1.85) 유지.
  */
 
 export interface NaverFormatOptions {
@@ -32,28 +25,28 @@ export interface NaverFormatOptions {
 
 const LINK_CARDS = {
   default: {
-    title: '보상스쿨 | 손해사정 실무 솔루션 & 무료 상담',
-    desc: '보험사의 일방적인 삭감·면책 주장, 전문 손해사정사의 객관적인 권익 보호 솔루션',
-    url: 'https://claim-works.com',
-    badge: '🏛️ 보상스쿨 공식 본진',
+    title: '보상스쿨 무료 상담 신청',
+    desc: '보험사의 억울한 거절과 삭감 주장, 보상스쿨의 전문 손해사정사가 직접 확인하고 명쾌한 답변과 해결책을 드립니다.',
+    url: 'https://claim-works.com/consultation',
+    image: 'https://claim-works.com/og-image.png',
   },
   traffic: {
     title: '보상스쿨 1분 자동차사고 합의금 계산기',
     desc: '과실비율, 입원/통원 치료비, 휴업손해, 향후치료비 손해사정 알고리즘 실시간 산정',
     url: 'https://claim-works.com/calculator/auto',
-    badge: '🚗 교통사고 실시간 계산기',
+    image: 'https://claim-works.com/og-image.png',
   },
   medical: {
     title: '보상스쿨 대법원 보험금 판례 & 분쟁 검색기',
     desc: '실손의료비, 질병진단비, 고지의무, 부책 분쟁 대법원 리딩 판례 실시간 검색',
     url: 'https://claim-works.com/precedent-search',
-    badge: '🩺 보험금 판례 검색기',
+    image: 'https://claim-works.com/og-image.png',
   },
   accident: {
     title: '보상스쿨 1:1 실시간 비공개 손해사정 채팅 상담',
     desc: '산재·근재·일상생활 배상책임 및 상해 후유장해 1:1 실시간 무료 법률·의학 검토',
     url: 'https://claim-works.com/chat',
-    badge: '⚖️ 1:1 실시간 상담창구',
+    image: 'https://claim-works.com/og-image.png',
   },
 };
 
@@ -340,18 +333,26 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     }
   }
 
-  // 9. 하단 보상스쿨 스마트 링크 배너 테이블
+  // 9. 하단 보상스쿨 스마트 OG 프리뷰 카드 테이블 (스크린샷의 네이버 네이티브 카드와 100% 동일한 디자인)
   const footerHtml = `
     <table style="width: 100%; border: 0; border-collapse: collapse; margin: 40px 0 24px 0;">
       <tr><td style="border-top: 1px solid #cbd5e1; height: 1px; padding: 0;"></td></tr>
     </table>
-    <table style="width: 100%; border: 2px solid #03c75a; border-collapse: collapse; margin-top: 24px; background-color: #f8fafc; text-align: center;">
+    <table style="width: 100%; max-width: 480px; border: 1px solid #e2e8f0; border-collapse: collapse; margin: 32px auto 20px auto; background-color: #ffffff; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
       <tr>
-        <td style="padding: 22px 20px;">
-          <p style="font-size: 12px; font-weight: bold; color: #03c75a; margin: 0 0 6px 0;">${linkCard.badge}</p>
-          <p style="font-size: 17px; font-weight: bold; color: #0f172a; margin: 0 0 6px 0;"><strong>${linkCard.title}</strong></p>
-          <p style="font-size: 13.5px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">${linkCard.desc}</p>
-          <p style="margin: 0;"><a href="${linkCard.url}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 10px 24px; background-color: #03c75a; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: bold; border-radius: 6px;">👉 ${linkCard.url.replace('https://', '')} 바로가기</a></p>
+        <td style="padding: 0; background-color: #ffffff; text-align: center; border-bottom: 1px solid #f1f5f9;">
+          <a href="${linkCard.url}" target="_blank" rel="noopener noreferrer" style="display: block; text-decoration: none;">
+            <img src="${linkCard.image}" alt="${linkCard.title}" style="width: 100%; max-width: 480px; height: auto; display: block; margin: 0 auto;" />
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 16px 18px;">
+          <a href="${linkCard.url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
+            <p style="font-size: 15px; font-weight: bold; color: #111827; margin: 0 0 6px 0; line-height: 1.4;">${linkCard.title}</p>
+            <p style="font-size: 13px; color: #6b7280; margin: 0 0 8px 0; line-height: 1.5;">${linkCard.desc}</p>
+            <p style="font-size: 12px; color: #03c75a; margin: 0; font-weight: 500;">claim-works.com</p>
+          </a>
         </td>
       </tr>
     </table>

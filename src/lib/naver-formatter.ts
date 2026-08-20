@@ -450,73 +450,73 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
           <table style="width: 100%; border-collapse: separate; border-spacing: 8px 10px;">
             <tr>
               <!-- 카드 1: 실시간 채팅상담 -->
-              <td style="width: 50%; padding: 0; vertical-align: middle;">
-                <a href="https://claim-works.com/chat" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
-                  <table style="width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-collapse: collapse; border-radius: 6px;">
-                    <tr>
-                      <td style="width: 46px; padding: 12px 8px; background-color: #eff6ff; text-align: center; vertical-align: middle; border-right: 1px solid #dbeafe;">
-                        <span style="font-size: 20px;">💬</span>
-                      </td>
-                      <td style="padding: 10px 14px; vertical-align: middle;">
-                        <div style="font-size: 14px; font-weight: bold; color: #2563eb; margin-bottom: 2px; line-height: 1.2;">실시간 채팅상담</div>
+              <td style="width: 50%; background-color: #f8fafc; border: 1px solid #dbeafe; border-radius: 6px; padding: 0; vertical-align: middle;">
+                <table style="width: 100%; border-collapse: collapse; border: 0;">
+                  <tr>
+                    <td style="width: 44px; padding: 12px 6px; background-color: #eff6ff; text-align: center; vertical-align: middle; border-right: 1px solid #dbeafe;">
+                      <a href="https://claim-works.com/chat" target="_blank" rel="noopener noreferrer" style="text-decoration: none; font-size: 20px; display: block;">💬</a>
+                    </td>
+                    <td style="padding: 10px 14px; vertical-align: middle;">
+                      <a href="https://claim-works.com/chat" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
+                        <div style="font-size: 14px; font-weight: bold; color: #2563eb; margin-bottom: 2px; line-height: 1.2;">실시간 채팅상담 ↗</div>
                         <div style="font-size: 11.5px; color: #64748b; line-height: 1.2;">보상스쿨 실시간 상담</div>
-                      </td>
-                    </tr>
-                  </table>
-                </a>
+                      </a>
+                    </td>
+                  </tr>
+                </table>
               </td>
 
               <!-- 카드 2: 전화상담 신청서 -->
-              <td style="width: 50%; padding: 0; vertical-align: middle;">
-                <a href="https://claim-works.com/consultation" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
-                  <table style="width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-collapse: collapse; border-radius: 6px;">
-                    <tr>
-                      <td style="width: 46px; padding: 12px 8px; background-color: #ecfdf5; text-align: center; vertical-align: middle; border-right: 1px solid #d1fae5;">
-                        <span style="font-size: 20px;">📞</span>
-                      </td>
-                      <td style="padding: 10px 14px; vertical-align: middle;">
-                        <div style="font-size: 14px; font-weight: bold; color: #059669; margin-bottom: 2px; line-height: 1.2;">전화상담 신청서</div>
+              <td style="width: 50%; background-color: #f8fafc; border: 1px solid #d1fae5; border-radius: 6px; padding: 0; vertical-align: middle;">
+                <table style="width: 100%; border-collapse: collapse; border: 0;">
+                  <tr>
+                    <td style="width: 44px; padding: 12px 6px; background-color: #ecfdf5; text-align: center; vertical-align: middle; border-right: 1px solid #d1fae5;">
+                      <a href="https://claim-works.com/consultation" target="_blank" rel="noopener noreferrer" style="text-decoration: none; font-size: 20px; display: block;">📞</a>
+                    </td>
+                    <td style="padding: 10px 14px; vertical-align: middle;">
+                      <a href="https://claim-works.com/consultation" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
+                        <div style="font-size: 14px; font-weight: bold; color: #059669; margin-bottom: 2px; line-height: 1.2;">전화상담 신청서 ↗</div>
                         <div style="font-size: 11.5px; color: #64748b; line-height: 1.2;">전문 손해사정사 전화예약</div>
-                      </td>
-                    </tr>
-                  </table>
-                </a>
+                      </a>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
 
             <tr>
               <!-- 카드 3: 예상 합의금 계산기 -->
-              <td style="width: 50%; padding: 0; vertical-align: middle;">
-                <a href="https://claim-works.com/calculator/auto" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
-                  <table style="width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-collapse: collapse; border-radius: 6px;">
-                    <tr>
-                      <td style="width: 46px; padding: 12px 8px; background-color: #eff6ff; text-align: center; vertical-align: middle; border-right: 1px solid #dbeafe;">
-                        <span style="font-size: 20px;">🧮</span>
-                      </td>
-                      <td style="padding: 10px 14px; vertical-align: middle;">
-                        <div style="font-size: 14px; font-weight: bold; color: #2563eb; margin-bottom: 2px; line-height: 1.2;">예상 합의금 계산기</div>
+              <td style="width: 50%; background-color: #f8fafc; border: 1px solid #dbeafe; border-radius: 6px; padding: 0; vertical-align: middle;">
+                <table style="width: 100%; border-collapse: collapse; border: 0;">
+                  <tr>
+                    <td style="width: 44px; padding: 12px 6px; background-color: #eff6ff; text-align: center; vertical-align: middle; border-right: 1px solid #dbeafe;">
+                      <a href="https://claim-works.com/calculator/auto" target="_blank" rel="noopener noreferrer" style="text-decoration: none; font-size: 20px; display: block;">🧮</a>
+                    </td>
+                    <td style="padding: 10px 14px; vertical-align: middle;">
+                      <a href="https://claim-works.com/calculator/auto" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
+                        <div style="font-size: 14px; font-weight: bold; color: #2563eb; margin-bottom: 2px; line-height: 1.2;">예상 합의금 계산기 ↗</div>
                         <div style="font-size: 11.5px; color: #64748b; line-height: 1.2;">1분 실시간 보상금 산정</div>
-                      </td>
-                    </tr>
-                  </table>
-                </a>
+                      </a>
+                    </td>
+                  </tr>
+                </table>
               </td>
 
               <!-- 카드 4: 보상스쿨 TV -->
-              <td style="width: 50%; padding: 0; vertical-align: middle;">
-                <a href="https://www.youtube.com/@bosangschool" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
-                  <table style="width: 100%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-collapse: collapse; border-radius: 6px;">
-                    <tr>
-                      <td style="width: 46px; padding: 12px 8px; background-color: #fef2f2; text-align: center; vertical-align: middle; border-right: 1px solid #fee2e2;">
-                        <span style="font-size: 20px;">▶️</span>
-                      </td>
-                      <td style="padding: 10px 14px; vertical-align: middle;">
-                        <div style="font-size: 14px; font-weight: bold; color: #dc2626; margin-bottom: 2px; line-height: 1.2;">보상스쿨 TV</div>
+              <td style="width: 50%; background-color: #f8fafc; border: 1px solid #fee2e2; border-radius: 6px; padding: 0; vertical-align: middle;">
+                <table style="width: 100%; border-collapse: collapse; border: 0;">
+                  <tr>
+                    <td style="width: 44px; padding: 12px 6px; background-color: #fef2f2; text-align: center; vertical-align: middle; border-right: 1px solid #fee2e2;">
+                      <a href="https://www.youtube.com/@bosangschool" target="_blank" rel="noopener noreferrer" style="text-decoration: none; font-size: 20px; display: block;">▶️</a>
+                    </td>
+                    <td style="padding: 10px 14px; vertical-align: middle;">
+                      <a href="https://www.youtube.com/@bosangschool" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">
+                        <div style="font-size: 14px; font-weight: bold; color: #dc2626; margin-bottom: 2px; line-height: 1.2;">보상스쿨 TV ↗</div>
                         <div style="font-size: 11.5px; color: #64748b; line-height: 1.2;">유튜브 바로가기</div>
-                      </td>
-                    </tr>
-                  </table>
-                </a>
+                      </a>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
           </table>

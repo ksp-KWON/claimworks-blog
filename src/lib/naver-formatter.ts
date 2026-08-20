@@ -325,18 +325,18 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
           .map(l => {
             const itemText = l.replace(/^- \[( |x)\]\s*/, '');
             const highlighted = applyNaverHighlighter(itemText);
-            return `<div style="margin: 6px 0; font-size: 14px; color: #334155; line-height: 1.6;"><span style="color: #059669; font-weight: bold; margin-right: 6px;">☑️</span>${highlighted}</div>`;
+            return `<div style="margin: 12px 0; font-size: 14.5px; color: #334155; line-height: 1.85; padding-left: 2px;"><span style="color: #059669; font-weight: bold; margin-right: 8px; font-size: 16px; vertical-align: middle;">☑️</span><span style="vertical-align: middle;">${highlighted}</span></div>`;
           }).join('');
 
         const checklistTable = `
           <table style="width: 100%; border: 1px solid #cbd5e1; border-collapse: collapse; margin: 22px 0; font-size: 14px;">
             <tr>
-              <td style="padding: 11px 16px; background-color: #f1f5f9; border-bottom: 1px solid #cbd5e1; font-weight: bold; color: #0f172a;">
+              <td style="padding: 12px 18px; background-color: #f1f5f9; border-bottom: 1px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 14.5px;">
                 📋 <strong>1분 자가진단 체크리스트</strong>
               </td>
             </tr>
             <tr>
-              <td style="padding: 14px 16px; background-color: #f8fafc; color: #334155; line-height: 1.8;">
+              <td style="padding: 16px 18px; background-color: #f8fafc; color: #334155; line-height: 1.85;">
                 ${checkItems}
               </td>
             </tr>

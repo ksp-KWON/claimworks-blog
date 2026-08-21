@@ -172,15 +172,15 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
   const renderAccordionDetail = () => {
     if (!activeConsultation) return null;
     return (
-      <div className="bg-gradient-to-b from-blue-50/40 to-transparent dark:from-blue-950/20 dark:to-transparent p-3 sm:p-4 border-b border-gray-200/80 dark:border-zinc-800 animate-in slide-in-from-top-2 fade-in duration-200 w-full" onClick={e => e.stopPropagation()}>
-        {/* 50:50 완벽한 대칭 균등 분할 그리드 (우측 여백 제거) */}
+      <div className="bg-gradient-to-b from-blue-50/30 to-transparent dark:from-blue-950/20 dark:to-transparent p-3 sm:p-4 border-b border-gray-200/80 dark:border-zinc-800 animate-in slide-in-from-top-2 fade-in duration-200 w-full" onClick={e => e.stopPropagation()}>
+        {/* 50:50 완벽한 대칭 균등 분할 그리드 (CommonBox 스타일) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
           {/* 좌측: 사고 상세 내용 박스 */}
-          <div className="bg-white dark:bg-[#202124] p-3.5 border border-gray-200/80 dark:border-zinc-700 rounded-none shadow-sm flex flex-col justify-between">
+          <div className="bg-white dark:bg-[#202124] border border-blue-200/80 dark:border-blue-900/50 rounded-none shadow-sm flex flex-col justify-between overflow-hidden">
             <div>
-              <div className="flex justify-between items-center mb-2 border-b border-gray-100 dark:border-zinc-800 pb-1.5">
+              <div className="px-4 py-2.5 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100 dark:border-blue-900/30 flex justify-between items-center">
                 <span className="text-xs font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] flex items-center gap-1.5">
-                  <span>🚗</span>
+                  <span className="text-sm leading-none">🚗</span>
                   <span>사고 상세 내용</span>
                 </span>
                 <button
@@ -196,29 +196,29 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
                     sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
                     window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
                   }}
-                  className="flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-colors shadow-sm"
+                  className="flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800 hover:bg-blue-50 transition-colors shadow-2xs"
                   title="캘린더 일정으로 보내기"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                   <span>일정 등록</span>
                 </button>
               </div>
-              <div className="text-xs text-gray-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed">
+              <div className="p-4 text-xs text-gray-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed">
                 {activeConsultation.content || '등록된 상세 내용이 없습니다.'}
               </div>
             </div>
           </div>
           
           {/* 우측: 문의 및 요청사항 박스 */}
-          <div className="bg-white dark:bg-[#202124] p-3.5 border border-gray-200/80 dark:border-zinc-700 rounded-none shadow-sm flex flex-col justify-between">
+          <div className="bg-white dark:bg-[#202124] border border-purple-200/80 dark:border-purple-900/50 rounded-none shadow-sm flex flex-col justify-between overflow-hidden">
             <div>
-              <div className="flex justify-between items-center mb-2 border-b border-gray-100 dark:border-zinc-800 pb-1.5">
+              <div className="px-4 py-2.5 bg-gradient-to-r from-purple-50/80 to-transparent dark:from-purple-900/20 dark:to-transparent border-b border-purple-100 dark:border-purple-900/30 flex justify-between items-center">
                 <span className="text-xs font-extrabold text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
-                  <span>💬</span>
+                  <span className="text-sm leading-none">💬</span>
                   <span>문의 및 요청사항</span>
                 </span>
               </div>
-              <div className="text-xs text-gray-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed">
+              <div className="p-4 text-xs text-gray-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed">
                 {activeConsultation.inquiry || '별도 문의사항이 없습니다.'}
               </div>
             </div>
@@ -250,9 +250,10 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
 
   return (
     <AdminPanelLayout innerClassName="space-y-2.5">
-      {/* 🏝️ 1. 상단 상태 요약 카드 아일랜드 */}
-      <PremiumCard borderColor="blue" hoverEffect={true} className="!p-3 shrink-0 flex flex-wrap items-center justify-between gap-2.5">
+      {/* 🏝️ 1. 상단 상태 요약 카드 아일랜드 (CommonBox 스타일) */}
+      <PremiumCard borderColor="blue" hoverEffect={true} watermarkEmoji="📋" className="!p-3 shrink-0 flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2">
+          <span className="text-base leading-none">📋</span>
           <span className="text-xs sm:text-sm font-extrabold text-gray-900 dark:text-white">
             실시간 상담 접수 현황
           </span>

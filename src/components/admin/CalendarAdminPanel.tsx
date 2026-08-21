@@ -533,16 +533,16 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
       {/* ── 🏝️ 1. 좌측: 월간 캘린더 그리드 카드 아일랜드 ── */}
       <PremiumCard borderColor="blue" hoverEffect={false} className="flex-1 min-w-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-white dark:bg-zinc-950">
         <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-y-auto custom-scrollbar">
-          {/* 캘린더 네비게이션 헤더 */}
-          <div className="p-3 md:p-4 border-b border-gray-200/80 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-950 sticky top-0 z-10">
+          {/* 캘린더 네비게이션 헤더 (CommonBox 스타일) */}
+          <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0 sticky top-0 z-10">
             <div className="flex items-center gap-2.5">
-              <h2 className="text-sm md:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
-                <span>📅</span>
+              <span className="text-base leading-none">📅</span>
+              <h2 className="text-xs sm:text-sm font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] flex items-center gap-1.5">
                 <span>{currentYear}년 {currentMonth + 1}월</span>
               </h2>
               <button
                 onClick={handleGoToday}
-                className="px-2 py-0.5 text-[11px] font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-none border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-colors shadow-sm"
+                className="px-2 py-0.5 text-[11px] font-bold bg-white dark:bg-zinc-800 text-blue-600 dark:text-blue-400 rounded-none border border-blue-200 dark:border-blue-800 hover:bg-blue-50 transition-colors shadow-2xs"
               >
                 오늘
               </button>
@@ -551,14 +551,14 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
             <div className="flex items-center gap-1">
               <button
                 onClick={handlePrevMonth}
-                className="w-7 h-7 rounded-none flex items-center justify-center border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors shadow-sm"
+                className="w-7 h-7 rounded-none flex items-center justify-center bg-white dark:bg-zinc-800 border border-blue-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs text-xs"
                 title="이전 달"
               >
                 ◀
               </button>
               <button
                 onClick={handleNextMonth}
-                className="w-7 h-7 rounded-none flex items-center justify-center border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors shadow-sm"
+                className="w-7 h-7 rounded-none flex items-center justify-center bg-white dark:bg-zinc-800 border border-blue-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs text-xs"
                 title="다음 달"
               >
                 ▶
@@ -644,9 +644,11 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
       {/* ── 🏝️ 2. 우측: 손해사정 실무 표준 대장 & 날짜별 진행일지 카드 아일랜드 ── */}
       <PremiumCard borderColor="blue" hoverEffect={false} className="w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80">
         <AdminHeaderBar 
+          emoji="📑"
+          tone="blue"
           title={
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">{selectedDate} 대장 ({selectedDateEvents.length}건)</span>
+              <span className="font-extrabold text-xs sm:text-sm text-[var(--google-blue)] dark:text-[#8ab4f8]">{selectedDate} 대장 ({selectedDateEvents.length}건)</span>
             </div>
           }
           rightContent={

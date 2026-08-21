@@ -52,9 +52,10 @@ export default function PostListPanel({
 
   return (
     <AdminPanelLayout innerClassName="space-y-2.5">
-      {/* 🏝️ 1. 상단 원고 현황 및 GitHub 토큰 상태 카드 아일랜드 */}
-      <PremiumCard borderColor="blue" hoverEffect={true} className="!p-3 shrink-0 flex flex-wrap items-center justify-between gap-2.5">
+      {/* 🏝️ 1. 상단 원고 현황 및 GitHub 토큰 상태 카드 아일랜드 (CommonBox 스타일) */}
+      <PremiumCard borderColor="blue" hoverEffect={true} watermarkEmoji="📚" className="!p-3 shrink-0 flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2">
+          <span className="text-base leading-none">📚</span>
           <span className="text-xs sm:text-sm font-extrabold text-gray-900 dark:text-white">
             발행 원고 데이터베이스
           </span>

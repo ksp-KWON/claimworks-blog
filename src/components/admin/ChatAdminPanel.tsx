@@ -322,6 +322,8 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
       >
         <AdminHeaderBar 
           title="실시간 상담 채팅" 
+          emoji="💬"
+          tone="blue"
           rightContent={<span className="text-[11px] text-[var(--google-blue)] dark:text-[#8ab4f8] font-bold bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800">{sortedAndFilteredSessions.length}건</span>} 
         />
         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar bg-gray-50/40 dark:bg-zinc-950/40">

@@ -130,22 +130,25 @@ export default function AiWritingStudio({
   // 공통 AI 어시스턴트 컨트롤 패널 (노아이콘 + 콤팩트 직각 3D 시스템)
   const renderAiControls = () => (
     <div className="flex flex-col h-full min-h-0 overflow-hidden bg-white dark:bg-[#202124]">
-      {/* 1. 패널 헤더 & 모드 탭 (직각 3D) */}
-      <div className="shrink-0 p-3 border-b border-gray-200/80 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 sticky top-0 z-10">
+      {/* 1. 패널 헤더 & 모드 탭 (CommonBox 톤온톤 헤더) */}
+      <div className="shrink-0 p-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 sticky top-0 z-10">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">
-            AI WRITING STUDIO
-          </span>
-          <span className="text-[10px] font-mono font-bold text-gray-400">
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm leading-none">✍️</span>
+            <span className="text-xs font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] uppercase tracking-wider">
+              AI WRITING STUDIO
+            </span>
+          </div>
+          <span className="text-[10px] font-mono font-bold text-gray-500 dark:text-zinc-400 bg-white/80 dark:bg-zinc-800 px-1.5 py-0.2 border border-gray-200 dark:border-zinc-700">
             {platform === 'naver' ? 'NAVER D.I.A.+' : 'GOOGLE E-E-A-T'}
           </span>
         </div>
-        <div className="grid grid-cols-2 gap-1 bg-gray-200/70 dark:bg-zinc-950 p-0.5 rounded-none border border-gray-200 dark:border-zinc-800">
+        <div className="grid grid-cols-2 gap-1 bg-white/70 dark:bg-zinc-950 p-0.5 rounded-none border border-gray-200 dark:border-zinc-800">
           <button 
             onClick={() => setActivePanelTab('manual')}
             className={`py-1 text-xs font-bold transition-all rounded-none text-center ${
               activePanelTab === 'manual' 
-                ? 'bg-white dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8] shadow-sm font-extrabold' 
+                ? 'bg-[var(--google-blue)] text-white shadow-sm font-extrabold' 
                 : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900'
             }`}
           >
@@ -155,7 +158,7 @@ export default function AiWritingStudio({
             onClick={() => setActivePanelTab('auto')}
             className={`py-1 text-xs font-bold transition-all rounded-none text-center ${
               activePanelTab === 'auto' 
-                ? 'bg-white dark:bg-zinc-800 text-rose-600 dark:text-rose-400 shadow-sm font-extrabold' 
+                ? 'bg-rose-600 text-white shadow-sm font-extrabold' 
                 : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900'
             }`}
           >

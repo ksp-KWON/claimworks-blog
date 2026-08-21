@@ -3,6 +3,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import remarkMath from 'remark-math';
@@ -324,11 +325,8 @@ interface MarkdownRendererProps {
 }
 
 export default function MarkdownRenderer({ content, inline = false }: MarkdownRendererProps) {
-  // 공문서 목차 기호(1., 1) 등)가 일반 리스트(<ol>)로 강제 변환되는 것을 막고 단락(Paragraph)으로 유지하기 위한 전처리.
-  // 공문서 도메인에서는 1., 1) 등이 나열형 리스트가 아니라 섹션/위계 구분자이므로 Paragraph로 파싱하는 것이 시맨틱하게 옳습니다.
-  const preProcessedContent = content
-    .replace(/^([0-9]+)\.\s/gm, '$1\\. ')
-    .replace(/^([0-9]+)\)\s/gm, '$1\\) ');
+  // 전 세계 웹 표준 마크다운(GFM) 준수: 1., 2., 3. 등의 순서 리스트는 표준 <ol><li>로 렌더링되도록 유지합니다.
+  const preProcessedContent = content;
 
   const rendererComponents: any = {
     ...sharedComponents,
@@ -432,7 +430,7 @@ export default function MarkdownRenderer({ content, inline = false }: MarkdownRe
 
   return (
     <ReactMarkdown
-      remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkMath]}
+      remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkBreaks, remarkMath]}
       rehypePlugins={[rehypeRaw, rehypeSlug, rehypeKatex]}
       components={rendererComponents}
     >

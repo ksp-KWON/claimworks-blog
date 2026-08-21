@@ -25,6 +25,7 @@ export default function PremiumHeading({
   if (level === 1) baseClass += ' text-xl sm:text-2xl';
   else if (level === 2) baseClass += ' text-lg sm:text-xl';
   else if (level === 3) baseClass += ' text-base sm:text-lg';
+  else if (level === 6) baseClass += ' text-[15.5px] sm:text-[16.5px]';
   else baseClass += ' text-sm sm:text-base';
 
   if (showLeftBorder) {

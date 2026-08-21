@@ -29,13 +29,13 @@ const getHeadingTone = (level: number, node?: React.ReactNode): 'red' | 'blue' |
   if (/(FAQ|자주\s*묻는\s*질문|자주묻는질문|질문과\s*답변|Q&A)/i.test(text)) return 'purple';
   if (/(핵심\s*요약|요약)/i.test(text)) return 'yellow';
 
-  // 제목 영역 기본 색상 위계: 빨(H2) - 파(H3) - 노(H4/H5) - 회(H6)
+  // 제목 영역 기본 색상 위계: 빨(H2) - 파(H3) - 노(H4/H5) - 초록(H6: 맞춤솔루션)
   switch (level) {
     case 2: return 'red';
     case 3: return 'blue';
     case 4:
     case 5: return 'yellow';
-    case 6: return 'gray';
+    case 6: return 'green';
     default: return 'red';
   }
 };
@@ -58,7 +58,7 @@ const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, c
     3: 'mt-10 mb-5 py-2.5',
     4: 'mt-8 mb-4 py-2',
     5: 'mt-6 mb-3 py-1.5',
-    6: 'mt-5 mb-2.5 py-1.5',
+    6: 'mt-6 mb-3 py-2',
   };
 
   return (
@@ -106,95 +106,9 @@ export const sharedComponents: Components & Record<string, any> = {
   h3: (props) => <UnifiedHeadingRenderer level={3} {...props} />,
   h4: (props) => <UnifiedHeadingRenderer level={4} {...props} />,
   h5: (props) => <UnifiedHeadingRenderer level={5} {...props} />,
-  h6: ({ children, id }) => {
-    const getText = (n: any): string => {
-      if (typeof n === 'string') return n;
-      if (Array.isArray(n)) return n.map(getText).join('');
-      if (n?.props?.children) return getText(n.props.children);
-      return '';
-    };
-    const text = getText(children).trim();
-    const docMatch = text.match(/^([①-⑳]|[㉮-㉻])\s*(.*)/);
-    
-    if (docMatch) {
-      const num = docMatch[1];
-      const title = docMatch[2];
-      return (
-        <h6 id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-8 mb-3 flex items-center gap-2.5 font-bold text-[17px] text-emerald-800 dark:text-emerald-300 break-keep">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-[15px] font-black shadow-sm border border-emerald-200/60 dark:border-emerald-700/50">
-            {num}
-          </span>
-          <span className="bg-gradient-to-r from-emerald-50/80 to-transparent dark:from-emerald-950/40 dark:to-transparent px-3 py-1 rounded-md border-l-2 border-emerald-500">
-            {title}
-          </span>
-        </h6>
-      );
-    }
-    
-    return <UnifiedHeadingRenderer level={6} id={id}>{children}</UnifiedHeadingRenderer>;
-  },
+  h6: (props) => <UnifiedHeadingRenderer level={6} {...props} />,
 
-  p: ({ children }) => {
-    const getText = (n: any): string => {
-      if (typeof n === 'string') return n;
-      if (Array.isArray(n)) return n.map(getText).join('');
-      if (n?.props?.children) return getText(n.props.children);
-      return '';
-    };
-    
-    const fullText = getText(children);
-
-    // 원문자(①~⑳, ㉮-㉻) 맞춤 솔루션 카드 렌더링 (에메랄드 그린 프리미엄 카드)
-    const docMarkerMatch = fullText.match(/^([①-⑳]|[㉮-㉻])\s/);
-    if (docMarkerMatch && React.Children.count(children) > 0) {
-      const childrenArray = React.Children.toArray(children);
-      const titleElements: React.ReactNode[] = [];
-      const bodyElements: React.ReactNode[] = [];
-      let isBody = false;
-
-      for (const child of childrenArray) {
-        if (isBody) {
-          bodyElements.push(child);
-          continue;
-        }
-        if (typeof child === 'string') {
-          if (child.includes('\n')) {
-            const parts = child.split('\n');
-            titleElements.push(parts[0]);
-            const rest = parts.slice(1).join('\n').trim();
-            if (rest) bodyElements.push(rest);
-            isBody = true;
-          } else {
-            titleElements.push(child);
-          }
-        } else if ((child as React.ReactElement)?.type === 'br') {
-          isBody = true;
-        } else {
-          titleElements.push(child);
-        }
-      }
-
-      if (isBody && bodyElements.length > 0) {
-        return (
-          <div className="my-8 bg-white dark:bg-[#202124] rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-emerald-100/80 dark:border-emerald-900/40 overflow-hidden transition-all duration-300 hover:shadow-[0_16px_50px_rgba(16,185,129,0.2)] hover:border-emerald-500 dark:hover:border-emerald-500 group">
-            <div className="bg-gradient-to-r from-emerald-50/90 to-transparent dark:from-emerald-950/40 dark:to-transparent px-5 py-3.5 border-b border-emerald-100 dark:border-emerald-900/40">
-              <div className="font-bold text-[16px] text-emerald-800 dark:text-emerald-300 flex items-center gap-2 break-keep">
-                <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-[14px] font-black border border-emerald-200/60 dark:border-emerald-700/50">
-                  {docMarkerMatch[1]}
-                </span>
-                <span>{titleElements}</span>
-              </div>
-            </div>
-            <div className="px-5 py-4 text-[15px] leading-[1.8] text-gray-700 dark:text-[#e8eaed] break-keep [&>p]:mb-0">
-              {bodyElements}
-            </div>
-          </div>
-        );
-      }
-    }
-
-    return <p className="mb-5 leading-[1.85] text-[#202124] dark:text-[#e8eaed] break-keep">{children}</p>;
-  },
+  p: ({ children }) => <p className="mb-5 leading-[1.85] text-[#202124] dark:text-[#e8eaed] break-keep">{children}</p>,
 
   // 헌법 제10조 웹 표준 리스트 태그 지원
   ul: ({ children }) => <ul className="list-disc ml-5 sm:ml-6 my-5 space-y-2.5 text-[15.5px] sm:text-[16px] text-gray-800 dark:text-[#e8eaed] marker:text-[#1A73E8] dark:marker:text-[#8ab4f8]">{children}</ul>,

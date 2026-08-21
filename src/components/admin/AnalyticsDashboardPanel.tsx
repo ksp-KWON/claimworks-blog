@@ -101,13 +101,24 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 5. 기간 선택 컨트롤 (24h / 7일 / 30일) */}
-        <PremiumCard className="!p-1.5 flex items-center justify-center bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-xl shadow-sm">
-          <div className="flex bg-gray-100 dark:bg-zinc-800 p-0.5 rounded-lg border border-gray-200/80 dark:border-zinc-700 text-xs font-bold w-full justify-between gap-1">
+        <PremiumCard borderColor="blue" className="!p-2.5 flex flex-col justify-between bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-xl shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">조회 기간 설정</span>
+            <span className="text-[10px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">
+              {period === '24h' ? '24시간' : period === '7d' ? '7일간' : '30일간'}
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-1 bg-gray-100 dark:bg-zinc-800/90 p-0.5 rounded-lg border border-gray-200/80 dark:border-zinc-700 w-full mt-1">
             {(['24h', '7d', '30d'] as const).map((p) => (
               <button
                 key={p}
+                type="button"
                 onClick={() => setPeriod(p)}
-                className={`flex-1 py-1 rounded transition-all text-center text-[11px] ${period === p ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] shadow-sm font-bold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900'}`}
+                className={`py-1 rounded-md text-xs font-bold transition-all text-center flex items-center justify-center ${
+                  period === p
+                    ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] shadow-sm font-extrabold ring-1 ring-black/5 dark:ring-white/10'
+                    : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-200 hover:bg-white/50 dark:hover:bg-zinc-700/50'
+                }`}
               >
                 {p === '24h' ? '24h' : p === '7d' ? '7일' : '30일'}
               </button>
@@ -116,13 +127,19 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 6. 시스템 API 설정 토글 */}
-        <PremiumCard className="!p-1.5 flex items-center justify-center bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-xl shadow-sm">
+        <PremiumCard borderColor="default" className="!p-2.5 flex flex-col justify-between bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-xl shadow-sm">
+          <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">시스템 연동 관리</span>
           <button
+            type="button"
             onClick={() => setShowSettings(!showSettings)}
-            className={`w-full h-full py-1 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${showSettings ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border border-blue-200 dark:border-blue-800' : 'bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'}`}
+            className={`w-full py-1 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 mt-1 border ${
+              showSettings
+                ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-200 dark:border-blue-800 shadow-sm'
+                : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200/80 dark:border-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-700'
+            }`}
           >
             <span>⚙️</span>
-            <span>API 설정</span>
+            <span>API 설정 {showSettings ? '닫기' : '열기'}</span>
           </button>
         </PremiumCard>
       </div>
@@ -206,30 +223,78 @@ export default function AnalyticsDashboardPanel() {
       {/* ── 2. 방문 추이 그래프 (명확한 높이 및 선명한 Bar 렌더링) ───────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 flex-1 min-h-0">
         <PremiumCard className="lg:col-span-2 !p-3.5 flex flex-col min-h-0">
-          <div className="flex items-center justify-between mb-2 border-b border-gray-100 dark:border-zinc-800 pb-1.5 shrink-0">
-            <span className="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5">
-              <span>📈</span>
-              <span>방문 추이 분석 그래프</span>
-            </span>
-            <span className="text-[10px] text-gray-400 font-medium">최근 {period === '24h' ? '24시간' : period === '7d' ? '7일' : '30일'}</span>
+          <div className="flex items-center justify-between mb-2 border-b border-gray-100 dark:border-zinc-800 pb-2 shrink-0">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
+                <span>📈</span>
+                <span>방문 추이 분석 그래프</span>
+              </span>
+              <span className="text-[10px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full border border-blue-100 dark:border-blue-800/50">
+                {period === '24h' ? '최근 24시간' : period === '7d' ? '최근 7일' : '최근 30일'}
+              </span>
+            </div>
+            
+            {/* 요약 통계 배지 */}
+            <div className="flex items-center gap-2 text-[11px]">
+              <span className="text-gray-500 dark:text-zinc-400">
+                최고: <strong className="text-gray-900 dark:text-white font-mono">{Math.max(...(trend.map(d => d.requests) || [0]), 0).toLocaleString()}</strong>건
+              </span>
+              <span className="text-gray-300 dark:text-zinc-700">|</span>
+              <span className="text-gray-500 dark:text-zinc-400">
+                평균: <strong className="text-blue-600 dark:text-blue-400 font-mono">{trend.length > 0 ? Math.round(trend.reduce((a, b) => a + b.requests, 0) / trend.length).toLocaleString() : 0}</strong>건
+              </span>
+            </div>
           </div>
 
-          {/* 명시적 높이 h-48를 주어 막대 그래프가 100% 뚜렷하게 렌더링되도록 구현 */}
-          <div className="h-44 w-full flex items-end gap-2 pt-4 px-2 pb-1 bg-gray-50/50 dark:bg-zinc-950/40 rounded-xl border border-gray-100/80 dark:border-zinc-800/60">
+          {/* 명시적 높이와 수치가 명확히 보이는 막대 그래프 렌더링 */}
+          <div className="h-48 w-full flex items-end gap-1.5 sm:gap-2 pt-6 px-2 pb-1.5 bg-gray-50/60 dark:bg-zinc-950/50 rounded-xl border border-gray-100/80 dark:border-zinc-800/70 relative">
             {trend.length > 0 ? (
               trend.map((t, idx) => {
                 const maxReq = Math.max(...trend.map(d => d.requests), 1);
-                const heightPx = Math.max(16, Math.floor((t.requests / maxReq) * 120));
+                const heightPx = Math.max(16, Math.floor((t.requests / maxReq) * 115));
+                const isMax = t.requests === maxReq;
+
+                const showValueAlways = period === '7d' ? true : period === '24h' ? (idx % 2 === 0 || isMax) : (idx % 3 === 0 || isMax);
+                const showLabelAlways = period === '7d' ? true : period === '24h' ? (idx % 3 === 0 || idx === trend.length - 1) : (idx % 4 === 0 || idx === trend.length - 1);
+
                 return (
-                  <div key={idx} className="flex-1 h-full flex flex-col justify-end items-center gap-1 group relative">
-                    <div className="text-[9px] text-gray-500 dark:text-zinc-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity absolute -top-1">
-                      {t.requests}
+                  <div key={idx} className="flex-1 h-full flex flex-col justify-end items-center group relative">
+                    {/* 호버 시 툴팁 */}
+                    <div className="absolute -top-7 bg-gray-900 text-white dark:bg-white dark:text-zinc-900 text-[10px] font-bold py-0.5 px-2 rounded-md shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-30 whitespace-nowrap">
+                      {t.label}: {t.requests}건 (방문자 {t.visitors}명)
                     </div>
+
+                    {/* 상시 노출 수치 */}
+                    <span
+                      className={`font-mono font-bold tracking-tight mb-1 text-center transition-all ${
+                        isMax
+                          ? 'text-blue-600 dark:text-blue-400 font-extrabold scale-105'
+                          : 'text-gray-600 dark:text-zinc-300'
+                      } ${
+                        period === '7d'
+                          ? 'text-xs'
+                          : period === '24h'
+                            ? (showValueAlways ? 'text-[9px]' : 'text-[9px] opacity-0 group-hover:opacity-100')
+                            : (showValueAlways ? 'text-[8px]' : 'text-[8px] opacity-0 group-hover:opacity-100')
+                      }`}
+                    >
+                      {t.requests}
+                    </span>
+
+                    {/* 막대 바 */}
                     <div
                       style={{ height: `${heightPx}px` }}
-                      className="w-full max-w-[28px] rounded-t-md bg-gradient-to-t from-[var(--google-blue)] to-[#669df6] dark:from-blue-600 dark:to-blue-400 group-hover:brightness-110 transition-all shadow-sm"
+                      className={`w-full max-w-[28px] rounded-t-md transition-all shadow-sm group-hover:brightness-125 ${
+                        isMax
+                          ? 'bg-gradient-to-t from-blue-600 to-indigo-400 dark:from-blue-500 dark:to-indigo-300 ring-1 ring-blue-400/40'
+                          : 'bg-gradient-to-t from-[var(--google-blue)] to-[#669df6] dark:from-blue-600 dark:to-blue-400'
+                      }`}
                     />
-                    <span className="text-[9px] text-gray-500 dark:text-zinc-400 truncate w-full text-center font-mono">
+
+                    {/* 하단 날짜/시간 라벨 */}
+                    <span className={`text-[9px] text-gray-500 dark:text-zinc-400 truncate w-full text-center font-mono mt-1 ${
+                      showLabelAlways ? 'opacity-100' : 'opacity-40 group-hover:opacity-100'
+                    }`}>
                       {t.label}
                     </span>
                   </div>

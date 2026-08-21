@@ -152,14 +152,13 @@ export default function AnalyticsDashboardPanel() {
           <button
             type="button"
             onClick={() => setShowSettings(!showSettings)}
-            className={`w-full py-1 px-2 text-xs font-bold transition-all flex items-center justify-center gap-1 mt-0.5 border rounded-none relative z-10 ${
+            className={`w-full py-1 px-2 text-xs font-bold transition-all flex items-center justify-center mt-0.5 border rounded-none relative z-10 ${
               showSettings
                 ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border-teal-300 dark:border-teal-800 shadow-sm'
                 : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200/80 dark:border-zinc-700 hover:bg-teal-50 hover:text-teal-700 dark:hover:bg-teal-950/30'
             }`}
           >
-            <span>⚙️</span>
-            <span>API {showSettings ? '닫기' : '설정'}</span>
+            API {showSettings ? '닫기' : '설정'}
           </button>
         </PremiumCard>
       </div>
@@ -168,9 +167,8 @@ export default function AnalyticsDashboardPanel() {
       {showSettings && (
         <PremiumCard borderColor="teal" hoverEffect={true} className="bg-gradient-to-b from-teal-50/30 to-transparent dark:from-teal-950/20 shrink-0 !p-3.5 rounded-none shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.6)] border border-teal-200 dark:border-teal-800/60">
           <div className="flex items-center justify-between border-b border-teal-100 dark:border-teal-900/50 pb-2 mb-2.5">
-            <h3 className="font-bold text-xs text-teal-900 dark:text-teal-200 flex items-center gap-1.5">
-              <span>🔐</span>
-              <span>시스템 API 키 및 자격증명 설정</span>
+            <h3 className="font-extrabold text-xs text-teal-900 dark:text-teal-200">
+              시스템 API 키 및 자격증명 설정
             </h3>
             <span className="text-[10px] text-teal-600 dark:text-teal-400 font-bold bg-teal-50 dark:bg-teal-950/50 px-2 py-0.5 rounded-none border border-teal-200 dark:border-teal-900">로컬 브라우저 암호화 저장</span>
           </div>
@@ -250,9 +248,8 @@ export default function AnalyticsDashboardPanel() {
           
           <div className="flex items-center justify-between mb-2 border-b border-gray-100 dark:border-zinc-800 pb-2 shrink-0 relative z-10">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
-                <span className="text-blue-600 dark:text-blue-400">📈</span>
-                <span>방문 추이 분석 그래프</span>
+              <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">
+                방문 추이 분석 그래프
               </span>
               <span className="text-[10px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800">
                 {period === '24h' ? '최근 24시간' : period === '7d' ? '최근 7일' : '최근 30일'}
@@ -340,9 +337,8 @@ export default function AnalyticsDashboardPanel() {
           </div>
 
           <div className="flex items-center justify-between mb-2 border-b border-gray-100 dark:border-zinc-800 pb-2 shrink-0 relative z-10">
-            <span className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
-              <span className="text-purple-600 dark:text-purple-400">🧭</span>
-              <span>검색 & 유입 채널</span>
+            <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">
+              검색 & 유입 채널
             </span>
             <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold bg-purple-50 dark:bg-purple-950/40 px-2 py-0.5 rounded-none border border-purple-200 dark:border-purple-900">점유율</span>
           </div>
@@ -374,11 +370,10 @@ export default function AnalyticsDashboardPanel() {
       <PremiumCard borderColor="blue" hoverEffect={true} className="!p-0 flex-1 min-h-0 flex flex-col rounded-none shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] border border-gray-200/80 dark:border-white/10 relative overflow-hidden group">
         <div className="p-3 sm:px-4 border-b border-gray-200/80 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-gradient-to-r from-blue-50/60 to-transparent dark:from-blue-950/30 dark:to-transparent relative z-10">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
-              <span className="text-blue-600 dark:text-blue-400">🏆</span>
-              <span>인기 보상 칼럼 TOP 10 실시간 순위</span>
+            <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">
+              인기 보상 칼럼 TOP 10 실시간 순위
             </span>
-            <span className="text-[10px] text-gray-400 hidden sm:inline-block">실시간 독자 유입 및 조회수 랭킹</span>
+            <span className="text-[10px] text-gray-400 hidden sm:inline-block">독자 유입 및 조회수 랭킹</span>
           </div>
           <PremiumBadge color="blue" className="!text-[10px] !px-2.5 !py-0.5 rounded-none">실시간 PV 집계</PremiumBadge>
         </div>

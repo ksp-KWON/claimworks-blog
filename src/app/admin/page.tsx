@@ -374,10 +374,9 @@ export default function AdminPage() {
         <div className="hidden md:flex items-center gap-1 shrink-0">
           <button 
             onClick={() => setActiveApp('analytics')}
-            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 border ${activeApp === 'analytics' || activeApp === 'post-settings' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
+            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'analytics' || activeApp === 'post-settings' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
           >
-            <span>📊</span>
-            <span>실시간 통계</span>
+            통계 관리
           </button>
           
           <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />

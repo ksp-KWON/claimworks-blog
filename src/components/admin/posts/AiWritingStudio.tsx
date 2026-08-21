@@ -245,33 +245,36 @@ export default function AiWritingStudio({
           </>
         ) : (
           <>
-            {/* 자동 모드 카테고리 그리드 (아이콘 배제, 콤팩트 직각 칩) */}
-            <div className="grid grid-cols-2 gap-1.5">
+            {/* 자동 모드 8개 카테고리 그리드 (완벽한 균형의 직각 3D 타일) */}
+            <div className="grid grid-cols-2 gap-2">
               {CATEGORIES.map(cat => {
                 const isSelected = selectedCategory === cat;
                 return (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`p-2 text-left transition-all rounded-none border text-xs font-bold ${
+                    className={`py-3 px-3 text-left transition-all duration-200 rounded-none border text-xs font-extrabold flex items-center justify-between shadow-sm ${
                       isSelected 
-                        ? 'border-l-[3px] border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 shadow-sm' 
-                        : 'border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 hover:bg-gray-50'
+                        ? 'border-l-[3.5px] border-blue-600 bg-blue-50/90 dark:bg-blue-950/50 text-blue-900 dark:text-blue-200 border-blue-200 dark:border-blue-800 shadow-blue-500/10' 
+                        : 'border-gray-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-300 hover:-translate-y-0.5'
                     }`}
                   >
-                    {cat}
+                    <span className="truncate">{cat}</span>
+                    {isSelected && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 shrink-0 ml-1.5" />
+                    )}
                   </button>
                 );
               })}
             </div>
 
-            <div className="p-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-none">
+            <div className="p-3.5 bg-gray-50/80 dark:bg-zinc-950 border border-gray-200/80 dark:border-zinc-800 rounded-none shadow-sm">
               {autoProgress ? (
                 <div className="text-xs font-extrabold text-blue-600 dark:text-blue-400 text-center animate-pulse">
                   {autoProgress}
                 </div>
               ) : (
-                <p className="text-[11px] text-gray-500 text-center leading-relaxed">
+                <p className="text-xs text-gray-500 dark:text-zinc-400 text-center leading-relaxed">
                   선택한 카테고리의 원고를 백그라운드 파이프라인에서 자동으로 기획·작성하여 즉시 발행합니다.
                 </p>
               )}

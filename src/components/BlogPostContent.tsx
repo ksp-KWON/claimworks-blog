@@ -2,18 +2,21 @@
 
 /**
  * BlogPostContent.tsx
- * 블로그 포스팅 본문 렌더링 클라이언트 컴포넌트
- * - Key Points 박스 (최상단, Google Blue 톤)
- * - 클린 TOC (DOM에서 직접 읽어 ID 100% 일치 보장)
- * - 본문에서 중복 섹션(목차/요약/체크리스트/FAQ/CTA) 자동 제거
- * - 자가진단 인터랙티브 체크리스트
- * - FAQ 아코디언
- * - CTA 배너 (헤더 배너 스타일 + 그림자)
- * - 저자 바이오 카드 (E-E-A-T 신호)
+ * 블로그 포스트 본문 렌더링 클라이언트 컴포넌트
+ * - [황금 표준 레이아웃 순서]
+ *   1. KeyPointsBox (핵심 요약)
+ *   2. opening (도입부 본문 서술)
+ *   3. TableOfContents (목차)
+ *   4. 본문 섹션들 (본문 1번 ~ 본문 끝까지 순차 렌더링)
+ *      - ChecklistBox (본문 1~2번 섹션 직후 자연스럽게 배치)
+ *      - FAQBox (본문 비교표/섹션 직후 아코디언 배치)
+ *   5. GlobalCalculatorAccordion (본문 종료 후 계산기)
+ *   6. CTABanner (무료 상담 신청)
+ *   7. relatedPostsNode (관련 글)
+ *   8. authorBioNode (손해사정사 프로필)
  */
 
 import React, { useEffect, useState } from 'react';
-// 분리된 서브 컴포넌트 임포트
 import KeyPointsBox from './blog/KeyPointsBox';
 import FAQBox from './blog/FAQBox';
 import CTABanner from './blog/CTABanner';
@@ -24,7 +27,6 @@ import MarkdownRenderer from './blog/MarkdownRenderer';
 
 import { parseBlogPost } from '@/lib/blog-utils';
 
-// ─── 스크롤 오프셋: header(64) + sticky banner(52) + 버퍼(20) = 136px ───
 const SCROLL_OFFSET = 140;
 
 interface BlogPostContentProps { 
@@ -62,87 +64,83 @@ export default function BlogPostContent({ content, relatedPostsNode, authorBioNo
     }
   };
 
-  // 본문 섹션(sections) 분리
-  // [근본 수정] sections가 1개 이하일 때 middleSections가 비어 본문이 사라지는 버그 수정.
-  // sections가 2개 이상이면: 마지막을 closingSection으로 분리 (박스 배치 목적)
-  // sections가 1개이면: 해당 1개를 middleSections로 렌더링, closingSection = ''
-  // sections가 0개이면: opening도 확인 후 fallback 처리
-  const middleSections = sections.length > 1 ? sections.slice(0, -1) : sections;
-  const closingSection = sections.length > 1 ? sections[sections.length - 1] : '';
+  // 체크리스트와 FAQ가 배치될 최적의 섹션 인덱스 계산
+  // - 체크리스트: 1번 섹션 직후 (인덱스 0 뒤)
+  // - FAQ: 본문 후반부 (예: N-2번째 또는 N-1번째 섹션 뒤)
+  const N = sections.length;
+  const checklistTargetIdx = N > 1 ? 0 : 0;
+  const faqTargetIdx = N >= 3 ? Math.min(2, N - 1) : N > 1 ? 1 : 0;
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* 1. 핵심 요약 포인트 박스 */}
       {keyPoints.length > 0 && <KeyPointsBox points={keyPoints} />}
 
-      {/* 2. 오프닝 (도입부 본문) */}
+      {/* 2. 오프닝 (도입부 본문 서술) */}
       {opening && (
-        <div data-blog-body>
+        <div data-blog-body className="text-gray-700 dark:text-gray-300 leading-relaxed">
           <MarkdownRenderer content={opening} />
         </div>
       )}
 
-      {/* 3. 이 글의 목차 */}
+      {/* 3. 이 글의 목차 (TOC) */}
       {toc.length > 0 && (
         <TableOfContents toc={toc} activeId={activeId} onItemClick={handleTOCClick} />
       )}
 
-      {/* 4. 중간 본문 섹션들 + (자가진단, FAQ 박스 분산 배치) */}
-      <div data-blog-body>
-        {(() => {
-          const innerBoxes = [
-            checklistItems.length > 0 ? <ChecklistBox key="checklist" items={checklistItems} /> : null,
-            faqItems.length > 0 ? <FAQBox key="faq" items={faqItems} /> : null,
-          ].filter(Boolean);
+      {/* 4. 본문 전체 순차 렌더링 (체크리스트 & FAQ 자연스럽게 결합) */}
+      <div data-blog-body className="space-y-6">
+        {sections.map((sec, idx) => (
+          <React.Fragment key={idx}>
+            <MarkdownRenderer content={sec} />
 
-          const N = middleSections.length;
-          const M = innerBoxes.length;
+            {/* 체크리스트 박스 (1번 섹션 직후) */}
+            {idx === checklistTargetIdx && checklistItems.length > 0 && (
+              <div className="my-6">
+                <ChecklistBox items={checklistItems} />
+              </div>
+            )}
 
-          const boxesPerSection: React.ReactNode[][] = Array.from({ length: Math.max(1, N) }, () => []);
+            {/* FAQ 아코디언 박스 (본문 후반부 섹션 직후) */}
+            {idx === faqTargetIdx && faqItems.length > 0 && (
+              <div className="my-6">
+                <FAQBox items={faqItems} />
+              </div>
+            )}
+          </React.Fragment>
+        ))}
 
-          if (N > 0) {
-            innerBoxes.forEach((box, i) => {
-              const sectionIndex = Math.floor((i * N) / M);
-              boxesPerSection[sectionIndex].push(box);
-            });
-          } else {
-            boxesPerSection[0] = innerBoxes;
-          }
-
-          return middleSections.map((sec, idx) => (
-            <React.Fragment key={idx}>
-              <MarkdownRenderer content={sec} />
-              {boxesPerSection[idx] && boxesPerSection[idx].map((box) => box)}
-            </React.Fragment>
-          ));
-        })()}
+        {/* 섹션이 없을 때 fallback */}
+        {sections.length === 0 && checklistItems.length > 0 && (
+          <div className="my-6">
+            <ChecklistBox items={checklistItems} />
+          </div>
+        )}
+        {sections.length === 0 && faqItems.length > 0 && (
+          <div className="my-6">
+            <FAQBox items={faqItems} />
+          </div>
+        )}
       </div>
 
-      {/* 5. 계산기 박스 */}
-      <div className="mt-8 mb-6">
+      {/* 5. 보상스쿨 통합 계산기 (모든 본문이 온전히 끝난 뒤 하단 배치) */}
+      <div className="mt-10 mb-6">
         <GlobalCalculatorAccordion />
       </div>
 
-      {/* 6. 클로징 섹션 (마지막 본문) */}
-      {closingSection && (
-        <div data-blog-body>
-          <MarkdownRenderer content={closingSection} />
-        </div>
-      )}
-
-      {/* 7. CTA 박스 */}
+      {/* 6. CTA 무료 상담 배너 */}
       <div className="mt-8 mb-10">
         <CTABanner />
       </div>
 
-      {/* 8. 관련글 박스 */}
+      {/* 7. 관련 글 탐색 박스 */}
       {relatedPostsNode && (
         <div className="mt-10">
           {relatedPostsNode}
         </div>
       )}
 
-      {/* 9. 저자소개 박스 */}
+      {/* 8. 전문가 프로필 카드 */}
       {authorBioNode && (
         <div className="mt-10">
           {authorBioNode}

@@ -83,11 +83,15 @@ const getToneColor = (node: React.ReactNode): 'red' | 'green' | 'yellow' | 'purp
     if (n?.props?.children) return getText(n.props.children);
     return '';
   };
-  const text = getText(node).trim().substring(0, 15);
+  const fullText = getText(node).trim();
+  // 보상스쿨 피드백 & 실무 인사이트는 독보적인 프리미엄 보라색(Purple) 톤 배정
+  if (/보상스쿨\s*피드백|실무\s*인사이트|실무인사이트/.test(fullText)) return 'purple';
+
+  const text = fullText.substring(0, 15);
+  if (/(🔮|💎|💜|🟣|👨‍⚖️|👨‍💼|👩‍⚖️|👩‍💼)/.test(text)) return 'purple';
   if (/(⚠️|🚨|🛑|❗|❌|⛔)/.test(text)) return 'red';
   if (/(✅|☑️|🌿|🌱|🍀|✔|📖)/.test(text)) return 'green';
   if (/(🔥|⭐|⚡|🌟|✨|🏆|💡)/.test(text)) return 'yellow';
-  if (/(🔮|💎|💜|🟣|👨‍⚖️|👨‍💼|👩‍⚖️|👩‍💼)/.test(text)) return 'purple';
   return 'blue';
 };
 

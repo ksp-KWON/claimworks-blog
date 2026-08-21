@@ -332,11 +332,16 @@ export default function AdminPage() {
       {/* Universal Top Header Bar (작업영역과 100% 일치하는 max-w-7xl 레이아웃) */}
       <div className="h-[60px] bg-white dark:bg-zinc-900 border-b border-gray-200/80 dark:border-zinc-800 px-2.5 sm:px-3.5 z-20 shrink-0 shadow-[0_2px_10px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.4)]">
         <div className="max-w-7xl mx-auto w-full h-full flex items-center justify-between gap-3">
-          {/* 좌측 로고 & 통합 관리자 타이틀 */}
-          <div className="flex items-center gap-3 shrink-0">
-            <Image src="/logo.png" alt="보상스쿨" width={120} height={30} className="h-6 w-auto dark:brightness-110" priority />
-            <span className="hidden sm:inline-flex items-center px-2 py-0.5 text-[11px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/80 rounded-none shadow-sm">
-              통합 관리자
+          {/* 좌측 로고 & 브랜드 타이틀 + 관리자페이지 뱃지 (방문자 페이지와 일체화) */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+            <div className="relative flex items-center justify-center shrink-0 h-[38px] sm:h-[44px]">
+              <Image src="/logo.png" alt="보상스쿨 로고" width={180} height={44} className="h-full w-auto object-contain transition-all" priority />
+            </div>
+            <span className="hidden sm:inline font-black text-sm sm:text-base text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-500 dark:from-white dark:to-gray-400 truncate tracking-[-0.075em]">
+              보상스쿨 전문 손해사정 그룹
+            </span>
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded-none bg-blue-50 dark:bg-blue-900/30 text-[10.5px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] tracking-wider border border-blue-200 dark:border-blue-800 shadow-sm shrink-0">
+              관리자페이지
             </span>
           </div>
 

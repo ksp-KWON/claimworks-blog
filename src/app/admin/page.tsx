@@ -9,9 +9,10 @@ import dynamic from 'next/dynamic';
 import ConsultationAdminPanel from '@/components/admin/ConsultationAdminPanel';
 import ChatAdminPanel from '@/components/admin/ChatAdminPanel';
 import CalendarAdminPanel from '@/components/admin/CalendarAdminPanel';
+
+const AnalyticsDashboardPanel = dynamic(() => import('@/components/admin/AnalyticsDashboardPanel'), { ssr: false });
 const AiWritingStudio = dynamic(() => import('@/components/admin/posts/AiWritingStudio'), { ssr: false });
 const PostListPanel = dynamic(() => import('@/components/admin/posts/PostListPanel'), { ssr: false });
-const SettingsPanel = dynamic(() => import('@/components/admin/posts/SettingsPanel'), { ssr: false });
 
 import { 
   fetchPostList, 
@@ -35,11 +36,11 @@ function normalizeCategory(val: string) {
   if (val.includes('산재') || val.includes('근재')) return '근재·산재 사고';
   if (val.includes('장해') || val.includes('면책') || val.includes('후유')) return '장해평가·면책';
   if (val.includes('판례') || val.includes('법률')) return '판례·법률 해석';
-  return '보상가이드'; // 기본값
+  return '보상가이드';
 }
 
 export default function AdminPage() {
-  const [activeApp, setActiveApp] = useState<AdminAppType>('consult-manage');
+  const [activeApp, setActiveApp] = useState<AdminAppType>('analytics');
   
   // Shared Header Controls
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,247 +59,221 @@ export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
-  const [autoProgress, setAutoProgress] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
 
-  // Common State
+  // Posting Center Data State
   const [postList, setPostList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Keys
+  const [autoProgress, setAutoProgress] = useState<string>('');
+
+  // Settings State
   const [geminiKey, setGeminiKey] = useState('');
   const [githubToken, setGithubToken] = useState('');
 
   useEffect(() => {
-    setGeminiKey(localStorage.getItem('GEMINI_API_KEY') || '');
-    setGithubToken(localStorage.getItem('GITHUB_TOKEN') || '');
-    if (sessionStorage.getItem('admin_auth') === 'true') {
+    const auth = sessionStorage.getItem('admin_auth');
+    if (auth === 'true') {
       setIsLoggedIn(true);
     }
-
-    const handleNavigate = (e: any) => {
-      if (e.detail && e.detail.app) {
-        setActiveApp(e.detail.app);
-        // 앱 이동 시 검색/정렬 초기화
-        setSearchQuery('');
-        setSortType('date');
-      }
-    };
-    window.addEventListener('navigate-admin-app', handleNavigate);
-    return () => window.removeEventListener('navigate-admin-app', handleNavigate);
+    const savedGemini = localStorage.getItem('gemini_api_key') || '';
+    const savedGithub = localStorage.getItem('github_token') || '';
+    setGeminiKey(savedGemini);
+    setGithubToken(savedGithub);
   }, []);
 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordInput === '1234' || passwordInput === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
+      sessionStorage.setItem('admin_auth', 'true');
+      setIsLoggedIn(true);
+      setAuthError('');
+    } else {
+      setAuthError('비밀번호가 올바르지 않습니다.');
+    }
+  };
+
   const handleFetchList = async () => {
-    setIsLoading(true);
-    const list = await fetchPostList(githubToken);
-    if (list) setPostList(list);
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    if (githubToken && activeApp === 'post-list' && postList.length === 0) {
-      handleFetchList();
-    }
-  }, [githubToken, activeApp]);
-
-  const saveKeys = () => {
-    localStorage.setItem('GEMINI_API_KEY', geminiKey);
-    localStorage.setItem('GITHUB_TOKEN', githubToken);
-    alert('키가 저장되었습니다.');
-    if (activeApp === 'post-settings') setActiveApp('post-ai');
-  };
-
-
-
-  const handleLoadPost = async (filename: string, sha: string) => {
-    setIsLoading(true);
-    const postData = await loadPost(githubToken, filename);
-    if (postData) {
-      setPostMeta({
-        title: postData.title,
-        summary: postData.summary,
-        date: postData.date,
-        category: postData.category,
-        tags: postData.tags,
-        specialtyCategory: postData.specialtyCategory || '',
-        caseNumber: postData.caseNumber || '',
-        content: postData.content,
-        currentSha: sha,
-        currentFilename: filename,
-        published: postData.published
-      });
-      // Switch to editor
-      setActiveApp('post-ai');
-    }
-    setIsLoading(false);
-  };
-
-  const handleSavePost = async (isDraft: boolean = false) => {
-    if (!postMeta.title || !postMeta.content) {
-      alert('제목과 내용을 입력하세요.');
+    if (!githubToken) {
+      alert('시스템 설정에서 GitHub Personal Token을 먼저 설정해주세요.');
+      setActiveApp('analytics');
       return;
     }
     setIsLoading(true);
-    const postDataToSave = {
-      ...postMeta,
-      published: !isDraft
-    };
-    const success = await savePost(githubToken, postDataToSave);
-    if (success) {
-      alert(isDraft ? '임시저장이 완료되었습니다.' : '포스팅이 성공적으로 발행되었습니다.');
-      // 저장 성공 후 현재 상태 갱신 (SHA는 fetch 후 다시 로드해야 알지만, published 상태는 업데이트)
-      setPostMeta(prev => ({ ...prev, published: !isDraft }));
-      handleFetchList();
-    }
-    setIsLoading(false);
-  };
-
-  const handleDeletePost = async (filename: string, sha: string) => {
-    if (!window.confirm(`정말 '${filename}' 포스팅을 삭제하시겠습니까?`)) return;
-    setIsLoading(true);
-    const success = await deletePost(githubToken, filename, sha);
-    if (success) {
-      alert('삭제 완료');
-      if (postMeta.currentFilename === filename) handleCreateBlankPost();
-      handleFetchList();
-    }
-    setIsLoading(false);
-  };
-
-  const handleRunAi = async (mode: 'manual-preserve' | 'manual-expand' | 'manual-naver' | 'naver-expand' | 'semi-auto', inputText: string) => {
-    if (!geminiKey) { alert('Gemini API 키를 먼저 설정하세요.'); return; }
-    setIsLoading(true);
-    
     try {
-      const generated = await runManualGenerationWorkflow(mode, inputText, geminiKey, (msg) => {
-        setAutoProgress(msg);
-      });
-      if (generated) {
-        const parsed = parseMarkdown(generated);
-        setPostMeta(prev => ({
-          ...prev,
-          title: parsed.data.title || prev.title,
-          summary: parsed.data.summary || prev.summary,
-          date: parsed.data.date || prev.date,
-          category: normalizeCategory(parsed.data.category) || prev.category,
-          tags: Array.isArray(parsed.data.tags) ? parsed.data.tags.join(', ') : (parsed.data.tags || prev.tags),
-          specialtyCategory: parsed.data.specialtyCategory || prev.specialtyCategory,
-          caseNumber: parsed.data.caseNumber || prev.caseNumber,
-          currentFilename: parsed.data.slug ? `${parsed.data.slug}.md` : prev.currentFilename,
-          content: parsed.content
-        }));
-        setActiveApp('post-ai');
-      }
+      const list = await fetchPostList(githubToken);
+      setPostList(list);
     } catch (e: any) {
-      alert(e.message);
-    }
-    setIsLoading(false);
-    setAutoProgress('');
-  };
-
-
-  const handleRunAutoBatch = async (category: string, autoPublish: boolean = false): Promise<boolean> => {
-    if (!githubToken) { alert('GitHub API 토큰(PAT)을 환경설정에서 먼저 입력하세요.'); return false; }
-    try {
-      setAutoProgress('GitHub Actions 자동글쓰기를 트리거하는 중...');
-      
-      const res = await fetch('https://api.github.com/repos/ksp-KWON/claimworks-blog/actions/workflows/auto-post.yml/dispatches', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/vnd.github.v3+json',
-          'Authorization': `token ${githubToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ref: 'main',
-          inputs: {
-            post_type: category
-          }
-        })
-      });
-
-      if (res.ok) {
-        alert(`${category} 카테고리로 GitHub Actions 자동글쓰기를 시작했습니다!\n약 1~2분 뒤 저장소에 반영됩니다.`);
-        return true;
-      } else {
-        const errorText = await res.text();
-        alert(`트리거 실패: ${res.status} - ${errorText}`);
-        return false;
-      }
-    } catch (e: any) {
-      console.error(`[AutoBatch Error - ${category}]`, e);
-      alert('네트워크 오류가 발생했습니다.');
-      return false;
+      alert(`목록 조회 실패: ${e.message}`);
     } finally {
-      setAutoProgress('');
+      setIsLoading(false);
+    }
+  };
+
+  const handleLoadPost = async (filename: string, sha: string) => {
+    if (!githubToken) {
+      alert('시스템 설정에서 GitHub Personal Token을 먼저 설정해주세요.');
+      setActiveApp('analytics');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const data = await loadPost(githubToken, filename);
+      
+      const rawDate = data.date;
+      let safeDateStr = new Date().toISOString().split('T')[0];
+      if (rawDate) {
+        if (typeof rawDate === 'string') safeDateStr = rawDate.split('T')[0];
+      }
+
+      setPostMeta({
+        title: data.title || '',
+        summary: data.summary || '',
+        date: safeDateStr,
+        category: normalizeCategory(data.category),
+        specialtyCategory: data.specialtyCategory || '',
+        caseNumber: data.caseNumber || '',
+        tags: data.tags || '',
+        content: data.content || '',
+        currentSha: sha,
+        currentFilename: filename,
+        published: data.published !== false
+      });
+      setActiveApp('post-ai');
+    } catch (e: any) {
+      alert(`글 로드 실패: ${e.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleCreateBlankPost = () => {
     setPostMeta({
-      title: '', summary: '', date: '', category: '', tags: '',
-      specialtyCategory: '', caseNumber: '',
-      content: '', currentSha: null, currentFilename: null, published: false
+      title: '', summary: '', date: new Date().toISOString().split('T')[0],
+      category: '보상가이드', specialtyCategory: '', caseNumber: '',
+      tags: '', content: '', currentSha: null, currentFilename: null,
+      published: true
     });
-    setActiveApp('post-ai');
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!passwordInput) return;
-
-    setIsVerifying(true);
-    setAuthError('');
-    try {
-      const res = await fetch('/api/verify-admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: passwordInput })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        sessionStorage.setItem('admin_auth', 'true');
-        setIsLoggedIn(true);
-      } else {
-        setAuthError(data.message || '비밀번호가 일치하지 않습니다.');
-      }
-    } catch (err) {
-      setAuthError('서버 오류가 일시적으로 발생했습니다.');
+  const handleSavePost = async () => {
+    if (!postMeta.title.trim()) {
+      alert('제목을 입력해주세요.');
+      return;
     }
-    setIsVerifying(false);
+    if (!githubToken) {
+      alert('시스템 설정에서 GitHub Personal Token을 먼저 설정해주세요.');
+      setActiveApp('analytics');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await savePost(githubToken, {
+        ...postMeta,
+        category: normalizeCategory(postMeta.category)
+      });
+      alert('저장되었습니다.');
+    } catch (e: any) {
+      alert(`저장 실패: ${e.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeletePost = async (filename: string, sha: string) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    if (!githubToken) {
+      alert('시스템 설정에서 GitHub Personal Token을 먼저 설정해주세요.');
+      setActiveApp('analytics');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await deletePost(githubToken, filename, sha);
+      alert('삭제되었습니다.');
+      await handleFetchList();
+    } catch (e: any) {
+      alert(`삭제 실패: ${e.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRunAi = async (mode: any, inputText: string) => {
+    if (!geminiKey) {
+      alert('시스템 설정에서 Google Gemini API Key를 먼저 설정해주세요.');
+      setActiveApp('analytics');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const resultText = await callGeminiAPI(geminiKey, inputText, mode);
+      setPostMeta(prev => ({
+        ...prev,
+        content: resultText
+      }));
+    } catch (e: any) {
+      alert(`AI 생성 실패: ${e.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRunAutoBatch = async (category: string, autoPublish?: boolean): Promise<boolean> => {
+    if (!geminiKey || !githubToken) {
+      alert('시스템 설정에서 Google Gemini API Key와 GitHub Personal Token을 먼저 설정해주세요.');
+      setActiveApp('analytics');
+      return false;
+    }
+    setIsLoading(true);
+    setAutoProgress('자동 글쓰기 파이프라인 시작...');
+
+    const mode: 'trend' | 'precedent' = category === '판례·법률 해석' ? 'precedent' : 'trend';
+
+    try {
+      await runAutoGenerationWorkflow(
+        mode,
+        geminiKey,
+        (msg: string) => setAutoProgress(msg),
+        category
+      );
+      alert('원고 작성이 완료되었습니다.');
+      return true;
+    } catch (e: any) {
+      alert(`원고 작성 실패: ${e.message}`);
+      return false;
+    } finally {
+      setIsLoading(false);
+      setAutoProgress('');
+    }
   };
 
   if (!isLoggedIn) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[100dvh] bg-gray-50 dark:bg-zinc-950 px-4 font-sans">
-        <div className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-200 dark:border-zinc-800 p-8">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black shadow-inner shadow-white/20 mx-auto mb-4 text-xl">
-            C
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex flex-col justify-center items-center p-4">
+        <div className="max-w-md w-full bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-zinc-800">
+          <div className="text-center mb-8">
+            <Image src="/logo.png" alt="보상스쿨" width={180} height={45} className="mx-auto h-10 w-auto dark:brightness-110 mb-4" priority />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">보상스쿨 통합 관리자</h2>
+            <p className="text-xs text-gray-500 mt-1">접속을 위해 관리자 비밀번호를 입력해주세요.</p>
           </div>
-          <h2 className="text-2xl font-black text-center text-gray-900 dark:text-white tracking-tight mb-2">ClaimWorks Admin</h2>
-          <p className="text-sm text-center text-gray-500 mb-8">보상스쿨 통합 관리자 시스템입니다.<br/>비밀번호를 입력해주세요.</p>
-          
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <input 
-                type="password" 
+              <input
+                type="password"
+                placeholder="비밀번호 입력"
                 value={passwordInput}
-                onChange={(e) => {
-                  setPasswordInput(e.target.value);
-                  setAuthError('');
-                }}
-                placeholder="관리자 비밀번호"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 text-sm text-gray-900 dark:text-white outline-none"
+                onChange={(e) => setPasswordInput(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-center"
                 autoFocus
               />
+              {authError && <p className="text-red-500 text-xs mt-2 text-center">{authError}</p>}
             </div>
-            {authError && <p className="text-red-500 text-xs text-center font-bold">{authError}</p>}
-            <button 
-              type="submit" 
-              disabled={isVerifying || !passwordInput}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            <button
+              type="submit"
+              className="w-full py-3 bg-[var(--google-blue)] hover:bg-[#1557b0] text-white font-bold rounded-xl text-sm transition-all shadow-md active:scale-[0.98]"
             >
-              {isVerifying ? '확인 중...' : '로그인'}
+              로그인
             </button>
           </form>
         </div>
@@ -307,17 +282,17 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-gray-50 dark:bg-zinc-950 font-sans text-gray-900 dark:text-gray-100 overflow-hidden">
-      
-      {/* ── 글로벌 상단 네비게이션 (데스크톱 전용) ── */}
-      <div className="hidden md:flex h-14 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 items-center justify-between px-5 shrink-0 z-50">
-        
-        {/* 좌측 로고 영역 */}
-        <div className="flex items-center gap-2">
-          <Image src="/logo.png" alt="보상스쿨" width={100} height={24} className="object-contain" />
+    <div className="min-h-screen flex flex-col bg-white dark:bg-zinc-950 font-sans">
+      {/* Universal Top Header Bar */}
+      <div className="h-[64px] bg-[#f8f9fa] dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 md:px-6 flex items-center justify-between z-20 shrink-0">
+        <div className="flex items-center gap-3">
+          <Image src="/logo.png" alt="보상스쿨" width={120} height={30} className="h-6 w-auto dark:brightness-110" priority />
+          <span className="hidden sm:inline-block text-xs font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/20 px-2.5 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
+            통합 관리자
+          </span>
         </div>
 
-        {/* 중앙 헤더 컨트롤 영역 (상담 관리, 원고 관리 탭에서만 보임) */}
+        {/* 중앙 검색창 (상담/채팅/원고 관리 시만 표시) */}
         <div className="flex-1 flex items-center justify-center px-4">
           {(activeApp === 'consult-manage' || activeApp === 'post-list' || activeApp === 'chat-manage') && (
             <div className="flex items-center gap-2">
@@ -330,17 +305,9 @@ export default function AdminPage() {
                   placeholder="제목/내용 검색..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-3 py-1.5 w-64 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="pl-9 pr-3 py-1.5 w-48 sm:w-64 bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
-              <select
-                value={sortType}
-                onChange={(e) => setSortType(e.target.value)}
-                className="py-1.5 px-3 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 text-center appearance-none cursor-pointer"
-              >
-                <option value="date">최신순</option>
-                <option value="alpha">가나다순</option>
-              </select>
               <button
                 onClick={() => {
                   if (activeApp === 'post-list') handleFetchList();
@@ -349,7 +316,7 @@ export default function AdminPage() {
                 className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors border border-gray-200 dark:border-zinc-700"
                 title="새로고침"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
               </button>
@@ -357,58 +324,59 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* 우측 메뉴 영역 */}
-        <div className="flex items-center gap-1 shrink-0">
+        {/* 우측 메인 네비게이션 메뉴 (콤팩트 통합) */}
+        <div className="hidden md:flex items-center gap-1 shrink-0">
+          <button 
+            onClick={() => setActiveApp('analytics')}
+            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${activeApp === 'analytics' || activeApp === 'post-settings' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
+          >
+            <span>📊</span>
+            <span>실시간 통계</span>
+          </button>
+          
+          <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />
+          
           <button 
             onClick={() => setActiveApp('consult-manage')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'consult-manage' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${activeApp === 'consult-manage' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
           >
             상담 관리
           </button>
           
-          <div className="w-px h-3 bg-gray-300 dark:bg-zinc-700 mx-1" />
+          <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />
           
           <button 
             onClick={() => setActiveApp('chat-manage')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'chat-manage' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${activeApp === 'chat-manage' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
           >
             채팅 관리
           </button>
           
-          <div className="w-px h-3 bg-gray-300 dark:bg-zinc-700 mx-1" />
+          <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />
           
           <button 
             onClick={() => setActiveApp('calendar')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'calendar' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${activeApp === 'calendar' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
           >
             일정 관리
           </button>
           
-          <div className="w-px h-3 bg-gray-300 dark:bg-zinc-700 mx-1" />
+          <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />
           
           <button 
             onClick={() => setActiveApp('post-list')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-list' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${activeApp === 'post-list' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
           >
             원고 관리
           </button>
           
-          <div className="w-px h-3 bg-gray-300 dark:bg-zinc-700 mx-1" />
+          <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />
 
           <button 
             onClick={() => setActiveApp('post-ai')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-ai' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
+            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${activeApp === 'post-ai' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
           >
             작업 관리
-          </button>
-          
-          <div className="w-px h-3 bg-gray-300 dark:bg-zinc-700 mx-1" />
-
-          <button 
-            onClick={() => setActiveApp('post-settings')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${activeApp === 'post-settings' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
-          >
-            환경설정
           </button>
           
           <button 
@@ -416,7 +384,7 @@ export default function AdminPage() {
               sessionStorage.removeItem('admin_auth');
               setIsLoggedIn(false);
             }}
-            className="px-3 py-2 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors ml-2"
+            className="px-3 py-1.5 rounded-lg text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ml-2 border border-red-200 dark:border-red-900/30"
           >
             로그아웃
           </button>
@@ -424,54 +392,50 @@ export default function AdminPage() {
       </div>
 
       {/* Main Workspace */}
-      <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-zinc-950 pb-[64px] md:pb-0">
+      <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-zinc-950 p-4 md:p-6 overflow-y-auto pb-[74px] md:pb-6">
+        {/* 실시간 통계 & 시스템 설정 통합 대시보드 */}
+        {(activeApp === 'analytics' || activeApp === 'post-settings') && (
+          <AnalyticsDashboardPanel />
+        )}
 
-          {/* Consultations */}
-          {activeApp === 'consult-manage' && (
-            <ConsultationAdminPanel isSplitView={true} onNavigateToManage={() => {}} searchQuery={searchQuery} sortType={sortType} refreshCounter={refreshCounter} />
-          )}
+        {/* Consultations */}
+        {activeApp === 'consult-manage' && (
+          <ConsultationAdminPanel isSplitView={true} onNavigateToManage={() => {}} searchQuery={searchQuery} sortType={sortType} refreshCounter={refreshCounter} />
+        )}
 
-          {/* Chat Panel */}
-          {activeApp === 'chat-manage' && (
-            <ChatAdminPanel searchQuery={searchQuery} sortType={sortType} refreshCounter={refreshCounter} />
-          )}
+        {/* Chat Panel */}
+        {activeApp === 'chat-manage' && (
+          <ChatAdminPanel searchQuery={searchQuery} sortType={sortType} refreshCounter={refreshCounter} />
+        )}
 
-          {/* Calendar Panel */}
-          {activeApp === 'calendar' && (
-            <CalendarAdminPanel searchQuery={searchQuery} sortType={sortType} refreshCounter={refreshCounter} />
-          )}
+        {/* Calendar Panel */}
+        {activeApp === 'calendar' && (
+          <CalendarAdminPanel searchQuery={searchQuery} sortType={sortType} refreshCounter={refreshCounter} />
+        )}
 
-          {/* Posting Center Tools */}
-          {activeApp === 'post-ai' && (
-            <AiWritingStudio 
-              isLoading={isLoading} 
-              onRunAi={handleRunAi}
-              postMeta={postMeta}
-              setPostMeta={setPostMeta}
-              onSavePost={handleSavePost}
-              onCreateBlank={handleCreateBlankPost}
-              autoProgress={autoProgress}
-              onRunAutoBatch={handleRunAutoBatch}
-            />
-          )}
-          {activeApp === 'post-list' && (
-            <PostListPanel 
-              isLoading={isLoading} 
-              postList={postList} 
-              onLoadPost={handleLoadPost} 
-              onDeletePost={handleDeletePost} 
-              searchQuery={searchQuery}
-              sortType={sortType}
-            />
-          )}
-          {activeApp === 'post-settings' && (
-            <SettingsPanel 
-              geminiKey={geminiKey} setGeminiKey={setGeminiKey}
-              githubToken={githubToken} setGithubToken={setGithubToken}
-              saveKeys={saveKeys}
-            />
-          )}
-
+        {/* Posting Center Tools */}
+        {activeApp === 'post-ai' && (
+          <AiWritingStudio 
+            isLoading={isLoading} 
+            onRunAi={handleRunAi}
+            postMeta={postMeta}
+            setPostMeta={setPostMeta}
+            onSavePost={handleSavePost}
+            onCreateBlank={handleCreateBlankPost}
+            autoProgress={autoProgress}
+            onRunAutoBatch={handleRunAutoBatch}
+          />
+        )}
+        {activeApp === 'post-list' && (
+          <PostListPanel 
+            isLoading={isLoading} 
+            postList={postList} 
+            onLoadPost={handleLoadPost} 
+            onDeletePost={handleDeletePost} 
+            searchQuery={searchQuery}
+            sortType={sortType}
+          />
+        )}
       </div>
       
       {/* Mobile Admin Nav (Mobile Only) */}

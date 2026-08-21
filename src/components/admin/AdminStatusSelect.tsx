@@ -67,7 +67,7 @@ export function AdminStatusSelect({
     <select
       value={currentVal}
       onChange={handleChange}
-      className={`text-xs font-bold px-2.5 py-1 rounded-xl border appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all ${getStyle(currentVal)} ${className}`}
+      className={`text-xs font-bold px-2.5 py-1 rounded-none border appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all shadow-sm ${getStyle(currentVal)} ${className}`}
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value} className="bg-white dark:bg-zinc-900 text-gray-900 dark:text-white">

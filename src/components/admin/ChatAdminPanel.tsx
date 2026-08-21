@@ -294,7 +294,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
   const sortedAndFilteredSessions = useMemo(() => {
     return [...sessions]
       .filter(item => {
-        if (item.status === '삭제') return false; // 삭제 상태 숨김
+        if (item.status === '삭제') return false;
         const query = searchQuery.toLowerCase();
         const nicknameMatch = item.visitor_nickname?.toLowerCase().includes(query) || false;
         const contentMatch = item.last_content?.toLowerCase().includes(query) || false;
@@ -313,204 +313,206 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
 
   return (
     <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-white dark:bg-[#202124] overflow-hidden min-w-0 min-h-0">
-      
-      {/* 왼쪽: 세션 리스트 (모바일에서는 선택된 세션이 없을 때만 표시) */}
-      <div className={`w-full md:w-[320px] lg:w-[360px] shrink-0 min-h-0 flex flex-col border-r border-gray-200 dark:border-zinc-800 ${selectedId ? 'hidden md:flex' : 'flex'}`}>
+      {/* 왼쪽: 세션 리스트 */}
+      <div className={`w-full md:w-[320px] lg:w-[360px] shrink-0 min-h-0 flex flex-col border-r border-gray-200/80 dark:border-zinc-800 ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <AdminHeaderBar 
-          title="채팅 목록" 
-          rightContent={<span className="text-xs text-gray-500 font-medium bg-gray-200/50 dark:bg-zinc-800 px-2 py-1 rounded-full">{sortedAndFilteredSessions.length}건</span>} 
+          title="실시간 상담 채팅" 
+          rightContent={<span className="text-[11px] text-[var(--google-blue)] dark:text-[#8ab4f8] font-bold bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800">{sortedAndFilteredSessions.length}건</span>} 
         />
-        <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/50 dark:bg-zinc-950/50">
-              {isLoading ? (
-                <div className="p-8 text-center text-sm text-gray-500 font-medium">로딩 중...</div>
-              ) : sortedAndFilteredSessions.length === 0 ? (
-                <div className="p-8 text-center text-sm text-gray-500 font-medium">조건에 맞는 채팅이 없습니다.</div>
-              ) : (
-                <div className="divide-y divide-gray-100 dark:divide-zinc-800">
-                  {sortedAndFilteredSessions.map(sess => {
-                    const status = sess.status || '대기';
-                    return (
-                      <div
-                        key={sess.id}
-                        onClick={() => handleSelectSession(sess.id)}
-                        className={`w-full text-left p-4 cursor-pointer transition-all duration-200 group ${selectedId === sess.id ? 'bg-blue-50/50 dark:bg-blue-900/20' : 'hover:bg-white dark:hover:bg-zinc-900 bg-white dark:bg-zinc-900/50'}`}
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="flex items-center gap-2 overflow-hidden w-full">
-                            <AdminStatusSelect
-                              status={status}
-                              onStatusChange={(val) => updateStatus(sess.id, val)}
-                              onDelete={() => deleteSession(sess.id)}
-                              className="text-xs px-2 py-0.5 rounded"
-                            />
-                            <span className="font-bold text-[15px] text-gray-900 dark:text-gray-100 truncate flex-1">
-                              {sess.visitor_nickname || '익명 방문자'}
-                            </span>
-                            <span className="text-[11px] text-gray-400 shrink-0 font-mono font-medium group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
-                              {new Date(sess.last_message_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center gap-3">
-                          <p className={`text-sm truncate flex-1 ${sess.unread_count > 0 && selectedId !== sess.id ? 'font-bold text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 font-medium'}`}>
-                            {sess.last_content}
-                          </p>
-                          {sess.unread_count > 0 && selectedId !== sess.id && (
-                            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 shadow-sm shadow-red-500/20">
-                              {sess.unread_count}
-                            </span>
-                          )}
-                        </div>
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/40 dark:bg-zinc-950/40">
+          {isLoading ? (
+            <div className="p-8 text-center text-xs text-gray-400">채팅 목록 로딩 중...</div>
+          ) : sortedAndFilteredSessions.length === 0 ? (
+            <div className="p-8 text-center text-xs text-gray-400">조건에 맞는 채팅이 없습니다.</div>
+          ) : (
+            <div className="divide-y divide-gray-100 dark:divide-zinc-800/60">
+              {sortedAndFilteredSessions.map(sess => {
+                const status = sess.status || '대기';
+                const isSelected = selectedId === sess.id;
+                return (
+                  <div
+                    key={sess.id}
+                    onClick={() => handleSelectSession(sess.id)}
+                    className={`w-full text-left p-3 cursor-pointer transition-all duration-200 border-l-[3px] ${
+                      isSelected 
+                        ? 'bg-blue-50/80 dark:bg-blue-950/40 border-[var(--google-blue)] shadow-sm' 
+                        : 'border-transparent hover:border-blue-300 hover:bg-white dark:hover:bg-zinc-900/80 bg-white dark:bg-[#202124]'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-1.5">
+                      <div className="flex items-center gap-1.5 overflow-hidden w-full">
+                        <AdminStatusSelect
+                          status={status}
+                          onStatusChange={(val) => updateStatus(sess.id, val)}
+                          onDelete={() => deleteSession(sess.id)}
+                          className="!text-[11px] !px-2 !py-0.2"
+                        />
+                        <span className="font-extrabold text-xs text-gray-900 dark:text-gray-100 truncate flex-1">
+                          {sess.visitor_nickname || '익명 방문자'}
+                        </span>
+                        <span className="text-[10px] text-gray-400 shrink-0 font-mono font-medium">
+                          {new Date(sess.last_message_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* 오른쪽: 채팅 화면 (모바일에서는 선택된 세션이 있을 때만 표시) */}
-          <div className={`flex-1 min-w-0 min-h-0 h-full flex flex-col relative bg-[#f8f9fa] dark:bg-zinc-950/80 ${!selectedId ? 'hidden md:flex' : 'flex'} overflow-hidden`}>
-            {selectedId && selectedSession ? (
-              <>
-                {/* 채팅 헤더 */}
-                <AdminHeaderBar 
-                  title={
-                    <div className="flex items-center gap-2 min-w-0 overflow-hidden">
-                      <button 
-                        onClick={() => setSelectedId(null)}
-                        className="md:hidden p-1.5 -ml-1.5 mr-1 text-gray-500 hover:bg-gray-200 dark:hover:bg-zinc-800 rounded-lg transition-colors shrink-0"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                      </button>
-                      <div className="flex items-center gap-2 min-w-0 truncate">
-                        <span className="truncate font-bold">{selectedSession.visitor_nickname || '익명 방문자'}</span>
-                        <span className="text-[10px] text-gray-400 font-mono font-medium hidden sm:inline-block shrink-0">ID: {selectedId.split('-')[0]}</span>
-                      </div>
-                      {selectedSession.status === '대기' && <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-sm bg-red-100 text-red-600 shrink-0">대기중</span>}
                     </div>
-                  }
-                  rightContent={
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        onClick={() => {
-                          const title = `[채팅상담] ${selectedSession.visitor_nickname || '익명 고객'}`;
-                          const recentMsgs = messages.slice(-3).map(m => `[${m.sender === 'visitor' ? '고객' : '관리자'}] ${m.content}`).join('\n');
-                          const contentText = `고객 닉네임: ${selectedSession.visitor_nickname || '익명'}\n세션ID: ${selectedId}\n최근 대화내역:\n${recentMsgs}`;
-                          const payload = {
-                            title,
-                            text: contentText,
-                            sourceApp: 'chat',
-                            sourceId: selectedId
-                          };
-                          sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
-                          window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
-                        }}
-                        className="flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-                        title="캘린더 일정으로 등록"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        <span>일정 등록</span>
-                      </button>
-                      <PremiumBadge color={selectedSession.status === '상담' ? 'blue' : selectedSession.status === '완료' ? 'green' : 'gray'} className="px-2 py-0.5 text-[10px]">
-                        {selectedSession.status || '대기'}
-                      </PremiumBadge>
-                    </div>
-                  }
-                />
-                
-                {/* 메시지 영역 */}
-                <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 md:p-6 space-y-4 bg-[#f8f9fa] dark:bg-zinc-950/80 custom-scrollbar">
-                  {messages.map((msg, index) => {
-                    const isAdmin = msg.sender === 'admin';
-                    const showAvatar = index === 0 || messages[index - 1].sender !== msg.sender;
-                    
-                    return (
-                      <div key={msg.id} className={`w-full flex items-end gap-2.5 ${isAdmin ? 'flex-row-reverse' : 'flex-row'}`}>
-                        {/* 아바타 (방문자일 경우만) */}
-                        {!isAdmin && (
-                          <div className={`w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0 ${!showAvatar && 'opacity-0'}`}>
-                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">V</span>
-                          </div>
-                        )}
-                        
-                        <div className={`max-w-[85%] md:max-w-[75%] min-w-0 flex flex-col ${isAdmin ? 'items-end ml-auto' : 'items-start mr-auto'}`}>
-                          {showAvatar && !isAdmin && (
-                            <span className="text-xs text-gray-500 mb-1 ml-1">{selectedSession.visitor_nickname || '방문자'}</span>
-                          )}
-                          
-                          <div className={`rounded-2xl px-4 py-3 shadow-sm max-w-full ${
-                            isAdmin 
-                              ? 'bg-blue-600 text-white rounded-br-sm shadow-blue-600/20' 
-                              : 'bg-white dark:bg-zinc-800 text-gray-800 dark:text-gray-100 rounded-bl-sm border border-gray-100 dark:border-zinc-700/50'
-                          }`}>
-                            <p className="text-[15px] whitespace-pre-wrap break-words [overflow-wrap:anywhere] leading-relaxed">{msg.content}</p>
-                          </div>
-                          <span className={`text-[11px] text-gray-400 mt-1.5 mx-1 font-mono font-medium ${isAdmin ? 'text-right' : 'text-left'}`}>
-                            {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* 입력창 */}
-                <div className="p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 w-full min-w-0">
-                  <div className="flex gap-3 relative w-full min-w-0">
-                    <textarea
-                      value={replyText}
-                      onChange={e => setReplyText(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSend();
-                        }
-                      }}
-                      placeholder="메시지를 입력하세요 (Shift+Enter로 줄바꿈)"
-                      className="w-full min-w-0 resize-none bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl p-3.5 pr-14 text-[15px] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-600/50 transition-all custom-scrollbar"
-                      rows={2}
-                    />
-                    
-                    {/* 매크로 UI */}
-                    <div className="absolute left-3 -top-10 flex gap-2 overflow-x-auto max-w-[calc(100%-20px)] custom-scrollbar pb-1">
-                      {MACRO_PHRASES.map((phrase, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setReplyText(prev => prev + (prev ? '\n' : '') + phrase)}
-                          className="shrink-0 px-2.5 py-1 text-[11px] font-medium bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-zinc-700 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800 transition-colors shadow-sm"
-                        >
-                          매크로 {idx + 1}
-                        </button>
-                      ))}
-                    </div>
-
-                    <button
-                      onClick={handleSend}
-                      disabled={!replyText.trim() || isSending}
-                      className="absolute right-3 bottom-3 p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 dark:disabled:bg-zinc-800 text-white disabled:text-gray-400 rounded-lg transition-all shadow-sm disabled:shadow-none flex items-center justify-center"
-                      title="전송"
-                    >
-                      {isSending ? (
-                        <svg className="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                      ) : (
-                        <svg className="w-5 h-5 translate-x-px -translate-y-px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                    <div className="flex justify-between items-center gap-2">
+                      <p className={`text-xs truncate flex-1 ${sess.unread_count > 0 && selectedId !== sess.id ? 'font-extrabold text-gray-900 dark:text-white' : 'text-gray-500 dark:text-zinc-400'}`}>
+                        {sess.last_content}
+                      </p>
+                      {sess.unread_count > 0 && selectedId !== sess.id && (
+                        <span className="bg-red-500 text-white text-[10px] font-extrabold px-1.5 py-0.2 rounded-none shrink-0 shadow-sm">
+                          {sess.unread_count}
+                        </span>
                       )}
-                    </button>
+                    </div>
                   </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* 오른쪽: 채팅 화면 */}
+      <div className={`flex-1 min-w-0 min-h-0 h-full flex flex-col relative bg-gray-50/50 dark:bg-zinc-950/80 ${!selectedId ? 'hidden md:flex' : 'flex'} overflow-hidden`}>
+        {selectedId && selectedSession ? (
+          <>
+            {/* 채팅 헤더 */}
+            <AdminHeaderBar 
+              title={
+                <div className="flex items-center gap-2 min-w-0 overflow-hidden">
+                  <button 
+                    onClick={() => setSelectedId(null)}
+                    className="md:hidden p-1 -ml-1 mr-1 text-gray-500 hover:bg-gray-200 dark:hover:bg-zinc-800 rounded-none transition-colors shrink-0"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+                  <div className="flex items-center gap-2 min-w-0 truncate">
+                    <span className="truncate font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">{selectedSession.visitor_nickname || '익명 방문자'}</span>
+                    <span className="text-[10px] text-gray-400 font-mono hidden sm:inline-block shrink-0">ID: {selectedId.split('-')[0]}</span>
+                  </div>
+                  {selectedSession.status === '대기' && <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-none bg-red-100 text-red-600 border border-red-200 shrink-0">대기중</span>}
                 </div>
-              </>
-            ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-[#f8f9fa] dark:bg-zinc-950/80">
-                <div className="w-20 h-20 rounded-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 shadow-sm flex items-center justify-center mb-6">
-                  <svg className="w-8 h-8 text-blue-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
+              }
+              rightContent={
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => {
+                      const title = `[채팅상담] ${selectedSession.visitor_nickname || '익명 고객'}`;
+                      const recentMsgs = messages.slice(-3).map(m => `[${m.sender === 'visitor' ? '고객' : '관리자'}] ${m.content}`).join('\n');
+                      const contentText = `고객 닉네임: ${selectedSession.visitor_nickname || '익명'}\n세션ID: ${selectedId}\n최근 대화내역:\n${recentMsgs}`;
+                      const payload = {
+                        title,
+                        text: contentText,
+                        sourceApp: 'chat',
+                        sourceId: selectedId
+                      };
+                      sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
+                      window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
+                    }}
+                    className="flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-none border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-colors shadow-sm"
+                    title="캘린더 일정으로 등록"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <span>일정 등록</span>
+                  </button>
+                  <PremiumBadge color={selectedSession.status === '상담' ? 'blue' : selectedSession.status === '완료' ? 'green' : 'gray'} className="!px-2 !py-0.5 !text-[10px] rounded-none">
+                    {selectedSession.status || '대기'}
+                  </PremiumBadge>
                 </div>
-                <p className="font-medium text-gray-500">좌측 목록에서 채팅 세션을 선택해주세요.</p>
+              }
+            />
+            
+            {/* 메시지 영역 */}
+            <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3 sm:p-4 space-y-3 bg-gray-50/60 dark:bg-zinc-950/80 custom-scrollbar">
+              {messages.map((msg, index) => {
+                const isAdmin = msg.sender === 'admin';
+                const showAvatar = index === 0 || messages[index - 1].sender !== msg.sender;
+                
+                return (
+                  <div key={msg.id} className={`w-full flex items-end gap-2 ${isAdmin ? 'flex-row-reverse' : 'flex-row'}`}>
+                    {/* 아바타 (방문자일 경우만) */}
+                    {!isAdmin && (
+                      <div className={`w-7 h-7 rounded-none bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-800 ${!showAvatar && 'opacity-0'}`}>
+                        <span className="text-[10px] font-extrabold text-blue-600 dark:text-blue-400">V</span>
+                      </div>
+                    )}
+                    
+                    <div className={`max-w-[85%] md:max-w-[75%] min-w-0 flex flex-col ${isAdmin ? 'items-end ml-auto' : 'items-start mr-auto'}`}>
+                      {showAvatar && !isAdmin && (
+                        <span className="text-[10px] text-gray-500 mb-0.5 ml-0.5 font-bold">{selectedSession.visitor_nickname || '방문자'}</span>
+                      )}
+                      
+                      <div className={`rounded-none px-3.5 py-2.5 shadow-sm max-w-full border ${
+                        isAdmin 
+                          ? 'bg-[var(--google-blue)] text-white border-blue-600 shadow-blue-500/10' 
+                          : 'bg-white dark:bg-[#202124] text-gray-800 dark:text-gray-100 border-gray-200/80 dark:border-zinc-700/80'
+                      }`}>
+                        <p className="text-xs sm:text-sm whitespace-pre-wrap break-words [overflow-wrap:anywhere] leading-relaxed">{msg.content}</p>
+                      </div>
+                      <span className={`text-[10px] text-gray-400 mt-1 mx-0.5 font-mono font-medium ${isAdmin ? 'text-right' : 'text-left'}`}>
+                        {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 입력창 (직각 3D 시스템) */}
+            <div className="p-3 border-t border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-[#202124] shrink-0 w-full min-w-0">
+              <div className="flex flex-col gap-2 relative w-full min-w-0">
+                {/* 매크로 UI */}
+                <div className="flex gap-1.5 overflow-x-auto custom-scrollbar pb-0.5">
+                  {MACRO_PHRASES.map((phrase, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setReplyText(prev => prev + (prev ? '\n' : '') + phrase)}
+                      className="shrink-0 px-2 py-0.5 text-[10.5px] font-bold bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 rounded-none hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 transition-colors shadow-sm"
+                    >
+                      매크로 {idx + 1}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 items-end">
+                  <textarea
+                    value={replyText}
+                    onChange={e => setReplyText(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                      }
+                    }}
+                    placeholder="메시지 입력 (Shift+Enter 줄바꿈)..."
+                    className="flex-1 min-w-0 resize-none bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none p-2.5 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all custom-scrollbar"
+                    rows={2}
+                  />
+
+                  <button
+                    onClick={handleSend}
+                    disabled={!replyText.trim() || isSending}
+                    className="h-[58px] px-4 bg-[var(--google-blue)] hover:bg-[#1557b0] disabled:bg-gray-200 dark:disabled:bg-zinc-800 text-white disabled:text-gray-400 rounded-none transition-all shadow-sm font-bold text-xs flex items-center justify-center shrink-0"
+                    title="전송"
+                  >
+                    {isSending ? '전송중' : '전송'}
+                  </button>
+                </div>
               </div>
-            )}
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-gray-50/50 dark:bg-zinc-950/80">
+            <div className="p-4 bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-zinc-800 rounded-none shadow-sm flex items-center justify-center mb-3">
+              <svg className="w-8 h-8 text-blue-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+            <p className="font-bold text-xs text-gray-500">좌측 목록에서 상담 채팅 세션을 선택해주세요.</p>
           </div>
+        )}
+      </div>
     </AdminPanelLayout>
   );
 }

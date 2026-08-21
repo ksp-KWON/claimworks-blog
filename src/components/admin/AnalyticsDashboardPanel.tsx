@@ -65,76 +65,76 @@ export default function AnalyticsDashboardPanel() {
   const topPages = data?.topPages || [];
 
   return (
-    <div className="h-full flex-1 flex flex-col min-h-0 space-y-3.5 max-w-7xl mx-auto w-full overflow-hidden">
+    <div className="h-full flex-1 flex flex-col min-h-0 space-y-2.5 max-w-7xl mx-auto w-full overflow-hidden">
       {/* 👑 1열(1 Row) 3D 입체 직사각형 상단 컨트롤 바 (프론트엔드 일치) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 shrink-0">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 shrink-0">
         {/* 1. 고유 방문자 */}
-        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-3 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden group">
-          <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[64px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
+        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-2.5 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_8px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_25px_rgba(0,0,0,0.6)] relative overflow-hidden group">
+          <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[58px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
             👥
           </div>
           <div className="relative z-10 flex flex-col justify-between h-full">
             <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">고유 방문자 (UV)</span>
-            <span className="text-lg sm:text-xl font-extrabold text-blue-600 dark:text-blue-400 mt-1 tracking-tight font-mono">
+            <span className="text-base sm:text-lg font-extrabold text-blue-600 dark:text-blue-400 mt-0.5 tracking-tight font-mono">
               {(summary.uniqueVisitors || 0).toLocaleString()}
             </span>
           </div>
         </PremiumCard>
 
         {/* 2. 총 페이지뷰 */}
-        <PremiumCard borderColor="green" hoverEffect={true} className="!p-3 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden group">
-          <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[64px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
+        <PremiumCard borderColor="green" hoverEffect={true} className="!p-2.5 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_8px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_25px_rgba(0,0,0,0.6)] relative overflow-hidden group">
+          <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[58px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
             📊
           </div>
           <div className="relative z-10 flex flex-col justify-between h-full">
             <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">총 페이지뷰 (PV)</span>
-            <span className="text-lg sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 tracking-tight font-mono">
+            <span className="text-base sm:text-lg font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5 tracking-tight font-mono">
               {(summary.pageviews || 0).toLocaleString()}
             </span>
           </div>
         </PremiumCard>
 
         {/* 3. 상담 유입 */}
-        <PremiumCard borderColor="purple" hoverEffect={true} className="!p-3 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden group">
-          <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[64px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
+        <PremiumCard borderColor="purple" hoverEffect={true} className="!p-2.5 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_8px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_25px_rgba(0,0,0,0.6)] relative overflow-hidden group">
+          <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[58px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
             📞
           </div>
           <div className="relative z-10 flex flex-col justify-between h-full">
             <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">상담 유입 건수</span>
-            <span className="text-lg sm:text-xl font-extrabold text-purple-600 dark:text-purple-400 mt-1 tracking-tight font-mono">
+            <span className="text-base sm:text-lg font-extrabold text-purple-600 dark:text-purple-400 mt-0.5 tracking-tight font-mono">
               {summary.consultationViews || 0}<span className="text-xs font-bold text-gray-400 ml-0.5">건</span>
             </span>
           </div>
         </PremiumCard>
 
         {/* 4. 응답 속도 */}
-        <PremiumCard borderColor="yellow" hoverEffect={true} className="!p-3 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden group">
-          <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[64px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
+        <PremiumCard borderColor="yellow" hoverEffect={true} className="!p-2.5 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_8px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_25px_rgba(0,0,0,0.6)] relative overflow-hidden group">
+          <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[58px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
             ⚡
           </div>
           <div className="relative z-10 flex flex-col justify-between h-full">
             <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">평균 응답 속도</span>
-            <span className="text-lg sm:text-xl font-extrabold text-amber-600 dark:text-amber-400 mt-1 tracking-tight font-mono">
+            <span className="text-base sm:text-lg font-extrabold text-amber-600 dark:text-amber-400 mt-0.5 tracking-tight font-mono">
               {summary.avgLoadTimeMs || 0}<span className="text-xs font-bold text-gray-400 ml-0.5">ms</span>
             </span>
           </div>
         </PremiumCard>
 
         {/* 5. 기간 선택 컨트롤 (24h / 7일 / 30일) */}
-        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-2.5 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden group">
+        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-2 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_8px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_25px_rgba(0,0,0,0.6)] relative overflow-hidden group">
           <div className="flex items-center justify-between relative z-10">
             <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">조회 기간</span>
-            <span className="text-[10px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded-none border border-blue-200 dark:border-blue-800">
+            <span className="text-[10px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.2 rounded-none border border-blue-200 dark:border-blue-800">
               {period === '24h' ? '24시간' : period === '7d' ? '7일간' : '30일간'}
             </span>
           </div>
-          <div className="grid grid-cols-3 gap-1 bg-gray-100 dark:bg-zinc-800 p-0.5 rounded-none border border-gray-200/80 dark:border-zinc-700 w-full mt-1 relative z-10">
+          <div className="grid grid-cols-3 gap-1 bg-gray-100 dark:bg-zinc-800 p-0.5 rounded-none border border-gray-200/80 dark:border-zinc-700 w-full mt-0.5 relative z-10">
             {(['24h', '7d', '30d'] as const).map((p) => (
               <button
                 key={p}
                 type="button"
                 onClick={() => setPeriod(p)}
-                className={`py-1 text-xs font-bold transition-all text-center flex items-center justify-center rounded-none ${
+                className={`py-0.5 text-xs font-bold transition-all text-center flex items-center justify-center rounded-none ${
                   period === p
                     ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] shadow-sm font-extrabold ring-1 ring-blue-400/30'
                     : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-200 hover:bg-white/50 dark:hover:bg-zinc-700/50'
@@ -147,12 +147,12 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 6. 시스템 API 설정 토글 */}
-        <PremiumCard borderColor="teal" hoverEffect={true} className="!p-2.5 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden group">
+        <PremiumCard borderColor="teal" hoverEffect={true} className="!p-2 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_8px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_25px_rgba(0,0,0,0.6)] relative overflow-hidden group">
           <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 relative z-10">시스템 연동</span>
           <button
             type="button"
             onClick={() => setShowSettings(!showSettings)}
-            className={`w-full py-1.5 px-2 text-xs font-bold transition-all flex items-center justify-center gap-1.5 mt-1 border rounded-none relative z-10 ${
+            className={`w-full py-1 px-2 text-xs font-bold transition-all flex items-center justify-center gap-1 mt-0.5 border rounded-none relative z-10 ${
               showSettings
                 ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border-teal-300 dark:border-teal-800 shadow-sm'
                 : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200/80 dark:border-zinc-700 hover:bg-teal-50 hover:text-teal-700 dark:hover:bg-teal-950/30'

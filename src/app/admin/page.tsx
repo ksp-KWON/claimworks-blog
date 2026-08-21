@@ -328,9 +328,9 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-zinc-950 font-sans">
+    <div className="h-screen overflow-hidden flex flex-col bg-white dark:bg-zinc-950 font-sans">
       {/* Universal Top Header Bar */}
-      <div className="h-[64px] bg-[#f8f9fa] dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 md:px-6 flex items-center justify-between z-20 shrink-0 shadow-sm">
+      <div className="h-[60px] bg-[#f8f9fa] dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 md:px-6 flex items-center justify-between z-20 shrink-0 shadow-sm">
         <div className="flex items-center gap-3">
           <Image src="/logo.png" alt="보상스쿨" width={120} height={30} className="h-6 w-auto dark:brightness-110" priority />
           <span className="hidden sm:inline-block text-xs font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/20 px-2.5 py-0.5 rounded-none border border-blue-200 dark:border-blue-800 shadow-sm">
@@ -438,7 +438,7 @@ export default function AdminPage() {
       </div>
 
       {/* Main Workspace */}
-      <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-zinc-950 p-3 md:p-5 overflow-hidden pb-[74px] md:pb-5">
+      <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-zinc-950 p-2.5 sm:p-3.5 overflow-hidden pb-[74px] md:pb-3.5">
         {/* 실시간 통계 & 시스템 설정 통합 대시보드 */}
         {(activeApp === 'analytics' || activeApp === 'post-settings') && (
           <AnalyticsDashboardPanel />

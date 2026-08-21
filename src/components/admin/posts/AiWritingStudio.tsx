@@ -280,17 +280,17 @@ export default function AiWritingStudio({
         )}
       </div>
 
-      {/* ── 3. 하단 공통 액션 영역 (콤팩트 직각 3D 액션 바) ── */}
-      <div className="shrink-0 p-3 border-t border-gray-200/80 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 space-y-2 shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
+      {/* ── 3. 하단 공통 액션 영역 (하단 여백 없이 시원하고 꽉 찬 3D 액션 바) ── */}
+      <div className="shrink-0 p-3.5 border-t border-gray-200/80 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-900/70 space-y-2.5 shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
         {activePanelTab === 'manual' ? (
           <PremiumButton 
             onClick={handleRunAi} 
             disabled={isLoading || !(postMeta.content || '').trim()} 
             variant="primary" 
-            className={`w-full !py-2.5 rounded-none text-xs font-extrabold border-none shadow-sm ${
+            className={`w-full !py-3 rounded-none text-sm font-extrabold border-none shadow-[0_6px_20px_rgba(0,0,0,0.1)] active:scale-[0.99] ${
               platform === 'naver'
-                ? '!bg-emerald-600 hover:!bg-emerald-700'
-                : '!bg-blue-600 hover:!bg-blue-700'
+                ? '!bg-emerald-600 hover:!bg-emerald-700 shadow-emerald-500/20'
+                : '!bg-blue-600 hover:!bg-blue-700 shadow-blue-500/20'
             }`}
           >
             {isLoading ? 'AI 각색/창작 진행 중...' : platform === 'naver' ? '네이버 AI 각색 시작' : '구글 E-E-A-T 창작 시작'}
@@ -300,36 +300,36 @@ export default function AiWritingStudio({
             onClick={handleRunSingleCategory} 
             disabled={isLoading || isBatchRunning} 
             variant="primary" 
-            className="w-full !py-2.5 rounded-none text-xs font-extrabold !bg-blue-600 hover:!bg-blue-700 border-none shadow-sm"
+            className="w-full !py-3 rounded-none text-sm font-extrabold !bg-blue-600 hover:!bg-blue-700 border-none shadow-[0_6px_20px_rgba(37,99,235,0.25)] active:scale-[0.99]"
           >
             카테고리 자동 발행 ({selectedCategory})
           </PremiumButton>
         )}
 
-        {/* 네이버 블로그 스마트에디터 복사 버튼 (직각 엣지) */}
+        {/* 네이버 블로그 스마트에디터 복사 버튼 (시원한 직각 엣지) */}
         <button
           onClick={handleCopyNaver}
           disabled={!postMeta.content || !(postMeta.content || '').trim()}
-          className={`w-full py-2 px-3 rounded-none flex items-center justify-center gap-1.5 text-xs font-extrabold transition-all border ${
+          className={`w-full py-2.5 px-3 rounded-none flex items-center justify-center gap-1.5 text-xs font-extrabold transition-all border shadow-sm ${
             isCopiedNaver 
-              ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' 
-              : 'bg-[#03c75a] hover:bg-[#02b351] text-white border-[#02b351] shadow-sm'
+              ? 'bg-emerald-600 text-white border-emerald-600 ring-2 ring-emerald-300' 
+              : 'bg-[#03c75a] hover:bg-[#02b351] text-white border-[#02b351] shadow-green-500/20'
           } disabled:opacity-40 disabled:cursor-not-allowed`}
         >
           <span>{isCopiedNaver ? '네이버 서식 복사 완료 (Ctrl+V)' : '네이버 스마트에디터 서식 복사'}</span>
         </button>
 
         {/* 문서 관리 액션 (새문서, 임시저장, 공식발행) */}
-        <div className="pt-1.5 border-t border-gray-200/80 dark:border-zinc-800 space-y-1.5">
-          <div className="grid grid-cols-2 gap-1.5">
-            <PremiumButton onClick={onCreateBlank} variant="secondary" className="!py-1.5 !text-xs rounded-none border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 font-bold">
+        <div className="pt-2 border-t border-gray-200/80 dark:border-zinc-800 space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            <PremiumButton onClick={onCreateBlank} variant="secondary" className="!py-2.5 !text-xs rounded-none border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 font-bold hover:bg-gray-50 shadow-sm">
               새 문서
             </PremiumButton>
-            <PremiumButton onClick={() => onSavePost(true)} disabled={isLoading} variant="secondary" className="!py-1.5 !text-xs rounded-none border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 font-bold text-gray-700 dark:text-zinc-300">
+            <PremiumButton onClick={() => onSavePost(true)} disabled={isLoading} variant="secondary" className="!py-2.5 !text-xs rounded-none border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 font-bold text-gray-700 dark:text-zinc-300 hover:bg-gray-50 shadow-sm">
               임시 저장
             </PremiumButton>
           </div>
-          <PremiumButton onClick={() => onSavePost(false)} disabled={isLoading} variant="primary" className="w-full !py-2 rounded-none text-xs font-extrabold !bg-gray-900 hover:!bg-black dark:!bg-white dark:!text-gray-900 border-none shadow-sm">
+          <PremiumButton onClick={() => onSavePost(false)} disabled={isLoading} variant="primary" className="w-full !py-2.5 rounded-none text-xs font-extrabold !bg-gray-900 hover:!bg-black dark:!bg-white dark:!text-gray-900 border-none shadow-md">
             {isLoading ? '발행 처리 중...' : '웹사이트 공식 발행하기'}
           </PremiumButton>
         </div>
@@ -338,9 +338,9 @@ export default function AiWritingStudio({
   );
 
   return (
-    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-[#f8f9fa] dark:bg-zinc-950 relative w-full min-h-0">
+    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-[#f8f9fa] dark:bg-zinc-950 relative w-full min-h-0 overflow-hidden">
       {/* ── 좌측/중앙 메인 에디터 영역 (직각 3D 레이아웃) ── */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-zinc-950 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-zinc-950 overflow-y-auto custom-scrollbar">
         <MarkdownEditor
           title={postMeta.title || ''}
           setTitle={(val) => setPostMeta((prev: any) => ({ ...prev, title: val }))}

@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import type { ChatSession, ChatMessage } from '@/lib/supabase';
 import AdminPanelLayout from './AdminPanelLayout';
 import { AdminHeaderBar } from './AdminHeader';
+import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import { AdminStatusSelect } from './AdminStatusSelect';
 
@@ -312,9 +313,13 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
   const selectedSession = sessions.find(s => s.id === selectedId);
 
   return (
-    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-white dark:bg-[#202124] overflow-hidden min-w-0 min-h-0">
-      {/* 왼쪽: 세션 리스트 */}
-      <div className={`w-full md:w-[320px] lg:w-[360px] shrink-0 min-h-0 flex flex-col border-r border-gray-200/80 dark:border-zinc-800 ${selectedId ? 'hidden md:flex' : 'flex'}`}>
+    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full gap-2.5 overflow-hidden min-w-0 min-h-0">
+      {/* 🏝️ 1. 좌측 세션 리스트 카드 아일랜드 */}
+      <PremiumCard 
+        borderColor="blue" 
+        hoverEffect={true} 
+        className={`w-full md:w-[320px] lg:w-[360px] shrink-0 min-h-0 h-full !p-0 flex flex-col overflow-hidden ${selectedId ? 'hidden md:flex' : 'flex'}`}
+      >
         <AdminHeaderBar 
           title="실시간 상담 채팅" 
           rightContent={<span className="text-[11px] text-[var(--google-blue)] dark:text-[#8ab4f8] font-bold bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800">{sortedAndFilteredSessions.length}건</span>} 
@@ -371,10 +376,14 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
             </div>
           )}
         </div>
-      </div>
+      </PremiumCard>
       
-      {/* 오른쪽: 채팅 화면 */}
-      <div className={`flex-1 min-w-0 min-h-0 h-full flex flex-col relative bg-gray-50/50 dark:bg-zinc-950/80 ${!selectedId ? 'hidden md:flex' : 'flex'} overflow-hidden`}>
+      {/* 🏝️ 2. 오른쪽: 실시간 채팅 워크스페이스 카드 아일랜드 */}
+      <PremiumCard 
+        borderColor="blue" 
+        hoverEffect={true} 
+        className={`flex-1 min-w-0 min-h-0 h-full !p-0 flex flex-col relative bg-gray-50/50 dark:bg-zinc-950/80 ${!selectedId ? 'hidden md:flex' : 'flex'} overflow-hidden`}
+      >
         {selectedId && selectedSession ? (
           <>
             {/* 채팅 헤더 */}
@@ -512,7 +521,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
             <p className="font-bold text-xs text-gray-500">좌측 목록에서 상담 채팅 세션을 선택해주세요.</p>
           </div>
         )}
-      </div>
+      </PremiumCard>
     </AdminPanelLayout>
   );
 }

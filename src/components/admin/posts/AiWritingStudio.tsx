@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PremiumButton from '@/components/ui/PremiumButton';
+import PremiumCard from '@/components/ui/PremiumCard';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import BottomSheet from '@/components/ui/BottomSheet';
 import AdminPanelLayout from '../AdminPanelLayout';
@@ -346,27 +347,29 @@ export default function AiWritingStudio({
   );
 
   return (
-    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-[#f8f9fa] dark:bg-zinc-950 relative w-full min-h-0 overflow-hidden">
-      {/* ── 좌측/중앙 메인 에디터 영역 (직각 3D 레이아웃) ── */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-zinc-950 overflow-y-auto custom-scrollbar">
-        <MarkdownEditor
-          title={postMeta.title || ''}
-          setTitle={(val) => setPostMeta((prev: any) => ({ ...prev, title: val }))}
-          content={postMeta.content || ''}
-          setContent={(val) => setPostMeta((prev: any) => ({ ...prev, content: typeof val === 'function' ? val(prev.content) : val }))}
-        />
-      </div>
+    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full gap-2.5 relative w-full min-h-0 overflow-hidden">
+      {/* ── 🏝️ 1. 좌측/중앙 메인 에디터 카드 아일랜드 (3D 직각 레이아웃) ── */}
+      <PremiumCard borderColor="blue" hoverEffect={true} className="flex-1 flex flex-col min-w-0 !p-0 h-full overflow-hidden bg-white dark:bg-[#202124]">
+        <div className="flex-1 min-h-0 flex flex-col overflow-y-auto custom-scrollbar">
+          <MarkdownEditor
+            title={postMeta.title || ''}
+            setTitle={(val) => setPostMeta((prev: any) => ({ ...prev, title: val }))}
+            content={postMeta.content || ''}
+            setContent={(val) => setPostMeta((prev: any) => ({ ...prev, content: typeof val === 'function' ? val(prev.content) : val }))}
+          />
+        </div>
+      </PremiumCard>
 
-      {/* ── 우측 AI 어시스턴트 사이드바 (데스크톱, 콤팩트 직각 3D) ── */}
-      <div className="hidden md:block w-80 shrink-0 bg-white dark:bg-[#202124] border-l border-gray-200/80 dark:border-zinc-800 flex flex-col h-full overflow-hidden shadow-sm">
+      {/* ── 🏝️ 2. 우측 AI 어시스턴트 사이드바 카드 아일랜드 (데스크톱, 콤팩트 직각 3D) ── */}
+      <PremiumCard borderColor="blue" hoverEffect={true} className="hidden md:flex w-80 lg:w-[340px] shrink-0 h-full !p-0 flex-col overflow-hidden bg-white dark:bg-[#202124]">
         {renderAiControls()}
-      </div>
+      </PremiumCard>
 
       {/* ── 모바일 하단 플로팅 버튼 및 바텀시트 ── */}
       <div className="md:hidden fixed bottom-6 right-4 z-40">
         <button
           onClick={() => setIsMobileAiOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-none p-3.5 shadow-xl flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider"
+          className="bg-[var(--google-blue)] hover:bg-blue-700 text-white rounded-none p-3.5 shadow-xl flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider"
         >
           <span>AI 어시스턴트</span>
         </button>

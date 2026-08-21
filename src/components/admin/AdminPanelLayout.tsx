@@ -11,16 +11,14 @@ interface AdminPanelLayoutProps {
 
 export default function AdminPanelLayout({
   children,
-  innerClassName = "flex flex-col w-full h-full bg-white dark:bg-[#202124]",
+  innerClassName = "flex-1 min-h-0 flex flex-col w-full overflow-hidden",
   className = ""
 }: AdminPanelLayoutProps) {
   return (
-    <div className={`flex-1 min-h-0 flex flex-col max-w-7xl mx-auto w-full ${className}`}>
-      <PremiumCard hoverEffect={false} className="flex-1 min-h-0 !p-0">
-        <div className={`w-full h-full flex flex-col min-h-0 ${innerClassName}`}>
-          {children}
-        </div>
-      </PremiumCard>
+    <div className={`h-full flex-1 min-h-0 flex flex-col max-w-7xl mx-auto w-full space-y-2.5 overflow-hidden ${className}`}>
+      <div className={`w-full h-full flex flex-col min-h-0 ${innerClassName}`}>
+        {children}
+      </div>
     </div>
   );
 }

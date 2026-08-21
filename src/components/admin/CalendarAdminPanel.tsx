@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import type { AdminCalendarEvent } from '@/lib/supabase';
 import AdminPanelLayout from './AdminPanelLayout';
 import { AdminHeaderBar } from './AdminHeader';
+import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';
 
 export interface ClaimsProgressEntry {
@@ -528,126 +529,124 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
   }, [events, selectedDate, searchQuery]);
 
   return (
-    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full bg-white dark:bg-[#111111] overflow-hidden min-w-0">
-      
-      {/* ── 좌측: 월간 캘린더 그리드 ── */}
-      <div className="flex-1 min-w-0 min-h-0 flex flex-col border-b md:border-b-0 md:border-r border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-y-auto custom-scrollbar">
-        
-        {/* 캘린더 네비게이션 헤더 */}
-        <div className="p-4 md:p-6 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-950 sticky top-0 z-10">
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <span>📅</span>
-              <span>{currentYear}년 {currentMonth + 1}월</span>
-            </h2>
-            <button
-              onClick={handleGoToday}
-              className="px-2.5 py-1 text-xs font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 transition-colors"
-            >
-              오늘
-            </button>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={handlePrevMonth}
-              className="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-              title="이전 달"
-            >
-              ◀
-            </button>
-            <button
-              onClick={handleNextMonth}
-              className="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-              title="다음 달"
-            >
-              ▶
-            </button>
-          </div>
-        </div>
-
-        {/* 요일 헤더 */}
-        <div className="grid grid-cols-7 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 text-center py-2 text-xs font-bold">
-          <span className="text-red-500">일</span>
-          <span className="text-gray-700 dark:text-gray-300">월</span>
-          <span className="text-gray-700 dark:text-gray-300">화</span>
-          <span className="text-gray-700 dark:text-gray-300">수</span>
-          <span className="text-gray-700 dark:text-gray-300">목</span>
-          <span className="text-gray-700 dark:text-gray-300">금</span>
-          <span className="text-blue-500">토</span>
-        </div>
-
-        {/* 날짜 그리드 */}
-        <div className="grid grid-cols-7 flex-1 min-h-[360px] divide-x divide-y divide-gray-100 dark:divide-zinc-800/80 bg-gray-50/30 dark:bg-zinc-950">
-          {calendarDays.map((day, idx) => {
-            const dayEvents = events.filter(e => e.date === day.dateStr);
-            const isSelected = selectedDate === day.dateStr;
-            const isToday = todayStr === day.dateStr;
-            const isSunday = idx % 7 === 0;
-            const isSaturday = idx % 7 === 6;
-
-            return (
-              <div
-                key={day.dateStr}
-                onClick={() => setSelectedDate(day.dateStr)}
-                className={`min-h-[85px] md:min-h-[105px] p-1.5 md:p-2 cursor-pointer transition-all flex flex-col justify-between ${
-                  isSelected 
-                    ? 'bg-blue-50/70 dark:bg-blue-950/40 ring-2 ring-blue-500 ring-inset z-10' 
-                    : 'hover:bg-white dark:hover:bg-zinc-900 bg-white/60 dark:bg-zinc-950/60'
-                } ${!day.isCurrentMonth ? 'opacity-35' : ''}`}
+    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full gap-2.5 overflow-hidden min-w-0">
+      {/* ── 🏝️ 1. 좌측: 월간 캘린더 그리드 카드 아일랜드 ── */}
+      <PremiumCard borderColor="blue" hoverEffect={true} className="flex-1 min-w-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-white dark:bg-zinc-950">
+        <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-y-auto custom-scrollbar">
+          {/* 캘린더 네비게이션 헤더 */}
+          <div className="p-3 md:p-4 border-b border-gray-200/80 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-950 sticky top-0 z-10">
+            <div className="flex items-center gap-2.5">
+              <h2 className="text-sm md:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <span>📅</span>
+                <span>{currentYear}년 {currentMonth + 1}월</span>
+              </h2>
+              <button
+                onClick={handleGoToday}
+                className="px-2 py-0.5 text-[11px] font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-none border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-colors shadow-sm"
               >
-                <div className="flex items-center justify-between">
-                  <span className={`text-xs md:text-sm font-bold w-6 h-6 flex items-center justify-center rounded-full ${
-                    isToday 
-                      ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30' 
-                      : isSunday 
-                        ? 'text-red-500' 
-                        : isSaturday 
-                          ? 'text-blue-500' 
-                          : 'text-gray-800 dark:text-gray-200'
-                  }`}>
-                    {day.dayNum}
-                  </span>
-                  {dayEvents.length > 0 && (
-                    <span className="text-[10px] font-bold text-gray-400 font-mono">
-                      {dayEvents.length}건
+                오늘
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handlePrevMonth}
+                className="w-7 h-7 rounded-none flex items-center justify-center border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors shadow-sm"
+                title="이전 달"
+              >
+                ◀
+              </button>
+              <button
+                onClick={handleNextMonth}
+                className="w-7 h-7 rounded-none flex items-center justify-center border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors shadow-sm"
+                title="다음 달"
+              >
+                ▶
+              </button>
+            </div>
+          </div>
+
+          {/* 요일 헤더 */}
+          <div className="grid grid-cols-7 border-b border-gray-200/80 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-900/50 text-center py-1.5 text-xs font-bold">
+            <span className="text-red-500">일</span>
+            <span className="text-gray-700 dark:text-gray-300">월</span>
+            <span className="text-gray-700 dark:text-gray-300">화</span>
+            <span className="text-gray-700 dark:text-gray-300">수</span>
+            <span className="text-gray-700 dark:text-gray-300">목</span>
+            <span className="text-gray-700 dark:text-gray-300">금</span>
+            <span className="text-blue-500">토</span>
+          </div>
+
+          {/* 날짜 그리드 */}
+          <div className="grid grid-cols-7 flex-1 min-h-[360px] divide-x divide-y divide-gray-100 dark:divide-zinc-800/80 bg-gray-50/30 dark:bg-zinc-950">
+            {calendarDays.map((day, idx) => {
+              const dayEvents = events.filter(e => e.date === day.dateStr);
+              const isSelected = selectedDate === day.dateStr;
+              const isToday = todayStr === day.dateStr;
+              const isSunday = idx % 7 === 0;
+              const isSaturday = idx % 7 === 6;
+
+              return (
+                <div
+                  key={day.dateStr}
+                  onClick={() => setSelectedDate(day.dateStr)}
+                  className={`min-h-[85px] md:min-h-[100px] p-1.5 md:p-2 cursor-pointer transition-all flex flex-col justify-between ${
+                    isSelected 
+                      ? 'bg-blue-50/70 dark:bg-blue-950/40 ring-2 ring-blue-500 ring-inset z-10' 
+                      : 'hover:bg-white dark:hover:bg-zinc-900 bg-white/60 dark:bg-zinc-950/60'
+                  } ${!day.isCurrentMonth ? 'opacity-35' : ''}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={`text-xs md:text-sm font-bold w-5 h-5 flex items-center justify-center rounded-none ${
+                      isToday 
+                        ? 'bg-blue-600 text-white shadow-sm' 
+                        : isSunday 
+                          ? 'text-red-500' 
+                          : isSaturday 
+                            ? 'text-blue-500' 
+                            : 'text-gray-800 dark:text-gray-200'
+                    }`}>
+                      {day.dayNum}
                     </span>
-                  )}
-                </div>
+                    {dayEvents.length > 0 && (
+                      <span className="text-[10px] font-extrabold text-blue-600 dark:text-blue-400 font-mono bg-blue-50 dark:bg-blue-900/30 px-1 rounded-none border border-blue-200 dark:border-blue-800">
+                        {dayEvents.length}건
+                      </span>
+                    )}
+                  </div>
 
-                <div className="space-y-1 mt-1 overflow-hidden">
-                  {dayEvents.slice(0, 2).map(ev => {
-                    const style = CATEGORY_COLORS[ev.category || '상담'] || CATEGORY_COLORS.상담;
-                    return (
-                      <div
-                        key={ev.id}
-                        className={`text-[10px] md:text-[11px] font-medium truncate px-1.5 py-0.5 rounded border ${style.badge} flex items-center gap-1`}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full ${style.dot} shrink-0`}></span>
-                        <span className="truncate">{ev.title}</span>
+                  <div className="space-y-1 mt-1 overflow-hidden">
+                    {dayEvents.slice(0, 2).map(ev => {
+                      const style = CATEGORY_COLORS[ev.category || '상담'] || CATEGORY_COLORS.상담;
+                      return (
+                        <div
+                          key={ev.id}
+                          className={`text-[10px] md:text-[10.5px] font-medium truncate px-1.5 py-0.5 rounded-none border ${style.badge} flex items-center gap-1 shadow-2xs`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-none ${style.dot} shrink-0`}></span>
+                          <span className="truncate font-bold">{ev.title}</span>
+                        </div>
+                      );
+                    })}
+                    {dayEvents.length > 2 && (
+                      <div className="text-[9px] font-bold text-gray-400 text-right pr-1">
+                        +{dayEvents.length - 2}건 더보기
                       </div>
-                    );
-                  })}
-                  {dayEvents.length > 2 && (
-                    <div className="text-[9px] font-bold text-gray-400 text-right pr-1">
-                      +{dayEvents.length - 2}건 더보기
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </PremiumCard>
 
-      {/* ── 우측: 손해사정 실무 표준 대장 & 날짜별 진행일지 패널 ── */}
-      <div className="w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex flex-col bg-[#f8f9fa] dark:bg-zinc-900/60 overflow-hidden">
-        
+      {/* ── 🏝️ 2. 우측: 손해사정 실무 표준 대장 & 날짜별 진행일지 카드 아일랜드 ── */}
+      <PremiumCard borderColor="blue" hoverEffect={true} className="w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80">
         <AdminHeaderBar 
           title={
-            <div className="flex items-center gap-2">
-              <span>📋</span>
-              <span className="font-bold text-[15px] text-gray-900 dark:text-white">{selectedDate} 대장 ({selectedDateEvents.length}건)</span>
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">{selectedDate} 대장 ({selectedDateEvents.length}건)</span>
             </div>
           }
           rightContent={
@@ -670,9 +669,9 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                 setEditingEventId(null);
                 setIsModalOpen(true);
               }}
-              className="px-2.5 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all shadow-sm flex items-center gap-1"
+              className="px-2.5 py-1 text-[11px] font-bold bg-[var(--google-blue)] hover:bg-blue-700 text-white rounded-none transition-all shadow-sm flex items-center gap-1"
             >
-              <span>➕</span> 신규 대장 등록
+              <span>➕</span> 신규 등록
             </button>
           }
         />
@@ -699,12 +698,12 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
               return (
                 <div
                   key={ev.id}
-                  className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm space-y-3"
+                  className="bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-zinc-800 rounded-none p-3.5 shadow-sm space-y-2.5"
                 >
                   {/* 카드 상단: 상태, 시간, 버튼 */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full border ${style.badge}`}>
+                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-none border ${style.badge}`}>
                         {ev.category || '상담'}
                       </span>
                       <span className="text-xs font-mono font-bold text-gray-500">
@@ -746,7 +745,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
 
                   {/* 고객명 및 핵심 요약 */}
                   <div>
-                    <h3 className="font-bold text-base text-gray-900 dark:text-white leading-snug">
+                    <h3 className="font-extrabold text-sm text-gray-900 dark:text-white leading-snug">
                       {ev.title}
                     </h3>
                     <div className="flex items-center gap-2 mt-1 text-xs text-gray-600 dark:text-gray-300">
@@ -756,7 +755,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                         </span>
                       )}
                       {ledger.accidentType && (
-                        <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 rounded text-[11px] font-medium">
+                        <span className="px-1.5 py-0.2 bg-gray-100 dark:bg-zinc-800 rounded-none text-[10.5px] font-bold">
                           {ledger.accidentType}
                         </span>
                       )}
@@ -771,7 +770,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   {/* 실무 대장 상세 아코디언 토글 버튼 */}
                   <button
                     onClick={() => setExpandedLedgerIds(prev => ({ ...prev, [ev.id]: !prev[ev.id] }))}
-                    className="w-full py-1 px-2.5 bg-gray-50 dark:bg-zinc-950 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-lg border border-gray-100 dark:border-zinc-800/80 flex items-center justify-between transition-colors"
+                    className="w-full py-1 px-2.5 bg-gray-50 dark:bg-zinc-950 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-none border border-gray-200/80 dark:border-zinc-800 flex items-center justify-between transition-colors shadow-2xs"
                   >
                     <span>📑 실무 대장 상세 정보</span>
                     <span>{isExpanded ? '▲ 접기' : '▼ 펼치기'}</span>
@@ -779,7 +778,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
 
                   {/* 실무 대장 세부 정보 (펼쳤을 때) */}
                   {isExpanded && (
-                    <div className="bg-gray-50/70 dark:bg-zinc-950/70 p-3 rounded-xl border border-gray-200/80 dark:border-zinc-800 space-y-2 text-xs">
+                    <div className="bg-gray-50/70 dark:bg-zinc-950/70 p-3 rounded-none border border-gray-200/80 dark:border-zinc-800 space-y-2 text-xs">
                       <div className="grid grid-cols-2 gap-2 text-gray-700 dark:text-gray-300">
                         <div><b>문의경로:</b> {ledger.inflowPath || '미지정'}</div>
                         <div><b>사고일자:</b> {ledger.accidentDate || '미상'}</div>
@@ -809,7 +808,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     {/* 누적된 업무일지 목록 (가로바 구분) */}
                     <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-0.5">
                       {(ledger.progressLogs || []).length === 0 ? (
-                        <div className="p-2.5 bg-gray-50 dark:bg-zinc-950 rounded-lg text-center text-[11px] text-gray-400">
+                        <div className="p-2.5 bg-gray-50 dark:bg-zinc-950 rounded-none text-center text-[11px] text-gray-400">
                           아직 기록된 진행사항이 없습니다. 아래에서 업무를 기록해 보세요.
                         </div>
                       ) : (
@@ -821,7 +820,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                               <div className="text-xs space-y-0.5">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-1.5">
-                                    <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded border ${tagStyle}`}>
+                                    <span className={`px-1.5 py-0.2 text-[10px] font-bold rounded-none border ${tagStyle}`}>
                                       {log.tag || '일반'}
                                     </span>
                                     <span className="font-mono font-bold text-gray-700 dark:text-gray-300 text-[11px]">
@@ -847,7 +846,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     </div>
 
                     {/* 인라인 업무일지 추가 폼 */}
-                    <div className="p-2.5 bg-gray-50 dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 space-y-2">
+                    <div className="p-2 bg-gray-50 dark:bg-zinc-950 rounded-none border border-gray-200 dark:border-zinc-800 space-y-2">
                       {/* 퀵 태그 버튼 */}
                       <div className="flex items-center gap-1 flex-wrap">
                         <span className="text-[11px] font-bold text-gray-500 mr-1">태그:</span>
@@ -859,9 +858,9 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                               ...prev,
                               [ev.id]: { ...(prev[ev.id] || { text: '' }), tag: t }
                             }))}
-                            className={`px-2 py-0.5 text-[10px] font-bold rounded border transition-all ${
+                            className={`px-2 py-0.2 text-[10px] font-bold rounded-none border transition-all ${
                               logInput.tag === t 
-                                ? 'bg-blue-600 text-white border-blue-600 shadow-xs' 
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-2xs' 
                                 : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-zinc-700'
                             }`}
                           >
@@ -884,13 +883,13 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                               handleAddInlineLog(ev);
                             }
                           }}
-                          placeholder="오늘 진행사항 입력 (예: 담당자 통화, 추가 서류 요청)"
-                          className="flex-1 p-2 text-xs bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
+                          placeholder="오늘 진행사항 입력..."
+                          className="flex-1 p-1.5 text-xs bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
                         />
                         <button
                           type="button"
                           onClick={() => handleAddInlineLog(ev)}
-                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors shrink-0 shadow-sm"
+                          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-none transition-colors shrink-0 shadow-sm"
                         >
                           기록
                         </button>
@@ -902,7 +901,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   {ev.sourceApp && (
                     <button
                       onClick={() => handleJumpToSource(ev)}
-                      className="w-full py-1.5 px-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1"
+                      className="w-full py-1 px-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-none transition-colors flex items-center justify-center gap-1 border border-blue-200 dark:border-blue-800"
                     >
                       <span>🔗</span>
                       <span>{ev.sourceApp === 'consultations' ? '원본 상담 접수내역 보기' : '채팅방 바로가기'}</span>
@@ -913,12 +912,12 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
             })
           )}
         </div>
-      </div>
+      </PremiumCard>
 
       {/* ── 손해사정 실무 대장 등록 / 수정 모달 ── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-gray-200 dark:border-zinc-800 space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <div className="bg-white dark:bg-[#202124] rounded-none max-w-xl w-full p-6 shadow-2xl border border-gray-200 dark:border-zinc-800 space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
             
             <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
               <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -944,7 +943,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     value={modalForm.title}
                     onChange={e => setModalForm(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="예: [예약접수] 박선미"
-                    className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs font-bold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none text-xs font-bold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
                 <div>
@@ -954,13 +953,13 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     value={modalForm.ledger.phone || ''}
                     onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, phone: e.target.value } }))}
                     placeholder="010-0000-0000"
-                    className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs font-mono text-gray-900 dark:text-white outline-none"
+                    className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none text-xs font-mono text-gray-900 dark:text-white outline-none"
                   />
                 </div>
               </div>
 
               {/* 2. 업무예정일(캘린더 날짜) 및 시간 */}
-              <div className="p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-xl border border-blue-100 dark:border-blue-900/40 grid grid-cols-2 gap-3">
+              <div className="p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-none border border-blue-100 dark:border-blue-900/40 grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-blue-900 dark:text-blue-300 mb-1">
                     📅 업무 예정일 (캘린더 등록일)
@@ -969,7 +968,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     type="date"
                     value={modalForm.date}
                     onChange={e => setModalForm(prev => ({ ...prev, date: e.target.value }))}
-                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-bold text-gray-900 dark:text-white outline-none"
+                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-none text-xs font-bold text-gray-900 dark:text-white outline-none"
                   />
                   <span className="text-[10px] text-blue-600 dark:text-blue-400 mt-1 block">
                     * 날짜를 바꾸면 해당 일자 캘린더로 카드가 이동합니다.
@@ -981,13 +980,13 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     type="time"
                     value={modalForm.time}
                     onChange={e => setModalForm(prev => ({ ...prev, time: e.target.value }))}
-                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-mono text-gray-900 dark:text-white outline-none"
+                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-none text-xs font-mono text-gray-900 dark:text-white outline-none"
                   />
                 </div>
               </div>
 
               {/* 3. 사고 및 보험 정보 */}
-              <div className="p-3 bg-gray-50 dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 space-y-2.5">
+              <div className="p-3 bg-gray-50 dark:bg-zinc-950 rounded-none border border-gray-200 dark:border-zinc-800 space-y-2.5">
                 <div className="font-bold text-gray-800 dark:text-gray-200 text-xs">🚗 사고 및 보험 정보</div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -996,7 +995,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     <select
                       value={modalForm.ledger.accidentType || '교통사고'}
                       onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, accidentType: e.target.value } }))}
-                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs font-bold"
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs font-bold"
                     >
                       <option value="교통사고">교통사고</option>
                       <option value="산재사고">산재사고</option>
@@ -1012,7 +1011,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                       type="date"
                       value={modalForm.ledger.accidentDate || ''}
                       onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, accidentDate: e.target.value } }))}
-                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs"
                     />
                   </div>
 
@@ -1023,7 +1022,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                       value={modalForm.ledger.insuranceCompany || ''}
                       onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, insuranceCompany: e.target.value } }))}
                       placeholder="예: 현대해상, 삼성화재"
-                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs"
                     />
                   </div>
                 </div>
@@ -1036,13 +1035,13 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     value={modalForm.ledger.faultRatio || ''}
                     onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, faultRatio: e.target.value } }))}
                     placeholder="예: 0:100 차대차, 블랙박스 영상 확보 완료"
-                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs"
                   />
                 </div>
               </div>
 
               {/* 4. 의료 및 병력 정보 */}
-              <div className="p-3 bg-gray-50 dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 space-y-2.5">
+              <div className="p-3 bg-gray-50 dark:bg-zinc-950 rounded-none border border-gray-200 dark:border-zinc-800 space-y-2.5">
                 <div className="font-bold text-gray-800 dark:text-gray-200 text-xs">🏥 의료 및 치료 정보</div>
                 
                 <div>
@@ -1052,7 +1051,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     value={modalForm.ledger.diagnosis || ''}
                     onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, diagnosis: e.target.value } }))}
                     placeholder="예: 비골신경마비, 요추 4-5번 추간판탈출증"
-                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs"
                   />
                 </div>
 
@@ -1064,7 +1063,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                       <button
                         type="button"
                         onClick={() => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, hasPreExisting: false } }))}
-                        className={`flex-1 py-1.5 rounded-lg font-bold border transition-colors ${
+                        className={`flex-1 py-1.5 rounded-none font-bold border transition-colors ${
                           !modalForm.ledger.hasPreExisting ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-zinc-900 text-gray-600 border-gray-200 dark:border-zinc-700'
                         }`}
                       >
@@ -1073,7 +1072,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                       <button
                         type="button"
                         onClick={() => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, hasPreExisting: true } }))}
-                        className={`flex-1 py-1.5 rounded-lg font-bold border transition-colors ${
+                        className={`flex-1 py-1.5 rounded-none font-bold border transition-colors ${
                           modalForm.ledger.hasPreExisting ? 'bg-amber-600 text-white border-amber-600' : 'bg-white dark:bg-zinc-900 text-gray-600 border-gray-200 dark:border-zinc-700'
                         }`}
                       >
@@ -1090,7 +1089,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                         value={modalForm.ledger.preExistingNote || ''}
                         onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, preExistingNote: e.target.value } }))}
                         placeholder="예: 2018년 디스크 시술 이력 있음"
-                        className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                        className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs"
                       />
                     </div>
                   )}
@@ -1104,7 +1103,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                       <button
                         type="button"
                         onClick={() => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, hasHospitalization: false } }))}
-                        className={`flex-1 py-1.5 rounded-lg font-bold border transition-colors ${
+                        className={`flex-1 py-1.5 rounded-none font-bold border transition-colors ${
                           !modalForm.ledger.hasHospitalization ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-zinc-900 text-gray-600 border-gray-200 dark:border-zinc-700'
                         }`}
                       >
@@ -1113,7 +1112,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                       <button
                         type="button"
                         onClick={() => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, hasHospitalization: true } }))}
-                        className={`flex-1 py-1.5 rounded-lg font-bold border transition-colors ${
+                        className={`flex-1 py-1.5 rounded-none font-bold border transition-colors ${
                           modalForm.ledger.hasHospitalization ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white dark:bg-zinc-900 text-gray-600 border-gray-200 dark:border-zinc-700'
                         }`}
                       >
@@ -1130,7 +1129,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                         value={modalForm.ledger.hospitalizationPeriod || ''}
                         onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, hospitalizationPeriod: e.target.value } }))}
                         placeholder="예: 2024.10.06 ~ 10.20 (14일간)"
-                        className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                        className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs"
                       />
                     </div>
                   )}
@@ -1145,7 +1144,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   value={modalForm.ledger.incomeNote || ''}
                   onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, incomeNote: e.target.value } }))}
                   placeholder="예: 급여소득자 월 350만 원 (원천징수 영수증 확보)"
-                  className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs"
+                  className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none text-xs"
                 />
               </div>
 
@@ -1155,14 +1154,14 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
               <PremiumButton
                 onClick={() => setIsModalOpen(false)}
                 variant="secondary"
-                className="flex-1 !py-2.5 !text-xs !rounded-xl"
+                className="flex-1 !py-2.5 !text-xs !rounded-none"
               >
                 취소
               </PremiumButton>
               <PremiumButton
                 onClick={handleSaveEvent}
                 variant="primary"
-                className="flex-1 !py-2.5 !text-xs !rounded-xl shadow-md"
+                className="flex-1 !py-2.5 !text-xs !rounded-none shadow-md"
               >
                 {editingEventId ? '대장 수정 / 예정일 이동 완료' : '대장 등록'}
               </PremiumButton>

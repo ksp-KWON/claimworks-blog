@@ -228,9 +228,50 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
     { label: '사고 및 문의 내용', align: 'left' as const }
   ];
 
+  const totalCount = sortedAndFilteredConsultations.length;
+  const waitCount = sortedAndFilteredConsultations.filter(c => (c.status || '대기').includes('대기') || (c.status || '').includes('미확인')).length;
+  const consultCount = sortedAndFilteredConsultations.filter(c => (c.status || '').includes('상담') || (c.status || '').includes('진행')).length;
+  const doneCount = sortedAndFilteredConsultations.filter(c => (c.status || '').includes('완료') || (c.status || '').includes('종결')).length;
+
   return (
-    <AdminPanelLayout innerClassName="flex flex-col w-full h-full bg-white dark:bg-[#202124] overflow-hidden min-w-0">
-      <div className="flex-1 min-h-0 flex flex-col w-full">
+    <AdminPanelLayout innerClassName="flex-1 min-h-0 flex flex-col w-full space-y-2.5 overflow-hidden">
+      {/* 🏝️ 1. 상단 상태 요약 카드 아일랜드 */}
+      <PremiumCard borderColor="blue" hoverEffect={true} className="!p-3 shrink-0 flex flex-wrap items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2">
+          <span className="text-xs sm:text-sm font-extrabold text-gray-900 dark:text-white">
+            실시간 상담 접수 현황
+          </span>
+          <span className="text-[10px] text-gray-400 font-mono hidden sm:inline-block">
+            최신순 정렬
+          </span>
+        </div>
+
+        {/* 상태별 카운트 배지 그룹 */}
+        <div className="flex items-center gap-1.5 flex-wrap text-xs">
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 rounded-none border border-gray-200/80 dark:border-zinc-700">
+            <span className="text-gray-500 dark:text-zinc-400 font-medium text-[11px]">전체</span>
+            <span className="font-mono font-extrabold text-gray-900 dark:text-white">{totalCount}</span>
+          </div>
+
+          <div className="flex items-center gap-1 bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded-none border border-red-200 dark:border-red-800">
+            <span className="text-red-600 dark:text-red-400 font-bold text-[11px]">대기</span>
+            <span className="font-mono font-extrabold text-red-600 dark:text-red-400">{waitCount}</span>
+          </div>
+
+          <div className="flex items-center gap-1 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800">
+            <span className="text-blue-600 dark:text-blue-400 font-bold text-[11px]">상담중</span>
+            <span className="font-mono font-extrabold text-blue-600 dark:text-blue-400">{consultCount}</span>
+          </div>
+
+          <div className="flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-none border border-emerald-200 dark:border-emerald-800">
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">완료</span>
+            <span className="font-mono font-extrabold text-emerald-600 dark:text-emerald-400">{doneCount}</span>
+          </div>
+        </div>
+      </PremiumCard>
+
+      {/* 🏝️ 2. 메인 데이터 테이블 카드 아일랜드 */}
+      <PremiumCard borderColor="blue" hoverEffect={true} className="flex-1 min-h-0 !p-0 flex flex-col overflow-hidden">
         {/* 데스크탑 버전 (Table) */}
         <div className="hidden md:flex flex-1 min-h-0 flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
@@ -239,7 +280,7 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
               <tbody className="bg-white dark:bg-[#202124] divide-y divide-gray-100 dark:divide-zinc-800/60">
               {sortedAndFilteredConsultations.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-12 text-center text-xs text-gray-400">
+                  <td colSpan={4} className="px-4 py-16 text-center text-xs text-gray-400">
                     {searchQuery ? '검색 결과가 없습니다.' : '아직 접수된 상담 내역이 없습니다.'}
                   </td>
                 </tr>
@@ -348,7 +389,7 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
               ))
           )}
         </div>
-      </div>
+      </PremiumCard>
     </AdminPanelLayout>
   );
 }

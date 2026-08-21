@@ -46,32 +46,59 @@ export default function PostListPanel({
     { label: '관리', width: 'w-40' }
   ];
 
-  return (
-    <AdminPanelLayout innerClassName="flex flex-col w-full h-full bg-white dark:bg-[#202124]">
-      <div className="flex-1 min-h-0 flex flex-col w-full">
-        {/* ⚠️ GitHub Token 미설정 안내 배너 */}
-        {!hasToken && (
-          <div className="bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50 rounded-none p-3 mb-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shrink-0 shadow-sm">
-            <div className="flex items-center gap-2 text-xs text-amber-800 dark:text-amber-300">
-              <span className="text-base">🔐</span>
-              <span>
-                <strong>GitHub Token(PAT)</strong>이 등록되지 않아 <strong>읽기 전용 모드</strong>로 목록을 표시합니다. 원고의 실시간 로드·수정·삭제를 위해 토큰을 등록해주세요.
-              </span>
-            </div>
-            {onOpenSettings && (
-              <button
-                type="button"
-                onClick={onOpenSettings}
-                className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-none text-xs font-bold shrink-0 transition-colors shadow-sm"
-              >
-                API 설정에서 토큰 등록 ⚙️
-              </button>
-            )}
-          </div>
-        )}
+  const totalCount = sortedAndFilteredList.length;
+  const draftCount = sortedAndFilteredList.filter(p => p.published === false).length;
+  const publishedCount = totalCount - draftCount;
 
+  return (
+    <AdminPanelLayout innerClassName="flex-1 min-h-0 flex flex-col w-full space-y-2.5 overflow-hidden">
+      {/* 🏝️ 1. 상단 원고 현황 및 GitHub 토큰 상태 카드 아일랜드 */}
+      <PremiumCard borderColor="blue" hoverEffect={true} className="!p-3 shrink-0 flex flex-wrap items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2">
+          <span className="text-xs sm:text-sm font-extrabold text-gray-900 dark:text-white">
+            발행 원고 데이터베이스
+          </span>
+          <span className="text-[10px] text-gray-400 font-mono hidden sm:inline-block">
+            GitHub .md 동기화
+          </span>
+        </div>
+
+        {/* 상태별 카운트 배지 및 토큰 상태 */}
+        <div className="flex items-center gap-2 flex-wrap text-xs">
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 rounded-none border border-gray-200/80 dark:border-zinc-700">
+            <span className="text-gray-500 dark:text-zinc-400 font-medium text-[11px]">총 원고</span>
+            <span className="font-mono font-extrabold text-gray-900 dark:text-white">{totalCount}</span>
+          </div>
+
+          <div className="flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-none border border-emerald-200 dark:border-emerald-800">
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">발행됨</span>
+            <span className="font-mono font-extrabold text-emerald-600 dark:text-emerald-400">{publishedCount}</span>
+          </div>
+
+          {draftCount > 0 && (
+            <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 rounded-none border border-gray-200 dark:border-zinc-700">
+              <span className="text-gray-600 dark:text-gray-400 font-bold text-[11px]">임시저장</span>
+              <span className="font-mono font-extrabold text-gray-700 dark:text-gray-300">{draftCount}</span>
+            </div>
+          )}
+
+          {!hasToken && onOpenSettings && (
+            <button
+              type="button"
+              onClick={onOpenSettings}
+              className="px-2.5 py-0.5 bg-amber-500 hover:bg-amber-600 text-white rounded-none text-[11px] font-bold transition-colors shadow-sm"
+              title="GitHub Personal Access Token 등록"
+            >
+              🔐 읽기 전용 (토큰 등록)
+            </button>
+          )}
+        </div>
+      </PremiumCard>
+
+      {/* 🏝️ 2. 메인 원고 목록 테이블 카드 아일랜드 */}
+      <PremiumCard borderColor="blue" hoverEffect={true} className="flex-1 min-h-0 !p-0 flex flex-col overflow-hidden">
         {sortedAndFilteredList.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-gray-400 bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-zinc-800 p-10 rounded-none">
+          <div className="h-full flex flex-col items-center justify-center text-gray-400 p-10">
             <svg className="w-12 h-12 mb-3 text-gray-300 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             <p className="font-bold text-xs text-gray-500 dark:text-zinc-400">{isLoading ? '게시물을 불러오는 중입니다...' : '조건에 맞는 게시물이 없습니다.'}</p>
           </div>
@@ -173,7 +200,7 @@ export default function PostListPanel({
             </div>
           </>
         )}
-      </div>
+      </PremiumCard>
     </AdminPanelLayout>
   );
 }

@@ -313,7 +313,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
   const selectedSession = sessions.find(s => s.id === selectedId);
 
   return (
-    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full gap-2.5 overflow-hidden min-w-0 min-h-0">
+    <AdminPanelLayout innerClassName="flex-col md:flex-row gap-2.5 min-w-0">
       {/* 🏝️ 1. 좌측 세션 리스트 카드 아일랜드 */}
       <PremiumCard 
         borderColor="blue" 

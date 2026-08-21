@@ -529,7 +529,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
   }, [events, selectedDate, searchQuery]);
 
   return (
-    <AdminPanelLayout innerClassName="flex flex-col md:flex-row w-full h-full gap-2.5 overflow-hidden min-w-0">
+    <AdminPanelLayout innerClassName="flex-col md:flex-row gap-2.5 min-w-0">
       {/* ── 🏝️ 1. 좌측: 월간 캘린더 그리드 카드 아일랜드 ── */}
       <PremiumCard borderColor="blue" hoverEffect={true} className="flex-1 min-w-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-white dark:bg-zinc-950">
         <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-y-auto custom-scrollbar">

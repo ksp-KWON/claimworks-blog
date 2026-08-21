@@ -106,7 +106,33 @@ export const sharedComponents: Components & Record<string, any> = {
   h3: (props) => <UnifiedHeadingRenderer level={3} {...props} />,
   h4: (props) => <UnifiedHeadingRenderer level={4} {...props} />,
   h5: (props) => <UnifiedHeadingRenderer level={5} {...props} />,
-  h6: (props) => <UnifiedHeadingRenderer level={6} {...props} />,
+  h6: ({ children, id }) => {
+    const getText = (n: any): string => {
+      if (typeof n === 'string') return n;
+      if (Array.isArray(n)) return n.map(getText).join('');
+      if (n?.props?.children) return getText(n.props.children);
+      return '';
+    };
+    const text = getText(children).trim();
+    const docMatch = text.match(/^([①-⑳]|[㉮-㉻])\s*(.*)/);
+    
+    if (docMatch) {
+      const num = docMatch[1];
+      const title = docMatch[2];
+      return (
+        <h6 id={id} style={{ scrollMarginTop: `${SCROLL_OFFSET}px` }} className="mt-8 mb-3 flex items-center gap-2.5 font-bold text-[17px] text-emerald-800 dark:text-emerald-300 break-keep">
+          <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-[15px] font-black shadow-sm border border-emerald-200/60 dark:border-emerald-700/50">
+            {num}
+          </span>
+          <span className="bg-gradient-to-r from-emerald-50/80 to-transparent dark:from-emerald-950/40 dark:to-transparent px-3 py-1 rounded-md border-l-2 border-emerald-500">
+            {title}
+          </span>
+        </h6>
+      );
+    }
+    
+    return <UnifiedHeadingRenderer level={6} id={id}>{children}</UnifiedHeadingRenderer>;
+  },
 
   p: ({ children }) => {
     const getText = (n: any): string => {
@@ -118,7 +144,7 @@ export const sharedComponents: Components & Record<string, any> = {
     
     const fullText = getText(children);
 
-    // 원문자(①~⑳, ㉮-㉻) 맞춤 솔루션 카드 렌더링
+    // 원문자(①~⑳, ㉮-㉻) 맞춤 솔루션 카드 렌더링 (에메랄드 그린 프리미엄 카드)
     const docMarkerMatch = fullText.match(/^([①-⑳]|[㉮-㉻])\s/);
     if (docMarkerMatch && React.Children.count(children) > 0) {
       const childrenArray = React.Children.toArray(children);
@@ -150,10 +176,13 @@ export const sharedComponents: Components & Record<string, any> = {
 
       if (isBody && bodyElements.length > 0) {
         return (
-          <div className="my-8 bg-white dark:bg-[#202124] rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-[#3c4043] overflow-hidden transition-all duration-300 hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)] hover:border-blue-300 dark:hover:border-blue-800 group">
-            <div className="bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent px-5 py-3.5 border-b border-blue-100/50 dark:border-blue-900/30">
-              <div className="font-bold text-[15.5px] text-[#1A73E8] dark:text-[#8ab4f8] flex items-start gap-1.5 break-keep">
-                {titleElements}
+          <div className="my-8 bg-white dark:bg-[#202124] rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-emerald-100/80 dark:border-emerald-900/40 overflow-hidden transition-all duration-300 hover:shadow-[0_16px_50px_rgba(16,185,129,0.2)] hover:border-emerald-500 dark:hover:border-emerald-500 group">
+            <div className="bg-gradient-to-r from-emerald-50/90 to-transparent dark:from-emerald-950/40 dark:to-transparent px-5 py-3.5 border-b border-emerald-100 dark:border-emerald-900/40">
+              <div className="font-bold text-[16px] text-emerald-800 dark:text-emerald-300 flex items-center gap-2 break-keep">
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-[14px] font-black border border-emerald-200/60 dark:border-emerald-700/50">
+                  {docMarkerMatch[1]}
+                </span>
+                <span>{titleElements}</span>
               </div>
             </div>
             <div className="px-5 py-4 text-[15px] leading-[1.8] text-gray-700 dark:text-[#e8eaed] break-keep [&>p]:mb-0">

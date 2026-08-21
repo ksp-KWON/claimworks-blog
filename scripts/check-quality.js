@@ -40,6 +40,12 @@ function processPost(filePath) {
   );
   body = body.replace(/\[\s*(?:이미지\s*제안|관련\s*글\s*추천|이미지제안|관련글추천)\s*:[^\]]*\]/gi, '');
 
+  // ── [2-1. 보상스쿨 실무 TIP 박스 표준 마크다운 정규화] ────────────────────
+  body = body.replace(
+    /(?:>*\s*#*\s*💡?\s*)?(?:손해사정사\s*(?:실무\s*조언|실무조언|조언)|보상스쿨\s*실무\s*TIP|\b실무\s*TIP)\s*\r?\n\s*>/gi,
+    '> ### 💡 보상스쿨 실무 TIP\n>'
+  );
+
   // ── [3. 오프닝 & 핵심 요약 배치 보장] ─────────────────────────────────
   let hasOpeningText = false;
   const trimmedBody = body.trim();

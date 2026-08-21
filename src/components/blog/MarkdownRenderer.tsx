@@ -197,7 +197,7 @@ export const sharedComponents: Components & Record<string, any> = {
     );
   },
 
-  // 헌법 제4조 인라인 용어 사전 및 인용구 박스
+  // 헌법 제4조 인라인 용어 사전 및 손해사정사 실무 조언/팁 박스 (CommonBox 일체화)
   blockquote: ({ children }) => {
     const tone = getToneColor(children);
     const boxHoverBorders: Record<string, string> = {
@@ -207,9 +207,87 @@ export const sharedComponents: Components & Record<string, any> = {
       yellow: 'border-yellow-300 dark:border-yellow-900/50 hover:border-yellow-500 hover:shadow-[0_16px_50px_rgba(234,179,8,0.25)]',
       purple: 'border-purple-200 dark:border-purple-900/50 hover:border-purple-500 hover:shadow-[0_16px_50px_rgba(168,85,247,0.25)]',
     };
+
+    const headerGradients: Record<string, string> = {
+      blue: 'from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100 dark:border-blue-900/30',
+      red: 'from-red-50/80 to-transparent dark:from-red-900/20 dark:to-transparent border-b border-red-100 dark:border-red-900/30',
+      green: 'from-green-50/80 to-transparent dark:from-green-900/20 dark:to-transparent border-b border-green-100 dark:border-green-900/30',
+      yellow: 'from-yellow-50/80 to-transparent dark:from-yellow-900/20 dark:to-transparent border-b border-yellow-200 dark:border-yellow-900/30',
+      purple: 'from-purple-50/80 to-transparent dark:from-purple-900/20 dark:to-transparent border-b border-purple-100 dark:border-purple-900/30',
+    };
+
+    const titleColors: Record<string, string> = {
+      blue: 'text-[var(--google-blue)] dark:text-blue-400',
+      red: 'text-[var(--google-red)] dark:text-red-400',
+      green: 'text-[var(--google-green)] dark:text-green-400',
+      yellow: 'text-yellow-600 dark:text-yellow-400',
+      purple: 'text-purple-600 dark:text-purple-400',
+    };
+
+    // 자식 요소 중 공백 문자열을 제외한 첫 번째 유효 요소가 헤딩(h1~h6)인지 검사
+    const rawChildrenArray = React.Children.toArray(children);
+    const validChildren = rawChildrenArray.filter(c => typeof c !== 'string' || c.trim() !== '');
+    let headingElement: React.ReactNode = null;
+    const bodyElements: React.ReactNode[] = [];
+
+    const isHeading = (node: any): boolean => {
+      if (!React.isValidElement(node)) return false;
+      const tagName = (node.props as any)?.node?.tagName;
+      if (typeof tagName === 'string' && /^h[1-6]$/i.test(tagName)) return true;
+      if (typeof node.type === 'string' && /^h[1-6]$/i.test(node.type)) return true;
+      return false;
+    };
+
+    if (validChildren.length > 0 && isHeading(validChildren[0])) {
+      headingElement = validChildren[0];
+      for (let i = 1; i < validChildren.length; i++) {
+        bodyElements.push(validChildren[i]);
+      }
+    } else {
+      for (let i = 0; i < validChildren.length; i++) {
+        bodyElements.push(validChildren[i]);
+      }
+    }
+
+    // 헤딩이 포함된 실무 팁/실무 조언 박스 -> CommonBox 상단 톤온톤 헤더 스트립으로 렌더링
+    if (headingElement && React.isValidElement(headingElement)) {
+      const headingChildren = (headingElement.props as any)?.children;
+      
+      const getText = (n: any): string => {
+        if (typeof n === 'string') return n;
+        if (Array.isArray(n)) return n.map(getText).join('');
+        if (n?.props?.children) return getText(n.props.children);
+        return '';
+      };
+      const titleStr = getText(headingChildren);
+      const emojiMatch = titleStr.match(/^([💡📌🛡️⚖️🚗💬⭐🔥⚡🏆])\s*/);
+      const boxEmoji = emojiMatch ? emojiMatch[1] : '💡';
+
+      return (
+        <div className={`my-8 bg-white dark:bg-[#202124] shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden group border rounded-none ${boxHoverBorders[tone]}`}>
+          {/* Watermark Emoji */}
+          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[110px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+            {boxEmoji}
+          </div>
+
+          {/* 상단 톤온톤 헤더 바 */}
+          <div className={`px-5 sm:px-6 py-3.5 bg-gradient-to-r ${headerGradients[tone]} relative z-10`}>
+            <h3 className={`text-[15.5px] font-bold flex items-center gap-1.5 break-keep !m-0 !p-0 border-0 bg-transparent ${titleColors[tone]}`}>
+              {headingChildren}
+            </h3>
+          </div>
+          {/* 본문 영역 */}
+          <div className="p-5 sm:p-6 text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.75] tracking-tight [&>p]:!mb-2.5 [&>p:last-child]:!mb-0 relative z-10 break-keep">
+            {bodyElements}
+          </div>
+        </div>
+      );
+    }
+
+    // 인라인 용어 사전 / 단순 인용구
     return (
-      <div className={`my-8 bg-white dark:bg-[#202124] p-5 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden group border ${boxHoverBorders[tone]}`}>
-        <div className="relative z-10 text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.75] tracking-tight [&>p]:m-0 break-keep">
+      <div className={`my-8 bg-white dark:bg-[#202124] p-5 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden group border rounded-none ${boxHoverBorders[tone]}`}>
+        <div className="relative z-10 text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.75] tracking-tight [&>p]:!mb-0 break-keep">
           {children}
         </div>
       </div>

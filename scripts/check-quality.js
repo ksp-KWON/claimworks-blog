@@ -40,8 +40,9 @@ function processPost(filePath) {
   );
   body = body.replace(/\[\s*(?:이미지\s*제안|관련\s*글\s*추천|이미지제안|관련글추천)\s*:[^\]]*\]/gi, '');
 
-  // ── [2-1. 비표준 GitHub alert 및 핀 박스 정규화] ────────────────────────
+  // ── [2-1. 비표준 GitHub alert 및 비표준 전문가 조언 박스 정규화] ──────────
   body = body.replace(/>\s*\[!(?:TIP|NOTE|IMPORTANT|WARNING|CAUTION)\]\s*\r?\n/gi, '> ### 💡 보상스쿨 피드백 & 실무 인사이트\n');
+  body = body.replace(/>\s*(?:전문가\s*조언|손해사정사\s*실무\s*조언|실무\s*TIP)\s*:\s*/gi, '> ### 💡 보상스쿨 피드백 & 실무 인사이트\n> ');
 
   // ── [3. 오프닝 & 핵심 요약 배치 보장] ─────────────────────────────────
   let hasOpeningText = false;
@@ -72,7 +73,7 @@ function processPost(filePath) {
     }
   }
 
-  // ── [4. 다단계 솔루션(①~⑳) 콜론 분리 및 헤딩 승격] ────────────────────
+  // ── [4. 다단계 솔루션(①~⑳) 콜론 분리 및 H6 헤딩 승격] ───────────────────
   body = body.replace(
     /(?:^|\r?\n)(?:#{1,6}\s*)?([①-⑳])\s*(?:\*\*)?(?:[1-9]단계\s*:\s*)?([^\n:]+?)(?:\*\*)?\s*:\s*([^\n]+)/g,
     (m, num, title, desc) => {
@@ -82,7 +83,7 @@ function processPost(filePath) {
     }
   );
 
-  // ── [5. 핵심 요약 및 1분 자가진단 박스 안전 래핑 (불릿만 캡처)] ──────────
+  // ── [5. 핵심 요약 박스 안전 래핑 (불릿만 캡처)] ────────────────────────
   body = body.replace(
     /(##\s*(?:💡\s*)?(?:핵심\s*요약|핵심요약)\s*\r?\n+)((?:[ \t]*>?[ \t]*[-*+].*\r?\n*)+)/g,
     (m, head, bullets) => {
@@ -102,31 +103,40 @@ function processPost(filePath) {
     }
   );
 
-  body = body.replace(
-    /(##\s*(?:💡\s*)?(?:1분\s*자가진단[^\n]*)\s*\r?\n+)((?:[ \t]*>?[ \t]*(?:[-*+](?!--)|\[[ xX-]\]|[☑️✅✔]).*\r?\n*)+)/g,
-    (m, head, bullets) => {
-      let cleanHead = head.trim();
-      if (!cleanHead.includes(':') && !cleanHead.includes('체크리스트')) {
-        cleanHead = '## 1분 자가진단 : 체크리스트';
-      }
-      const cleanBullets = bullets
-        .split(/\r?\n/)
-        .map((l) => l.trim())
-        .filter((l) => l && !l.startsWith('---') && !l.startsWith('***'))
-        .map((l) => {
-          let text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').trim();
-          if (!text.startsWith('[ ]') && !text.startsWith('[-]') && !text.startsWith('[x]')) {
-            text = text.replace(/^[☑️✅✔]+\s*/, '');
-            text = `[ ] ${text}`;
-          }
-          return `> - ${text}`;
-        })
-        .join('\n');
-      return `${cleanHead}\n${cleanBullets}\n\n`;
+  // ── [6. 1분 자가진단 헤딩 및 체크리스트 완전 표준화] ────────────────────
+  body = body.replace(/##[^\n]*1분\s*(?:자가진단|체크리스트|체크)[^\n]*/gi, (m) => {
+    let subject = '';
+    const colonMatch = m.match(/:\s*([^\n\r]+)/);
+    if (colonMatch && !colonMatch[1].includes('지금 전문가')) {
+      subject = ` : ${colonMatch[1].replace(/체크리스트/g, '').trim()} 체크리스트`;
+    } else {
+      subject = ' : 체크리스트';
     }
-  );
+    return `## 1분 자가진단${subject}`;
+  });
 
-  // ── [6. 표(Table) 끝에 붙은 인라인 용어사전, 팁, 링크 분리 및 삭제] ────
+  body = body.replace(/(##\s*1분\s*자가진단[^\n]*\r?\n+)((?:[ \t]*>?[ \t]*[-*+☑️✅✔\[].*\r?\n*)+)/gi, (m, head, bullets) => {
+    const cleanBullets = bullets
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter((l) => l && !l.startsWith('---') && !l.startsWith('***') && !l.includes('위 항목 중 하나라도'))
+      .map((l) => {
+        let text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').trim();
+        text = text.replace(/^[☑️✅✔]+\s*/, '');
+        if (!text.startsWith('[ ]') && !text.startsWith('[-]') && !text.startsWith('[x]')) {
+          text = `[ ] ${text}`;
+        }
+        return `> - ${text}`;
+      })
+      .join('\n');
+    return `${head.trim()}\n${cleanBullets}\n\n`;
+  });
+
+  // ── [7. FAQ 및 결론 헤딩 표준화] ─────────────────────────────────────────
+  body = body.replace(/##\s*(?:[1-9]\.\s*)?(?:💡\s*)?(?:자주\s*묻는\s*질문|자주묻는질문|FAQ)[^\n]*/gi, '## 💡 자주 묻는 질문 (FAQ)');
+  body = body.replace(/##\s*(?:[1-9]\.\s*)?(?:결론\s*및\s*보상스쿨의\s*맞춤형\s*솔루션|결론\s*및\s*보상스쿨\s*맞춤형\s*솔루션|결론\s*및\s*맞춤형\s*솔루션)[^\n]*/gi, '## 5. 결론 및 보상스쿨의 맞춤형 솔루션');
+
+  // ── [8. 표(Table) 끝에 붙은 인라인 용어사전, 팁, 링크 분리 및 삭제] ────
   body = body.replace(
     /(\|.*\|)[ \t]*(?:💡|📖|📌|>?[ \t]*💡)\s*(?:\*\*)?(?:함께\s*읽[^\n:]+?|관련\s*글[^\n:]+?)(?:\*\*)?\s*(?::|\r?\n)[\s\S]*?(?=\r?\n\r?\n#|$)/gi,
     '$1\n\n'
@@ -139,7 +149,7 @@ function processPost(filePath) {
     }
   );
 
-  // ── [7. 인라인 용어사전 표준화 (대괄호 완전 제거 및 볼드 통일)] ─────────
+  // ── [9. 인라인 용어사전 표준화 (대괄호 완전 제거 및 볼드 통일)] ─────────
   body = body.replace(/>\s*(?:💡|📖|📌)\s*(?:\*\*)?\[([^\n\]]+)\](?:\*\*)?\s*:\s*/g, '> 💡 **$1** : ');
   body = body.replace(/>\s*(?:💡|📖|📌)\s*(?:\*\*)?([^:\n*]+?)(?:\*\*)?\s*:\s*/g, (m, term) => {
     const cleanTerm = term.replace(/[*_\[\]]/g, '').trim();
@@ -147,18 +157,18 @@ function processPost(filePath) {
     return `> 💡 **${cleanTerm}** : `;
   });
 
-  // ── [8. 중복 관련 글 추천 헤더 및 본문 단독 링크 목록 삭제] ─
+  // ── [10. 중복 관련 글 추천 헤더 및 본문 단독 링크 목록 삭제] ─
   body = body.replace(/##\s*🔗?\s*함께\s*읽으면\s*(?:도움이\s*되는|도움되는|좋은)\s*보상\s*(?:칼럼|글)[\s\S]*?(?=\r?\n\r?\n#|$)/gi, '');
   body = body.replace(/(?:^|\r?\n)\[[^\]\n]+\]\(\/blog\/[^\)\n]+\)[ \t]*(?=\r?\n|$)/g, '');
 
-  // ── [9. H3 소제목 공문서식 번호 제거 및 이스케이프된 H2 헤딩 자동 승격] ──
+  // ── [11. H3 소제목 공문서식 번호 제거 및 이스케이프된 H2 헤딩 자동 승격] ─
   body = body.replace(/###\s*(?:[가-하]\.|\([가-하]\)|[1-9]\.|\([1-9]\)|[1-9]\))\s*/g, '### ');
   body = body.replace(/(?:^|\r?\n)([1-9])\\\.\s+([^\n]+)/g, '\n\n## $1. $2');
 
-  // ── [9-1. 파손된 핵심 요약 볼드 기호 교정] ─────────────────────────────
+  // ── [11-1. 파손된 핵심 요약 볼드 기호 교정] ────────────────────────────
   body = body.replace(/(>\s*-\s*)([^\n*:]+?)\*\*\s*:/g, '$1**$2** :');
 
-  // ── [9-2. 시그니처 박스 표준화 (보상스쿨 피드백 & 실무 인사이트)] ──────
+  // ── [11-2. 시그니처 박스 표준화 (보상스쿨 피드백 & 실무 인사이트)] ─────
   body = body.replace(
     />\s*###\s*(?:💡\s*)?(?:보상스쿨\s*피드백\s*&\s*실무\s*인사이트|보상스쿨\s*실무\s*TIP|보상스쿨\s*실무TIP|손해사정사\s*실무\s*조언|실무\s*TIP|보상스쿨\s*실무쟁점)[^\n]*/gi,
     '> ### 💡 보상스쿨 피드백 & 실무 인사이트'
@@ -168,14 +178,14 @@ function processPost(filePath) {
     '> ### 💡 보상스쿨 피드백 & 실무 인사이트\n> '
   );
 
-  // ── [10. 마크다운 표(Table) 구분선 및 행 오타 자동 교정] ────────────────
+  // ── [12. 마크다운 표(Table) 구분선 및 행 오타 자동 교정] ────────────────
   body = body.replace(/(\|(?:\s*:?-+:?\s*\|)+)\s*>[ \t]*/g, '$1\n');
   body = body.replace(/(\|.*\|)\r?\n[ \t]*\r?\n+(\s*\|)/g, '$1\n$2');
 
-  // ── [11. 표와 인용구 사이 빈 줄 강제 확보] ────────────────────────────
+  // ── [13. 표와 인용구 사이 빈 줄 강제 확보] ────────────────────────────
   body = body.replace(/(\|.*\|)\r?\n(>[^\n]+)/g, '$1\n\n$2');
 
-  // ── [12. 다중 빈 줄 정리] ──────────────────────────────────────────────
+  // ── [14. 다중 빈 줄 정리] ──────────────────────────────────────────────
   body = body.replace(/(?:\r?\n){3,}/g, '\n\n').trim();
 
   // gray-matter stringify로 안전하게 재결합

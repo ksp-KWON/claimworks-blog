@@ -59,9 +59,6 @@ published: true
 
 보험사가 '절차대로 진행되었다'고 주장하더라도, 그 절차 자체가 법률적 요건(서면 동의 등)을 충족했는지를 전문적으로 검토해야 합니다.
 
-[수술 중 사망 상해사망보험금 지급 거절 대응 및 재검토 성공 사례](/blog/medical-procedure-death-insurance-exemption-ruling)
-[상해사망보험금 분쟁, 대법원이 말하는 '외래 사고' 입증과 감정 결과의 중요성](/blog/supreme-court-accidental-death-insurance-dispute)
-
 ## 🛡️ 지금 손해사정사가 필요한 상황인지 1분 체크
 
 ☑️ 보험계약자가 나의 동의 없이 수익자를 임의로 변경한 사실을 확인하셨나요?

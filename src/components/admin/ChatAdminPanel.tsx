@@ -324,7 +324,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
           title="실시간 상담 채팅" 
           rightContent={<span className="text-[11px] text-[var(--google-blue)] dark:text-[#8ab4f8] font-bold bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800">{sortedAndFilteredSessions.length}건</span>} 
         />
-        <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/40 dark:bg-zinc-950/40">
+        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar bg-gray-50/40 dark:bg-zinc-950/40">
           {isLoading ? (
             <div className="p-8 text-center text-xs text-gray-400">채팅 목록 로딩 중...</div>
           ) : sortedAndFilteredSessions.length === 0 ? (
@@ -381,7 +381,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
       {/* 🏝️ 2. 오른쪽: 실시간 채팅 워크스페이스 카드 아일랜드 */}
       <PremiumCard 
         borderColor="blue" 
-        hoverEffect={true} 
+        hoverEffect={false} 
         className={`flex-1 min-w-0 min-h-0 h-full !p-0 flex flex-col relative bg-gray-50/50 dark:bg-zinc-950/80 ${!selectedId ? 'hidden md:flex' : 'flex'} overflow-hidden`}
       >
         {selectedId && selectedSession ? (

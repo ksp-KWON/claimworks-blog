@@ -96,7 +96,7 @@ export default function PostListPanel({
       </PremiumCard>
 
       {/* 🏝️ 2. 메인 원고 목록 테이블 카드 아일랜드 */}
-      <PremiumCard borderColor="blue" hoverEffect={true} className="flex-1 min-h-0 !p-0 flex flex-col overflow-hidden">
+      <PremiumCard borderColor="blue" hoverEffect={false} className="flex-1 min-h-0 !p-0 flex flex-col overflow-hidden">
         {sortedAndFilteredList.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-400 p-10">
             <svg className="w-12 h-12 mb-3 text-gray-300 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
@@ -149,7 +149,7 @@ export default function PostListPanel({
 
             {/* 데스크탑 뷰 (테이블형) */}
             <div className="hidden md:flex flex-1 min-h-0 flex-col overflow-hidden">
-              <div className="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
+              <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto custom-scrollbar">
                 <table className="min-w-full divide-y divide-gray-200/80 dark:divide-zinc-800">
                   <AdminTableHeader columns={tableColumns} />
                   <tbody className="bg-white dark:bg-[#202124] divide-y divide-gray-100 dark:divide-zinc-800/60">

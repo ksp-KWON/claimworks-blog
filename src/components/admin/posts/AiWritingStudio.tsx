@@ -129,7 +129,7 @@ export default function AiWritingStudio({
 
   // 공통 AI 어시스턴트 컨트롤 패널 (노아이콘 + 콤팩트 직각 3D 시스템)
   const renderAiControls = () => (
-    <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-[#202124]">
+    <div className="flex flex-col h-full min-h-0 overflow-hidden bg-white dark:bg-[#202124]">
       {/* 1. 패널 헤더 & 모드 탭 (직각 3D) */}
       <div className="shrink-0 p-3 border-b border-gray-200/80 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 sticky top-0 z-10">
         <div className="flex items-center justify-between mb-2">
@@ -349,7 +349,7 @@ export default function AiWritingStudio({
   return (
     <AdminPanelLayout innerClassName="flex-col md:flex-row gap-2.5 relative min-w-0">
       {/* ── 🏝️ 1. 좌측/중앙 메인 에디터 카드 아일랜드 (3D 직각 레이아웃) ── */}
-      <PremiumCard borderColor="blue" hoverEffect={true} className="flex-1 flex flex-col min-w-0 !p-0 h-full overflow-hidden bg-white dark:bg-[#202124]">
+      <PremiumCard borderColor="blue" hoverEffect={false} className="flex-1 flex flex-col min-w-0 !p-0 h-full overflow-hidden bg-white dark:bg-[#202124]">
         <div className="flex-1 min-h-0 flex flex-col overflow-y-auto custom-scrollbar">
           <MarkdownEditor
             title={postMeta.title || ''}
@@ -361,7 +361,7 @@ export default function AiWritingStudio({
       </PremiumCard>
 
       {/* ── 🏝️ 2. 우측 AI 어시스턴트 사이드바 카드 아일랜드 (데스크톱, 콤팩트 직각 3D) ── */}
-      <PremiumCard borderColor="blue" hoverEffect={true} className="hidden md:flex w-80 lg:w-[340px] shrink-0 h-full !p-0 flex-col overflow-hidden bg-white dark:bg-[#202124]">
+      <PremiumCard borderColor="blue" hoverEffect={false} className="hidden md:flex w-80 lg:w-[340px] shrink-0 h-full !p-0 flex-col overflow-hidden bg-white dark:bg-[#202124]">
         {renderAiControls()}
       </PremiumCard>
 

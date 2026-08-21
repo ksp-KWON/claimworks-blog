@@ -531,7 +531,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
   return (
     <AdminPanelLayout innerClassName="flex-col md:flex-row gap-2.5 min-w-0">
       {/* ── 🏝️ 1. 좌측: 월간 캘린더 그리드 카드 아일랜드 ── */}
-      <PremiumCard borderColor="blue" hoverEffect={true} className="flex-1 min-w-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-white dark:bg-zinc-950">
+      <PremiumCard borderColor="blue" hoverEffect={false} className="flex-1 min-w-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-white dark:bg-zinc-950">
         <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-y-auto custom-scrollbar">
           {/* 캘린더 네비게이션 헤더 */}
           <div className="p-3 md:p-4 border-b border-gray-200/80 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-950 sticky top-0 z-10">
@@ -642,7 +642,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
       </PremiumCard>
 
       {/* ── 🏝️ 2. 우측: 손해사정 실무 표준 대장 & 날짜별 진행일지 카드 아일랜드 ── */}
-      <PremiumCard borderColor="blue" hoverEffect={true} className="w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80">
+      <PremiumCard borderColor="blue" hoverEffect={false} className="w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80">
         <AdminHeaderBar 
           title={
             <div className="flex items-center gap-1.5">
@@ -677,7 +677,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
         />
 
         {/* 대장 카드 목록 */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+        <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 custom-scrollbar">
           {isLoading ? (
             <div className="p-8 text-center text-sm text-gray-400">대장 데이터를 불러오는 중...</div>
           ) : selectedDateEvents.length === 0 ? (

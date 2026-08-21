@@ -286,10 +286,10 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
       </PremiumCard>
 
       {/* 🏝️ 2. 메인 데이터 테이블 카드 아일랜드 */}
-      <PremiumCard borderColor="blue" hoverEffect={true} className="flex-1 min-h-0 !p-0 flex flex-col overflow-hidden">
+      <PremiumCard borderColor="blue" hoverEffect={false} className="flex-1 min-h-0 !p-0 flex flex-col overflow-hidden">
         {/* 데스크탑 버전 (Table) */}
         <div className="hidden md:flex flex-1 min-h-0 flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto custom-scrollbar">
             <table className="min-w-full divide-y divide-gray-200/80 dark:divide-zinc-800">
               <AdminTableHeader columns={tableColumns} />
               <tbody className="bg-white dark:bg-[#202124] divide-y divide-gray-100 dark:divide-zinc-800/60">

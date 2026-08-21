@@ -27,7 +27,7 @@ export default function PremiumCard({
     default: 'from-blue-50/80 to-transparent dark:from-blue-900/20'
   };
 
-  let baseClass = 'bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/80 dark:border-white/10 shadow-[0_0_25px_rgba(0,0,0,0.07),0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_0_30px_rgba(0,0,0,0.75)] transition-all duration-300 relative overflow-hidden rounded-none';
+  let baseClass = 'bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/80 dark:border-white/10 shadow-[0_0_25px_rgba(0,0,0,0.07),0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_0_30px_rgba(0,0,0,0.75)] transition-all duration-300 relative overflow-hidden rounded-none flex flex-col min-h-0';
   
   if (hoverEffect) {
     // Add vertical lift to make it pop visually
@@ -60,7 +60,7 @@ export default function PremiumCard({
       {hoverEffect && (
         <div className={`absolute inset-0 bg-gradient-to-br ${gradientMap[borderColor]} opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none z-0`}></div>
       )}
-      <div className={hoverEffect ? "relative z-10 h-full" : "h-full"}>
+      <div className={`w-full h-full flex flex-col min-h-0 flex-1 ${hoverEffect ? 'relative z-10' : ''}`}>
         {children}
       </div>
     </div>

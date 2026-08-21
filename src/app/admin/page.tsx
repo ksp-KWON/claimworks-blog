@@ -91,6 +91,19 @@ export default function AdminPage() {
     }
   };
 
+  useEffect(() => {
+    if (activeApp === 'post-list') {
+      const token = githubToken || localStorage.getItem('github_token') || '';
+      if (token) {
+        setIsLoading(true);
+        fetchPostList(token)
+          .then(list => setPostList(list))
+          .catch(err => console.warn('Auto fetch post list:', err))
+          .finally(() => setIsLoading(false));
+      }
+    }
+  }, [activeApp, githubToken]);
+
   const handleFetchList = async () => {
     if (!githubToken) {
       alert('시스템 설정에서 GitHub Personal Token을 먼저 설정해주세요.');
@@ -392,7 +405,7 @@ export default function AdminPage() {
       </div>
 
       {/* Main Workspace */}
-      <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-zinc-950 p-4 md:p-6 overflow-y-auto pb-[74px] md:pb-6">
+      <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-zinc-950 p-3 md:p-5 overflow-hidden pb-[74px] md:pb-5">
         {/* 실시간 통계 & 시스템 설정 통합 대시보드 */}
         {(activeApp === 'analytics' || activeApp === 'post-settings') && (
           <AnalyticsDashboardPanel />

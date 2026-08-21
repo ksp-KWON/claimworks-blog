@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { UniversalAnalyticsData, SystemCredentials } from '@/lib/analytics/types';
+import { getUniversalAnalyticsData } from '@/lib/analytics/universal-analytics';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumHeading from '@/components/ui/PremiumHeading';
@@ -9,8 +10,8 @@ import PremiumButton from '@/components/ui/PremiumButton';
 
 export default function AnalyticsDashboardPanel() {
   const [period, setPeriod] = useState<'24h' | '7d' | '30d'>('7d');
-  const [data, setData] = useState<UniversalAnalyticsData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [data, setData] = useState<UniversalAnalyticsData>(() => getUniversalAnalyticsData('7d'));
+  const [loading, setLoading] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<string>('');
 
@@ -46,27 +47,23 @@ export default function AnalyticsDashboardPanel() {
   };
 
   useEffect(() => {
-    let isMounted = true;
-    async function fetchAnalytics() {
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/admin-analytics?period=${period}`);
-        if (res.ok) {
-          const json = await res.json();
-          if (isMounted) setData(json);
-        } else {
-          throw new Error('API failed');
-        }
-      } catch (err) {
-        console.warn('Analytics fetch fallback:', err);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    }
-
-    fetchAnalytics();
-    return () => { isMounted = false; };
+    setLoading(true);
+    const analytics = getUniversalAnalyticsData(period);
+    setData(analytics);
+    setLoading(false);
   }, [period]);
+
+  const summary = data?.summary || {
+    uniqueVisitors: 0,
+    totalRequests: 0,
+    pageviews: 0,
+    consultationViews: 0,
+    avgLoadTimeMs: 0,
+    blockedAttacks: 0,
+  };
+  const trend = data?.trend || [];
+  const topReferrers = data?.topReferrers || [];
+  const topPages = data?.topPages || [];
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto w-full">
@@ -183,13 +180,13 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
       )}
 
-      {/* ── 3. KPI 요약 카드 그리드 (PremiumCard 공유) ────────────────────────── */}
+      {/* ── 3. KPI 요약 카드 그리드 ────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: '고유 방문자 (UV)', value: data ? data.summary.uniqueVisitors.toLocaleString() : '-', icon: '👥', color: 'text-blue-600 dark:text-blue-400', border: 'blue' as const },
-          { label: '총 페이지뷰 (PV)', value: data ? data.summary.pageviews.toLocaleString() : '-', icon: '👀', color: 'text-emerald-600 dark:text-emerald-400', border: 'green' as const },
-          { label: '상담 유입 건수', value: data ? `${data.summary.consultationViews}건` : '-', icon: '📋', color: 'text-purple-600 dark:text-purple-400', border: 'purple' as const },
-          { label: '평균 응답 속도', value: data ? `${data.summary.avgLoadTimeMs}ms` : '-', icon: '⚡', color: 'text-amber-600 dark:text-amber-400', border: 'yellow' as const },
+          { label: '고유 방문자 (UV)', value: (summary.uniqueVisitors || 0).toLocaleString(), icon: '👥', color: 'text-blue-600 dark:text-blue-400', border: 'blue' as const },
+          { label: '총 페이지뷰 (PV)', value: (summary.pageviews || 0).toLocaleString(), icon: '👀', color: 'text-emerald-600 dark:text-emerald-400', border: 'green' as const },
+          { label: '상담 유입 건수', value: `${summary.consultationViews || 0}건`, icon: '📋', color: 'text-purple-600 dark:text-purple-400', border: 'purple' as const },
+          { label: '평균 응답 속도', value: `${summary.avgLoadTimeMs || 0}ms`, icon: '⚡', color: 'text-amber-600 dark:text-amber-400', border: 'yellow' as const },
         ].map((kpi, idx) => (
           <PremiumCard key={idx} hoverEffect={true} borderColor={kpi.border} className="!p-4 flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-lg bg-gray-50 dark:bg-zinc-800 flex items-center justify-center text-xl shrink-0 border border-gray-100 dark:border-zinc-700/60 shadow-inner">
@@ -205,7 +202,7 @@ export default function AnalyticsDashboardPanel() {
         ))}
       </div>
 
-      {/* ── 4. 트래픽 추이 차트 & 유입 경로 (PremiumCard 공유) ─────────────────── */}
+      {/* ── 4. 트래픽 추이 차트 & 유입 경로 ─────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <PremiumCard className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-zinc-800 pb-3">
@@ -216,9 +213,9 @@ export default function AnalyticsDashboardPanel() {
           </div>
 
           <div className="h-48 flex items-end gap-2 pt-6 px-2">
-            {data && data.trend.length > 0 ? (
-              data.trend.map((t, idx) => {
-                const maxReq = Math.max(...data.trend.map(d => d.requests), 1);
+            {trend.length > 0 ? (
+              trend.map((t, idx) => {
+                const maxReq = Math.max(...trend.map(d => d.requests), 1);
                 const heightPercent = Math.max(12, (t.requests / maxReq) * 100);
                 return (
                   <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 group">
@@ -252,8 +249,8 @@ export default function AnalyticsDashboardPanel() {
           </div>
 
           <div className="space-y-3">
-            {data && data.topReferrers.length > 0 ? (
-              data.topReferrers.map((ref, idx) => (
+            {topReferrers.length > 0 ? (
+              topReferrers.map((ref, idx) => (
                 <div key={idx} className="space-y-1">
                   <div className="flex justify-between text-xs font-bold">
                     <span className="text-gray-700 dark:text-zinc-300">{ref.source}</span>
@@ -268,7 +265,7 @@ export default function AnalyticsDashboardPanel() {
                 </div>
               ))
             ) : (
-              <div className="text-xs text-gray-400 py-8 text-center">유입 채널 분석 중...</div>
+              <div className="text-xs text-gray-400 py-8 text-center">유입 채널 집계 완료 대기중...</div>
             )}
           </div>
         </PremiumCard>
@@ -284,8 +281,8 @@ export default function AnalyticsDashboardPanel() {
         </div>
 
         <div className="divide-y divide-gray-100 dark:divide-zinc-800/60 overflow-x-auto">
-          {data && data.topPages.length > 0 ? (
-            data.topPages.map((page, idx) => (
+          {topPages.length > 0 ? (
+            topPages.map((page, idx) => (
               <div key={idx} className="p-3.5 sm:px-5 flex items-center justify-between gap-4 hover:bg-gray-50/80 dark:hover:bg-zinc-800/40 transition-colors">
                 <div className="flex items-center gap-3 min-w-0">
                   <span className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-extrabold shrink-0 ${idx < 3 ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400'}`}>
@@ -302,7 +299,7 @@ export default function AnalyticsDashboardPanel() {
                 </div>
                 <div className="flex items-center gap-4 shrink-0 text-xs">
                   <span className="font-bold text-gray-900 dark:text-white">
-                    {page.views.toLocaleString()} <span className="text-gray-400 font-normal">PV</span>
+                    {(page.views || 0).toLocaleString()} <span className="text-gray-400 font-normal">PV</span>
                   </span>
                 </div>
               </div>

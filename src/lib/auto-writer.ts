@@ -201,7 +201,7 @@ export async function runAutoGenerationWorkflow(
 }
 
 export async function runManualGenerationWorkflow(
-  mode: 'manual-preserve' | 'manual-expand' | 'manual-naver' | 'naver-expand' | 'semi-auto',
+  mode: 'manual-preserve' | 'manual-expand' | 'manual-naver' | 'naver-expand' | 'semi-auto' | 'semi-auto-naver',
   aiInput: string,
   geminiKey: string,
   onProgress: (msg: string) => void

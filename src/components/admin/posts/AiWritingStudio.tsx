@@ -7,7 +7,7 @@ import { copyToNaverClipboard } from '@/lib/naver-formatter';
 
 interface AiWritingStudioProps {
   isLoading: boolean;
-  onRunAi: (mode: 'manual-preserve' | 'manual-expand' | 'manual-naver' | 'naver-expand' | 'semi-auto', inputText: string) => void;
+  onRunAi: (mode: 'manual-preserve' | 'manual-expand' | 'manual-naver' | 'naver-expand' | 'semi-auto' | 'semi-auto-naver', inputText: string) => void;
   postMeta: any;
   setPostMeta: any;
   onSavePost: (isDraft?: boolean) => void;
@@ -36,6 +36,11 @@ const NAVER_MODES = [
   {
     id: 'naver-expand', label: '네이버 블로그 확장', badge: '신규 창작',
     desc: '핵심 키워드로 풍부한 네이버 블로그 원고를 창작합니다.',
+    activeClass: 'border-l-[3px] border-emerald-600 bg-emerald-50/70 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-200 shadow-sm'
+  },
+  {
+    id: 'semi-auto-naver', label: '링크/키워드 기획', badge: '반자동',
+    desc: '키워드·링크로 네이버 D.I.A.+ 공감 스토리 원고를 창작합니다.',
     activeClass: 'border-l-[3px] border-emerald-600 bg-emerald-50/70 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-200 shadow-sm'
   }
 ];
@@ -67,7 +72,7 @@ export default function AiWritingStudio({
   
   const [activePanelTab, setActivePanelTab] = useState<'manual' | 'auto'>('manual');
   const [platform, setPlatform] = useState<'naver' | 'google'>('naver');
-  const [aiMode, setAiMode] = useState<'manual-preserve' | 'manual-expand' | 'manual-naver' | 'naver-expand' | 'semi-auto'>('manual-naver');
+  const [aiMode, setAiMode] = useState<'manual-preserve' | 'manual-expand' | 'manual-naver' | 'naver-expand' | 'semi-auto' | 'semi-auto-naver'>('manual-naver');
   const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0]);
 
   // Mobile Bottom Sheet State

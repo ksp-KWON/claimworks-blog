@@ -74,9 +74,13 @@ function processPost(filePath) {
   }
 
   // ── [4. 다단계 솔루션(①~⑳) 콜론 분리 및 H6 헤딩 승격] ───────────────────
+  // 이미 ###### 로 시작하지 않는 일반 텍스트 솔루션 줄만 H6로 승격 (1:1 등 콜론 오분리 방지)
   body = body.replace(
-    /(?:^|\r?\n)(?:#{1,6}\s*)?([①-⑳])\s*(?:\*\*)?(?:[1-9]단계\s*:\s*)?([^\n:]+?)(?:\*\*)?\s*:\s*([^\n]+)/g,
+    /(?:^|\r?\n)(?<!#\s*)([①-⑳])\s*(?:\*\*)?(?:[1-9]단계\s*:\s*)?([^\n:]+?)(?:\*\*)?\s*:\s*([^\n]+)/g,
     (m, num, title, desc) => {
+      if (m.trim().startsWith('#')) return m;
+      // 1:1, 24:00 등 숫자 비율/시간 예외
+      if (/\d+$/.test(title.trim()) && /^\d+/.test(desc.trim())) return m;
       const cleanTitle = title.replace(/[*_#]/g, '').trim();
       const cleanDesc = desc.trim();
       return `\n\n###### ${num} ${cleanTitle}\n\n${cleanDesc}`;

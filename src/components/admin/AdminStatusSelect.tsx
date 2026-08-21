@@ -2,43 +2,78 @@
 
 import React from 'react';
 
-interface AdminStatusSelectProps {
-  status: string;
-  onStatusChange: (newStatus: string) => void;
-  onDelete: () => void;
+export interface AdminStatusSelectProps {
+  status?: string;
+  value?: string;
+  onStatusChange?: (newStatus: any) => void;
+  onChange?: (newStatus: any) => void;
+  onDelete?: () => void;
+  options?: { value: string; label: string }[];
   className?: string;
 }
 
-export function AdminStatusSelect({ status, onStatusChange, onDelete, className = '' }: AdminStatusSelectProps) {
-  // Normalize status strings for display (e.g. '상담완료' -> '완료')
-  const normalizedStatus = status === '상담완료' || status === '상담 완료' ? '완료' : (status || '대기');
+const DEFAULT_OPTIONS = [
+  { value: '대기', label: '대기' },
+  { value: '미확인', label: '미확인' },
+  { value: '상담중', label: '상담중' },
+  { value: '상담', label: '상담' },
+  { value: '보류', label: '보류' },
+  { value: '완료', label: '완료' },
+  { value: '종결', label: '종결' },
+  { value: '삭제', label: '삭제' },
+];
+
+export function AdminStatusSelect({
+  status,
+  value,
+  onStatusChange,
+  onChange,
+  onDelete,
+  options = DEFAULT_OPTIONS,
+  className = ''
+}: AdminStatusSelectProps) {
+  const currentVal = value || status || '대기';
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newVal = e.target.value;
+    if (newVal === '삭제' && onDelete) {
+      if (confirm('정말로 이 항목을 삭제하시겠습니까?')) {
+        onDelete();
+      }
+      return;
+    }
+    if (onStatusChange) onStatusChange(newVal);
+    if (onChange) onChange(newVal);
+  };
+
+  const getStyle = (val: string) => {
+    const v = val.toLowerCase();
+    if (v.includes('미확인') || v.includes('new') || v.includes('대기')) {
+      return 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50';
+    }
+    if (v.includes('상담') || v.includes('진행') || v.includes('답변완료')) {
+      return 'bg-blue-50 dark:bg-blue-950/40 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-200 dark:border-blue-800/50';
+    }
+    if (v.includes('보류') || v.includes('재검토')) {
+      return 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/50';
+    }
+    if (v.includes('종결') || v.includes('완료') || v.includes('발행')) {
+      return 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50';
+    }
+    return 'bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700';
+  };
 
   return (
     <select
-      value={normalizedStatus}
-      onClick={e => e.stopPropagation()}
-      onChange={(e) => {
-        const val = e.target.value;
-        if (val === 'delete') {
-          e.target.value = normalizedStatus; // revert visual selection temporarily
-          onDelete();
-        } else {
-          onStatusChange(val);
-        }
-      }}
-      className={`appearance-none text-center font-bold outline-none border-0 cursor-pointer shadow-sm shrink-0 ${
-        normalizedStatus === '대기' ? 'bg-red-50 text-red-600' :
-        normalizedStatus === '상담' ? 'bg-blue-50 text-blue-600' :
-        normalizedStatus === '완료' ? 'bg-green-50 text-green-600' :
-        normalizedStatus === '보류' ? 'bg-yellow-50 text-yellow-600' :
-        'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-gray-300'
-      } ${className}`}
+      value={currentVal}
+      onChange={handleChange}
+      className={`text-xs font-bold px-2.5 py-1 rounded-xl border appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all ${getStyle(currentVal)} ${className}`}
     >
-      <option value="대기" className="text-gray-900 bg-white font-medium">대기</option>
-      <option value="상담" className="text-gray-900 bg-white font-medium">상담</option>
-      <option value="완료" className="text-gray-900 bg-white font-medium">완료</option>
-      <option value="보류" className="text-gray-900 bg-white font-medium">보류</option>
-      <option value="delete" className="text-red-600 bg-white font-bold">삭제</option>
+      {options.map((opt) => (
+        <option key={opt.value} value={opt.value} className="bg-white dark:bg-zinc-900 text-gray-900 dark:text-white">
+          {opt.label}
+        </option>
+      ))}
     </select>
   );
 }

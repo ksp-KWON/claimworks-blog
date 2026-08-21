@@ -1,19 +1,25 @@
+'use client';
+
 import React from 'react';
-import PremiumCard from '@/components/ui/PremiumCard';
 
 interface AdminPanelLayoutProps {
   children: React.ReactNode;
   innerClassName?: string;
+  className?: string;
 }
 
-export default function AdminPanelLayout({ children, innerClassName = "flex flex-col w-full h-full bg-white dark:bg-[#111111]" }: AdminPanelLayoutProps) {
+export default function AdminPanelLayout({
+  children,
+  innerClassName = "flex flex-col w-full h-full bg-white dark:bg-zinc-900",
+  className = ""
+}: AdminPanelLayoutProps) {
   return (
-    <div className="flex-1 min-h-0 flex flex-col p-4 md:p-8 bg-gray-50 dark:bg-zinc-950">
-      <PremiumCard className="flex-1 min-h-0 p-0 overflow-hidden relative block border-0 md:border md:border-gray-200 dark:md:border-zinc-800 shadow-sm">
-        <div className={`absolute inset-0 ${innerClassName}`}>
+    <div className={`flex-1 min-h-0 flex flex-col max-w-7xl mx-auto w-full ${className}`}>
+      <div className="flex-1 min-h-0 flex flex-col bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden transition-all">
+        <div className={`w-full h-full flex flex-col min-h-0 ${innerClassName}`}>
           {children}
         </div>
-      </PremiumCard>
+      </div>
     </div>
   );
 }

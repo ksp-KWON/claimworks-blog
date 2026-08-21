@@ -80,7 +80,7 @@ export default function PostListPanel({
             {/* 모바일 뷰 (카드형) */}
             <div className="md:hidden flex-1 min-h-0 overflow-y-auto space-y-3 custom-scrollbar">
                 {sortedAndFilteredList.map((post) => (
-                  <PremiumCard key={post.sha} borderColor="blue" hoverEffect={true} className="p-4 transition-all rounded-none shadow-[0_8px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_25px_rgba(0,0,0,0.5)] border border-gray-200/80 dark:border-white/10">
+                  <PremiumCard key={post.sha} borderColor="blue" hoverEffect={true} className="p-4 transition-all rounded-none shadow-[0_0_25px_rgba(0,0,0,0.07),0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_0_30px_rgba(0,0,0,0.6)] border border-gray-200/80 dark:border-white/10">
                     <div className="flex flex-col gap-3">
                       <div className="flex items-center gap-2 overflow-hidden">
                         <div className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug truncate flex-1 min-w-0">

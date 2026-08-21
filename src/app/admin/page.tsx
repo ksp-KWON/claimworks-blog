@@ -296,7 +296,7 @@ export default function AdminPage() {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex flex-col justify-center items-center p-4">
-        <div className="max-w-md w-full bg-white dark:bg-[#202124] rounded-none shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] p-8 border border-gray-200/80 dark:border-white/10 relative overflow-hidden">
+        <div className="max-w-md w-full bg-white dark:bg-[#202124] rounded-none shadow-[0_0_50px_rgba(0,0,0,0.12),0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_0_60px_rgba(0,0,0,0.75)] p-8 border border-gray-200/80 dark:border-white/10 relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--google-blue)] via-indigo-500 to-purple-500" />
           <div className="text-center mb-8">
             <Image src="/logo.png" alt="보상스쿨" width={180} height={45} className="mx-auto h-10 w-auto dark:brightness-110 mb-4" priority />

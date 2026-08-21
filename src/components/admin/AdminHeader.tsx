@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
+import PremiumHeading from '@/components/ui/PremiumHeading';
 
-export const adminHeaderClasses = "bg-white dark:bg-zinc-900 border-b border-gray-200/80 dark:border-zinc-800 shrink-0";
+export const adminHeaderClasses = "bg-white dark:bg-[#202124] border-b border-gray-200/80 dark:border-white/10 shrink-0";
 
 interface AdminTableHeaderProps {
   columns: {
@@ -41,9 +42,15 @@ interface AdminHeaderBarProps {
 export function AdminHeaderBar({ title, rightContent, action, className = '' }: AdminHeaderBarProps) {
   const finalAction = action || rightContent;
   return (
-    <div className={`h-[56px] px-4 md:px-6 flex justify-between items-center z-10 ${adminHeaderClasses} ${className}`}>
-      <div className="text-sm md:text-base font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
-        {title}
+    <div className={`h-[58px] px-4 md:px-6 flex justify-between items-center z-10 ${adminHeaderClasses} ${className}`}>
+      <div className="flex items-center gap-2">
+        {typeof title === 'string' ? (
+          <PremiumHeading level={3} showLeftBorder={true} gradient="blue" className="!mb-0 !text-sm sm:!text-base">
+            {title}
+          </PremiumHeading>
+        ) : (
+          title
+        )}
       </div>
       {finalAction && <div className="flex items-center gap-2.5">{finalAction}</div>}
     </div>

@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { UniversalAnalyticsData, SystemCredentials } from '@/lib/analytics/types';
-import AdminSectionHeader from './ui/AdminSectionHeader';
-import AdminCard from './ui/AdminCard';
+import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumHeading from '@/components/ui/PremiumHeading';
+import PremiumButton from '@/components/ui/PremiumButton';
 
 export default function AnalyticsDashboardPanel() {
   const [period, setPeriod] = useState<'24h' | '7d' | '30d'>('7d');
@@ -68,45 +70,51 @@ export default function AnalyticsDashboardPanel() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto w-full">
-      {/* 👑 통합 관리자 섹션 헤더 */}
-      <AdminSectionHeader
-        icon={<span>📊</span>}
-        title="실시간 웹 트래픽 & 대시보드 통계"
-        badgeText="W3C Privacy-First"
-        badgeColor="blue"
-        description="Cloudflare 엣지 네트워크 기반의 실시간 방문자 수, 페이지뷰, 인기 포스팅 분석 데이터입니다."
-      >
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border ${showSettings ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-200 dark:border-blue-800' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 border-gray-200 dark:border-zinc-700 hover:bg-gray-50'}`}
-          >
-            <span>⚙️</span>
-            <span>시스템 API 설정</span>
-          </button>
+      {/* 👑 프론트엔드 공통 PremiumCard + PremiumHeading 헤더 */}
+      <PremiumCard className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <PremiumHeading level={2} showLeftBorder={true} gradient="blue" className="!mb-0 !text-base sm:!text-lg">
+              실시간 웹 트래픽 & 대시보드 통계
+            </PremiumHeading>
+            <PremiumBadge color="blue">W3C Privacy-First</PremiumBadge>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1 pl-3.5">
+            Cloudflare 엣지 네트워크 기반의 실시간 방문자 수, 페이지뷰, 인기 포스팅 분석 데이터입니다.
+          </p>
+        </div>
 
-          <div className="flex bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl border border-gray-200/80 dark:border-zinc-700 text-xs font-bold">
+        <div className="flex items-center gap-2 shrink-0">
+          <PremiumButton
+            variant="secondary"
+            onClick={() => setShowSettings(!showSettings)}
+            className="!px-3 !py-1.5 !text-xs"
+            icon={<span>⚙️</span>}
+          >
+            시스템 API 설정
+          </PremiumButton>
+
+          <div className="flex bg-gray-100 dark:bg-zinc-800 p-1 rounded-lg border border-gray-200/80 dark:border-zinc-700 text-xs font-bold">
             {(['24h', '7d', '30d'] as const).map((p) => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
-                className={`px-2.5 py-1 rounded-lg transition-all ${period === p ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900'}`}
+                className={`px-2.5 py-1 rounded-md transition-all ${period === p ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] shadow-sm font-bold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900'}`}
               >
                 {p === '24h' ? '24시간' : p === '7d' ? '7일간' : '30일간'}
               </button>
             ))}
           </div>
         </div>
-      </AdminSectionHeader>
+      </PremiumCard>
 
       {/* ⚙️ 시스템 API 자격증명 설정 아코디언 카드 */}
       {showSettings && (
-        <AdminCard className="border-blue-200 dark:border-blue-900/50 bg-gradient-to-b from-blue-50/30 to-transparent dark:from-blue-950/20">
+        <PremiumCard borderColor="blue" className="bg-gradient-to-b from-blue-50/30 to-transparent dark:from-blue-950/20">
           <div className="flex items-center justify-between border-b border-gray-200/80 dark:border-zinc-800 pb-3 mb-4">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🔐</span>
-              <h3 className="font-bold text-sm text-gray-900 dark:text-white">통합 시스템 자격증명 & API 키 관리</h3>
-            </div>
+            <PremiumHeading level={3} showLeftBorder={true} gradient="blue" className="!mb-0 !text-sm">
+              통합 시스템 자격증명 & API 키 관리
+            </PremiumHeading>
             <span className="text-[11px] text-gray-500 dark:text-zinc-400">브라우저 로컬 암호화 저장</span>
           </div>
 
@@ -121,7 +129,7 @@ export default function AnalyticsDashboardPanel() {
                   value={credentials.geminiApiKey}
                   onChange={(e) => setCredentials({ ...credentials, geminiApiKey: e.target.value })}
                   placeholder="AI_zaSy..."
-                  className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-1 focus:ring-blue-500 font-mono text-gray-900 dark:text-zinc-100"
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-1 focus:ring-blue-500 font-mono text-gray-900 dark:text-zinc-100"
                 />
               </div>
 
@@ -134,7 +142,7 @@ export default function AnalyticsDashboardPanel() {
                   value={credentials.githubToken}
                   onChange={(e) => setCredentials({ ...credentials, githubToken: e.target.value })}
                   placeholder="github_pat_..."
-                  className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-1 focus:ring-blue-500 font-mono text-gray-900 dark:text-zinc-100"
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-1 focus:ring-blue-500 font-mono text-gray-900 dark:text-zinc-100"
                 />
               </div>
 
@@ -147,7 +155,7 @@ export default function AnalyticsDashboardPanel() {
                   value={credentials.cloudflareZoneId || ''}
                   onChange={(e) => setCredentials({ ...credentials, cloudflareZoneId: e.target.value })}
                   placeholder="Zone ID (32자리)"
-                  className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-1 focus:ring-blue-500 font-mono text-gray-900 dark:text-zinc-100"
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-1 focus:ring-blue-500 font-mono text-gray-900 dark:text-zinc-100"
                 />
               </div>
 
@@ -160,34 +168,31 @@ export default function AnalyticsDashboardPanel() {
                   value={credentials.cloudflareApiToken || ''}
                   onChange={(e) => setCredentials({ ...credentials, cloudflareApiToken: e.target.value })}
                   placeholder="Analytics Read Token"
-                  className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-1 focus:ring-blue-500 font-mono text-gray-900 dark:text-zinc-100"
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-1 focus:ring-blue-500 font-mono text-gray-900 dark:text-zinc-100"
                 />
               </div>
             </div>
 
             <div className="flex items-center justify-between pt-2">
               <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{saveStatus}</span>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-[var(--google-blue)] text-white text-xs font-bold rounded-xl hover:bg-blue-600 transition-colors shadow-sm"
-              >
+              <PremiumButton type="submit" variant="primary" className="!px-4 !py-2 !text-xs">
                 자격증명 로컬 저장
-              </button>
+              </PremiumButton>
             </div>
           </form>
-        </AdminCard>
+        </PremiumCard>
       )}
 
-      {/* ── 3. KPI 요약 카드 그리드 ────────────────────────────────────────── */}
+      {/* ── 3. KPI 요약 카드 그리드 (PremiumCard 공유) ────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: '고유 방문자 (UV)', value: data ? data.summary.uniqueVisitors.toLocaleString() : '-', icon: '👥', color: 'text-blue-600 dark:text-blue-400' },
-          { label: '총 페이지뷰 (PV)', value: data ? data.summary.pageviews.toLocaleString() : '-', icon: '👀', color: 'text-emerald-600 dark:text-emerald-400' },
-          { label: '상담 유입 건수', value: data ? `${data.summary.consultationViews}건` : '-', icon: '📋', color: 'text-purple-600 dark:text-purple-400' },
-          { label: '평균 응답 속도', value: data ? `${data.summary.avgLoadTimeMs}ms` : '-', icon: '⚡', color: 'text-amber-600 dark:text-amber-400' },
+          { label: '고유 방문자 (UV)', value: data ? data.summary.uniqueVisitors.toLocaleString() : '-', icon: '👥', color: 'text-blue-600 dark:text-blue-400', border: 'blue' as const },
+          { label: '총 페이지뷰 (PV)', value: data ? data.summary.pageviews.toLocaleString() : '-', icon: '👀', color: 'text-emerald-600 dark:text-emerald-400', border: 'green' as const },
+          { label: '상담 유입 건수', value: data ? `${data.summary.consultationViews}건` : '-', icon: '📋', color: 'text-purple-600 dark:text-purple-400', border: 'purple' as const },
+          { label: '평균 응답 속도', value: data ? `${data.summary.avgLoadTimeMs}ms` : '-', icon: '⚡', color: 'text-amber-600 dark:text-amber-400', border: 'yellow' as const },
         ].map((kpi, idx) => (
-          <AdminCard key={idx} className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-gray-50 dark:bg-zinc-800 flex items-center justify-center text-xl shrink-0 border border-gray-100 dark:border-zinc-700/60 shadow-inner">
+          <PremiumCard key={idx} hoverEffect={true} borderColor={kpi.border} className="!p-4 flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-lg bg-gray-50 dark:bg-zinc-800 flex items-center justify-center text-xl shrink-0 border border-gray-100 dark:border-zinc-700/60 shadow-inner">
               {kpi.icon}
             </div>
             <div>
@@ -196,19 +201,17 @@ export default function AnalyticsDashboardPanel() {
                 {loading ? '...' : kpi.value}
               </p>
             </div>
-          </AdminCard>
+          </PremiumCard>
         ))}
       </div>
 
-      {/* ── 4. 트래픽 추이 차트 & 유입 경로 ─────────────────────────────────── */}
+      {/* ── 4. 트래픽 추이 차트 & 유입 경로 (PremiumCard 공유) ─────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* 방문 추이 차트 */}
-        <AdminCard className="lg:col-span-2">
+        <PremiumCard className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-zinc-800 pb-3">
-            <h3 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-              <span>📈</span>
-              <span>일별 방문 추이 분석</span>
-            </h3>
+            <PremiumHeading level={3} showLeftBorder={true} gradient="blue" className="!mb-0 !text-sm">
+              일별 방문 추이 분석
+            </PremiumHeading>
             <span className="text-[11px] text-gray-400">최근 {period === '24h' ? '24시간' : period === '7d' ? '7일' : '30일'}</span>
           </div>
 
@@ -224,7 +227,7 @@ export default function AnalyticsDashboardPanel() {
                     </div>
                     <div
                       style={{ height: `${heightPercent}%` }}
-                      className="w-full max-w-[28px] rounded-t-lg bg-gradient-to-t from-[var(--google-blue)] to-blue-400 dark:from-blue-700 dark:to-blue-400 group-hover:brightness-110 transition-all shadow-sm"
+                      className="w-full max-w-[28px] rounded-t-md bg-gradient-to-t from-[var(--google-blue)] to-blue-400 dark:from-blue-700 dark:to-blue-400 group-hover:brightness-110 transition-all shadow-sm"
                     />
                     <span className="text-[10px] text-gray-400 truncate w-full text-center">
                       {t.label}
@@ -238,15 +241,13 @@ export default function AnalyticsDashboardPanel() {
               </div>
             )}
           </div>
-        </AdminCard>
+        </PremiumCard>
 
-        {/* 주요 유입 채널 */}
-        <AdminCard>
+        <PremiumCard>
           <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-zinc-800 pb-3">
-            <h3 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-              <span>🧭</span>
-              <span>검색 & 유입 채널</span>
-            </h3>
+            <PremiumHeading level={3} showLeftBorder={true} gradient="indigo" className="!mb-0 !text-sm">
+              검색 & 유입 채널
+            </PremiumHeading>
             <span className="text-[11px] text-gray-400">비율</span>
           </div>
 
@@ -270,17 +271,16 @@ export default function AnalyticsDashboardPanel() {
               <div className="text-xs text-gray-400 py-8 text-center">유입 채널 분석 중...</div>
             )}
           </div>
-        </AdminCard>
+        </PremiumCard>
       </div>
 
       {/* ── 5. 인기 보상 칼럼 TOP 10 ───────────────────────────────────────── */}
-      <AdminCard noPadding={true}>
+      <PremiumCard className="!p-0">
         <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
-          <h3 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-            <span>🏆</span>
-            <span>가장 많이 읽은 인기 보상 칼럼 TOP 10</span>
-          </h3>
-          <span className="text-[11px] font-bold text-[var(--google-blue)] dark:text-[#8ab4f8]">실시간 조회수</span>
+          <PremiumHeading level={3} showLeftBorder={true} gradient="yellow" className="!mb-0 !text-sm">
+            가장 많이 읽은 인기 보상 칼럼 TOP 10
+          </PremiumHeading>
+          <PremiumBadge color="blue">실시간 조회수</PremiumBadge>
         </div>
 
         <div className="divide-y divide-gray-100 dark:divide-zinc-800/60 overflow-x-auto">
@@ -288,7 +288,7 @@ export default function AnalyticsDashboardPanel() {
             data.topPages.map((page, idx) => (
               <div key={idx} className="p-3.5 sm:px-5 flex items-center justify-between gap-4 hover:bg-gray-50/80 dark:hover:bg-zinc-800/40 transition-colors">
                 <div className="flex items-center gap-3 min-w-0">
-                  <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0 ${idx < 3 ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400'}`}>
+                  <span className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-extrabold shrink-0 ${idx < 3 ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 shadow-sm' : 'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400'}`}>
                     {idx + 1}
                   </span>
                   <a
@@ -311,7 +311,7 @@ export default function AnalyticsDashboardPanel() {
             <div className="p-8 text-center text-xs text-gray-400">인기 포스트 집계 중...</div>
           )}
         </div>
-      </AdminCard>
+      </PremiumCard>
     </div>
   );
 }

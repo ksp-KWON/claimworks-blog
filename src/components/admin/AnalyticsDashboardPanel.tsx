@@ -55,7 +55,7 @@ export default function AnalyticsDashboardPanel() {
       if (cfZone) headers['x-cf-zone-id'] = cfZone;
       if (cfToken) headers['x-cf-api-token'] = cfToken;
 
-      const res = await fetch(`/api/admin/analytics?period=${period}`, { headers });
+      const res = await fetch(`/api/admin-analytics?period=${period}`, { headers });
       const json = await res.json();
       if (json.success && json.data) {
         setData(json.data);

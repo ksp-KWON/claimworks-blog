@@ -6,12 +6,13 @@ interface CommonBoxProps {
   tone: BoxTone;
   title: string;
   children: React.ReactNode;
+  icon?: React.ReactNode;
   headerRight?: React.ReactNode;
   topElement?: React.ReactNode;
   emoji?: string; // 하위 호환성 유지용 (렌더링은 배제)
 }
 
-export default function CommonBox({ tone, title, children, headerRight, topElement }: CommonBoxProps) {
+export default function CommonBox({ tone, title, children, icon, headerRight, topElement }: CommonBoxProps) {
   const boxHoverBorders: Record<BoxTone, string> = {
     blue: 'border-blue-200 dark:border-blue-900/50 hover:border-[var(--google-blue)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.18)]',
     red: 'border-red-200 dark:border-red-900/50 hover:border-[var(--google-red)] hover:shadow-[0_12px_40px_rgba(234,67,53,0.18)]',
@@ -41,9 +42,10 @@ export default function CommonBox({ tone, title, children, headerRight, topEleme
       {topElement}
 
       <div className="relative z-10">
-        {/* Full-width clean header strip (No-Emoji Pure Typography) */}
+        {/* Full-width clean header strip with SVG line symbol */}
         <div className={`-mt-5 sm:-mt-6 -mx-5 sm:-mx-6 px-5 sm:px-6 py-3.5 mb-4 flex items-center justify-between gap-3 flex-wrap ${headerGradients[tone]}`}>
-          <h3 className={`text-[15.5px] font-extrabold pl-2.5 flex items-center tracking-tight ${titleStyles[tone]}`}>
+          <h3 className={`text-[15.5px] font-extrabold pl-2.5 flex items-center gap-2 tracking-tight ${titleStyles[tone]}`}>
+            {icon && <span className="shrink-0 flex items-center">{icon}</span>}
             <span>{title}</span>
           </h3>
           {headerRight && <div>{headerRight}</div>}

@@ -197,12 +197,21 @@ export const sharedComponents: Components & Record<string, any> = {
     if (headingElement && React.isValidElement(headingElement)) {
       const headingChildren = (headingElement.props as any)?.children;
 
+      const insightSvgIcon = (
+        <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <path d="M12 8v4" />
+          <path d="M12 16h.01" />
+        </svg>
+      );
+
       return (
         <div className={`my-8 bg-white dark:bg-[#202124] shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden group border rounded-none ${boxHoverBorders[tone]}`}>
-          {/* 상단 톤온톤 헤더 바 (Pure Typography) */}
+          {/* 상단 톤온톤 헤더 바 (모던 SVG 라인 심볼 탑재) */}
           <div className={`px-5 sm:px-6 py-3 bg-gradient-to-r ${headerGradients[tone]} relative z-10`}>
-            <h3 className={`text-[15.5px] font-extrabold pl-2.5 flex items-center tracking-tight !m-0 !p-0 border-0 bg-transparent ${titleColors[tone]}`}>
-              {headingChildren}
+            <h3 className={`text-[15.5px] font-extrabold pl-2.5 flex items-center gap-2 tracking-tight !m-0 !p-0 border-0 bg-transparent ${titleColors[tone]}`}>
+              <span className="shrink-0 flex items-center">{insightSvgIcon}</span>
+              <span>{headingChildren}</span>
             </h3>
           </div>
           {/* 본문 영역 */}

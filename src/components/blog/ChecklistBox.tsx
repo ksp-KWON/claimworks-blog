@@ -31,10 +31,18 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
     </div>
   );
 
+  const icon = (
+    <svg className="w-4 h-4 text-[var(--google-green)] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 11l3 3L22 4" />
+      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+    </svg>
+  );
+
   return (
     <CommonBox
       tone="green"
       title="1분 자가진단 체크리스트"
+      icon={icon}
       topElement={progressBar}
       headerRight={headerRight}
     >

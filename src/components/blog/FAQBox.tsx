@@ -16,8 +16,14 @@ interface FAQBoxProps {
 export default function FAQBox({ items }: FAQBoxProps) {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
+  const icon = (
+    <svg className="w-4 h-4 text-[var(--google-blue)] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+
   return (
-    <CommonBox tone="blue" title="자주 묻는 질문 (FAQ)">
+    <CommonBox tone="blue" title="자주 묻는 질문 (FAQ)" icon={icon}>
       <div className="divide-y divide-gray-100 dark:divide-white/5">
         {items.map((item, i) => (
           <div key={i}>

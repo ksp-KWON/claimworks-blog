@@ -329,110 +329,105 @@ export default function AdminPage() {
 
   return (
     <div className="h-screen overflow-hidden flex flex-col bg-white dark:bg-zinc-950 font-sans">
-      {/* Universal Top Header Bar */}
-      <div className="h-[60px] bg-[#f8f9fa] dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 md:px-6 flex items-center justify-between z-20 shrink-0 shadow-sm">
-        <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt="보상스쿨" width={120} height={30} className="h-6 w-auto dark:brightness-110" priority />
-          <span className="hidden sm:inline-block text-xs font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/20 px-2.5 py-0.5 rounded-none border border-blue-200 dark:border-blue-800 shadow-sm">
-            통합 관리자
-          </span>
-        </div>
+      {/* Universal Top Header Bar (작업영역과 100% 일치하는 max-w-7xl 레이아웃) */}
+      <div className="h-[60px] bg-white dark:bg-zinc-900 border-b border-gray-200/80 dark:border-zinc-800 px-2.5 sm:px-3.5 z-20 shrink-0 shadow-[0_2px_10px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.4)]">
+        <div className="max-w-7xl mx-auto w-full h-full flex items-center justify-between gap-3">
+          {/* 좌측 로고 & 통합 관리자 타이틀 */}
+          <div className="flex items-center gap-3 shrink-0">
+            <Image src="/logo.png" alt="보상스쿨" width={120} height={30} className="h-6 w-auto dark:brightness-110" priority />
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 text-[11px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/80 rounded-none shadow-sm">
+              통합 관리자
+            </span>
+          </div>
 
-        {/* 중앙 검색창 (상담/채팅/원고 관리 시만 표시) */}
-        <div className="flex-1 flex items-center justify-center px-4">
-          {(activeApp === 'consult-manage' || activeApp === 'post-list' || activeApp === 'chat-manage') && (
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="제목/내용 검색..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-3 py-1.5 w-48 sm:w-64 bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm font-sans"
-                />
+          {/* 중앙 검색창 (상담/채팅/원고 관리 시만 표시) */}
+          <div className="flex-1 flex items-center justify-center px-2 min-w-0">
+            {(activeApp === 'consult-manage' || activeApp === 'post-list' || activeApp === 'chat-manage') && (
+              <div className="flex items-center gap-1.5 w-full max-w-xs sm:max-w-sm">
+                <div className="relative flex-1">
+                  <svg className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="제목/내용 검색..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-8 pr-2.5 py-1.5 w-full bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm font-sans"
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    if (activeApp === 'post-list') handleFetchList();
+                    else setRefreshCounter(c => c + 1);
+                  }}
+                  className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-none transition-colors border border-gray-200 dark:border-zinc-700 shadow-sm shrink-0"
+                  title="새로고침"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
               </div>
-              <button
-                onClick={() => {
-                  if (activeApp === 'post-list') handleFetchList();
-                  else setRefreshCounter(c => c + 1);
-                }}
-                className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-none transition-colors border border-gray-200 dark:border-zinc-700 shadow-sm"
-                title="새로고침"
-              >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              </button>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* 우측 메인 네비게이션 메뉴 (3D 입체 직각 탭) */}
-        <div className="hidden md:flex items-center gap-1 shrink-0">
-          <button 
-            onClick={() => setActiveApp('analytics')}
-            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'analytics' || activeApp === 'post-settings' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
-          >
-            통계 관리
-          </button>
-          
-          <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />
-          
-          <button 
-            onClick={() => setActiveApp('consult-manage')}
-            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'consult-manage' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
-          >
-            상담 관리
-          </button>
-          
-          <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />
-          
-          <button 
-            onClick={() => setActiveApp('chat-manage')}
-            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'chat-manage' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
-          >
-            채팅 관리
-          </button>
-          
-          <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />
-          
-          <button 
-            onClick={() => setActiveApp('calendar')}
-            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'calendar' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
-          >
-            일정 관리
-          </button>
-          
-          <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />
-          
-          <button 
-            onClick={() => setActiveApp('post-list')}
-            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'post-list' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
-          >
-            원고 관리
-          </button>
-          
-          <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />
- 
-          <button 
-            onClick={() => setActiveApp('post-ai')}
-            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'post-ai' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
-          >
-            작업 관리
-          </button>
-          
-          <button 
-            onClick={() => {
-              sessionStorage.removeItem('admin_auth');
-              setIsLoggedIn(false);
-            }}
-            className="px-3 py-1.5 rounded-none text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ml-2 border border-red-200 dark:border-red-900/30"
-          >
-            로그아웃
-          </button>
+          {/* 우측 메인 네비게이션 메뉴 (하단 작업영역 우측 라인과 일치) */}
+          <div className="hidden md:flex items-center gap-1 shrink-0 bg-gray-100/80 dark:bg-zinc-950 p-1 rounded-none border border-gray-200/80 dark:border-zinc-800 shadow-sm">
+            <button 
+              onClick={() => setActiveApp('analytics')}
+              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'analytics' || activeApp === 'post-settings' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+            >
+              통계 관리
+            </button>
+            
+            <button 
+              onClick={() => setActiveApp('consult-manage')}
+              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'consult-manage' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+            >
+              상담 관리
+            </button>
+            
+            <button 
+              onClick={() => setActiveApp('chat-manage')}
+              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'chat-manage' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+            >
+              채팅 관리
+            </button>
+            
+            <button 
+              onClick={() => setActiveApp('calendar')}
+              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'calendar' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+            >
+              일정 관리
+            </button>
+            
+            <button 
+              onClick={() => setActiveApp('post-list')}
+              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'post-list' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+            >
+              원고 관리
+            </button>
+   
+            <button 
+              onClick={() => setActiveApp('post-ai')}
+              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'post-ai' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+            >
+              작업 관리
+            </button>
+            
+            <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-0.5" />
+
+            <button 
+              onClick={() => {
+                sessionStorage.removeItem('admin_auth');
+                setIsLoggedIn(false);
+              }}
+              className="px-2.5 py-1 rounded-none text-xs font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors border border-transparent hover:border-red-200 dark:hover:border-red-900/50"
+            >
+              로그아웃
+            </button>
+          </div>
         </div>
       </div>
 

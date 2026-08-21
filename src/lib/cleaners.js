@@ -35,17 +35,15 @@ function cleanFssText(text) {
     .replace(/""/g, '"')
     
     // 3. 깨진 개행 문자 복원
-    // 'n'이 단독으로 나오거나(앞뒤 공백/줄바꿈) 비정상적인 \r\n 등을 정제
     .replace(/(?:\b|^)n(?:\b|$)/g, '\n')
     .replace(/\r\n/g, '\n')
-    // 중복된 줄바꿈 기호를 문단 구분이 가능한 \n\n 으로 압축 (기존 땜빵식 \n 교체 제거)
     .replace(/\n{3,}/g, '\n\n');
 
   // 4. 구조적 파싱 (마크다운 변환)
   const lines = cleaned.split('\n');
   const markdownLines = lines.map(line => {
     let l = line.trim();
-    if (!l) return ''; // 빈 줄 유지 (join 시 \n으로 합쳐짐)
+    if (!l) return '';
 
     // 대제목/중제목 파싱 (■, ㅁ)
     if (l.startsWith('■') || l.startsWith('ㅁ')) {
@@ -54,7 +52,7 @@ function cleanFssText(text) {
     
     // 특별 소제목 파싱 (< 소비자 유의사항 > 등)
     if (l.startsWith('<') && l.endsWith('>')) {
-      return `### 💡 ${l.substring(1, l.length - 1).trim()}`;
+      return `### ${l.substring(1, l.length - 1).trim()}`;
     }
     
     // 소주제 파싱 (▲)
@@ -79,17 +77,11 @@ function cleanFssText(text) {
   });
 
   // 5. 마크다운 간격 통일 및 찌꺼기 제거
-  // 문단 구분을 명확히 하기 위해 조인 (기존 filter(Boolean) 삭제 - 빈 줄을 살려야 markdown 리스트가 깨지지 않음)
   let finalMarkdown = markdownLines.join('\n');
   
-  // 마크다운 리스트 문법이 정상 작동하도록 헤딩 및 리스트(첫 항목) 앞뒤에 빈 줄 추가
   finalMarkdown = finalMarkdown.replace(/\n(###)/g, '\n\n$1');
   finalMarkdown = finalMarkdown.replace(/([^\n])\n(- |1\. )/g, '$1\n\n$2');
-  
-  // 연속된 빈 줄 최종 압축
   finalMarkdown = finalMarkdown.replace(/\n{3,}/g, '\n\n');
-  
-  // 첨부파일 문구 제거
   finalMarkdown = finalMarkdown.replace(/※\s*자세한\s*내용은\s*첨부파일을\s*참고하시기\s*바랍니다\.?/g, '');
 
   return finalMarkdown.trim();

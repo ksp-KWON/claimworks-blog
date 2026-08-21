@@ -346,9 +346,9 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
         continue;
       }
 
-      // 6-B. 인라인 용어사전 (💡 ...) ➔ [메모/점선형 인용구 툴 5]
+      // 6-B. 인라인 용어사전 (용어 설명 인용구) ➔ [메모/점선형 인용구 툴 5]
       const joinedQuote = quoteLines.join('<br/>');
-      if (joinedQuote.includes('💡') || joinedQuote.includes('용어')) {
+      if (joinedQuote.includes('💡') || joinedQuote.includes('용어') || (joinedQuote.includes('**') && joinedQuote.includes(' : '))) {
         const highlighted = applyNaverHighlighter(joinedQuote);
         const glossaryTable = `
           <table style="width: 100%; border: 1px dashed #86efac; background-color: #f0fdf4; border-collapse: collapse; margin: 16px 0;">

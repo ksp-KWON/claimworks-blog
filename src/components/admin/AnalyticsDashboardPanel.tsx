@@ -72,22 +72,22 @@ export default function AnalyticsDashboardPanel() {
         {/* 1. 고유 방문자 */}
         <PremiumCard borderColor="blue" hoverEffect={true} watermarkEmoji="👥" className="!p-3 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">고유 방문자 (UV)</span>
+            <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">순 방문자수</span>
             <span className="w-1.5 h-1.5 rounded-none bg-[var(--google-blue)] dark:bg-[#8ab4f8]" />
           </div>
           <span className="text-base sm:text-lg font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] tracking-tight font-mono">
-            {(summary.uniqueVisitors || 0).toLocaleString()}
+            {(summary.uniqueVisitors || 0).toLocaleString()}<span className="text-xs font-bold text-gray-400 ml-0.5">명</span>
           </span>
         </PremiumCard>
 
         {/* 2. 총 페이지뷰 */}
         <PremiumCard borderColor="green" hoverEffect={true} watermarkEmoji="📊" className="!p-3 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">총 페이지뷰 (PV)</span>
+            <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">총 조회수</span>
             <span className="w-1.5 h-1.5 rounded-none bg-[var(--google-green)] dark:text-[#81c995]" />
           </div>
           <span className="text-base sm:text-lg font-extrabold text-[var(--google-green)] dark:text-[#81c995] tracking-tight font-mono">
-            {(summary.pageviews || 0).toLocaleString()}
+            {(summary.pageviews || 0).toLocaleString()}<span className="text-xs font-bold text-gray-400 ml-0.5">회</span>
           </span>
         </PremiumCard>
 
@@ -370,7 +370,7 @@ export default function AnalyticsDashboardPanel() {
             </span>
             <span className="text-[10px] text-gray-400 hidden sm:inline-block">독자 유입 및 조회수 랭킹</span>
           </div>
-          <PremiumBadge color="blue" className="!text-[10px] !px-2.5 !py-0.5 rounded-none">실시간 PV 집계</PremiumBadge>
+          <PremiumBadge color="blue" className="!text-[10px] !px-2.5 !py-0.5 rounded-none">실시간 조회수 집계</PremiumBadge>
         </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-gray-100 dark:divide-zinc-800/60 min-h-0 relative z-10 bg-white dark:bg-[#202124]">
@@ -400,7 +400,7 @@ export default function AnalyticsDashboardPanel() {
                 </div>
                 <div className="shrink-0 flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white font-mono bg-gray-50 dark:bg-zinc-900 px-2.5 py-1 rounded-none border border-gray-200/80 dark:border-zinc-700/80 shadow-sm group-hover/row:border-blue-300 dark:group-hover/row:border-blue-700 transition-colors">
                   <span className="text-blue-600 dark:text-blue-400">{(page.views || 0).toLocaleString()}</span>
-                  <span className="text-gray-400 font-normal text-[10px]">PV</span>
+                  <span className="text-gray-400 font-normal text-[10px]">회 조회</span>
                 </div>
               </div>
             ))

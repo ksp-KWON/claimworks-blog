@@ -6,6 +6,7 @@ import { getUniversalAnalyticsData } from '@/lib/analytics/universal-analytics';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
+import AdminPanelLayout from './AdminPanelLayout';
 
 export default function AnalyticsDashboardPanel() {
   const [period, setPeriod] = useState<'24h' | '7d' | '30d'>('7d');
@@ -65,7 +66,7 @@ export default function AnalyticsDashboardPanel() {
   const topPages = data?.topPages || [];
 
   return (
-    <div className="h-full flex-1 flex flex-col min-h-0 space-y-2.5 max-w-7xl mx-auto w-full overflow-y-auto custom-scrollbar pr-0.5">
+    <AdminPanelLayout innerClassName="space-y-2.5">
       {/* 👑 1열(1 Row) 3D 입체 직사각형 상단 컨트롤 바 */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 shrink-0">
         {/* 1. 고유 방문자 */}
@@ -360,7 +361,7 @@ export default function AnalyticsDashboardPanel() {
       </div>
 
       {/* ── 3. 인기 보상 칼럼 TOP 10 ───────── */}
-      <PremiumCard borderColor="blue" hoverEffect={true} watermarkEmoji="🏆" className="!p-0 min-h-[300px] flex flex-col group shrink-0">
+      <PremiumCard borderColor="blue" hoverEffect={false} watermarkEmoji="🏆" className="!p-0 flex-1 min-h-0 flex flex-col overflow-hidden">
         <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <span className="text-base leading-none">🏆</span>
@@ -408,6 +409,6 @@ export default function AnalyticsDashboardPanel() {
           )}
         </div>
       </PremiumCard>
-    </div>
+    </AdminPanelLayout>
   );
 }

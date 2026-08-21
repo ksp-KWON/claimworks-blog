@@ -14,7 +14,7 @@ import PremiumCard from '../ui/PremiumCard';
 
 const SCROLL_OFFSET = 140;
 
-// 헤딩 톤온톤 컬러 매핑 (헌법 제10조 시맨틱 위계 및 특수 섹션 지원)
+// 헤딩 톤온톤 컬러 매핑 (헌법 제10조 시맨틱 위계)
 const getHeadingTone = (level: number, node?: React.ReactNode): 'red' | 'blue' | 'yellow' | 'green' | 'purple' | 'gray' => {
   const getText = (n: any): string => {
     if (typeof n === 'string') return n;
@@ -86,12 +86,9 @@ const getToneColor = (node: React.ReactNode): 'red' | 'green' | 'yellow' | 'purp
   const fullText = getText(node).trim();
   // 보상스쿨 피드백 & 실무 인사이트는 독보적인 프리미엄 보라색(Purple) 톤 배정
   if (/보상스쿨\s*피드백|실무\s*인사이트|실무인사이트/.test(fullText)) return 'purple';
-
-  const text = fullText.substring(0, 15);
-  if (/(🔮|💎|💜|🟣|👨‍⚖️|👨‍💼|👩‍⚖️|👩‍💼)/.test(text)) return 'purple';
-  if (/(⚠️|🚨|🛑|❗|❌|⛔)/.test(text)) return 'red';
-  if (/(✅|☑️|🌿|🌱|🍀|✔|📖)/.test(text)) return 'green';
-  if (/(🔥|⭐|⚡|🌟|✨|🏆|💡)/.test(text)) return 'yellow';
+  if (/(주의|경고|위험|금지|부지급|면책)/.test(fullText)) return 'red';
+  if (/(해결|승소|지급|보상|확보)/.test(fullText)) return 'green';
+  if (/(핵심|팁|포인트|체크)/.test(fullText)) return 'yellow';
   return 'blue';
 };
 
@@ -148,27 +145,27 @@ export const sharedComponents: Components & Record<string, any> = {
   blockquote: ({ children }) => {
     const tone = getToneColor(children);
     const boxHoverBorders: Record<string, string> = {
-      blue: 'border-blue-200 dark:border-blue-900/50 hover:border-[var(--google-blue)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.25)]',
-      red: 'border-red-200 dark:border-red-900/50 hover:border-[var(--google-red)] hover:shadow-[0_16px_50px_rgba(234,67,53,0.25)]',
-      green: 'border-green-200 dark:border-green-900/50 hover:border-[var(--google-green)] hover:shadow-[0_16px_50px_rgba(52,168,83,0.25)]',
-      yellow: 'border-yellow-300 dark:border-yellow-900/50 hover:border-yellow-500 hover:shadow-[0_16px_50px_rgba(234,179,8,0.25)]',
-      purple: 'border-purple-200 dark:border-purple-900/50 hover:border-purple-500 hover:shadow-[0_16px_50px_rgba(168,85,247,0.25)]',
+      blue: 'border-blue-200 dark:border-blue-900/50 hover:border-[var(--google-blue)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.18)]',
+      red: 'border-red-200 dark:border-red-900/50 hover:border-[var(--google-red)] hover:shadow-[0_12px_40px_rgba(234,67,53,0.18)]',
+      green: 'border-green-200 dark:border-green-900/50 hover:border-[var(--google-green)] hover:shadow-[0_12px_40px_rgba(52,168,83,0.18)]',
+      yellow: 'border-yellow-300 dark:border-yellow-900/50 hover:border-yellow-500 hover:shadow-[0_12px_40px_rgba(234,179,8,0.18)]',
+      purple: 'border-purple-200 dark:border-purple-900/50 hover:border-purple-500 hover:shadow-[0_12px_40px_rgba(168,85,247,0.18)]',
     };
 
     const headerGradients: Record<string, string> = {
-      blue: 'from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100 dark:border-blue-900/30',
-      red: 'from-red-50/80 to-transparent dark:from-red-900/20 dark:to-transparent border-b border-red-100 dark:border-red-900/30',
-      green: 'from-green-50/80 to-transparent dark:from-green-900/20 dark:to-transparent border-b border-green-100 dark:border-green-900/30',
-      yellow: 'from-yellow-50/80 to-transparent dark:from-yellow-900/20 dark:to-transparent border-b border-yellow-200 dark:border-yellow-900/30',
-      purple: 'from-purple-50/80 to-transparent dark:from-purple-900/20 dark:to-transparent border-b border-purple-100 dark:border-purple-900/30',
+      blue: 'from-blue-50/90 to-transparent dark:from-blue-900/25 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40',
+      red: 'from-red-50/90 to-transparent dark:from-red-900/25 dark:to-transparent border-b border-red-100 dark:border-red-900/40',
+      green: 'from-green-50/90 to-transparent dark:from-green-900/25 dark:to-transparent border-b border-green-100 dark:border-green-900/40',
+      yellow: 'from-yellow-50/90 to-transparent dark:from-yellow-900/25 dark:to-transparent border-b border-yellow-200 dark:border-yellow-900/40',
+      purple: 'from-purple-50/90 to-transparent dark:from-purple-900/25 dark:to-transparent border-b border-purple-100 dark:border-purple-900/40',
     };
 
     const titleColors: Record<string, string> = {
-      blue: 'text-[var(--google-blue)] dark:text-blue-400',
-      red: 'text-[var(--google-red)] dark:text-red-400',
-      green: 'text-[var(--google-green)] dark:text-green-400',
-      yellow: 'text-yellow-600 dark:text-yellow-400',
-      purple: 'text-purple-600 dark:text-purple-400',
+      blue: 'text-[var(--google-blue)] dark:text-blue-400 border-l-4 border-[var(--google-blue)]',
+      red: 'text-[var(--google-red)] dark:text-red-400 border-l-4 border-[var(--google-red)]',
+      green: 'text-[var(--google-green)] dark:text-green-400 border-l-4 border-[var(--google-green)]',
+      yellow: 'text-yellow-600 dark:text-yellow-400 border-l-4 border-yellow-500',
+      purple: 'text-purple-600 dark:text-purple-400 border-l-4 border-purple-500',
     };
 
     // 자식 요소 중 공백 문자열을 제외한 첫 번째 유효 요소가 헤딩(h1~h6)인지 검사
@@ -199,27 +196,12 @@ export const sharedComponents: Components & Record<string, any> = {
     // 헤딩이 포함된 실무 팁/실무 조언 박스 -> CommonBox 상단 톤온톤 헤더 스트립으로 렌더링
     if (headingElement && React.isValidElement(headingElement)) {
       const headingChildren = (headingElement.props as any)?.children;
-      
-      const getText = (n: any): string => {
-        if (typeof n === 'string') return n;
-        if (Array.isArray(n)) return n.map(getText).join('');
-        if (n?.props?.children) return getText(n.props.children);
-        return '';
-      };
-      const titleStr = getText(headingChildren);
-      const emojiMatch = titleStr.match(/^([💡📌🛡️⚖️🚗💬⭐🔥⚡🏆])\s*/);
-      const boxEmoji = emojiMatch ? emojiMatch[1] : '💡';
 
       return (
         <div className={`my-8 bg-white dark:bg-[#202124] shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden group border rounded-none ${boxHoverBorders[tone]}`}>
-          {/* Watermark Emoji */}
-          <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[110px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
-            {boxEmoji}
-          </div>
-
-          {/* 상단 톤온톤 헤더 바 */}
-          <div className={`px-5 sm:px-6 py-3.5 bg-gradient-to-r ${headerGradients[tone]} relative z-10`}>
-            <h3 className={`text-[15.5px] font-bold flex items-center gap-1.5 break-keep !m-0 !p-0 border-0 bg-transparent ${titleColors[tone]}`}>
+          {/* 상단 톤온톤 헤더 바 (Pure Typography) */}
+          <div className={`px-5 sm:px-6 py-3 bg-gradient-to-r ${headerGradients[tone]} relative z-10`}>
+            <h3 className={`text-[15.5px] font-extrabold pl-2.5 flex items-center tracking-tight !m-0 !p-0 border-0 bg-transparent ${titleColors[tone]}`}>
               {headingChildren}
             </h3>
           </div>
@@ -305,12 +287,9 @@ export const sharedComponents: Components & Record<string, any> = {
 
   relatedbox: ({ children }: any) => (
     <PremiumCard borderColor="blue" hoverEffect={true} className="my-10 group">
-      <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300">
-        🔗
-      </div>
       <div className="relative z-10">
         <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-4">
-          <PremiumHeading level={3} showLeftBorder gradient="blue" icon={<span className="text-[var(--google-blue)] text-lg leading-none">🔗</span>} className="!mb-0">
+          <PremiumHeading level={3} showLeftBorder gradient="blue" className="!mb-0">
             함께 읽으면 도움이 되는 글
           </PremiumHeading>
         </div>

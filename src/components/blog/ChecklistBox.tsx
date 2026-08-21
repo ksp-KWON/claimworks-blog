@@ -24,7 +24,7 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
 
   const headerRight = (
     <div className="text-right flex items-center gap-2">
-      <span className="text-xs text-[#5f6368] font-bold">해당 항목 클릭</span>
+      <span className="text-xs text-[#5f6368] dark:text-gray-400 font-bold">해당 항목 클릭</span>
       <span className="text-lg font-black text-[var(--google-green)] dark:text-[#81c995]">
         {count}<span className="text-xs font-bold text-gray-400">/{items.length}</span>
       </span>
@@ -34,7 +34,6 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
   return (
     <CommonBox
       tone="green"
-      emoji="☑️"
       title="1분 자가진단 체크리스트"
       topElement={progressBar}
       headerRight={headerRight}
@@ -77,10 +76,9 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
       </div>
 
       {count >= 3 && (
-        <div className="mt-4 bg-[#fce8e6] dark:bg-[#c5221f]/10 border border-[#f28b82]/30 px-4 py-3 flex items-start gap-2 rounded-none">
-          <span className="text-[14px] mt-0.5">⚠️</span>
-          <p className="text-[#c5221f] dark:text-[#f28b82] text-[13px] font-semibold leading-relaxed">
-            <strong className="font-extrabold">{count}개 이상 해당</strong>됩니다. 숨은 보상금이 있을 가능성이 높으니 전문가 무료 진단을 권장합니다.
+        <div className="mt-4 bg-[#fce8e6] dark:bg-[#c5221f]/10 border-l-4 border-[#c5221f] dark:border-[#f28b82] px-4 py-3 flex items-start gap-2 rounded-none">
+          <p className="text-[#c5221f] dark:text-[#f28b82] text-[13.5px] font-semibold leading-relaxed">
+            <strong className="font-extrabold">{count}개 이상 해당</strong>됩니다. 숨은 보상금이 있을 가능성이 높으니 전문가 정밀 진단을 권장합니다.
           </p>
         </div>
       )}

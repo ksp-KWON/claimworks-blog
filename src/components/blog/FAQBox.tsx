@@ -17,13 +17,13 @@ export default function FAQBox({ items }: FAQBoxProps) {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <CommonBox tone="blue" emoji="💡" title="자주 묻는 질문 (FAQ)">
+    <CommonBox tone="blue" title="자주 묻는 질문 (FAQ)">
       <div className="divide-y divide-gray-100 dark:divide-white/5">
         {items.map((item, i) => (
           <div key={i}>
             <button
               onClick={() => setOpenIdx(openIdx === i ? null : i)}
-              className="w-full flex items-center gap-3 py-2 text-left transition-colors group/btn"
+              className="w-full flex items-center gap-3 py-2.5 text-left transition-colors group/btn"
             >
               <span className={`text-[13px] font-black shrink-0 transition-colors mt-0.5 ${openIdx === i ? 'text-[var(--google-blue)]' : 'text-gray-400 dark:text-gray-500 group-hover/btn:text-[var(--google-blue)]'}`}>
                 Q{i + 1}
@@ -44,8 +44,8 @@ export default function FAQBox({ items }: FAQBoxProps) {
                 openIdx === i ? 'max-h-[1000px] opacity-100 mt-2 mb-3' : 'max-h-0 opacity-0'
               }`}
             >
-              <div className="pl-[34px] pr-2 py-2">
-                <div className="bg-blue-50/50 dark:bg-blue-900/10 rounded-none p-4 text-[13.5px] leading-[1.7] text-gray-700 dark:text-gray-300 border-l-2 border-blue-200 dark:border-blue-800 break-keep">
+              <div className="pl-[30px] pr-2 py-2">
+                <div className="bg-blue-50/50 dark:bg-blue-900/10 rounded-none p-4 text-[13.5px] leading-[1.75] text-gray-700 dark:text-gray-300 border-l-2 border-blue-300 dark:border-blue-700 break-keep">
                   <MarkdownRenderer content={item.a} inline={true} />
                 </div>
               </div>

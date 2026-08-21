@@ -19,13 +19,12 @@ export default function TableOfContents({
   if (!toc.length) return null;
 
   const headerRight = (
-    <span className="text-[11px] font-medium text-gray-400 mt-1">항목 클릭 시 이동</span>
+    <span className="text-[11px] font-semibold text-gray-400 mt-1">항목 클릭 시 이동</span>
   );
 
   return (
     <CommonBox
       tone="blue"
-      emoji="📑"
       title="이 글의 목차"
       headerRight={headerRight}
     >

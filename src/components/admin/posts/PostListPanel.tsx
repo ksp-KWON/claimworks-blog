@@ -80,27 +80,27 @@ export default function PostListPanel({
             {/* 모바일 뷰 (카드형) */}
             <div className="md:hidden flex-1 min-h-0 overflow-y-auto space-y-3 custom-scrollbar">
                 {sortedAndFilteredList.map((post) => (
-                  <PremiumCard key={post.sha} className="p-4 transition-colors">
+                  <PremiumCard key={post.sha} borderColor="blue" hoverEffect={true} className="p-4 transition-all rounded-none shadow-[0_8px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_25px_rgba(0,0,0,0.5)] border border-gray-200/80 dark:border-white/10">
                     <div className="flex flex-col gap-3">
                       <div className="flex items-center gap-2 overflow-hidden">
                         <div className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug truncate flex-1 min-w-0">
                           {post.title}
                         </div>
                         {post.published === false && (
-                          <PremiumBadge color="gray" className="text-[10px] px-1.5 py-0.5 whitespace-nowrap bg-gray-200 text-gray-600 dark:bg-zinc-700 dark:text-gray-300 flex-shrink-0">
+                          <PremiumBadge color="gray" className="text-[10px] px-1.5 py-0.5 whitespace-nowrap bg-gray-200 text-gray-600 dark:bg-zinc-700 dark:text-gray-300 flex-shrink-0 rounded-none">
                             임시저장
                           </PremiumBadge>
                         )}
                       </div>
                       <div className="flex items-center justify-between">
-                        <PremiumBadge color="gray" className="font-mono text-xs">
+                        <PremiumBadge color="gray" className="font-mono text-xs rounded-none">
                           {post.date || post.name.replace('.md', '')}
                         </PremiumBadge>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => onLoadPost(post.name, post.sha)}
                             disabled={isLoading}
-                            className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-lg border border-blue-200 dark:border-blue-800/50 transition-colors flex items-center gap-1"
+                            className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-none border border-blue-200 dark:border-blue-800/50 transition-colors flex items-center gap-1 shadow-sm"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                             수정
@@ -108,7 +108,7 @@ export default function PostListPanel({
                           <button
                             onClick={() => onDeletePost(post.name, post.sha)}
                             disabled={isLoading}
-                            className="px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs font-bold rounded-lg border border-red-200 dark:border-red-800/50 transition-colors flex items-center gap-1"
+                            className="px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs font-bold rounded-none border border-red-200 dark:border-red-800/50 transition-colors flex items-center gap-1 shadow-sm"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             삭제
@@ -123,11 +123,11 @@ export default function PostListPanel({
             {/* 데스크탑 뷰 (테이블형) */}
             <div className="hidden md:flex flex-1 min-h-0 flex-col overflow-hidden">
               <div className="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
-                <table className="min-w-full divide-y divide-gray-100 dark:divide-zinc-800">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
                   <AdminTableHeader columns={tableColumns} />
-                  <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-50 dark:divide-zinc-800/50">
+                  <tbody className="bg-white dark:bg-[#202124] divide-y divide-gray-100 dark:divide-zinc-800/60">
                     {sortedAndFilteredList.map((post) => (
-                      <tr key={post.sha} className="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors group">
+                      <tr key={post.sha} className="hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-all duration-200 group border-l-2 border-transparent hover:border-[var(--google-blue)]">
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <span className="text-sm text-gray-600 dark:text-gray-400 font-mono font-medium">
                             {post.date || post.name.replace('.md', '')}
@@ -135,11 +135,11 @@ export default function PostListPanel({
                         </td>
                         <td className="px-6 py-4 text-left max-w-0 w-full">
                           <div className="flex items-center gap-2 overflow-hidden w-full">
-                            <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate flex-1 min-w-0">
+                            <div className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-[var(--google-blue)] dark:group-hover:text-[#8ab4f8] transition-colors truncate flex-1 min-w-0">
                               {post.title}
                             </div>
                             {post.published === false && (
-                              <PremiumBadge color="gray" className="text-[10px] px-1.5 py-0.5 whitespace-nowrap bg-gray-200 text-gray-600 dark:bg-zinc-700 dark:text-gray-300 flex-shrink-0">
+                              <PremiumBadge color="gray" className="text-[10px] px-1.5 py-0.5 whitespace-nowrap bg-gray-200 text-gray-600 dark:bg-zinc-700 dark:text-gray-300 flex-shrink-0 rounded-none">
                                 임시저장
                               </PremiumBadge>
                             )}
@@ -147,11 +147,11 @@ export default function PostListPanel({
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           {/* 데스크탑에서는 항상 관리 버튼을 연하게 노출하고 hover시 뚜렷하게 */}
-                          <div className="flex items-center justify-center gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center justify-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                             <button
                               onClick={() => onLoadPost(post.name, post.sha)}
                               disabled={isLoading}
-                              className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold rounded border border-blue-200 dark:border-blue-800/50 transition-colors flex items-center gap-1"
+                              className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-none border border-blue-200 dark:border-blue-800/50 transition-colors flex items-center gap-1 shadow-sm"
                             >
                               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                               수정
@@ -159,7 +159,7 @@ export default function PostListPanel({
                             <button
                               onClick={() => onDeletePost(post.name, post.sha)}
                               disabled={isLoading}
-                              className="px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs font-bold rounded border border-red-200 dark:border-red-800/50 transition-colors flex items-center gap-1"
+                              className="px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs font-bold rounded-none border border-red-200 dark:border-red-800/50 transition-colors flex items-center gap-1 shadow-sm"
                             >
                               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                               삭제

@@ -296,11 +296,12 @@ export default function AdminPage() {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex flex-col justify-center items-center p-4">
-        <div className="max-w-md w-full bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-zinc-800">
+        <div className="max-w-md w-full bg-white dark:bg-[#202124] rounded-none shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] p-8 border border-gray-200/80 dark:border-white/10 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--google-blue)] via-indigo-500 to-purple-500" />
           <div className="text-center mb-8">
             <Image src="/logo.png" alt="보상스쿨" width={180} height={45} className="mx-auto h-10 w-auto dark:brightness-110 mb-4" priority />
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">보상스쿨 통합 관리자</h2>
-            <p className="text-xs text-gray-500 mt-1">접속을 위해 관리자 비밀번호를 입력해주세요.</p>
+            <h2 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">보상스쿨 통합 관리자</h2>
+            <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1">접속을 위해 관리자 비밀번호를 입력해주세요.</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
@@ -309,14 +310,14 @@ export default function AdminPage() {
                 placeholder="비밀번호 입력"
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-center"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-sm focus:outline-none focus:ring-2 focus:ring-[var(--google-blue)] transition-all text-center font-mono"
                 autoFocus
               />
-              {authError && <p className="text-red-500 text-xs mt-2 text-center">{authError}</p>}
+              {authError && <p className="text-red-500 text-xs mt-2 text-center font-bold">{authError}</p>}
             </div>
             <button
               type="submit"
-              className="w-full py-3 bg-[var(--google-blue)] hover:bg-[#1557b0] text-white font-bold rounded-xl text-sm transition-all shadow-md active:scale-[0.98]"
+              className="w-full py-3 bg-[var(--google-blue)] hover:bg-[#1557b0] text-white font-bold rounded-none text-sm transition-all shadow-[0_8px_20px_rgba(26,115,232,0.3)] active:scale-[0.99]"
             >
               로그인
             </button>
@@ -329,10 +330,10 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-zinc-950 font-sans">
       {/* Universal Top Header Bar */}
-      <div className="h-[64px] bg-[#f8f9fa] dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 md:px-6 flex items-center justify-between z-20 shrink-0">
+      <div className="h-[64px] bg-[#f8f9fa] dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 md:px-6 flex items-center justify-between z-20 shrink-0 shadow-sm">
         <div className="flex items-center gap-3">
           <Image src="/logo.png" alt="보상스쿨" width={120} height={30} className="h-6 w-auto dark:brightness-110" priority />
-          <span className="hidden sm:inline-block text-xs font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/20 px-2.5 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
+          <span className="hidden sm:inline-block text-xs font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/20 px-2.5 py-0.5 rounded-none border border-blue-200 dark:border-blue-800 shadow-sm">
             통합 관리자
           </span>
         </div>
@@ -350,7 +351,7 @@ export default function AdminPage() {
                   placeholder="제목/내용 검색..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-3 py-1.5 w-48 sm:w-64 bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="pl-9 pr-3 py-1.5 w-48 sm:w-64 bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm font-sans"
                 />
               </div>
               <button
@@ -358,7 +359,7 @@ export default function AdminPage() {
                   if (activeApp === 'post-list') handleFetchList();
                   else setRefreshCounter(c => c + 1);
                 }}
-                className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-lg transition-colors border border-gray-200 dark:border-zinc-700"
+                className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-zinc-800 rounded-none transition-colors border border-gray-200 dark:border-zinc-700 shadow-sm"
                 title="새로고침"
               >
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -369,11 +370,11 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* 우측 메인 네비게이션 메뉴 (콤팩트 통합) */}
+        {/* 우측 메인 네비게이션 메뉴 (3D 입체 직각 탭) */}
         <div className="hidden md:flex items-center gap-1 shrink-0">
           <button 
             onClick={() => setActiveApp('analytics')}
-            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${activeApp === 'analytics' || activeApp === 'post-settings' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
+            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 border ${activeApp === 'analytics' || activeApp === 'post-settings' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
           >
             <span>📊</span>
             <span>실시간 통계</span>
@@ -383,7 +384,7 @@ export default function AdminPage() {
           
           <button 
             onClick={() => setActiveApp('consult-manage')}
-            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${activeApp === 'consult-manage' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
+            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'consult-manage' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
           >
             상담 관리
           </button>
@@ -392,7 +393,7 @@ export default function AdminPage() {
           
           <button 
             onClick={() => setActiveApp('chat-manage')}
-            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${activeApp === 'chat-manage' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
+            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'chat-manage' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
           >
             채팅 관리
           </button>
@@ -401,7 +402,7 @@ export default function AdminPage() {
           
           <button 
             onClick={() => setActiveApp('calendar')}
-            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${activeApp === 'calendar' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
+            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'calendar' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
           >
             일정 관리
           </button>
@@ -410,16 +411,16 @@ export default function AdminPage() {
           
           <button 
             onClick={() => setActiveApp('post-list')}
-            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${activeApp === 'post-list' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
+            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'post-list' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
           >
             원고 관리
           </button>
           
           <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-1" />
-
+ 
           <button 
             onClick={() => setActiveApp('post-ai')}
-            className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${activeApp === 'post-ai' ? 'bg-gray-100 dark:bg-zinc-800 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
+            className={`px-3 py-1.5 rounded-none text-xs sm:text-sm font-bold transition-all border ${activeApp === 'post-ai' ? 'bg-blue-50 dark:bg-blue-900/30 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300 dark:border-blue-700 shadow-sm' : 'text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200'}`}
           >
             작업 관리
           </button>
@@ -429,7 +430,7 @@ export default function AdminPage() {
               sessionStorage.removeItem('admin_auth');
               setIsLoggedIn(false);
             }}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ml-2 border border-red-200 dark:border-red-900/30"
+            className="px-3 py-1.5 rounded-none text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ml-2 border border-red-200 dark:border-red-900/30"
           >
             로그아웃
           </button>

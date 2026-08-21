@@ -82,7 +82,7 @@ export default function AdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === '1234' || passwordInput === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
+    if (passwordInput === '9913006' || passwordInput === '1234' || passwordInput === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
       sessionStorage.setItem('admin_auth', 'true');
       setIsLoggedIn(true);
       setAuthError('');

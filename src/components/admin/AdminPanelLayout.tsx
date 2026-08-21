@@ -16,7 +16,7 @@ export default function AdminPanelLayout({
 }: AdminPanelLayoutProps) {
   return (
     <div className={`flex-1 min-h-0 flex flex-col max-w-7xl mx-auto w-full ${className}`}>
-      <PremiumCard hoverEffect={false} className="flex-1 min-h-0 p-0 overflow-hidden relative block shadow-[0_0_35px_rgba(0,0,0,0.08),0_4px_16px_rgba(0,0,0,0.04)] dark:shadow-[0_0_40px_rgba(0,0,0,0.75)] border border-gray-200/80 dark:border-white/10 rounded-none bg-white dark:bg-[#202124]">
+      <PremiumCard hoverEffect={false} className="flex-1 min-h-0 !p-0">
         <div className={`w-full h-full flex flex-col min-h-0 ${innerClassName}`}>
           {children}
         </div>

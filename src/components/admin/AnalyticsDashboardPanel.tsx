@@ -66,10 +66,10 @@ export default function AnalyticsDashboardPanel() {
 
   return (
     <div className="h-full flex-1 flex flex-col min-h-0 space-y-2.5 max-w-7xl mx-auto w-full overflow-hidden">
-      {/* 👑 1열(1 Row) 3D 입체 직사각형 상단 컨트롤 바 (프론트엔드 일치) */}
+      {/* 👑 1열(1 Row) 3D 입체 직사각형 상단 컨트롤 바 */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 shrink-0">
         {/* 1. 고유 방문자 */}
-        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-2.5 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_0_25px_rgba(0,0,0,0.07),0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_0_30px_rgba(0,0,0,0.7)] relative overflow-hidden group">
+        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-2.5 flex flex-col justify-between group">
           <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[58px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
             👥
           </div>
@@ -82,7 +82,7 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 2. 총 페이지뷰 */}
-        <PremiumCard borderColor="green" hoverEffect={true} className="!p-2.5 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_0_25px_rgba(0,0,0,0.07),0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_0_30px_rgba(0,0,0,0.7)] relative overflow-hidden group">
+        <PremiumCard borderColor="green" hoverEffect={true} className="!p-2.5 flex flex-col justify-between group">
           <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[58px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
             📊
           </div>
@@ -95,7 +95,7 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 3. 상담 유입 */}
-        <PremiumCard borderColor="purple" hoverEffect={true} className="!p-2.5 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_0_25px_rgba(0,0,0,0.07),0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_0_30px_rgba(0,0,0,0.7)] relative overflow-hidden group">
+        <PremiumCard borderColor="purple" hoverEffect={true} className="!p-2.5 flex flex-col justify-between group">
           <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[58px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
             📞
           </div>
@@ -108,7 +108,7 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 4. 응답 속도 */}
-        <PremiumCard borderColor="yellow" hoverEffect={true} className="!p-2.5 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_0_25px_rgba(0,0,0,0.07),0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_0_30px_rgba(0,0,0,0.7)] relative overflow-hidden group">
+        <PremiumCard borderColor="yellow" hoverEffect={true} className="!p-2.5 flex flex-col justify-between group">
           <div className="absolute right-[-6px] bottom-[-12px] opacity-[0.04] dark:opacity-[0.08] text-[58px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
             ⚡
           </div>
@@ -121,7 +121,7 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 5. 기간 선택 컨트롤 (24h / 7일 / 30일) */}
-        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-2 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_0_25px_rgba(0,0,0,0.07),0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_0_30px_rgba(0,0,0,0.7)] relative overflow-hidden group">
+        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-2 flex flex-col justify-between group">
           <div className="flex items-center justify-between relative z-10">
             <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">조회 기간</span>
             <span className="text-[10px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.2 rounded-none border border-blue-200 dark:border-blue-800">
@@ -147,7 +147,7 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 6. 시스템 API 설정 토글 */}
-        <PremiumCard borderColor="teal" hoverEffect={true} className="!p-2 flex flex-col justify-between bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-white/10 rounded-none shadow-[0_0_25px_rgba(0,0,0,0.07),0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_0_30px_rgba(0,0,0,0.7)] relative overflow-hidden group">
+        <PremiumCard borderColor="teal" hoverEffect={true} className="!p-2 flex flex-col justify-between group">
           <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 relative z-10">시스템 연동</span>
           <button
             type="button"
@@ -165,7 +165,7 @@ export default function AnalyticsDashboardPanel() {
 
       {/* ⚙️ 시스템 API 자격증명 설정 아코디언 카드 (토글 시 노출) */}
       {showSettings && (
-        <PremiumCard borderColor="teal" hoverEffect={true} className="bg-gradient-to-b from-teal-50/30 to-transparent dark:from-teal-950/20 shrink-0 !p-3.5 rounded-none shadow-[0_0_30px_rgba(0,0,0,0.08)] dark:shadow-[0_0_35px_rgba(0,0,0,0.6)] border border-teal-200 dark:border-teal-800/60">
+        <PremiumCard borderColor="teal" hoverEffect={true} className="bg-gradient-to-b from-teal-50/30 to-transparent dark:from-teal-950/20 shrink-0 !p-3.5 border-teal-200 dark:border-teal-800/60">
           <div className="flex items-center justify-between border-b border-teal-100 dark:border-teal-900/50 pb-2 mb-2.5">
             <h3 className="font-extrabold text-xs text-teal-900 dark:text-teal-200">
               시스템 API 키 및 자격증명 설정
@@ -238,10 +238,10 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
       )}
 
-      {/* ── 2. 방문 추이 그래프 & 검색/유입 채널 (3D 입체 직사각형 엣지) ───────────────── */}
+      {/* ── 2. 방문 추이 그래프 & 검색/유입 채널 ───────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 shrink-0">
         {/* 1. 방문 추이 그래프 (2칸) */}
-        <PremiumCard borderColor="blue" hoverEffect={true} className="lg:col-span-2 !p-3.5 flex flex-col justify-between rounded-none shadow-[0_0_30px_rgba(0,0,0,0.08),0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-[0_0_35px_rgba(0,0,0,0.7)] border border-gray-200/80 dark:border-white/10 relative overflow-hidden group">
+        <PremiumCard borderColor="blue" hoverEffect={true} className="lg:col-span-2 !p-3.5 flex flex-col justify-between group">
           <div className="absolute right-[-10px] bottom-[-15px] opacity-[0.03] dark:opacity-[0.06] text-[110px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-3 transition-transform duration-300">
             📈
           </div>
@@ -330,8 +330,8 @@ export default function AnalyticsDashboardPanel() {
           </div>
         </PremiumCard>
 
-        {/* 2. 유입 채널 랭킹 (1칸, 3D 입체 직각 엣지) */}
-        <PremiumCard borderColor="purple" hoverEffect={true} className="!p-3.5 flex flex-col justify-between rounded-none shadow-[0_0_30px_rgba(0,0,0,0.08),0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-[0_0_35px_rgba(0,0,0,0.7)] border border-gray-200/80 dark:border-white/10 relative overflow-hidden group">
+        {/* 2. 유입 채널 랭킹 (1칸) */}
+        <PremiumCard borderColor="purple" hoverEffect={true} className="!p-3.5 flex flex-col justify-between group">
           <div className="absolute right-[-10px] bottom-[-15px] opacity-[0.03] dark:opacity-[0.06] text-[100px] select-none pointer-events-none group-hover/card:scale-110 group-hover/card:rotate-6 transition-transform duration-300">
             🧭
           </div>
@@ -366,8 +366,8 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
       </div>
 
-      {/* ── 3. 인기 보상 칼럼 TOP 10 (3D 입체 풀사이즈 직각 테이블) ───────── */}
-      <PremiumCard borderColor="blue" hoverEffect={true} className="!p-0 flex-1 min-h-0 flex flex-col rounded-none shadow-[0_0_35px_rgba(0,0,0,0.09),0_4px_16px_rgba(0,0,0,0.04)] dark:shadow-[0_0_40px_rgba(0,0,0,0.75)] border border-gray-200/80 dark:border-white/10 relative overflow-hidden group">
+      {/* ── 3. 인기 보상 칼럼 TOP 10 ───────── */}
+      <PremiumCard borderColor="blue" hoverEffect={true} className="!p-0 flex-1 min-h-0 flex flex-col group">
         <div className="p-3 sm:px-4 border-b border-gray-200/80 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-gradient-to-r from-blue-50/60 to-transparent dark:from-blue-950/30 dark:to-transparent relative z-10">
           <div className="flex items-center gap-2">
             <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">

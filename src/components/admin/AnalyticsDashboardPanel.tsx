@@ -220,22 +220,23 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
       )}
 
-      {/* ── 2. 방문 추이 그래프 (명확한 높이 및 선명한 Bar 렌더링) ───────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 flex-1 min-h-0">
-        <PremiumCard className="lg:col-span-2 !p-3.5 flex flex-col min-h-0">
-          <div className="flex items-center justify-between mb-2 border-b border-gray-100 dark:border-zinc-800 pb-2 shrink-0">
+      {/* ── 2. 방문 추이 그래프 & 검색/유입 채널 (공란 없이 콤팩트 정돈) ───────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 shrink-0">
+        {/* 1. 방문 추이 그래프 (2칸) */}
+        <PremiumCard className="lg:col-span-2 !p-3 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-1.5 border-b border-gray-100 dark:border-zinc-800 pb-1.5 shrink-0">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
+              <span className="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5">
                 <span>📈</span>
                 <span>방문 추이 분석 그래프</span>
               </span>
-              <span className="text-[10px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full border border-blue-100 dark:border-blue-800/50">
+              <span className="text-[10px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">
                 {period === '24h' ? '최근 24시간' : period === '7d' ? '최근 7일' : '최근 30일'}
               </span>
             </div>
             
             {/* 요약 통계 배지 */}
-            <div className="flex items-center gap-2 text-[11px]">
+            <div className="flex items-center gap-2 text-[10.5px]">
               <span className="text-gray-500 dark:text-zinc-400">
                 최고: <strong className="text-gray-900 dark:text-white font-mono">{Math.max(...(trend.map(d => d.requests) || [0]), 0).toLocaleString()}</strong>건
               </span>
@@ -246,12 +247,12 @@ export default function AnalyticsDashboardPanel() {
             </div>
           </div>
 
-          {/* 명시적 높이와 수치가 명확히 보이는 막대 그래프 렌더링 */}
-          <div className="h-48 w-full flex items-end gap-1.5 sm:gap-2 pt-6 px-2 pb-1.5 bg-gray-50/60 dark:bg-zinc-950/50 rounded-xl border border-gray-100/80 dark:border-zinc-800/70 relative">
+          {/* 콤팩트한 막대 그래프 (h-36) */}
+          <div className="h-36 w-full flex items-end gap-1.5 sm:gap-2 pt-4 px-2 pb-1 bg-gray-50/60 dark:bg-zinc-950/50 rounded-xl border border-gray-100/80 dark:border-zinc-800/70 relative">
             {trend.length > 0 ? (
               trend.map((t, idx) => {
                 const maxReq = Math.max(...trend.map(d => d.requests), 1);
-                const heightPx = Math.max(16, Math.floor((t.requests / maxReq) * 115));
+                const heightPx = Math.max(14, Math.floor((t.requests / maxReq) * 82));
                 const isMax = t.requests === maxReq;
 
                 const showValueAlways = period === '7d' ? true : period === '24h' ? (idx % 2 === 0 || isMax) : (idx % 3 === 0 || isMax);
@@ -260,22 +261,22 @@ export default function AnalyticsDashboardPanel() {
                 return (
                   <div key={idx} className="flex-1 h-full flex flex-col justify-end items-center group relative">
                     {/* 호버 시 툴팁 */}
-                    <div className="absolute -top-7 bg-gray-900 text-white dark:bg-white dark:text-zinc-900 text-[10px] font-bold py-0.5 px-2 rounded-md shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-30 whitespace-nowrap">
+                    <div className="absolute -top-6 bg-gray-900 text-white dark:bg-white dark:text-zinc-900 text-[10px] font-bold py-0.5 px-1.5 rounded shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-30 whitespace-nowrap">
                       {t.label}: {t.requests}건 (방문자 {t.visitors}명)
                     </div>
 
                     {/* 상시 노출 수치 */}
                     <span
-                      className={`font-mono font-bold tracking-tight mb-1 text-center transition-all ${
+                      className={`font-mono font-bold tracking-tight mb-0.5 text-center transition-all ${
                         isMax
                           ? 'text-blue-600 dark:text-blue-400 font-extrabold scale-105'
                           : 'text-gray-600 dark:text-zinc-300'
                       } ${
                         period === '7d'
-                          ? 'text-xs'
+                          ? 'text-[11px]'
                           : period === '24h'
-                            ? (showValueAlways ? 'text-[9px]' : 'text-[9px] opacity-0 group-hover:opacity-100')
-                            : (showValueAlways ? 'text-[8px]' : 'text-[8px] opacity-0 group-hover:opacity-100')
+                            ? (showValueAlways ? 'text-[8.5px]' : 'text-[8.5px] opacity-0 group-hover:opacity-100')
+                            : (showValueAlways ? 'text-[7.5px]' : 'text-[7.5px] opacity-0 group-hover:opacity-100')
                       }`}
                     >
                       {t.requests}
@@ -292,7 +293,7 @@ export default function AnalyticsDashboardPanel() {
                     />
 
                     {/* 하단 날짜/시간 라벨 */}
-                    <span className={`text-[9px] text-gray-500 dark:text-zinc-400 truncate w-full text-center font-mono mt-1 ${
+                    <span className={`text-[8.5px] text-gray-500 dark:text-zinc-400 truncate w-full text-center font-mono mt-0.5 ${
                       showLabelAlways ? 'opacity-100' : 'opacity-40 group-hover:opacity-100'
                     }`}>
                       {t.label}
@@ -308,9 +309,9 @@ export default function AnalyticsDashboardPanel() {
           </div>
         </PremiumCard>
 
-        {/* 유입 채널 랭킹 */}
-        <PremiumCard className="!p-3.5 flex flex-col min-h-0">
-          <div className="flex items-center justify-between mb-2 border-b border-gray-100 dark:border-zinc-800 pb-1.5 shrink-0">
+        {/* 2. 유입 채널 랭킹 (1칸, 공란 없이 딱 맞춤) */}
+        <PremiumCard className="!p-3 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-1.5 border-b border-gray-100 dark:border-zinc-800 pb-1.5 shrink-0">
             <span className="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5">
               <span>🧭</span>
               <span>검색 & 유입 채널</span>
@@ -318,13 +319,13 @@ export default function AnalyticsDashboardPanel() {
             <span className="text-[10px] text-gray-400">점유율</span>
           </div>
 
-          <div className="space-y-2 flex-1 overflow-y-auto custom-scrollbar pr-1">
+          <div className="space-y-2 py-0.5">
             {topReferrers.length > 0 ? (
               topReferrers.map((ref, idx) => (
-                <div key={idx} className="space-y-1">
+                <div key={idx} className="space-y-0.5">
                   <div className="flex justify-between text-[11px] font-bold">
-                    <span className="text-gray-700 dark:text-zinc-300">{ref.source}</span>
-                    <span className="text-[var(--google-blue)] dark:text-[#8ab4f8]">{ref.percentage}%</span>
+                    <span className="text-gray-700 dark:text-zinc-300 truncate">{ref.source}</span>
+                    <span className="text-[var(--google-blue)] dark:text-[#8ab4f8] font-mono shrink-0 ml-2">{ref.percentage}%</span>
                   </div>
                   <div className="w-full h-1.5 rounded-full bg-gray-100 dark:bg-zinc-800 overflow-hidden">
                     <div
@@ -335,46 +336,58 @@ export default function AnalyticsDashboardPanel() {
                 </div>
               ))
             ) : (
-              <div className="text-xs text-gray-400 py-6 text-center">유입 채널 분석 중...</div>
+              <div className="text-xs text-gray-400 py-4 text-center">유입 채널 분석 중...</div>
             )}
           </div>
         </PremiumCard>
       </div>
 
-      {/* ── 3. 인기 보상 칼럼 TOP 10 (콤팩트 테이블) ───────────────────────── */}
-      <PremiumCard className="!p-0 shrink-0">
-        <div className="p-2.5 sm:px-3.5 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
-          <span className="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5">
-            <span>🏆</span>
-            <span>인기 보상 칼럼 TOP 10</span>
-          </span>
-          <PremiumBadge color="blue" className="!text-[10px] !px-2 !py-0.5">실시간 PV</PremiumBadge>
+      {/* ── 3. 인기 보상 칼럼 TOP 10 (넓고 시원한 메인 리스트로 확장) ───────── */}
+      <PremiumCard className="!p-0 flex-1 min-h-0 flex flex-col shadow-sm">
+        <div className="p-2.5 sm:px-3.5 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-gray-50/50 dark:bg-zinc-900/50">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
+              <span>🏆</span>
+              <span>인기 보상 칼럼 TOP 10 실시간 순위</span>
+            </span>
+            <span className="text-[10px] text-gray-400 hidden sm:inline-block">독자 유입 및 조회수 랭킹</span>
+          </div>
+          <PremiumBadge color="blue" className="!text-[10px] !px-2 !py-0.5">실시간 PV 집계</PremiumBadge>
         </div>
 
-        <div className="divide-y divide-gray-100 dark:divide-zinc-800/60 max-h-40 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-gray-100 dark:divide-zinc-800/60 min-h-0">
           {topPages.length > 0 ? (
             topPages.map((page, idx) => (
-              <div key={idx} className="px-3 py-1.5 flex items-center justify-between gap-3 hover:bg-gray-50/80 dark:hover:bg-zinc-800/40 transition-colors">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className={`w-4 h-4 rounded flex items-center justify-center text-[9px] font-extrabold shrink-0 ${idx < 3 ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' : 'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400'}`}>
+              <div key={idx} className="px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-3 hover:bg-blue-50/40 dark:hover:bg-zinc-800/50 transition-colors">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <span className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-extrabold shrink-0 shadow-sm ${
+                    idx === 0 
+                      ? 'bg-amber-500 text-white dark:bg-amber-500' 
+                      : idx === 1 
+                        ? 'bg-slate-400 text-white dark:bg-slate-400' 
+                        : idx === 2 
+                          ? 'bg-amber-700 text-white dark:bg-amber-700' 
+                          : 'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400'
+                  }`}>
                     {idx + 1}
                   </span>
                   <a
                     href={page.path}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-bold text-gray-800 dark:text-zinc-200 hover:text-[var(--google-blue)] truncate transition-colors"
+                    className="text-xs sm:text-sm font-bold text-gray-800 dark:text-zinc-200 hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] truncate transition-colors"
                   >
                     {page.title}
                   </a>
                 </div>
-                <div className="shrink-0 text-[11px] font-bold text-gray-900 dark:text-white font-mono">
-                  {(page.views || 0).toLocaleString()} <span className="text-gray-400 font-normal text-[10px]">PV</span>
+                <div className="shrink-0 flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white font-mono bg-gray-50 dark:bg-zinc-800/60 px-2 py-0.5 rounded-lg border border-gray-200/60 dark:border-zinc-700/60">
+                  <span className="text-blue-600 dark:text-blue-400">{(page.views || 0).toLocaleString()}</span>
+                  <span className="text-gray-400 font-normal text-[10px]">PV</span>
                 </div>
               </div>
             ))
           ) : (
-            <div className="p-4 text-center text-xs text-gray-400">집계 중...</div>
+            <div className="p-8 text-center text-xs text-gray-400">집계 중...</div>
           )}
         </div>
       </PremiumCard>

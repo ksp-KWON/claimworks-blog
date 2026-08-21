@@ -94,11 +94,43 @@ export default function AdminPage() {
   useEffect(() => {
     if (activeApp === 'post-list') {
       const token = githubToken || localStorage.getItem('github_token') || '';
+      setIsLoading(true);
       if (token) {
-        setIsLoading(true);
         fetchPostList(token)
           .then(list => setPostList(list))
-          .catch(err => console.warn('Auto fetch post list:', err))
+          .catch(err => {
+            console.warn('GitHub API fetch failed, falling back to local posts:', err);
+            return fetch('/api/posts?admin=true')
+              .then(res => res.json())
+              .then(posts => {
+                if (Array.isArray(posts)) {
+                  setPostList(posts.map(p => ({
+                    name: `${p.slug}.md`,
+                    sha: p.slug,
+                    title: p.title,
+                    date: p.date,
+                    published: p.published !== false
+                  })));
+                }
+              });
+          })
+          .finally(() => setIsLoading(false));
+      } else {
+        // Fallback: 토큰 미등록 시에도 정적 포스트 목록을 읽기 전용으로 로드
+        fetch('/api/posts?admin=true')
+          .then(res => res.json())
+          .then(posts => {
+            if (Array.isArray(posts)) {
+              setPostList(posts.map(p => ({
+                name: `${p.slug}.md`,
+                sha: p.slug,
+                title: p.title,
+                date: p.date,
+                published: p.published !== false
+              })));
+            }
+          })
+          .catch(err => console.warn('Fetch local posts failed:', err))
           .finally(() => setIsLoading(false));
       }
     }
@@ -447,6 +479,8 @@ export default function AdminPage() {
             onDeletePost={handleDeletePost} 
             searchQuery={searchQuery}
             sortType={sortType}
+            hasToken={Boolean(githubToken || (typeof window !== 'undefined' && localStorage.getItem('github_token')))}
+            onOpenSettings={() => setActiveApp('analytics')}
           />
         )}
       </div>

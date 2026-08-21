@@ -11,9 +11,20 @@ interface PostListPanelProps {
   onDeletePost: (filename: string, sha: string) => void;
   searchQuery: string;
   sortType: string;
+  hasToken?: boolean;
+  onOpenSettings?: () => void;
 }
 
-export default function PostListPanel({ isLoading, postList, onLoadPost, onDeletePost, searchQuery, sortType }: PostListPanelProps) {
+export default function PostListPanel({
+  isLoading,
+  postList,
+  onLoadPost,
+  onDeletePost,
+  searchQuery,
+  sortType,
+  hasToken = true,
+  onOpenSettings
+}: PostListPanelProps) {
 
   const sortedAndFilteredList = useMemo(() => {
     return [...postList]
@@ -38,6 +49,27 @@ export default function PostListPanel({ isLoading, postList, onLoadPost, onDelet
   return (
     <AdminPanelLayout innerClassName="flex flex-col w-full h-full bg-white dark:bg-[#111111]">
       <div className="flex-1 min-h-0 flex flex-col w-full">
+        {/* ⚠️ GitHub Token 미설정 안내 배너 */}
+        {!hasToken && (
+          <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50 rounded-xl p-3 mb-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shrink-0 shadow-sm">
+            <div className="flex items-center gap-2 text-xs text-amber-800 dark:text-amber-300">
+              <span className="text-base">🔐</span>
+              <span>
+                <strong>GitHub Token(PAT)</strong>이 등록되지 않아 <strong>읽기 전용 모드</strong>로 목록을 표시합니다. 원고의 실시간 로드·수정·삭제를 위해 토큰을 등록해주세요.
+              </span>
+            </div>
+            {onOpenSettings && (
+              <button
+                type="button"
+                onClick={onOpenSettings}
+                className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shrink-0 transition-colors shadow-sm"
+              >
+                API 설정에서 토큰 등록 ⚙️
+              </button>
+            )}
+          </div>
+        )}
+
         {sortedAndFilteredList.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-400 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-[0_4px_20px_rgba(0,0,0,0.06)] p-10">
             <svg className="w-16 h-16 mb-4 text-gray-200 dark:text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>

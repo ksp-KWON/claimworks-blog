@@ -30,11 +30,11 @@ export default function CommonBox({ tone, title, children, icon, headerRight, to
   };
 
   const titleStyles: Record<BoxTone, string> = {
-    blue: 'text-[var(--google-blue)] dark:text-blue-400 border-l-4 border-[var(--google-blue)]',
-    red: 'text-[var(--google-red)] dark:text-red-400 border-l-4 border-[var(--google-red)]',
-    green: 'text-[var(--google-green)] dark:text-green-400 border-l-4 border-[var(--google-green)]',
-    yellow: 'text-yellow-600 dark:text-yellow-400 border-l-4 border-yellow-500',
-    purple: 'text-purple-600 dark:text-purple-400 border-l-4 border-purple-500',
+    blue: 'text-[var(--google-blue)] dark:text-blue-400',
+    red: 'text-[var(--google-red)] dark:text-red-400',
+    green: 'text-[var(--google-green)] dark:text-green-400',
+    yellow: 'text-yellow-600 dark:text-yellow-400',
+    purple: 'text-purple-600 dark:text-purple-400',
   };
 
   return (
@@ -44,7 +44,7 @@ export default function CommonBox({ tone, title, children, icon, headerRight, to
       <div className="relative z-10">
         {/* Full-width clean header strip with SVG line symbol */}
         <div className={`-mt-5 sm:-mt-6 -mx-5 sm:-mx-6 px-5 sm:px-6 py-3.5 mb-4 flex items-center justify-between gap-3 flex-wrap ${headerGradients[tone]}`}>
-          <h3 className={`text-[15.5px] font-extrabold pl-2.5 flex items-center gap-2 tracking-tight ${titleStyles[tone]}`}>
+          <h3 className={`text-[15.5px] font-extrabold flex items-center gap-2.5 tracking-tight ${titleStyles[tone]}`}>
             {icon && <span className="shrink-0 flex items-center">{icon}</span>}
             <span>{title}</span>
           </h3>

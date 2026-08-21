@@ -7,7 +7,7 @@ export default function CTABanner() {
     <div className="mt-12 mb-8 bg-white dark:bg-[#202124] px-4 py-5 sm:p-6 rounded-none border border-gray-200 dark:border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_16px_50px_rgba(26,115,232,0.18)] hover:border-[#1a73e8] transition-all duration-300 relative overflow-hidden group">
       <div className="relative z-10 space-y-5">
         <div>
-          <h3 className="font-extrabold text-gray-900 dark:text-white text-[16.5px] tracking-tight flex items-center gap-2.5 border-l-4 border-[#1a73e8] pl-2.5">
+          <h3 className="font-extrabold text-gray-900 dark:text-white text-[16.5px] tracking-tight flex items-center gap-2.5">
             <svg className="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               <path d="m9 12 2 2 4-4" />

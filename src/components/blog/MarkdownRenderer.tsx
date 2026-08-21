@@ -161,11 +161,11 @@ export const sharedComponents: Components & Record<string, any> = {
     };
 
     const titleColors: Record<string, string> = {
-      blue: 'text-[var(--google-blue)] dark:text-blue-400 border-l-4 border-[var(--google-blue)]',
-      red: 'text-[var(--google-red)] dark:text-red-400 border-l-4 border-[var(--google-red)]',
-      green: 'text-[var(--google-green)] dark:text-green-400 border-l-4 border-[var(--google-green)]',
-      yellow: 'text-yellow-600 dark:text-yellow-400 border-l-4 border-yellow-500',
-      purple: 'text-purple-600 dark:text-purple-400 border-l-4 border-purple-500',
+      blue: 'text-[var(--google-blue)] dark:text-blue-400',
+      red: 'text-[var(--google-red)] dark:text-red-400',
+      green: 'text-[var(--google-green)] dark:text-green-400',
+      yellow: 'text-yellow-600 dark:text-yellow-400',
+      purple: 'text-purple-600 dark:text-purple-400',
     };
 
     // 자식 요소 중 공백 문자열을 제외한 첫 번째 유효 요소가 헤딩(h1~h6)인지 검사
@@ -209,7 +209,7 @@ export const sharedComponents: Components & Record<string, any> = {
         <div className={`my-8 bg-white dark:bg-[#202124] shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden group border rounded-none ${boxHoverBorders[tone]}`}>
           {/* 상단 톤온톤 헤더 바 (모던 SVG 라인 심볼 탑재) */}
           <div className={`px-5 sm:px-6 py-3 bg-gradient-to-r ${headerGradients[tone]} relative z-10`}>
-            <h3 className={`text-[15.5px] font-extrabold pl-2.5 flex items-center gap-2 tracking-tight !m-0 !p-0 border-0 bg-transparent ${titleColors[tone]}`}>
+            <h3 className={`text-[15.5px] font-extrabold flex items-center gap-2.5 tracking-tight !m-0 !p-0 border-0 bg-transparent ${titleColors[tone]}`}>
               <span className="shrink-0 flex items-center">{insightSvgIcon}</span>
               <span>{headingChildren}</span>
             </h3>

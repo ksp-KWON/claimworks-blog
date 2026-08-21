@@ -74,7 +74,7 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   for (const line of lines) {
     const trimmed = line.trim();
     
-    // code block check for TOC
+    // code block check
     if (line.startsWith('```')) {
       inCodeBlock = !inCodeBlock;
       if (currentSectionType === 'NONE') {
@@ -83,16 +83,15 @@ export function parseBlogPost(content: string): ParsedBlogPost {
       continue;
     }
 
-    // 1. Heading Detection (H2, H3 모두 섹션 분리 기준으로 확장)
-    let headingMatch = trimmed.match(/^(#{2,3})\s+(.+)$/);
+    // 1. Heading Detection (H2, H3)
+    let headingMatch = !inCodeBlock ? trimmed.match(/^(#{2,3})\s+(.+)$/) : null;
     
-    // [근본 해결: FAQ 내 H3 충돌 방어 룰]
-    // FAQ 수집 모드에서 ### Q: 또는 ### A: 형태를 만나면, 새로운 섹션 분기용 헤딩으로 취급하지 않고 무시합니다.
+    // [FAQ 내 H3 충돌 방어] FAQ 수집 모드에서 ### Q: 또는 ### A: 형태는 섹션 분기용 헤딩이 아님
     if (headingMatch && currentSectionType === 'FAQ' && /^(?:[*_💬✅☑️🛡️⭐\s]*[QA]\d*[*_]*\s*[:.-]?\s*)/i.test(headingMatch[2])) {
       headingMatch = null;
     }
 
-    if (headingMatch && !inCodeBlock) {
+    if (headingMatch) {
       const rawText = headingMatch[2].trim();
       
       let isSpecial = false;
@@ -116,81 +115,107 @@ export function parseBlogPost(content: string): ParsedBlogPost {
 
       if (isSpecial) continue;
 
+      // 일반 본문 헤딩을 만났을 때
+      if (currentSectionType === 'FAQ' && currentQ) {
+        result.faqItems.push({ q: currentQ, a: currentA.trim() });
+        currentQ = ''; currentA = '';
+      }
       currentSectionType = 'NONE';
       
+      const isH2 = headingMatch[1].length === 2;
       const id = slugger.slug(cleanHeadingText(rawText));
       const text = cleanHeadingText(rawText, true);
         
-      if (text && headingMatch[1].length === 2) {
-        result.toc.push({ id, text });
-      }
+      if (isH2) {
+        if (text) result.toc.push({ id, text });
 
-      // 첫 번째 TOC 제목 등장 전까지의 텍스트를 오프닝으로 분리
-      if (!hasFirstHeading) {
-        hasFirstHeading = true;
-        const opStr = currentSectionLines.join('\n').trim();
-        if (opStr) result.opening = opStr;
-        currentSectionLines = [line];
+        // 첫 번째 일반 H2 제목 등장 전까지 모인 내용을 오프닝(도입부)으로 분리
+        if (!hasFirstHeading) {
+          hasFirstHeading = true;
+          const opStr = currentSectionLines.join('\n').trim();
+          if (opStr) result.opening = opStr;
+          currentSectionLines = [line];
+        } else {
+          pushCurrentSection();
+          currentSectionLines = [line];
+        }
       } else {
-        pushCurrentSection();
+        // H3 헤딩은 현재 섹션의 하위 내용으로 포함
         currentSectionLines.push(line);
       }
       continue;
     }
 
-    // 2. Process Line based on currentSectionType
-    // Stop early triggers
-    if (currentSectionType === 'FAQ' && /^(?:#+\s*)?(?:[*_💬✅☑️🛡️⭐\s]*Q\d*[*_]*\s*[:.-]?\s*)/i.test(trimmed)) {
-      if (currentQ) result.faqItems.push({ q: currentQ, a: currentA.trim() });
-      currentQ = trimmed.replace(/^(?:#+\s*)?(?:[*_💬✅☑️🛡️⭐\s]*Q\d*[*_]*\s*[:.-]?\s*)/i, '').trim();
-      currentA = '';
-      continue;
-    } else if (currentSectionType !== 'FAQ' && /^#{1,6}\s/.test(trimmed)) {
-       currentSectionType = 'NONE';
-    }
-    
-    if (/\[SEO_SUMMARY\]/.test(trimmed)) {
-      currentSectionType = 'NONE';
-      continue;
+    // 2. Process Lines by State
+    if (currentSectionType === 'FAQ') {
+      if (/^(?:#+\s*)?(?:[*_💬✅☑️🛡️⭐\s]*Q\d*[*_]*\s*[:.-]?\s*)/i.test(trimmed)) {
+        if (currentQ) result.faqItems.push({ q: currentQ, a: currentA.trim() });
+        currentQ = trimmed.replace(/^(?:#+\s*)?(?:[*_💬✅☑️🛡️⭐\s]*Q\d*[*_]*\s*[:.-]?\s*)/i, '').trim();
+        currentA = '';
+        continue;
+      }
+      if (currentQ) {
+        if (trimmed !== '---') {
+          const cleanLine = line.replace(/^\s*(?:[*_💬✅☑️🛡️⭐\s]*A\d*[*_]*\s*[:.-]?\s*)/i, '');
+          currentA += cleanLine + '\n';
+        }
+        continue;
+      }
     }
 
     if (currentSectionType === 'KEY_POINTS') {
       const cleanLine = trimmed.replace(/^[> \t]+/, '').trim();
-      if (!cleanLine || /^[-=_*]{2,}$/.test(cleanLine)) continue;
-      if (/^[-*]\s+/.test(cleanLine) || /^[🛡️💡✅☑️⭐]/.test(cleanLine)) {
-        const text = cleanLine.replace(/^[-*]\s*/, '').replace(/^[🛡️💡✅☑️⭐]+\s*/, '').trim();
-        if (text && !/^[-=_*~]{1,}$/.test(text) && result.keyPoints.length < 3) {
+      if (!cleanLine) continue; // 빈 줄은 스킵
+
+      const isBullet = /^[-*+]\s+/.test(cleanLine) || /^[🛡️💡✅☑️⭐]/.test(cleanLine);
+      if (isBullet && result.keyPoints.length < 3) {
+        const text = cleanLine.replace(/^[-*+]\s*/, '').replace(/^[🛡️💡✅☑️⭐]+\s*/, '').trim();
+        if (text && !/^[-=_*~]{2,}$/.test(text)) {
           result.keyPoints.push(text);
+          continue;
         }
       }
-    } else if (currentSectionType === 'CHECKLIST') {
+
+      // 구분선인 경우 스킵
+      if (/^[-=_*]{2,}$/.test(cleanLine)) continue;
+
+      // 불릿이 아닌 일반 텍스트 라인을 만나면 -> KEY_POINTS 종료, 일반 모드로 전환하여 오프닝 라인에 추가
+      currentSectionType = 'NONE';
+    }
+
+    if (currentSectionType === 'CHECKLIST') {
       const cleanLine = trimmed.replace(/^[> \t]+/, '').trim();
-      if (!cleanLine || /^[-=_*]{2,}$/.test(cleanLine)) continue;
-      if (/^[-*]\s+/.test(cleanLine) || /^\[[ xX]\]/.test(cleanLine) || /^[\u2611\u2705\uFE0F[\]]/.test(cleanLine)) {
-        const text = cleanLine.replace(/^[-*]\s*/, '').replace(/^\[[ xX]\]\s*/i, '').replace(/^[\u2611\u2705\uFE0F]+\s*/gu, '').trim();
-        if (text && !/^[-=_*~]{1,}$/.test(text)) {
+      if (!cleanLine) continue;
+
+      const isCheckItem = /^[-*+]\s+/.test(cleanLine) || /^\[[ xX-]\]/.test(cleanLine) || /^[\u2611\u2705\uFE0F[\]]/.test(cleanLine);
+      if (isCheckItem) {
+        const text = cleanLine.replace(/^[-*+]\s*/, '').replace(/^\[[ xX-]\]\s*/i, '').replace(/^[\u2611\u2705\uFE0F]+\s*/gu, '').trim();
+        if (text && !/^[-=_*~]{2,}$/.test(text)) {
           result.checklistItems.push(text);
+          continue;
         }
       }
-    } else if (currentSectionType === 'FAQ') {
-      if (currentQ) {
-        if (trimmed !== '---') {
-          // 답변 앞의 'A :' 등 불필요한 접두사 자동 제거 (렌더링 폼 중복 방지)
-          const cleanLine = line.replace(/^\s*(?:[*_💬✅☑️🛡️⭐\s]*A\d*[*_]*\s*[:.-]?\s*)/i, '');
-          currentA += cleanLine + '\n';
-        }
-      }
-    } else if (currentSectionType === 'CTA') {
-      // skip
-    } else if (currentSectionType === 'NONE') {
-      let processedLine = line;
 
-      // 1. 관련 정보 텍스트 자동 삭제 (피로감 줄이기)
+      if (/^[-=_*]{2,}$/.test(cleanLine)) continue;
+
+      // 체크리스트가 아닌 일반 텍스트면 NONE으로 전환
+      currentSectionType = 'NONE';
+    }
+
+    if (currentSectionType === 'CTA') {
+      continue;
+    }
+
+    if (currentSectionType === 'NONE') {
+      if (/\[SEO_SUMMARY\]/.test(trimmed)) continue;
+
+      // 1. 관련 정보 텍스트 자동 삭제
       if (/^\s*(\[|\*\*|#+\s*)?(관련\s*(정보|글|포스팅)|함께\s*읽기|관련정보|관련글)(\]|\*\*|:)?\s*$/.test(trimmed)) {
-        continue; // 이 줄은 완전히 렌더링에서 제외
+        continue;
       }
 
-      // 2. 단독 링크 자동 감지 및 변환 (불릿 유무 무관)
+      // 2. 단독 링크 자동 감지 및 변환
+      let processedLine = line;
       const singleLinkMatch = trimmed.match(/^\s*(?:[-*]\s*)?\[([^\]]+)\]\(([^)]+)\)\s*$/);
       if (singleLinkMatch) {
         const text = singleLinkMatch[1].trim();
@@ -205,7 +230,13 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   if (currentQ) {
     result.faqItems.push({ q: currentQ, a: currentA.trim() });
   }
-  pushCurrentSection();
+  
+  if (!hasFirstHeading) {
+    const opStr = currentSectionLines.join('\n').trim();
+    if (opStr) result.opening = opStr;
+  } else {
+    pushCurrentSection();
+  }
 
   const applyBold = (str: string) => str.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
   
@@ -226,17 +257,8 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   }
   result.sections = result.sections.map(groupRelatedLinks);
 
-  // [재발방지 Fallback 1]
-  // opening이 비어있고 sections가 1개 이상이면, sections[0]을 opening으로 복구한다.
-  // 이 마크다운이 ## 헤딩으로 시작하는 구조여서 opening이 비는 경우를 방어.
-  if (!result.opening && result.sections.length >= 1) {
-    result.opening = result.sections[0];
-    result.sections = result.sections.slice(1);
-  }
-
-  // [재발방지 Fallback 2]
-  // sections도 비어있고 opening도 비어있으면 (파서가 전혀 내용을 못 잡은 경우),
-  // 전체 raw content를 그대로 1개 섹션으로 넣어 본문이 완전히 사라지는 것을 방지.
+  // [재발방지 Fallback]
+  // sections도 비어있고 opening도 비어있을 때만 (극단적 파싱 실패 방어)
   if (!result.opening && result.sections.length === 0 && content.trim()) {
     result.sections = [groupRelatedLinks(applyBold(content.trim()))];
   }

@@ -43,14 +43,21 @@ export function formatDate(dateVal: unknown): string {
   return String(dateVal);
 }
 
+// 빌드 및 런타임 디스크 I/O 최적화를 위한 인메모리 캐시
+let cachedPosts: PostData[] | null = null;
+
 // 전체 마크다운 파일들을 조회하여 파싱하는 내부 헬퍼 함수
 function getAllPosts(): PostData[] {
+  if (cachedPosts) {
+    return cachedPosts;
+  }
+
   try {
     if (!fs.existsSync(postsDirectory)) {
       return [];
     }
     const fileNames = fs.readdirSync(postsDirectory);
-    return fileNames
+    const result = fileNames
       .filter((fileName) => fileName.endsWith('.md'))
       .map((fileName) => {
         const slug = fileName.replace(/\.md$/, '');
@@ -58,8 +65,7 @@ function getAllPosts(): PostData[] {
         const fileContents = fs.readFileSync(fullPath, 'utf8');
         const { data, content } = matter(fileContents);
 
-        // [근본 해결] YAML frontmatter에서 category가 문자열 또는 배열로 올 수 있어
-        // 반드시 문자열로 정규화합니다. 배열이면 콤마+공백으로 합칩니다.
+        // YAML frontmatter에서 category가 문자열 또는 배열로 올 수 있어 문자열로 정규화
         const normalizeToString = (val: unknown): string => {
           if (Array.isArray(val)) return val.filter(Boolean).join(', ');
           if (typeof val === 'string') return val;
@@ -84,6 +90,9 @@ function getAllPosts(): PostData[] {
           content: content,
         };
       });
+
+    cachedPosts = result;
+    return result;
   } catch (error) {
     console.error('Error reading directory: ', error);
     return [];
@@ -129,37 +138,16 @@ export function getSortedPostsData(includeUnpublished = false): Omit<PostData, '
 
 // 특정 블로그 글 하나를 가져오는 함수 (비공개 글은 관리자 권한 없이 조회 불가)
 export function getPostData(slug: string, includeUnpublished = false): PostData | null {
-  try {
-    const fullPath = path.join(postsDirectory, `${slug}.md`);
-    if (!fs.existsSync(fullPath)) {
-      return null;
-    }
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-    const { data, content } = matter(fileContents);
-
-    const published = data.published !== false;
-
-    // 비공개 글이고 비공개 비포함 옵션일 때 차단
-    if (!published && !includeUnpublished) {
-      return null;
-    }
-
-    return {
-      slug,
-      title: data.title || '',
-      date: formatDate(data.date),
-      updatedAt: data.updatedAt ? formatDate(data.updatedAt) : undefined,
-      summary: data.summary || '',
-      category: data.category || '',
-      caseNumber: data.caseNumber || '',
-      regionCategory: data.regionCategory || '',
-      specialtyCategory: data.specialtyCategory || '',
-      tags: Array.isArray(data.tags) ? data.tags : [],
-      content: content || '',
-      published,
-    };
-  } catch (error) {
-    console.error(`Error loading post: ${slug}`, error);
+  const allPosts = getAllPosts();
+  const post = allPosts.find((p) => p.slug === slug);
+  if (!post) {
     return null;
   }
+
+  const published = post.published !== false;
+  if (!published && !includeUnpublished) {
+    return null;
+  }
+
+  return post;
 }

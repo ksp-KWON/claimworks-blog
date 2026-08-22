@@ -3,6 +3,7 @@ import YouTubeBriefing from "@/components/YouTubeBriefing";
 import HomePostList from "@/components/HomePostList";
 import type { Metadata } from "next";
 import PremiumHeading from "@/components/ui/PremiumHeading";
+import AppIcon from "@/components/ui/AppIcon";
 
 export const metadata: Metadata = {
   title: "보상스쿨 | 정도와 승소율의 전문 손해사정 그룹",
@@ -89,14 +90,20 @@ export default function Home() {
       {/* 유튜브 전문가 브리핑 섹션 (소개글 위쪽 배치) */}
       <YouTubeBriefing />
 
-      {/* 분야별 보상 가이드 글로벌 타이틀 (박스 형태 제거하여 중복 방지) */}
+      {/* 보상스쿨 매거진 글로벌 타이틀 (미디어 센터와 대칭 통일) */}
       <section className="space-y-6 sm:space-y-8">
         <div className="px-1 sm:px-2">
-          <PremiumHeading level={1} gradient="blue" showLeftBorder={true} className="!mb-3 !text-xl sm:!text-2xl">
-            분야별 전문 보상 가이드 & 판례 분석
+          <PremiumHeading 
+            level={1} 
+            gradient="blue" 
+            showLeftBorder={false} 
+            icon={<AppIcon name="book" size={24} className="text-[var(--google-blue)]" />}
+            className="!mb-3 !text-xl sm:!text-2xl"
+          >
+            보상스쿨 매거진
           </PremiumHeading>
           <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
-            사망·후유장해부터 실손·질병 진단까지, 보상스쿨 전문가 그룹이 엄선한 핵심 실무 노하우와 명쾌한 해결책을 제공합니다.
+            사망·후유장해부터 실손·질병 진단까지, 보상스쿨 전문가 그룹의 분야별 보상 가이드와 최신 판례 분석을 전달합니다.
           </p>
         </div>
 

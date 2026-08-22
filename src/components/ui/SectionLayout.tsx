@@ -45,7 +45,7 @@ export default function SectionLayout({
             gradient={themeColor} 
             icon={icon} 
             className="!mb-0 !text-xl sm:!text-2xl" 
-            showLeftBorder={true}
+            showLeftBorder={false}
           >
             {title}
           </PremiumHeading>

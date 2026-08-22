@@ -32,7 +32,7 @@ export default function AnalyticsDashboardPanel() {
   useEffect(() => {
     const gemini = localStorage.getItem('gemini_api_key') || '';
     const github = localStorage.getItem('github_token') || '';
-    const cfZone = localStorage.getItem('cf_zone_id') || '';
+    const cfZone = localStorage.getItem('cf_zone_id') || 'a9a2edc37447f981df70dd90cf7521ef';
     const cfToken = localStorage.getItem('cf_api_token') || '';
 
     setCredentials({
@@ -289,13 +289,13 @@ export default function AnalyticsDashboardPanel() {
 
               <div>
                 <label className="block text-[10px] font-bold text-gray-600 dark:text-zinc-400 mb-0.5">
-                  CF Zone ID
+                  CF Zone ID (자동 감지)
                 </label>
                 <input
                   type="text"
                   value={credentials.cloudflareZoneId || ''}
                   onChange={(e) => setCredentials({ ...credentials, cloudflareZoneId: e.target.value })}
-                  placeholder="Zone ID (32자리)"
+                  placeholder="자동 감지 (비워두셔도 됩니다)"
                   className="w-full px-2.5 py-1 text-xs bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none focus:ring-1 focus:ring-teal-500 font-mono text-gray-900 dark:text-zinc-100"
                 />
               </div>

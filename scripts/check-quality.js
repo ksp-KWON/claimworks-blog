@@ -204,7 +204,84 @@ function processPost(filePath) {
   // ── [13. 표와 인용구 사이 빈 줄 강제 확보] ────────────────────────────
   body = body.replace(/(\|.*\|)\r?\n(>[^\n]+)/g, '$1\n\n$2');
 
-  // ── [14. 다중 빈 줄 정리] ──────────────────────────────────────────────
+  // ── [14. 스마트 문단 호흡 정규화 (GFM Paragraph Breathing Rule)] ─────────
+  // 4문장 이상의 긴 텍스트 단락을 2~3문장 단위로 쾌적하게 \n\n 분리
+  const blocks = body.split(/\r?\n\r?\n/);
+  const normalizedBlocks = blocks.map(block => {
+    const trimmed = block.trim();
+    if (
+      !trimmed ||
+      trimmed.startsWith('#') ||
+      trimmed.startsWith('>') ||
+      trimmed.startsWith('|') ||
+      trimmed.startsWith('-') ||
+      trimmed.startsWith('*') ||
+      /^[1-9]\./.test(trimmed) ||
+      trimmed.startsWith('```')
+    ) {
+      return block;
+    }
+
+    // 문장 분리
+    const sentences = [];
+    let current = '';
+    let inParen = 0;
+    let inQuote = false;
+
+    for (let i = 0; i < block.length; i++) {
+      const char = block[i];
+      current += char;
+
+      if (char === '(' || char === '[' || char === '{') inParen++;
+      else if (char === ')' || char === ']' || char === '}') inParen = Math.max(0, inParen - 1);
+      else if (char === '"' || char === '“' || char === '”') inQuote = !inQuote;
+
+      if (inParen === 0 && (char === '.' || char === '?' || char === '!')) {
+        const nextChar = block[i + 1];
+        const isEnd = (nextChar === undefined || /\s/.test(nextChar) || nextChar === '"' || nextChar === '”');
+        const prevTrimmed = current.slice(0, -1).trim();
+        const prevChar = prevTrimmed.slice(-1);
+        const isSentenceEnd = /[가-힣0-9"'\)\]]/.test(prevChar);
+        const isNumberDot = /\d+\.$/.test(current.trim());
+
+        if (isEnd && isSentenceEnd && !isNumberDot) {
+          while (i + 1 < block.length && /\s/.test(block[i + 1])) {
+            i++;
+          }
+          sentences.push(current.trim());
+          current = '';
+        }
+      }
+    }
+
+    if (current.trim()) {
+      sentences.push(current.trim());
+    }
+
+    if (sentences.length < 4) return block;
+
+    const chunks = [];
+    let currentChunk = [];
+
+    for (let i = 0; i < sentences.length; i++) {
+      currentChunk.push(sentences[i]);
+      const remaining = sentences.length - (i + 1);
+      if (currentChunk.length >= 2 && remaining >= 2) {
+        chunks.push(currentChunk.join(' '));
+        currentChunk = [];
+      }
+    }
+
+    if (currentChunk.length > 0) {
+      chunks.push(currentChunk.join(' '));
+    }
+
+    return chunks.join('\n\n');
+  });
+
+  body = normalizedBlocks.join('\n\n');
+
+  // ── [15. 다중 빈 줄 정리] ──────────────────────────────────────────────
   body = body.replace(/(?:\r?\n){3,}/g, '\n\n').trim();
 
   // gray-matter stringify로 안전하게 재결합

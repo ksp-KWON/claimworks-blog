@@ -135,14 +135,14 @@ export const sharedComponents: Components & Record<string, any> = {
     
     let toneClass = 'text-[#1A73E8] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/20'; // 기본: Blue
     
-    if (/(거절|면책|부지급|삭감|주의|경고|위험|금지|불리|과실|기왕증|불가|제한|악용|분쟁|소송|실패|거부)/.test(text)) {
-      toneClass = 'text-[#d93025] dark:text-[#f28b82] bg-red-50 dark:bg-red-900/20'; // Red
-    } else if (/(지급|보상|합의|성공|가능|해결|유리|승소|안전|권리|인정|전액|확보)/.test(text)) {
-      toneClass = 'text-[#137333] dark:text-[#81c995] bg-emerald-50 dark:bg-emerald-900/20'; // Green
-    } else if (/(핵심|중요|필수|확인|점검|기준|원칙|주의사항|팁|노하우|명심|포인트)/.test(text)) {
-      toneClass = 'text-[#e37400] dark:text-[#fde293] bg-amber-50 dark:bg-amber-900/20'; // Amber/Orange
-    } else if (/(전문가|손해사정사|의학|법률|판례|자문|소견)/.test(text)) {
-      toneClass = 'text-[#9333ea] dark:text-[#c084fc] bg-purple-50 dark:bg-purple-900/20'; // Purple
+    if (/(거절|면책|부지급|삭감|주의|경고|위험|금지|불리|과실|기왕증|불가|제한|악용|분쟁|소송|실패|거부|위반|처벌|구상|압박|피해)/.test(text)) {
+      toneClass = 'text-[#d93025] dark:text-[#f28b82] bg-red-50 dark:bg-red-900/20'; // Red: 위험/면책/손해
+    } else if (/(지급|보상|합의|성공|가능|해결|유리|승소|안전|권리|인정|전액|확보|부책|방어|수령|구제|무죄)/.test(text)) {
+      toneClass = 'text-[#137333] dark:text-[#81c995] bg-emerald-50 dark:bg-emerald-900/20'; // Green: 승소/해결/권익
+    } else if (/(핵심|중요|필수|확인|점검|기준|원칙|주의사항|팁|노하우|명심|포인트|체크|절차|방법|동선)/.test(text)) {
+      toneClass = 'text-[#e37400] dark:text-[#fde293] bg-amber-50 dark:bg-amber-900/20'; // Amber/Orange: 핵심/체크
+    } else if (/(전문가|손해사정사|손해사정|의학|법률|판례|자문|소견|감정|진단|포렌식|맥브라이드|자배법)/.test(text)) {
+      toneClass = 'text-[#9333ea] dark:text-[#c084fc] bg-purple-50 dark:bg-purple-900/20'; // Purple: 전문성/법리/의학
     }
 
     return (

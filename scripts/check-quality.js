@@ -45,7 +45,18 @@ function processPost(filePath) {
   body = body.replace(/>\s*\[!(?:TIP|NOTE|IMPORTANT|WARNING|CAUTION)\]\s*\r?\n/gi, '> ### 보상스쿨 피드백 & 실무 인사이트\n');
   body = body.replace(/>\s*(?:전문가\s*조언|손해사정사\s*실무\s*조언|실무\s*TIP)\s*:\s*/gi, '> ### 보상스쿨 피드백 & 실무 인사이트\n> ');
 
-  // ── [3. 오프닝 & 핵심 요약 배치 보장] ─────────────────────────────────
+  // ── [3. 오프닝 & 핵심 요약 순서 교정 및 배치 보장] ───────────────────
+  // 오프닝 문단이 ## 핵심 요약보다 위에 있는 경우 순서를 표준(## 핵심 요약 -> 오프닝)으로 자동 교정
+  const keyPointOrderMatch = body.match(/(?:^|\r?\n)(##\s*(?:💡|🎯)?\s*(?:핵심\s*요약|핵심요약|핵심\s*포인트)[^\n]*\r?\n+(?:[ \t]*>?[ \t]*[-*+].*\r?\n*)+)/i);
+  if (keyPointOrderMatch && keyPointOrderMatch.index > 0) {
+    const beforeKeyPoints = body.slice(0, keyPointOrderMatch.index).trim();
+    const keyPointsBlock = keyPointOrderMatch[1].trim();
+    const afterKeyPoints = body.slice(keyPointOrderMatch.index + keyPointOrderMatch[0].length).trim();
+    if (beforeKeyPoints && !beforeKeyPoints.startsWith('#') && !beforeKeyPoints.startsWith('>')) {
+      body = `${keyPointsBlock}\n\n${beforeKeyPoints}\n\n${afterKeyPoints}`;
+    }
+  }
+
   let hasOpeningText = false;
   const trimmedBody = body.trim();
 

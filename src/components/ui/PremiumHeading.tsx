@@ -20,7 +20,7 @@ export default function PremiumHeading({
 }: PremiumHeadingProps) {
   const Tag = `h${level}` as React.ElementType;
   
-  let baseClass = 'font-bold tracking-tight flex items-center gap-2 mb-3';
+  let baseClass = 'font-bold tracking-tight flex items-center flex-nowrap gap-2 mb-3';
   
   if (level === 1) baseClass += ' text-xl sm:text-2xl';
   else if (level === 2) baseClass += ' text-lg sm:text-xl';
@@ -63,8 +63,8 @@ export default function PremiumHeading({
 
   return (
     <Tag className={`${baseClass} ${className}`} {...props}>
-      {icon && <span className="shrink-0">{icon}</span>}
-      <span className={textClass}>{children}</span>
+      {icon && <span className="shrink-0 flex items-center">{icon}</span>}
+      <span className={`min-w-0 ${textClass}`}>{children}</span>
     </Tag>
   );
 }

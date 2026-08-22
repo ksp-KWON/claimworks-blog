@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import AppIcon from '@/components/ui/AppIcon';
 
 export default function ConsultationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -104,7 +105,7 @@ export default function ConsultationPage() {
         {/* 상단 띠 배너 */}
         <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3">
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <span className="text-lg shrink-0">💡</span>
+            <AppIcon name="lightbulb" size={18} className="shrink-0 text-white" />
             <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
               <span className="underline decoration-wavy mr-1.5">[전문 상담]</span>
               보상스쿨의 전문 손해사정사가 직접 확인하고 명쾌한 답변을 드립니다.

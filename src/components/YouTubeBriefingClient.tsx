@@ -36,10 +36,13 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
       {/* 텍스트 타이틀 영역 (시각적 계층화를 위해 박스 제거) */}
       <div className="px-1 sm:px-2">
         <div className="flex flex-wrap gap-y-2 items-end justify-between mb-3">
-          <PremiumHeading level={2} gradient="red" showLeftBorder={false} className="!mb-0 !text-xl sm:!text-2xl flex items-center">
-            <span aria-hidden="true" className="flex items-center leading-none mr-2 text-red-500">
-              <AppIcon name="youtube" size={24} />
-            </span>
+          <PremiumHeading 
+            level={2} 
+            gradient="red" 
+            showLeftBorder={false} 
+            icon={<AppIcon name="youtube" size={24} className="text-red-500" />}
+            className="!mb-0 !text-xl sm:!text-2xl"
+          >
             보상스쿨 미디어 센터
           </PremiumHeading>
           

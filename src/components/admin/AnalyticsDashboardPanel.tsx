@@ -330,19 +330,25 @@ export default function AnalyticsDashboardPanel() {
           </div>
 
           {/* 콤팩트한 막대 그래프 (h-36) */}
-          <div className="p-3 sm:p-4">
-            <div className="h-36 w-full flex items-end gap-1.5 sm:gap-2 pt-4 px-2 pb-1 bg-gray-50/70 dark:bg-zinc-950/70 rounded-none border border-gray-100 dark:border-zinc-800">
+          <div className="p-2.5 sm:p-4">
+            <div className={`h-36 w-full flex items-end pt-4 pb-1 bg-gray-50/70 dark:bg-zinc-950/70 rounded-none border border-gray-100 dark:border-zinc-800 overflow-hidden ${
+              period === '7d' 
+                ? 'gap-2 sm:gap-4 px-2.5 sm:px-4' 
+                : period === '24h' 
+                  ? 'gap-0.5 sm:gap-1.5 px-1 sm:px-2' 
+                  : 'gap-[1px] sm:gap-1 px-1 sm:px-2'
+            }`}>
               {trend.length > 0 ? (
                 trend.map((t, idx) => {
                   const maxReq = Math.max(...trend.map(d => d.requests), 1);
                   const heightPx = Math.max(14, Math.floor((t.requests / maxReq) * 82));
                   const isMax = t.requests === maxReq;
 
-                  const showValueAlways = period === '7d' ? true : period === '24h' ? (idx % 2 === 0 || isMax) : (idx % 3 === 0 || isMax);
-                  const showLabelAlways = period === '7d' ? true : period === '24h' ? (idx % 3 === 0 || idx === trend.length - 1) : (idx % 4 === 0 || idx === trend.length - 1);
+                  const showValueAlways = period === '7d' ? true : period === '24h' ? (idx % 2 === 0 || isMax) : (idx % 4 === 0 || isMax);
+                  const showLabelAlways = period === '7d' ? true : period === '24h' ? (idx % 3 === 0 || idx === trend.length - 1) : (idx % 5 === 0 || idx === trend.length - 1);
 
                   return (
-                    <div key={idx} className="flex-1 h-full flex flex-col justify-end items-center group/bar relative">
+                    <div key={idx} className="flex-1 min-w-0 h-full flex flex-col justify-end items-center group/bar relative">
                       {/* 호버 시 툴팁 */}
                       <div className="absolute -top-6 bg-gray-900 text-white dark:bg-white dark:text-zinc-900 text-[10px] font-bold py-0.5 px-1.5 rounded-none shadow-lg pointer-events-none opacity-0 group/bar:opacity-100 transition-opacity z-30 whitespace-nowrap">
                         {t.label}: {t.requests}건 (방문자 {t.visitors}명)
@@ -350,7 +356,7 @@ export default function AnalyticsDashboardPanel() {
 
                       {/* 상시 노출 수치 */}
                       <span
-                        className={`font-mono font-bold tracking-tight mb-0.5 text-center transition-all ${
+                        className={`font-mono font-bold tracking-tight mb-0.5 text-center transition-all truncate w-full px-0.5 ${
                           isMax
                             ? 'text-blue-600 dark:text-blue-400 font-extrabold scale-105'
                             : 'text-gray-600 dark:text-zinc-300'
@@ -358,8 +364,8 @@ export default function AnalyticsDashboardPanel() {
                           period === '7d'
                             ? 'text-[11px]'
                             : period === '24h'
-                              ? (showValueAlways ? 'text-[8.5px]' : 'text-[8.5px] opacity-0 group-hover/bar:opacity-100')
-                              : (showValueAlways ? 'text-[7.5px]' : 'text-[7.5px] opacity-0 group-hover/bar:opacity-100')
+                              ? (showValueAlways ? 'text-[8px] sm:text-[8.5px]' : 'text-[8px] opacity-0 group-hover/bar:opacity-100 hidden sm:block')
+                              : (showValueAlways ? 'text-[7px] sm:text-[7.5px]' : 'text-[7px] opacity-0 group-hover/bar:opacity-100 hidden sm:block')
                         }`}
                       >
                         {t.requests}
@@ -368,7 +374,7 @@ export default function AnalyticsDashboardPanel() {
                       {/* 막대 바 */}
                       <div
                         style={{ height: `${heightPx}px` }}
-                        className={`w-full max-w-[28px] rounded-none transition-all shadow-sm group-hover/bar:brightness-125 ${
+                        className={`w-full max-w-full sm:max-w-[28px] rounded-none transition-all shadow-sm group-hover/bar:brightness-125 ${
                           isMax
                             ? 'bg-gradient-to-t from-blue-600 to-indigo-400 dark:from-blue-500 dark:to-indigo-300 ring-1 ring-blue-400/40'
                             : 'bg-gradient-to-t from-[var(--google-blue)] to-[#669df6] dark:from-blue-600 dark:to-blue-400'
@@ -376,7 +382,7 @@ export default function AnalyticsDashboardPanel() {
                       />
 
                       {/* 하단 날짜/시간 라벨 */}
-                      <span className={`text-[8.5px] text-gray-500 dark:text-zinc-400 truncate w-full text-center font-mono mt-0.5 ${
+                      <span className={`text-[8px] sm:text-[8.5px] text-gray-500 dark:text-zinc-400 truncate w-full text-center font-mono mt-0.5 ${
                         showLabelAlways ? 'opacity-100' : 'opacity-40 group-hover/bar:opacity-100'
                       }`}>
                         {t.label}

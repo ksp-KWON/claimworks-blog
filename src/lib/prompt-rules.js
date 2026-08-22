@@ -246,7 +246,7 @@ const TOPIC_SCHEMA = {
     },
     slug: {
       type: "STRING",
-      description: "URL-friendly 영문 slug (예: traumatic-brain-injury-compensation)"
+      description: "URL-friendly 영문 slug (소문자 및 하이픈 조합의 고유 주소)"
     },
     title: {
       type: "STRING",
@@ -262,7 +262,7 @@ const TOPIC_SCHEMA = {
     },
     specialtyCategory: {
       type: "STRING",
-      description: "전문 진료과목 (예: 신경외과, 정형외과, 내과 등)"
+      description: "사안과 직결된 전문 진료과목"
     },
     tags: {
       type: "ARRAY",
@@ -303,11 +303,11 @@ function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCatego
 
 위 키워드와 맥락을 바탕으로, 어떻게 하면 잠재 고객(보험 분쟁 중인 사람)이 검색 결과에서 클릭하지 않고는 못 배길지 연쇄 사고(Chain-of-Thought)를 거쳐 기획하십시오:
 1. thoughtProcess: 기획 및 마케팅 전략에 대한 연쇄 사고 논리 서술
-2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소 (예: daily-accident-compensation)
+2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
 3. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
 4. summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문
 5. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
-6. specialtyCategory: 전문 진료과목 (예: 정형외과)
+6. specialtyCategory: 사안과 직결된 전문 진료과목
 7. tags: 관련 태그 5개
 8. keywords: 타겟 키워드 목록
 
@@ -327,10 +327,10 @@ function getPrecedentPlanningPrompt(courtCase, existingPosts, targetCategory) {
 
 1. thoughtProcess: 판례의 핵심 쟁점을 일반인이 공감할 스토리로 전환하는 연쇄 사고 논리
 2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
-3. title: SEO 최적화 판례 제목 (예: "골절 수술 후 발생한 합병증, 법원은 왜 보험사의 손을 들어주지 않았을까?")
+3. title: SEO 최적화 판례 제목 (사건의 핵심 쟁점과 판결 취지를 알기 쉽게 후킹하는 제목)
 4. summary: 150자 이내의 메타 디스크립션 요약문
 5. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
-6. specialtyCategory: 전문 진료과목
+6. specialtyCategory: 사안과 직결된 전문 진료과목
 7. tags: 관련 태그 5개
 8. keywords: 타겟 키워드 목록
 
@@ -400,7 +400,7 @@ function getQueryGenerationPrompt(targetCategory, existingTitles) {
 ${existingTitles}
 
 [키워드 창작 원칙]
-1. 위 최근 발행 글에 이미 등장한 흔한 주제(예: 도수치료, 백내장, 캠핑장 배상, 자율주행 등)는 완전히 배제하십시오.
+1. 위 최근 발행 글에 이미 등장한 주제 및 키워드는 완전히 배제하십시오.
 2. **[${targetCategory}]** 분야에서 피보험자/피해자가 겪는 완전히 새로운 세부 질환, 특수 사고, 최신 판례, 미개척 분쟁 영역을 발굴하십시오.
 3. 오늘 구글 뉴스에서 탐색해 볼 만한 참신하고 실질적인 검색어 3개를 창작하세요.
 
@@ -420,8 +420,8 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
 [중요 필터링 규칙]
 1. 최근 발행 글에 이미 다루어진 주제와 유사한 키워드는 반드시 탈락시키십시오.
-2. 아직 블로그에서 다루지 않은 새로운 의학/법률/손해사정 실무 명사(예: "체외충격파", "일실수익", "추간판탈출증", "골절후유장해", "면책약관", "고지의무")만 추출하십시오.
-3. 반드시 짧고 핵심적인 명사로만 추출하세요.
+2. 아직 블로그에서 다루지 않은 새로운 의학/법률/손해사정 실무 명사만 추출하십시오.
+3. 반드시 짧고 핵심적인 명사 단어로만 추출하세요.
 
 아래와 같은 JSON 형식으로만 응답하세요:
 {"thoughtProcess": "기존 글과의 중복을 걸러내고 참신한 실무 쟁점을 선정한 논리 (Chain-of-Thought)", "candidates": [{"newsTitle": "기사원문", "searchKeyword": "검색용키워드명사"}]}`;
@@ -436,10 +436,27 @@ function getFallbackLegalKeywordPrompt(targetCategory, context, existingTitles =
 [최근 다룬 주제 제외 목록]
 ${existingTitles}
 
-[중요] 위 목록에 없는 새로운 실무 명사(예: "노동능력상실률", "고지의무", "추간판탈출증", "직업급수", "기왕증기여도")로만 추출하세요.
+[중요] 위 목록에 없는 완전히 새로운 실무 명사로만 추출하세요.
 
 아래와 같은 JSON 형식으로만 응답하세요:
-{"candidates": [{"searchKeyword": "핵심법률명사"}]}`;
+{"thoughtProcess": "카테고리 본질에 맞는 핵심 법률/의학 쟁점 분석 논리 (Chain-of-Thought)", "candidates": [{"searchKeyword": "핵심법률명사"}]}`;
+}
+
+function getNovelTopicPrompt(targetCategory, existingTitles, retryFeedback = '') {
+  const feedbackMsg = retryFeedback ? `\n[재시도 주의사항]\n이전 생성 결과("${retryFeedback}")는 최근 발행 글과 중복되었습니다. 완전히 다른 새로운 분쟁 주제를 발굴하십시오.\n` : '';
+  return `당신은 대한민국 최고의 손해사정 전문 블로그 수석 편집장입니다.
+**[${targetCategory}]** 카테고리에서 최근 아래의 주제들이 이미 발행되었습니다:
+
+[최근 30개 발행 글 (절대 중복 금지!)]
+${existingTitles}
+${feedbackMsg}
+[지시사항]
+1. 위 목록에 이미 등장한 주제 및 연관 키워드는 절대 다루지 마십시오.
+2. **[${targetCategory}]** 분야에서 실제 손해사정사에게 상담 문의가 많지만 아직 블로그에서 다루지 않은 '완전히 새로운 실무 분쟁 주제' 1개를 발굴하십시오.
+3. 특정 관행에 얽매이지 말고, 해당 카테고리의 의학/약관/손해액 산정 실무에서 소비자가 겪는 현실적 고통과 권리 구제 포인트를 포착하십시오.
+
+반드시 아래 JSON 형식으로 반환하세요:
+{"thoughtProcess": "새로운 주제 선정 이유 및 수임 관점 논리 (Chain-of-Thought)", "keyword": "완전히 새로운 핵심 키워드", "newsTitle": "최신 실무 분쟁 이슈 제목"}`;
 }
 
 function getHealingPrompt(keywords) {
@@ -481,6 +498,7 @@ module.exports = {
   getQueryGenerationPrompt,
   getKeywordExtractionPrompt,
   getFallbackLegalKeywordPrompt,
+  getNovelTopicPrompt,
   getHealingPrompt,
   getFssEvaluationPrompt,
 };

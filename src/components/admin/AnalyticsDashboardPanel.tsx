@@ -67,7 +67,7 @@ export default function AnalyticsDashboardPanel() {
   const topPages = data?.topPages || [];
 
   return (
-    <AdminPanelLayout innerClassName="h-full overflow-y-auto custom-scrollbar space-y-2.5 p-1 pb-1 md:pb-0 pr-1 sm:pr-2">
+    <AdminPanelLayout innerClassName="h-full overflow-y-auto custom-scrollbar space-y-3 p-1 pb-6 md:pb-1 pr-1 sm:pr-2">
       {/* 1열(1 Row) 3D 입체 직사각형 상단 컨트롤 바 */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 shrink-0">
         {/* 1. 고유 방문자 */}
@@ -361,8 +361,8 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
       </div>
 
-      {/* ── 3. 인기 보상 칼럼 TOP 10 ───────── */}
-      <PremiumCard borderColor="blue" hoverEffect={false} watermarkIcon="award" className="!p-0 flex-1 min-h-0 flex flex-col overflow-hidden">
+      {/* ── 3. 인기 보상 칼럼 TOP 10 (스크롤 시 붕괴 방지 shrink-0 min-h-[360px]) ───────── */}
+      <PremiumCard borderColor="blue" hoverEffect={false} watermarkIcon="award" className="!p-0 shrink-0 min-h-[360px] flex flex-col overflow-hidden">
         <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <AppIcon name="award" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />
@@ -374,7 +374,7 @@ export default function AnalyticsDashboardPanel() {
           <PremiumBadge color="blue" className="!text-[10px] !px-2.5 !py-0.5 rounded-none">실시간 조회수 집계</PremiumBadge>
         </div>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-gray-100 dark:divide-zinc-800/60 min-h-0 relative z-10 bg-white dark:bg-[#202124]">
+        <div className="divide-y divide-gray-100 dark:divide-zinc-800/60 relative z-10 bg-white dark:bg-[#202124]">
           {topPages.length > 0 ? (
             topPages.map((page, idx) => (
               <div key={idx} className="px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-blue-50/60 dark:hover:bg-blue-950/30 transition-all duration-200 group/row border-l-2 border-transparent hover:border-[var(--google-blue)]">

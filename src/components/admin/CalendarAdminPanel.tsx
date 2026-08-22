@@ -793,17 +793,17 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                                 {log.text}
                               </p>
                             </div>
-                            <div className="flex items-center gap-0.5 shrink-0 opacity-80 group-hover/log:opacity-100">
+                            <div className="flex flex-col items-center justify-center gap-0.5 shrink-0 ml-1 opacity-80 group-hover/log:opacity-100">
                               <button
                                 onClick={() => setEditingLogState({ eventId: ev.id, logId: log.id, tag: log.tag || '일반', text: log.text })}
-                                className="text-gray-400 hover:text-blue-600 p-1"
+                                className="p-1 text-gray-400 hover:text-blue-600 rounded-none hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
                                 title="일지 수정"
                               >
                                 <AppIcon name="edit" size={11} />
                               </button>
                               <button
                                 onClick={() => handleDeleteInlineLog(ev, log.id)}
-                                className="text-gray-300 hover:text-red-500 p-1"
+                                className="p-1 text-gray-300 hover:text-red-500 rounded-none hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
                                 title="일지 삭제"
                               >
                                 <AppIcon name="trash" size={11} />

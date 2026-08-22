@@ -18,6 +18,8 @@ export default function AnalyticsDashboardPanel() {
   const [saveStatus, setSaveStatus] = useState<string>('');
   const [realConsultCount, setRealConsultCount] = useState<number | null>(null);
 
+  const [dataSource, setDataSource] = useState<'cloudflare_live' | 'system_standard'>('system_standard');
+
   const [credentials, setCredentials] = useState<SystemCredentials>({
     geminiApiKey: '',
     githubToken: '',
@@ -62,14 +64,56 @@ export default function AnalyticsDashboardPanel() {
     localStorage.setItem('cf_api_token', credentials.cloudflareApiToken || '');
     setSaveStatus('✅ 저장되었습니다.');
     setTimeout(() => setSaveStatus(''), 3000);
+    // 즉시 재조회
+    fetchAnalyticsData(period, credentials.cloudflareZoneId, credentials.cloudflareApiToken);
+  };
+
+  const fetchAnalyticsData = async (
+    targetPeriod: '24h' | '7d' | '30d',
+    zoneId?: string,
+    apiToken?: string
+  ) => {
+    setLoading(true);
+    const zId = zoneId ?? credentials.cloudflareZoneId;
+    const token = apiToken ?? credentials.cloudflareApiToken;
+
+    if (zId && token) {
+      try {
+        const res = await fetch('/api/analytics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ zoneId: zId, apiToken: token, period: targetPeriod }),
+        });
+        const json = await res.json();
+        if (json.success && json.summary) {
+          const fallbackData = getUniversalAnalyticsData(targetPeriod);
+          setData({
+            ...fallbackData,
+            ...json,
+            summary: {
+              ...fallbackData.summary,
+              ...json.summary,
+            },
+            trend: json.trend || fallbackData.trend,
+          });
+          setDataSource('cloudflare_live');
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // Cloudflare 연결 실패 시 시스템 표준 엔진으로 폴백
+      }
+    }
+
+    const standardData = getUniversalAnalyticsData(targetPeriod);
+    setData(standardData);
+    setDataSource('system_standard');
+    setLoading(false);
   };
 
   useEffect(() => {
-    setLoading(true);
-    const analytics = getUniversalAnalyticsData(period);
-    setData(analytics);
-    setLoading(false);
-  }, [period]);
+    fetchAnalyticsData(period);
+  }, [period, credentials.cloudflareZoneId, credentials.cloudflareApiToken]);
 
   const summary = data?.summary || {
     uniqueVisitors: 0,
@@ -265,6 +309,12 @@ export default function AnalyticsDashboardPanel() {
               <span className="text-[10px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800">
                 {period === '24h' ? '최근 24시간' : period === '7d' ? '최근 7일' : '최근 30일'}
               </span>
+              {dataSource === 'cloudflare_live' && (
+                <span className="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-none border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Cloudflare 실측치 연동
+                </span>
+              )}
             </div>
             
             {/* 요약 통계 배지 */}

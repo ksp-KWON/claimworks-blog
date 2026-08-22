@@ -96,7 +96,7 @@ export default function BlogPostContent({ content, relatedPostsNode, authorBioNo
 
       {/* 2. 오프닝 (도입부 본문 서술) */}
       {opening && (
-        <div data-blog-body className="my-7 text-gray-700 dark:text-gray-300 text-[15.5px] sm:text-[16px] leading-[1.88] [&>p]:mb-5 [&>p:last-child]:mb-0">
+        <div data-blog-body className="my-7 text-gray-700 dark:text-gray-300 text-[15.5px] sm:text-[16px] leading-[1.88] [&>p]:mb-6 sm:[&>p]:mb-8 [&>p:last-child]:!mb-0">
           <MarkdownRenderer content={opening} />
         </div>
       )}

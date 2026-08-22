@@ -2,13 +2,35 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { UniversalAnalyticsData, SystemCredentials } from '@/lib/analytics/types';
-import { getUniversalAnalyticsData } from '@/lib/analytics/universal-analytics';
 import { supabase } from '@/lib/supabase';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
 import AppIcon from '@/components/ui/AppIcon';
 import AdminPanelLayout from './AdminPanelLayout';
+
+const EMPTY_ANALYTICS_DATA: UniversalAnalyticsData = {
+  period: '7d',
+  lastUpdated: new Date().toISOString(),
+  summary: {
+    uniqueVisitors: 0,
+    totalRequests: 0,
+    pageviews: 0,
+    consultationViews: 0,
+    avgLoadTimeMs: 0,
+    blockedAttacks: 0,
+  },
+  vitals: {
+    lcp: { scoreMs: 120, status: 'GOOD', percentageGood: 100 },
+    inp: { scoreMs: 15, status: 'GOOD', percentageGood: 100 },
+    cls: { score: 0.01, status: 'GOOD', percentageGood: 100 },
+  },
+  topPages: [],
+  topReferrers: [],
+  topCountries: [],
+  devices: { mobile: 70, desktop: 28, tablet: 2 },
+  trend: [],
+};
 
 const STATIC_ROUTE_MAP: Record<string, string> = {
   '/': '보상스쿨 메인 홈',
@@ -48,7 +70,7 @@ function getPageDisplayTitle(path: string, postMap: Record<string, string>): str
 
 export default function AnalyticsDashboardPanel() {
   const [period, setPeriod] = useState<'24h' | '7d' | '30d'>('7d');
-  const [data, setData] = useState<UniversalAnalyticsData>(() => getUniversalAnalyticsData('7d'));
+  const [data, setData] = useState<UniversalAnalyticsData>(EMPTY_ANALYTICS_DATA);
   const [loading, setLoading] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<string>('');
@@ -143,15 +165,16 @@ export default function AnalyticsDashboardPanel() {
         }
 
         if (res.ok && json?.success && json?.summary) {
-          const fallbackData = getUniversalAnalyticsData(targetPeriod);
           setData({
-            ...fallbackData,
+            ...EMPTY_ANALYTICS_DATA,
             ...json,
             summary: {
-              ...fallbackData.summary,
+              ...EMPTY_ANALYTICS_DATA.summary,
               ...json.summary,
             },
-            trend: json.trend || fallbackData.trend,
+            trend: json.trend || [],
+            topReferrers: json.topReferrers || [],
+            topPages: json.topPages || [],
           });
           setDataSource('cloudflare_live');
           setApiError(null);
@@ -165,8 +188,7 @@ export default function AnalyticsDashboardPanel() {
       }
     }
 
-    const standardData = getUniversalAnalyticsData(targetPeriod);
-    setData(standardData);
+    setData(EMPTY_ANALYTICS_DATA);
     setDataSource('system_standard');
     setLoading(false);
   }, [credentials.cloudflareZoneId, credentials.cloudflareApiToken]);

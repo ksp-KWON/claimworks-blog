@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { UniversalAnalyticsData, SystemCredentials } from '@/lib/analytics/types';
 import { getUniversalAnalyticsData } from '@/lib/analytics/universal-analytics';
+import { supabase } from '@/lib/supabase';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
@@ -15,6 +16,7 @@ export default function AnalyticsDashboardPanel() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<string>('');
+  const [realConsultCount, setRealConsultCount] = useState<number | null>(null);
 
   const [credentials, setCredentials] = useState<SystemCredentials>({
     geminiApiKey: '',
@@ -35,6 +37,21 @@ export default function AnalyticsDashboardPanel() {
       cloudflareZoneId: cfZone,
       cloudflareApiToken: cfToken,
     });
+
+    // 실제 Supabase 상담 건수 실측치 조회
+    async function fetchRealStats() {
+      try {
+        const { count, error } = await supabase
+          .from('consultations')
+          .select('*', { count: 'exact', head: true });
+        if (!error && typeof count === 'number') {
+          setRealConsultCount(count);
+        }
+      } catch {
+        // 로컬 목업 환경 안전 폴백
+      }
+    }
+    fetchRealStats();
   }, []);
 
   const handleSaveCredentials = (e: React.FormEvent) => {
@@ -99,7 +116,7 @@ export default function AnalyticsDashboardPanel() {
             <span className="w-1.5 h-1.5 rounded-none bg-purple-500" />
           </div>
           <span className="text-base sm:text-lg font-extrabold text-purple-600 dark:text-purple-400 tracking-tight font-mono">
-            {summary.consultationViews || 0}<span className="text-xs font-bold text-gray-400 ml-0.5">건</span>
+            {realConsultCount !== null ? realConsultCount : (summary.consultationViews || 0)}<span className="text-xs font-bold text-gray-400 ml-0.5">건</span>
           </span>
         </PremiumCard>
 

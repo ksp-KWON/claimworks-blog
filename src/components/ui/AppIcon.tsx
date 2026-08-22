@@ -8,7 +8,7 @@ export type AppIconName =
   | 'home' | 'search' | 'settings' | 'user' | 'users' | 'calendar' | 'clock'
   | 'phone' | 'chat' | 'mail' | 'link' | 'external-link' | 'plus' | 'edit' | 'trash'
   | 'check' | 'warning' | 'info' | 'close' | 'chevron-right' | 'chevron-left' | 'chevron-down' | 'chevron-up'
-  | 'list' | 'menu' | 'copy' | 'refresh' | 'lock' | 'coffee' | 'sun' | 'moon' | 'monitor' | 'send' | 'minimize' | 'play'
+  | 'list' | 'menu' | 'copy' | 'refresh' | 'lock' | 'coffee' | 'sun' | 'moon' | 'monitor' | 'send' | 'minimize' | 'play' | 'cloud'
   // 보상 & 법률 & 통계
   | 'scale' | 'shield' | 'shield-check' | 'shield-alert' | 'file-text' | 'folder'
   | 'calculator' | 'chart' | 'trending-up' | 'award' | 'zap' | 'landmark' | 'book' | 'compass' | 'flame'
@@ -235,6 +235,9 @@ const ICON_PATHS: Record<AppIconName, React.ReactNode> = {
   ),
   play: (
     <polygon points="5 3 19 12 5 21 5 3" />
+  ),
+  cloud: (
+    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
   ),
   flame: (
     <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />

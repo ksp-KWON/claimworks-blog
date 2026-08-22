@@ -275,24 +275,44 @@ export default function AnalyticsDashboardPanel() {
           </div>
         </PremiumCard>
 
-        {/* 6. 시스템 API 설정 토글 */}
-        <PremiumCard borderColor={dataSource === 'cloudflare_live' ? 'green' : 'teal'} hoverEffect={true} className="!p-2.5 flex flex-col justify-between">
+        {/* 6. 시스템 API 설정 토글 (세련된 SVG 심볼 & 연두/레드 상태 일체형) */}
+        <PremiumCard 
+          borderColor={dataSource === 'cloudflare_live' ? 'green' : apiError ? 'red' : 'teal'} 
+          hoverEffect={true} 
+          className="!p-2.5 flex flex-col justify-between"
+        >
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">시스템 연동</span>
-            <span className={`w-1.5 h-1.5 rounded-none ${dataSource === 'cloudflare_live' ? 'bg-emerald-500 animate-pulse' : 'bg-teal-500'}`} />
+            <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">클라우드 연동</span>
+            <span className={`w-1.5 h-1.5 rounded-none ${dataSource === 'cloudflare_live' ? 'bg-emerald-500 animate-pulse' : apiError ? 'bg-rose-500' : 'bg-gray-400'}`} />
           </div>
           <button
             type="button"
             onClick={() => setShowSettings(!showSettings)}
-            className={`w-full py-1 px-2 text-xs font-bold transition-all flex items-center justify-center border rounded-none ${
+            title={dataSource === 'cloudflare_live' ? 'Cloudflare 실시간 연동 중 (클릭하여 API 설정)' : 'Cloudflare API 설정 열기'}
+            className={`w-full py-1 px-2 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border rounded-none shadow-sm ${
               showSettings
-                ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border-teal-300 dark:border-teal-800 shadow-sm'
+                ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border-teal-300 dark:border-teal-800 ring-1 ring-teal-400/50'
                 : dataSource === 'cloudflare_live'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100 font-extrabold'
-                  : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200/80 dark:border-zinc-700 hover:bg-teal-50 hover:text-teal-700 dark:hover:bg-teal-950/30'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 font-extrabold'
+                  : apiError
+                    ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800 hover:bg-rose-100 font-extrabold'
+                    : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200/80 dark:border-zinc-700 hover:bg-teal-50 hover:text-teal-700'
             }`}
           >
-            {dataSource === 'cloudflare_live' ? '🟢 실시간 연동' : `API ${showSettings ? '닫기' : '설정'}`}
+            <AppIcon 
+              name="cloud" 
+              size={14} 
+              className={
+                dataSource === 'cloudflare_live' 
+                  ? 'text-emerald-600 dark:text-emerald-400 shrink-0' 
+                  : apiError 
+                    ? 'text-rose-600 dark:text-rose-400 shrink-0' 
+                    : 'text-gray-500 dark:text-zinc-400 shrink-0'
+              } 
+            />
+            <span className="truncate">
+              {showSettings ? '설정 닫기' : dataSource === 'cloudflare_live' ? '실시간 연동' : 'API 설정'}
+            </span>
           </button>
         </PremiumCard>
       </div>
@@ -387,20 +407,17 @@ export default function AnalyticsDashboardPanel() {
         {/* 1. 방문 추이 그래프 (2칸) */}
         <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="trending-up" className="lg:col-span-2 !p-0 flex flex-col justify-between">
           <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <AppIcon name="trending-up" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />
-              <span className="font-extrabold text-xs sm:text-sm text-[var(--google-blue)] dark:text-[#8ab4f8]">
+              <span className="font-extrabold text-xs sm:text-sm text-[var(--google-blue)] dark:text-[#8ab4f8] flex items-center gap-1.5">
                 방문 추이 분석 그래프
+                {dataSource === 'cloudflare_live' && (
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" title="Cloudflare 실측치 실시간 연동" />
+                )}
               </span>
               <span className="text-[10px] font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800">
                 {period === '24h' ? '최근 24시간' : period === '7d' ? '최근 7일' : '최근 30일'}
               </span>
-              {dataSource === 'cloudflare_live' && (
-                <span className="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-none border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Cloudflare 실측치 연동
-                </span>
-              )}
             </div>
             
             {/* 요약 통계 배지 또는 터치/호버 활성 시점 실시간 수치 */}

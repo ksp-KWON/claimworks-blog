@@ -218,7 +218,7 @@ export const sharedComponents: Components & Record<string, any> = {
             </h3>
           </div>
           {/* 본문 영역 */}
-          <div className="p-5 sm:p-6 text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.75] tracking-tight [&>p]:!mb-2.5 [&>p:last-child]:!mb-0 relative z-10 break-keep">
+          <div className="p-5 sm:p-6 text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.75] tracking-tight [&>p]:mb-4 sm:[&>p]:mb-5 [&>p:last-child]:!mb-0 relative z-10 break-keep">
             {bodyElements}
           </div>
         </div>
@@ -228,7 +228,7 @@ export const sharedComponents: Components & Record<string, any> = {
     // 인라인 용어 사전 / 단순 인용구
     return (
       <div className={`my-8 bg-white dark:bg-[#202124] p-5 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden group border rounded-none ${boxHoverBorders[tone]}`}>
-        <div className="relative z-10 text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.75] tracking-tight [&>p]:!mb-0 break-keep">
+        <div className="relative z-10 text-[14.5px] sm:text-[15px] font-medium text-gray-700 dark:text-[#e8eaed] leading-[1.75] tracking-tight [&>p]:mb-4 sm:[&>p]:mb-5 [&>p:last-child]:!mb-0 break-keep">
           {children}
         </div>
       </div>

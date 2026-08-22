@@ -16,6 +16,7 @@ export default function AnalyticsDashboardPanel() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<string>('');
+  const [apiError, setApiError] = useState<string | null>(null);
   const [realConsultCount, setRealConsultCount] = useState<number | null>(null);
 
   const [dataSource, setDataSource] = useState<'cloudflare_live' | 'system_standard'>('system_standard');
@@ -63,6 +64,7 @@ export default function AnalyticsDashboardPanel() {
     apiToken?: string
   ) => {
     setLoading(true);
+    setApiError(null);
     const zId = zoneId ?? credentials.cloudflareZoneId;
     const token = apiToken ?? credentials.cloudflareApiToken;
 
@@ -86,11 +88,14 @@ export default function AnalyticsDashboardPanel() {
             trend: json.trend || fallbackData.trend,
           });
           setDataSource('cloudflare_live');
+          setApiError(null);
           setLoading(false);
           return;
+        } else {
+          setApiError(json.message || 'Cloudflare API 응답 오류');
         }
-      } catch {
-        // Cloudflare 연결 실패 시 시스템 표준 엔진으로 폴백
+      } catch (err: any) {
+        setApiError(`네트워크 연결 오류: ${err?.message || '통신 실패'}`);
       }
     }
 
@@ -100,16 +105,18 @@ export default function AnalyticsDashboardPanel() {
     setLoading(false);
   }, [credentials.cloudflareZoneId, credentials.cloudflareApiToken]);
 
-  const handleSaveCredentials = (e: React.FormEvent) => {
+  const handleSaveCredentials = async (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem('gemini_api_key', credentials.geminiApiKey);
     localStorage.setItem('github_token', credentials.githubToken);
     localStorage.setItem('cf_zone_id', credentials.cloudflareZoneId || '');
     localStorage.setItem('cf_api_token', credentials.cloudflareApiToken || '');
-    setSaveStatus('✅ 저장되었습니다.');
-    setTimeout(() => setSaveStatus(''), 3000);
+    setSaveStatus('⏳ Cloudflare 연동 검증 중...');
+    
     // 즉시 재조회
-    fetchAnalyticsData(period, credentials.cloudflareZoneId, credentials.cloudflareApiToken);
+    await fetchAnalyticsData(period, credentials.cloudflareZoneId, credentials.cloudflareApiToken);
+    setSaveStatus('✅ 설정이 로컬 브라우저에 안전하게 저장되었습니다.');
+    setTimeout(() => setSaveStatus(''), 4000);
   };
 
   useEffect(() => {
@@ -203,10 +210,10 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 6. 시스템 API 설정 토글 */}
-        <PremiumCard borderColor="teal" hoverEffect={true} className="!p-2.5 flex flex-col justify-between">
+        <PremiumCard borderColor={dataSource === 'cloudflare_live' ? 'green' : 'teal'} hoverEffect={true} className="!p-2.5 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">시스템 연동</span>
-            <span className="w-1.5 h-1.5 rounded-none bg-teal-500" />
+            <span className={`w-1.5 h-1.5 rounded-none ${dataSource === 'cloudflare_live' ? 'bg-emerald-500 animate-pulse' : 'bg-teal-500'}`} />
           </div>
           <button
             type="button"
@@ -214,10 +221,12 @@ export default function AnalyticsDashboardPanel() {
             className={`w-full py-1 px-2 text-xs font-bold transition-all flex items-center justify-center border rounded-none ${
               showSettings
                 ? 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border-teal-300 dark:border-teal-800 shadow-sm'
-                : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200/80 dark:border-zinc-700 hover:bg-teal-50 hover:text-teal-700 dark:hover:bg-teal-950/30'
+                : dataSource === 'cloudflare_live'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100 font-extrabold'
+                  : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200/80 dark:border-zinc-700 hover:bg-teal-50 hover:text-teal-700 dark:hover:bg-teal-950/30'
             }`}
           >
-            API {showSettings ? '닫기' : '설정'}
+            {dataSource === 'cloudflare_live' ? '🟢 실시간 연동' : `API ${showSettings ? '닫기' : '설정'}`}
           </button>
         </PremiumCard>
       </div>
@@ -231,6 +240,16 @@ export default function AnalyticsDashboardPanel() {
             </h3>
             <span className="text-[10px] text-teal-600 dark:text-teal-400 font-bold bg-teal-50 dark:bg-teal-950/50 px-2 py-0.5 rounded-none border border-teal-200 dark:border-teal-900">로컬 브라우저 암호화 저장</span>
           </div>
+
+          {/* 에러 발생 시 안내 박스 */}
+          {apiError && (
+            <div className="mb-2.5 p-2.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-xs text-red-700 dark:text-red-300 flex items-start gap-2">
+              <AppIcon name="shield-alert" size={16} className="shrink-0 mt-0.5 text-red-500" />
+              <div className="break-keep font-medium leading-relaxed">
+                <strong className="font-bold text-red-900 dark:text-red-200">연동 실패: </strong> {apiError}
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSaveCredentials} className="space-y-2.5">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">

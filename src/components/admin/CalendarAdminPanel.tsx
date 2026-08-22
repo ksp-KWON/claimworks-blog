@@ -8,6 +8,7 @@ import { AdminHeaderBar } from './AdminHeader';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';
 import AppIcon from '@/components/ui/AppIcon';
+import BottomSheet from '@/components/ui/BottomSheet';
 
 export interface ClaimsProgressEntry {
   id: string;
@@ -94,7 +95,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
 
   const [events, setEvents] = useState<ExtendedCalendarEvent[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [mobileTab, setMobileTab] = useState<'calendar' | 'ledger'>('calendar');
+  const [isMobileSheetOpen, setIsMobileSheetOpen] = useState<boolean>(false);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
   const [expandedLedgerIds, setExpandedLedgerIds] = useState<Record<string, boolean>>({});
   const [inlineLogInputs, setInlineLogInputs] = useState<Record<string, { tag: string; text: string }>>({});
@@ -505,6 +506,278 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     fetchEvents();
   };
 
+  // 단일 통합 대장 렌더러 (데스크톱 패널 & 모바일 바텀시트 공통 사용)
+  const renderLedgerContent = (isMobile = false) => (
+    <div className="flex-1 min-h-0 flex flex-col h-full overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80">
+      <AdminHeaderBar 
+        icon={<AppIcon name="file-text" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />}
+        tone="blue"
+        title={
+          <div className="flex items-center gap-1.5">
+            <span className="font-extrabold text-xs sm:text-sm text-[var(--google-blue)] dark:text-[#8ab4f8]">
+              {selectedDate} 대장 ({selectedDateEvents.length}건)
+            </span>
+          </div>
+        }
+        rightContent={
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => {
+                setModalForm({
+                  date: selectedDate,
+                  time: '14:00',
+                  title: '',
+                  category: '상담',
+                  ledger: {
+                    phone: '',
+                    inflowPath: '홈페이지',
+                    accidentType: '교통사고',
+                    hasPreExisting: false,
+                    hasHospitalization: false,
+                    progressLogs: []
+                  }
+                });
+                setEditingEventId(null);
+                setIsModalOpen(true);
+              }}
+              className="px-2.5 py-1 text-[11px] font-bold bg-[var(--google-blue)] hover:bg-blue-700 text-white rounded-none transition-all shadow-sm flex items-center gap-1"
+            >
+              <AppIcon name="plus" size={12} /> 신규 등록
+            </button>
+            {isMobile && (
+              <button
+                onClick={() => setIsMobileSheetOpen(false)}
+                className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-900 dark:hover:text-white text-sm font-bold"
+                title="닫기"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        }
+      />
+
+      {/* 대장 카드 목록: 내부 독립 스크롤 */}
+      <div className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-4 space-y-4 custom-scrollbar">
+        {isLoading ? (
+          <div className="p-8 text-center text-sm text-gray-400">대장 데이터를 불러오는 중...</div>
+        ) : selectedDateEvents.length === 0 ? (
+          <div className="p-12 text-center text-gray-400 space-y-3 flex flex-col items-center">
+            <AppIcon name="coffee" size={32} className="text-gray-300 dark:text-zinc-700" />
+            <p className="text-xs font-medium leading-relaxed">
+              이 날짜에 등록된 손해사정 대장이 없습니다.<br/>
+              상단의 <b>[+ 신규 등록]</b> 버튼을 눌러보세요.
+            </p>
+          </div>
+        ) : (
+          selectedDateEvents.map(ev => {
+            const style = CATEGORY_COLORS[ev.category || '상담'] || CATEGORY_COLORS.상담;
+            const ledger = ev.ledger || {};
+            const isExpanded = !!expandedLedgerIds[ev.id];
+            const logInput = inlineLogInputs[ev.id] || { tag: '통화', text: '' };
+
+            return (
+              <div
+                key={ev.id}
+                className="bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-zinc-800 rounded-none p-3.5 shadow-sm space-y-2.5"
+              >
+                {/* 카드 상단: 상태, 시간, 버튼 */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded-none border ${style.badge}`}>
+                      {ev.category || '상담'}
+                    </span>
+                    <span className="text-xs font-mono font-bold text-gray-500">
+                      {ev.time || '10:00'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => {
+                        setEditingEventId(ev.id);
+                        setModalForm({
+                          date: ev.date,
+                          time: ev.time || '10:00',
+                          title: ev.title,
+                          category: ev.category || '상담',
+                          ledger: {
+                            ...ledger,
+                            sourceApp: ev.sourceApp,
+                            sourceId: ev.sourceId
+                          }
+                        });
+                        setIsModalOpen(true);
+                      }}
+                      className="text-xs text-gray-400 hover:text-blue-600 p-1 font-bold flex items-center gap-1"
+                      title="대장 수정 / 날짜 이동"
+                    >
+                      <AppIcon name="edit" size={12} /> 수정
+                    </button>
+                    <button
+                      onClick={() => handleDeleteEvent(ev.id)}
+                      className="text-xs text-gray-400 hover:text-red-500 p-1"
+                      title="삭제"
+                    >
+                      <AppIcon name="trash" size={13} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* 고객명 및 핵심 요약 */}
+                <div>
+                  <h3 className="font-extrabold text-sm text-gray-900 dark:text-white leading-snug">
+                    {ev.title}
+                  </h3>
+                  <div className="flex items-center gap-2 mt-1 text-xs text-gray-600 dark:text-gray-300">
+                    {ledger.phone && (
+                      <span className="font-mono font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                        <AppIcon name="phone" size={12} /> {ledger.phone}
+                      </span>
+                    )}
+                    {ledger.accidentType && (
+                      <span className="px-1.5 py-0.2 bg-gray-100 dark:bg-zinc-800 rounded-none text-[10.5px] font-bold">
+                        {ledger.accidentType}
+                      </span>
+                    )}
+                    {ledger.diagnosis && (
+                      <span className="truncate text-gray-500 text-[11px]">
+                        진단: {ledger.diagnosis}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* 실무 대장 상세 아코디언 토글 버튼 */}
+                <button
+                  onClick={() => setExpandedLedgerIds(prev => ({ ...prev, [ev.id]: !prev[ev.id] }))}
+                  className="w-full py-1 px-2.5 bg-gray-50 dark:bg-zinc-950 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-none border border-gray-200/80 dark:border-zinc-800 flex items-center justify-between transition-colors shadow-2xs"
+                >
+                  <span className="flex items-center gap-1.5"><AppIcon name="file-text" size={12} /> 실무 대장 상세 정보</span>
+                  <span>{isExpanded ? '▲ 접기' : '▼ 펼치기'}</span>
+                </button>
+
+                {/* 실무 대장 상세 필드 (펼쳤을 때) */}
+                {isExpanded && (
+                  <div className="p-3 bg-gray-50/80 dark:bg-zinc-900/60 rounded-none border border-gray-200/70 dark:border-zinc-800 space-y-2 text-xs">
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-gray-600 dark:text-gray-300">
+                      <div><span className="text-gray-400">유입경로:</span> <b className="text-gray-800 dark:text-gray-200">{ledger.inflowPath || '-'}</b></div>
+                      <div><span className="text-gray-400">생년월일/성별:</span> <b className="text-gray-800 dark:text-gray-200">{ledger.birthDate || '-'}{ledger.gender ? ` (${ledger.gender})` : ''}</b></div>
+                      <div><span className="text-gray-400">사고일자:</span> <b className="text-gray-800 dark:text-gray-200">{ledger.accidentDate || '-'}</b></div>
+                      <div><span className="text-gray-400">사고유형:</span> <b className="text-gray-800 dark:text-gray-200">{ledger.accidentType || '-'}</b></div>
+                      <div><span className="text-gray-400">입원/통원:</span> <b className="text-gray-800 dark:text-gray-200">{ledger.hasHospitalization ? `입원 (${ledger.hospitalizationPeriod || ''})` : '통원/무'}</b></div>
+                      <div><span className="text-gray-400">기왕증여부:</span> <b className="text-gray-800 dark:text-gray-200">{ledger.hasPreExisting ? `유 (${ledger.preExistingNote || ''})` : '무'}</b></div>
+                      {ledger.faultRatio && <div><span className="text-gray-400">과실비율:</span> <b className="text-blue-600 dark:text-blue-400">{ledger.faultRatio}</b></div>}
+                      {ledger.incomeNote && <div><span className="text-gray-400">소득사항:</span> <b className="text-gray-800 dark:text-gray-200">{ledger.incomeNote}</b></div>}
+                      {ledger.insuranceCompany && <div className="col-span-2"><span className="text-gray-400">보험회사:</span> <b className="text-gray-800 dark:text-gray-200">{ledger.insuranceCompany}</b></div>}
+                    </div>
+
+                    {ledger.text && (
+                      <div className="p-2 bg-white dark:bg-zinc-950 rounded-none border border-gray-200/50 dark:border-zinc-800 text-gray-700 dark:text-gray-300 leading-relaxed">
+                        <div className="text-[10.5px] font-bold text-gray-400 mb-0.5">상담 및 접수 내용</div>
+                        {ledger.text}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 진행사항 업무일지 목록 (히스토리) */}
+                {ledger.progressLogs && ledger.progressLogs.length > 0 && (
+                  <div className="space-y-1.5 pt-1">
+                    <div className="text-[11px] font-bold text-gray-500 flex items-center justify-between">
+                      <span>진행사항 히스토리 ({ledger.progressLogs.length}건)</span>
+                    </div>
+                    <div className="space-y-1 max-h-36 overflow-y-auto custom-scrollbar pr-1">
+                      {ledger.progressLogs.map(log => (
+                        <div
+                          key={log.id}
+                          className="text-[11px] p-2 bg-gray-50 dark:bg-zinc-900 rounded-none border border-gray-200/60 dark:border-zinc-800 flex items-start justify-between gap-1.5 group/log"
+                        >
+                          <div className="space-y-0.5 flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 font-mono text-[10px] text-gray-400">
+                              <span className="font-bold text-blue-600 dark:text-blue-400 px-1 bg-blue-50 dark:bg-blue-900/30 rounded-none">
+                                {log.tag || '일반'}
+                              </span>
+                              <span>{log.date} {log.time}</span>
+                            </div>
+                            <p className="text-gray-800 dark:text-gray-200 break-keep leading-tight font-medium">
+                              {log.text}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteInlineLog(ev, log.id)}
+                            className="text-gray-300 hover:text-red-500 opacity-0 group-hover/log:opacity-100 transition-opacity p-0.5"
+                            title="로그 삭제"
+                          >
+                            <AppIcon name="trash" size={11} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 신규 진행사항 인라인 빠른 작성 칸 */}
+                <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 flex items-center gap-1.5">
+                  <select
+                    value={logInput.tag}
+                    onChange={e => setInlineLogInputs(prev => ({
+                      ...prev,
+                      [ev.id]: { ...(prev[ev.id] || { text: '' }), tag: e.target.value }
+                    }))}
+                    className="p-1.5 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-[11px] font-bold rounded-none outline-none shrink-0"
+                  >
+                    <option value="통화">통화</option>
+                    <option value="면담">면담</option>
+                    <option value="서류">서류</option>
+                    <option value="병원">병원</option>
+                    <option value="절충">절충</option>
+                    <option value="종결">종결</option>
+                  </select>
+
+                  <input
+                    type="text"
+                    placeholder="새 진행사항 메모 후 엔터..."
+                    value={logInput.text}
+                    onChange={e => setInlineLogInputs(prev => ({
+                      ...prev,
+                      [ev.id]: { ...(prev[ev.id] || { tag: '통화' }), text: e.target.value }
+                    }))}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddInlineLog(ev);
+                      }
+                    }}
+                    className="flex-1 p-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-xs rounded-none outline-none focus:border-blue-500 min-w-0"
+                  />
+
+                  <button
+                    onClick={() => handleAddInlineLog(ev)}
+                    className="px-2.5 py-1.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-bold rounded-none hover:bg-black transition-colors shrink-0"
+                  >
+                    기록
+                  </button>
+                </div>
+
+                {/* 원본 접수/채팅 바로가기 링크 */}
+                {ev.sourceApp && (
+                  <button
+                    onClick={() => handleJumpToSource(ev)}
+                    className="w-full py-1 px-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-none transition-colors flex items-center justify-center gap-1.5 border border-blue-200 dark:border-blue-800"
+                  >
+                    <AppIcon name="link" size={12} />
+                    <span>{ev.sourceApp === 'consultations' ? '원본 상담 접수내역 보기' : '채팅방 바로가기'}</span>
+                  </button>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+
   const handleJumpToSource = (event: ExtendedCalendarEvent) => {
     if (event.sourceApp === 'consultations' && event.sourceId) {
       sessionStorage.setItem('pending_select_id', event.sourceId);
@@ -529,34 +802,8 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
 
   return (
     <AdminPanelLayout innerClassName="flex-col md:flex-row gap-2.5 min-w-0 h-full">
-      {/* 모바일 전용 뷰 전환 세그먼트 탭 */}
-      <div className="md:hidden flex bg-gray-200/80 dark:bg-zinc-800 p-1 rounded-none gap-1 shrink-0">
-        <button
-          onClick={() => setMobileTab('calendar')}
-          className={`flex-1 py-2 text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-            mobileTab === 'calendar'
-              ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-sm'
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
-          }`}
-        >
-          <AppIcon name="calendar" size={14} />
-          <span>월간 캘린더</span>
-        </button>
-        <button
-          onClick={() => setMobileTab('ledger')}
-          className={`flex-1 py-2 text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-            mobileTab === 'ledger'
-              ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-sm'
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
-          }`}
-        >
-          <AppIcon name="file-text" size={14} />
-          <span>실무 대장 ({selectedDateEvents.length}건)</span>
-        </button>
-      </div>
-
-      {/* ── 🏝️ 1. 좌측: 월간 캘린더 그리드 카드 아일랜드 ── */}
-      <PremiumCard borderColor="blue" hoverEffect={false} className={`${mobileTab === 'calendar' ? 'flex' : 'hidden'} md:flex flex-1 min-w-0 min-h-0 flex-col !p-0 overflow-hidden bg-white dark:bg-zinc-950`}>
+      {/* ── 🏝️ 1. 월간 캘린더 그리드 카드 아일랜드 (모바일 전폭 시원한 뷰) ── */}
+      <PremiumCard borderColor="blue" hoverEffect={false} className="flex-1 min-w-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-white dark:bg-zinc-950">
         <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-y-auto custom-scrollbar">
           {/* 캘린더 네비게이션 헤더 (CommonBox 스타일) */}
           <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0 sticky top-0 z-10">
@@ -616,7 +863,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   key={day.dateStr}
                   onClick={() => {
                     setSelectedDate(day.dateStr);
-                    setMobileTab('ledger');
+                    setIsMobileSheetOpen(true);
                   }}
                   className={`min-h-[85px] md:min-h-[100px] p-1.5 md:p-2 cursor-pointer transition-all flex flex-col justify-between ${
                     isSelected 
@@ -669,280 +916,24 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
         </div>
       </PremiumCard>
 
-      {/* ── 🏝️ 2. 우측: 선택 일자 손해사정 실무 대장 카드 아일랜드 ── */}
-      <PremiumCard borderColor="blue" hoverEffect={false} className={`${mobileTab === 'ledger' ? 'flex' : 'hidden'} md:flex flex-1 md:flex-initial w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex-col !p-0 overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80`}>
-        <AdminHeaderBar 
-          icon={<AppIcon name="file-text" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />}
-          tone="blue"
-          title={
-            <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-xs sm:text-sm text-[var(--google-blue)] dark:text-[#8ab4f8]">{selectedDate} 대장 ({selectedDateEvents.length}건)</span>
-            </div>
-          }
-          rightContent={
-            <button
-              onClick={() => {
-                setModalForm({
-                  date: selectedDate,
-                  time: '14:00',
-                  title: '',
-                  category: '상담',
-                  ledger: {
-                    phone: '',
-                    inflowPath: '홈페이지',
-                    accidentType: '교통사고',
-                    hasPreExisting: false,
-                    hasHospitalization: false,
-                    progressLogs: []
-                  }
-                });
-                setEditingEventId(null);
-                setIsModalOpen(true);
-              }}
-              className="px-2.5 py-1 text-[11px] font-bold bg-[var(--google-blue)] hover:bg-blue-700 text-white rounded-none transition-all shadow-sm flex items-center gap-1"
-            >
-              <AppIcon name="plus" size={12} /> 신규 등록
-            </button>
-          }
-        />
-
-        {/* 대장 카드 목록 */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-          {isLoading ? (
-            <div className="p-8 text-center text-sm text-gray-400">대장 데이터를 불러오는 중...</div>
-          ) : selectedDateEvents.length === 0 ? (
-            <div className="p-12 text-center text-gray-400 space-y-3 flex flex-col items-center">
-              <AppIcon name="coffee" size={32} className="text-gray-300 dark:text-zinc-700" />
-              <p className="text-xs font-medium leading-relaxed">
-                이 날짜에 등록된 손해사정 대장이 없습니다.<br/>
-                상단의 <b>[+ 신규 대장 등록]</b> 버튼을 눌러보세요.
-              </p>
-            </div>
-          ) : (
-            selectedDateEvents.map(ev => {
-              const style = CATEGORY_COLORS[ev.category || '상담'] || CATEGORY_COLORS.상담;
-              const ledger = ev.ledger || {};
-              const isExpanded = !!expandedLedgerIds[ev.id];
-              const logInput = inlineLogInputs[ev.id] || { tag: '통화', text: '' };
-
-              return (
-                <div
-                  key={ev.id}
-                  className="bg-white dark:bg-[#202124] border border-gray-200/80 dark:border-zinc-800 rounded-none p-3.5 shadow-sm space-y-2.5"
-                >
-                  {/* 카드 상단: 상태, 시간, 버튼 */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-none border ${style.badge}`}>
-                        {ev.category || '상담'}
-                      </span>
-                      <span className="text-xs font-mono font-bold text-gray-500">
-                        {ev.time || '10:00'}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => {
-                          setEditingEventId(ev.id);
-                          setModalForm({
-                            date: ev.date,
-                            time: ev.time || '10:00',
-                            title: ev.title,
-                            category: ev.category || '상담',
-                            ledger: {
-                              ...ledger,
-                              sourceApp: ev.sourceApp,
-                              sourceId: ev.sourceId
-                            }
-                          });
-                          setIsModalOpen(true);
-                        }}
-                        className="text-xs text-gray-400 hover:text-blue-600 p-1 font-bold flex items-center gap-1"
-                        title="대장 수정 / 날짜 이동"
-                      >
-                        <AppIcon name="edit" size={12} /> 수정
-                      </button>
-                      <button
-                        onClick={() => handleDeleteEvent(ev.id)}
-                        className="text-xs text-gray-400 hover:text-red-500 p-1"
-                        title="삭제"
-                      >
-                        <AppIcon name="trash" size={13} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 고객명 및 핵심 요약 */}
-                  <div>
-                    <h3 className="font-extrabold text-sm text-gray-900 dark:text-white leading-snug">
-                      {ev.title}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-gray-600 dark:text-gray-300">
-                      {ledger.phone && (
-                        <span className="font-mono font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                          <AppIcon name="phone" size={12} /> {ledger.phone}
-                        </span>
-                      )}
-                      {ledger.accidentType && (
-                        <span className="px-1.5 py-0.2 bg-gray-100 dark:bg-zinc-800 rounded-none text-[10.5px] font-bold">
-                          {ledger.accidentType}
-                        </span>
-                      )}
-                      {ledger.diagnosis && (
-                        <span className="truncate text-gray-500 text-[11px]">
-                          진단: {ledger.diagnosis}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* 실무 대장 상세 아코디언 토글 버튼 */}
-                  <button
-                    onClick={() => setExpandedLedgerIds(prev => ({ ...prev, [ev.id]: !prev[ev.id] }))}
-                    className="w-full py-1 px-2.5 bg-gray-50 dark:bg-zinc-950 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-none border border-gray-200/80 dark:border-zinc-800 flex items-center justify-between transition-colors shadow-2xs"
-                  >
-                    <span className="flex items-center gap-1.5"><AppIcon name="file-text" size={12} /> 실무 대장 상세 정보</span>
-                    <span>{isExpanded ? '▲ 접기' : '▼ 펼치기'}</span>
-                  </button>
-
-                  {/* 실무 대장 세부 정보 (펼쳤을 때) */}
-                  {isExpanded && (
-                    <div className="bg-gray-50/70 dark:bg-zinc-950/70 p-3 rounded-none border border-gray-200/80 dark:border-zinc-800 space-y-2 text-xs">
-                      <div className="grid grid-cols-2 gap-2 text-gray-700 dark:text-gray-300">
-                        <div><b>문의경로:</b> {ledger.inflowPath || '미지정'}</div>
-                        <div><b>사고일자:</b> {ledger.accidentDate || '미상'}</div>
-                        <div><b>보험회사:</b> {ledger.insuranceCompany || '미지정'}</div>
-                        <div><b>과실/유형:</b> {ledger.faultRatio || '미상'}</div>
-                        <div><b>소득사항:</b> {ledger.incomeNote || '미기재'}</div>
-                        <div><b>기왕병력:</b> {ledger.hasPreExisting ? `유 (${ledger.preExistingNote || ''})` : '무'}</div>
-                        <div className="col-span-2"><b>입원치료:</b> {ledger.hasHospitalization ? `입원 (${ledger.hospitalizationPeriod || ''})` : '통원/무'}</div>
-                      </div>
-                      {ledger.text && (
-                        <div className="pt-1 border-t border-gray-200 dark:border-zinc-800 text-[11px] text-gray-500 whitespace-pre-wrap">
-                          <b>접수원문:</b> {ledger.text}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* ────────────────────────────────────────── */}
-                  {/* 4. 날짜별 상담일지 & 진행사항 타임라인 */}
-                  {/* ────────────────────────────────────────── */}
-                  <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 space-y-2">
-                    <div className="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
-                      <AppIcon name="pin" size={13} className="text-blue-600" />
-                      <span>날짜별 진행사항 (업무일지)</span>
-                    </div>
-
-                    {/* 누적된 업무일지 목록 (가로바 구분) */}
-                    <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-0.5">
-                      {(ledger.progressLogs || []).length === 0 ? (
-                        <div className="p-2.5 bg-gray-50 dark:bg-zinc-950 rounded-none text-center text-[11px] text-gray-400">
-                          아직 기록된 진행사항이 없습니다. 아래에서 업무를 기록해 보세요.
-                        </div>
-                      ) : (
-                        (ledger.progressLogs || []).map((log, lIdx) => {
-                          const tagStyle = TAG_STYLES[log.tag || '일반'] || TAG_STYLES.일반;
-                          return (
-                            <React.Fragment key={log.id}>
-                              {lIdx > 0 && <div className="border-t border-dashed border-gray-200 dark:border-zinc-800 my-1" />}
-                              <div className="text-xs space-y-0.5">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-1.5">
-                                    <span className={`px-1.5 py-0.2 text-[10px] font-bold rounded-none border ${tagStyle}`}>
-                                      {log.tag || '일반'}
-                                    </span>
-                                    <span className="font-mono font-bold text-gray-700 dark:text-gray-300 text-[11px]">
-                                      [{log.date} {log.time}]
-                                    </span>
-                                  </div>
-                                  <button
-                                    onClick={() => handleDeleteInlineLog(ev, log.id)}
-                                    className="text-gray-400 hover:text-red-500 text-[11px] p-0.5"
-                                    title="일지 삭제"
-                                  >
-                                    ✕
-                                  </button>
-                                </div>
-                                <p className="text-gray-800 dark:text-gray-200 leading-relaxed pl-1 font-medium text-[11.5px] whitespace-pre-wrap">
-                                  {log.text}
-                                </p>
-                              </div>
-                            </React.Fragment>
-                          );
-                        })
-                      )}
-                    </div>
-
-                    {/* 인라인 업무일지 추가 폼 */}
-                    <div className="p-2 bg-gray-50 dark:bg-zinc-950 rounded-none border border-gray-200 dark:border-zinc-800 space-y-2">
-                      {/* 퀵 태그 버튼 */}
-                      <div className="flex items-center gap-1 flex-wrap">
-                        <span className="text-[11px] font-bold text-gray-500 mr-1">태그:</span>
-                        {(['통화', '서류', '병원', '절충', '종결'] as const).map(t => (
-                          <button
-                            key={t}
-                            type="button"
-                            onClick={() => setInlineLogInputs(prev => ({
-                              ...prev,
-                              [ev.id]: { ...(prev[ev.id] || { text: '' }), tag: t }
-                            }))}
-                            className={`px-2 py-0.2 text-[10px] font-bold rounded-none border transition-all ${
-                              logInput.tag === t 
-                                ? 'bg-blue-600 text-white border-blue-600 shadow-2xs' 
-                                : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-zinc-700'
-                            }`}
-                          >
-                            {t}
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="flex gap-1.5">
-                        <input
-                          type="text"
-                          value={logInput.text}
-                          onChange={e => setInlineLogInputs(prev => ({
-                            ...prev,
-                            [ev.id]: { ...(prev[ev.id] || { tag: '통화' }), text: e.target.value }
-                          }))}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              handleAddInlineLog(ev);
-                            }
-                          }}
-                          placeholder="오늘 진행사항 입력..."
-                          className="flex-1 p-1.5 text-xs bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleAddInlineLog(ev)}
-                          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-none transition-colors shrink-0 shadow-sm"
-                        >
-                          기록
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 원본 접수/채팅 바로가기 링크 */}
-                  {ev.sourceApp && (
-                    <button
-                      onClick={() => handleJumpToSource(ev)}
-                      className="w-full py-1 px-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-none transition-colors flex items-center justify-center gap-1.5 border border-blue-200 dark:border-blue-800"
-                    >
-                      <AppIcon name="link" size={12} />
-                      <span>{ev.sourceApp === 'consultations' ? '원본 상담 접수내역 보기' : '채팅방 바로가기'}</span>
-                    </button>
-                  )}
-                </div>
-              );
-            })
-          )}
-        </div>
+      {/* ── 🏝️ 2. 데스크톱 우측: 선택 일자 손해사정 실무 대장 카드 아일랜드 ── */}
+      <PremiumCard borderColor="blue" hoverEffect={false} className="hidden md:flex w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex-col !p-0 overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80">
+        {renderLedgerContent(false)}
       </PremiumCard>
+
+      {/* ── 🏝️ 3. 모바일 전용 바텀시트 팝업: 날짜 클릭 시 슬라이드 업 ── */}
+      <BottomSheet
+        isOpen={isMobileSheetOpen}
+        onClose={() => setIsMobileSheetOpen(false)}
+        showBackdrop={true}
+        maxHeight="max-h-[86vh]"
+        bottomOffset="bottom-[64px]"
+        padding="p-0 pb-2"
+      >
+        <div className="h-[78vh] flex flex-col min-h-0 overflow-hidden">
+          {renderLedgerContent(true)}
+        </div>
+      </BottomSheet>
 
       {/* ── 손해사정 실무 대장 등록 / 수정 모달 ── */}
       {isModalOpen && (

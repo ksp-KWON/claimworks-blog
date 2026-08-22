@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import PremiumButton from '@/components/ui/PremiumButton';
 import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumBadge from '@/components/ui/PremiumBadge';
+import AppIcon from '@/components/ui/AppIcon';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import BottomSheet from '@/components/ui/BottomSheet';
 import AdminPanelLayout from '../AdminPanelLayout';
@@ -134,7 +136,7 @@ export default function AiWritingStudio({
       <div className="shrink-0 p-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 sticky top-0 z-10">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5">
-            <span className="text-sm leading-none">✍️</span>
+            <AppIcon name="edit" size={15} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />
             <span className="text-xs font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] uppercase tracking-wider">
               AI WRITING STUDIO
             </span>

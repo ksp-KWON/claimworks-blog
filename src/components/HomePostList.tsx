@@ -4,6 +4,7 @@ import PostCard from '@/components/ui/PostCard';
 import SectionLayout, { SectionThemeColor } from '@/components/ui/SectionLayout';
 import { PostData } from '@/lib/posts';
 import { COLUMN_CATEGORIES } from '@/lib/constants/categories';
+import { CATEGORY_ICONS } from '@/components/ui/CategoryIcons';
 
 export default function HomePostList({ initialPosts }: { initialPosts: Omit<PostData, 'content'>[] }) {
   // 카테고리별로 포스트 분류
@@ -40,7 +41,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: Omit<Post
           <SectionLayout
             key={category.slug}
             title={category.name}
-            icon={<span aria-hidden="true">{category.icon}</span>}
+            icon={(() => { const Icon = CATEGORY_ICONS[category.slug]; return Icon ? <Icon /> : null; })()}
             themeColor={themeColor as SectionThemeColor}
             viewAllLink={{ href: `/categories/${category.slug}` }}
           >

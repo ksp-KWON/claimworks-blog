@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
+import AppIcon from '@/components/ui/AppIcon';
 
 export type SectionThemeColor = 'red' | 'rose' | 'blue' | 'green' | 'teal' | 'purple' | 'indigo' | 'yellow' | 'default';
 
@@ -59,7 +60,7 @@ export default function SectionLayout({
                 className={`flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-${themeColor === 'default' ? 'blue' : themeColor}-500 transition-colors group/link`}
               >
                 {viewAllLink.text || '전체보기'}
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                <AppIcon name="chevron-right" size={14} className="group-hover/link:translate-x-0.5 transition-transform" strokeWidth={2.5} />
               </a>
             ) : (
               <Link 
@@ -67,7 +68,7 @@ export default function SectionLayout({
                 className={`flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-${themeColor === 'default' ? 'blue' : themeColor}-500 transition-colors group/link`}
               >
                 {viewAllLink.text || '전체보기'}
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                <AppIcon name="chevron-right" size={14} className="group-hover/link:translate-x-0.5 transition-transform" strokeWidth={2.5} />
               </Link>
             )
           )}

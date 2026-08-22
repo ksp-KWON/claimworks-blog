@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import AppIcon from '@/components/ui/AppIcon';
 
 interface Props {
   tags: string[];
@@ -38,10 +39,10 @@ export default function SidebarTagMore({ tags }: Props) {
         className={`w-full text-sm font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer ${!isOpen ? 'mt-3' : ''}`}
       >
         <div className="flex items-center gap-2">
-          <svg className="w-4 h-4 text-[var(--google-red)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"></path></svg>
+          <AppIcon name="list" size={16} className="text-[var(--google-red)]" />
           {isOpen ? '인기 태그 접기' : `인기 태그 더보기 (+${tags.length})`}
         </div>
-        <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        <AppIcon name="chevron-down" size={16} className={`text-[#5f6368] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} strokeWidth={2.5} />
       </button>
     </div>
   );

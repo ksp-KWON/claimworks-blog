@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import AppIcon from '@/components/ui/AppIcon';
 export type AdminAppType = 'analytics' | 'post-ai' | 'post-list' | 'post-settings' | 'editor' | 'consult-manage' | 'chat-manage' | 'calendar';
 import BottomSheet from '@/components/ui/BottomSheet';
 
@@ -57,51 +58,31 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
     {
       id: 'analytics',
       label: '통계',
-      icon: (
-        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={activeApp === 'analytics' ? '2.5' : '1.8'} strokeLinecap="round" strokeLinejoin="round">
-          <path d="M18 20V10M12 20V4M6 20v-6" />
-        </svg>
-      ),
+      icon: <AppIcon name="chart" size={24} className="mb-1" strokeWidth={activeApp === 'analytics' ? 2.5 : 1.8} />,
       isActive: activeApp === 'analytics',
     },
     {
       id: 'consult',
       label: '상담',
-      icon: (
-        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={activeApp === 'consult-manage' ? '2' : '1.5'} strokeLinecap="round" strokeLinejoin="round">
-          <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-        </svg>
-      ),
+      icon: <AppIcon name="phone" size={24} className="mb-1" strokeWidth={activeApp === 'consult-manage' ? 2.5 : 1.8} />,
       isActive: activeApp === 'consult-manage',
     },
     {
       id: 'chat',
       label: '채팅',
-      icon: (
-        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={activeApp === 'chat-manage' ? '2' : '1.5'} strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-        </svg>
-      ),
+      icon: <AppIcon name="chat" size={24} className="mb-1" strokeWidth={activeApp === 'chat-manage' ? 2.5 : 1.8} />,
       isActive: activeApp === 'chat-manage',
     },
     {
       id: 'calendar',
       label: '일정',
-      icon: (
-        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={activeApp === 'calendar' ? '2' : '1.5'} strokeLinecap="round" strokeLinejoin="round">
-          <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
+      icon: <AppIcon name="calendar" size={24} className="mb-1" strokeWidth={activeApp === 'calendar' ? 2.5 : 1.8} />,
       isActive: activeApp === 'calendar',
     },
     {
       id: 'posts',
       label: '원고',
-      icon: (
-        <svg className="w-6 h-6 sm:w-7 sm:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={activeApp.startsWith('post') ? '2' : '1.5'} strokeLinecap="round" strokeLinejoin="round">
-          <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-        </svg>
-      ),
+      icon: <AppIcon name="file-text" size={24} className="mb-1" strokeWidth={activeApp.startsWith('post') ? 2.5 : 1.8} />,
       isActive: activeApp.startsWith('post') || openModal === 'posts',
     },
   ];
@@ -111,11 +92,13 @@ export default function MobileAdminNav({ activeApp, setActiveApp, onLogout }: Mo
       {/* 포스트 팝업 */}
       <BottomSheet isOpen={openModal === 'posts'} onClose={closeModals} showBackdrop={true}>
         <h3 className="text-lg font-bold text-gray-900 dark:text-white px-1 mb-4">포스팅 센터</h3>
-        <button onClick={() => { setActiveApp('post-list'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors mb-3">
-          <span className="text-base text-gray-900 dark:text-white font-bold">📄 원고 관리</span>
+        <button onClick={() => { setActiveApp('post-list'); closeModals(); }} className="w-full flex items-center gap-2.5 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors mb-3">
+          <AppIcon name="file-text" size={18} className="text-blue-600 dark:text-blue-400" />
+          <span className="text-base text-gray-900 dark:text-white font-bold">원고 관리</span>
         </button>
-        <button onClick={() => { setActiveApp('post-ai'); closeModals(); }} className="w-full flex flex-col gap-1 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
-          <span className="text-base text-gray-900 dark:text-white font-bold">🤖 AI 작성 스튜디오</span>
+        <button onClick={() => { setActiveApp('post-ai'); closeModals(); }} className="w-full flex items-center gap-2.5 p-4 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700/80 text-left transition-colors">
+          <AppIcon name="brain" size={18} className="text-purple-600 dark:text-purple-400" />
+          <span className="text-base text-gray-900 dark:text-white font-bold">AI 작성 스튜디오</span>
         </button>
       </BottomSheet>
 

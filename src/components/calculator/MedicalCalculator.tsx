@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useCalculatorExport } from "@/hooks/useCalculatorExport";
+import AppIcon from '@/components/ui/AppIcon';
 
 
 // ── 데이터 타입 정의 ──
@@ -41,9 +42,9 @@ const GENERATIONS = [
 ];
 
 const HOSPITAL_TYPES = [
-  { id: 'clinic', label: '의원·클리닉', emoji: '🏥', desc: '동네 병의원, 보건소, 한의원' },
-  { id: 'hospital', label: '일반 병원', emoji: '🏨', desc: '입원 30병상 이상 병원급' },
-  { id: 'general', label: '상급·종합병원', emoji: '🏫', desc: '대학병원, 대형 상급종합병원' },
+  { id: 'clinic', label: '의원·클리닉', desc: '동네 병의원, 보건소, 한의원' },
+  { id: 'hospital', label: '일반 병원', desc: '입원 30병상 이상 병원급' },
+  { id: 'general', label: '상급·종합병원', desc: '대학병원, 대형 상급종합병원' },
 ] as const;
 
 export default function MedicalCalculator() {
@@ -216,7 +217,9 @@ export default function MedicalCalculator() {
           {/* 1. 가입 세대 선택 */}
           <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-white/5 transition-all">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center text-lg">📅</div>
+              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
               <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">실손의료비 가입 세대</h3>
             </div>
             <div className="flex flex-col gap-3">
@@ -244,14 +247,16 @@ export default function MedicalCalculator() {
               })}
             </div>
             <div className="mt-5 p-4 rounded-none text-xs font-bold leading-relaxed border" style={{ backgroundColor: `${selectedGen.color}0A`, color: selectedGen.color, borderColor: `${selectedGen.color}20` }}>
-              <span className="mr-1">💡</span> {selectedGen.note}
+              <svg className="w-3.5 h-3.5 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> {selectedGen.note}
             </div>
           </div>
 
           {/* 2. 진료 형태 및 병원 규모 */}
           <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-white/5 transition-all">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center text-lg">🏥</div>
+              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </div>
               <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">진료 형태 및 병원 규모</h3>
             </div>
             
@@ -283,7 +288,9 @@ export default function MedicalCalculator() {
                       const isActive = data.clinicType === ht.id;
                       return (
                         <button key={ht.id} onClick={() => handleChange('clinicType', ht.id)} className={`flex items-center gap-4 p-3.5 rounded-none border-2 transition-all duration-300 ${isActive ? 'border-[#34A853] bg-[#e6f4ea] dark:bg-[#34A853]/10 text-[#34A853] dark:text-[#81c995] shadow-sm' : 'border-transparent bg-[#f8f9fa] dark:bg-[#2d2d2d] text-gray-500 hover:bg-gray-50 dark:hover:bg-[#303134]'}`}>
-                          <span className="text-2xl filter drop-shadow-sm">{ht.emoji}</span>
+                          <span className="flex items-center justify-center w-8 h-8 shrink-0">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                          </span>
                           <div className="text-left">
                             <div className={`font-black text-[13px] ${isActive ? '' : 'text-[#202124] dark:text-gray-200'}`}>{ht.label}</div>
                             <div className={`text-[10px] font-semibold mt-0.5 ${isActive ? 'opacity-80' : 'text-gray-400'}`}>{ht.desc}</div>
@@ -300,7 +307,9 @@ export default function MedicalCalculator() {
           {/* 3. 발생 진료비 (급여/비급여 분리) */}
           <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-white/5 transition-all">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center text-lg">💳</div>
+              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              </div>
               <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">기본 발생 진료비 (환자 부담 총액)</h3>
             </div>
             
@@ -326,7 +335,9 @@ export default function MedicalCalculator() {
           {(data.generation >= 3) && (
             <div className="bg-[#fce8e6]/30 dark:bg-[#d93025]/5 rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-red-100 dark:border-red-900/20 transition-all animate-in fade-in slide-in-from-top-4">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center text-lg">💉</div>
+                <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>
+                </div>
                 <h3 className="text-sm font-extrabold text-[#d93025] dark:text-red-400">3대 비급여 특약 병원비{data.generation === 5 && ' (비중증)'}</h3>
               </div>
               <p className="text-[10px] text-red-400 dark:text-red-500 font-semibold mb-5 pl-11">※ 위의 일반 비급여와 중복 입력하지 마세요.</p>
@@ -363,7 +374,9 @@ export default function MedicalCalculator() {
         <div className="lg:col-span-7 lg:sticky lg:top-[100px] flex flex-col gap-5">
           
           <div className="bg-[#f8f9fa] dark:bg-[#2d2d2d] rounded-none px-6 py-5 border border-gray-100 dark:border-white/5 flex items-center gap-3">
-            <span className="text-2xl">📑</span>
+            <span className="flex items-center text-gray-500">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </span>
             <div>
               <h2 className="text-base font-extrabold text-gray-900 dark:text-white">전문가용 산출 명세서</h2>
               <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">입력하신 3대 비급여 특약까지 포함된 정밀 산출 내역입니다.</p>
@@ -462,23 +475,25 @@ export default function MedicalCalculator() {
           </div>
 
           <div className="bg-[#fce8e6]/80 dark:bg-[#d93025]/10 rounded-none p-4 border border-[#d93025]/20 flex gap-3 text-[12px] leading-relaxed text-[#d93025] dark:text-[#f28b82] font-semibold shadow-sm">
-            <span className="shrink-0 text-base mt-0.5">⚠️</span>
+            <span className="shrink-0 mt-0.5 flex items-center text-[#d93025]">
+              <AppIcon name="warning" size={16} />
+            </span>
             <p>위 결과는 <strong>단순 계산 추정치</strong>입니다. 실제 보상 시에는 비례보상, 면책상병 여부, 연간 보상한도 초과 등에 따라 지급액이 달라질 수 있습니다.</p>
           </div>
 
           <div className="flex flex-col gap-2 mt-2">
             <button onClick={() => { document.getElementById('chat-floating-btn')?.click(); }} className="flex items-center justify-center w-full gap-2 py-4 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-none font-bold text-[14px] sm:text-[15px] transition-all shadow-sm hover:shadow-md" id="medical-calc-chat-btn">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              <AppIcon name="chat" size={20} />
               보상스쿨 1:1 무료 상담 신청하기
             </button>
             
             <div className="grid grid-cols-2 gap-2">
               <button onClick={() => shareResult('실손의료비', result.totalPayout)} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#1a73e8] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#8ab4f8] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
-                <svg className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                <AppIcon name="link" size={16} className="group-hover:-translate-y-0.5 transition-transform" />
                 결과 공유하기
               </button>
               <button onClick={() => exportPDF('보상스쿨_실손의료비_계산결과.pdf')} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#202124] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#e8eaed] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
-                <svg className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <AppIcon name="file-text" size={16} className="group-hover:translate-y-0.5 transition-transform" />
                 PDF 다운로드
               </button>
             </div>

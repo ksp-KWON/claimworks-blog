@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useCalculatorExport } from "@/hooks/useCalculatorExport";
+import AppIcon from '@/components/ui/AppIcon';
 
 
 export interface LiabilityData {
@@ -141,20 +142,51 @@ export default function LiabilityCalculator() {
           {/* 피해 유형 선택 */}
           <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-white/5 transition-all">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center text-lg">📋</div>
+              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+              </div>
               <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">발생한 피해 유형 선택</h3>
             </div>
             <div className="space-y-3">
               {[
-                { key: 'hasInjury', emoji: '🩹', title: '부상 (상해)', sub: '휴업손해 및 위자료', activeClass: 'border-[#d93025] bg-[#fce8e6] dark:bg-[#d93025]/15', textActive: 'text-[#c5221f] dark:text-[#f28b82]' },
-                { key: 'hasDisability', emoji: '🩼', title: '후유장해', sub: '미래 일실수입 (상실수익)', activeClass: 'border-[#d93025] bg-[#fce8e6] dark:bg-[#d93025]/15', textActive: 'text-[#c5221f] dark:text-[#f28b82]' },
-                { key: 'hasDeath', emoji: '🕊️', title: '사망', sub: '생계비 공제 일실수입 및 장례비', activeClass: 'border-[#d93025] bg-[#fce8e6] dark:bg-[#d93025]/15', textActive: 'text-[#c5221f] dark:text-[#f28b82]' },
-                { key: 'hasCare', emoji: '👨‍🦽', title: '개호 (간병)', sub: '중증장해로 인한 개호비', activeClass: 'border-[#d93025] bg-[#fce8e6] dark:bg-[#d93025]/15', textActive: 'text-[#c5221f] dark:text-[#f28b82]' },
+                { 
+                  key: 'hasInjury', 
+                  icon: () => <AppIcon name="bandaid" size={20} />, 
+                  title: '부상 (상해)', 
+                  sub: '휴업손해 및 위자료', 
+                  activeClass: 'border-[#d93025] bg-[#fce8e6] dark:bg-[#d93025]/15', 
+                  textActive: 'text-[#c5221f] dark:text-[#f28b82]' 
+                },
+                { 
+                  key: 'hasDisability', 
+                  icon: () => <AppIcon name="crutches" size={20} />, 
+                  title: '후유장해', 
+                  sub: '미래 일실수입 (상실수익)', 
+                  activeClass: 'border-[#d93025] bg-[#fce8e6] dark:bg-[#d93025]/15', 
+                  textActive: 'text-[#c5221f] dark:text-[#f28b82]' 
+                },
+                { 
+                  key: 'hasDeath', 
+                  icon: () => <AppIcon name="rose" size={20} />, 
+                  title: '사망', 
+                  sub: '생계비 공제 일실수입 및 장례비', 
+                  activeClass: 'border-[#d93025] bg-[#fce8e6] dark:bg-[#d93025]/15', 
+                  textActive: 'text-[#c5221f] dark:text-[#f28b82]' 
+                },
+                { 
+                  key: 'hasCare', 
+                  icon: () => <AppIcon name="wheelchair" size={20} />, 
+                  title: '개호 (간병)', 
+                  sub: '중증장해로 인한 개호비', 
+                  activeClass: 'border-[#d93025] bg-[#fce8e6] dark:bg-[#d93025]/15', 
+                  textActive: 'text-[#c5221f] dark:text-[#f28b82]' 
+                },
               ].map(item => {
                 const isActive = data[item.key as keyof LiabilityData] as boolean;
+                const IconComp = item.icon;
                 return (
                   <button key={item.key} onClick={() => handleChange(item.key as keyof LiabilityData, !isActive)} className={`w-full flex items-center gap-4 p-4 rounded-none border-2 transition-all text-left ${isActive ? item.activeClass : 'border-transparent bg-[#f8f9fa] dark:bg-[#2d2d2d] hover:bg-gray-50'}`}>
-                    <span className="text-2xl">{item.emoji}</span>
+                    <span className="flex items-center justify-center shrink-0"><IconComp /></span>
                     <div className="flex-1">
                       <div className={`font-black text-[14px] ${isActive ? item.textActive : 'text-[#202124] dark:text-[#e8eaed]'}`}>{item.title}</div>
                       <div className="text-[11px] text-gray-400 font-semibold">{item.sub}</div>
@@ -168,7 +200,9 @@ export default function LiabilityCalculator() {
           {/* 기본 정보 */}
           <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-white/5 transition-all">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center text-lg">👤</div>
+              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
               <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">기본 정보</h3>
             </div>
             <div className="space-y-5">
@@ -185,7 +219,10 @@ export default function LiabilityCalculator() {
                   <input type="text" inputMode="numeric" value={data.income ? fmt(data.income) : ''} onChange={e => handleChange('income', parse(e.target.value))} className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-3 pl-4 pr-12 text-[15px] font-black focus:ring-2 focus:ring-[#d93025] focus:outline-none transition-all" />
                   <span className="absolute right-4 top-3.5 text-[13px] text-gray-400 font-bold">원</span>
                 </div>
-                <button onClick={() => handleChange('income', 3441360)} className="w-full py-2 bg-[#fce8e6] dark:bg-[#d93025]/15 text-[#c5221f] dark:text-[#f28b82] text-[12px] font-bold rounded-none hover:bg-[#fad2cf] transition-all">📊 보통인부 시중노임단가 자동 적용 (3,441,360원)</button>
+                <button onClick={() => handleChange('income', 3441360)} className="w-full py-2 bg-[#fce8e6] dark:bg-[#d93025]/15 text-[#c5221f] dark:text-[#f28b82] text-[12px] font-bold rounded-none hover:bg-[#fad2cf] transition-all flex items-center justify-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  보통인부 시중노임단가 자동 적용 (3,441,360원)
+                </button>
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-2">본인 과실 비율</label>
@@ -201,14 +238,19 @@ export default function LiabilityCalculator() {
           {(data.hasInjury || data.hasDisability || data.hasDeath || data.hasCare) && (
             <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-white/5 transition-all animate-in fade-in slide-in-from-top-4">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center text-lg">🔍</div>
+                <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
                 <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">상세 입력 내역</h3>
               </div>
               
               <div className="space-y-6">
                 {data.hasInjury && !data.hasDeath && (
                   <div className="space-y-4 pb-4 border-b border-gray-100 dark:border-white/10 last:border-0">
-                    <h4 className="text-[12px] font-black text-[#c5221f] flex items-center gap-1.5"><span className="text-lg">🩹</span> 부상 치료 상세</h4>
+                    <h4 className="text-[12px] font-black text-[#c5221f] flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>
+                      부상 치료 상세
+                    </h4>
                     <div>
                       <label className="block text-[11px] font-bold text-gray-500 mb-1">입원 일수</label>
                       <input type="number" value={data.hospitalDays === 0 ? '0' : (data.hospitalDays || '')} onChange={e => handleChange('hospitalDays', Number(e.target.value))} className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-2.5 px-3 text-[14px] font-bold focus:ring-2 focus:ring-[#d93025]" />
@@ -218,7 +260,10 @@ export default function LiabilityCalculator() {
                 
                 {data.hasDisability && !data.hasDeath && (
                   <div className="space-y-4 pb-4 border-b border-gray-100 dark:border-white/10 last:border-0">
-                    <h4 className="text-[12px] font-black text-[#c5221f] flex items-center gap-1.5"><span className="text-lg">🩼</span> 후유장해 상세</h4>
+                    <h4 className="text-[12px] font-black text-[#c5221f] flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="5" r="1"/><path d="m9 20 3-9 3 9"/><path d="m6.5 14 5.5 1.5 5.5-1.5"/></svg>
+                      후유장해 상세
+                    </h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-[11px] font-bold text-gray-500 mb-1">노동능력상실률 (%)</label>
@@ -234,7 +279,10 @@ export default function LiabilityCalculator() {
 
                 {data.hasCare && (
                   <div className="space-y-4 pb-4 border-b border-gray-100 dark:border-white/10 last:border-0">
-                    <h4 className="text-[12px] font-black text-[#c5221f] flex items-center gap-1.5"><span className="text-lg">👨‍🦽</span> 개호(간병) 상세</h4>
+                    <h4 className="text-[12px] font-black text-[#c5221f] flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="4" r="2"/><path d="m15 19-3-6H8l-2 5"/><path d="M12 13h5l3 8"/><path d="M9 19h6"/></svg>
+                      개호(간병) 상세
+                    </h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-[11px] font-bold text-gray-500 mb-1">일일 필요 개호인 (명)</label>
@@ -250,7 +298,9 @@ export default function LiabilityCalculator() {
 
                 {data.hasDeath && (
                   <div className="bg-[#fce8e6] dark:bg-[#d93025]/10 border border-[#f28b82]/50 rounded-none p-4 text-center">
-                    <span className="text-2xl mb-1 block">🕊️</span>
+                    <span className="flex items-center justify-center text-[#c5221f] mb-1.5">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V11"/><path d="M5 3a7 7 0 0 0 7 7 7 7 0 0 0 7-7"/></svg>
+                    </span>
                     <p className="text-[12px] font-bold text-[#c5221f] dark:text-[#f28b82]">사망 사고 산정 기준 자동 적용</p>
                     <p className="text-[11px] text-[#ea4335] dark:text-[#f28b82] mt-1">일실수입에서 생계비(1/3) 공제 / 위자료 장해율 100% 적용</p>
                   </div>
@@ -262,7 +312,9 @@ export default function LiabilityCalculator() {
           {/* 추가 비용 */}
           <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-white/5 transition-all">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center text-lg">💊</div>
+              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7z"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/></svg>
+              </div>
               <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">기타 추가 비용</h3>
             </div>
             <div className="space-y-4">
@@ -295,7 +347,9 @@ export default function LiabilityCalculator() {
         {/* ── 우측: 세련된 결과 명세서 패널 (7열, 스티키 고정) ── */}
         <div className="lg:col-span-7 lg:sticky lg:top-[100px] flex flex-col gap-5">
           <div className="bg-[#f8f9fa] dark:bg-[#2d2d2d] rounded-none px-6 py-5 border border-gray-100 dark:border-white/5 flex items-center gap-3">
-            <span className="text-2xl">📑</span>
+            <span className="flex items-center text-gray-500">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </span>
             <div>
               <h2 className="text-base font-extrabold text-gray-900 dark:text-white">법원 소송가액 명세서</h2>
               <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">입력하신 정보를 바탕으로 산출된 예상 손해배상액입니다.</p>
@@ -396,23 +450,25 @@ export default function LiabilityCalculator() {
           </div>
 
           <div className="bg-[#fce8e6]/80 dark:bg-[#d93025]/10 rounded-none p-4 border border-[#f28b82]/50 flex gap-3 text-[12px] leading-relaxed text-[#c5221f] dark:text-[#f28b82] font-semibold shadow-sm">
-            <span className="shrink-0 text-base mt-0.5">⚠️</span>
+            <span className="shrink-0 mt-0.5 flex items-center text-[#c5221f]">
+              <AppIcon name="warning" size={16} />
+            </span>
             <p>위 결과는 <strong>법원 소송 판례(호프만계수) 기준</strong> 단순 적용 수치입니다. 실제 소송 시 피해자의 구체적 직업, 과실 비율, 개호 등에 따라 크게 달라질 수 있으므로 보상 전문가와의 상담을 적극 권장합니다.</p>
           </div>
 
           <div className="flex flex-col gap-2 mt-2">
             <button onClick={() => { document.getElementById('chat-floating-btn')?.click(); }} className="flex items-center justify-center w-full gap-2 py-4 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-none font-bold text-[14px] sm:text-[15px] transition-all shadow-sm hover:shadow-md" id="liability-calc-chat-btn">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              <AppIcon name="chat" size={20} />
               보상스쿨 1:1 무료 상담 신청하기
             </button>
             
             <div className="grid grid-cols-2 gap-2">
               <button onClick={() => shareResult('배상책임', result.totalAmount)} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#1a73e8] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#8ab4f8] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
-                <svg className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                <AppIcon name="link" size={16} className="group-hover:-translate-y-0.5 transition-transform" />
                 결과 공유하기
               </button>
               <button onClick={() => exportPDF('보상스쿨_배상책임_예상보상금.pdf')} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#202124] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#e8eaed] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
-                <svg className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <AppIcon name="file-text" size={16} className="group-hover:translate-y-0.5 transition-transform" />
                 PDF 다운로드
               </button>
             </div>

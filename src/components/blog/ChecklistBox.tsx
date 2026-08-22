@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import MarkdownRenderer from './MarkdownRenderer';
 import CommonBox from './CommonBox';
+import AppIcon from '@/components/ui/AppIcon';
 
 interface ChecklistBoxProps {
   items: string[];
@@ -31,12 +32,7 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
     </div>
   );
 
-  const icon = (
-    <svg className="w-4 h-4 text-[var(--google-green)] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 11l3 3L22 4" />
-      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-    </svg>
-  );
+  const icon = <AppIcon name="shield-check" size={16} className="text-[var(--google-green)] dark:text-[#81c995]" />;
 
   return (
     <CommonBox

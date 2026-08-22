@@ -1,4 +1,5 @@
 import React from 'react';
+import AppIcon, { type AppIconName } from './AppIcon';
 
 type BorderColor = 'red' | 'rose' | 'blue' | 'green' | 'teal' | 'purple' | 'indigo' | 'yellow' | 'default';
 
@@ -6,6 +7,7 @@ interface PremiumCardProps extends React.HTMLAttributes<HTMLDivElement> {
   borderColor?: BorderColor;
   hoverEffect?: boolean;
   watermarkEmoji?: string;
+  watermarkIcon?: AppIconName;
 }
 
 export default function PremiumCard({
@@ -14,6 +16,7 @@ export default function PremiumCard({
   borderColor = 'default',
   hoverEffect = true,
   watermarkEmoji,
+  watermarkIcon,
   ...props
 }: PremiumCardProps) {
   // CommonBox와 일치하는 세련된 톤별 호버 글로우 & 보더
@@ -35,8 +38,14 @@ export default function PremiumCard({
 
   return (
     <div className={`${baseClass} ${className}`} {...props}>
-      {/* 워터마크 이모지 (CommonBox 일체화) */}
-      {watermarkEmoji && (
+      {/* 워터마크 SVG 아이콘 (CommonBox 3D 일체화) */}
+      {watermarkIcon && (
+        <div className="absolute right-[-10px] bottom-[-14px] opacity-[0.03] dark:opacity-[0.05] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 z-0">
+          <AppIcon name={watermarkIcon} size={100} strokeWidth={1.5} />
+        </div>
+      )}
+      {/* 레거시 워터마크 이모지 지원 */}
+      {!watermarkIcon && watermarkEmoji && (
         <div className="absolute right-[-8px] bottom-[-14px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 z-0">
           {watermarkEmoji}
         </div>

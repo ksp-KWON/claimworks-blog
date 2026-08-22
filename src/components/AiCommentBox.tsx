@@ -1,21 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import AppIcon from '@/components/ui/AppIcon';
 
 interface AiCommentBoxProps {
   sourceText: string;
   type: 'precedent' | 'fss' | 'traffic';
   // UI Customization
   className?: string;
-}
-
-function IconBriefcase({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-    </svg>
-  );
 }
 
 export default function AiCommentBox({ sourceText, type, className = '' }: AiCommentBoxProps) {
@@ -51,8 +43,8 @@ export default function AiCommentBox({ sourceText, type, className = '' }: AiCom
   return (
     <div className={`bg-[#fcf8e3]/30 dark:bg-[#fcf8e3]/5 p-4 rounded-none border border-[#faebcc]/50 dark:border-[#faebcc]/10 space-y-2 ${className}`}>
       <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
-        <span className="text-sm"><IconBriefcase className="w-4 h-4" /></span>
-        👨‍🏫 보상스쿨 수석 손해사정사 실무 코멘트
+        <AppIcon name="book" size={16} />
+        <span>보상스쿨 수석 손해사정사 실무 코멘트</span>
       </div>
       
       <div className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium pl-1 min-h-[2.5rem]">
@@ -61,9 +53,7 @@ export default function AiCommentBox({ sourceText, type, className = '' }: AiCom
             onClick={fetchComment}
             className="mt-1 px-5 py-2.5 bg-[#8a6d3b] dark:bg-[#c4a86f] text-white dark:text-[#202124] text-xs font-bold rounded-none shadow-md hover:bg-[#6e562d] dark:hover:bg-[#a38a58] transition-colors flex items-center gap-1.5"
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+            <AppIcon name="zap" size={14} />
             이 사안의 핵심 실무 요약 보기
           </button>
         ) : loading ? (

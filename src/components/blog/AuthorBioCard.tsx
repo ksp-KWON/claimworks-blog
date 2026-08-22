@@ -2,16 +2,24 @@ import Image from 'next/image';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import AppIcon from '@/components/ui/AppIcon';
 
 export default function AuthorBioCard() {
   return (
-    <PremiumCard borderColor="indigo" hoverEffect className="mt-12 mb-10 group">
-      <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[120px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
-        👨‍💼
-      </div>
+    <PremiumCard borderColor="indigo" hoverEffect watermarkIcon="user" className="mt-12 mb-10 group">
       <div className="relative z-10">
         <div className="border-b border-gray-100 dark:border-white/5 pb-3 mb-4">
-          <PremiumHeading level={3} gradient="indigo" showLeftBorder={true} icon={<span className="text-[17px] leading-none">👨‍💼</span>} className="!mb-0 !text-base">
+          <PremiumHeading 
+            level={3} 
+            gradient="indigo" 
+            showLeftBorder={true} 
+            icon={
+              <span className="flex items-center text-indigo-600 dark:text-indigo-400">
+                <AppIcon name="user" size={16} />
+              </span>
+            } 
+            className="!mb-0 !text-base"
+          >
             저자 소개
           </PremiumHeading>
         </div>
@@ -39,7 +47,7 @@ export default function AuthorBioCard() {
             </p>
             <div className="mt-3 flex items-center gap-3 text-[12px] text-indigo-600 dark:text-indigo-400 font-bold">
               <a href="/about" className="hover:underline flex items-center gap-1 group/link">
-                <svg className="w-3.5 h-3.5 group-hover/link:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <AppIcon name="external-link" size={13} className="group-hover/link:-translate-y-0.5 transition-transform" />
                 저자 소개 보기
               </a>
               <span className="text-gray-300 dark:text-gray-600">|</span>

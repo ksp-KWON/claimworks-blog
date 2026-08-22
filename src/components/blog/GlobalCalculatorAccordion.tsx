@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import AppIcon from '@/components/ui/AppIcon';
 
 const ACCORDION_ITEMS = [
   {
@@ -47,12 +48,7 @@ export default function GlobalCalculatorAccordion() {
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-none bg-blue-100 dark:bg-blue-900/40 text-[var(--google-blue)] dark:text-[#8ab4f8] flex items-center justify-center shrink-0">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-              <rect x="4" y="2" width="16" height="20" rx="2" strokeWidth="2"/>
-              <line x1="8" y1="6" x2="16" y2="6"/>
-              <line x1="16" y1="14" x2="16" y2="18"/>
-              <path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01"/>
-            </svg>
+            <AppIcon name="calculator" size={20} />
           </div>
           <div>
             <div className="text-base sm:text-lg font-extrabold tracking-tight">
@@ -91,9 +87,7 @@ export default function GlobalCalculatorAccordion() {
                   </div>
                 </div>
                 <div className={`text-gray-400 ${item.textGroupHover} group-hover/item:translate-x-1 transition-all`}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
+                  <AppIcon name="chevron-right" size={16} />
                 </div>
               </Link>
             ))}

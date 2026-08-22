@@ -2,13 +2,14 @@ import React from 'react';
 import Link from 'next/link';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
+import AppIcon from '@/components/ui/AppIcon';
 
 export type MenuThemeColor = 'blue' | 'red' | 'green' | 'yellow' | 'purple';
 
 export interface MenuCardProps {
   href?: string;
   onClick?: () => void;
-  icon: string | React.ReactNode;
+  icon: React.ReactNode;
   title: string;
   themeColor: MenuThemeColor;
   badgeText?: string;
@@ -62,13 +63,10 @@ export default function MenuCard({ href, onClick, icon, title, description, badg
 
   const content = (
     <PremiumCard borderColor={themeColor} hoverEffect className="!p-4 sm:!p-5 relative overflow-hidden group">
-      <div className="absolute right-[-10px] bottom-[-20px] opacity-[0.03] dark:opacity-[0.05] text-[90px] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
-        {icon}
-      </div>
       <div className="relative z-10 space-y-2 flex flex-col min-w-0">
         <div className="flex items-center justify-between min-w-0 gap-2">
-          <PremiumHeading level={3} gradient={themeColor} showLeftBorder={true} className={`!mb-0 !text-sm pr-2 rounded-r-xl ${bgGradients[themeColor]} min-w-0 truncate`}>
-            <span className={`${theme.textIcon} text-lg leading-none mr-2 shrink-0`}>{icon}</span>
+          <PremiumHeading level={3} gradient={themeColor} showLeftBorder={false} className={`!mb-0 !text-sm pr-2 rounded-r-xl ${bgGradients[themeColor]} min-w-0 truncate`}>
+            <span className={`${theme.textIcon} flex items-center shrink-0 mr-2`}>{icon}</span>
             <span className="truncate">{title}</span>
           </PremiumHeading>
           {badgeText && (
@@ -85,9 +83,7 @@ export default function MenuCard({ href, onClick, icon, title, description, badg
             <div className="flex items-center gap-2 truncate">
               {buttonText}
             </div>
-            <svg className="w-4 h-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+            <AppIcon name="chevron-right" size={16} className="shrink-0 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.5} />
           </div>
         )}
       </div>

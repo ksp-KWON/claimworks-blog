@@ -1,4 +1,5 @@
 import CommonBox from './CommonBox';
+import AppIcon from '@/components/ui/AppIcon';
 
 interface TOCItem {
   id: string;
@@ -22,16 +23,7 @@ export default function TableOfContents({
     <span className="text-[11px] font-semibold text-gray-400 mt-1">항목 클릭 시 이동</span>
   );
 
-  const icon = (
-    <svg className="w-4 h-4 text-[var(--google-blue)] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="8" y1="6" x2="21" y2="6" />
-      <line x1="8" y1="12" x2="21" y2="12" />
-      <line x1="8" y1="18" x2="21" y2="18" />
-      <line x1="3" y1="6" x2="3.01" y2="6" />
-      <line x1="3" y1="12" x2="3.01" y2="12" />
-      <line x1="3" y1="18" x2="3.01" y2="18" />
-    </svg>
-  );
+  const icon = <AppIcon name="list" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />;
 
   return (
     <CommonBox

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import AppIcon from '@/components/ui/AppIcon';
 import AdminPanelLayout from '../AdminPanelLayout';
 import { AdminTableHeader } from '../AdminHeader';
 
@@ -52,10 +53,10 @@ export default function PostListPanel({
 
   return (
     <AdminPanelLayout innerClassName="space-y-2.5">
-      {/* 🏝️ 1. 상단 원고 현황 및 GitHub 토큰 상태 카드 아일랜드 (CommonBox 스타일) */}
-      <PremiumCard borderColor="blue" hoverEffect={true} watermarkEmoji="📚" className="!p-3 shrink-0 flex flex-wrap items-center justify-between gap-2.5">
+      {/* 1. 상단 원고 현황 및 GitHub 토큰 상태 카드 아일랜드 (CommonBox 스타일) */}
+      <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="book" className="!p-3 shrink-0 flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2">
-          <span className="text-base leading-none">📚</span>
+          <AppIcon name="book" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />
           <span className="text-xs sm:text-sm font-extrabold text-gray-900 dark:text-white">
             발행 원고 데이터베이스
           </span>
@@ -87,10 +88,10 @@ export default function PostListPanel({
             <button
               type="button"
               onClick={onOpenSettings}
-              className="px-2.5 py-0.5 bg-amber-500 hover:bg-amber-600 text-white rounded-none text-[11px] font-bold transition-colors shadow-sm"
+              className="px-2.5 py-0.5 bg-amber-500 hover:bg-amber-600 text-white rounded-none text-[11px] font-bold transition-colors shadow-sm flex items-center gap-1"
               title="GitHub Personal Access Token 등록"
             >
-              🔐 읽기 전용 (토큰 등록)
+              <AppIcon name="lock" size={11} /> 읽기 전용 (토큰 등록)
             </button>
           )}
         </div>

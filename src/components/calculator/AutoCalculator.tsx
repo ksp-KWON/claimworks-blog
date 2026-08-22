@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useCalculatorExport } from "@/hooks/useCalculatorExport";
 import { AutoInsuranceData, initialAutoData, INJURY_ALIMONY_TABLE } from './auto/calculator-types';
 import { INJURY_DB } from './auto/injury-db';
+import AppIcon from '@/components/ui/AppIcon';
 
 
 export default function AutoCalculator() {
@@ -154,19 +155,43 @@ export default function AutoCalculator() {
           {/* 피해 유형 선택 */}
           <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-white/5 transition-all">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center text-lg">📋</div>
+              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+              </div>
               <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">발생한 피해 유형 선택</h3>
             </div>
             <div className="space-y-3">
               {[
-                { key: 'hasInjury', emoji: '🩹', title: '부상 (상해)', sub: '대인배상 I', activeClass: 'border-[#1A73E8] bg-[#e8f0fe] dark:bg-[#1A73E8]/15', textActive: 'text-[#1A73E8] dark:text-[#8ab4f8]' },
-                { key: 'hasDisability', emoji: '🩼', title: '후유장해', sub: '대인배상 II', activeClass: 'border-[#7C4DFF] bg-[#f3e8ff] dark:bg-[#7C4DFF]/15', textActive: 'text-[#7C4DFF] dark:text-[#ce93d8]' },
-                { key: 'hasDeath', emoji: '🕊️', title: '사망', sub: '사망 피해보상', activeClass: 'border-[#d93025] bg-[#fce8e6] dark:bg-[#d93025]/15', textActive: 'text-[#d93025] dark:text-[#f28b82]' },
+                { 
+                  key: 'hasInjury', 
+                  icon: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>, 
+                  title: '부상 (상해)', 
+                  sub: '대인배상 I', 
+                  activeClass: 'border-[#1A73E8] bg-[#e8f0fe] dark:bg-[#1A73E8]/15', 
+                  textActive: 'text-[#1A73E8] dark:text-[#8ab4f8]' 
+                },
+                { 
+                  key: 'hasDisability', 
+                  icon: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="5" r="1"/><path d="m9 20 3-9 3 9"/><path d="m6.5 14 5.5 1.5 5.5-1.5"/></svg>, 
+                  title: '후유장해', 
+                  sub: '대인배상 II', 
+                  activeClass: 'border-[#7C4DFF] bg-[#f3e8ff] dark:bg-[#7C4DFF]/15', 
+                  textActive: 'text-[#7C4DFF] dark:text-[#ce93d8]' 
+                },
+                { 
+                  key: 'hasDeath', 
+                  icon: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V11"/><path d="M5 3a7 7 0 0 0 7 7 7 7 0 0 0 7-7"/></svg>, 
+                  title: '사망', 
+                  sub: '사망 피해보상', 
+                  activeClass: 'border-[#d93025] bg-[#fce8e6] dark:bg-[#d93025]/15', 
+                  textActive: 'text-[#d93025] dark:text-[#f28b82]' 
+                },
               ].map(item => {
                 const isActive = data[item.key as keyof AutoInsuranceData] as boolean;
+                const IconComp = item.icon;
                 return (
                   <button key={item.key} onClick={() => handleChange(item.key as keyof AutoInsuranceData, !isActive)} className={`w-full flex items-center gap-4 p-4 rounded-none border-2 transition-all text-left ${isActive ? item.activeClass : 'border-transparent bg-[#f8f9fa] dark:bg-[#2d2d2d] hover:bg-gray-50'}`}>
-                    <span className="text-2xl">{item.emoji}</span>
+                    <span className="flex items-center justify-center shrink-0"><IconComp /></span>
                     <div className="flex-1">
                       <div className={`font-black text-[14px] ${isActive ? item.textActive : 'text-[#202124] dark:text-[#e8eaed]'}`}>{item.title}</div>
                       <div className="text-[11px] text-gray-400 font-semibold">{item.sub}</div>
@@ -180,7 +205,9 @@ export default function AutoCalculator() {
           {/* 기본 정보 */}
           <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-white/5 transition-all">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center text-lg">👤</div>
+              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
               <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">기본 정보 (소득 및 과실)</h3>
             </div>
             <div className="space-y-5">
@@ -190,7 +217,10 @@ export default function AutoCalculator() {
                   <input type="text" inputMode="numeric" value={data.income ? fmt(data.income) : ''} onChange={e => handleChange('income', parse(e.target.value))} placeholder="3,500,000" className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-3 pl-4 pr-12 text-[15px] font-black focus:ring-2 focus:ring-[#1A73E8] focus:bg-white focus:outline-none transition-all" />
                   <span className="absolute right-4 top-3.5 text-[13px] text-gray-400 font-bold">원</span>
                 </div>
-                <button onClick={() => { handleChange('income', 3284525); handleChange('isIncomeProven', false); }} className="w-full py-2 bg-[#e8f0fe] dark:bg-[#1A73E8]/15 text-[#1A73E8] dark:text-[#8ab4f8] text-[12px] font-bold rounded-none hover:bg-[#d2e3fc] transition-all">📊 도시일용근로자 임금 적용 (3,284,525원)</button>
+                <button onClick={() => { handleChange('income', 3284525); handleChange('isIncomeProven', false); }} className="w-full py-2 bg-[#e8f0fe] dark:bg-[#1A73E8]/15 text-[#1A73E8] dark:text-[#8ab4f8] text-[12px] font-bold rounded-none hover:bg-[#d2e3fc] transition-all flex items-center justify-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  도시일용근로자 임금 적용 (3,284,525원)
+                </button>
               </div>
               <div className="flex justify-between items-center bg-[#f8f9fa] dark:bg-[#2d2d2d] p-3.5 rounded-none">
                 <div>
@@ -218,14 +248,19 @@ export default function AutoCalculator() {
           {(data.hasInjury || data.hasDisability || data.hasDeath) && (
             <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-white/5 transition-all animate-in fade-in slide-in-from-top-4">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center text-lg">🔍</div>
+                <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
                 <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">상세 입력 내역</h3>
               </div>
               
               <div className="space-y-6">
                 {data.hasInjury && (
                   <div className="space-y-4 pb-4 border-b border-gray-100 dark:border-white/10 last:border-0">
-                    <h4 className="text-[12px] font-black text-[#1A73E8] flex items-center gap-1.5"><span className="text-lg">🩹</span> 부상 치료 상세</h4>
+                    <h4 className="text-[12px] font-black text-[#1A73E8] flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>
+                      부상 치료 상세
+                    </h4>
                     <div className="relative" ref={searchRef}>
                       <input type="text" value={searchTerm} onChange={e => { setSearchTerm(e.target.value); setIsSearchFocused(true); }} onFocus={() => setIsSearchFocused(true)} placeholder="진단명 검색 (예: 경추염좌)" className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-2.5 px-4 text-[13px] font-bold focus:ring-2 focus:ring-[#1A73E8]" />
                       {isSearchFocused && searchTerm && (
@@ -263,7 +298,10 @@ export default function AutoCalculator() {
                 
                 {data.hasDisability && (
                   <div className="space-y-4 pb-4 border-b border-gray-100 dark:border-white/10 last:border-0">
-                    <h4 className="text-[12px] font-black text-[#7C4DFF] flex items-center gap-1.5"><span className="text-lg">🩼</span> 후유장해 상세</h4>
+                    <h4 className="text-[12px] font-black text-[#7C4DFF] flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="5" r="1"/><path d="m9 20 3-9 3 9"/><path d="m6.5 14 5.5 1.5 5.5-1.5"/></svg>
+                      후유장해 상세
+                    </h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-[11px] font-bold text-gray-500 mb-1">장해율 (%)</label>
@@ -279,7 +317,10 @@ export default function AutoCalculator() {
 
                 {data.hasDeath && (
                   <div className="space-y-4">
-                    <h4 className="text-[12px] font-black text-[#d93025] flex items-center gap-1.5"><span className="text-lg">🕊️</span> 사망 상세</h4>
+                    <h4 className="text-[12px] font-black text-[#d93025] flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V11"/><path d="M5 3a7 7 0 0 0 7 7 7 7 0 0 0 7-7"/></svg>
+                      사망 상세
+                    </h4>
                     <div>
                       <label className="block text-[11px] font-bold text-gray-500 mb-1">사고 당시 만 나이</label>
                       <input type="number" value={data.ageAtAccident || ''} onChange={e => handleChange('ageAtAccident', Number(e.target.value))} className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-2.5 px-3 text-[14px] font-bold focus:ring-2 focus:ring-[#d93025]" />
@@ -293,7 +334,9 @@ export default function AutoCalculator() {
           {/* 추가 비용 */}
           <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-white/5 transition-all">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center text-lg">💊</div>
+              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7z"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/></svg>
+              </div>
               <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">기타 추가 비용</h3>
             </div>
             <div className="space-y-4">
@@ -318,7 +361,9 @@ export default function AutoCalculator() {
         {/* ── 우측: 세련된 결과 명세서 패널 (7열, 스티키 고정) ── */}
         <div className="lg:col-span-7 lg:sticky lg:top-[100px] flex flex-col gap-5">
           <div className="bg-[#f8f9fa] dark:bg-[#2d2d2d] rounded-none px-6 py-5 border border-gray-100 dark:border-white/5 flex items-center gap-3">
-            <span className="text-2xl">📑</span>
+            <span className="flex items-center text-gray-500">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </span>
             <div>
               <h2 className="text-base font-extrabold text-gray-900 dark:text-white">자동차사고 합의금 명세서</h2>
               <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">입력하신 정보를 바탕으로 산출된 예상 합의금 내역입니다.</p>
@@ -438,23 +483,25 @@ export default function AutoCalculator() {
           </div>
 
           <div className="bg-[#fce8e6]/80 dark:bg-[#d93025]/10 rounded-none p-4 border border-[#d93025]/20 flex gap-3 text-[12px] leading-relaxed text-[#d93025] dark:text-[#f28b82] font-semibold shadow-sm">
-            <span className="shrink-0 text-base mt-0.5">⚠️</span>
+            <span className="shrink-0 mt-0.5 flex items-center text-[#d93025]">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </span>
             <p>위 결과는 <strong>보험회사 약관 기준</strong> 참고용입니다. 실제 소송 기준(특인) 적용 시 수천만 원 이상 증액될 수 있으므로 합의 전 보상 전문가와 상담하세요.</p>
           </div>
 
           <div className="flex flex-col gap-2 mt-2">
             <button onClick={() => { document.getElementById('chat-floating-btn')?.click(); }} className="flex items-center justify-center w-full gap-2 py-4 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-none font-bold text-[14px] sm:text-[15px] transition-all shadow-sm hover:shadow-md" id="auto-calc-chat-btn">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              <AppIcon name="chat" size={20} />
               보상스쿨 1:1 무료 상담 신청하기
             </button>
             
             <div className="grid grid-cols-2 gap-2">
               <button onClick={() => shareResult('자동차', result.finalTotal)} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#1a73e8] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#8ab4f8] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
-                <svg className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                <AppIcon name="link" size={16} className="group-hover:-translate-y-0.5 transition-transform" />
                 결과 공유하기
               </button>
               <button onClick={() => exportPDF('보상스쿨_자동차사고_예상합의금.pdf')} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#202124] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#e8eaed] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
-                <svg className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <AppIcon name="file-text" size={16} className="group-hover:translate-y-0.5 transition-transform" />
                 PDF 다운로드
               </button>
             </div>

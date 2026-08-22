@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import MarkdownRenderer from './MarkdownRenderer';
 import CommonBox from './CommonBox';
+import AppIcon from '@/components/ui/AppIcon';
 
 interface FAQItem {
   q: string;
@@ -16,11 +17,7 @@ interface FAQBoxProps {
 export default function FAQBox({ items }: FAQBoxProps) {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
-  const icon = (
-    <svg className="w-4 h-4 text-[var(--google-blue)] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
-  );
+  const icon = <AppIcon name="chat" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />;
 
   return (
     <CommonBox tone="blue" title="자주 묻는 질문 (FAQ)" icon={icon}>

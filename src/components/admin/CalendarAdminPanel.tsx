@@ -7,6 +7,7 @@ import AdminPanelLayout from './AdminPanelLayout';
 import { AdminHeaderBar } from './AdminHeader';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';
+import AppIcon from '@/components/ui/AppIcon';
 
 export interface ClaimsProgressEntry {
   id: string;
@@ -536,7 +537,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
           {/* 캘린더 네비게이션 헤더 (CommonBox 스타일) */}
           <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0 sticky top-0 z-10">
             <div className="flex items-center gap-2.5">
-              <span className="text-base leading-none">📅</span>
+              <AppIcon name="calendar" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />
               <h2 className="text-xs sm:text-sm font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] flex items-center gap-1.5">
                 <span>{currentYear}년 {currentMonth + 1}월</span>
               </h2>
@@ -554,14 +555,14 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                 className="w-7 h-7 rounded-none flex items-center justify-center bg-white dark:bg-zinc-800 border border-blue-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs text-xs"
                 title="이전 달"
               >
-                ◀
+                <AppIcon name="chevron-left" size={12} />
               </button>
               <button
                 onClick={handleNextMonth}
                 className="w-7 h-7 rounded-none flex items-center justify-center bg-white dark:bg-zinc-800 border border-blue-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs text-xs"
                 title="다음 달"
               >
-                ▶
+                <AppIcon name="chevron-right" size={12} />
               </button>
             </div>
           </div>
@@ -641,10 +642,9 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
         </div>
       </PremiumCard>
 
-      {/* ── 🏝️ 2. 우측: 손해사정 실무 표준 대장 & 날짜별 진행일지 카드 아일랜드 ── */}
       <PremiumCard borderColor="blue" hoverEffect={false} className="w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80">
         <AdminHeaderBar 
-          emoji="📑"
+          icon={<AppIcon name="file-text" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />}
           tone="blue"
           title={
             <div className="flex items-center gap-1.5">
@@ -673,7 +673,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
               }}
               className="px-2.5 py-1 text-[11px] font-bold bg-[var(--google-blue)] hover:bg-blue-700 text-white rounded-none transition-all shadow-sm flex items-center gap-1"
             >
-              <span>➕</span> 신규 등록
+              <AppIcon name="plus" size={12} /> 신규 등록
             </button>
           }
         />
@@ -683,8 +683,8 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
           {isLoading ? (
             <div className="p-8 text-center text-sm text-gray-400">대장 데이터를 불러오는 중...</div>
           ) : selectedDateEvents.length === 0 ? (
-            <div className="p-12 text-center text-gray-400 space-y-3">
-              <div className="text-3xl">☕</div>
+            <div className="p-12 text-center text-gray-400 space-y-3 flex flex-col items-center">
+              <AppIcon name="coffee" size={32} className="text-gray-300 dark:text-zinc-700" />
               <p className="text-xs font-medium leading-relaxed">
                 이 날짜에 등록된 손해사정 대장이 없습니다.<br/>
                 상단의 <b>[+ 신규 대장 등록]</b> 버튼을 눌러보세요.
@@ -730,17 +730,17 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                           });
                           setIsModalOpen(true);
                         }}
-                        className="text-xs text-gray-400 hover:text-blue-600 p-1 font-bold"
+                        className="text-xs text-gray-400 hover:text-blue-600 p-1 font-bold flex items-center gap-1"
                         title="대장 수정 / 날짜 이동"
                       >
-                        ✏️ 수정
+                        <AppIcon name="edit" size={12} /> 수정
                       </button>
                       <button
                         onClick={() => handleDeleteEvent(ev.id)}
                         className="text-xs text-gray-400 hover:text-red-500 p-1"
                         title="삭제"
                       >
-                        🗑️
+                        <AppIcon name="trash" size={13} />
                       </button>
                     </div>
                   </div>
@@ -752,8 +752,8 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     </h3>
                     <div className="flex items-center gap-2 mt-1 text-xs text-gray-600 dark:text-gray-300">
                       {ledger.phone && (
-                        <span className="font-mono font-bold text-blue-600 dark:text-blue-400">
-                          📞 {ledger.phone}
+                        <span className="font-mono font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                          <AppIcon name="phone" size={12} /> {ledger.phone}
                         </span>
                       )}
                       {ledger.accidentType && (
@@ -774,7 +774,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     onClick={() => setExpandedLedgerIds(prev => ({ ...prev, [ev.id]: !prev[ev.id] }))}
                     className="w-full py-1 px-2.5 bg-gray-50 dark:bg-zinc-950 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-none border border-gray-200/80 dark:border-zinc-800 flex items-center justify-between transition-colors shadow-2xs"
                   >
-                    <span>📑 실무 대장 상세 정보</span>
+                    <span className="flex items-center gap-1.5"><AppIcon name="file-text" size={12} /> 실무 대장 상세 정보</span>
                     <span>{isExpanded ? '▲ 접기' : '▼ 펼치기'}</span>
                   </button>
 
@@ -803,7 +803,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   {/* ────────────────────────────────────────── */}
                   <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 space-y-2">
                     <div className="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
-                      <span>📌</span>
+                      <AppIcon name="pin" size={13} className="text-blue-600" />
                       <span>날짜별 진행사항 (업무일지)</span>
                     </div>
 
@@ -903,9 +903,9 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   {ev.sourceApp && (
                     <button
                       onClick={() => handleJumpToSource(ev)}
-                      className="w-full py-1 px-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-none transition-colors flex items-center justify-center gap-1 border border-blue-200 dark:border-blue-800"
+                      className="w-full py-1 px-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-none transition-colors flex items-center justify-center gap-1.5 border border-blue-200 dark:border-blue-800"
                     >
-                      <span>🔗</span>
+                      <AppIcon name="link" size={12} />
                       <span>{ev.sourceApp === 'consultations' ? '원본 상담 접수내역 보기' : '채팅방 바로가기'}</span>
                     </button>
                   )}
@@ -923,7 +923,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
             
             <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
               <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <span>📑</span>
+                <AppIcon name="file-text" size={16} className="text-blue-600" />
                 <span>{editingEventId ? '손해사정 대장 수정 / 다음 예정일 이동' : '신규 손해사정 대장 등록'}</span>
               </h3>
               <button
@@ -963,8 +963,9 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
               {/* 2. 업무예정일(캘린더 날짜) 및 시간 */}
               <div className="p-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-none border border-blue-100 dark:border-blue-900/40 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-blue-900 dark:text-blue-300 mb-1">
-                    📅 업무 예정일 (캘린더 등록일)
+                  <label className="block font-bold text-blue-900 dark:text-blue-300 mb-1 flex items-center gap-1.5">
+                    <AppIcon name="calendar" size={13} />
+                    업무 예정일 (캘린더 등록일)
                   </label>
                   <input
                     type="date"
@@ -989,7 +990,10 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
 
               {/* 3. 사고 및 보험 정보 */}
               <div className="p-3 bg-gray-50 dark:bg-zinc-950 rounded-none border border-gray-200 dark:border-zinc-800 space-y-2.5">
-                <div className="font-bold text-gray-800 dark:text-gray-200 text-xs">🚗 사고 및 보험 정보</div>
+                <div className="font-bold text-gray-800 dark:text-gray-200 text-xs flex items-center gap-1.5">
+                  <AppIcon name="car" size={14} className="text-blue-600" />
+                  사고 및 보험 정보
+                </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   <div>
@@ -1044,7 +1048,10 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
 
               {/* 4. 의료 및 병력 정보 */}
               <div className="p-3 bg-gray-50 dark:bg-zinc-950 rounded-none border border-gray-200 dark:border-zinc-800 space-y-2.5">
-                <div className="font-bold text-gray-800 dark:text-gray-200 text-xs">🏥 의료 및 치료 정보</div>
+                <div className="font-bold text-gray-800 dark:text-gray-200 text-xs flex items-center gap-1.5">
+                  <AppIcon name="hospital" size={14} className="text-green-600" />
+                  의료 및 치료 정보
+                </div>
                 
                 <div>
                   <label className="block text-gray-500 text-[11px] mb-1">진단병명</label>

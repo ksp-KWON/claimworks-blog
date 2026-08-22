@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createPortal } from 'react-dom';
+import AppIcon from '@/components/ui/AppIcon';
 
 export default function SearchBar() {
   const [query, setQuery] = useState('');
@@ -26,7 +27,7 @@ export default function SearchBar() {
         aria-label="검색 열기"
         title="검색"
       >
-        <svg className="w-5 h-5 sm:w-[22px] sm:h-[22px] group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <AppIcon name="search" size={20} className="group-hover:-translate-y-0.5 transition-transform" />
       </button>
 
       {/* Full Screen Search Modal */}
@@ -38,7 +39,7 @@ export default function SearchBar() {
                 onClick={() => setIsOpen(false)} 
                 className="p-2 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors mr-2"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+                <AppIcon name="chevron-left" size={24} />
               </button>
               <form onSubmit={handleSearch} className="flex-1 relative flex items-center">
                 <input
@@ -51,7 +52,7 @@ export default function SearchBar() {
                 />
                 {query && (
                   <button type="button" onClick={() => setQuery('')} className="absolute right-4 text-[#5f6368] hover:text-[#202124] dark:hover:text-white transition-colors">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <AppIcon name="close" size={20} />
                   </button>
                 )}
                 {/* 모바일 키보드에서 '검색' 버튼 처리를 위한 숨김 서브밋 버튼 추가 */}
@@ -67,7 +68,7 @@ export default function SearchBar() {
             
             <div className="p-6 sm:px-12 flex-1">
               <p className="text-sm font-bold text-[#5f6368] dark:text-[#9aa0a6] mb-4 flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                <AppIcon name="trending-up" size={16} />
                 인기 검색 키워드
               </p>
               <div className="flex flex-wrap gap-2.5 sm:gap-3">

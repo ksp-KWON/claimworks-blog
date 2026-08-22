@@ -506,9 +506,11 @@ export default function PrecedentSearchPage() {
         </div>
       )}
 
-      {/* ⚠️ 법률 면책 고지 배너 */}
+      {/* 법률 면책 고지 배너 */}
       <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-3.5 rounded-none flex items-start gap-2.5 text-xs font-semibold leading-relaxed shadow-sm mt-8">
-        <span className="text-base shrink-0 mt-0.5">⚠️</span>
+        <span className="shrink-0 mt-0.5 flex items-center">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </span>
         <span>본 검색 시스템은 공공 API를 바탕으로 한 참고 정보이며, 어떠한 법률 자문도 대행하지 않습니다. 실제 지급 거절 등의 사안은 전문 손해사정사와 직접 상담하십시오.</span>
       </div>
     </div>

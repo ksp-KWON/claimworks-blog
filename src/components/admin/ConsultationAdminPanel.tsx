@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import type { Consultation } from '@/lib/supabase';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import AppIcon from '@/components/ui/AppIcon';
 import { AdminStatusSelect } from './AdminStatusSelect';
 import AdminPanelLayout from './AdminPanelLayout';
 import { AdminTableHeader } from './AdminHeader';
@@ -173,14 +174,12 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
     if (!activeConsultation) return null;
     return (
       <div className="bg-gradient-to-b from-blue-50/30 to-transparent dark:from-blue-950/20 dark:to-transparent p-3 sm:p-4 border-b border-gray-200/80 dark:border-zinc-800 animate-in slide-in-from-top-2 fade-in duration-200 w-full" onClick={e => e.stopPropagation()}>
-        {/* 50:50 완벽한 대칭 균등 분할 그리드 (CommonBox 스타일) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
-          {/* 좌측: 사고 상세 내용 박스 */}
           <div className="bg-white dark:bg-[#202124] border border-blue-200/80 dark:border-blue-900/50 rounded-none shadow-sm flex flex-col justify-between overflow-hidden">
             <div>
               <div className="px-4 py-2.5 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100 dark:border-blue-900/30 flex justify-between items-center">
                 <span className="text-xs font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] flex items-center gap-1.5">
-                  <span className="text-sm leading-none">🚗</span>
+                  <AppIcon name="car" size={14} className="text-[var(--google-blue)]" />
                   <span>사고 상세 내용</span>
                 </span>
                 <button
@@ -199,7 +198,7 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
                   className="flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800 hover:bg-blue-50 transition-colors shadow-2xs"
                   title="캘린더 일정으로 보내기"
                 >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  <AppIcon name="calendar" size={12} />
                   <span>일정 등록</span>
                 </button>
               </div>
@@ -209,12 +208,11 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
             </div>
           </div>
           
-          {/* 우측: 문의 및 요청사항 박스 */}
           <div className="bg-white dark:bg-[#202124] border border-purple-200/80 dark:border-purple-900/50 rounded-none shadow-sm flex flex-col justify-between overflow-hidden">
             <div>
               <div className="px-4 py-2.5 bg-gradient-to-r from-purple-50/80 to-transparent dark:from-purple-900/20 dark:to-transparent border-b border-purple-100 dark:border-purple-900/30 flex justify-between items-center">
                 <span className="text-xs font-extrabold text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
-                  <span className="text-sm leading-none">💬</span>
+                  <AppIcon name="chat" size={14} className="text-purple-600" />
                   <span>문의 및 요청사항</span>
                 </span>
               </div>
@@ -250,10 +248,9 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
 
   return (
     <AdminPanelLayout innerClassName="space-y-2.5">
-      {/* 🏝️ 1. 상단 상태 요약 카드 아일랜드 (CommonBox 스타일) */}
-      <PremiumCard borderColor="blue" hoverEffect={true} watermarkEmoji="📋" className="!p-3 shrink-0 flex flex-wrap items-center justify-between gap-2.5">
+      <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="file-text" className="!p-3 shrink-0 flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2">
-          <span className="text-base leading-none">📋</span>
+          <AppIcon name="file-text" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />
           <span className="text-xs sm:text-sm font-extrabold text-gray-900 dark:text-white">
             실시간 상담 접수 현황
           </span>

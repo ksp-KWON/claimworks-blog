@@ -64,8 +64,13 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
                 href={`/regions/${encodeURIComponent(decodedSido)}/${encodeURIComponent(gugun)}`} 
                 className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-white dark:bg-[#303134] rounded-none border border-gray-200 dark:border-gray-700 shadow-[0_4px_15px_rgba(0,0,0,0.03)] hover:shadow-[4px_8px_20px_rgba(52,168,83,0.15)] hover:border-[var(--google-green)] hover:-translate-y-1 transition-all duration-300"
               >
-                <div className="w-12 h-12 flex items-center justify-center text-xl text-green-600 bg-green-50 dark:bg-green-900/20 rounded-none mb-3 group-hover:scale-110 group-hover:bg-[var(--google-green)] group-hover:text-white transition-all duration-300">
-                  🏥
+                <div className="w-12 h-12 flex items-center justify-center text-green-600 bg-green-50 dark:bg-green-900/20 rounded-none mb-3 group-hover:scale-110 group-hover:bg-[var(--google-green)] group-hover:text-white transition-all duration-300">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 22V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16" />
+                    <line x1="12" y1="10" x2="12" y2="14" />
+                    <line x1="10" y1="12" x2="14" y2="12" />
+                    <line x1="3" y1="22" x2="21" y2="22" />
+                  </svg>
                 </div>
                 <h3 className="text-sm font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-[var(--google-green)] transition-colors text-center">{gugun}</h3>
               </Link>

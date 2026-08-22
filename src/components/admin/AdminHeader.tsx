@@ -39,6 +39,7 @@ interface AdminHeaderBarProps {
   className?: string;
   tone?: 'blue' | 'red' | 'green' | 'yellow' | 'purple';
   emoji?: string;
+  icon?: React.ReactNode;
 }
 
 export function AdminHeaderBar({ 
@@ -47,7 +48,8 @@ export function AdminHeaderBar({
   action, 
   className = '',
   tone = 'blue',
-  emoji
+  emoji,
+  icon
 }: AdminHeaderBarProps) {
   const finalAction = action || rightContent;
   
@@ -70,7 +72,8 @@ export function AdminHeaderBar({
   return (
     <div className={`h-[48px] px-4 sm:px-5 flex justify-between items-center z-10 bg-gradient-to-r ${toneGradients[tone]} border-b shrink-0 ${className}`}>
       <div className="flex items-center gap-2 min-w-0">
-        {emoji && <span className="text-base leading-none shrink-0">{emoji}</span>}
+        {icon && <span className="shrink-0 flex items-center">{icon}</span>}
+        {!icon && emoji && <span className="text-base leading-none shrink-0">{emoji}</span>}
         {typeof title === 'string' ? (
           <span className={`font-extrabold text-xs sm:text-sm tracking-tight truncate ${titleColors[tone]}`}>
             {title}

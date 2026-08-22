@@ -325,7 +325,7 @@ export default function TrafficCarePage() {
       {/* 🚗 교통사고 로컬 안심케어 센터 상단 띠 배너 */}
       <div className="bg-[#137333] text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3 rounded-t-none">
         <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          <span className="text-lg shrink-0">🚗</span>
+          <span className="shrink-0 flex items-center"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17H5m14 0a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2m14 0v2m-14-2v2M7 11h2m6 0h2" /><circle cx="7.5" cy="17" r="1.5" /><circle cx="16.5" cy="17" r="1.5" /></svg></span>
           <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
             <span className="underline decoration-wavy mr-1.5">[지역 안내]</span>
             도로교통공단 안전 통계와 우수 추천 병원, 보상 지식을 통합 안내해 드립니다.
@@ -399,7 +399,7 @@ export default function TrafficCarePage() {
       {/* 에러 피드백 */}
       {error && !loading && (
         <div className="bg-white dark:bg-[#202124] rounded-none py-12 px-5 border border-gray-100 dark:border-white/5 shadow-sm text-center font-bold text-sm text-rose-600 dark:text-rose-400">
-          ⚠️ {error}
+          <span className="flex items-center justify-center gap-1.5"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>{error}</span></span>
         </div>
       )}
 
@@ -408,7 +408,7 @@ export default function TrafficCarePage() {
         <div className="space-y-6">
           <h2 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] border-b border-gray-100 dark:border-white/5 pb-2 flex justify-between items-center">
             <span className="text-[#137333] dark:text-[#81c995] font-extrabold">
-              📍 {loadedGugun} 실시간 교통사고 다발 위험 분석 리포트
+              {loadedGugun} 실시간 교통사고 다발 위험 분석 리포트
             </span>
             <span className="text-[10px] text-gray-400 font-medium">
               실시간 공공 데이터
@@ -418,12 +418,12 @@ export default function TrafficCarePage() {
           {/* 데이터 출처 안내 배너 */}
           {activeZone.isSafeZone ? (
             <div className="flex items-start gap-2.5 px-4 py-3 rounded-none bg-blue-50 dark:bg-blue-950/15 border border-blue-200/50 dark:border-blue-700/30 text-xs text-blue-700 dark:text-blue-400 font-semibold leading-relaxed">
-              <span className="shrink-0 mt-0.5">🛡️</span>
+              <span className="shrink-0 mt-0.5 flex items-center"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
               <span>선택하신 <strong>{loadedGugun} 전역</strong>은 최근 3개년 동안 도로교통공단 지정 법규위반 및 보행사고 다발지역 이력이 존재하지 않는 안심 관리 구역입니다.</span>
             </div>
           ) : (
             <div className="flex items-start gap-2.5 px-4 py-3 rounded-none bg-green-50 dark:bg-green-950/15 border border-green-200/50 dark:border-green-700/30 text-xs text-[#137333] dark:text-[#81c995] font-semibold leading-relaxed">
-              <span className="shrink-0 mt-0.5">✅</span>
+              <span className="shrink-0 mt-0.5 flex items-center"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
               <span><strong>도로교통공단(TAAS) 실시간 공식 데이터</strong>를 기반으로 합니다. 지도 핀포인트는 실제 교통사고 다발 지점의 공식 GPS 좌표입니다.</span>
             </div>
           )}
@@ -435,7 +435,7 @@ export default function TrafficCarePage() {
             {!activeZone.isSafeZone && (
               <div className="bg-green-50/10 dark:bg-green-950/5 p-4.5 rounded-none border border-green-100/20 dark:border-white/5 space-y-2">
                 <label className="block text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">
-                  ⚠️ 위험 다발 구역 선택 (교차로별 위험 순위 Top {zones.length})
+                  위험 다발 구역 선택 (교차로별 위험 순위 Top {zones.length})
                 </label>
                 <div className="relative">
                   <select
@@ -463,7 +463,7 @@ export default function TrafficCarePage() {
               {activeZone.isSafeZone ? (
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 text-[10px] font-bold border border-blue-100/30 flex items-center gap-1">
-                    🛡️ 교통사고 안심 행정구역
+                    교통사고 안심 행정구역
                   </span>
                   <span className="px-2.5 py-1 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-bold border border-green-100/30">
                     다발위험지 0개소
@@ -561,7 +561,7 @@ export default function TrafficCarePage() {
                               : 'bg-white dark:bg-[#303134] text-gray-500 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5'
                           }`}
                         >
-                          <span>🌙</span> 주말진료
+                          <span className="flex items-center gap-1"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span>주말진료</span></span>
                         </button>
                         <button
                           onClick={() => setOnlyEmergency(!onlyEmergency)}
@@ -571,7 +571,7 @@ export default function TrafficCarePage() {
                               : 'bg-white dark:bg-[#303134] text-gray-500 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5'
                           }`}
                         >
-                          <span>🏥</span> 대형병원
+                          <span className="flex items-center gap-1"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>대형병원</span></span>
                         </button>
                       </div>
                     </div>
@@ -668,7 +668,7 @@ export default function TrafficCarePage() {
                     rel="noopener noreferrer"
                     className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer border border-gray-200/40 dark:border-white/5"
                   >
-                    📖 사고원인 맞춤 칼럼 읽기 (1건)
+                    사고원인 맞춤 칼럼 읽기 (1건)
                   </Link>
                 ) : (
                   <Link
@@ -677,7 +677,7 @@ export default function TrafficCarePage() {
                     rel="noopener noreferrer"
                     className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer border border-gray-200/40 dark:border-white/5"
                   >
-                    📖 보상스쿨 전체 칼럼 읽기
+                    보상스쿨 전체 칼럼 읽기
                   </Link>
                 );
               })()}
@@ -686,7 +686,7 @@ export default function TrafficCarePage() {
                 onClick={(e) => { e.preventDefault(); openChat(); }}
                 className="flex-1 text-center py-2.5 bg-[#137333] hover:bg-[#0b6623] text-white text-xs font-bold rounded-none shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                💬 내 과실·보상 무료 상담 (실시간 채팅)
+                내 과실·보상 무료 상담 (실시간 채팅)
               </a>
             </div>
           </article>

@@ -8,6 +8,7 @@ import { AdminHeaderBar } from './AdminHeader';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import { AdminStatusSelect } from './AdminStatusSelect';
+import AppIcon from '@/components/ui/AppIcon';
 
 interface SessionWithMeta extends ChatSession {
   last_content?: string;
@@ -322,7 +323,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
       >
         <AdminHeaderBar 
           title="실시간 상담 채팅" 
-          emoji="💬"
+          icon={<AppIcon name="chat" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />}
           tone="blue"
           rightContent={<span className="text-[11px] text-[var(--google-blue)] dark:text-[#8ab4f8] font-bold bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800">{sortedAndFilteredSessions.length}건</span>} 
         />

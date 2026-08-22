@@ -6,6 +6,7 @@ import { getUniversalAnalyticsData } from '@/lib/analytics/universal-analytics';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
+import AppIcon from '@/components/ui/AppIcon';
 import AdminPanelLayout from './AdminPanelLayout';
 
 export default function AnalyticsDashboardPanel() {
@@ -67,10 +68,10 @@ export default function AnalyticsDashboardPanel() {
 
   return (
     <AdminPanelLayout innerClassName="space-y-2.5">
-      {/* 👑 1열(1 Row) 3D 입체 직사각형 상단 컨트롤 바 */}
+      {/* 1열(1 Row) 3D 입체 직사각형 상단 컨트롤 바 */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 shrink-0">
         {/* 1. 고유 방문자 */}
-        <PremiumCard borderColor="blue" hoverEffect={true} watermarkEmoji="👥" className="!p-3 flex flex-col justify-between">
+        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="users" className="!p-3 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">순 방문자수</span>
             <span className="w-1.5 h-1.5 rounded-none bg-[var(--google-blue)] dark:bg-[#8ab4f8]" />
@@ -81,7 +82,7 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 2. 총 페이지뷰 */}
-        <PremiumCard borderColor="green" hoverEffect={true} watermarkEmoji="📊" className="!p-3 flex flex-col justify-between">
+        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="chart" className="!p-3 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">총 조회수</span>
             <span className="w-1.5 h-1.5 rounded-none bg-[var(--google-green)] dark:text-[#81c995]" />
@@ -92,7 +93,7 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 3. 상담 유입 */}
-        <PremiumCard borderColor="purple" hoverEffect={true} watermarkEmoji="📞" className="!p-3 flex flex-col justify-between">
+        <PremiumCard borderColor="purple" hoverEffect={true} watermarkIcon="phone" className="!p-3 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">상담 유입 건수</span>
             <span className="w-1.5 h-1.5 rounded-none bg-purple-500" />
@@ -103,7 +104,7 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 4. 응답 속도 */}
-        <PremiumCard borderColor="yellow" hoverEffect={true} watermarkEmoji="⚡" className="!p-3 flex flex-col justify-between">
+        <PremiumCard borderColor="yellow" hoverEffect={true} watermarkIcon="zap" className="!p-3 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">평균 응답 속도</span>
             <span className="w-1.5 h-1.5 rounded-none bg-amber-500" />
@@ -237,10 +238,10 @@ export default function AnalyticsDashboardPanel() {
       {/* ── 2. 방문 추이 그래프 & 검색/유입 채널 ───────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 shrink-0">
         {/* 1. 방문 추이 그래프 (2칸) */}
-        <PremiumCard borderColor="blue" hoverEffect={true} watermarkEmoji="📈" className="lg:col-span-2 !p-0 flex flex-col justify-between">
+        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="trending-up" className="lg:col-span-2 !p-0 flex flex-col justify-between">
           <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
-              <span className="text-base leading-none">📈</span>
+              <AppIcon name="trending-up" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />
               <span className="font-extrabold text-xs sm:text-sm text-[var(--google-blue)] dark:text-[#8ab4f8]">
                 방문 추이 분석 그래프
               </span>
@@ -276,7 +277,7 @@ export default function AnalyticsDashboardPanel() {
                   return (
                     <div key={idx} className="flex-1 h-full flex flex-col justify-end items-center group/bar relative">
                       {/* 호버 시 툴팁 */}
-                      <div className="absolute -top-6 bg-gray-900 text-white dark:bg-white dark:text-zinc-900 text-[10px] font-bold py-0.5 px-1.5 rounded-none shadow-lg pointer-events-none opacity-0 group-hover/bar:opacity-100 transition-opacity z-30 whitespace-nowrap">
+                      <div className="absolute -top-6 bg-gray-900 text-white dark:bg-white dark:text-zinc-900 text-[10px] font-bold py-0.5 px-1.5 rounded-none shadow-lg pointer-events-none opacity-0 group/bar:opacity-100 transition-opacity z-30 whitespace-nowrap">
                         {t.label}: {t.requests}건 (방문자 {t.visitors}명)
                       </div>
 
@@ -326,10 +327,10 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
 
         {/* 2. 유입 채널 랭킹 (1칸) */}
-        <PremiumCard borderColor="purple" hoverEffect={true} watermarkEmoji="🧭" className="!p-0 flex flex-col justify-between">
+        <PremiumCard borderColor="purple" hoverEffect={true} watermarkIcon="compass" className="!p-0 flex flex-col justify-between">
           <div className="px-4 py-3 bg-gradient-to-r from-purple-50/80 to-transparent dark:from-purple-900/20 dark:to-transparent border-b border-purple-100/80 dark:border-purple-900/30 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
-              <span className="text-base leading-none">🧭</span>
+              <AppIcon name="compass" size={16} className="text-purple-600 dark:text-purple-400" />
               <span className="font-extrabold text-xs sm:text-sm text-purple-600 dark:text-purple-400">
                 검색 & 유입 채널
               </span>
@@ -361,10 +362,10 @@ export default function AnalyticsDashboardPanel() {
       </div>
 
       {/* ── 3. 인기 보상 칼럼 TOP 10 ───────── */}
-      <PremiumCard borderColor="blue" hoverEffect={false} watermarkEmoji="🏆" className="!p-0 flex-1 min-h-0 flex flex-col overflow-hidden">
+      <PremiumCard borderColor="blue" hoverEffect={false} watermarkIcon="award" className="!p-0 flex-1 min-h-0 flex flex-col overflow-hidden">
         <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-base leading-none">🏆</span>
+            <AppIcon name="award" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />
             <span className="font-extrabold text-xs sm:text-sm text-[var(--google-blue)] dark:text-[#8ab4f8]">
               인기 보상 칼럼 TOP 10 실시간 순위
             </span>

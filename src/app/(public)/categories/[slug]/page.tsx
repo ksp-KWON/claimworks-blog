@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getSortedPostsData } from '@/lib/posts';
 import { ALL_CATEGORIES, getCategoryBySlug, STOP_WORDS } from '@/lib/constants/categories';
+import { CATEGORY_ICONS } from '@/components/ui/CategoryIcons';
 import PostCard from '@/components/ui/PostCard';
 import Link from 'next/link';
 
@@ -99,7 +100,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
       <div className="border-b border-[var(--google-border)] pb-4 mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2">
-          <span className="text-2xl">{category.icon}</span>
+          <span className="flex items-center text-[var(--google-blue)] dark:text-[#8ab4f8]">{(() => { const I = CATEGORY_ICONS[category.slug]; return I ? <I /> : null; })()}</span>
           {category.name} 보상가이드
         </h1>
         <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-1.5">

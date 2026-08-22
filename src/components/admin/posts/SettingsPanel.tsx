@@ -4,6 +4,7 @@ import AdminPanelLayout from '../AdminPanelLayout';
 import { AdminHeaderBar } from '../AdminHeader';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumButton from '@/components/ui/PremiumButton';
+import AppIcon from '@/components/ui/AppIcon';
 
 interface SettingsPanelProps {
   geminiKey: string;
@@ -19,7 +20,8 @@ export default function SettingsPanel({ geminiKey, setGeminiKey, githubToken, se
       <AdminHeaderBar 
         title={
           <div className="flex items-center gap-2">
-            <span>⚙️ 환경 설정</span>
+            <AppIcon name="settings" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />
+            <span>환경 설정</span>
             <span className="text-[10px] md:text-xs text-gray-400 font-medium hidden sm:inline ml-2 font-normal tracking-normal">안전한 AI 연동 및 블로그 데이터 관리를 위한 자격 증명 설정입니다.</span>
           </div>
         }

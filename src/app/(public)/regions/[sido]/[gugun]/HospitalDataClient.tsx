@@ -119,7 +119,14 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
   if (!data) {
     return (
       <div className="py-20 text-center bg-white dark:bg-[#202124] rounded-none border border-gray-200 dark:border-gray-800 shadow-[0_12px_40px_rgba(0,0,0,0.15)]">
-        <div className="text-4xl mb-4">🏥</div>
+        <div className="flex items-center justify-center text-gray-400 mb-4">
+          <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 22V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16" />
+            <line x1="12" y1="10" x2="12" y2="14" />
+            <line x1="10" y1="12" x2="14" y2="12" />
+            <line x1="3" y1="22" x2="21" y2="22" />
+          </svg>
+        </div>
         <h2 className="text-xl font-extrabold text-[#202124] dark:text-[#e8eaed] mb-2">데이터 준비중</h2>
         <p className="text-[#5f6368] dark:text-[#9aa0a6] text-sm">해당 지역의 의료기관 데이터가 업데이트되고 있습니다.</p>
         <Link href={`/regions/${encodeURIComponent(sido)}`} className="mt-6 inline-block bg-black text-white px-6 py-2 font-bold text-sm hover:bg-gray-800 transition-colors">
@@ -153,19 +160,27 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
         <div className="p-6 sm:p-10 space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-5 bg-gray-50 dark:bg-[#303134] border border-gray-200 dark:border-gray-700 rounded-none shadow-[4px_4px_0px_rgba(0,0,0,0.05)]">
-              <div className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">📍 주소</div>
+              <div className="flex items-center gap-1 text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+                주소
+              </div>
               <div className="text-sm text-[#202124] dark:text-[#e8eaed] font-medium leading-relaxed">{deepLinkedHospitalData.address}</div>
             </div>
             <div className="p-5 bg-gray-50 dark:bg-[#303134] border border-gray-200 dark:border-gray-700 rounded-none shadow-[4px_4px_0px_rgba(0,0,0,0.05)]">
-              <div className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">📞 전화번호</div>
+              <div className="flex items-center gap-1 text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.5 2 2 0 0 1 3.6 1.3h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.06-.95a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                전화번호
+              </div>
               <div className="text-sm text-[#202124] dark:text-[#e8eaed] font-medium">{deepLinkedHospitalData.tel || '정보 없음'}</div>
             </div>
           </div>
 
           <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-8">
             <div className="bg-amber-50 dark:bg-amber-900/20 p-6 sm:p-8 rounded-none border border-amber-200 dark:border-amber-800 shadow-[0_8px_30px_rgba(251,191,36,0.15)] flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-white dark:bg-black rounded-full flex items-center justify-center text-2xl shadow-md mb-4 border border-amber-100 dark:border-amber-900">
-                ⚖️
+              <div className="w-16 h-16 bg-white dark:bg-black rounded-full flex items-center justify-center text-amber-600 shadow-md mb-4 border border-amber-100 dark:border-amber-900">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2v20" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
               </div>
               <h3 className="text-lg sm:text-xl font-extrabold text-[#202124] dark:text-[#e8eaed] mb-2">해당 병원 진단/보상 관련 분쟁이 있으신가요?</h3>
               <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] mb-6 font-medium leading-relaxed max-w-lg">

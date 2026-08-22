@@ -12,16 +12,17 @@ import Link from 'next/link';
 import SidebarTagMore from './SidebarTagMore';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
+import MenuCard from '@/components/ui/MenuCard';
+import AppIcon from '@/components/ui/AppIcon';
+import type { MenuThemeColor } from '@/components/ui/MenuCard';
 
 interface SidebarContentProps {
   tags?: string[];
 }
-import MenuCard from '@/components/ui/MenuCard';
-import type { MenuThemeColor } from '@/components/ui/MenuCard';
 
 interface SidebarItem {
   href: string;
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   themeColor: MenuThemeColor;
   badgeText: string;
@@ -29,10 +30,11 @@ interface SidebarItem {
   buttonText: string;
 }
 
+// ── 사이드바 6대 메뉴 — W3C 표준 AppIcon 라인 심볼 탑재 ──
 const SIDEBAR_ITEMS: SidebarItem[] = [
   {
     href: '/precedent-search',
-    icon: '⚖️',
+    icon: <AppIcon name="search" size={20} />,
     title: '빅데이터 판례검색센터',
     themeColor: 'blue',
     badgeText: '실시간 연동',
@@ -41,7 +43,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   },
   {
     href: '/fss-news',
-    icon: '🏛️',
+    icon: <AppIcon name="shield-check" size={20} />,
     title: '금감원 소비자보호센터',
     themeColor: 'red',
     badgeText: '실시간 연동',
@@ -50,7 +52,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   },
   {
     href: '/traffic-care',
-    icon: '🚗',
+    icon: <AppIcon name="car" size={20} />,
     title: '교통사고 로컬 케어',
     themeColor: 'green',
     badgeText: '지역 안내',
@@ -59,7 +61,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   },
   {
     href: '/calculator',
-    icon: '🧮',
+    icon: <AppIcon name="calculator" size={20} />,
     title: '보상금·합의금 계산기',
     themeColor: 'purple',
     badgeText: '통합 계산',
@@ -68,7 +70,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   },
   {
     href: '/regions',
-    icon: '🗺️',
+    icon: <AppIcon name="compass" size={20} />,
     title: '지역별 의료기관',
     themeColor: 'green',
     badgeText: '전국 매핑',
@@ -77,7 +79,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   },
   {
     href: '/categories',
-    icon: '📂',
+    icon: <AppIcon name="folder" size={20} />,
     title: '분야별 전문 보상 가이드',
     themeColor: 'yellow',
     badgeText: '핵심 실무',
@@ -104,14 +106,9 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
           <PremiumHeading 
             level={3} 
             gradient="red" 
-            showLeftBorder={true} 
+            showLeftBorder={false}
             className={`!mb-4 !text-sm pr-2 rounded-r-xl bg-gradient-to-r from-red-100/80 to-transparent dark:from-red-900/30 dark:to-transparent`}
-            icon={
-              <svg className="w-4 h-4 text-[var(--google-red)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
-                <line x1="7" y1="7" x2="7.01" y2="7" />
-              </svg>
-            }
+            icon={<AppIcon name="pin" size={16} className="text-[var(--google-red)]" />}
           >
             인기 키워드 태그
           </PremiumHeading>

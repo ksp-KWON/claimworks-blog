@@ -244,7 +244,7 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   };
 
   if (result.opening) {
-    result.opening = groupRelatedLinks(result.opening);
+    result.opening = groupRelatedLinks(applyBold(result.opening));
   }
   result.sections = result.sections.map(groupRelatedLinks);
 

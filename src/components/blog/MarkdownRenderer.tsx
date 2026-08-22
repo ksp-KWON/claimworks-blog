@@ -11,6 +11,7 @@ import rehypeKatex from 'rehype-katex';
 import type { Components } from 'react-markdown';
 import PremiumHeading from '../ui/PremiumHeading';
 import PremiumCard from '../ui/PremiumCard';
+import AppIcon from '../ui/AppIcon';
 
 const SCROLL_OFFSET = 140;
 
@@ -84,11 +85,21 @@ const getToneColor = (node: React.ReactNode): 'red' | 'green' | 'yellow' | 'purp
     return '';
   };
   const fullText = getText(node).trim();
-  // 보상스쿨 피드백 & 실무 인사이트는 독보적인 프리미엄 보라색(Purple) 톤 배정
+  
+  // 1. [헌법 제12조] 보상스쿨 피드백 & 실무 인사이트 -> 독보적인 프리미엄 보라색(Purple) 톤 배정
   if (/보상스쿨\s*피드백|실무\s*인사이트|실무인사이트/.test(fullText)) return 'purple';
+  
+  // 2. [헌법 제4조] 인라인 용어 사전 (> **용어명** : 설명) -> 항상 따뜻하고 명확한 노란색/앰버(Yellow) 톤 배정
+  // 용어 정의 형식인 '**용어** :' 또는 '용어명 :' 형태인 경우 항상 노란색으로 일관되게 고정
+  if (/(?:^|\n)\s*(?:\*\*[^*]+\*\*|[^\n:]+)\s*[:：]/.test(fullText) || /(?:용어\s*사전|단어\s*설명|용어\s*정의)/.test(fullText)) {
+    return 'yellow';
+  }
+  
+  // 3. 일반 인용구 톤온톤 매핑
   if (/(주의|경고|위험|금지|부지급|면책)/.test(fullText)) return 'red';
   if (/(해결|승소|지급|보상|확보)/.test(fullText)) return 'green';
   if (/(핵심|팁|포인트|체크)/.test(fullText)) return 'yellow';
+  
   return 'blue';
 };
 
@@ -197,20 +208,12 @@ export const sharedComponents: Components & Record<string, any> = {
     if (headingElement && React.isValidElement(headingElement)) {
       const headingChildren = (headingElement.props as any)?.children;
 
-      const insightSvgIcon = (
-        <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          <path d="M12 8v4" />
-          <path d="M12 16h.01" />
-        </svg>
-      );
-
       return (
         <div className={`my-8 bg-white dark:bg-[#202124] shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden group border rounded-none ${boxHoverBorders[tone]}`}>
           {/* 상단 톤온톤 헤더 바 (모던 SVG 라인 심볼 탑재) */}
           <div className={`px-5 sm:px-6 py-3 bg-gradient-to-r ${headerGradients[tone]} relative z-10`}>
             <h3 className={`text-[15.5px] font-extrabold flex items-center gap-2.5 tracking-tight !m-0 !p-0 border-0 bg-transparent ${titleColors[tone]}`}>
-              <span className="shrink-0 flex items-center">{insightSvgIcon}</span>
+              <AppIcon name="shield-alert" size={16} className={titleColors[tone]} />
               <span>{headingChildren}</span>
             </h3>
           </div>

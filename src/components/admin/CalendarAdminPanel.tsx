@@ -93,12 +93,10 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
 
   const [events, setEvents] = useState<ExtendedCalendarEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // 펼쳐진 대장 상세 카드 ID 목록 (아코디언 토글)
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [mobileTab, setMobileTab] = useState<'calendar' | 'ledger'>('calendar');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
   const [expandedLedgerIds, setExpandedLedgerIds] = useState<Record<string, boolean>>({});
-
-  // 인라인 업무일지 작성 상태 (이벤트 ID별)
   const [inlineLogInputs, setInlineLogInputs] = useState<Record<string, { tag: string; text: string }>>({});
 
   // 모달 상태
@@ -530,9 +528,35 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
   }, [events, selectedDate, searchQuery]);
 
   return (
-    <AdminPanelLayout innerClassName="flex-col md:flex-row gap-2.5 min-w-0">
+    <AdminPanelLayout innerClassName="flex-col md:flex-row gap-2.5 min-w-0 h-full">
+      {/* 모바일 전용 뷰 전환 세그먼트 탭 */}
+      <div className="md:hidden flex bg-gray-200/80 dark:bg-zinc-800 p-1 rounded-none gap-1 shrink-0">
+        <button
+          onClick={() => setMobileTab('calendar')}
+          className={`flex-1 py-2 text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+            mobileTab === 'calendar'
+              ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-sm'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+          }`}
+        >
+          <AppIcon name="calendar" size={14} />
+          <span>월간 캘린더</span>
+        </button>
+        <button
+          onClick={() => setMobileTab('ledger')}
+          className={`flex-1 py-2 text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+            mobileTab === 'ledger'
+              ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-sm'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+          }`}
+        >
+          <AppIcon name="file-text" size={14} />
+          <span>실무 대장 ({selectedDateEvents.length}건)</span>
+        </button>
+      </div>
+
       {/* ── 🏝️ 1. 좌측: 월간 캘린더 그리드 카드 아일랜드 ── */}
-      <PremiumCard borderColor="blue" hoverEffect={false} className="flex-1 min-w-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-white dark:bg-zinc-950">
+      <PremiumCard borderColor="blue" hoverEffect={false} className={`${mobileTab === 'calendar' ? 'flex' : 'hidden'} md:flex flex-1 min-w-0 min-h-0 flex-col !p-0 overflow-hidden bg-white dark:bg-zinc-950`}>
         <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-y-auto custom-scrollbar">
           {/* 캘린더 네비게이션 헤더 (CommonBox 스타일) */}
           <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0 sticky top-0 z-10">
@@ -590,7 +614,10 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
               return (
                 <div
                   key={day.dateStr}
-                  onClick={() => setSelectedDate(day.dateStr)}
+                  onClick={() => {
+                    setSelectedDate(day.dateStr);
+                    setMobileTab('ledger');
+                  }}
                   className={`min-h-[85px] md:min-h-[100px] p-1.5 md:p-2 cursor-pointer transition-all flex flex-col justify-between ${
                     isSelected 
                       ? 'bg-blue-50/70 dark:bg-blue-950/40 ring-2 ring-blue-500 ring-inset z-10' 
@@ -642,7 +669,8 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
         </div>
       </PremiumCard>
 
-      <PremiumCard borderColor="blue" hoverEffect={false} className="w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80">
+      {/* ── 🏝️ 2. 우측: 선택 일자 손해사정 실무 대장 카드 아일랜드 ── */}
+      <PremiumCard borderColor="blue" hoverEffect={false} className={`${mobileTab === 'ledger' ? 'flex' : 'hidden'} md:flex flex-1 md:flex-initial w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex-col !p-0 overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80`}>
         <AdminHeaderBar 
           icon={<AppIcon name="file-text" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />}
           tone="blue"

@@ -371,11 +371,12 @@ export default function AiWritingStudio({
       </PremiumCard>
 
       {/* ── 모바일 하단 플로팅 버튼 및 바텀시트 ── */}
-      <div className="md:hidden fixed bottom-6 right-4 z-40">
+      <div className="md:hidden fixed bottom-[80px] right-4 z-[90]">
         <button
           onClick={() => setIsMobileAiOpen(true)}
-          className="bg-[var(--google-blue)] hover:bg-blue-700 text-white rounded-none p-3.5 shadow-xl flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider"
+          className="bg-[var(--google-blue)] hover:bg-blue-700 text-white rounded-none px-4 py-3 shadow-[0_8px_30px_rgba(26,115,232,0.4)] flex items-center gap-2 text-xs font-extrabold tracking-wide active:scale-95 transition-all border border-blue-400/30"
         >
+          <AppIcon name="zap" size={16} />
           <span>AI 어시스턴트</span>
         </button>
       </div>
@@ -383,8 +384,12 @@ export default function AiWritingStudio({
       <BottomSheet
         isOpen={isMobileAiOpen}
         onClose={() => setIsMobileAiOpen(false)}
+        showBackdrop={true}
+        maxHeight="max-h-[88vh]"
+        bottomOffset="bottom-[64px]"
+        padding="p-3 pb-6"
       >
-        <div className="h-[75vh]">
+        <div className="flex-1 flex flex-col min-h-0 h-[78vh] overflow-hidden">
           {renderAiControls()}
         </div>
       </BottomSheet>

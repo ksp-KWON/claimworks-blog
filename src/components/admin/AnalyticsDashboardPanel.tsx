@@ -19,6 +19,7 @@ export default function AnalyticsDashboardPanel() {
   const [realConsultCount, setRealConsultCount] = useState<number | null>(null);
 
   const [dataSource, setDataSource] = useState<'cloudflare_live' | 'system_standard'>('system_standard');
+  const [activeTrendItem, setActiveTrendItem] = useState<{ label: string; requests: number; visitors: number; timestamp?: string } | null>(null);
 
   const [credentials, setCredentials] = useState<SystemCredentials>({
     geminiApiKey: '',
@@ -317,15 +318,23 @@ export default function AnalyticsDashboardPanel() {
               )}
             </div>
             
-            {/* 요약 통계 배지 */}
+            {/* 요약 통계 배지 또는 터치/호버 활성 시점 실시간 수치 */}
             <div className="flex items-center gap-2 text-[10.5px]">
-              <span className="text-gray-500 dark:text-zinc-400">
-                최고: <strong className="text-gray-900 dark:text-white font-mono">{Math.max(...(trend.map(d => d.requests) || [0]), 0).toLocaleString()}</strong>건
-              </span>
-              <span className="text-gray-300 dark:text-zinc-700">|</span>
-              <span className="text-gray-500 dark:text-zinc-400">
-                평균: <strong className="text-blue-600 dark:text-blue-400 font-mono">{trend.length > 0 ? Math.round(trend.reduce((a, b) => a + b.requests, 0) / trend.length).toLocaleString() : 0}</strong>건
-              </span>
+              {activeTrendItem ? (
+                <span className="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800">
+                  <strong className="text-gray-900 dark:text-white mr-1">{activeTrendItem.label}</strong>: {activeTrendItem.requests.toLocaleString()}건 (방문자 {activeTrendItem.visitors.toLocaleString()}명)
+                </span>
+              ) : (
+                <>
+                  <span className="text-gray-500 dark:text-zinc-400">
+                    최고: <strong className="text-gray-900 dark:text-white font-mono">{Math.max(...(trend.map(d => d.requests) || [0]), 0).toLocaleString()}</strong>건
+                  </span>
+                  <span className="text-gray-300 dark:text-zinc-700">|</span>
+                  <span className="text-gray-500 dark:text-zinc-400">
+                    평균: <strong className="text-blue-600 dark:text-blue-400 font-mono">{trend.length > 0 ? Math.round(trend.reduce((a, b) => a + b.requests, 0) / trend.length).toLocaleString() : 0}</strong>건
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
@@ -335,7 +344,7 @@ export default function AnalyticsDashboardPanel() {
               period === '7d' 
                 ? 'gap-2 sm:gap-4 px-2.5 sm:px-4' 
                 : period === '24h' 
-                  ? 'gap-0.5 sm:gap-1.5 px-1 sm:px-2' 
+                  ? 'gap-0.5 sm:gap-1.5 px-1.5 sm:px-3' 
                   : 'gap-[1px] sm:gap-1 px-1 sm:px-2'
             }`}>
               {trend.length > 0 ? (
@@ -343,30 +352,35 @@ export default function AnalyticsDashboardPanel() {
                   const maxReq = Math.max(...trend.map(d => d.requests), 1);
                   const heightPx = Math.max(14, Math.floor((t.requests / maxReq) * 82));
                   const isMax = t.requests === maxReq;
+                  const isHovered = activeTrendItem?.label === t.label;
 
-                  const showValueAlways = period === '7d' ? true : period === '24h' ? (idx % 2 === 0 || isMax) : (idx % 4 === 0 || isMax);
-                  const showLabelAlways = period === '7d' ? true : period === '24h' ? (idx % 3 === 0 || idx === trend.length - 1) : (idx % 5 === 0 || idx === trend.length - 1);
+                  // 24시간: 4시간 간격(0시, 4시, 8시, 12시, 16시, 20시, 마지막) 선명한 라벨
+                  // 30일: 5일 간격(5일, 10일, 15일, 20일, 25일, 마지막) 선명한 라벨
+                  // 7일: 7일 전체 선명한 라벨
+                  const showLabelAlways = period === '7d' 
+                    ? true 
+                    : period === '24h' 
+                      ? (idx % 4 === 0 || idx === trend.length - 1) 
+                      : (idx % 5 === 0 || idx === trend.length - 1);
+
+                  // 상단 수치: 7일은 전체, 24h/30d는 최고값(MAX) 또는 활성 막대
+                  const showValue = period === '7d' ? true : (isMax || isHovered);
 
                   return (
-                    <div key={idx} className="flex-1 min-w-0 h-full flex flex-col justify-end items-center group/bar relative">
-                      {/* 호버 시 툴팁 */}
-                      <div className="absolute -top-6 bg-gray-900 text-white dark:bg-white dark:text-zinc-900 text-[10px] font-bold py-0.5 px-1.5 rounded-none shadow-lg pointer-events-none opacity-0 group/bar:opacity-100 transition-opacity z-30 whitespace-nowrap">
-                        {t.label}: {t.requests}건 (방문자 {t.visitors}명)
-                      </div>
-
-                      {/* 상시 노출 수치 */}
+                    <div 
+                      key={idx} 
+                      onMouseEnter={() => setActiveTrendItem(t)}
+                      onMouseLeave={() => setActiveTrendItem(null)}
+                      onClick={() => setActiveTrendItem(prev => prev?.label === t.label ? null : t)}
+                      className="flex-1 min-w-0 h-full flex flex-col justify-end items-center group/bar relative cursor-pointer"
+                    >
+                      {/* 상시 노출 수치 (말줄임 없이 선명한 수치) */}
                       <span
-                        className={`font-mono font-bold tracking-tight mb-0.5 text-center transition-all truncate w-full px-0.5 ${
-                          isMax
-                            ? 'text-blue-600 dark:text-blue-400 font-extrabold scale-105'
-                            : 'text-gray-600 dark:text-zinc-300'
-                        } ${
-                          period === '7d'
-                            ? 'text-[11px]'
-                            : period === '24h'
-                              ? (showValueAlways ? 'text-[8px] sm:text-[8.5px]' : 'text-[8px] opacity-0 group-hover/bar:opacity-100 hidden sm:block')
-                              : (showValueAlways ? 'text-[7px] sm:text-[7.5px]' : 'text-[7px] opacity-0 group-hover/bar:opacity-100 hidden sm:block')
-                        }`}
+                        className={`font-mono font-bold tracking-tight mb-0.5 text-center transition-all whitespace-nowrap ${
+                          isMax || isHovered
+                            ? 'text-blue-600 dark:text-blue-400 font-extrabold text-[9px] sm:text-[10px] scale-105 z-20'
+                            : 'text-gray-600 dark:text-zinc-300 text-[8px]'
+                        } ${showValue ? 'opacity-100' : 'opacity-0'}`}
                       >
                         {t.requests}
                       </span>
@@ -374,19 +388,25 @@ export default function AnalyticsDashboardPanel() {
                       {/* 막대 바 */}
                       <div
                         style={{ height: `${heightPx}px` }}
-                        className={`w-full max-w-full sm:max-w-[28px] rounded-none transition-all shadow-sm group-hover/bar:brightness-125 ${
-                          isMax
-                            ? 'bg-gradient-to-t from-blue-600 to-indigo-400 dark:from-blue-500 dark:to-indigo-300 ring-1 ring-blue-400/40'
-                            : 'bg-gradient-to-t from-[var(--google-blue)] to-[#669df6] dark:from-blue-600 dark:to-blue-400'
+                        className={`w-full max-w-full sm:max-w-[28px] rounded-none transition-all shadow-sm ${
+                          isMax || isHovered
+                            ? 'bg-gradient-to-t from-blue-600 to-indigo-400 dark:from-blue-500 dark:to-indigo-300 ring-2 ring-blue-400/80 brightness-110'
+                            : 'bg-gradient-to-t from-[var(--google-blue)] to-[#669df6] dark:from-blue-600 dark:to-blue-400 group-hover/bar:brightness-110'
                         }`}
                       />
 
-                      {/* 하단 날짜/시간 라벨 */}
-                      <span className={`text-[8px] sm:text-[8.5px] text-gray-500 dark:text-zinc-400 truncate w-full text-center font-mono mt-0.5 ${
-                        showLabelAlways ? 'opacity-100' : 'opacity-40 group-hover/bar:opacity-100'
-                      }`}>
-                        {t.label}
-                      </span>
+                      {/* 하단 날짜/시간 라벨 (말줄임 없이 온전한 텍스트 + 틱 마크) */}
+                      <div className="w-full h-4 flex flex-col items-center justify-center mt-0.5">
+                        {showLabelAlways ? (
+                          <span className={`text-[8.5px] sm:text-[9px] font-mono whitespace-nowrap overflow-visible font-bold ${
+                            isHovered ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-400'
+                          }`}>
+                            {t.label}
+                          </span>
+                        ) : (
+                          <span className="w-0.5 h-1 bg-gray-300 dark:bg-zinc-700 rounded-none group-hover/bar:bg-blue-500" />
+                        )}
+                      </div>
                     </div>
                   );
                 })

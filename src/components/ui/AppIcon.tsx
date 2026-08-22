@@ -12,7 +12,7 @@ export type AppIconName =
   // 보상 & 법률 & 통계
   | 'scale' | 'shield' | 'shield-check' | 'shield-alert' | 'file-text' | 'folder'
   | 'calculator' | 'chart' | 'trending-up' | 'award' | 'zap' | 'landmark' | 'book' | 'compass' | 'flame'
-  | 'hardhat' | 'lightbulb' | 'rose'
+  | 'hardhat' | 'lightbulb' | 'rose' | 'bullhorn' | 'bank'
   // 의학 & 상해 & 신체
   | 'car' | 'hospital' | 'heart' | 'bone' | 'brain' | 'pill' | 'syringe'
   | 'bandaid' | 'crutches' | 'wheelchair' | 'stethoscope' | 'scissors' | 'eye'
@@ -490,6 +490,24 @@ const ICON_PATHS: Record<AppIconName, React.ReactNode> = {
     <>
       <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
       <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
+    </>
+  ),
+  bullhorn: (
+    <>
+      <path d="M11 5L6 9H2v6h4l5 4V5z" />
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+    </>
+  ),
+  bank: (
+    <>
+      <line x1="3" y1="21" x2="21" y2="21" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <polyline points="3 10 12 4 21 10" />
+      <line x1="5" y1="10" x2="5" y2="21" />
+      <line x1="9" y1="10" x2="9" y2="21" />
+      <line x1="15" y1="10" x2="15" y2="21" />
+      <line x1="19" y1="10" x2="19" y2="21" />
     </>
   ),
 };

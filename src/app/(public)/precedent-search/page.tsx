@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AiCommentBox from '@/components/AiCommentBox';
+import AppIcon from '@/components/ui/AppIcon';
 
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
@@ -302,7 +303,7 @@ export default function PrecedentSearchPage() {
       {/* 상단 띠 배너 */}
       <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3">
         <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          <span className="text-lg shrink-0">💡</span>
+          <AppIcon name="lightbulb" size={18} className="shrink-0 text-white" />
           <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
             <span className="underline decoration-wavy mr-1.5">[보상 트렌드]</span>
             법원의 실시간 대법원 판례 기준을 파악하면 보험사의 삭감 주장을 방어할 수 있습니다.
@@ -411,9 +412,7 @@ export default function PrecedentSearchPage() {
                     
                     {/* 우측 꺽쇠 화살표 */}
                     <div className="shrink-0 flex items-center justify-end sm:justify-center w-6 h-6 text-gray-300 group-hover:text-[var(--google-blue)] transition-colors">
-                      <svg className={`w-5 h-5 transition-transform duration-300 ${isDetailOpen ? 'rotate-180 text-[var(--google-blue)]' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                      </svg>
+                      <AppIcon name="chevron-down" size={20} className={`transition-transform duration-300 ${isDetailOpen ? 'rotate-180 text-[var(--google-blue)]' : ''}`} strokeWidth={2} />
                     </div>
                   </div>
 
@@ -430,7 +429,8 @@ export default function PrecedentSearchPage() {
                           {/* 판결 핵심 요지 */}
                           <div className="bg-blue-50/30 dark:bg-blue-950/20 p-4 rounded-none border border-blue-100/50 dark:border-blue-900/30 space-y-2">
                             <div className="flex items-center gap-1.5 text-xs font-bold text-[#1a73e8] dark:text-[#8ab4f8]">
-                              <span className="text-sm">⚖️</span> 판결 핵심 요지 및 미리보기
+                              <AppIcon name="scale" size={16} />
+                              <span>판결 핵심 요지 및 미리보기</span>
                             </div>
                             <div className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium whitespace-pre-wrap">
                               {prec.casePoints || prec.judgmentSummary || getSmartSummary('', prec.caseContent)}
@@ -451,15 +451,17 @@ export default function PrecedentSearchPage() {
                               rel="noopener noreferrer"
                               className="px-4 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 border border-gray-250 dark:border-white/10 rounded-none text-[11px] font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 w-full sm:w-auto"
                             >
-                              <span>🔗</span> 법제처 공식 원문 새창으로 열람하기
+                              <AppIcon name="external-link" size={14} />
+                              <span>법제처 공식 원문 새창으로 열람하기</span>
                             </a>
                           </div>
 
                           {/* 판결문 본문 (옵션) */}
                           {prec.caseContent && (
                             <div className="bg-gray-50/50 dark:bg-[#303134]/30 p-4 rounded-none border border-gray-200 dark:border-white/5 shadow-inner mt-4">
-                              <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-white/5 pb-2 mb-2">
-                                📜 대법원 공식 판결문 전문
+                              <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-white/5 pb-2 mb-2 flex items-center gap-1.5">
+                                <AppIcon name="file-text" size={14} />
+                                <span>대법원 공식 판결문 전문</span>
                               </div>
                               <pre className="text-[11px] text-gray-600 dark:text-gray-400 font-medium leading-relaxed max-h-[300px] overflow-y-auto whitespace-pre-wrap font-sans pr-2">
                                 {prec.caseContent}
@@ -470,16 +472,19 @@ export default function PrecedentSearchPage() {
                           {/* 액션 버튼 */}
                           <div className="flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-white/5 flex-col sm:flex-row">
                             {relatedPosts.length > 0 ? (
-                              <Link href={`/blog/${relatedPosts[0].slug}`} target="_blank" className="w-full text-center py-3 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold transition-colors cursor-pointer">
-                                📖 관련 분석 칼럼 읽기 ({relatedPosts.length}건)
+                              <Link href={`/blog/${relatedPosts[0].slug}`} target="_blank" className="w-full text-center py-3 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                                <AppIcon name="book" size={14} />
+                                <span>관련 분석 칼럼 읽기 ({relatedPosts.length}건)</span>
                               </Link>
                             ) : (
-                              <Link href="/blog" target="_blank" className="w-full text-center py-3 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold transition-colors cursor-pointer">
-                                📖 보상스쿨 전체 칼럼 읽기
+                              <Link href="/blog" target="_blank" className="w-full text-center py-3 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                                <AppIcon name="book" size={14} />
+                                <span>보상스쿨 전체 칼럼 읽기</span>
                               </Link>
                             )}
                             <button onClick={() => openChatWithContext()} className="w-full text-center py-3 bg-[var(--google-blue)] hover:bg-[#174ea6] text-white text-xs font-bold shadow-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer" id="precedent-chat-btn">
-                              💬 무료 보상 검토 신청
+                              <AppIcon name="chat" size={14} />
+                              <span>무료 보상 검토 신청</span>
                             </button>
                           </div>
                         </div>
@@ -509,7 +514,7 @@ export default function PrecedentSearchPage() {
       {/* 법률 면책 고지 배너 */}
       <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-3.5 rounded-none flex items-start gap-2.5 text-xs font-semibold leading-relaxed shadow-sm mt-8">
         <span className="shrink-0 mt-0.5 flex items-center">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <AppIcon name="warning" size={16} />
         </span>
         <span>본 검색 시스템은 공공 API를 바탕으로 한 참고 정보이며, 어떠한 법률 자문도 대행하지 않습니다. 실제 지급 거절 등의 사안은 전문 손해사정사와 직접 상담하십시오.</span>
       </div>

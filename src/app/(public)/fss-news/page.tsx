@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { cleanFssText } from '@/lib/cleaners';
+import AppIcon from '@/components/ui/AppIcon';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';
@@ -244,14 +245,14 @@ export default function FssNewsPage() {
     const cat = category === 'warn' ? 'alert' : category;
     switch (cat) {
       case 'alert':
-        return '🚨 소비자경보';
+        return '소비자경보';
       case 'case':
-        return '⚖️ 분쟁사례';
+        return '분쟁사례';
       case 'tip':
-        return '💡 금융꿀팁';
+        return '금융꿀팁';
       case 'press':
       default:
-        return '📢 보도자료';
+        return '보도자료';
     }
   };
 
@@ -259,24 +260,24 @@ export default function FssNewsPage() {
     const cat = category === 'warn' ? 'alert' : category;
     switch (cat) {
       case 'alert':
-        return '🚨 소비자경보 핵심 가이드';
+        return '소비자경보 핵심 가이드';
       case 'case':
-        return '⚖️ 분쟁사례 핵심 요지';
+        return '분쟁사례 핵심 요지';
       case 'tip':
-        return '💡 실용 금융꿀팁 요약';
+        return '실용 금융꿀팁 요약';
       case 'press':
       default:
-        return '📢 금감원 핵심 보도 요약';
+        return '금감원 핵심 보도 요약';
     }
   };
 
   return (
     <div className="space-y-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       
-      {/* 🚨 실시간 소비자 이슈 브리핑 상단 띠 배너 */}
+      {/* 실시간 소비자 이슈 브리핑 상단 띠 배너 */}
       <div className="bg-red-600 text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3 animate-pulse shadow-md">
         <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          <span className="text-lg shrink-0">🚨</span>
+          <AppIcon name="shield-alert" size={18} className="shrink-0 text-white" />
           <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
             <span className="underline decoration-wavy mr-1.5">[금감원 실시간 브리핑]</span>
             금융감독원 최신 소비자경보 및 분쟁조정 가이드라인 실시간 안내 중
@@ -318,23 +319,24 @@ export default function FssNewsPage() {
           {/* 탭 카테고리 메뉴 */}
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2 mt-4 pt-4 border-t border-gray-150 dark:border-white/10">
             {[
-              { id: 'all', label: '전체보기' },
-              { id: 'alert', label: '🚨 소비자경보' },
-              { id: 'case', label: '⚖️ 분쟁사례' },
-              { id: 'tip', label: '💡 금융꿀팁' },
-              { id: 'press', label: '📢 보도자료' },
-              { id: 'products', label: '🏦 상품 비교' }
+              { id: 'all', label: '전체보기', icon: 'list' as const },
+              { id: 'alert', label: '소비자경보', icon: 'shield-alert' as const },
+              { id: 'case', label: '분쟁사례', icon: 'scale' as const },
+              { id: 'tip', label: '금융꿀팁', icon: 'lightbulb' as const },
+              { id: 'press', label: '보도자료', icon: 'bullhorn' as const },
+              { id: 'products', label: '상품 비교', icon: 'bank' as const }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id as TabType)}
-                className={`py-2.5 rounded-none text-xs font-bold transition-all cursor-pointer truncate px-1 text-center ${
+                className={`py-2.5 rounded-none text-xs font-bold transition-all cursor-pointer truncate px-1 text-center flex items-center justify-center gap-1.5 ${
                   activeTab === tab.id
                     ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm font-black'
                     : 'bg-gray-50 text-gray-600 hover:bg-gray-150 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10'
                 }`}
               >
-                {tab.label}
+                <AppIcon name={tab.icon} size={14} />
+                <span>{tab.label}</span>
               </button>
             ))}
           </div>
@@ -348,7 +350,8 @@ export default function FssNewsPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-gray-200 dark:border-white/10">
             <h2 className="text-lg font-extrabold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2">
-              <span>🏦</span> 금융감독원 금융상품 한눈에 비교공시
+              <AppIcon name="bank" size={20} />
+              <span>금융감독원 금융상품 한눈에 비교공시</span>
             </h2>
             <div className="flex gap-1.5">
               <button
@@ -375,8 +378,9 @@ export default function FssNewsPage() {
           </div>
 
           {productMessage && (
-            <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-              ℹ️ {productMessage}
+            <div className="text-xs text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5">
+              <AppIcon name="info" size={14} />
+              <span>{productMessage}</span>
             </div>
           )}
 
@@ -432,7 +436,7 @@ export default function FssNewsPage() {
           {loading && (
             <div className="bg-white dark:bg-[#202124] rounded-none py-14 px-6 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4 animate-pulse">
               <div className="inline-block w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
-              <div className="text-sm font-bold text-[#202124] dark:text-[#e8eaed]">🏛️ 금융감독원 공식 소비자보호 데이터를 동기화 중입니다...</div>
+              <div className="text-sm font-bold text-[#202124] dark:text-[#e8eaed]">금융감독원 공식 소비자보호 데이터를 동기화 중입니다...</div>
               <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] max-w-xs mx-auto leading-relaxed">
                 금감원 최신 소비자경보 및 분쟁조정 가이드라인을 실시간으로 가져옵니다.
               </p>
@@ -463,8 +467,9 @@ export default function FssNewsPage() {
                   >
                     {/* 헤더 배지 & 날짜 */}
                     <div className="flex items-center justify-between flex-wrap gap-2">
-                      <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-none ${getCategoryBadgeClass(item.category)}`}>
-                        {getCategoryName(item.category)}
+                      <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-none flex items-center gap-1 ${getCategoryBadgeClass(item.category)}`}>
+                        <AppIcon name={item.category === 'warn' || item.category === 'alert' ? 'shield-alert' : item.category === 'case' ? 'scale' : item.category === 'tip' ? 'lightbulb' : 'bullhorn'} size={12} />
+                        <span>{getCategoryName(item.category)}</span>
                       </span>
                       <span className="text-[10px] text-gray-400 dark:text-gray-500 font-semibold">{item.date}</span>
                     </div>
@@ -477,7 +482,8 @@ export default function FssNewsPage() {
                     {/* 핵심 3줄 요약 가이드 */}
                     <div className="bg-gray-50 dark:bg-white/2 p-4 rounded-none border border-gray-200/80 dark:border-white/5 space-y-2">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
-                        {getSummaryBoxTitle(item.category || 'press')}
+                        <AppIcon name="lightbulb" size={14} />
+                        <span>{getSummaryBoxTitle(item.category || 'press')}</span>
                       </div>
                       <ul className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium space-y-1.5 list-disc pl-4">
                         {(Array.isArray(item.summary) ? item.summary : [item.summary || item.title]).map((sumLine, idx) => (
@@ -486,11 +492,11 @@ export default function FssNewsPage() {
                       </ul>
                     </div>
 
-                    {/* 👨‍🏫 보상스쿨 수석 손해사정사 실무 코멘트 (즉시 유려하게 렌더링) */}
+                    {/* 보상스쿨 수석 손해사정사 실무 코멘트 */}
                     {item.comment && (
                       <div className="bg-[#fcf8e3]/40 dark:bg-[#fcf8e3]/5 p-4 rounded-none border border-[#faebcc] dark:border-[#faebcc]/10 space-y-2">
                         <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
-                          <span>👨‍🏫</span>
+                          <AppIcon name="shield-check" size={14} />
                           <span>보상스쿨 수석 손해사정사 실무 코멘트</span>
                         </div>
                         <p className="text-xs text-gray-800 dark:text-gray-200 leading-relaxed font-medium pl-0.5">
@@ -515,8 +521,8 @@ export default function FssNewsPage() {
                           onClick={() => setExpandedCardId(expandedCardId === item.id ? null : item.id)}
                           className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-800 dark:text-gray-200 border border-gray-250 dark:border-white/10 rounded-none text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
                         >
-                          <span>📄</span>
-                          {expandedCardId === item.id ? '보도/결정문 전문 닫기' : '전문 확인 (HWP 변환)'}
+                          <AppIcon name="file-text" size={14} />
+                          <span>{expandedCardId === item.id ? '보도/결정문 전문 닫기' : '전문 확인 (HWP 변환)'}</span>
                         </button>
                       )}
                       {item.officialUrl && (
@@ -524,9 +530,10 @@ export default function FssNewsPage() {
                           href={item.officialUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 border border-gray-250 dark:border-white/10 rounded-none text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 shadow-sm text-center"
+                          className="flex-1 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 border border-gray-250 dark:border-white/10 rounded-none text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm text-center"
                         >
-                          <span>🔗</span> 금감원 원문 새창보기
+                          <AppIcon name="external-link" size={14} />
+                          <span>금감원 원문 새창보기</span>
                         </a>
                       )}
                     </div>
@@ -534,8 +541,11 @@ export default function FssNewsPage() {
                     {/* 전문 텍스트 노출 영역 */}
                     {expandedCardId === item.id && item.fullContent && (
                       <div className="bg-gray-50/50 dark:bg-[#303134]/30 p-4 sm:p-5 rounded-none border border-gray-200 dark:border-white/10 text-xs text-gray-800 dark:text-gray-200 leading-relaxed space-y-3 whitespace-pre-wrap font-medium animate-in fade-in slide-in-from-top-2 duration-200 shadow-inner">
-                        <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-white/10 pb-2 mb-2 flex justify-between">
-                          <span>📄 금융감독원 보도문/결정문 전문 (한글 HWP 대체 텍스트)</span>
+                        <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-white/10 pb-2 mb-2 flex justify-between items-center">
+                          <span className="flex items-center gap-1">
+                            <AppIcon name="file-text" size={12} />
+                            <span>금융감독원 보도문/결정문 전문 (한글 HWP 대체 텍스트)</span>
+                          </span>
                           <span>HWP 뷰어 무설치 열람 중</span>
                         </div>
                         <div className="text-xs text-gray-800 dark:text-gray-200 leading-relaxed [&>p]:mb-3 [&_a]:text-[var(--google-blue)] hover:[&_a]:underline [&_h3]:text-sm [&_h3]:font-bold [&_h3]:mt-6 [&_h3]:mb-3 [&_h3]:text-gray-900 dark:[&_h3]:text-white [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-3 [&_ul]:space-y-1.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-3 [&_ol]:space-y-1.5 [&_li]:leading-relaxed">
@@ -556,9 +566,10 @@ export default function FssNewsPage() {
                               href={`/blog/${related[0].slug}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer"
+                              className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                             >
-                              📖 관련 분석 칼럼 읽기 ({related.length}건)
+                              <AppIcon name="book" size={14} />
+                              <span>관련 분석 칼럼 읽기 ({related.length}건)</span>
                             </Link>
                           );
                         } else {
@@ -567,9 +578,10 @@ export default function FssNewsPage() {
                               href="/blog"
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer"
+                              className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                             >
-                              📖 보상스쿨 전체 칼럼 읽기
+                              <AppIcon name="book" size={14} />
+                              <span>보상스쿨 전체 칼럼 읽기</span>
                             </Link>
                           );
                         }
@@ -579,7 +591,8 @@ export default function FssNewsPage() {
                         className="flex-1 text-center py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-xs font-bold rounded-none shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                         id="fss-news-chat-btn"
                       >
-                        💬 내 보상 무료 검토 신청
+                        <AppIcon name="chat" size={14} />
+                        <span>내 보상 무료 검토 신청</span>
                       </button>
                     </div>
                   </div>

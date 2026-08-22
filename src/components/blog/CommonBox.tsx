@@ -9,7 +9,6 @@ interface CommonBoxProps {
   icon?: React.ReactNode;
   headerRight?: React.ReactNode;
   topElement?: React.ReactNode;
-  emoji?: string; // 하위 호환성 유지용 (렌더링은 배제)
 }
 
 export default function CommonBox({ tone, title, children, icon, headerRight, topElement }: CommonBoxProps) {

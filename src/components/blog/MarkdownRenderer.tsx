@@ -116,7 +116,7 @@ export const sharedComponents: Components & Record<string, any> = {
   h5: (props) => <UnifiedHeadingRenderer level={5} {...props} />,
   h6: (props) => <UnifiedHeadingRenderer level={6} {...props} />,
 
-  p: ({ children }) => <p className="mb-5 leading-[1.85] text-[#202124] dark:text-[#e8eaed] break-keep">{children}</p>,
+  p: ({ children }) => <p className="mb-6 sm:mb-8 leading-[1.85] text-[#202124] dark:text-[#e8eaed] break-keep">{children}</p>,
 
   // 헌법 제10조 웹 표준 리스트 태그 지원
   ul: ({ children }) => <ul className="list-disc ml-5 sm:ml-6 my-5 space-y-2.5 text-[15.5px] sm:text-[16px] text-gray-800 dark:text-[#e8eaed] marker:text-[#1A73E8] dark:marker:text-[#8ab4f8]">{children}</ul>,

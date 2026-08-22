@@ -75,8 +75,16 @@ export default function AnalyticsDashboardPanel() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ zoneId: zId, apiToken: token, period: targetPeriod }),
         });
-        const json = await res.json();
-        if (json.success && json.summary) {
+        
+        const rawText = await res.text();
+        let json: any = null;
+        try {
+          json = rawText ? JSON.parse(rawText) : null;
+        } catch {
+          json = null;
+        }
+
+        if (res.ok && json?.success && json?.summary) {
           const fallbackData = getUniversalAnalyticsData(targetPeriod);
           setData({
             ...fallbackData,
@@ -92,7 +100,7 @@ export default function AnalyticsDashboardPanel() {
           setLoading(false);
           return;
         } else {
-          setApiError(json.message || 'Cloudflare API 응답 오류');
+          setApiError(json?.message || `Cloudflare API 응답 오류 (${res.status}): ${rawText?.slice(0, 100) || '빈 응답'}`);
         }
       } catch (err: any) {
         setApiError(`네트워크 연결 오류: ${err?.message || '통신 실패'}`);

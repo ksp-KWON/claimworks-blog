@@ -2,10 +2,10 @@
  * functions/api/analytics.ts
  * Cloudflare Pages Functions - Cloudflare Web Analytics (RUM) 공식 표준 엔진
  * 
- * [완벽한 실측치 100% 동기화]
- * 1. 24h / 7d / 30d 순수 브라우저 방문자 수(Visits) & 페이지뷰(Page views)
- * 2. 실제 네이버/구글/다음/직접 검색 유입 채널(Referrers) 실측 점유율
- * 3. 실제 독자들이 가장 많이 읽은 인기 칼럼(Top Pages) 실측 랭킹
+ * [표준, 범용, 콤팩트, 통합 단일 원칙]
+ * 1. 24h / 7d / 30d 순수 브라우저 방문자 수(Visits) & 페이지뷰(Page views) 실측치
+ * 2. 실제 검색 유입 출처(Referrers: 네이버/구글/다음/직접) 실시간 점유율
+ * 3. 실제 독자들이 가장 많이 읽은 인기 페이지(Top Pages) 순수 경로 및 조회수 실측치
  */
 
 interface Env {
@@ -140,7 +140,7 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
         viewer {
           accounts(filter: { accountTag: $accountTag }) {
             rumPageloadEventsAdaptiveGroups(
-              limit: 15
+              limit: 20
               filter: { datetime_geq: $since, datetime_leq: $until }
               orderBy: [count_DESC]
             ) {
@@ -248,36 +248,19 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
       { source: '직접 방문 (Direct / Bookmark)', percentage: Math.round((directCount / totalRefCount) * 100) || 8 },
     ];
 
-    // ── 4. 인기 페이지(Top Pages) 실측 랭킹 매핑 ──────────────────────────────
+    // ── 4. 인기 페이지(Top Pages) 순수 경로 및 조회수 실측 데이터 ─────────────
+    // 하드코딩 if-else 없이 순수하게 실측된 경로(path)와 조회수(views)를 반환
     const rawPages = pageJson.data?.viewer?.accounts?.[0]?.rumPageloadEventsAdaptiveGroups || [];
     const topPages = rawPages
       .filter((p: any) => {
         const path = p.dimensions?.requestPath || '';
-        return path !== '/admin' && path !== '/api/analytics';
+        return path && path !== '/admin' && path !== '/api/analytics';
       })
       .slice(0, 10)
-      .map((p: any) => {
-        const path = p.dimensions?.requestPath || '';
-        let title = path;
-        if (path === '/') title = '보상스쿨 메인 홈';
-        else if (path === '/blog') title = '보상스쿨 매거진 칼럼 모아보기';
-        else if (path === '/calculator/auto') title = '교통사고 12~14급 경상환자 합의금 산정 계산기';
-        else if (path === '/consultation') title = '손해사정 1:1 온라인 보상 무료상담';
-        else if (path.includes('delivery-paid-transport')) title = '배달 라이더 유상운송사고 책임보험 보상 및 구상권 방어 가이드';
-        else if (path.includes('accidental-death')) title = '상해사망 보험금 지급 분쟁 및 질병사망 면책 반박 가이드';
-        else if (path.includes('dental-implant')) title = '임플란트 치조골 이식술 삭감 통보? 종수술비 전액 수령 가이드';
-        else if (path.includes('precedent-search')) title = '금융분쟁조정위원회 및 대법원 보상 판례 검색기';
-        else if (path.includes('fss-news')) title = '금융감독원 보상 소비자 경보 및 분쟁 보도자료';
-        else {
-          title = path.replace('/blog/', '').replace(/-/g, ' ');
-        }
-
-        return {
-          path,
-          title,
-          views: p.count || 0,
-        };
-      });
+      .map((p: any) => ({
+        path: p.dimensions?.requestPath || '',
+        views: p.count || 0,
+      }));
 
     return new Response(
       JSON.stringify({

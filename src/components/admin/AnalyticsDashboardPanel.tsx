@@ -10,6 +10,42 @@ import PremiumButton from '@/components/ui/PremiumButton';
 import AppIcon from '@/components/ui/AppIcon';
 import AdminPanelLayout from './AdminPanelLayout';
 
+const STATIC_ROUTE_MAP: Record<string, string> = {
+  '/': '보상스쿨 메인 홈',
+  '/blog': '보상스쿨 매거진 (칼럼 전체보기)',
+  '/calculator': '보상금 전역 계산기',
+  '/calculator/auto': '교통사고 12~14급 경상환자 합의금 계산기',
+  '/calculator/liability': '일상생활배상책임 손해액 계산기',
+  '/calculator/medical': '질병 진단비 및 실손 보상금 계산기',
+  '/consultation': '손해사정 1:1 온라인 보상 무료상담',
+  '/precedent-search': '금융분쟁조정위원회 및 대법원 보상 판례 검색기',
+  '/fss-news': '금융감독원 보상 소비자 경보 및 분쟁 보도자료',
+  '/about': '보상스쿨 소개 및 전문 손해사정사 소개',
+  '/chat': '보상 AI 챗봇 실시간 상담',
+  '/terms': '이용약관',
+  '/privacy': '개인정보처리방침',
+};
+
+function getPageDisplayTitle(path: string, postMap: Record<string, string>): string {
+  if (!path) return '페이지';
+  if (STATIC_ROUTE_MAP[path]) return STATIC_ROUTE_MAP[path];
+  
+  if (path.startsWith('/blog/')) {
+    const slug = path.replace('/blog/', '').split('?')[0].split('#')[0];
+    if (postMap[slug]) return postMap[slug];
+    return decodeURIComponent(slug).replace(/-/g, ' ');
+  }
+  if (path.startsWith('/categories/')) {
+    const cat = path.replace('/categories/', '').split('?')[0];
+    return `카테고리: ${decodeURIComponent(cat).replace(/-/g, ' ')}`;
+  }
+  if (path.startsWith('/regions/')) {
+    const reg = path.replace('/regions/', '').split('?')[0];
+    return `지역 보상 네트워크: ${decodeURIComponent(reg).replace(/\//g, ' ')}`;
+  }
+  return path;
+}
+
 export default function AnalyticsDashboardPanel() {
   const [period, setPeriod] = useState<'24h' | '7d' | '30d'>('7d');
   const [data, setData] = useState<UniversalAnalyticsData>(() => getUniversalAnalyticsData('7d'));
@@ -29,6 +65,8 @@ export default function AnalyticsDashboardPanel() {
     cloudflareApiToken: '',
   });
 
+  const [postTitlesMap, setPostTitlesMap] = useState<Record<string, string>>({});
+
   useEffect(() => {
     const gemini = localStorage.getItem('gemini_api_key') || '';
     const github = localStorage.getItem('github_token') || '';
@@ -41,6 +79,26 @@ export default function AnalyticsDashboardPanel() {
       cloudflareZoneId: cfZone,
       cloudflareApiToken: cfToken,
     });
+
+    // 전체 포스트 제목 인덱스 동적 로드 (Single Source of Truth)
+    async function loadPostTitles() {
+      try {
+        const res = await fetch('/api/posts');
+        if (res.ok) {
+          const posts = await res.json();
+          const map: Record<string, string> = {};
+          posts.forEach((p: any) => {
+            if (p.slug && p.title) {
+              map[p.slug] = p.title;
+            }
+          });
+          setPostTitlesMap(map);
+        }
+      } catch {
+        // 폴백 유지
+      }
+    }
+    loadPostTitles();
 
     // 실제 Supabase 상담 건수 실측치 조회
     async function fetchRealStats() {
@@ -496,35 +554,38 @@ export default function AnalyticsDashboardPanel() {
 
         <div className="divide-y divide-gray-100 dark:divide-zinc-800/60 relative z-10 bg-white dark:bg-[#202124]">
           {topPages.length > 0 ? (
-            topPages.map((page, idx) => (
-              <div key={idx} className="px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-blue-50/60 dark:hover:bg-blue-950/30 transition-all duration-200 group/row border-l-2 border-transparent hover:border-[var(--google-blue)]">
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <span className={`w-5 h-5 rounded-none flex items-center justify-center text-[10px] font-extrabold shrink-0 shadow-sm transition-transform duration-200 group-hover/row:scale-110 ${
-                    idx === 0 
-                      ? 'bg-amber-500 text-white shadow-amber-500/30' 
-                      : idx === 1 
-                        ? 'bg-slate-400 text-white shadow-slate-400/30' 
-                        : idx === 2 
-                          ? 'bg-amber-700 text-white shadow-amber-700/30' 
-                          : 'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400'
-                  }`}>
-                    {idx + 1}
-                  </span>
-                  <a
-                    href={page.path}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs sm:text-sm font-bold text-gray-800 dark:text-zinc-200 group-hover/row:text-[var(--google-blue)] dark:group-hover/row:text-[#8ab4f8] truncate transition-colors"
-                  >
-                    {page.title}
-                  </a>
+            topPages.map((page, idx) => {
+              const displayTitle = getPageDisplayTitle(page.path, postTitlesMap);
+              return (
+                <div key={idx} className="px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-blue-50/60 dark:hover:bg-blue-950/30 transition-all duration-200 group/row border-l-2 border-transparent hover:border-[var(--google-blue)]">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <span className={`w-5 h-5 rounded-none flex items-center justify-center text-[10px] font-extrabold shrink-0 shadow-sm transition-transform duration-200 group-hover/row:scale-110 ${
+                      idx === 0 
+                        ? 'bg-amber-500 text-white shadow-amber-500/30' 
+                        : idx === 1 
+                          ? 'bg-slate-400 text-white shadow-slate-400/30' 
+                          : idx === 2 
+                            ? 'bg-amber-700 text-white shadow-amber-700/30' 
+                            : 'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400'
+                    }`}>
+                      {idx + 1}
+                    </span>
+                    <a
+                      href={page.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs sm:text-sm font-bold text-gray-800 dark:text-zinc-200 group-hover/row:text-[var(--google-blue)] dark:group-hover/row:text-[#8ab4f8] truncate transition-colors"
+                    >
+                      {displayTitle}
+                    </a>
+                  </div>
+                  <div className="shrink-0 flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white font-mono bg-gray-50 dark:bg-zinc-900 px-2.5 py-1 rounded-none border border-gray-200/80 dark:border-zinc-700/80 shadow-sm group-hover/row:border-blue-300 dark:group-hover/row:border-blue-700 transition-colors">
+                    <span className="text-blue-600 dark:text-blue-400">{(page.views || 0).toLocaleString()}</span>
+                    <span className="text-gray-400 font-normal text-[10px]">회 조회</span>
+                  </div>
                 </div>
-                <div className="shrink-0 flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white font-mono bg-gray-50 dark:bg-zinc-900 px-2.5 py-1 rounded-none border border-gray-200/80 dark:border-zinc-700/80 shadow-sm group-hover/row:border-blue-300 dark:group-hover/row:border-blue-700 transition-colors">
-                  <span className="text-blue-600 dark:text-blue-400">{(page.views || 0).toLocaleString()}</span>
-                  <span className="text-gray-400 font-normal text-[10px]">회 조회</span>
-                </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="p-8 text-center text-xs text-gray-400">집계 중...</div>
           )}

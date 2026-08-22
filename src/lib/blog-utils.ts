@@ -141,10 +141,9 @@ export function parseBlogPost(content: string): ParsedBlogPost {
     // 2. 상태별 라인 처리
     if (currentSectionType === 'KEY_POINTS') {
       const cleanLine = trimmed.replace(/^[> \t]+/, '').trim();
-      if (!cleanLine) continue;
-
       const isBullet = /^[-*+]\s+/.test(cleanLine) || /^[🛡️💡✅☑️⭐]/.test(cleanLine);
-      if (isBullet && result.keyPoints.length < 3) {
+
+      if (isBullet && result.keyPoints.length < 3 && cleanLine) {
         const text = cleanLine.replace(/^[-*+]\s*/, '').replace(/^[🛡️💡✅☑️⭐]+\s*/, '').trim();
         if (text && !/^[-=_*~]{2,}$/.test(text)) {
           result.keyPoints.push(text);
@@ -152,9 +151,13 @@ export function parseBlogPost(content: string): ParsedBlogPost {
         }
       }
 
-      // 불릿이 아닌 일반 텍스트는 오프닝으로 보냄
-      if (!hasFirstHeading) {
-        currentSectionLines.push(line);
+      // 불릿이 아닌 일반 텍스트 및 빈 줄은 KEY_POINTS를 해제하고 오프닝에 온전히 보존
+      if (!isBullet) {
+        currentSectionType = 'NONE';
+        if (!hasFirstHeading) {
+          currentSectionLines.push(line);
+        }
+        continue;
       }
       continue;
     }

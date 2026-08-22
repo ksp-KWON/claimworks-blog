@@ -8,7 +8,6 @@ import { AdminHeaderBar } from './AdminHeader';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';
 import AppIcon from '@/components/ui/AppIcon';
-import BottomSheet from '@/components/ui/BottomSheet';
 
 export interface ClaimsProgressEntry {
   id: string;
@@ -95,10 +94,11 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
 
   const [events, setEvents] = useState<ExtendedCalendarEvent[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isMobileSheetOpen, setIsMobileSheetOpen] = useState<boolean>(false);
+  const [mobileTab, setMobileTab] = useState<'calendar' | 'ledger'>('calendar');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
   const [expandedLedgerIds, setExpandedLedgerIds] = useState<Record<string, boolean>>({});
   const [inlineLogInputs, setInlineLogInputs] = useState<Record<string, { tag: string; text: string }>>({});
+  const [editingLogState, setEditingLogState] = useState<{ eventId: string; logId: string; tag: string; text: string } | null>(null);
 
   // 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -478,6 +478,53 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     }
   };
 
+  // ─── 5-B. 인라인 업무일지 수정 저장 ───
+  const handleUpdateInlineLog = async (eventItem: ExtendedCalendarEvent, logId: string, newTag: string, newText: string) => {
+    if (!newText.trim()) return;
+
+    const currentLedger = eventItem.ledger || {};
+    const updatedLogs = (currentLedger.progressLogs || []).map(l => {
+      if (l.id === logId) {
+        return { ...l, tag: newTag, text: newText.trim() };
+      }
+      return l;
+    });
+
+    const updatedLedger: ClaimsLedgerData = {
+      ...currentLedger,
+      progressLogs: updatedLogs
+    };
+
+    const fullPayload = {
+      text: updatedLedger.text || eventItem.content,
+      time: eventItem.time || '10:00',
+      category: eventItem.category || '상담',
+      sourceApp: eventItem.sourceApp,
+      sourceId: eventItem.sourceId,
+      ledger: updatedLedger
+    };
+
+    setEvents(prev => {
+      const next = prev.map(e => String(e.id) === String(eventItem.id) ? { ...e, ledger: updatedLedger, content: JSON.stringify(fullPayload) } : e);
+      localStorage.setItem('local_calendar_events', JSON.stringify(next));
+      return next;
+    });
+
+    setEditingLogState(null);
+
+    try {
+      await fetch(`/api/admin-manage?table=admin_calendar_events&id=${encodeURIComponent(eventItem.id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: JSON.stringify(fullPayload)
+        })
+      });
+    } catch (err) {
+      console.warn('API log update error:', err);
+    }
+  };
+
   // ─── 6. 일정 카드 영구 삭제 (서버 API 통신) ───
   const handleDeleteEvent = async (id: string) => {
     if (!window.confirm('정말 이 손해사정 일정을 영구 삭제하시겠습니까?')) return;
@@ -506,8 +553,8 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     fetchEvents();
   };
 
-  // 단일 통합 대장 렌더러 (데스크톱 패널 & 모바일 바텀시트 공통 사용)
-  const renderLedgerContent = (isMobile = false) => (
+  // 단일 통합 대장 렌더러 (데스크톱 & 모바일 100% 공통 사용)
+  const renderLedgerContent = () => (
     <div className="flex-1 min-h-0 flex flex-col h-full overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80">
       <AdminHeaderBar 
         icon={<AppIcon name="file-text" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />}
@@ -520,40 +567,29 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
           </div>
         }
         rightContent={
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => {
-                setModalForm({
-                  date: selectedDate,
-                  time: '14:00',
-                  title: '',
-                  category: '상담',
-                  ledger: {
-                    phone: '',
-                    inflowPath: '홈페이지',
-                    accidentType: '교통사고',
-                    hasPreExisting: false,
-                    hasHospitalization: false,
-                    progressLogs: []
-                  }
-                });
-                setEditingEventId(null);
-                setIsModalOpen(true);
-              }}
-              className="px-2.5 py-1 text-[11px] font-bold bg-[var(--google-blue)] hover:bg-blue-700 text-white rounded-none transition-all shadow-sm flex items-center gap-1"
-            >
-              <AppIcon name="plus" size={12} /> 신규 등록
-            </button>
-            {isMobile && (
-              <button
-                onClick={() => setIsMobileSheetOpen(false)}
-                className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-900 dark:hover:text-white text-sm font-bold"
-                title="닫기"
-              >
-                ✕
-              </button>
-            )}
-          </div>
+          <button
+            onClick={() => {
+              setModalForm({
+                date: selectedDate,
+                time: '14:00',
+                title: '',
+                category: '상담',
+                ledger: {
+                  phone: '',
+                  inflowPath: '홈페이지',
+                  accidentType: '교통사고',
+                  hasPreExisting: false,
+                  hasHospitalization: false,
+                  progressLogs: []
+                }
+              });
+              setEditingEventId(null);
+              setIsModalOpen(true);
+            }}
+            className="px-2.5 py-1 text-[11px] font-bold bg-[var(--google-blue)] hover:bg-blue-700 text-white rounded-none transition-all shadow-sm flex items-center gap-1"
+          >
+            <AppIcon name="plus" size={12} /> 신규 등록
+          </button>
         }
       />
 
@@ -609,14 +645,15 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                         });
                         setIsModalOpen(true);
                       }}
-                      className="text-xs text-gray-400 hover:text-blue-600 p-1 font-bold flex items-center gap-1"
+                      className="text-xs text-gray-500 hover:text-blue-600 px-1.5 py-0.5 font-bold flex items-center gap-1 rounded-none hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-transparent hover:border-blue-200"
                       title="대장 수정 / 날짜 이동"
                     >
-                      <AppIcon name="edit" size={12} /> 수정
+                      <AppIcon name="edit" size={12} />
+                      <span>수정</span>
                     </button>
                     <button
                       onClick={() => handleDeleteEvent(ev.id)}
-                      className="text-xs text-gray-400 hover:text-red-500 p-1"
+                      className="text-xs text-gray-400 hover:text-red-500 p-1 rounded-none hover:bg-red-50 dark:hover:bg-red-950/40"
                       title="삭제"
                     >
                       <AppIcon name="trash" size={13} />
@@ -687,32 +724,94 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                     <div className="text-[11px] font-bold text-gray-500 flex items-center justify-between">
                       <span>진행사항 히스토리 ({ledger.progressLogs.length}건)</span>
                     </div>
-                    <div className="space-y-1 max-h-36 overflow-y-auto custom-scrollbar pr-1">
-                      {ledger.progressLogs.map(log => (
-                        <div
-                          key={log.id}
-                          className="text-[11px] p-2 bg-gray-50 dark:bg-zinc-900 rounded-none border border-gray-200/60 dark:border-zinc-800 flex items-start justify-between gap-1.5 group/log"
-                        >
-                          <div className="space-y-0.5 flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5 font-mono text-[10px] text-gray-400">
-                              <span className="font-bold text-blue-600 dark:text-blue-400 px-1 bg-blue-50 dark:bg-blue-900/30 rounded-none">
-                                {log.tag || '일반'}
-                              </span>
-                              <span>{log.date} {log.time}</span>
+                    <div className="space-y-1 max-h-48 overflow-y-auto custom-scrollbar pr-1">
+                      {ledger.progressLogs.map(log => {
+                        const isEditingThis = editingLogState?.eventId === ev.id && editingLogState?.logId === log.id;
+
+                        if (isEditingThis) {
+                          return (
+                            <div key={log.id} className="p-2 bg-blue-50/80 dark:bg-blue-950/40 rounded-none border border-blue-200 dark:border-blue-800 space-y-1.5">
+                              <div className="flex items-center gap-1.5">
+                                <select
+                                  value={editingLogState.tag}
+                                  onChange={e => setEditingLogState(prev => prev ? { ...prev, tag: e.target.value } : null)}
+                                  className="p-1 bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-700 text-[10px] font-bold rounded-none outline-none"
+                                >
+                                  <option value="통화">통화</option>
+                                  <option value="면담">면담</option>
+                                  <option value="서류">서류</option>
+                                  <option value="병원">병원</option>
+                                  <option value="절충">절충</option>
+                                  <option value="종결">종결</option>
+                                </select>
+                                <span className="font-mono text-[10px] text-gray-400">{log.date} {log.time}</span>
+                              </div>
+                              <input
+                                type="text"
+                                value={editingLogState.text}
+                                onChange={e => setEditingLogState(prev => prev ? { ...prev, text: e.target.value } : null)}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleUpdateInlineLog(ev, log.id, editingLogState.tag, editingLogState.text);
+                                  }
+                                }}
+                                className="w-full p-1.5 text-xs bg-white dark:bg-zinc-900 border border-blue-300 dark:border-blue-600 rounded-none outline-none"
+                                autoFocus
+                              />
+                              <div className="flex justify-end gap-1">
+                                <button
+                                  onClick={() => setEditingLogState(null)}
+                                  className="px-2 py-0.5 text-[10px] font-bold bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 rounded-none"
+                                >
+                                  취소
+                                </button>
+                                <button
+                                  onClick={() => handleUpdateInlineLog(ev, log.id, editingLogState.tag, editingLogState.text)}
+                                  className="px-2 py-0.5 text-[10px] font-bold bg-blue-600 text-white rounded-none shadow-2xs hover:bg-blue-700"
+                                >
+                                  저장
+                                </button>
+                              </div>
                             </div>
-                            <p className="text-gray-800 dark:text-gray-200 break-keep leading-tight font-medium">
-                              {log.text}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => handleDeleteInlineLog(ev, log.id)}
-                            className="text-gray-300 hover:text-red-500 opacity-0 group-hover/log:opacity-100 transition-opacity p-0.5"
-                            title="로그 삭제"
+                          );
+                        }
+
+                        return (
+                          <div
+                            key={log.id}
+                            className="text-[11px] p-2 bg-gray-50 dark:bg-zinc-900 rounded-none border border-gray-200/60 dark:border-zinc-800 flex items-start justify-between gap-1.5 group/log"
                           >
-                            <AppIcon name="trash" size={11} />
-                          </button>
-                        </div>
-                      ))}
+                            <div className="space-y-0.5 flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5 font-mono text-[10px] text-gray-400">
+                                <span className="font-bold text-blue-600 dark:text-blue-400 px-1 bg-blue-50 dark:bg-blue-900/30 rounded-none">
+                                  {log.tag || '일반'}
+                                </span>
+                                <span>{log.date} {log.time}</span>
+                              </div>
+                              <p className="text-gray-800 dark:text-gray-200 break-keep leading-tight font-medium">
+                                {log.text}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-0.5 shrink-0 opacity-80 group-hover/log:opacity-100">
+                              <button
+                                onClick={() => setEditingLogState({ eventId: ev.id, logId: log.id, tag: log.tag || '일반', text: log.text })}
+                                className="text-gray-400 hover:text-blue-600 p-1"
+                                title="일지 수정"
+                              >
+                                <AppIcon name="edit" size={11} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteInlineLog(ev, log.id)}
+                                className="text-gray-300 hover:text-red-500 p-1"
+                                title="일지 삭제"
+                              >
+                                <AppIcon name="trash" size={11} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -802,8 +901,34 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
 
   return (
     <AdminPanelLayout innerClassName="flex-col md:flex-row gap-2.5 min-w-0 h-full">
-      {/* ── 🏝️ 1. 월간 캘린더 그리드 카드 아일랜드 (모바일 전폭 시원한 뷰) ── */}
-      <PremiumCard borderColor="blue" hoverEffect={false} className="flex-1 min-w-0 min-h-0 flex flex-col !p-0 overflow-hidden bg-white dark:bg-zinc-950">
+      {/* 모바일 전용 뷰 전환 세그먼트 탭 (100% 풀스크린 전환) */}
+      <div className="md:hidden flex bg-gray-200/80 dark:bg-zinc-800 p-1 rounded-none gap-1 shrink-0">
+        <button
+          onClick={() => setMobileTab('calendar')}
+          className={`flex-1 py-2 text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+            mobileTab === 'calendar'
+              ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-sm'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+          }`}
+        >
+          <AppIcon name="calendar" size={14} />
+          <span>월간 달력</span>
+        </button>
+        <button
+          onClick={() => setMobileTab('ledger')}
+          className={`flex-1 py-2 text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+            mobileTab === 'ledger'
+              ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-sm'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+          }`}
+        >
+          <AppIcon name="file-text" size={14} />
+          <span>실무 대장 ({selectedDateEvents.length}건)</span>
+        </button>
+      </div>
+
+      {/* ── 🏝️ 1. 월간 캘린더 그리드 카드 아일랜드 (모바일: 100% 풀스크린) ── */}
+      <PremiumCard borderColor="blue" hoverEffect={false} className={`${mobileTab === 'calendar' ? 'flex' : 'hidden'} md:flex flex-1 min-w-0 min-h-0 flex-col !p-0 overflow-hidden bg-white dark:bg-zinc-950`}>
         <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-y-auto custom-scrollbar">
           {/* 캘린더 네비게이션 헤더 (CommonBox 스타일) */}
           <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0 sticky top-0 z-10">
@@ -863,7 +988,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   key={day.dateStr}
                   onClick={() => {
                     setSelectedDate(day.dateStr);
-                    setIsMobileSheetOpen(true);
+                    setMobileTab('ledger');
                   }}
                   className={`min-h-[85px] md:min-h-[100px] p-1.5 md:p-2 cursor-pointer transition-all flex flex-col justify-between ${
                     isSelected 
@@ -916,29 +1041,15 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
         </div>
       </PremiumCard>
 
-      {/* ── 🏝️ 2. 데스크톱 우측: 선택 일자 손해사정 실무 대장 카드 아일랜드 ── */}
-      <PremiumCard borderColor="blue" hoverEffect={false} className="hidden md:flex w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex-col !p-0 overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80">
-        {renderLedgerContent(false)}
+      {/* ── 🏝️ 2. 선택 일자 손해사정 실무 대장 카드 아일랜드 (모바일: 100% 풀스크린 / 데스크톱: 우측 2열) ── */}
+      <PremiumCard borderColor="blue" hoverEffect={false} className={`${mobileTab === 'ledger' ? 'flex' : 'hidden'} md:flex flex-1 md:flex-initial w-full md:w-[380px] lg:w-[440px] shrink-0 min-h-0 flex-col !p-0 overflow-hidden bg-gray-50/50 dark:bg-zinc-950/80`}>
+        {renderLedgerContent()}
       </PremiumCard>
 
-      {/* ── 🏝️ 3. 모바일 전용 바텀시트 팝업: 날짜 클릭 시 슬라이드 업 ── */}
-      <BottomSheet
-        isOpen={isMobileSheetOpen}
-        onClose={() => setIsMobileSheetOpen(false)}
-        showBackdrop={true}
-        maxHeight="max-h-[86vh]"
-        bottomOffset="bottom-[64px]"
-        padding="p-0 pb-2"
-      >
-        <div className="h-[78vh] flex flex-col min-h-0 overflow-hidden">
-          {renderLedgerContent(true)}
-        </div>
-      </BottomSheet>
-
-      {/* ── 손해사정 실무 대장 등록 / 수정 모달 ── */}
+      {/* ── 손해사정 실무 대장 등록 / 수정 모달 (z-[110] 최상단 레이어 보장) ── */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#202124] rounded-none max-w-xl w-full p-6 shadow-2xl border border-gray-200 dark:border-zinc-800 space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white dark:bg-[#202124] rounded-none max-w-xl w-full p-5 sm:p-6 shadow-2xl border border-gray-200 dark:border-zinc-800 space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
             
             <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
               <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -947,7 +1058,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 text-lg"
+                className="text-gray-400 hover:text-gray-600 text-lg font-bold p-1"
               >
                 ✕
               </button>

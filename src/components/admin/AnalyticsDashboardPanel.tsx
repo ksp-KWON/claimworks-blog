@@ -67,7 +67,7 @@ export default function AnalyticsDashboardPanel() {
   const topPages = data?.topPages || [];
 
   return (
-    <AdminPanelLayout innerClassName="h-full overflow-y-auto custom-scrollbar space-y-3 p-1 pb-10 md:pb-1 pr-1 sm:pr-2">
+    <AdminPanelLayout innerClassName="h-full overflow-y-auto custom-scrollbar space-y-2.5 p-1 pb-1 md:pb-0 pr-1 sm:pr-2">
       {/* 1열(1 Row) 3D 입체 직사각형 상단 컨트롤 바 */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 shrink-0">
         {/* 1. 고유 방문자 */}
@@ -362,7 +362,7 @@ export default function AnalyticsDashboardPanel() {
       </div>
 
       {/* ── 3. 인기 보상 칼럼 TOP 10 ───────── */}
-      <PremiumCard borderColor="blue" hoverEffect={false} watermarkIcon="award" className="!p-0 flex-1 min-h-[320px] md:min-h-0 flex flex-col overflow-hidden">
+      <PremiumCard borderColor="blue" hoverEffect={false} watermarkIcon="award" className="!p-0 flex-1 min-h-0 flex flex-col overflow-hidden">
         <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <AppIcon name="award" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />

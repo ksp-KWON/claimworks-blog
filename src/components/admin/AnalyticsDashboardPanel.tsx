@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { UniversalAnalyticsData, SystemCredentials } from '@/lib/analytics/types';
 import { getUniversalAnalyticsData } from '@/lib/analytics/universal-analytics';
 import { supabase } from '@/lib/supabase';
@@ -50,25 +50,13 @@ export default function AnalyticsDashboardPanel() {
           setRealConsultCount(count);
         }
       } catch {
-        // 로컬 목업 환경 안전 폴백
+        // 로컬 환경 안전 폴백
       }
     }
     fetchRealStats();
   }, []);
 
-  const handleSaveCredentials = (e: React.FormEvent) => {
-    e.preventDefault();
-    localStorage.setItem('gemini_api_key', credentials.geminiApiKey);
-    localStorage.setItem('github_token', credentials.githubToken);
-    localStorage.setItem('cf_zone_id', credentials.cloudflareZoneId || '');
-    localStorage.setItem('cf_api_token', credentials.cloudflareApiToken || '');
-    setSaveStatus('✅ 저장되었습니다.');
-    setTimeout(() => setSaveStatus(''), 3000);
-    // 즉시 재조회
-    fetchAnalyticsData(period, credentials.cloudflareZoneId, credentials.cloudflareApiToken);
-  };
-
-  const fetchAnalyticsData = async (
+  const fetchAnalyticsData = useCallback(async (
     targetPeriod: '24h' | '7d' | '30d',
     zoneId?: string,
     apiToken?: string
@@ -109,11 +97,23 @@ export default function AnalyticsDashboardPanel() {
     setData(standardData);
     setDataSource('system_standard');
     setLoading(false);
+  }, [credentials.cloudflareZoneId, credentials.cloudflareApiToken]);
+
+  const handleSaveCredentials = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem('gemini_api_key', credentials.geminiApiKey);
+    localStorage.setItem('github_token', credentials.githubToken);
+    localStorage.setItem('cf_zone_id', credentials.cloudflareZoneId || '');
+    localStorage.setItem('cf_api_token', credentials.cloudflareApiToken || '');
+    setSaveStatus('✅ 저장되었습니다.');
+    setTimeout(() => setSaveStatus(''), 3000);
+    // 즉시 재조회
+    fetchAnalyticsData(period, credentials.cloudflareZoneId, credentials.cloudflareApiToken);
   };
 
   useEffect(() => {
     fetchAnalyticsData(period);
-  }, [period, credentials.cloudflareZoneId, credentials.cloudflareApiToken]);
+  }, [period, fetchAnalyticsData]);
 
   const summary = data?.summary || {
     uniqueVisitors: 0,

@@ -306,12 +306,19 @@ export async function POST(req: NextRequest) {
 
     if (totalRefCount === 0) totalRefCount = 1;
 
-    const topReferrers = [
-      { source: '네이버 검색 (SmartSearch)', percentage: Math.round((naverCount / totalRefCount) * 100) || 48 },
-      { source: '구글 검색 (Google Organic)', percentage: Math.round((googleCount / totalRefCount) * 100) || 32 },
-      { source: '다음/카카오 (Daum Kakao)', percentage: Math.round((daumCount / totalRefCount) * 100) || 12 },
-      { source: '직접 방문 (Direct / Bookmark)', percentage: Math.round((directCount / totalRefCount) * 100) || 8 },
-    ];
+    const topReferrers = (naverCount > 0 || googleCount > 0 || daumCount > 0 || directCount > 0)
+      ? [
+          { source: '네이버 검색 (SmartSearch)', percentage: Math.round((naverCount / totalRefCount) * 100) },
+          { source: '구글 검색 (Google Organic)', percentage: Math.round((googleCount / totalRefCount) * 100) },
+          { source: '다음/카카오 (Daum Kakao)', percentage: Math.round((daumCount / totalRefCount) * 100) },
+          { source: '직접 방문 (Direct / Bookmark)', percentage: Math.round((directCount / totalRefCount) * 100) },
+        ]
+      : [
+          { source: '네이버 검색 (SmartSearch)', percentage: 0 },
+          { source: '구글 검색 (Google Organic)', percentage: 0 },
+          { source: '다음/카카오 (Daum Kakao)', percentage: 0 },
+          { source: '직접 방문 (Direct / Bookmark)', percentage: 0 },
+        ];
 
     // ── 4. 인기 페이지(Top Pages) 순수 경로 및 조회수 실측 데이터 ─────────────
     const rawPages = pageJson.data?.viewer?.accounts?.[0]?.rumPageloadEventsAdaptiveGroups || [];
@@ -340,12 +347,7 @@ export async function POST(req: NextRequest) {
           count: b.count || 0,
           percentage: Math.round(((b.count || 0) / totalBrowserCount) * 100),
         }))
-      : [
-          { name: 'Chrome', count: Math.round(pageviews * 0.46), percentage: 46 },
-          { name: 'Mobile Safari', count: Math.round(pageviews * 0.28), percentage: 28 },
-          { name: 'Samsung Internet', count: Math.round(pageviews * 0.16), percentage: 16 },
-          { name: 'Whale / Naver', count: Math.round(pageviews * 0.10), percentage: 10 },
-        ];
+      : [];
 
     let totalDeviceCount = rawDevices.reduce((acc: number, d: any) => acc + (d.count || 0), 0);
     if (totalDeviceCount === 0) totalDeviceCount = 1;
@@ -361,13 +363,13 @@ export async function POST(req: NextRequest) {
       else desktopCount += (d.count || 0);
     }
 
-    const devices = rawDevices.length > 0
+    const devices = rawDevices.length > 0 && (mobileCount > 0 || desktopCount > 0 || tabletCount > 0)
       ? {
-          mobile: Math.round((mobileCount / totalDeviceCount) * 100) || 72,
-          desktop: Math.round((desktopCount / totalDeviceCount) * 100) || 26,
-          tablet: Math.round((tabletCount / totalDeviceCount) * 100) || 2,
+          mobile: Math.round((mobileCount / totalDeviceCount) * 100),
+          desktop: Math.round((desktopCount / totalDeviceCount) * 100),
+          tablet: Math.round((tabletCount / totalDeviceCount) * 100),
         }
-      : { mobile: 74, desktop: 24, tablet: 2 };
+      : { mobile: 0, desktop: 0, tablet: 0 };
 
     const operatingSystems = rawOS.length > 0
       ? rawOS.slice(0, 4).map((o: any) => ({
@@ -375,12 +377,7 @@ export async function POST(req: NextRequest) {
           count: o.count || 0,
           percentage: Math.round(((o.count || 0) / totalDeviceCount) * 100),
         }))
-      : [
-          { name: 'Android', count: Math.round(pageviews * 0.54), percentage: 54 },
-          { name: 'iOS', count: Math.round(pageviews * 0.28), percentage: 28 },
-          { name: 'Windows', count: Math.round(pageviews * 0.16), percentage: 16 },
-          { name: 'Mac OS', count: Math.round(pageviews * 0.02), percentage: 2 },
-        ];
+      : [];
 
     return NextResponse.json({
       success: true,

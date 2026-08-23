@@ -32,13 +32,8 @@ const EMPTY_ANALYTICS_DATA: UniversalAnalyticsData = {
   topPages: [],
   topReferrers: [],
   topCountries: [],
-  devices: { mobile: 74, desktop: 24, tablet: 2 },
-  browsers: [
-    { name: 'Chrome', count: 46, percentage: 46 },
-    { name: 'Mobile Safari', count: 28, percentage: 28 },
-    { name: 'Samsung Internet', count: 16, percentage: 16 },
-    { name: 'Whale / Naver', count: 10, percentage: 10 },
-  ],
+  devices: { mobile: 0, desktop: 0, tablet: 0 },
+  browsers: [],
   trend: [],
 };
 
@@ -241,8 +236,8 @@ export default function AnalyticsDashboardPanel() {
             trend: json.trend || [],
             topReferrers: json.topReferrers || [],
             topPages: json.topPages || [],
-            devices: json.devices || { mobile: 74, desktop: 24, tablet: 2 },
-            browsers: json.browsers || EMPTY_ANALYTICS_DATA.browsers,
+            devices: json.devices || { mobile: 0, desktop: 0, tablet: 0 },
+            browsers: json.browsers || [],
             vitals: json.vitals || EMPTY_ANALYTICS_DATA.vitals,
           });
           setDataSource('cloudflare_live');
@@ -743,7 +738,11 @@ export default function AnalyticsDashboardPanel() {
                 <span>웹 브라우저 점유율</span>
                 <span className="text-[10px] text-gray-400 font-normal">인앱 및 모바일 웹</span>
               </div>
-              {renderMetricProgressList(browserItems, 'from-teal-500 to-emerald-500')}
+              {browserItems.length > 0 ? (
+                renderMetricProgressList(browserItems, 'from-teal-500 to-emerald-500')
+              ) : (
+                <div className="text-xs text-gray-400 py-3 text-center">브라우저 분석 집계 중...</div>
+              )}
             </div>
 
             {/* 3. 구글 코어 웹 바이탈 품질 */}

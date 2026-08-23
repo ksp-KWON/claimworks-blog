@@ -273,7 +273,7 @@ export default function AdminPage() {
     setIsLoading(true);
     setAutoProgress('자동 글쓰기 파이프라인 시작...');
 
-    const mode: 'trend' | 'precedent' = category === '판례·법률 해석' ? 'precedent' : 'trend';
+    const mode: 'trend' | 'precedent' = (category === '판례·분쟁조정' || category === '판례·법률 해석') ? 'precedent' : 'trend';
 
     try {
       await runAutoGenerationWorkflow(

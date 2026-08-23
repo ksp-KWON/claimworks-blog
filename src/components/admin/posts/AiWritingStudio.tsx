@@ -20,7 +20,7 @@ interface AiWritingStudioProps {
 }
 
 const CATEGORIES = [
-  '판례·법률 해석',
+  '판례·분쟁조정',
   '사망·자살 보험금',
   '질병진단·실손',
   '교통사고 보상',

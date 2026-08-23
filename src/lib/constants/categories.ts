@@ -14,12 +14,12 @@ export const STOP_WORDS = [
 
 export const COLUMN_CATEGORIES: CategoryMeta[] = [
   { 
-    name: '판례·법률 해석', 
-    slug: '판례-법률-해석', 
+    name: '판례·분쟁조정', 
+    slug: '판례-분쟁조정', 
     icon: '⚖️', 
     color: 'bg-[var(--google-blue)]', 
-    desc: '대법원 판례 및 법률 해석 기준',
-    keywords: ['판례', '대법원', '판결', '소송']
+    desc: '대법원 판례 및 금융분쟁조정위원회 결정례',
+    keywords: ['판례', '대법원', '분조위', '분쟁조정', '결정례', '소송', '금융감독원', '법률']
   },
   { 
     name: '사망·자살 보험금', 
@@ -166,5 +166,8 @@ export const ALL_CATEGORIES = [...COLUMN_CATEGORIES, ...SPECIALTIES];
 
 export function getCategoryBySlug(slug: string): CategoryMeta | undefined {
   const decodedSlug = decodeURIComponent(slug);
+  if (decodedSlug === '판례-법률-해석') {
+    return ALL_CATEGORIES.find(c => c.slug === '판례-분쟁조정');
+  }
   return ALL_CATEGORIES.find(c => c.slug === decodedSlug);
 }

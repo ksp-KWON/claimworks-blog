@@ -120,12 +120,12 @@ export const getCategoryTheme = (category: string): { color: 'red' | 'rose' | 'b
   if (c.includes('배상책임') || c.includes('의료')) return { color: 'green', icon: 'shield' };
   if (c.includes('근재') || c.includes('산재')) return { color: 'teal', icon: 'hardhat' };
   if (c.includes('장해평가') || c.includes('면책') || c.includes('후유장해')) return { color: 'purple', icon: 'crutches' };
-  if (c.includes('판례') || c.includes('법률')) return { color: 'indigo', icon: 'scale' };
+  if (c.includes('판례') || c.includes('법률') || c.includes('분쟁조정') || c.includes('분조위')) return { color: 'indigo', icon: 'scale' };
   return { color: 'yellow', icon: 'lightbulb' };
 };
 
 export const CATEGORIES = [
-  '판례·법률 해석',
+  '판례·분쟁조정',
   '사망·자살 보험금',
   '질병진단·실손',
   '교통사고 보상',

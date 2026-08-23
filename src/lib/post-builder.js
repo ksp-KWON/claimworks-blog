@@ -108,7 +108,7 @@ function getRecent30DaysContext(targetCategory = null) {
 
   // 4. 해당 카테고리 전용 최근 글 (맥락 제공용)
   let categoryPosts = globalPosts;
-  if (targetCategory && targetCategory !== '판례·법률 해석') {
+  if (targetCategory && targetCategory !== '판례·분쟁조정' && targetCategory !== '판례·법률 해석') {
     categoryPosts = existingPosts.filter(p => {
       const cat = String(p.category || '');
       return cat.includes(targetCategory) || targetCategory.includes(cat);

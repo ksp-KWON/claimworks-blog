@@ -38,6 +38,7 @@ export const IconClipboard = ({ className = 'w-6 h-6' }: { className?: string })
 
 // ── 카테고리 slug → AppIcon 키 룩업 맵 ──
 export const CATEGORY_ICON_NAMES: Record<string, AppIconName> = {
+  '판례-분쟁조정': 'scale',
   '판례-법률-해석': 'scale',
   '사망-자살-보험금': 'rose',
   '질병진단-실손': 'heart',
@@ -60,6 +61,7 @@ export const CATEGORY_ICON_NAMES: Record<string, AppIconName> = {
 };
 
 export const CATEGORY_ICONS: Record<string, React.FC<{ className?: string }>> = {
+  '판례-분쟁조정': IconScale,
   '판례-법률-해석': IconScale,
   '사망-자살-보험금': IconRose,
   '질병진단-실손': IconHeart,

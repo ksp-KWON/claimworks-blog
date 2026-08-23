@@ -2,12 +2,11 @@ import { callGeminiAPI } from './admin-api';
 import { 
   getRandomAngle, 
   getTopicPlanningPrompt, 
-  getPrecedentPlanningPrompt, 
   getManualPlanningPrompt, 
   buildArticlePrompt, 
   getQueryGenerationPrompt,
   getKeywordExtractionPrompt,
-  getHealingPrompt,
+  getNovelTopicPrompt,
   TOPIC_SCHEMA,
   CONTENT_SCHEMA
 } from './prompt-rules';
@@ -26,16 +25,6 @@ function parseGeneratedContent(text: string) {
   return { content, thoughtProcess: '' };
 }
 
-async function fetchProxy(action: string, payload: any = {}) {
-  const res = await fetch('/api/ai-pipeline/proxy', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, ...payload })
-  });
-  if (!res.ok) throw new Error(`Proxy error: ${res.status}`);
-  return res.json();
-}
-
 function safeJsonParse(jsonStr: string, fallback: any = null) {
   try {
     const match = jsonStr.match(/```(?:json)?\n([\s\S]*?)\n```/) || jsonStr.match(/{[\s\S]*}/);
@@ -47,7 +36,7 @@ function safeJsonParse(jsonStr: string, fallback: any = null) {
   }
 }
 
-function buildPostFrontmatter(topic: any, content: string, precedentDetail: any = null) {
+function buildPostFrontmatter(topic: any, content: string) {
   let summary = (topic.summary || '').replace(/"/g, "'").replace(/\n/g, ' ').trim();
   if (!summary) {
     summary = content.replace(/[#*`>[\]!]/g, '').replace(/\s+/g, ' ').trim().slice(0, 140);
@@ -68,8 +57,8 @@ function buildPostFrontmatter(topic: any, content: string, precedentDetail: any 
     published: true
   };
   
-  if (precedentDetail && precedentDetail.caseNo) {
-    frontmatterData.caseNumber = precedentDetail.caseNo;
+  if (topic.caseNumber) {
+    frontmatterData.caseNumber = topic.caseNumber;
   }
   return stringifyMarkdown(frontmatterData, content);
 }
@@ -78,107 +67,49 @@ export async function runAutoGenerationWorkflow(
   type: 'precedent' | 'trend',
   geminiKey: string,
   onProgress: (msg: string) => void,
-  targetCategory: string = '보상/보험/손해사정'
+  targetCategory: string = '보상가이드'
 ) {
-  onProgress(`1/6: [${targetCategory}] 최신 트렌드 뉴스 검색어 자율 생성 중...`);
+  onProgress(`1/5: [${targetCategory}] 최근 30일 발행 글 분석 중...`);
   let existingPostsArr: any[] = [];
   try {
     const res = await fetch('/api/posts?admin=true');
-    existingPostsArr = await res.json();
+    if (res.ok) existingPostsArr = await res.json();
   } catch(e) {}
   
   const recentPosts = existingPostsArr.slice(0, 50);
   const existingSlugs = recentPosts.length > 0 ? recentPosts.map(p => p.slug).join(', ') : '- (없음)';
   const existingTitles = recentPosts.length > 0 ? recentPosts.map(p => `[${p.category || '일반'}] ${p.title}`).join('\n') : '- (없음)';
 
-
+  onProgress(`2/5: [${targetCategory}] 트렌드 키워드 및 미개척 주제 도출 중...`);
   const queryGenPrompt = getQueryGenerationPrompt(targetCategory, existingTitles);
-  let dynamicQueries: string[] = [targetCategory]; 
+  let dynamicKeyword = `${targetCategory} 권익 구제 실무`;
+  let dynamicTitle = `${targetCategory} 손해사정 핵심 쟁점`;
   
   try {
     const qStr = await callGeminiAPI(geminiKey, queryGenPrompt, 'keyword-extraction', undefined, ['lite', 'flash']);
     const qParsed = safeJsonParse(qStr, { queries: [] });
     if (qParsed.queries && qParsed.queries.length > 0) {
-      dynamicQueries = qParsed.queries;
+      dynamicKeyword = qParsed.queries[0];
+      dynamicTitle = qParsed.queries.slice(0, 2).join(' / ');
     }
   } catch (e) {
-    console.warn('Dynamic query generation failed', e);
-  }
-
-  onProgress(`2/6: 동적 검색어로 뉴스 수집 중... (${dynamicQueries.join(', ')})`);
-  let headlines: string[] = [];
-  try {
-    const { data } = await fetchProxy('rss', { queries: dynamicQueries });
-    headlines = data || [];
-  } catch (e) {
-    console.warn('RSS fetch failed', e);
-  }
-
-  onProgress(`3/6: [${targetCategory}] 핵심 키워드를 추출 중...`);
-  let keywords: { searchKeyword: string, newsTitle: string }[] = [];
-  if (headlines.length > 0) {
-    const prompt = getKeywordExtractionPrompt(targetCategory, existingTitles, headlines);
+    console.warn('Keyword generation fallback to novel topic', e);
+    const novelPrompt = getNovelTopicPrompt(targetCategory, existingTitles);
     try {
-      const schemaStr = await callGeminiAPI(geminiKey, prompt, 'keyword-extraction', undefined, ['lite', 'flash']);
-      const parsed = safeJsonParse(schemaStr, { candidates: [] });
-      keywords = parsed.candidates || [];
-      if (keywords.length === 0) throw new Error('추출된 키워드가 없습니다.');
-    } catch (e) {
-      throw new Error('뉴스 키워드 추출에 실패했습니다.');
-    }
-  } else {
-    throw new Error('오늘자 관련 뉴스가 없어 키워드를 추출할 수 없습니다.');
-  }
-
-  onProgress('4/6: 법제처 최신 판례 매칭 중...');
-  let precedentDetail = null;
-  let finalKeyword = keywords[0]?.searchKeyword;
-  
-  for (const kw of keywords.slice(0, 5)) {
-    try {
-      const { data } = await fetchProxy('law', { keyword: kw.searchKeyword });
-      if (data) {
-        precedentDetail = data;
-        finalKeyword = kw.searchKeyword;
-        break;
+      const nStr = await callGeminiAPI(geminiKey, novelPrompt, 'keyword-extraction', undefined, ['flash']);
+      const nParsed = safeJsonParse(nStr);
+      if (nParsed.keyword) {
+        dynamicKeyword = nParsed.keyword;
+        dynamicTitle = nParsed.newsTitle || `${dynamicKeyword} 실무 쟁점`;
       }
     } catch {}
   }
 
-  if (type === 'precedent' && !precedentDetail) {
-    onProgress('4.5/6: 판례 검색 실패. AI 자가 치유 진행 중...');
-    const healingPrompt = getHealingPrompt(keywords.map(k => k.searchKeyword).join(', '));
-    try {
-      const hStr = await callGeminiAPI(geminiKey, healingPrompt, 'keyword-extraction', undefined, ['lite', 'flash']);
-      const hParsed = safeJsonParse(hStr, { keywords: [] });
-      
-      for (const fw of (hParsed.keywords || [])) {
-        try {
-          const { data } = await fetchProxy('law', { keyword: fw });
-          if (data) {
-            precedentDetail = data;
-            finalKeyword = fw;
-            break;
-          }
-        } catch {}
-      }
-    } catch(e) {}
-  }
-
-  if (type === 'precedent' && !precedentDetail) {
-    throw new Error('현재 트렌드에 부합하는 대법원 판례를 찾지 못했습니다.');
-  }
-
-  onProgress('5/6: 블로그 포스팅 기획 및 설계 중...');
+  onProgress(`3/5: [${targetCategory}] 블로그 포스팅 기획 및 설계 중...`);
   const angle = getRandomAngle();
-  const trendTitle = keywords.find(k => k.searchKeyword === finalKeyword)?.newsTitle || '없음';
-
   let topicPlanStr = '';
   try {
-    const planPrompt = (type === 'precedent' && precedentDetail)
-      ? getPrecedentPlanningPrompt(precedentDetail, existingSlugs, targetCategory)
-      : getTopicPlanningPrompt(finalKeyword, trendTitle, existingSlugs, targetCategory);
-      
+    const planPrompt = getTopicPlanningPrompt(dynamicKeyword, dynamicTitle, existingSlugs, targetCategory);
     topicPlanStr = await callGeminiAPI(geminiKey, planPrompt, 'keyword-extraction', TOPIC_SCHEMA, ['lite', 'flash']);
   } catch(e: any) {
     throw new Error('기획안 도출에 실패했습니다: ' + e.message);
@@ -186,8 +117,8 @@ export async function runAutoGenerationWorkflow(
   
   const topic = safeJsonParse(topicPlanStr);
 
-  onProgress('6/6: AI가 심층 전문 칼럼을 작성 중입니다. (약 30초 소요)...');
-  const prompt = buildArticlePrompt(topic, angle, existingPostsArr, type === 'precedent' ? precedentDetail : null);
+  onProgress('4/5: AI가 단일 헌법 뼈대에 맞추어 전문 칼럼을 집필 중입니다 (약 20초 소요)...');
+  const prompt = buildArticlePrompt(topic, angle, existingPostsArr);
   
   const generated = await callGeminiAPI(geminiKey, prompt, 'auto-generate', CONTENT_SCHEMA, ['flash', 'pro']);
   const { content, thoughtProcess } = parseGeneratedContent(generated);
@@ -195,7 +126,8 @@ export async function runAutoGenerationWorkflow(
     onProgress(`🧠 [사고 과정] : ${thoughtProcess.substring(0, 150)}...`);
   }
   
-  const finalContent = buildPostFrontmatter(topic, content, type === 'precedent' ? precedentDetail : null);
+  onProgress('5/5: 최종 마크다운 및 메타데이터 정규화 완료!');
+  const finalContent = buildPostFrontmatter(topic, content);
   
   onProgress('완료! 에디터에서 내용을 확인하세요.');
   return finalContent;

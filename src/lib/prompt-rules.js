@@ -259,7 +259,11 @@ const TOPIC_SCHEMA = {
     },
     category: {
       type: "STRING",
-      description: "사망·자살 보험금, 질병진단·실손, 교통사고 보상, 배상책임·의료, 근재·산재 사고, 장해평가·면책, 보상가이드 중 1개 선택"
+      description: "판례·법률 해석, 사망·자살 보험금, 질병진단·실손, 교통사고 보상, 배상책임·의료, 근재·산재 사고, 장해평가·면책, 보상가이드 중 1개 선택"
+    },
+    caseNumber: {
+      type: "STRING",
+      description: "판례·법률 해석 카테고리인 경우 대법원/하급심 사건번호(예: 2019다214248) 또는 금융분쟁조정위원회 결정번호. 일반 주제인 경우 빈 문자열."
     },
     specialtyCategory: {
       type: "STRING",
@@ -297,21 +301,27 @@ const CONTENT_SCHEMA = {
 // ── 6. 기획 프롬프트 헬퍼들 ──────────────────────────────────────────
 function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCategory, planFeedback = '') {
   const feedbackSection = planFeedback ? `\n[🚨 기획안 재시도 피드백 (반드시 준수)]\n${planFeedback}\n` : '';
+  const isLegal = targetCategory === '판례·법률 해석';
+  const legalInstruction = isLegal
+    ? `\n[판례·법률 카테고리 특화 지침]\n- 반드시 실존하는 대한민국 대법원 판례(예: 2019다214248) 또는 금융분쟁조정위원회 표준 결정례를 바탕으로 기획하십시오.\n- 가공의 사건번호는 절대 창작하지 마시고, 실존하는 사건번호를 caseNumber 필드에 명시하십시오.\n`
+    : '';
+
   return `당신은 '보상스쿨'의 최정상 콘텐츠 기획자이자 마케터입니다.
 오늘 확정된 대표 키워드는 [${keyword}] 이며, 관련된 오늘의 이슈는 [${trendTitle}] 입니다.
-반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
+반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.${legalInstruction}
 
 [최근 발행 글 및 슬러그 목록 (중복 금지!)]
 ${existingPosts}
 ${feedbackSection}
 [기획 핵심 지시사항]
-1. 최근 30일간 다룬 질환명, 신체 부위, 특수 사고 유형과 겹치지 않는 완전히 참신하고 새로운 분쟁 영역을 발굴하십시오.
+1. 최근 30일간 다룬 질환명, 신체 부위, 특수 사고 유형, 판례 사건과 겹치지 않는 완전히 참신하고 새로운 분쟁 영역을 발굴하십시오.
 2. 위 키워드와 맥락을 바탕으로, 어떻게 하면 잠재 고객(보험 분쟁 중인 사람)이 검색 결과에서 클릭하지 않고는 못 배길지 연쇄 사고(Chain-of-Thought)를 거쳐 기획하십시오:
    - thoughtProcess: 기획 및 마케팅 전략에 대한 연쇄 사고 논리 서술
    - slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
    - title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
    - summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문
-   - category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
+   - category: 판례·법률 해석|사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1개
+   - caseNumber: 실존하는 사건번호(판례 카테고리인 경우) 또는 빈 문자열
    - specialtyCategory: 사안과 직결된 전문 진료과목
    - tags: 관련 태그 5개
    - keywords: 타겟 키워드 목록
@@ -319,15 +329,19 @@ ${feedbackSection}
 반드시 지정된 JSON 스키마를 준수하여 출력하십시오.`;
 }
 
-function getPrecedentPlanningPrompt(courtCase, existingPosts, targetCategory, planFeedback = '') {
+function getPrecedentPlanningPrompt(courtCase, existingPosts, targetCategory = '판례·법률 해석', planFeedback = '') {
   const feedbackSection = planFeedback ? `\n[🚨 기획안 재시도 피드백 (반드시 준수)]\n${planFeedback}\n` : '';
+  const caseNo = courtCase?.caseNumber || courtCase?.caseNo || courtCase?.id || '';
+  const caseName = courtCase?.caseName || courtCase?.title || '';
+  const caseSummary = courtCase?.summary || courtCase?.judgmentSummary || courtCase?.content || '';
+
   return `당신은 '보상스쿨'의 최정상 판례 기획자이자 테크니컬 라이터입니다.
 아래 판례 정보를 분석하여 일반 소비자가 이해하기 쉽고 SEO 유입 효과가 극대화된 블로그 포스팅을 기획하십시오.
 반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
 
-판례 사건명: ${courtCase.caseName || courtCase.title}
-판례 사건번호: ${courtCase.caseNumber || courtCase.caseNo || courtCase.id}
-판례 내용 요약: ${courtCase.summary || courtCase.content}
+판례 사건명: ${caseName}
+판례 사건번호: ${caseNo}
+판례 내용 요약: ${caseSummary}
 
 [기존 슬러그 및 최근 다룬 주제 (중복 금지)]
 ${existingPosts}
@@ -336,10 +350,11 @@ ${feedbackSection}
 2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
 3. title: SEO 최적화 판례 제목 (사건의 핵심 쟁점과 판결 취지를 알기 쉽게 후킹하는 제목)
 4. summary: 150자 이내의 메타 디스크립션 요약문
-5. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
-6. specialtyCategory: 사안과 직결된 전문 진료과목
-7. tags: 관련 태그 5개
-8. keywords: 타겟 키워드 목록
+5. category: 판례·법률 해석|사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1개
+6. caseNumber: "${caseNo}"
+7. specialtyCategory: 사안과 직결된 전문 진료과목
+8. tags: 관련 태그 5개
+9. keywords: 타겟 키워드 목록
 
 반드시 지정된 JSON 스키마를 준수하여 출력하십시오.`;
 }
@@ -372,7 +387,7 @@ function getManualPlanningPrompt(arg1, arg2, arg3, arg4) {
 2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
 3. title: 매력적인 최종 포스트 제목
 4. summary: 150자 이내의 메타 디스크립션 요약문
-5. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
+5. category: 판례·법률 해석|사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1개
 6. specialtyCategory: 전문 진료과목
 7. tags: 관련 태그 5개
 8. keywords: 타겟 키워드 목록
@@ -435,23 +450,13 @@ ${headlines.slice(0, 50).map((t, i) => `${i + 1}. ${t}`).join('\n')}
 {"thoughtProcess": "기존 글과의 중복을 걸러내고 참신한 실무 쟁점을 선정한 논리 (Chain-of-Thought)", "candidates": [{"newsTitle": "기사원문", "searchKeyword": "검색용키워드명사"}]}`;
 }
 
-function getFallbackLegalKeywordPrompt(targetCategory, context, existingTitles = '') {
-  return `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
-방금 최신 뉴스 키워드(${context})를 기반으로 대법원 판례 검색을 시도했으나 판례를 찾지 못했습니다.
-
-따라서, **[${targetCategory}]** 분야의 가장 본질적이고 손해사정 실무와 직결된 핵심 법률/의학 단어(명사)를 도출해 주세요.
-
-[최근 다룬 주제 제외 목록]
-${existingTitles}
-
-[중요] 위 목록에 없는 완전히 새로운 실무 명사로만 추출하세요.
-
-아래와 같은 JSON 형식으로만 응답하세요:
-{"thoughtProcess": "카테고리 본질에 맞는 핵심 법률/의학 쟁점 분석 논리 (Chain-of-Thought)", "candidates": [{"searchKeyword": "핵심법률명사"}]}`;
-}
-
 function getNovelTopicPrompt(targetCategory, existingTitles, retryFeedback = '') {
   const feedbackMsg = retryFeedback ? `\n[재시도 주의사항]\n이전 생성 결과("${retryFeedback}")는 최근 발행 글과 중복되었습니다. 완전히 다른 새로운 분쟁 주제를 발굴하십시오.\n` : '';
+  const isLegal = targetCategory === '판례·법률 해석';
+  const legalInstruction = isLegal
+    ? `\n[판례·법률 카테고리 특화 지침]\n- 반드시 아직 블로그에서 다루지 않은 실존 대법원 주요 판결 또는 금융분쟁조정위원회 표준 결정례를 바탕으로 주제를 도출하십시오.\n`
+    : '';
+
   return `당신은 대한민국 최고의 손해사정 전문 블로그 수석 편집장입니다.
 **[${targetCategory}]** 카테고리에서 최근 아래의 주제들이 이미 발행되었습니다:
 
@@ -460,20 +465,11 @@ ${existingTitles}
 ${feedbackMsg}
 [지시사항]
 1. 위 목록에 이미 등장한 주제 및 연관 키워드는 절대 다루지 마십시오.
-2. **[${targetCategory}]** 분야에서 실제 손해사정사에게 상담 문의가 많지만 아직 블로그에서 다루지 않은 '완전히 새로운 실무 분쟁 주제' 1개를 발굴하십시오.
+2. **[${targetCategory}]** 분야에서 실제 손해사정사에게 상담 문의가 많지만 아직 블로그에서 다루지 않은 '완전히 새로운 실무 분쟁 주제' 1개를 발굴하십시오.${legalInstruction}
 3. 특정 관행에 얽매이지 말고, 해당 카테고리의 의학/약관/손해액 산정 실무에서 소비자가 겪는 현실적 고통과 권리 구제 포인트를 포착하십시오.
 
 반드시 아래 JSON 형식으로 반환하세요:
 {"thoughtProcess": "새로운 주제 선정 이유 및 수임 관점 논리 (Chain-of-Thought)", "keyword": "완전히 새로운 핵심 키워드", "newsTitle": "최신 실무 분쟁 이슈 제목"}`;
-}
-
-function getHealingPrompt(keywords) {
-  return `당신은 대한민국 최고의 손해사정 블로그 수석 편집장입니다.
-방금 키워드(${keywords})로 판례 검색에 실패했습니다.
-이를 대체할 수 있는 가장 본질적이고 손해사정 실무와 직결된 핵심 법률/의학 단어(명사) 3개를 도출해 주세요.
-
-반드시 아래 JSON 형식으로만 응답하세요:
-{"keywords": ["핵심법률명사1", "핵심법률명사2", "핵심법률명사3"]}`;
 }
 
 function getFssEvaluationPrompt(fssTitle, fssContent) {
@@ -505,8 +501,6 @@ module.exports = {
   getRenewalPrompt,
   getQueryGenerationPrompt,
   getKeywordExtractionPrompt,
-  getFallbackLegalKeywordPrompt,
   getNovelTopicPrompt,
-  getHealingPrompt,
   getFssEvaluationPrompt,
 };

@@ -3,7 +3,7 @@
 import PostCard from '@/components/ui/PostCard';
 import SectionLayout, { SectionThemeColor } from '@/components/ui/SectionLayout';
 import { PostData } from '@/lib/posts';
-import { COLUMN_CATEGORIES } from '@/lib/constants/categories';
+import { COLUMN_CATEGORIES, isCategoryMatch } from '@/lib/constants/categories';
 import { CATEGORY_ICONS } from '@/components/ui/CategoryIcons';
 
 export default function HomePostList({ initialPosts }: { initialPosts: Omit<PostData, 'content'>[] }) {
@@ -16,7 +16,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: Omit<Post
         : typeof post.category === 'string'
           ? post.category.split(',').map(x => x.trim()).filter(Boolean)
           : [];
-      return cats.some(c => c.includes(cat.name) || cat.name.includes(c));
+      return cats.some(c => isCategoryMatch(c, cat.name));
     });
     return { category: cat, posts };
   }).filter(item => item.posts.length > 0);

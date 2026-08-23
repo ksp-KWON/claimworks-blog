@@ -164,6 +164,22 @@ export const SPECIALTIES: CategoryMeta[] = [
 
 export const ALL_CATEGORIES = [...COLUMN_CATEGORIES, ...SPECIALTIES];
 
+export function isCategoryMatch(postCategory: string, targetCategoryName: string): boolean {
+  if (!postCategory || !targetCategoryName) return false;
+  const pCat = postCategory.trim();
+  const tCat = targetCategoryName.trim();
+  
+  // 판례·분쟁조정과 구 카테고리명(판례·법률 해석, 판례 등) 상호 호환 매칭
+  if (tCat === '판례·분쟁조정' || tCat === '판례·법률 해석') {
+    if (pCat.includes('판례') || pCat.includes('분쟁조정') || pCat.includes('분조위') || pCat.includes('법률 해석') || pCat.includes('법률')) {
+      return true;
+    }
+  }
+
+  if (pCat === tCat) return true;
+  return pCat.includes(tCat) || tCat.includes(pCat);
+}
+
 export function getCategoryBySlug(slug: string): CategoryMeta | undefined {
   const decodedSlug = decodeURIComponent(slug);
   if (decodedSlug === '판례-법률-해석') {

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getSortedPostsData } from '@/lib/posts';
-import { ALL_CATEGORIES, getCategoryBySlug, STOP_WORDS } from '@/lib/constants/categories';
+import { ALL_CATEGORIES, getCategoryBySlug, isCategoryMatch, STOP_WORDS } from '@/lib/constants/categories';
 import { CATEGORY_ICONS } from '@/components/ui/CategoryIcons';
 import PostCard from '@/components/ui/PostCard';
 import Link from 'next/link';
@@ -53,7 +53,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   // 엄격한 필터링 로직 적용
   const filteredPosts = allPosts.filter(p => {
     // 1. 카테고리 또는 특수분류 완전 일치/포함
-    if (p.category && String(p.category).toLowerCase().includes(filterText)) return true;
+    if (p.category && isCategoryMatch(String(p.category), category.name)) return true;
     if (p.specialtyCategory && String(p.specialtyCategory).toLowerCase().includes(filterText)) return true;
     
     // 2. 태그 매칭 (가장 중요) - 확장 키워드 포함

@@ -57,23 +57,36 @@ const PortalToolbar = () => {
   if (!portalTarget) return null;
 
   return createPortal(
-    <div className="mdxeditor" style={{ background: 'transparent', border: 'none', padding: 0 }}>
-      <div className="mdxeditor-toolbar flex items-center gap-1 border-r border-gray-200 dark:border-zinc-700 pr-3 shrink-0" style={{ background: 'transparent', border: 'none', padding: 0 }}>
-        <UndoRedo />
-        <BlockTypeSelect />
-        <BoldItalicUnderlineToggles />
-        <StrikeThroughSupSubToggles />
-        <CodeToggle />
-        <div className="w-px h-5 bg-gray-200 dark:bg-zinc-700 mx-1"></div>
-        <ListsToggle />
-        <div className="w-px h-5 bg-gray-200 dark:bg-zinc-700 mx-1"></div>
-        <CreateLink />
-        <InsertImage />
-        <InsertTable />
-        <InsertThematicBreak />
-        <InsertAdmonition />
-        <div className="ml-auto flex items-center border-l border-gray-200 dark:border-zinc-700 pl-2">
-          <DiffSourceToggleWrapper>{null}</DiffSourceToggleWrapper>
+    <div className="mdxeditor w-full min-w-0" style={{ background: 'transparent', border: 'none', padding: 0 }}>
+      <div 
+        className="mdxeditor-toolbar w-full min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-1.5" 
+        style={{ background: 'transparent', border: 'none', padding: 0 }}
+      >
+        {/* 1행 (모바일 1단 / 데스크톱 좌측): 서식 & 텍스트 기본 도구 */}
+        <div className="flex items-center flex-wrap gap-0.5 sm:gap-1 min-w-0 w-full sm:w-auto">
+          <UndoRedo />
+          <div className="w-px h-4 bg-gray-200 dark:bg-zinc-700 mx-0.5 shrink-0" />
+          <BlockTypeSelect />
+          <div className="w-px h-4 bg-gray-200 dark:bg-zinc-700 mx-0.5 shrink-0" />
+          <BoldItalicUnderlineToggles />
+          <StrikeThroughSupSubToggles />
+          <CodeToggle />
+        </div>
+
+        {/* 2행 (모바일 2단 / 데스크톱 우측): 리스트 토글 + 요소 삽입 + 소스 토글 */}
+        <div className="flex items-center justify-between flex-wrap gap-0.5 sm:gap-1 min-w-0 w-full sm:w-auto pt-1 sm:pt-0 border-t sm:border-t-0 border-gray-100 dark:border-zinc-800">
+          <div className="flex items-center flex-wrap gap-0.5 sm:gap-1 min-w-0">
+            <ListsToggle />
+            <div className="w-px h-4 bg-gray-200 dark:bg-zinc-700 mx-0.5 shrink-0" />
+            <CreateLink />
+            <InsertImage />
+            <InsertTable />
+            <InsertThematicBreak />
+            <InsertAdmonition />
+          </div>
+          <div className="flex items-center pl-1 sm:pl-2 ml-auto shrink-0 border-l border-gray-200 dark:border-zinc-700">
+            <DiffSourceToggleWrapper>{null}</DiffSourceToggleWrapper>
+          </div>
         </div>
       </div>
     </div>,
@@ -193,6 +206,43 @@ const WysiwygEditor = forwardRef<WysiwygEditorRef, WysiwygEditorProps>(({ initia
       <style>{`
         .mdx-editor-wrapper .mdxeditor-toolbar {
           display: none !important;
+        }
+        /* 상단 포탈 툴바 내부 최적화 */
+        #custom-toolbar-portal .mdxeditor {
+          width: 100% !important;
+        }
+        #custom-toolbar-portal .mdxeditor-toolbar {
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+          background: transparent !important;
+          border: none !important;
+          padding: 0 !important;
+          overflow: visible !important;
+        }
+        #custom-toolbar-portal button {
+          min-width: 28px !important;
+          height: 28px !important;
+          padding: 2px 4px !important;
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          border-radius: 2px !important;
+          font-size: 12px !important;
+          transition: all 0.15s ease !important;
+        }
+        #custom-toolbar-portal select,
+        #custom-toolbar-portal button[role="combobox"] {
+          height: 28px !important;
+          font-size: 12px !important;
+          padding: 0 6px !important;
+          max-width: 120px !important;
+        }
+        /* 모바일 팝업/다이얼로그 레이아웃 안전장치 */
+        [data-radix-popper-content-wrapper],
+        .mdxeditor-popup-container {
+          z-index: 9999 !important;
+          max-width: calc(100vw - 20px) !important;
         }
       `}</style>
     </div>

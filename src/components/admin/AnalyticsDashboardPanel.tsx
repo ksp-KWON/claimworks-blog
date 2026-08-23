@@ -80,16 +80,12 @@ function getPageDisplayTitle(path: string, postMap: Record<string, string>): str
 
 /**
  * 직전 기간 대비 등락률 뱃지 렌더링 헬퍼 (W3C / Cloudflare 표준 방식)
- * @param delta 직전 기간 대비 변동률 (%)
- * @param isReverse 로딩시간 등 수치가 낮을수록 긍정적인 지표 여부
  */
 function renderDeltaBadge(delta?: number, isReverse: boolean = false) {
   if (delta === undefined || delta === null) {
     return <span className="w-1.5 h-1.5 rounded-none bg-gray-300 dark:bg-zinc-700" />;
   }
 
-  // 로딩속도(isReverse): 음수(단축)가 긍정, 양수(지연)가 부정
-  // 일반지표: 양수(증가)가 긍정, 음수(감소)가 부정
   const isPositive = isReverse ? delta < 0 : delta > 0;
   const isNegative = isReverse ? delta > 0 : delta < 0;
   const isZero = delta === 0;
@@ -106,6 +102,35 @@ function renderDeltaBadge(delta?: number, isReverse: boolean = false) {
       <span>{arrow}</span>
       <span>{absDelta}%</span>
     </PremiumBadge>
+  );
+}
+
+/**
+ * 표준 게이지 바 리스트 공통 렌더러 (중복 제거 & 텍스트 짤림 방지)
+ */
+function renderMetricProgressList(
+  items: Array<{ label: string; percentage: number }>,
+  barGradient: string = 'from-[var(--google-blue)] to-purple-500'
+) {
+  return (
+    <div className="space-y-2">
+      {items.map((item, idx) => (
+        <div key={idx} className="space-y-0.5">
+          <div className="flex justify-between text-[11px] font-bold">
+            <span className="text-gray-700 dark:text-zinc-300 truncate">{item.label}</span>
+            <span className="text-[var(--google-blue)] dark:text-[#8ab4f8] font-mono shrink-0 ml-2">
+              {item.percentage}%
+            </span>
+          </div>
+          <div className="w-full h-1.5 rounded-none bg-gray-100 dark:bg-zinc-800 overflow-hidden border border-gray-200/50 dark:border-zinc-700/50">
+            <div
+              style={{ width: `${Math.min(Math.max(item.percentage, 0), 100)}%` }}
+              className={`h-full bg-gradient-to-r ${barGradient} rounded-none transition-all duration-300`}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -245,7 +270,6 @@ export default function AnalyticsDashboardPanel() {
     localStorage.setItem('cf_api_token', credentials.cloudflareApiToken || '');
     setSaveStatus('⏳ Cloudflare 연동 검증 중...');
     
-    // 즉시 재조회
     await fetchAnalyticsData(period, credentials.cloudflareZoneId, credentials.cloudflareApiToken);
     setSaveStatus('✅ 설정이 로컬 브라우저에 안전하게 저장되었습니다.');
     setTimeout(() => setSaveStatus(''), 4000);
@@ -262,6 +286,10 @@ export default function AnalyticsDashboardPanel() {
   const devices = data?.devices || { mobile: 74, desktop: 24, tablet: 2 };
   const browsers = data?.browsers || EMPTY_ANALYTICS_DATA.browsers || [];
   const vitals = data?.vitals || EMPTY_ANALYTICS_DATA.vitals;
+
+  // 게이지 바 포맷 변환
+  const referrerItems = topReferrers.map(r => ({ label: r.source, percentage: r.percentage }));
+  const browserItems = browsers.map(b => ({ label: b.name, percentage: b.percentage }));
 
   return (
     <AdminPanelLayout innerClassName="h-full overflow-y-auto custom-scrollbar space-y-3 p-1 pb-6 md:pb-1 pr-1 sm:pr-2">
@@ -389,7 +417,6 @@ export default function AnalyticsDashboardPanel() {
             <span className="text-[10px] text-teal-600 dark:text-teal-400 font-bold bg-teal-50 dark:bg-teal-950/50 px-2 py-0.5 rounded-none border border-teal-200 dark:border-teal-900">로컬 브라우저 암호화 저장</span>
           </div>
 
-          {/* 에러 발생 시 안내 박스 */}
           {apiError && (
             <div className="mb-2.5 p-2.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-xs text-red-700 dark:text-red-300 flex items-start gap-2">
               <AppIcon name="shield-alert" size={16} className="shrink-0 mt-0.5 text-red-500" />
@@ -464,9 +491,9 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
       )}
 
-      {/* ── 2. 방문 추이 그래프 (2칸) & 검색/유입 채널 랭킹 (1칸) ───────────────── */}
+      {/* ── 2. 2행: 방문 추이 그래프 (2칸) & 검색/유입 채널 랭킹 (1칸) ───────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 shrink-0">
-        {/* 1. 방문 추이 그래프 (2칸) */}
+        {/* 1. 방문 추이 그래프 (2칸: 66.7%) */}
         <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="trending-up" className="lg:col-span-2 !p-0 flex flex-col justify-between">
           <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -576,7 +603,7 @@ export default function AnalyticsDashboardPanel() {
           </div>
         </PremiumCard>
 
-        {/* 2. 유입 채널 랭킹 (1칸) */}
+        {/* 2. 유입 채널 랭킹 (1칸: 33.3%) */}
         <PremiumCard borderColor="purple" hoverEffect={true} watermarkIcon="compass" className="!p-0 flex flex-col justify-between">
           <div className="px-4 py-3 bg-gradient-to-r from-purple-50/80 to-transparent dark:from-purple-900/20 dark:to-transparent border-b border-purple-100/80 dark:border-purple-900/30 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
@@ -588,22 +615,9 @@ export default function AnalyticsDashboardPanel() {
             <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold bg-purple-50 dark:bg-purple-950/40 px-2 py-0.5 rounded-none border border-purple-200 dark:border-purple-900">점유율</span>
           </div>
 
-          <div className="p-4 space-y-2.5">
-            {topReferrers.length > 0 ? (
-              topReferrers.map((ref, idx) => (
-                <div key={idx} className="space-y-0.5">
-                  <div className="flex justify-between text-[11px] font-bold">
-                    <span className="text-gray-700 dark:text-zinc-300 truncate">{ref.source}</span>
-                    <span className="text-[var(--google-blue)] dark:text-[#8ab4f8] font-mono shrink-0 ml-2">{ref.percentage}%</span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-none bg-gray-100 dark:bg-zinc-800 overflow-hidden border border-gray-200/50 dark:border-zinc-700/50">
-                    <div
-                      style={{ width: `${ref.percentage}%` }}
-                      className="h-full bg-gradient-to-r from-[var(--google-blue)] to-purple-500 rounded-none"
-                    />
-                  </div>
-                </div>
-              ))
+          <div className="p-4">
+            {referrerItems.length > 0 ? (
+              renderMetricProgressList(referrerItems, 'from-[var(--google-blue)] to-purple-500')
             ) : (
               <div className="text-xs text-gray-400 py-4 text-center">유입 채널 분석 중...</div>
             )}
@@ -611,15 +625,21 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
       </div>
 
-      {/* ── 3. 하단 상세 분석: 50% 50% Cloudflare 글로벌 표준 그리드 (모바일 1열 자동 스택) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 shrink-0">
-        {/* 좌측 (50%): 인기 보상 칼럼 TOP 10 실시간 순위 */}
-        <PremiumCard borderColor="blue" hoverEffect={false} watermarkIcon="award" className="!p-0 flex flex-col overflow-hidden">
+      {/* ── 3. 3행: 인기 보상 칼럼 TOP 10 (2칸: 66.7%) & 독자 접속 환경 (1칸: 33.3%) ── */}
+      {/* 상하 가로선 완벽 일치 (lg:grid-cols-3) & 모바일 order-last 제어 */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 shrink-0">
+        {/* 좌측 (2칸: 66.7%) — 인기 보상 칼럼 TOP 10 (모바일에서는 order-last로 맨 아래로) */}
+        <PremiumCard 
+          borderColor="blue" 
+          hoverEffect={false} 
+          watermarkIcon="award" 
+          className="lg:col-span-2 order-last lg:order-none !p-0 flex flex-col overflow-hidden"
+        >
           <div className="px-4 py-3 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100/80 dark:border-blue-900/30 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <AppIcon name="award" size={16} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />
               <span className="font-extrabold text-xs sm:text-sm text-[var(--google-blue)] dark:text-[#8ab4f8]">
-                인기 보상 칼럼 TOP 10
+                인기 보상 칼럼 TOP 10 실시간 순위
               </span>
             </div>
             <PremiumBadge color="blue" className="!text-[10px] !px-2 !py-0.5 rounded-none">실시간 순위</PremiumBadge>
@@ -665,107 +685,83 @@ export default function AnalyticsDashboardPanel() {
           </div>
         </PremiumCard>
 
-        {/* 우측 (50%): 독자 접속 환경 및 구글 SEO 웹 품질 (Cloudflare 표준 위젯) */}
-        <div className="space-y-2.5 flex flex-col justify-between">
-          {/* 1. 기기 환경 점유율 (Device Types) */}
-          <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="users" className="!p-3.5">
-            <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-2 mb-2.5">
-              <div className="flex items-center gap-2">
-                <AppIcon name="users" size={15} className="text-blue-600 dark:text-blue-400" />
-                <h4 className="font-extrabold text-xs text-gray-800 dark:text-zinc-200">
-                  접속 기기 점유율 (Device Types)
-                </h4>
-              </div>
-              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-900">
-                모바일 {devices.mobile}%
+        {/* 우측 (1칸: 33.3%) — 독자 접속 환경 및 구글 SEO 웹 품질 (단일 통합 PremiumCard) */}
+        <PremiumCard 
+          borderColor="teal" 
+          hoverEffect={true} 
+          watermarkIcon="users" 
+          className="!p-0 flex flex-col justify-between overflow-hidden"
+        >
+          {/* 헤더 */}
+          <div className="px-4 py-3 bg-gradient-to-r from-teal-50/80 to-transparent dark:from-teal-900/20 dark:to-transparent border-b border-teal-100/80 dark:border-teal-900/30 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2">
+              <AppIcon name="users" size={16} className="text-teal-600 dark:text-teal-400" />
+              <span className="font-extrabold text-xs sm:text-sm text-teal-800 dark:text-teal-200">
+                독자 접속 환경 & 품질
               </span>
             </div>
+            <span className="text-[10px] text-teal-700 dark:text-teal-300 font-bold bg-teal-50 dark:bg-teal-950/50 px-2 py-0.5 rounded-none border border-teal-200 dark:border-teal-900">실시간 환경</span>
+          </div>
 
-            <div className="space-y-2">
+          <div className="p-4 space-y-3.5 divide-y divide-gray-100 dark:divide-zinc-800/80">
+            {/* 1. 기기 점유율 */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] font-bold text-gray-700 dark:text-zinc-300">
+                <span>기기 점유율 (Device Types)</span>
+                <span className="text-teal-600 dark:text-teal-400 font-mono text-[10px]">모바일 {devices.mobile}%</span>
+              </div>
               <div className="w-full h-2 rounded-none bg-gray-100 dark:bg-zinc-800 overflow-hidden flex border border-gray-200/50 dark:border-zinc-700/50">
                 <div style={{ width: `${devices.mobile}%` }} className="h-full bg-blue-500" title={`모바일 ${devices.mobile}%`} />
                 <div style={{ width: `${devices.desktop}%` }} className="h-full bg-teal-500" title={`데스크톱 ${devices.desktop}%`} />
                 <div style={{ width: `${devices.tablet}%` }} className="h-full bg-amber-500" title={`태블릿 ${devices.tablet}%`} />
               </div>
-              <div className="flex items-center justify-between text-[11px] font-bold text-gray-600 dark:text-zinc-400 pt-0.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-none bg-blue-500" />
-                  <span>스마트폰 (Mobile): <strong className="font-mono text-gray-900 dark:text-white">{devices.mobile}%</strong></span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-none bg-teal-500" />
-                  <span>PC (Desktop): <strong className="font-mono text-gray-900 dark:text-white">{devices.desktop}%</strong></span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-none bg-amber-500" />
-                  <span>태블릿: <strong className="font-mono text-gray-900 dark:text-white">{devices.tablet}%</strong></span>
-                </div>
+              <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 dark:text-zinc-400 pt-0.5">
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-none bg-blue-500" />모바일 {devices.mobile}%</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-none bg-teal-500" />PC {devices.desktop}%</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-none bg-amber-500" />태블릿 {devices.tablet}%</span>
               </div>
             </div>
-          </PremiumCard>
 
-          {/* 2. 브라우저 점유율 (Top Browsers) */}
-          <PremiumCard borderColor="teal" hoverEffect={true} watermarkIcon="compass" className="!p-3.5">
-            <div className="flex items-center justify-between border-b border-teal-100/60 dark:border-teal-900/40 pb-2 mb-2">
-              <div className="flex items-center gap-2">
-                <AppIcon name="compass" size={15} className="text-teal-600 dark:text-teal-400" />
-                <h4 className="font-extrabold text-xs text-teal-900 dark:text-teal-200">
-                  웹 브라우저 환경 (Browsers)
-                </h4>
+            {/* 2. 웹 브라우저 환경 (표준 게이지 바 렌더러 적용) */}
+            <div className="pt-3 space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] font-bold text-gray-700 dark:text-zinc-300">
+                <span>웹 브라우저 점유율</span>
+                <span className="text-[10px] text-gray-400 font-normal">인앱 및 모바일 웹</span>
               </div>
-              <span className="text-[10px] text-teal-600 dark:text-teal-400 font-bold">인앱 및 모바일 웹</span>
+              {renderMetricProgressList(browserItems, 'from-teal-500 to-emerald-500')}
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              {browsers.slice(0, 4).map((b, idx) => (
-                <div key={idx} className="p-2 bg-teal-50/40 dark:bg-teal-950/20 border border-teal-100/80 dark:border-teal-900/40 rounded-none flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-gray-700 dark:text-zinc-300 truncate mr-1">
-                    {b.name}
-                  </span>
-                  <span className="text-[11px] font-extrabold font-mono text-teal-700 dark:text-teal-300 shrink-0">
-                    {b.percentage}%
+            {/* 3. 구글 코어 웹 바이탈 품질 */}
+            <div className="pt-3 space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] font-bold text-gray-700 dark:text-zinc-300">
+                <span>구글 코어 웹 바이탈 (SEO)</span>
+                <PremiumBadge color="green" className="!text-[9.5px] !px-1.5 !py-0 rounded-none">
+                  구글 합격 (Good)
+                </PremiumBadge>
+              </div>
+              <div className="grid grid-cols-3 gap-1.5 text-center pt-0.5">
+                <div className="p-1 bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100/80 dark:border-emerald-900/40 rounded-none">
+                  <span className="block text-[9px] font-bold text-gray-500 dark:text-zinc-400">LCP (속도)</span>
+                  <span className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                    {vitals.lcp.scoreMs}ms
                   </span>
                 </div>
-              ))}
-            </div>
-          </PremiumCard>
-
-          {/* 3. 구글 코어 웹 바이탈 품질 (Core Web Vitals) */}
-          <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="zap" className="!p-3.5">
-            <div className="flex items-center justify-between border-b border-emerald-100/60 dark:border-emerald-900/40 pb-2 mb-2">
-              <div className="flex items-center gap-2">
-                <AppIcon name="zap" size={15} className="text-emerald-600 dark:text-emerald-400" />
-                <h4 className="font-extrabold text-xs text-emerald-900 dark:text-emerald-200">
-                  구글 코어 웹 바이탈 (SEO 웹 품질)
-                </h4>
-              </div>
-              <PremiumBadge color="green" className="!text-[10px] !px-2 !py-0.2 rounded-none">
-                구글 SEO 합격 (Good)
-              </PremiumBadge>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2 text-center pt-1">
-              <div className="p-1.5 bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100/80 dark:border-emerald-900/40 rounded-none">
-                <span className="block text-[10px] font-bold text-gray-500 dark:text-zinc-400">LCP (로딩속도)</span>
-                <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
-                  {vitals.lcp.scoreMs}ms
-                </span>
-              </div>
-              <div className="p-1.5 bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100/80 dark:border-emerald-900/40 rounded-none">
-                <span className="block text-[10px] font-bold text-gray-500 dark:text-zinc-400">INP (반응성)</span>
-                <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
-                  {vitals.inp.scoreMs}ms
-                </span>
-              </div>
-              <div className="p-1.5 bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100/80 dark:border-emerald-900/40 rounded-none">
-                <span className="block text-[10px] font-bold text-gray-500 dark:text-zinc-400">CLS (안정성)</span>
-                <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
-                  {vitals.cls.score}
-                </span>
+                <div className="p-1 bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100/80 dark:border-emerald-900/40 rounded-none">
+                  <span className="block text-[9px] font-bold text-gray-500 dark:text-zinc-400">INP (반응)</span>
+                  <span className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                    {vitals.inp.scoreMs}ms
+                  </span>
+                </div>
+                <div className="p-1 bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-100/80 dark:border-emerald-900/40 rounded-none">
+                  <span className="block text-[9px] font-bold text-gray-500 dark:text-zinc-400">CLS (안정)</span>
+                  <span className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                    {vitals.cls.score}
+                  </span>
+                </div>
               </div>
             </div>
-          </PremiumCard>
-        </div>
+          </div>
+        </PremiumCard>
       </div>
     </AdminPanelLayout>
   );

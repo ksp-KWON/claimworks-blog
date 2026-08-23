@@ -28,7 +28,10 @@ async function generateSinglePost() {
 
   // 1. Topic 로드
   const postTypeEnv = process.env.POST_TYPE || 'all';
-  const targetCategory = postTypeEnv === 'all' ? null : postTypeEnv;
+  let targetCategory = postTypeEnv === 'all' ? null : postTypeEnv;
+  if (targetCategory === '판례·법률 해석' || (targetCategory && targetCategory.includes('판례'))) {
+    targetCategory = '판례·분쟁조정';
+  }
   const dailyTopic = await getDailyTopic(targetCategory);
 
   console.log(`  [로드] 카테고리: [${dailyTopic.category}] | 확정 키워드: '${dailyTopic.keyword}' (${dailyTopic.trendTitle || '미개척 실무'})`);

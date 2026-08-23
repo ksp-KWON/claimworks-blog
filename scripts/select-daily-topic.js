@@ -43,7 +43,9 @@ function determineCategory() {
   const args = process.argv.slice(2);
   const catIdx = args.indexOf('--category');
   if (catIdx !== -1 && args[catIdx + 1]) {
-    return args[catIdx + 1];
+    const raw = args[catIdx + 1];
+    if (raw === '판례·법률 해석' || raw.includes('판례')) return '판례·분쟁조정';
+    return raw;
   }
   const utcHour = new Date().getUTCHours();
   if (utcHour >= 0 && utcHour < TARGET_CATEGORIES.length) {

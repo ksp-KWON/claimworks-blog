@@ -87,9 +87,10 @@ export async function runAutoGenerationWorkflow(
     existingPostsArr = await res.json();
   } catch(e) {}
   
-  const recentPosts = existingPostsArr.slice(0, 30);
+  const recentPosts = existingPostsArr.slice(0, 50);
   const existingSlugs = recentPosts.length > 0 ? recentPosts.map(p => p.slug).join(', ') : '- (없음)';
-  const existingTitles = recentPosts.length > 0 ? recentPosts.map(p => `${p.title}`).join('\n') : '- (없음)';
+  const existingTitles = recentPosts.length > 0 ? recentPosts.map(p => `[${p.category || '일반'}] ${p.title}`).join('\n') : '- (없음)';
+
 
   const queryGenPrompt = getQueryGenerationPrompt(targetCategory, existingTitles);
   let dynamicQueries: string[] = [targetCategory]; 

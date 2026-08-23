@@ -295,27 +295,32 @@ const CONTENT_SCHEMA = {
 };
 
 // ── 6. 기획 프롬프트 헬퍼들 ──────────────────────────────────────────
-function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCategory) {
+function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCategory, planFeedback = '') {
+  const feedbackSection = planFeedback ? `\n[🚨 기획안 재시도 피드백 (반드시 준수)]\n${planFeedback}\n` : '';
   return `당신은 '보상스쿨'의 최정상 콘텐츠 기획자이자 마케터입니다.
 오늘 확정된 대표 키워드는 [${keyword}] 이며, 관련된 오늘의 이슈는 [${trendTitle}] 입니다.
 반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
 
-기존 슬러그 (중복 금지) : [${existingPosts}]
-
-위 키워드와 맥락을 바탕으로, 어떻게 하면 잠재 고객(보험 분쟁 중인 사람)이 검색 결과에서 클릭하지 않고는 못 배길지 연쇄 사고(Chain-of-Thought)를 거쳐 기획하십시오:
-1. thoughtProcess: 기획 및 마케팅 전략에 대한 연쇄 사고 논리 서술
-2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
-3. title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
-4. summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문
-5. category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
-6. specialtyCategory: 사안과 직결된 전문 진료과목
-7. tags: 관련 태그 5개
-8. keywords: 타겟 키워드 목록
+[최근 발행 글 및 슬러그 목록 (중복 금지!)]
+${existingPosts}
+${feedbackSection}
+[기획 핵심 지시사항]
+1. 최근 30일간 다룬 질환명, 신체 부위, 특수 사고 유형과 겹치지 않는 완전히 참신하고 새로운 분쟁 영역을 발굴하십시오.
+2. 위 키워드와 맥락을 바탕으로, 어떻게 하면 잠재 고객(보험 분쟁 중인 사람)이 검색 결과에서 클릭하지 않고는 못 배길지 연쇄 사고(Chain-of-Thought)를 거쳐 기획하십시오:
+   - thoughtProcess: 기획 및 마케팅 전략에 대한 연쇄 사고 논리 서술
+   - slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
+   - title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
+   - summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문
+   - category: 사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1~2개
+   - specialtyCategory: 사안과 직결된 전문 진료과목
+   - tags: 관련 태그 5개
+   - keywords: 타겟 키워드 목록
 
 반드시 지정된 JSON 스키마를 준수하여 출력하십시오.`;
 }
 
-function getPrecedentPlanningPrompt(courtCase, existingPosts, targetCategory) {
+function getPrecedentPlanningPrompt(courtCase, existingPosts, targetCategory, planFeedback = '') {
+  const feedbackSection = planFeedback ? `\n[🚨 기획안 재시도 피드백 (반드시 준수)]\n${planFeedback}\n` : '';
   return `당신은 '보상스쿨'의 최정상 판례 기획자이자 테크니컬 라이터입니다.
 아래 판례 정보를 분석하여 일반 소비자가 이해하기 쉽고 SEO 유입 효과가 극대화된 블로그 포스팅을 기획하십시오.
 반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
@@ -324,8 +329,9 @@ function getPrecedentPlanningPrompt(courtCase, existingPosts, targetCategory) {
 판례 사건번호: ${courtCase.caseNumber || courtCase.caseNo || courtCase.id}
 판례 내용 요약: ${courtCase.summary || courtCase.content}
 
-기존 슬러그 (중복 금지) : [${existingPosts}]
-
+[기존 슬러그 및 최근 다룬 주제 (중복 금지)]
+${existingPosts}
+${feedbackSection}
 1. thoughtProcess: 판례의 핵심 쟁점을 일반인이 공감할 스토리로 전환하는 연쇄 사고 논리
 2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
 3. title: SEO 최적화 판례 제목 (사건의 핵심 쟁점과 판결 취지를 알기 쉽게 후킹하는 제목)
@@ -337,6 +343,7 @@ function getPrecedentPlanningPrompt(courtCase, existingPosts, targetCategory) {
 
 반드시 지정된 JSON 스키마를 준수하여 출력하십시오.`;
 }
+
 
 function getManualPlanningPrompt(arg1, arg2, arg3, arg4) {
   let topicTitle, rawInput, existingPosts, targetCategory;

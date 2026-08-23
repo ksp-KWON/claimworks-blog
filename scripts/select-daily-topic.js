@@ -20,7 +20,11 @@ const { XMLParser } = require('fast-xml-parser');
 // ── 공통 유틸 ────────────────────────────────────────────────────────────
 const { POSTS_DIR, sleep, safeFetch } = require('./pipeline-utils.js');
 const { callGemini } = require('./gemini-helper');
-const { getExistingPosts } = require('../src/lib/post-builder.js');
+const { 
+  getExistingPosts, 
+  getRecent30DaysContext, 
+  isDuplicateTopic 
+} = require('../src/lib/post-builder.js');
 const { 
   getQueryGenerationPrompt, 
   getKeywordExtractionPrompt, 
@@ -63,75 +67,6 @@ function determineCategory() {
   return TARGET_CATEGORIES[Math.floor(Math.random() * TARGET_CATEGORIES.length)];
 }
 
-/**
- * 카테고리별 최근 30개 글 컨텍스트 및 중복 방지 토큰 추출
- */
-function getRecentCategoryContext(targetCategory, limit = 30) {
-  const existingPosts = getExistingPosts();
-  
-  // 해당 카테고리 글 필터링 (최신순)
-  const categoryPosts = existingPosts
-    .filter(p => {
-      if (targetCategory === '판례·법률 해석') return true;
-      const cat = String(p.category || '');
-      return cat.includes(targetCategory) || targetCategory.includes(cat);
-    })
-    .slice(0, limit);
-
-  // 최근 30개 글 제목 목록
-  const recentTitlesStr = categoryPosts.map((p, idx) => `${idx + 1}. ${p.title}`).join('\n');
-
-  // 금지 키워드 및 토큰 집합 생성
-  const forbiddenKeywords = new Set();
-  categoryPosts.forEach(p => {
-    // 1. 제목에서 2글자 이상 명사/단어 추출
-    const titleTokens = p.title
-      .replace(/[^가-힣a-zA-Z0-9]/g, ' ')
-      .split(/\s+/)
-      .filter(w => w.length >= 2);
-    titleTokens.forEach(w => forbiddenKeywords.add(w.toLowerCase()));
-
-    // 2. 태그 등록
-    if (Array.isArray(p.tags)) {
-      p.tags.forEach(t => {
-        const cleanTag = String(t).trim().toLowerCase();
-        if (cleanTag.length >= 2) forbiddenKeywords.add(cleanTag);
-      });
-    }
-  });
-
-  return {
-    recentTitlesStr: recentTitlesStr || '최근 발행 글 없음',
-    forbiddenKeywords,
-    recentCount: categoryPosts.length
-  };
-}
-
-/**
- * 단일 공통 중복 검증기 (Strict Deduplicator)
- * 후보 키워드가 최근 30개 글의 금지 키워드 집합과 겹치는지 엄격 판별
- */
-function isDuplicateTopic(keyword, forbiddenKeywords) {
-  if (!keyword || typeof keyword !== 'string') return true;
-  const kw = keyword.toLowerCase().trim();
-  if (kw.length < 2) return true;
-
-  // 1. 전체 문자열 직접 일치
-  if (forbiddenKeywords.has(kw)) return true;
-
-  // 2. 2글자 이상 토큰 단위 상호 포함 검사
-  for (const forbidden of forbiddenKeywords) {
-    if (forbidden.length >= 2) {
-      if (kw === forbidden) return true;
-      // 주요 의학/법률 명사가 포함된 경우 (예: '갑상선', '백내장', '도수치료' 등)
-      if (kw.includes(forbidden) || forbidden.includes(kw)) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
 
 /**
  * [1단계-A] AI 검색 키워드 창작
@@ -388,7 +323,7 @@ async function generateNovelTopicWithRetry(targetCategory, recentTitlesStr, forb
 }
 
 /**
- * 메인 주제 결정 파이프라인 (표준 3단계 일원화)
+ * 메인 주제 결정 파이프라인 (표준 3단계 일원화 & 전역 30일 중복 방지)
  */
 async function getDailyTopic(inputCategory) {
   let targetCategory = inputCategory || determineCategory();
@@ -397,17 +332,17 @@ async function getDailyTopic(inputCategory) {
   const existingPosts = getExistingPosts();
   const usedCaseNumbers = new Set(existingPosts.map(p => p.caseNumber).filter(Boolean));
   
-  // 1. 해당 카테고리 최근 30개 글 컨텍스트 및 블랙리스트 로드
-  let categoryContext = getRecentCategoryContext(targetCategory, 30);
-  console.log(`  [분석] [${targetCategory}] 최근 발행 글 ${categoryContext.recentCount}개 로드 완료 (중복 방지 엔진 가동)`);
+  // 1. 최근 30일 전역 컨텍스트 및 블랙리스트 로드
+  let context30Days = getRecent30DaysContext(targetCategory);
+  console.log(`  [분석] 최근 30일 발행 글 ${context30Days.total30DaysCount}개 로드 완료 (전역 중복 방지 엔진 가동)`);
 
   let found = null;
 
   if (targetCategory === '판례·법률 해석') {
     // 2-A. 판례 카테고리: 트렌드 뉴스 수집 ➔ 판례 탐색망
-    const aiQueries = await generateTrendySearchKeywords(targetCategory, categoryContext.recentTitlesStr);
+    const aiQueries = await generateTrendySearchKeywords(targetCategory, context30Days.globalRecentTitlesStr);
     const headlines = await fetchTrendingNews(aiQueries);
-    const rankedCandidates = await extractInsuranceKeywords(headlines, targetCategory, categoryContext.recentTitlesStr);
+    const rankedCandidates = await extractInsuranceKeywords(headlines, targetCategory, context30Days.globalRecentTitlesStr);
 
     console.log('[2/3] 트렌드 키워드 기반 법제처 판례 탐색 중...');
     found = await findPrecedent(rankedCandidates, usedCaseNumbers);
@@ -415,7 +350,7 @@ async function getDailyTopic(inputCategory) {
     // 판례 탐색 2차 안전장치 (상위 법률 용어)
     if (!found) {
       console.log('[2/3] ⚠️ 1차 탐색 실패. 2차 안전망(상위 법률 용어) 가동...');
-      const fallbackPrompt = getFallbackLegalKeywordPrompt(targetCategory, rankedCandidates.slice(0, 3).map(c => c.searchKeyword).join(', '), categoryContext.recentTitlesStr);
+      const fallbackPrompt = getFallbackLegalKeywordPrompt(targetCategory, rankedCandidates.slice(0, 3).map(c => c.searchKeyword).join(', '), context30Days.globalRecentTitlesStr);
       try {
         const schema = {
           type: 'OBJECT',
@@ -441,19 +376,19 @@ async function getDailyTopic(inputCategory) {
     if (!found) {
       console.warn('⚠️ 판례 탐색 실패 — 일반 포스트(보상가이드)로 안전 전환합니다.');
       targetCategory = '보상가이드';
-      categoryContext = getRecentCategoryContext(targetCategory, 30); // 💡 보상가이드 컨텍스트로 새로 고침!
-      found = await generateNovelTopicWithRetry(targetCategory, categoryContext.recentTitlesStr, categoryContext.forbiddenKeywords);
+      context30Days = getRecent30DaysContext(targetCategory);
+      found = await generateNovelTopicWithRetry(targetCategory, context30Days.globalRecentTitlesStr, context30Days.forbiddenKeywords);
     }
   } else {
-    // 2-B. 일반 트렌드 카테고리: 뉴스 수집 ➔ 실무 키워드 추출 ➔ 중복 검증
-    const aiQueries = await generateTrendySearchKeywords(targetCategory, categoryContext.recentTitlesStr);
+    // 2-B. 일반 트렌드 카테고리: 뉴스 수집 ➔ 실무 키워드 추출 ➔ 전역 30일 중복 검증
+    const aiQueries = await generateTrendySearchKeywords(targetCategory, context30Days.globalRecentTitlesStr);
     const headlines = await fetchTrendingNews(aiQueries);
-    const rankedCandidates = await extractInsuranceKeywords(headlines, targetCategory, categoryContext.recentTitlesStr);
+    const rankedCandidates = await extractInsuranceKeywords(headlines, targetCategory, context30Days.globalRecentTitlesStr);
 
-    console.log(`[2/3] 일반 트렌드 카테고리: 최근 30개 글과 중복 여부 정밀 검증 중...`);
+    console.log(`[2/3] 일반 트렌드 카테고리: 최근 30일 전역 글과 중복 여부 정밀 검증 중...`);
     if (rankedCandidates && rankedCandidates.length > 0) {
       for (const cand of rankedCandidates) {
-        if (!isDuplicateTopic(cand.searchKeyword, categoryContext.forbiddenKeywords)) {
+        if (!isDuplicateTopic(cand.searchKeyword, context30Days.forbiddenKeywords)) {
           console.log(`    ✅ 중복되지 않는 참신한 뉴스 키워드 채택: "${cand.searchKeyword}"`);
           found = {
             keyword: cand.searchKeyword,
@@ -462,7 +397,7 @@ async function getDailyTopic(inputCategory) {
           };
           break;
         } else {
-          console.log(`    ⏩ 최근 발행 글과 중복되어 스킵: "${cand.searchKeyword}"`);
+          console.log(`    ⏩ 최근 30일 글과 중복되어 스킵: "${cand.searchKeyword}"`);
         }
       }
     }
@@ -470,7 +405,7 @@ async function getDailyTopic(inputCategory) {
     // 뉴스 후보가 전원 중복되었거나 없을 경우: 3단계 AI 단독 발굴 엔진 실행
     if (!found) {
       console.log(`    ⚠️ 뉴스 후보 전원 중복/부재. [3단계 미개척 주제 발굴 엔진] 가동...`);
-      found = await generateNovelTopicWithRetry(targetCategory, categoryContext.recentTitlesStr, categoryContext.forbiddenKeywords);
+      found = await generateNovelTopicWithRetry(targetCategory, context30Days.globalRecentTitlesStr, context30Days.forbiddenKeywords);
     }
   }
 
@@ -490,7 +425,6 @@ async function getDailyTopic(inputCategory) {
 
 module.exports = { 
   getDailyTopic, 
-  determineCategory, 
-  getRecentCategoryContext, 
-  isDuplicateTopic 
+  determineCategory 
 };
+

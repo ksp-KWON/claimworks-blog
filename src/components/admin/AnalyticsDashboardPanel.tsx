@@ -10,7 +10,7 @@ import AppIcon from '@/components/ui/AppIcon';
 import AdminPanelLayout from './AdminPanelLayout';
 
 const EMPTY_ANALYTICS_DATA: UniversalAnalyticsData = {
-  period: '7d',
+  period: '24h',
   lastUpdated: new Date().toISOString(),
   summary: {
     uniqueVisitors: 0,
@@ -135,7 +135,7 @@ function renderMetricProgressList(
 }
 
 export default function AnalyticsDashboardPanel() {
-  const [period, setPeriod] = useState<'24h' | '7d' | '30d'>('7d');
+  const [period, setPeriod] = useState<'24h' | '7d' | '30d'>('24h');
   const [data, setData] = useState<UniversalAnalyticsData>(EMPTY_ANALYTICS_DATA);
   const [loading, setLoading] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);

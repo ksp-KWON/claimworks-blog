@@ -293,51 +293,67 @@ export default function AnalyticsDashboardPanel() {
 
   return (
     <AdminPanelLayout innerClassName="h-full overflow-y-auto custom-scrollbar space-y-3 p-1 pb-6 md:pb-1 pr-1 sm:pr-2">
-      {/* ── 1. 1열(1 Row) 상단 컨트롤 바 (직전 대비 등락률 PremiumBadge 일체형) ── */}
+      {/* ── 1. 1행: 상단 6대 컨트롤 바 (직전 대비 등락률 PremiumBadge 일체형) ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 shrink-0">
-        {/* 1. 고유 방문자 */}
-        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="users" className="!p-2.5 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">순 방문자수</span>
-            {renderDeltaBadge(summary.uniqueVisitorsDelta)}
-          </div>
-          <span className="text-base sm:text-lg font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] tracking-tight font-mono">
-            {(summary.uniqueVisitors || 0).toLocaleString()}<span className="text-xs font-bold text-gray-400 ml-0.5">명</span>
-          </span>
-        </PremiumCard>
-
-        {/* 2. 총 페이지뷰 */}
-        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="chart" className="!p-2.5 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">총 조회수</span>
-            {renderDeltaBadge(summary.pageviewsDelta)}
-          </div>
-          <span className="text-base sm:text-lg font-extrabold text-[var(--google-green)] dark:text-[#81c995] tracking-tight font-mono">
-            {(summary.pageviews || 0).toLocaleString()}<span className="text-xs font-bold text-gray-400 ml-0.5">회</span>
-          </span>
-        </PremiumCard>
-
-        {/* 3. 상담 유입 */}
-        <PremiumCard borderColor="purple" hoverEffect={true} watermarkIcon="phone" className="!p-2.5 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">상담 유입 건수</span>
-            {renderDeltaBadge(summary.consultationViewsDelta)}
-          </div>
-          <span className="text-base sm:text-lg font-extrabold text-purple-600 dark:text-purple-400 tracking-tight font-mono">
-            {realConsultCount !== null ? realConsultCount : (summary.consultationViews || 0)}<span className="text-xs font-bold text-gray-400 ml-0.5">건</span>
-          </span>
-        </PremiumCard>
-
-        {/* 4. 응답 속도 (로딩 시간 단축 시 초록 긍정 뱃지 ↘, 지연 시 로즈 ↗) */}
-        <PremiumCard borderColor="yellow" hoverEffect={true} watermarkIcon="zap" className="!p-2.5 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">평균 응답 속도</span>
-            {renderDeltaBadge(summary.avgLoadTimeMsDelta, true)}
-          </div>
-          <span className="text-base sm:text-lg font-extrabold text-amber-600 dark:text-amber-400 tracking-tight font-mono">
-            {summary.avgLoadTimeMs || 0}<span className="text-xs font-bold text-gray-400 ml-0.5">ms</span>
-          </span>
-        </PremiumCard>
+        {/* 1~4. 핵심 KPI 요약 카드 4종 (단일 매핑 표준 렌더러) */}
+        {[
+          {
+            label: '순 방문자수',
+            value: summary.uniqueVisitors,
+            unit: '명',
+            delta: summary.uniqueVisitorsDelta,
+            isReverse: false,
+            color: 'blue' as const,
+            icon: 'users' as const,
+            textClass: 'text-[var(--google-blue)] dark:text-[#8ab4f8]',
+          },
+          {
+            label: '총 조회수',
+            value: summary.pageviews,
+            unit: '회',
+            delta: summary.pageviewsDelta,
+            isReverse: false,
+            color: 'green' as const,
+            icon: 'chart' as const,
+            textClass: 'text-[var(--google-green)] dark:text-[#81c995]',
+          },
+          {
+            label: '상담 유입 건수',
+            value: realConsultCount !== null ? realConsultCount : (summary.consultationViews || 0),
+            unit: '건',
+            delta: summary.consultationViewsDelta,
+            isReverse: false,
+            color: 'purple' as const,
+            icon: 'phone' as const,
+            textClass: 'text-purple-600 dark:text-purple-400',
+          },
+          {
+            label: '평균 응답 속도',
+            value: summary.avgLoadTimeMs || 0,
+            unit: 'ms',
+            delta: summary.avgLoadTimeMsDelta,
+            isReverse: true,
+            color: 'yellow' as const,
+            icon: 'zap' as const,
+            textClass: 'text-amber-600 dark:text-amber-400',
+          },
+        ].map((card, idx) => (
+          <PremiumCard 
+            key={idx} 
+            borderColor={card.color} 
+            hoverEffect={true} 
+            watermarkIcon={card.icon} 
+            className="!p-2.5 flex flex-col justify-between"
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">{card.label}</span>
+              {renderDeltaBadge(card.delta, card.isReverse)}
+            </div>
+            <span className={`text-base sm:text-lg font-extrabold ${card.textClass} tracking-tight font-mono`}>
+              {(card.value || 0).toLocaleString()}<span className="text-xs font-bold text-gray-400 ml-0.5">{card.unit}</span>
+            </span>
+          </PremiumCard>
+        ))}
 
         {/* 5. 기간 선택 컨트롤 (24h / 7일 / 30일) */}
         <PremiumCard borderColor="blue" hoverEffect={true} className="!p-2.5 flex flex-col justify-between">
@@ -491,7 +507,7 @@ export default function AnalyticsDashboardPanel() {
         </PremiumCard>
       )}
 
-      {/* ── 2. 2행: 방문 추이 그래프 (2칸) & 검색/유입 채널 랭킹 (1칸) ───────────────── */}
+      {/* ── 2. 2행: 방문 추이 그래프 (2칸: 66.7%) & 검색/유입 채널 랭킹 (1칸: 33.3%) ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 shrink-0">
         {/* 1. 방문 추이 그래프 (2칸: 66.7%) */}
         <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="trending-up" className="lg:col-span-2 !p-0 flex flex-col justify-between">
@@ -626,7 +642,6 @@ export default function AnalyticsDashboardPanel() {
       </div>
 
       {/* ── 3. 3행: 인기 보상 칼럼 TOP 10 (2칸: 66.7%) & 독자 접속 환경 (1칸: 33.3%) ── */}
-      {/* 상하 가로선 완벽 일치 (lg:grid-cols-3) & 모바일 order-last 제어 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 shrink-0">
         {/* 좌측 (2칸: 66.7%) — 인기 보상 칼럼 TOP 10 (모바일에서는 order-last로 맨 아래로) */}
         <PremiumCard 

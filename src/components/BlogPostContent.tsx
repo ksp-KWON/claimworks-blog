@@ -68,7 +68,7 @@ export default function BlogPostContent({ content, relatedPostsNode, authorBioNo
 
   // ── [AI 자유도 보장] 동적 본문 & 클로징 분리 알고리즘 ──
   // 섹션이 1개든 10개든 제한 없이 유연하게 처리
-  const CLOSING_PATTERN = /^(?:#+s*)?(?:d+[.)]s*)?(?:[⚖️💡🛡️📌s]*)(?:결론|솔루션|마무리|대응s*전략|권익s*보호|맺음말)/i;
+  const CLOSING_PATTERN = /^(?:#+\s*)?(?:\d+[.)]\s*)?(?:결론|솔루션|마무리|대응\s*전략|권익\s*보호|맺음말)/i;
 
   let bodySections: string[] = sections;
   let closingSection: string | null = null;

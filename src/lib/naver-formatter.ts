@@ -321,7 +321,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       // 6-NEW: 보상스쿨 실무인사이트 클로징 박스 (> ### 헤딩 + 본문)
       // 패턴: > ### 보상스쿨 가이드 & 실무 인사이트 또는 유사 헤딩
       // 수집된 quoteLines[0]이 이미 헤딩 텍스트 (### prefix는 L317에서 제거됨)
-      if (quoteLines.length >= 1 && (quoteLines[0].includes('보상스쿨') || quoteLines[0].includes('실무 인사이트') || quoteLines[0].includes('실무인사이트'))) {
+      if (quoteLines.length >= 1 && /보상스쿨|실무\s*인사이트|실무인사이트/.test(quoteLines[0])) {
         const boxTitle = quoteLines[0];
         const bodyLines = quoteLines.slice(1).filter(l => l.trim());
         const bodyItems = bodyLines.map(l => {
@@ -330,14 +330,14 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
         }).join('');
 
         const insightBox = `
-          <table style="width: 100%; border: 1px solid #e2e8f0; border-left: 5px solid #3b82f6; background-color: #f8fafc; border-collapse: collapse; margin: 26px 0 12px 0;">
+          <table style="width: 100%; border: 1px solid #e9d5ff; border-left: 5px solid #9333ea; background-color: #faf5ff; border-collapse: collapse; margin: 26px 0 12px 0;">
             <tr>
-              <td style="padding: 10px 16px; background-color: #f0f7ff; border-bottom: 1px solid #dbeafe;">
-                <span style="font-size: 15.5px; font-weight: bold; color: #1e3a8a;">💡 ${boxTitle}</span>
+              <td style="padding: 10px 16px; background-color: #f5f3ff; border-bottom: 1px solid #ddd6fe;">
+                <span style="font-size: 15.5px; font-weight: bold; color: #7c3aed;">💡 ${boxTitle}</span>
               </td>
             </tr>
             <tr>
-              <td style="padding: 14px 16px; background-color: #f8fafc; color: #334155; line-height: 1.85; font-size: 14.5px;">
+              <td style="padding: 14px 16px; background-color: #faf5ff; color: #4c1d95; line-height: 1.85; font-size: 14.5px;">
                 ${bodyItems || '<div style="font-size: 14.5px; color: #334155;">전문 손해사정사가 직접 작성한 실무 인사이트입니다.</div>'}
               </td>
             </tr>

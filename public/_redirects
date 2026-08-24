@@ -1,22 +1,15 @@
-# Cloudflare Pages 301 Permanent Redirects for Google Search Console 404 Resolution
+# ==============================================================================
+# Cloudflare Pages Global Standard 301 Redirect Rules (SSOT)
+# ==============================================================================
 
-# 1. Direct 404 Resolution for GSC reported URLs (2026.08)
-/blog/brain-hemorrhage-insurance-claim-guide-2 /blog/brain-hemorrhage-insurance-claim-guide 301
-/blog/health-insurance-out-of-pocket-limit-ruling-2 /blog/health-insurance-out-of-pocket-limit-ruling 301
-/blog/guide-spinal-compression-fracture /blog/spinal-compression-fracture-disability-dispute-guide 301
+# [Rule 1] Legacy OpenGraph Image URL Normalization (Universal Parameter Match)
+/blog/:slug/opengraph-image  /blog/:slug  301
+/blog/:slug/opengraph-image/ /blog/:slug  301
+
+# [Rule 2] Migrated Blog Post Slugs
+/blog/brain-hemorrhage-insurance-claim-guide-2          /blog/brain-hemorrhage-insurance-claim-guide          301
+/blog/health-insurance-out-of-pocket-limit-ruling-2     /blog/health-insurance-out-of-pocket-limit-ruling     301
+/blog/guide-spinal-compression-fracture                 /blog/spinal-compression-fracture-disability-dispute-guide 301
 /blog/debtor-bankruptcy-death-inheritance-ruling-2024gcu834 /blog/debtor-bankruptcy-death-inheritance-ruling-2024geu834 301
-/blog/debtor-bankruptcy-death-inheritance-ruling-2024gcu834/opengraph-image /blog/debtor-bankruptcy-death-inheritance-ruling-2024geu834 301
-/blog/unlisted-stock-divorce-property-division-ruling/opengraph-image /blog/unlisted-stock-divorce-property-division-ruling 301
-/blog/medical-negligence-fss-injury-dispute/opengraph-image /blog/medical-negligence-fss-injury-dispute 301
-/blog/dental-loss-disability-insurance-claim-dispute/opengraph-image /blog/dental-loss-disability-insurance-claim-dispute 301
-/blog/insurance-claim-lawsuit-dispute-resolution/opengraph-image /blog/insurance-claim-lawsuit-dispute-resolution 301
-/blog/chemotherapy-cerebral-hemorrhage-insurance-dispute/opengraph-image /blog/chemotherapy-cerebral-hemorrhage-insurance-dispute 301
-
-# 2. Legacy Slugs Redirect
-/blog/guide-premises-liability-no-fault /blog/guide-slip-fall-compensation 301
-/blog/private-health-insurance-claim-guide /blog/guide-private-health-insurance-non-reimbursable 301
-
-# 3. Global Wildcard for Raw OpenGraph Image URLs
-/blog/:slug/opengraph-image /blog/:slug 301
-/blog/:slug/opengraph-image/ /blog/:slug 301
-/blog/*/opengraph-image /blog/:splat 301
+/blog/guide-premises-liability-no-fault                 /blog/guide-slip-fall-compensation                   301
+/blog/private-health-insurance-claim-guide              /blog/guide-private-health-insurance-non-reimbursable 301

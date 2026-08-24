@@ -326,19 +326,19 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
         const bodyLines = quoteLines.slice(1).filter(l => l.trim());
         const bodyItems = bodyLines.map(l => {
           const highlighted = applyNaverHighlighter(l);
-          return `<div style="margin: 10px 0; font-size: 14.5px; color: #1e3a5f; line-height: 1.85;">${highlighted}</div>`;
+          return `<div style="margin: 10px 0; font-size: 14.5px; color: #334155; line-height: 1.85;">${highlighted}</div>`;
         }).join('');
 
         const insightBox = `
-          <table style="width: 100%; border: 1.5px solid #1d4ed8; background-color: #eff6ff; border-collapse: collapse; margin: 26px 0; border-radius: 6px;">
+          <table style="width: 100%; border: 1px solid #e2e8f0; border-left: 5px solid #3b82f6; background-color: #f8fafc; border-collapse: collapse; margin: 26px 0 12px 0;">
             <tr>
-              <td style="padding: 11px 18px; background-color: #1d4ed8; border-bottom: 1px solid #1e40af;">
-                <span style="font-size: 15px; font-weight: bold; color: #ffffff; letter-spacing: 0.02em;">💡 ${boxTitle}</span>
+              <td style="padding: 10px 16px; background-color: #f0f7ff; border-bottom: 1px solid #dbeafe;">
+                <span style="font-size: 15.5px; font-weight: bold; color: #1e3a8a;">💡 ${boxTitle}</span>
               </td>
             </tr>
             <tr>
-              <td style="padding: 16px 18px; background-color: #eff6ff; color: #1e3a5f; line-height: 1.85;">
-                ${bodyItems || '<div style="font-size: 14.5px; color: #1e3a5f;">전문 손해사정사가 직접 작성한 실무 인사이트입니다.</div>'}
+              <td style="padding: 14px 16px; background-color: #f8fafc; color: #334155; line-height: 1.85; font-size: 14.5px;">
+                ${bodyItems || '<div style="font-size: 14.5px; color: #334155;">전문 손해사정사가 직접 작성한 실무 인사이트입니다.</div>'}
               </td>
             </tr>
           </table>

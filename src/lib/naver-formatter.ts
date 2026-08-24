@@ -314,8 +314,37 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     if (trimmed.startsWith('>')) {
       const quoteLines: string[] = [];
       while (i < lines.length && lines[i].trim().startsWith('>')) {
-        quoteLines.push(lines[i].trim().replace(/^>\s?/, '').trim());
+        quoteLines.push(lines[i].trim().replace(/^>\s?/, '').replace(/^#{1,6}\s+/, '').trim());
         i++;
+      }
+
+      // 6-NEW: 보상스쿨 실무인사이트 클로징 박스 (> ### 헤딩 + 본문)
+      // 패턴: > ### 보상스쿨 가이드 & 실무 인사이트 또는 유사 헤딩
+      // 수집된 quoteLines[0]이 이미 헤딩 텍스트 (### prefix는 L317에서 제거됨)
+      if (quoteLines.length >= 1 && (quoteLines[0].includes('보상스쿨') || quoteLines[0].includes('실무 인사이트') || quoteLines[0].includes('실무인사이트'))) {
+        const boxTitle = quoteLines[0];
+        const bodyLines = quoteLines.slice(1).filter(l => l.trim());
+        const bodyItems = bodyLines.map(l => {
+          const highlighted = applyNaverHighlighter(l);
+          return `<div style="margin: 10px 0; font-size: 14.5px; color: #1e3a5f; line-height: 1.85;">${highlighted}</div>`;
+        }).join('');
+
+        const insightBox = `
+          <table style="width: 100%; border: 1.5px solid #1d4ed8; background-color: #eff6ff; border-collapse: collapse; margin: 26px 0; border-radius: 6px;">
+            <tr>
+              <td style="padding: 11px 18px; background-color: #1d4ed8; border-bottom: 1px solid #1e40af;">
+                <span style="font-size: 15px; font-weight: bold; color: #ffffff; letter-spacing: 0.02em;">💡 ${boxTitle}</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 18px; background-color: #eff6ff; color: #1e3a5f; line-height: 1.85;">
+                ${bodyItems || '<div style="font-size: 14.5px; color: #1e3a5f;">전문 손해사정사가 직접 작성한 실무 인사이트입니다.</div>'}
+              </td>
+            </tr>
+          </table>
+        `;
+        blocks.push(insightBox);
+        continue;
       }
 
       // 6-A. 1분 자가진단 체크리스트 ➔ [체크보드 카드 인용구 툴 6]

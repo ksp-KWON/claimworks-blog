@@ -55,7 +55,6 @@ function getHoffmanForMonths(months: number) {
 
 export default function LiabilityCalculator() {
   const [data, setData] = useState<LiabilityData>(initialData);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
   const handleChange = (field: keyof LiabilityData, value: number | boolean) => {
@@ -138,44 +137,44 @@ export default function LiabilityCalculator() {
   const { exportPDF, shareResult } = useCalculatorExport(resultRef);
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-6">
       {/* 1. 타이틀 헤더 */}
-      <div className="text-center space-y-1.5 mb-2">
+      <div className="text-center space-y-2 mb-2">
         <PremiumHeading level={1} gradient="red" className="justify-center !text-2xl sm:!text-3xl">
           배상책임 소송가액 계산기
         </PremiumHeading>
-        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] max-w-lg mx-auto leading-relaxed">
+        <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
           법원 손해배상 판례 기준(호프만계수)을 적용한 위자료, 일실수입, 개호비 산출 도구입니다.
         </p>
       </div>
 
       {/* 2. 🏆 상단 실시간 예상 손해배상액 챔피언 카드 */}
-      <div ref={resultRef} className="bg-gradient-to-br from-rose-600 to-red-700 dark:from-rose-700 dark:to-red-900 p-6 sm:p-7 text-white shadow-md relative overflow-hidden">
+      <div ref={resultRef} className="bg-gradient-to-br from-rose-600 to-red-700 dark:from-rose-700 dark:to-red-900 p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
         <div className="relative z-10 flex flex-col justify-between">
-          <div className="flex items-center justify-between gap-2 mb-3">
-            <span className="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-xs px-2.5 py-1 text-[11px] font-bold text-white/90 uppercase tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-300 animate-pulse"></span>
-              실시간 예상 총 배상액 (과실 상계 후)
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <span className="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-xs px-3 py-1.5 text-xs font-extrabold text-white/90 uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-rose-300 animate-pulse"></span>
+              실시간 예상 총 배상액 (과실 상계 후 최종액)
             </span>
-            <span className="text-[11px] text-white/70 font-medium">
-              과실 {data.faultRatio}% 반영
+            <span className="text-xs sm:text-[13px] text-white/80 font-bold">
+              본인 과실 {data.faultRatio}% 반영
             </span>
           </div>
 
-          <div className="flex items-end gap-2 mb-4">
-            <div className="text-4xl sm:text-5xl font-black tracking-tight drop-shadow-xs">
+          <div className="flex items-end gap-2 mb-5">
+            <div className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-xs">
               {Math.floor(result.totalAmount).toLocaleString()}
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-white/90 mb-1">원</div>
+            <div className="text-2xl sm:text-3xl font-bold text-white/90 mb-1">원</div>
           </div>
 
-          <div className="pt-3 border-t border-white/20 flex flex-wrap items-center justify-between text-xs text-white/80 font-medium gap-2">
+          <div className="pt-4 border-t border-white/20 flex flex-wrap items-center justify-between text-xs sm:text-sm text-white/90 font-medium gap-3">
             <div>
-              <span className="text-white/60 mr-1">피해유형:</span>
-              <span className="font-bold text-white">{[data.hasInjury && '부상', data.hasDisability && '장해', data.hasDeath && '사망', data.hasCare && '개호'].filter(Boolean).join(', ') || '선택 없음'}</span>
+              <span className="text-white/60 mr-1.5">피해 유형:</span>
+              <span className="font-bold text-white">{[data.hasInjury && '부상(치료)', data.hasDisability && '후유장해', data.hasDeath && '사망', data.hasCare && '개호(간병)'].filter(Boolean).join(', ') || '선택 없음'}</span>
             </div>
             <div>
-              <span className="text-white/60 mr-1">월소득:</span>
+              <span className="text-white/60 mr-1.5">월 평균 소득:</span>
               <span className="font-bold text-white">{data.income.toLocaleString()}원</span>
             </div>
           </div>
@@ -186,35 +185,35 @@ export default function LiabilityCalculator() {
       <div className="space-y-4">
         
         {/* [섹션 1] 피해 유형 선택 4단 칩 */}
-        <div className="bg-white dark:bg-[#202124] p-4 sm:p-5 border border-rose-200/90 dark:border-rose-900/50 shadow-xs space-y-3">
+        <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-rose-200/90 dark:border-rose-900/50 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
-              <AppIcon name="scale" size={14} className="text-rose-600" />
+            <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <AppIcon name="scale" size={18} className="text-rose-600" />
               1. 발생한 피해 유형 선택
             </h2>
-            <span className="text-[10.5px] text-gray-400">복수 선택 가능</span>
+            <span className="text-xs text-gray-400 font-medium">복수 선택 가능</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {[
               { key: 'hasInjury', label: '부상 (상해)', sub: '치료비·휴업손해' },
-              { key: 'hasDisability', label: '후유장해', sub: '일실수입' },
-              { key: 'hasDeath', label: '사망', sub: '유족 배상금' },
-              { key: 'hasCare', label: '개호 (간병)', sub: '평생 간병비' },
+              { key: 'hasDisability', label: '후유장해', sub: '미래 일실수입' },
+              { key: 'hasDeath', label: '사망', sub: '유족 배상 및 장례비' },
+              { key: 'hasCare', label: '개호 (간병)', sub: '평생 전문 간병비' },
             ].map(item => {
               const isActive = data[item.key as keyof LiabilityData] as boolean;
               return (
                 <button
                   key={item.key}
                   onClick={() => handleChange(item.key as keyof LiabilityData, !isActive)}
-                  className={`p-2.5 text-center border transition-all cursor-pointer ${
+                  className={`p-3 text-center border transition-all cursor-pointer ${
                     isActive
                       ? 'border-rose-600 bg-rose-50/90 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 font-extrabold shadow-xs'
-                      : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-600 dark:text-zinc-400 hover:bg-gray-100'
+                      : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
                   }`}
                 >
-                  <div className="text-xs sm:text-[13px]">{item.label}</div>
-                  <div className="text-[10px] opacity-70 mt-0.5">{item.sub}</div>
+                  <div className="text-xs sm:text-sm font-extrabold">{item.label}</div>
+                  <div className="text-[11px] opacity-75 mt-1 font-medium">{item.sub}</div>
                 </button>
               );
             })}
@@ -222,63 +221,63 @@ export default function LiabilityCalculator() {
         </div>
 
         {/* [섹션 2] 연령, 소득, 과실비율 */}
-        <div className="bg-white dark:bg-[#202124] p-4 sm:p-5 border border-gray-200/90 dark:border-zinc-800 shadow-xs space-y-3.5">
-          <h2 className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
-            <AppIcon name="chart" size={14} className="text-rose-600" />
+        <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/90 dark:border-zinc-800 shadow-xs space-y-4">
+          <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+            <AppIcon name="chart" size={18} className="text-rose-600" />
             2. 사고 당시 연령 & 소득 & 과실비율
           </h2>
 
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-medium text-gray-500 mb-1">피해자 연령 (만 나이)</label>
+                <label className="block text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">피해자 연령 (만 나이)</label>
                 <div className="relative">
                   <input
                     type="number"
                     value={data.ageAtAccident || ''}
                     onChange={e => handleChange('ageAtAccident', Number(e.target.value))}
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1.5 px-2.5 pr-6 text-xs font-bold focus:border-rose-500 focus:outline-none"
+                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2.5 px-3.5 pr-7 text-sm font-bold text-gray-900 dark:text-white focus:border-rose-500 focus:outline-none"
                   />
-                  <span className="absolute right-2 top-2 text-[10.5px] text-gray-400">세</span>
+                  <span className="absolute right-3 top-3 text-xs text-gray-400 font-bold">세</span>
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-gray-500 mb-1">월 평균 소득</label>
+                <label className="block text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">월 평균 소득</label>
                 <div className="relative">
                   <input
                     type="text"
                     inputMode="numeric"
                     value={data.income ? fmt(data.income) : ''}
                     onChange={e => handleChange('income', parse(e.target.value))}
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1.5 px-2.5 pr-6 text-xs font-bold focus:border-rose-500 focus:outline-none"
+                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2.5 px-3.5 pr-7 text-sm font-bold text-gray-900 dark:text-white focus:border-rose-500 focus:outline-none"
                   />
-                  <span className="absolute right-2 top-2 text-[10.5px] text-gray-400">원</span>
+                  <span className="absolute right-3 top-3 text-xs text-gray-400 font-bold">원</span>
                 </div>
               </div>
             </div>
 
             <button
               onClick={() => handleChange('income', 3441360)}
-              className="w-full py-1.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/60 text-[11px] font-bold hover:bg-rose-100 transition-colors cursor-pointer"
+              className="w-full py-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200/80 dark:border-rose-800/80 text-xs sm:text-[12.5px] font-extrabold hover:bg-rose-100 transition-colors cursor-pointer"
             >
               보통인부 시중노임단가 자동 적용 (3,441,360원)
             </button>
 
             {/* 과실 비율 퀵 칩 */}
             <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="text-[11px] font-medium text-gray-500">본인 과실 비율</label>
-                <span className="text-xs font-bold text-rose-600 dark:text-rose-400">{data.faultRatio}%</span>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300">본인 과실 비율</label>
+                <span className="text-xs sm:text-sm font-extrabold text-rose-600 dark:text-rose-400">{data.faultRatio}%</span>
               </div>
-              <div className="grid grid-cols-5 gap-1.5">
+              <div className="grid grid-cols-5 gap-2">
                 {[0, 10, 20, 30, 50].map(v => (
                   <button
                     key={v}
                     onClick={() => handleChange('faultRatio', v)}
-                    className={`py-1.5 text-xs font-bold border transition-all cursor-pointer ${
+                    className={`py-2 text-xs sm:text-[13px] font-extrabold border transition-all cursor-pointer ${
                       data.faultRatio === v
-                        ? 'bg-rose-600 text-white border-rose-600'
-                        : 'bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-400 hover:bg-gray-100'
+                        ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                        : 'bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
                     }`}
                   >
                     {v}%
@@ -289,101 +288,101 @@ export default function LiabilityCalculator() {
           </div>
         </div>
 
-        {/* [섹션 3] 세부 손해배상 항목 (스마트 아코디언) */}
+        {/* [섹션 3] 세부 손해배상 항목 */}
         {(data.hasInjury || data.hasDisability || data.hasDeath || data.hasCare) && (
-          <div className="bg-white dark:bg-[#202124] p-4 sm:p-5 border border-gray-200/90 dark:border-zinc-800 shadow-xs space-y-3 animate-in fade-in duration-200">
-            <h2 className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
-              <AppIcon name="crutches" size={14} className="text-rose-600" />
-              3. 세부 손해배상 항목 입력
+          <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/90 dark:border-zinc-800 shadow-xs space-y-4 animate-in fade-in duration-200">
+            <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+              <AppIcon name="crutches" size={18} className="text-rose-600" />
+              3. 세부 손해배상 항목 상세 입력
             </h2>
 
-            <div className="space-y-3 pt-1">
+            <div className="space-y-4 pt-1">
               {data.hasInjury && !data.hasDeath && (
                 <div>
-                  <label className="block text-[10.5px] text-gray-500 mb-0.5">입원 일수 (휴업손해)</label>
+                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">입원 일수 (휴업손해)</label>
                   <input
                     type="number"
                     value={data.hospitalDays === 0 ? '0' : (data.hospitalDays || '')}
                     onChange={e => handleChange('hospitalDays', Number(e.target.value))}
                     placeholder="30"
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1.5 px-2.5 text-xs font-bold focus:border-rose-500 focus:outline-none"
+                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-rose-500 focus:outline-none"
                   />
                 </div>
               )}
 
               {data.hasDisability && !data.hasDeath && (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10.5px] text-gray-500 mb-0.5">노동능력상실률 (%)</label>
+                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">노동능력상실률 (%)</label>
                     <input
                       type="number"
                       value={data.disabilityRate === 0 ? '0' : (data.disabilityRate || '')}
                       onChange={e => handleChange('disabilityRate', Number(e.target.value))}
                       placeholder="15"
-                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1.5 px-2.5 text-xs font-bold focus:border-rose-500 focus:outline-none"
+                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-rose-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10.5px] text-gray-500 mb-0.5">장해 기간 (0=영구)</label>
+                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">장해 기간 (0=영구)</label>
                     <input
                       type="number"
                       value={data.disabilityYears === 0 ? '0' : (data.disabilityYears || '')}
                       onChange={e => handleChange('disabilityYears', Number(e.target.value))}
                       placeholder="0"
-                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1.5 px-2.5 text-xs font-bold focus:border-rose-500 focus:outline-none"
+                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-rose-500 focus:outline-none"
                     />
                   </div>
                 </div>
               )}
 
               {data.hasCare && (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10.5px] text-gray-500 mb-0.5">필요 개호인 (명)</label>
+                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">필요 개호인 (명)</label>
                     <input
                       type="number"
                       step="0.5"
                       value={data.carePersons === 0 ? '0' : (data.carePersons || '')}
                       onChange={e => handleChange('carePersons', Number(e.target.value))}
                       placeholder="1"
-                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1.5 px-2.5 text-xs font-bold focus:border-rose-500 focus:outline-none"
+                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-rose-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10.5px] text-gray-500 mb-0.5">개호 기간 (0=여명)</label>
+                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">개호 기간 (0=여명)</label>
                     <input
                       type="number"
                       value={data.careYears === 0 ? '0' : (data.careYears || '')}
                       onChange={e => handleChange('careYears', Number(e.target.value))}
                       placeholder="0"
-                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1.5 px-2.5 text-xs font-bold focus:border-rose-500 focus:outline-none"
+                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-rose-500 focus:outline-none"
                     />
                   </div>
                 </div>
               )}
 
               {/* 기왕/향후 치료비 */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10.5px] text-gray-500 mb-0.5">기왕 치료비</label>
+                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">기왕 치료비 (병원비)</label>
                   <input
                     type="text"
                     inputMode="numeric"
                     value={data.pastTreatmentCost ? fmt(data.pastTreatmentCost) : ''}
                     onChange={e => handleChange('pastTreatmentCost', parse(e.target.value))}
                     placeholder="0"
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1.5 px-2.5 text-xs font-bold focus:border-rose-500 focus:outline-none"
+                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-rose-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10.5px] text-gray-500 mb-0.5">향후 치료비</label>
+                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">향후 치료비 (수술/성형)</label>
                   <input
                     type="text"
                     inputMode="numeric"
                     value={data.futureTreatmentCost ? fmt(data.futureTreatmentCost) : ''}
                     onChange={e => handleChange('futureTreatmentCost', parse(e.target.value))}
                     placeholder="0"
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1.5 px-2.5 text-xs font-bold focus:border-rose-500 focus:outline-none"
+                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-rose-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -392,104 +391,95 @@ export default function LiabilityCalculator() {
         )}
       </div>
 
-      {/* 4. 📋 접이식 세부 산출 명세서 아코디언 */}
-      <div className="bg-white dark:bg-[#202124] border border-gray-200 dark:border-zinc-800 shadow-xs overflow-hidden">
-        <button
-          onClick={() => setIsDetailOpen(!isDetailOpen)}
-          className="w-full flex items-center justify-between p-4 bg-gray-50/80 dark:bg-zinc-900/80 hover:bg-gray-100 transition-colors text-left cursor-pointer"
-        >
-          <div className="flex items-center gap-2">
-            <AppIcon name="file-text" size={16} className="text-rose-600" />
-            <span className="text-xs sm:text-sm font-extrabold text-gray-900 dark:text-white">
-              세부 손해배상 산출 내역 및 호프만 공식 {isDetailOpen ? '접기' : '확인하기'}
-            </span>
-          </div>
-          <span className="text-xs text-gray-400 font-bold">
-            {isDetailOpen ? '▲' : '▼'}
-          </span>
-        </button>
+      {/* 4. 📋 세부 산출 명세서 (상시 100% 노출) */}
+      <div className="bg-white dark:bg-[#202124] border border-gray-200 dark:border-zinc-800 shadow-xs p-5 sm:p-6 space-y-4">
+        <div className="flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-3">
+          <AppIcon name="file-text" size={18} className="text-rose-600" />
+          <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
+            세부 손해배상 산출 명세서 & 호프만 법리 공식
+          </h3>
+        </div>
 
-        {isDetailOpen && (
-          <div className="p-4 sm:p-5 space-y-3 text-xs border-t border-gray-100 dark:border-zinc-800 animate-in fade-in duration-150">
-            <div className="space-y-2 text-gray-600 dark:text-gray-300">
-              {result.alimony > 0 && (
-                <div className="flex justify-between py-1 border-b border-gray-100 dark:border-zinc-800">
-                  <span>· 위자료 (정신적 손해)</span>
-                  <span className="font-bold text-gray-900 dark:text-white">{Math.floor(result.alimony).toLocaleString()} 원</span>
-                </div>
-              )}
-              {data.hasInjury && !data.hasDeath && (
-                <div className="flex justify-between py-1 border-b border-gray-100 dark:border-zinc-800">
-                  <span>· 휴업손해 (입원 {data.hospitalDays}일)</span>
-                  <span className="font-bold text-gray-900 dark:text-white">{Math.floor(result.hospitalLoss).toLocaleString()} 원</span>
-                </div>
-              )}
-              {(data.hasDisability || data.hasDeath) && (
-                <div className="flex justify-between py-1 border-b border-gray-100 dark:border-zinc-800">
-                  <span>· 일실수입 ({data.hasDeath ? '사망' : `장해 ${data.disabilityRate}%`})</span>
-                  <span className="font-bold text-gray-900 dark:text-white">{Math.floor(result.lostIncome).toLocaleString()} 원</span>
-                </div>
-              )}
-              {result.careCost > 0 && (
-                <div className="flex justify-between py-1 border-b border-gray-100 dark:border-zinc-800">
-                  <span>· 개호비 (간병비)</span>
-                  <span className="font-bold text-gray-900 dark:text-white">{Math.floor(result.careCost).toLocaleString()} 원</span>
-                </div>
-              )}
-              {result.treatment > 0 && (
-                <div className="flex justify-between py-1 border-b border-gray-100 dark:border-zinc-800">
-                  <span>· 치료비 (기왕/향후)</span>
-                  <span className="font-bold text-gray-900 dark:text-white">{Math.floor(result.treatment).toLocaleString()} 원</span>
-                </div>
-              )}
-              <div className="flex justify-between py-1.5 font-extrabold text-rose-600 dark:text-rose-400 border-t border-gray-200 dark:border-zinc-700">
-                <span>최종 예상 배상액 (과실 상계 후)</span>
-                <span>{Math.floor(result.totalAmount).toLocaleString()} 원</span>
-              </div>
+        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300">
+          {result.alimony > 0 && (
+            <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
+              <span className="font-medium">· 정신적 손해 (위자료)</span>
+              <span className="font-extrabold text-gray-900 dark:text-white">{Math.floor(result.alimony).toLocaleString()} 원</span>
             </div>
+          )}
+          {data.hasInjury && !data.hasDeath && (
+            <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
+              <span className="font-medium">· 휴업손해 (입원 {data.hospitalDays}일)</span>
+              <span className="font-extrabold text-gray-900 dark:text-white">{Math.floor(result.hospitalLoss).toLocaleString()} 원</span>
+            </div>
+          )}
+          {(data.hasDisability || data.hasDeath) && (
+            <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
+              <span className="font-medium">· 일실수입 ({data.hasDeath ? '사망 상실수익액' : `후유장해 ${data.disabilityRate}%`})</span>
+              <span className="font-extrabold text-gray-900 dark:text-white">{Math.floor(result.lostIncome).toLocaleString()} 원</span>
+            </div>
+          )}
+          {result.careCost > 0 && (
+            <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
+              <span className="font-medium">· 개호비 (간병비용 합계)</span>
+              <span className="font-extrabold text-gray-900 dark:text-white">{Math.floor(result.careCost).toLocaleString()} 원</span>
+            </div>
+          )}
+          {result.treatment > 0 && (
+            <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
+              <span className="font-medium">· 적극적 손해 (기왕/향후 치료비)</span>
+              <span className="font-extrabold text-gray-900 dark:text-white">{Math.floor(result.treatment).toLocaleString()} 원</span>
+            </div>
+          )}
+          <div className="flex justify-between py-3 font-black text-sm sm:text-base text-rose-600 dark:text-rose-400 border-t-2 border-rose-600/30 dark:border-rose-400/30">
+            <span>최종 예상 총 손해배상액</span>
+            <span>{Math.floor(result.totalAmount).toLocaleString()} 원</span>
+          </div>
+        </div>
 
-            {/* 계산 공식 */}
-            {result.formulas.length > 0 && (
-              <div className="pt-2 border-t border-gray-100 dark:border-zinc-800">
-                <h4 className="text-[11px] font-bold text-rose-600 mb-1">적용된 법원 판례 산출식</h4>
-                <ul className="list-disc list-inside text-[10.5px] text-gray-500 space-y-0.5">
-                  {result.formulas.map((f, i) => <li key={i}>{f}</li>)}
-                </ul>
-              </div>
-            )}
+        {/* 계산 공식 */}
+        {result.formulas.length > 0 && (
+          <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-900/70 p-3.5">
+            <h4 className="text-xs font-extrabold text-rose-600 dark:text-rose-400 mb-1.5 flex items-center gap-1.5">
+              <AppIcon name="calculator" size={14} />
+              적용된 법원 판례 산출식 (호프만)
+            </h4>
+            <ul className="list-disc list-inside text-xs text-gray-600 dark:text-gray-400 space-y-1 leading-relaxed">
+              {result.formulas.map((f, i) => <li key={i}>{f}</li>)}
+            </ul>
           </div>
         )}
       </div>
 
       {/* 5. 🛡️ 전문가 조언 및 액션 버튼 바 */}
-      <div className="bg-amber-50 dark:bg-amber-950/30 p-3 border border-amber-200/80 dark:border-amber-900/40 text-[11px] leading-relaxed text-amber-900 dark:text-amber-300 flex items-start gap-2">
-        <AppIcon name="shield-alert" size={14} className="text-amber-600 shrink-0 mt-0.5" />
-        <p>위 결과는 <strong>법원 소송 판례(호프만 계수) 기준</strong> 단순 적용 수치입니다. 실제 소송 시 과실 비율, 정년, 개호 등에 따라 달라질 수 있으므로 전문가의 상담을 권장합니다.</p>
+      <div className="bg-amber-50 dark:bg-amber-950/30 p-4 border border-amber-200/80 dark:border-amber-900/40 text-xs sm:text-[13px] leading-relaxed text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
+        <AppIcon name="shield-alert" size={16} className="text-amber-600 shrink-0 mt-0.5" />
+        <p>위 결과는 <strong>법원 소송 판례(호프만 계수) 기준</strong> 단순 적용 수치입니다. 실제 소송 시 피해자의 과실 비율, 정년, 개호 등에 따라 크게 달라질 수 있으므로 손해사정 전문가의 상담을 권장합니다.</p>
       </div>
 
-      <div className="space-y-2 pt-1">
+      <div className="space-y-2.5 pt-1">
         <button
           onClick={() => { document.getElementById('chat-floating-btn')?.click(); }}
-          className="flex items-center justify-center w-full gap-2 py-3.5 bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm transition-all shadow-md shadow-rose-500/20 cursor-pointer"
+          className="flex items-center justify-center w-full gap-2 py-4 bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-rose-500/20 cursor-pointer"
         >
-          <AppIcon name="chat" size={18} />
-          배상책임 손해액 1:1 무료 상담 신청
+          <AppIcon name="chat" size={20} />
+          배상책임 손해액 1:1 무료 상담 신청하기
         </button>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2.5">
           <button
             onClick={() => shareResult('배상책임', result.totalAmount)}
-            className="flex items-center justify-center gap-1.5 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-rose-500 text-gray-700 dark:text-gray-300 font-bold text-xs transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-2 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-rose-500 text-gray-800 dark:text-gray-200 font-bold text-xs sm:text-sm transition-colors cursor-pointer shadow-xs"
           >
-            <AppIcon name="link" size={13} />
-            결과 공유하기
+            <AppIcon name="link" size={15} />
+            결과 링크 공유
           </button>
           <button
             onClick={() => exportPDF('보상스쿨_배상책임_예상보상금.pdf')}
-            className="flex items-center justify-center gap-1.5 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-rose-500 text-gray-700 dark:text-gray-300 font-bold text-xs transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-2 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-rose-500 text-gray-800 dark:text-gray-200 font-bold text-xs sm:text-sm transition-colors cursor-pointer shadow-xs"
           >
-            <AppIcon name="file-text" size={13} />
-            PDF 다운로드
+            <AppIcon name="file-text" size={15} />
+            PDF 명세서 다운로드
           </button>
         </div>
       </div>

@@ -516,20 +516,20 @@ export default function ChatWidget() {
 
                 {/* Quick Action Pills (세련된 라운드 칩 바) */}
                 <div className="px-3.5 py-2 bg-white dark:bg-[#18181b] border-t border-gray-100 dark:border-zinc-800/80 shrink-0">
-                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                  <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
                     <button 
                       onClick={() => router.push('/calculator')}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-blue-50/80 hover:bg-blue-100/80 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 py-1.5 px-3 rounded-full border border-blue-200/60 dark:border-blue-800/40 transition-colors text-xs font-semibold text-blue-700 dark:text-blue-300 shrink-0 shadow-2xs"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-blue-50/90 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 py-1.5 px-3 rounded-full border border-blue-200 dark:border-blue-800/50 transition-all text-xs font-bold text-blue-700 dark:text-blue-300 shrink-0 shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer"
                     >
-                      <AppIcon name="calculator" size={14} className="shrink-0" />
+                      <AppIcon name="calculator" size={13} className="shrink-0 text-blue-600 dark:text-blue-400" />
                       <span>예상 합의금 계산기</span>
                     </button>
                     
                     <button 
                       onClick={() => router.push('/consultation')}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 py-1.5 px-3 rounded-full border border-gray-200/80 dark:border-zinc-700 transition-colors text-xs font-medium text-gray-700 dark:text-gray-300 shrink-0 shadow-2xs"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-50/90 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 py-1.5 px-3 rounded-full border border-emerald-200 dark:border-emerald-800/50 transition-all text-xs font-bold text-emerald-700 dark:text-emerald-300 shrink-0 shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer"
                     >
-                      <AppIcon name="phone" size={14} className="shrink-0" />
+                      <AppIcon name="phone" size={13} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
                       <span>전화 상담 예약</span>
                     </button>
                   </div>

@@ -158,6 +158,11 @@ export default function AutoCalculator() {
   const result = calculateResult();
   const { exportPDF, shareResult } = useCalculatorExport(resultRef);
 
+  const inputClass = "w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-3 px-3.5 text-sm font-bold text-gray-900 dark:text-white rounded-none focus:border-blue-500 focus:outline-none transition-colors placeholder-gray-400";
+  const labelHeaderClass = "flex items-center justify-between mb-2";
+  const labelTextClass = "text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-gray-100 select-none";
+  const labelSubClass = "text-[11px] text-gray-400 dark:text-zinc-500 font-medium select-none";
+
   return (
     <div className="w-full space-y-6">
       {/* 1. 타이틀 헤더 */}
@@ -171,12 +176,12 @@ export default function AutoCalculator() {
       </div>
 
       {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         
         {/* [STEP 1] 피해 유형 선택 */}
-        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="bandaid" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="bandaid" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
           {/* STEP 1 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-blue-200/80 dark:border-blue-800/80">STEP 01</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -187,7 +192,7 @@ export default function AutoCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">복수 선택 가능</span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2.5 pt-1">
+          <div className="grid grid-cols-3 gap-3">
             {[
               { key: 'hasInjury', label: '부상 (치료)', sub: '입원·통원 치료비', color: 'blue' },
               { key: 'hasDisability', label: '후유장해', sub: '노동력 상실수익액', color: 'purple' },
@@ -198,7 +203,7 @@ export default function AutoCalculator() {
                 <button
                   key={item.key}
                   onClick={() => handleChange(item.key as keyof AutoInsuranceData, !isActive)}
-                  className={`p-3 sm:p-4 text-center border transition-all cursor-pointer ${
+                  className={`p-3.5 text-center border transition-all cursor-pointer ${
                     isActive
                       ? 'border-blue-600 bg-blue-50/90 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-extrabold shadow-xs'
                       : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
@@ -213,9 +218,9 @@ export default function AutoCalculator() {
         </PremiumCard>
 
         {/* [STEP 2] 기본 정보 (소득 및 과실) */}
-        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="chart" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="chart" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
           {/* STEP 2 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-blue-200/80 dark:border-blue-800/80">STEP 02</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -226,14 +231,14 @@ export default function AutoCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">손해배상 산정 기초</span>
           </div>
 
-          <div className="space-y-4 pt-1">
+          <div className="space-y-5">
             {/* 소득 입력 & 도시일용 퀵 버튼 */}
             <div>
-              <div className="flex items-center justify-between h-5 mb-2">
-                <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">
+              <div className={labelHeaderClass}>
+                <label className={labelTextClass}>
                   월 소득 <span className="text-gray-400 font-normal">(세전 기준)</span>
                 </label>
-                <span className="text-[11px] text-gray-400 font-medium">일실수입 및 휴업손해 기준</span>
+                <span className={labelSubClass}>일실수입 및 휴업손해 기준</span>
               </div>
               <div className="flex gap-2.5">
                 <div className="relative flex-1">
@@ -243,13 +248,13 @@ export default function AutoCalculator() {
                     value={data.income ? fmt(data.income) : ''}
                     onChange={e => handleChange('income', parse(e.target.value))}
                     placeholder="3,500,000"
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2.5 px-3.5 pr-8 text-sm font-bold text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none"
+                    className={`${inputClass} pr-8`}
                   />
-                  <span className="absolute right-3 top-3 text-xs text-gray-400 font-bold">원</span>
+                  <span className="absolute right-3.5 top-3.5 text-xs text-gray-400 font-bold">원</span>
                 </div>
                 <button
                   onClick={() => { handleChange('income', 3284525); handleChange('isIncomeProven', false); }}
-                  className="px-3 py-2.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/80 text-xs sm:text-[12.5px] font-extrabold hover:bg-blue-100 transition-colors cursor-pointer shrink-0"
+                  className="px-3.5 py-3 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/80 text-xs sm:text-[12.5px] font-extrabold hover:bg-blue-100 transition-colors cursor-pointer shrink-0"
                 >
                   도시일용임금 자동 적용 (3,284,525원)
                 </button>
@@ -258,16 +263,16 @@ export default function AutoCalculator() {
 
             {/* 과실 비율 퀵 칩 */}
             <div>
-              <div className="flex items-center justify-between h-5 mb-2">
-                <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">본인 과실 비율</label>
+              <div className={labelHeaderClass}>
+                <label className={labelTextClass}>본인 과실 비율</label>
                 <span className="text-xs sm:text-sm font-extrabold text-blue-600 dark:text-blue-400">{data.faultRatio}%</span>
               </div>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-5 gap-2.5">
                 {[0, 10, 20, 30, 50].map(v => (
                   <button
                     key={v}
                     onClick={() => handleChange('faultRatio', v)}
-                    className={`py-2 text-xs sm:text-[13px] font-extrabold border transition-all cursor-pointer ${
+                    className={`py-2.5 text-xs sm:text-[13px] font-extrabold border transition-all cursor-pointer ${
                       data.faultRatio === v
                         ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                         : 'bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
@@ -283,9 +288,9 @@ export default function AutoCalculator() {
 
         {/* [STEP 3] 세부 치료 & 장해 내역 */}
         {(data.hasInjury || data.hasDisability || data.hasDeath) && (
-          <PremiumCard borderColor="purple" hoverEffect={true} watermarkIcon="crutches" className="!p-5 sm:!p-6 space-y-4 overflow-hidden animate-in fade-in duration-200">
+          <PremiumCard borderColor="purple" hoverEffect={true} watermarkIcon="crutches" className="!p-5 sm:!p-7 space-y-5 overflow-hidden animate-in fade-in duration-200">
             {/* STEP 3 그라데이션 헤더 바 */}
-            <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-purple-50 via-indigo-50/60 to-transparent dark:from-purple-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-purple-100 dark:border-purple-900/40 flex items-center justify-between">
+            <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-purple-50 via-indigo-50/60 to-transparent dark:from-purple-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-purple-100 dark:border-purple-900/40 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono font-bold text-purple-600 dark:text-purple-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-purple-200/80 dark:border-purple-800/80">STEP 03</span>
                 <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -296,14 +301,14 @@ export default function AutoCalculator() {
               <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">의학적 항목 산정</span>
             </div>
 
-            <div className="space-y-4 pt-1">
+            <div className="space-y-5">
               {/* 부상 치료 상세 */}
               {data.hasInjury && (
-                <div className="space-y-3 pb-4 border-b border-gray-100 dark:border-zinc-800 last:border-0">
+                <div className="space-y-4 pb-5 border-b border-gray-100 dark:border-zinc-800 last:border-0">
                   <div className="relative" ref={searchRef}>
-                    <div className="flex items-center justify-between h-5 mb-2">
-                      <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">진단명 자동 검색 (약관 상해급수)</label>
-                      <span className="text-[11px] text-gray-400 font-medium">1~14급 자동 매핑</span>
+                    <div className={labelHeaderClass}>
+                      <label className={labelTextClass}>진단명 자동 검색 (약관 상해급수)</label>
+                      <span className={labelSubClass}>1~14급 자동 매핑</span>
                     </div>
                     <input
                       type="text"
@@ -311,7 +316,7 @@ export default function AutoCalculator() {
                       onChange={e => { setSearchTerm(e.target.value); setIsSearchFocused(true); }}
                       onFocus={() => setIsSearchFocused(true)}
                       placeholder="상해 진단명 검색 (예: 뇌진탕, 경추염좌, 십자인대 파열, 골절)"
-                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2.5 px-3.5 text-xs sm:text-sm font-medium focus:border-blue-500 focus:outline-none"
+                      className={inputClass}
                     />
                     {isSearchFocused && searchTerm && (
                       <div className="absolute z-50 w-full mt-1 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-xl max-h-48 overflow-y-auto">
@@ -340,31 +345,31 @@ export default function AutoCalculator() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                     <div>
-                      <div className="flex items-center justify-between h-5 mb-2">
-                        <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">입원 일수</label>
-                        <span className="text-[11px] text-gray-400 font-medium">휴업손해(85%)</span>
+                      <div className={labelHeaderClass}>
+                        <label className={labelTextClass}>입원 일수</label>
+                        <span className={labelSubClass}>휴업손해(85%)</span>
                       </div>
                       <input
                         type="number"
                         value={data.hospitalDays || ''}
                         onChange={e => handleChange('hospitalDays', Number(e.target.value))}
                         placeholder="0"
-                        className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none"
+                        className={inputClass}
                       />
                     </div>
                     <div>
-                      <div className="flex items-center justify-between h-5 mb-2">
-                        <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">통원 일수</label>
-                        <span className="text-[11px] text-gray-400 font-medium">기타손배금(8천원)</span>
+                      <div className={labelHeaderClass}>
+                        <label className={labelTextClass}>통원 일수</label>
+                        <span className={labelSubClass}>기타손배금(8천원)</span>
                       </div>
                       <input
                         type="number"
                         value={data.outpatientDays || ''}
                         onChange={e => handleChange('outpatientDays', Number(e.target.value))}
                         placeholder="0"
-                        className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none"
+                        className={inputClass}
                       />
                     </div>
                   </div>
@@ -373,10 +378,10 @@ export default function AutoCalculator() {
 
               {/* 후유장해 상세 */}
               {data.hasDisability && (
-                <div className="grid grid-cols-2 gap-3 pb-4 border-b border-gray-100 dark:border-zinc-800 last:border-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-5 border-b border-gray-100 dark:border-zinc-800 last:border-0">
                   <div>
-                    <div className="flex items-center justify-between h-5 mb-2">
-                      <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">노동능력상실률 (%)</label>
+                    <div className={labelHeaderClass}>
+                      <label className={labelTextClass}>노동능력상실률 (%)</label>
                       <span className="text-[11px] text-purple-600 font-bold">맥브라이드 장해</span>
                     </div>
                     <input
@@ -386,31 +391,31 @@ export default function AutoCalculator() {
                       value={data.disabilityRate || ''}
                       onChange={e => handleChange('disabilityRate', Number(e.target.value))}
                       placeholder="14"
-                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-purple-500 focus:outline-none"
+                      className={inputClass}
                     />
                   </div>
                   <div>
-                    <div className="flex items-center justify-between h-5 mb-2">
-                      <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">장해 기간 (0=영구)</label>
-                      <span className="text-[11px] text-gray-400 font-medium">호프만 개월수</span>
+                    <div className={labelHeaderClass}>
+                      <label className={labelTextClass}>장해 기간 (0=영구)</label>
+                      <span className={labelSubClass}>호프만 개월수</span>
                     </div>
                     <input
                       type="number"
                       value={data.disabilityYears || ''}
                       onChange={e => handleChange('disabilityYears', Number(e.target.value))}
                       placeholder="0"
-                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-purple-500 focus:outline-none"
+                      className={inputClass}
                     />
                   </div>
                 </div>
               )}
 
               {/* 직불/향후치료비 */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <div className="flex items-center justify-between h-5 mb-2">
-                    <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">직불 치료비</label>
-                    <span className="text-[11px] text-gray-400 font-medium">본인 부담 영수증</span>
+                  <div className={labelHeaderClass}>
+                    <label className={labelTextClass}>직불 치료비</label>
+                    <span className={labelSubClass}>본인 부담 영수증</span>
                   </div>
                   <input
                     type="text"
@@ -418,13 +423,13 @@ export default function AutoCalculator() {
                     value={data.directReceipts ? fmt(data.directReceipts) : ''}
                     onChange={e => handleChange('directReceipts', parse(e.target.value))}
                     placeholder="0"
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none"
+                    className={inputClass}
                   />
                 </div>
                 <div>
-                  <div className="flex items-center justify-between h-5 mb-2">
-                    <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">향후 치료비</label>
-                    <span className="text-[11px] text-gray-400 font-medium">핀제거·성형 등</span>
+                  <div className={labelHeaderClass}>
+                    <label className={labelTextClass}>향후 치료비</label>
+                    <span className={labelSubClass}>핀제거·성형 등</span>
                   </div>
                   <input
                     type="text"
@@ -432,7 +437,7 @@ export default function AutoCalculator() {
                     value={data.futureTreatmentCost ? fmt(data.futureTreatmentCost) : ''}
                     onChange={e => handleChange('futureTreatmentCost', parse(e.target.value))}
                     placeholder="0"
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-3 text-sm font-bold text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none"
+                    className={inputClass}
                   />
                 </div>
               </div>
@@ -442,9 +447,9 @@ export default function AutoCalculator() {
       </div>
 
       {/* 3. 📋 세부 손해배상 산출 명세서 (상시 100% 노출) */}
-      <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+      <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 space-y-4 overflow-hidden">
         {/* 명세서 그라데이션 헤더 바 */}
-        <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+        <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AppIcon name="file-text" size={16} className="text-blue-600 dark:text-blue-400" />
             <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
@@ -454,43 +459,43 @@ export default function AutoCalculator() {
           <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">약관 지급기준 실시간 연산</span>
         </div>
 
-        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300 pt-1">
+        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300">
           {result.alimony > 0 && (
-            <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
+            <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
               <span className="font-medium">· {result.appliedAlimonyLabel}</span>
               <span className="font-extrabold text-gray-900 dark:text-white">{result.alimony.toLocaleString()} 원</span>
             </div>
           )}
           {data.hasInjury && (
             <>
-              <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
+              <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
                 <span className="font-medium">· 휴업손해 (입원 {data.hospitalDays}일, 85% 반영)</span>
                 <span className="font-extrabold text-gray-900 dark:text-white">{result.lostIncome.toLocaleString()} 원</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
+              <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
                 <span className="font-medium">· 기타손해배상금 (통원 {data.outpatientDays}일 × 8,000원)</span>
                 <span className="font-extrabold text-gray-900 dark:text-white">{result.otherDamages.toLocaleString()} 원</span>
               </div>
             </>
           )}
           {(data.hasDisability || data.hasDeath) && (
-            <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
+            <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
               <span className="font-medium">· 상실수익액 ({data.hasDeath ? '사망 일실수입' : `후유장해 ${data.disabilityRate}%`})</span>
               <span className="font-extrabold text-gray-900 dark:text-white">{result.lostEarnings.toLocaleString()} 원</span>
             </div>
           )}
           {(data.directReceipts > 0 || data.futureTreatmentCost > 0) && (
-            <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
+            <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
               <span className="font-medium">· 추가 치료비 (직불 {data.directReceipts.toLocaleString()}원 + 향후 {data.futureTreatmentCost.toLocaleString()}원)</span>
               <span className="font-extrabold text-gray-900 dark:text-white">{(data.directReceipts + data.futureTreatmentCost).toLocaleString()} 원</span>
             </div>
           )}
-          <div className="flex justify-between py-2 font-bold text-gray-900 dark:text-white border-t border-gray-200 dark:border-zinc-700">
+          <div className="flex justify-between py-2.5 font-bold text-gray-900 dark:text-white border-t border-gray-200 dark:border-zinc-700">
             <span>과실 상계 전 손해액 총합</span>
             <span>{result.totalBeforeFault.toLocaleString()} 원</span>
           </div>
           {data.faultRatio > 0 && (
-            <div className="flex justify-between py-2 text-red-500 font-extrabold">
+            <div className="flex justify-between py-2.5 text-red-500 font-extrabold">
               <span>(-) 본인 과실 상계 ({data.faultRatio}%)</span>
               <span>-{result.faultDeduction.toLocaleString()} 원</span>
             </div>
@@ -499,7 +504,7 @@ export default function AutoCalculator() {
 
         {/* 계산 공식 */}
         {result.formulas.length > 0 && (
-          <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-900/70 p-3.5">
+          <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-900/70 p-4">
             <h4 className="text-xs font-extrabold text-blue-600 dark:text-blue-400 mb-1.5 flex items-center gap-1.5">
               <AppIcon name="calculator" size={14} />
               적용된 대인배상 약관 산출식
@@ -550,7 +555,7 @@ export default function AutoCalculator() {
         <p>위 결과는 <strong>보험회사 대인배상 약관 지급기준</strong> 참고용입니다. 실제 소송 판례 기준(특인) 적용 시 수천만 원 이상 증액될 수 있으므로 조기 합의 전 손해사정 전문가와의 상담을 적극 권장합니다.</p>
       </div>
 
-      <div className="space-y-2.5 pt-1">
+      <div className="space-y-3 pt-1">
         <Link
           href="/consultation"
           className="flex items-center justify-center w-full gap-2 py-4 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-blue-500/20 text-center cursor-pointer"
@@ -559,7 +564,7 @@ export default function AutoCalculator() {
           <span>손해사정사 1:1 무료 상담 신청하기</span>
         </Link>
 
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => shareResult('자동차사고', result.finalTotal)}
             className="flex items-center justify-center gap-2 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-blue-500 text-gray-800 dark:text-gray-200 font-bold text-xs sm:text-sm transition-colors cursor-pointer shadow-xs"

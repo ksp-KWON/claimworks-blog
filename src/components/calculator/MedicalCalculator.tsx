@@ -204,6 +204,11 @@ export default function MedicalCalculator() {
   const selectedGen = GENERATIONS.find(g => g.id === data.generation)!;
   const { exportPDF, shareResult } = useCalculatorExport(resultRef);
 
+  const inputClass = "w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-3 px-3.5 text-sm font-bold text-gray-900 dark:text-white rounded-none focus:border-emerald-500 focus:outline-none transition-colors placeholder-gray-400";
+  const labelHeaderClass = "flex items-center justify-between mb-2";
+  const labelTextClass = "text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-gray-100 select-none";
+  const labelSubClass = "text-[11px] text-gray-400 dark:text-zinc-500 font-medium select-none";
+
   return (
     <div className="w-full space-y-6">
       {/* 1. 타이틀 헤더 */}
@@ -217,12 +222,12 @@ export default function MedicalCalculator() {
       </div>
 
       {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         
         {/* [STEP 1] 실손 가입 세대 5단 칩 */}
-        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="hospital" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="hospital" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
           {/* STEP 1 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-emerald-200/80 dark:border-emerald-800/80">STEP 01</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -233,14 +238,14 @@ export default function MedicalCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">약관 세대별 공제율</span>
           </div>
 
-          <div className="grid grid-cols-5 gap-2 pt-1">
+          <div className="grid grid-cols-5 gap-2.5">
             {GENERATIONS.map(gen => {
               const isActive = data.generation === gen.id;
               return (
                 <button
                   key={gen.id}
                   onClick={() => handleChange('generation', gen.id)}
-                  className={`py-2.5 px-1.5 text-center border transition-all cursor-pointer ${
+                  className={`py-3 px-1.5 text-center border transition-all cursor-pointer ${
                     isActive
                       ? 'border-emerald-600 bg-emerald-50/90 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-extrabold shadow-xs'
                       : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
@@ -253,16 +258,16 @@ export default function MedicalCalculator() {
             })}
           </div>
 
-          <div className="p-3 bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50 text-xs sm:text-[13px] font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-2">
+          <div className="p-3.5 bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50 text-xs sm:text-[13px] font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-2">
             <AppIcon name="shield-check" size={16} className="shrink-0 text-emerald-600" />
             <span>{selectedGen.note}</span>
           </div>
         </PremiumCard>
 
         {/* [STEP 2] 진료 형태 & 병원 규모 */}
-        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="compass" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="compass" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
           {/* STEP 2 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-emerald-200/80 dark:border-emerald-800/80">STEP 02</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -273,12 +278,12 @@ export default function MedicalCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">의원/병원/종합병원 구분</span>
           </div>
 
-          <div className="space-y-4 pt-1">
+          <div className="space-y-5">
             {/* 입원/통원 2단 탭 */}
             <div className="grid grid-cols-2 gap-2 bg-gray-100 dark:bg-zinc-900 p-1.5 border border-gray-200/80 dark:border-zinc-800">
               <button
                 onClick={() => handleChange('treatmentType', 'inpatient')}
-                className={`py-2.5 text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
+                className={`py-3 text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
                   data.treatmentType === 'inpatient'
                     ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
@@ -288,7 +293,7 @@ export default function MedicalCalculator() {
               </button>
               <button
                 onClick={() => handleChange('treatmentType', 'outpatient')}
-                className={`py-2.5 text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
+                className={`py-3 text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
                   data.treatmentType === 'outpatient'
                     ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
@@ -300,34 +305,34 @@ export default function MedicalCalculator() {
 
             {/* 통원 시 일수 및 병원 선택 */}
             {data.treatmentType === 'outpatient' && (
-              <div className="space-y-3 pt-1 animate-in fade-in duration-150">
+              <div className="space-y-4 pt-1 animate-in fade-in duration-150">
                 <div className="flex items-center justify-between h-5 mb-2">
-                  <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">통원 일수</label>
+                  <label className={labelTextClass}>통원 일수</label>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleChange('outpatientDays', Math.max(1, data.outpatientDays - 1))}
-                      className="w-8 h-8 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center font-black text-sm hover:bg-gray-200 cursor-pointer"
+                      className="w-9 h-9 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center font-black text-sm hover:bg-gray-200 cursor-pointer"
                     >
                       -
                     </button>
-                    <span className="w-12 text-center text-sm font-black text-gray-900 dark:text-white">{data.outpatientDays}일</span>
+                    <span className="w-14 text-center text-sm font-black text-gray-900 dark:text-white">{data.outpatientDays}일</span>
                     <button
                       onClick={() => handleChange('outpatientDays', data.outpatientDays + 1)}
-                      className="w-8 h-8 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center font-black text-sm hover:bg-gray-200 cursor-pointer"
+                      className="w-9 h-9 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center font-black text-sm hover:bg-gray-200 cursor-pointer"
                     >
                       +
                     </button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-2.5">
                   {HOSPITAL_TYPES.map(ht => {
                     const isActive = data.clinicType === ht.id;
                     return (
                       <button
                         key={ht.id}
                         onClick={() => handleChange('clinicType', ht.id)}
-                        className={`p-2.5 sm:p-3 text-center border transition-all cursor-pointer ${
+                        className={`p-3 text-center border transition-all cursor-pointer ${
                           isActive
                             ? 'border-emerald-600 bg-emerald-50/90 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 font-extrabold'
                             : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
@@ -344,9 +349,9 @@ export default function MedicalCalculator() {
         </PremiumCard>
 
         {/* [STEP 3] 발생 진료비 입력 */}
-        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
           {/* STEP 3 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-emerald-200/80 dark:border-emerald-800/80">STEP 03</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -357,12 +362,12 @@ export default function MedicalCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">급여·비급여 분리 산정</span>
           </div>
 
-          <div className="space-y-4 pt-1">
-            <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-5">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="flex items-center justify-between h-5 mb-2">
-                  <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">급여 (본인부담금)</label>
-                  <span className="text-[11px] text-gray-400 font-medium">영수증 급여란</span>
+                <div className={labelHeaderClass}>
+                  <label className={labelTextClass}>급여 (본인부담금)</label>
+                  <span className={labelSubClass}>영수증 급여란</span>
                 </div>
                 <div className="relative">
                   <input
@@ -371,15 +376,15 @@ export default function MedicalCalculator() {
                     value={data.coveredCost ? fmt(data.coveredCost) : ''}
                     onChange={e => handleChange('coveredCost', parse(e.target.value))}
                     placeholder="0"
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2.5 px-3.5 pr-7 text-sm font-bold text-gray-900 dark:text-white focus:border-emerald-500 focus:outline-none"
+                    className={`${inputClass} pr-7`}
                   />
-                  <span className="absolute right-3 top-3 text-xs text-gray-400 font-bold">원</span>
+                  <span className="absolute right-3.5 top-3.5 text-xs text-gray-400 font-bold">원</span>
                 </div>
               </div>
               <div>
-                <div className="flex items-center justify-between h-5 mb-2">
-                  <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">비급여 (일반)</label>
-                  <span className="text-[11px] text-gray-400 font-medium">영수증 비급여란</span>
+                <div className={labelHeaderClass}>
+                  <label className={labelTextClass}>비급여 (일반)</label>
+                  <span className={labelSubClass}>영수증 비급여란</span>
                 </div>
                 <div className="relative">
                   <input
@@ -388,20 +393,20 @@ export default function MedicalCalculator() {
                     value={data.nonCoveredCost ? fmt(data.nonCoveredCost) : ''}
                     onChange={e => handleChange('nonCoveredCost', parse(e.target.value))}
                     placeholder="0"
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2.5 px-3.5 pr-7 text-sm font-bold text-gray-900 dark:text-white focus:border-emerald-500 focus:outline-none"
+                    className={`${inputClass} pr-7`}
                   />
-                  <span className="absolute right-3 top-3 text-xs text-gray-400 font-bold">원</span>
+                  <span className="absolute right-3.5 top-3.5 text-xs text-gray-400 font-bold">원</span>
                 </div>
               </div>
             </div>
 
             {/* 3~5세대 3대 비급여 특약 */}
             {data.generation >= 3 && (
-              <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 space-y-3">
+              <div className="pt-4 border-t border-gray-100 dark:border-zinc-800 space-y-3">
                 <span className="text-xs font-extrabold text-rose-600 dark:text-rose-400">3대 비급여 특약 (해당 시 입력)</span>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <div className="flex items-center justify-between h-5 mb-1.5">
+                    <div className="flex items-center justify-between mb-1.5">
                       <label className="text-xs text-gray-700 dark:text-gray-300 font-bold">도수/체외충격파</label>
                     </div>
                     <input
@@ -410,11 +415,11 @@ export default function MedicalCalculator() {
                       value={data.manualTherapyCost ? fmt(data.manualTherapyCost) : ''}
                       onChange={e => handleChange('manualTherapyCost', parse(e.target.value))}
                       placeholder="0"
-                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-2.5 text-xs sm:text-sm font-bold focus:border-emerald-500 focus:outline-none"
+                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2.5 px-3 text-xs sm:text-sm font-bold focus:border-emerald-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <div className="flex items-center justify-between h-5 mb-1.5">
+                    <div className="flex items-center justify-between mb-1.5">
                       <label className="text-xs text-gray-700 dark:text-gray-300 font-bold">비급여 주사료</label>
                     </div>
                     <input
@@ -423,11 +428,11 @@ export default function MedicalCalculator() {
                       value={data.injectionCost ? fmt(data.injectionCost) : ''}
                       onChange={e => handleChange('injectionCost', parse(e.target.value))}
                       placeholder="0"
-                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-2.5 text-xs sm:text-sm font-bold focus:border-emerald-500 focus:outline-none"
+                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2.5 px-3 text-xs sm:text-sm font-bold focus:border-emerald-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <div className="flex items-center justify-between h-5 mb-1.5">
+                    <div className="flex items-center justify-between mb-1.5">
                       <label className="text-xs text-gray-700 dark:text-gray-300 font-bold">비급여 MRI/MRA</label>
                     </div>
                     <input
@@ -436,7 +441,7 @@ export default function MedicalCalculator() {
                       value={data.mriCost ? fmt(data.mriCost) : ''}
                       onChange={e => handleChange('mriCost', parse(e.target.value))}
                       placeholder="0"
-                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2 px-2.5 text-xs sm:text-sm font-bold focus:border-emerald-500 focus:outline-none"
+                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2.5 px-3 text-xs sm:text-sm font-bold focus:border-emerald-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -447,9 +452,9 @@ export default function MedicalCalculator() {
       </div>
 
       {/* 3. 📋 세부 공제 내역서 (상시 100% 노출) */}
-      <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+      <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 space-y-4 overflow-hidden">
         {/* 명세서 그라데이션 헤더 바 */}
-        <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
+        <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AppIcon name="file-text" size={16} className="text-emerald-600 dark:text-emerald-400" />
             <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
@@ -459,12 +464,12 @@ export default function MedicalCalculator() {
           <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">세대별 공제액 실시간 연산</span>
         </div>
 
-        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300 pt-1">
-          <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
+        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300">
+          <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
             <span className="font-medium">· 총 발생 의료비 합계</span>
             <span className="font-extrabold text-gray-900 dark:text-white">{result.totalCost.toLocaleString()} 원</span>
           </div>
-          <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80 text-rose-600 dark:text-rose-400">
+          <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80 text-rose-600 dark:text-rose-400">
             <span className="font-extrabold">· (-) 자기부담금 공제 합계</span>
             <span className="font-extrabold">-{result.totalDeduction.toLocaleString()} 원</span>
           </div>
@@ -479,7 +484,7 @@ export default function MedicalCalculator() {
 
         {/* 계산 공식 */}
         {result.formulas.length > 0 && (
-          <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-900/70 p-3.5">
+          <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-900/70 p-4">
             <h4 className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 mb-1.5 flex items-center gap-1.5">
               <AppIcon name="calculator" size={14} />
               적용된 세대별 공제 공식
@@ -530,7 +535,7 @@ export default function MedicalCalculator() {
         <p>위 결과는 <strong>단순 약관 산출 추정치</strong>입니다. 비례보상, 면책 질환, 연간 보상한도 등에 따라 실제 지급액이 달라질 수 있으므로 부지급 통보 시 손해사정사의 1:1 상담을 권장합니다.</p>
       </div>
 
-      <div className="space-y-2.5 pt-1">
+      <div className="space-y-3 pt-1">
         <Link
           href="/consultation"
           className="flex items-center justify-center w-full gap-2 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-emerald-500/20 text-center cursor-pointer"
@@ -539,7 +544,7 @@ export default function MedicalCalculator() {
           <span>실손 부지급 1:1 무료 상담 신청하기</span>
         </Link>
 
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => shareResult('실손의료비', result.totalPayout)}
             className="flex items-center justify-center gap-2 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 text-gray-800 dark:text-gray-200 font-bold text-xs sm:text-sm transition-colors cursor-pointer shadow-xs"

@@ -64,30 +64,21 @@ const CALCULATORS = [
   }
 ];
 
+import CalculatorHeaderNav from '@/components/calculator/CalculatorHeaderNav';
+import AppIcon from '@/components/ui/AppIcon';
+
 export default function CalculatorIndex() {
   return (
-    <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* 스마트 보상금 계산기 상단 띠 배너 */}
-      <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3 rounded-t-none">
-        <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          <span className="shrink-0 flex items-center">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="8" y1="14" x2="8.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="8" y1="18" x2="8.01" y2="18"/><line x1="16" y1="18" x2="16.01" y2="18"/>
-            </svg>
-          </span>
-          <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
-            <span className="underline decoration-wavy mr-1.5">[통합 계산]</span>
-            보상스쿨 빅데이터 알고리즘으로 예상 보상금을 미리 산출해보세요.
-          </div>
-        </div>
-      </div>
+    <div className="space-y-8 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* 전역 공통 계산기 네비게이션 */}
+      <CalculatorHeaderNav currentTab="index" />
 
-      <div className="text-center space-y-4">
-        <PremiumHeading level={1} gradient="blue" className="justify-center !text-3xl">
+      <div className="text-center space-y-3">
+        <PremiumHeading level={1} gradient="blue" className="justify-center !text-2xl sm:!text-3xl">
           스마트 보상금 계산기
         </PremiumHeading>
-        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
-          복잡한 계산식과 수많은 예외 규정을 보상스쿨 빅데이터 알고리즘으로 단순화했습니다. 원하시는 계산기를 선택하여 나에게 맞는 보상금 규모를 미리 파악해 보세요.
+        <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
+          복잡한 계산식과 수많은 예외 규정을 보상스쿨 실무 알고리즘으로 단순화했습니다. 원하시는 계산기를 선택하여 나에게 맞는 보상금 규모를 미리 파악해 보세요.
         </p>
       </div>
 

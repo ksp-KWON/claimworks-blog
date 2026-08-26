@@ -6,7 +6,6 @@ import { AutoInsuranceData, initialAutoData, INJURY_ALIMONY_TABLE } from './auto
 import { INJURY_DB } from './auto/injury-db';
 import AppIcon from '@/components/ui/AppIcon';
 
-
 export default function AutoCalculator() {
   const [data, setData] = useState<AutoInsuranceData>(initialAutoData);
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,7 +15,9 @@ export default function AutoCalculator() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) setIsSearchFocused(false);
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -25,8 +26,11 @@ export default function AutoCalculator() {
   const handleToggleDiagnosis = (id: string) => {
     setData(prev => {
       let newDiagnoses = [...prev.selectedDiagnoses];
-      if (newDiagnoses.includes(id)) newDiagnoses = newDiagnoses.filter(d => d !== id);
-      else newDiagnoses.push(id);
+      if (newDiagnoses.includes(id)) {
+        newDiagnoses = newDiagnoses.filter(d => d !== id);
+      } else {
+        newDiagnoses.push(id);
+      }
       
       if (newDiagnoses.length > 0) {
         const selected = INJURY_DB.filter(i => newDiagnoses.includes(i.id));
@@ -43,13 +47,14 @@ export default function AutoCalculator() {
   const handleChange = (field: keyof AutoInsuranceData, value: number | boolean) => {
     let finalValue = value;
     if (typeof value === 'number') {
-      if (field === 'faultRatio' || field === 'disabilityRate') finalValue = Math.min(100, Math.max(0, value));
-      else finalValue = Math.max(0, value);
+      if (field === 'faultRatio' || field === 'disabilityRate') {
+        finalValue = Math.min(100, Math.max(0, value));
+      } else {
+        finalValue = Math.max(0, value);
+      }
     }
     setData(prev => ({ ...prev, [field]: finalValue }));
   };
-
-
 
   const fmt = (val: number | string) => {
     if (!val) return '';
@@ -57,10 +62,12 @@ export default function AutoCalculator() {
   };
   const parse = (val: string) => Math.max(0, Number(val.replace(/[^0-9]/g, '')) || 0);
 
-  // ── 계산 로직 ──
+  // ── 대법원 호프만 계수 연산 (PoT Engine) ──
   const getHoffmanCoefficient = (months: number) => {
     let sum = 0;
-    for (let i = 1; i <= months; i++) sum += 1 / (1 + 0.05 * (i / 12));
+    for (let i = 1; i <= months; i++) {
+      sum += 1 / (1 + 0.05 * (i / 12));
+    }
     return Math.min(sum, 240);
   };
 
@@ -89,10 +96,14 @@ export default function AutoCalculator() {
     const canClaimLostIncome = data.ageAtAccident < 65 || data.isIncomeProven;
     const dailyIncome = data.income / 30;
     const lostIncome = (data.hasInjury && canClaimLostIncome) ? Math.floor(dailyIncome * data.hospitalDays * 0.85) : 0;
-    if (data.hasInjury && lostIncome > 0) formulas.push(`휴업손해: (월소득/30) × ${data.hospitalDays}일 × 85% = ${lostIncome.toLocaleString()}원`);
+    if (data.hasInjury && lostIncome > 0) {
+      formulas.push(`휴업손해: (월소득/30) × ${data.hospitalDays}일 × 85% = ${lostIncome.toLocaleString()}원`);
+    }
 
     const otherDamages = data.hasInjury ? data.outpatientDays * 8000 : 0;
-    if (otherDamages > 0) formulas.push(`기타손배금: 통원 ${data.outpatientDays}일 × 8,000원`);
+    if (otherDamages > 0) {
+      formulas.push(`기타손배금: 통원 ${data.outpatientDays}일 × 8,000원`);
+    }
 
     let lostEarnings = 0;
     const DAILY_WORKER_WAGE = 3284525;
@@ -142,339 +153,430 @@ export default function AutoCalculator() {
   };
 
   const result = calculateResult();
-
   const { exportPDF, shareResult } = useCalculatorExport(resultRef);
 
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         
-        {/* ── 좌측: 입력 폼 (5열) ── */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
+        {/* ── 좌측: 3-Step 구조화 입력 폼 (5열) ── */}
+        <div className="lg:col-span-5 flex flex-col gap-5">
           
-          {/* 피해 유형 선택 */}
-          <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-white/5 transition-all">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+          {/* STEP 1: 피해 유형 선택 */}
+          <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-blue-200/90 dark:border-blue-900/50 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">STEP 01</span>
+                <h3 className="text-sm font-extrabold text-gray-900 dark:text-white">피해 유형 선택</h3>
               </div>
-              <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">발생한 피해 유형 선택</h3>
+              <span className="text-[11px] text-gray-400 font-medium">복수 선택 가능</span>
             </div>
-            <div className="space-y-3">
+            
+            <div className="space-y-2.5">
               {[
                 { 
                   key: 'hasInjury', 
-                  icon: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>, 
+                  icon: 'bandaid' as const, 
                   title: '부상 (상해)', 
-                  sub: '대인배상 I', 
-                  activeClass: 'border-[#1A73E8] bg-[#e8f0fe] dark:bg-[#1A73E8]/15', 
-                  textActive: 'text-[#1A73E8] dark:text-[#8ab4f8]' 
+                  sub: '대인배상 I (입원·통원 치료)', 
+                  activeClass: 'border-blue-500 bg-blue-50/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 shadow-xs' 
                 },
                 { 
                   key: 'hasDisability', 
-                  icon: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="5" r="1"/><path d="m9 20 3-9 3 9"/><path d="m6.5 14 5.5 1.5 5.5-1.5"/></svg>, 
+                  icon: 'crutches' as const, 
                   title: '후유장해', 
-                  sub: '대인배상 II', 
-                  activeClass: 'border-[#7C4DFF] bg-[#f3e8ff] dark:bg-[#7C4DFF]/15', 
-                  textActive: 'text-[#7C4DFF] dark:text-[#ce93d8]' 
+                  sub: '대인배상 II (노동능력상실)', 
+                  activeClass: 'border-purple-500 bg-purple-50/80 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 shadow-xs' 
                 },
                 { 
                   key: 'hasDeath', 
-                  icon: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V11"/><path d="M5 3a7 7 0 0 0 7 7 7 7 0 0 0 7-7"/></svg>, 
+                  icon: 'rose' as const, 
                   title: '사망', 
-                  sub: '사망 피해보상', 
-                  activeClass: 'border-[#d93025] bg-[#fce8e6] dark:bg-[#d93025]/15', 
-                  textActive: 'text-[#d93025] dark:text-[#f28b82]' 
+                  sub: '사망 위자료 및 상실수익액', 
+                  activeClass: 'border-rose-500 bg-rose-50/80 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 shadow-xs' 
                 },
               ].map(item => {
                 const isActive = data[item.key as keyof AutoInsuranceData] as boolean;
-                const IconComp = item.icon;
                 return (
-                  <button key={item.key} onClick={() => handleChange(item.key as keyof AutoInsuranceData, !isActive)} className={`w-full flex items-center gap-4 p-4 rounded-none border-2 transition-all text-left ${isActive ? item.activeClass : 'border-transparent bg-[#f8f9fa] dark:bg-[#2d2d2d] hover:bg-gray-50'}`}>
-                    <span className="flex items-center justify-center shrink-0"><IconComp /></span>
-                    <div className="flex-1">
-                      <div className={`font-black text-[14px] ${isActive ? item.textActive : 'text-[#202124] dark:text-[#e8eaed]'}`}>{item.title}</div>
-                      <div className="text-[11px] text-gray-400 font-semibold">{item.sub}</div>
+                  <button 
+                    key={item.key} 
+                    onClick={() => handleChange(item.key as keyof AutoInsuranceData, !isActive)} 
+                    className={`w-full flex items-center gap-3.5 p-3.5 rounded-none border transition-all text-left cursor-pointer ${
+                      isActive 
+                        ? item.activeClass 
+                        : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 hover:bg-gray-100/80 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    <span className="shrink-0 flex items-center justify-center">
+                      <AppIcon name={item.icon} size={20} />
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-extrabold text-[13.5px]">{item.title}</div>
+                      <div className="text-[11px] opacity-75 font-medium truncate">{item.sub}</div>
                     </div>
+                    <span className={`w-5 h-5 rounded-none border flex items-center justify-center text-xs font-bold ${isActive ? 'bg-current text-white border-transparent' : 'border-gray-300 dark:border-zinc-700'}`}>
+                      {isActive && <AppIcon name="check" size={12} className="text-white" />}
+                    </span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* 기본 정보 */}
-          <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-white/5 transition-all">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          {/* STEP 2: 기본 조건 입력 (소득 및 과실) */}
+          <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/90 dark:border-zinc-800 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">STEP 02</span>
+                <h3 className="text-sm font-extrabold text-gray-900 dark:text-white">소득 & 과실비율 입력</h3>
               </div>
-              <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">기본 정보 (소득 및 과실)</h3>
             </div>
-            <div className="space-y-5">
+
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-2">월 소득 / 신고소득</label>
+                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1.5">월 소득 / 신고소득</label>
                 <div className="relative mb-2">
-                  <input type="text" inputMode="numeric" value={data.income ? fmt(data.income) : ''} onChange={e => handleChange('income', parse(e.target.value))} placeholder="3,500,000" className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-3 pl-4 pr-12 text-[15px] font-black focus:ring-2 focus:ring-[#1A73E8] focus:bg-white focus:outline-none transition-all" />
-                  <span className="absolute right-4 top-3.5 text-[13px] text-gray-400 font-bold">원</span>
+                  <input 
+                    type="text" 
+                    inputMode="numeric" 
+                    value={data.income ? fmt(data.income) : ''} 
+                    onChange={e => handleChange('income', parse(e.target.value))} 
+                    placeholder="3,500,000" 
+                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2.5 pl-3.5 pr-10 text-[14px] font-bold focus:border-blue-500 focus:outline-none transition-all" 
+                  />
+                  <span className="absolute right-3.5 top-3 text-[12px] text-gray-400 font-bold">원</span>
                 </div>
-                <button onClick={() => { handleChange('income', 3284525); handleChange('isIncomeProven', false); }} className="w-full py-2 bg-[#e8f0fe] dark:bg-[#1A73E8]/15 text-[#1A73E8] dark:text-[#8ab4f8] text-[12px] font-bold rounded-none hover:bg-[#d2e3fc] transition-all flex items-center justify-center gap-1.5">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <button 
+                  onClick={() => { handleChange('income', 3284525); handleChange('isIncomeProven', false); }} 
+                  className="w-full py-2 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 text-[11.5px] font-bold rounded-none hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all flex items-center justify-center gap-1.5 border border-blue-200/60 dark:border-blue-800/60 cursor-pointer"
+                >
+                  <AppIcon name="chart" size={13} />
                   도시일용근로자 임금 적용 (3,284,525원)
                 </button>
               </div>
-              <div className="flex justify-between items-center bg-[#f8f9fa] dark:bg-[#2d2d2d] p-3.5 rounded-none">
+
+              <div className="flex justify-between items-center bg-gray-50 dark:bg-zinc-900 p-3 rounded-none border border-gray-200/80 dark:border-zinc-800">
                 <div>
-                  <div className="text-[13px] font-bold">세법상 소득 입증 가능 여부</div>
+                  <div className="text-[12px] font-bold text-gray-800 dark:text-gray-200">세법상 소득 증빙 가능</div>
                   <div className="text-[10px] text-gray-400">65세 이상일 경우 입증 필수</div>
                 </div>
-                <button onClick={() => handleChange('isIncomeProven', !data.isIncomeProven)} className={`w-11 h-6 rounded-full transition-all relative ${data.isIncomeProven ? 'bg-[#1A73E8]' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                  <span className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${data.isIncomeProven ? 'left-6' : 'left-1'}`} />
+                <button 
+                  onClick={() => handleChange('isIncomeProven', !data.isIncomeProven)} 
+                  className={`w-10 h-5 rounded-full transition-all relative cursor-pointer ${data.isIncomeProven ? 'bg-blue-600' : 'bg-gray-300 dark:bg-zinc-700'}`}
+                >
+                  <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${data.isIncomeProven ? 'left-5' : 'left-0.5'}`} />
                 </button>
               </div>
+
               <div>
-                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-2">본인 과실 비율</label>
+                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1.5">피해자 본인 과실 비율</label>
                 <div className="relative mb-2">
-                  <input type="number" min="0" max="100" value={data.faultRatio === 0 ? '0' : (data.faultRatio || '')} onChange={e => handleChange('faultRatio', Number(e.target.value))} className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-3 pl-4 pr-12 text-[15px] font-black focus:ring-2 focus:ring-[#1A73E8] focus:bg-white focus:outline-none transition-all" />
-                  <span className="absolute right-4 top-3.5 text-[13px] text-gray-400 font-bold">%</span>
+                  <input 
+                    type="number" 
+                    min="0" 
+                    max="100" 
+                    value={data.faultRatio === 0 ? '0' : (data.faultRatio || '')} 
+                    onChange={e => handleChange('faultRatio', Number(e.target.value))} 
+                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2.5 pl-3.5 pr-10 text-[14px] font-bold focus:border-blue-500 focus:outline-none transition-all" 
+                  />
+                  <span className="absolute right-3.5 top-3 text-[12px] text-gray-400 font-bold">%</span>
                 </div>
                 <div className="grid grid-cols-4 gap-1.5">
-                  {[0, 10, 20, 30].map(v => <button key={v} onClick={() => handleChange('faultRatio', v)} className={`py-2 rounded-none text-[12px] font-bold border transition-all ${data.faultRatio === v ? 'bg-[#1A73E8] text-white border-[#1A73E8]' : 'bg-white dark:bg-[#2d2d2d] border-gray-200 dark:border-white/10 text-gray-600'}`}>{v}%</button>)}
+                  {[0, 10, 20, 30].map(v => (
+                    <button 
+                      key={v} 
+                      onClick={() => handleChange('faultRatio', v)} 
+                      className={`py-1.5 rounded-none text-[11.5px] font-bold border transition-all cursor-pointer ${
+                        data.faultRatio === v 
+                          ? 'bg-blue-600 text-white border-blue-600' 
+                          : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-400 hover:bg-gray-50'
+                      }`}
+                    >
+                      {v}%
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* 피해 상세 입력 (선택한 피해만 노출) */}
+          {/* STEP 3: 세부 피해 및 치료 내역 */}
           {(data.hasInjury || data.hasDisability || data.hasDeath) && (
-            <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-white/5 transition-all animate-in fade-in slide-in-from-top-4">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/90 dark:border-zinc-800 shadow-sm space-y-4 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded">STEP 03</span>
+                  <h3 className="text-sm font-extrabold text-gray-900 dark:text-white">세부 치료 & 장해 내역</h3>
                 </div>
-                <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">상세 입력 내역</h3>
               </div>
               
-              <div className="space-y-6">
+              <div className="space-y-5">
+                {/* 부상 세부 */}
                 {data.hasInjury && (
-                  <div className="space-y-4 pb-4 border-b border-gray-100 dark:border-white/10 last:border-0">
-                    <h4 className="text-[12px] font-black text-[#1A73E8] flex items-center gap-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>
-                      부상 치료 상세
+                  <div className="space-y-3 pb-4 border-b border-gray-100 dark:border-zinc-800 last:border-0">
+                    <h4 className="text-[12px] font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+                      <AppIcon name="bandaid" size={14} />
+                      상해 진단명 & 치료 일수
                     </h4>
+                    
                     <div className="relative" ref={searchRef}>
-                      <input type="text" value={searchTerm} onChange={e => { setSearchTerm(e.target.value); setIsSearchFocused(true); }} onFocus={() => setIsSearchFocused(true)} placeholder="진단명 검색 (예: 경추염좌)" className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-2.5 px-4 text-[13px] font-bold focus:ring-2 focus:ring-[#1A73E8]" />
+                      <input 
+                        type="text" 
+                        value={searchTerm} 
+                        onChange={e => { setSearchTerm(e.target.value); setIsSearchFocused(true); }} 
+                        onFocus={() => setIsSearchFocused(true)} 
+                        placeholder="진단명 검색 (예: 뇌진탕, 염좌, 골절)" 
+                        className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2 px-3 text-[12.5px] font-medium focus:border-blue-500 focus:outline-none" 
+                      />
                       {isSearchFocused && searchTerm && (
-                        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-[#303134] border border-gray-200 dark:border-gray-700 rounded-none shadow-xl max-h-44 overflow-y-auto">
+                        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none shadow-xl max-h-44 overflow-y-auto">
                           {INJURY_DB.filter(i => i.name.replace(/\s+/g, '').includes(searchTerm.replace(/\s+/g, ''))).map(i => (
-                            <div key={i.id} onMouseDown={e => { e.preventDefault(); handleToggleDiagnosis(i.id); setSearchTerm(''); setIsSearchFocused(false); }} className="px-3 py-2.5 text-[12px] hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer border-b border-gray-100 dark:border-gray-800 flex justify-between">
-                              <span>{i.name}</span><span className="font-bold text-[#1A73E8]">{i.grade}급</span>
+                            <div 
+                              key={i.id} 
+                              onMouseDown={e => { e.preventDefault(); handleToggleDiagnosis(i.id); setSearchTerm(''); setIsSearchFocused(false); }} 
+                              className="px-3 py-2 text-[12px] hover:bg-blue-50 dark:hover:bg-zinc-800 cursor-pointer border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center"
+                            >
+                              <span className="text-gray-800 dark:text-gray-200">{i.name}</span>
+                              <span className="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded text-[11px]">{i.grade}급</span>
                             </div>
                           ))}
                         </div>
                       )}
                     </div>
+
                     {data.selectedDiagnoses.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 pt-1">
                         {INJURY_DB.filter(i => data.selectedDiagnoses.includes(i.id)).map(i => (
-                          <div key={i.id} className="flex items-center gap-1 bg-[#e8f0fe] dark:bg-[#1A73E8]/20 text-[#1A73E8] px-2.5 py-1 rounded-full text-[11px] font-bold">
+                          <div key={i.id} className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-none text-[11px] font-bold">
                             <span>[{i.grade}급] {i.name}</span>
-                            <button onClick={() => handleToggleDiagnosis(i.id)} className="ml-1 hover:text-red-500">✕</button>
+                            <button onClick={() => handleToggleDiagnosis(i.id)} className="hover:text-red-500 cursor-pointer font-normal">✕</button>
                           </div>
                         ))}
                       </div>
                     )}
-                    <div className="grid grid-cols-2 gap-3">
+
+                    <div className="grid grid-cols-2 gap-3 pt-1">
                       <div>
                         <label className="block text-[11px] font-bold text-gray-500 mb-1">입원 일수</label>
-                        <input type="number" value={data.hospitalDays || ''} onChange={e => handleChange('hospitalDays', Number(e.target.value))} className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-2.5 px-3 text-[14px] font-bold focus:ring-2 focus:ring-[#1A73E8]" />
+                        <div className="relative">
+                          <input 
+                            type="number" 
+                            value={data.hospitalDays || ''} 
+                            onChange={e => handleChange('hospitalDays', Number(e.target.value))} 
+                            placeholder="0"
+                            className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2 px-3 pr-7 text-[13px] font-bold focus:border-blue-500 focus:outline-none" 
+                          />
+                          <span className="absolute right-2.5 top-2.5 text-[11px] text-gray-400 font-bold">일</span>
+                        </div>
                       </div>
                       <div>
                         <label className="block text-[11px] font-bold text-gray-500 mb-1">통원 일수</label>
-                        <input type="number" value={data.outpatientDays || ''} onChange={e => handleChange('outpatientDays', Number(e.target.value))} className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-2.5 px-3 text-[14px] font-bold focus:ring-2 focus:ring-[#1A73E8]" />
+                        <div className="relative">
+                          <input 
+                            type="number" 
+                            value={data.outpatientDays || ''} 
+                            onChange={e => handleChange('outpatientDays', Number(e.target.value))} 
+                            placeholder="0"
+                            className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2 px-3 pr-7 text-[13px] font-bold focus:border-blue-500 focus:outline-none" 
+                          />
+                          <span className="absolute right-2.5 top-2.5 text-[11px] text-gray-400 font-bold">일</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
                 
+                {/* 후유장해 세부 */}
                 {data.hasDisability && (
-                  <div className="space-y-4 pb-4 border-b border-gray-100 dark:border-white/10 last:border-0">
-                    <h4 className="text-[12px] font-black text-[#7C4DFF] flex items-center gap-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="5" r="1"/><path d="m9 20 3-9 3 9"/><path d="m6.5 14 5.5 1.5 5.5-1.5"/></svg>
-                      후유장해 상세
+                  <div className="space-y-3 pb-4 border-b border-gray-100 dark:border-zinc-800 last:border-0">
+                    <h4 className="text-[12px] font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+                      <AppIcon name="crutches" size={14} />
+                      후유장해율 & 상실 기간
                     </h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[11px] font-bold text-gray-500 mb-1">장해율 (%)</label>
-                        <input type="number" value={data.disabilityRate || ''} onChange={e => handleChange('disabilityRate', Number(e.target.value))} className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-2.5 px-3 text-[14px] font-bold focus:ring-2 focus:ring-[#7C4DFF]" />
+                        <label className="block text-[11px] font-bold text-gray-500 mb-1">맥브라이드 장해율</label>
+                        <div className="relative">
+                          <input 
+                            type="number" 
+                            min="0" 
+                            max="100" 
+                            value={data.disabilityRate || ''} 
+                            onChange={e => handleChange('disabilityRate', Number(e.target.value))} 
+                            placeholder="14"
+                            className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2 px-3 pr-7 text-[13px] font-bold focus:border-purple-500 focus:outline-none" 
+                          />
+                          <span className="absolute right-2.5 top-2.5 text-[11px] text-gray-400 font-bold">%</span>
+                        </div>
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-gray-500 mb-1">장해 기간 (0=영구)</label>
-                        <input type="number" value={data.disabilityYears === 0 ? '0' : (data.disabilityYears || '')} onChange={e => handleChange('disabilityYears', Number(e.target.value))} className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-2.5 px-3 text-[14px] font-bold focus:ring-2 focus:ring-[#7C4DFF]" />
+                        <label className="block text-[11px] font-bold text-gray-500 mb-1">장해 인정 기간</label>
+                        <div className="relative">
+                          <input 
+                            type="number" 
+                            value={data.disabilityYears || ''} 
+                            onChange={e => handleChange('disabilityYears', Number(e.target.value))} 
+                            placeholder="0 (영구)"
+                            className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2 px-3 pr-7 text-[13px] font-bold focus:border-purple-500 focus:outline-none" 
+                          />
+                          <span className="absolute right-2.5 top-2.5 text-[11px] text-gray-400 font-bold">년</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {data.hasDeath && (
-                  <div className="space-y-4">
-                    <h4 className="text-[12px] font-black text-[#d93025] flex items-center gap-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22V11"/><path d="M5 3a7 7 0 0 0 7 7 7 7 0 0 0 7-7"/></svg>
-                      사망 상세
-                    </h4>
-                    <div>
-                      <label className="block text-[11px] font-bold text-gray-500 mb-1">사고 당시 만 나이</label>
-                      <input type="number" value={data.ageAtAccident || ''} onChange={e => handleChange('ageAtAccident', Number(e.target.value))} className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-2.5 px-3 text-[14px] font-bold focus:ring-2 focus:ring-[#d93025]" />
+                {/* 기타 비용 */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1">직불 치료비</label>
+                    <div className="relative">
+                      <input 
+                        type="text" 
+                        inputMode="numeric" 
+                        value={data.directReceipts ? fmt(data.directReceipts) : ''} 
+                        onChange={e => handleChange('directReceipts', parse(e.target.value))} 
+                        placeholder="0" 
+                        className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2 px-3 pr-7 text-[13px] font-bold focus:border-blue-500 focus:outline-none" 
+                      />
+                      <span className="absolute right-2.5 top-2.5 text-[11px] text-gray-400 font-bold">원</span>
                     </div>
                   </div>
-                )}
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1">향후 치료비</label>
+                    <div className="relative">
+                      <input 
+                        type="text" 
+                        inputMode="numeric" 
+                        value={data.futureTreatmentCost ? fmt(data.futureTreatmentCost) : ''} 
+                        onChange={e => handleChange('futureTreatmentCost', parse(e.target.value))} 
+                        placeholder="0" 
+                        className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2 px-3 pr-7 text-[13px] font-bold focus:border-blue-500 focus:outline-none" 
+                      />
+                      <span className="absolute right-2.5 top-2.5 text-[11px] text-gray-400 font-bold">원</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
-
-          {/* 추가 비용 */}
-          <div className="bg-white dark:bg-[#202124] rounded-none p-6 sm:p-7 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-white/5 transition-all">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-[#f8f9fa] dark:bg-[#2d2d2d] flex items-center justify-center">
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7z"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/></svg>
-              </div>
-              <h3 className="text-sm font-extrabold text-[#202124] dark:text-[#e8eaed]">기타 추가 비용</h3>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-2">직불 치료비 (개인 지출 영수증)</label>
-                <div className="relative">
-                  <input type="text" inputMode="numeric" value={data.directReceipts ? fmt(data.directReceipts) : ''} onChange={e => handleChange('directReceipts', parse(e.target.value))} placeholder="0" className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-3 pl-4 pr-12 text-[15px] font-black focus:ring-2 focus:ring-[#34A853] focus:outline-none transition-all" />
-                  <span className="absolute right-4 top-3.5 text-[13px] text-gray-400 font-bold">원</span>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-2">향후 치료비 (성형, 흉터 제거 등)</label>
-                <div className="relative">
-                  <input type="text" inputMode="numeric" value={data.futureTreatmentCost ? fmt(data.futureTreatmentCost) : ''} onChange={e => handleChange('futureTreatmentCost', parse(e.target.value))} placeholder="0" className="w-full bg-[#f8f9fa] dark:bg-[#2d2d2d] border-transparent rounded-none py-3 pl-4 pr-12 text-[15px] font-black focus:ring-2 focus:ring-[#34A853] focus:outline-none transition-all" />
-                  <span className="absolute right-4 top-3.5 text-[13px] text-gray-400 font-bold">원</span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* ── 우측: 세련된 결과 명세서 패널 (7열, 스티키 고정) ── */}
-        <div className="lg:col-span-7 lg:sticky lg:top-[100px] flex flex-col gap-5">
-          <div className="bg-[#f8f9fa] dark:bg-[#2d2d2d] rounded-none px-6 py-5 border border-gray-100 dark:border-white/5 flex items-center gap-3">
-            <span className="flex items-center text-gray-500">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            </span>
+        {/* ── 우측: 실시간 예상 합의금 명세서 (7열, 스티키 고정) ── */}
+        <div className="lg:col-span-7 lg:sticky lg:top-[100px] flex flex-col gap-4">
+          <div className="bg-gray-100 dark:bg-zinc-900 px-5 py-3.5 border border-gray-200 dark:border-zinc-800 flex items-center gap-2.5">
+            <AppIcon name="file-text" size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
             <div>
-              <h2 className="text-base font-extrabold text-gray-900 dark:text-white">자동차사고 합의금 명세서</h2>
-              <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">입력하신 정보를 바탕으로 산출된 예상 합의금 내역입니다.</p>
+              <h2 className="text-sm font-extrabold text-gray-900 dark:text-white">자동차사고 예상 합의금 명세서</h2>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">입력하신 조건에 따른 약관 기준 예상액입니다.</p>
             </div>
           </div>
 
-          <div ref={resultRef} className="flex flex-col gap-5">
-            {/* 최종 합의금 카드: 멋진 파란색 그라데이션 적용 */}
-            <div className="bg-gradient-to-br from-[#1A73E8] to-[#1557b0] dark:from-[#2e7bf2] dark:to-[#1A73E8] rounded-none p-8 sm:p-10 text-white shadow-xl shadow-[#1A73E8]/20 relative overflow-hidden transition-all duration-300 hover:scale-[1.01]">
-              <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full blur-xl pointer-events-none transform -translate-x-10 translate-y-10"></div>
-              
-              <div className="relative z-10 flex flex-col h-full justify-between">
+          <div ref={resultRef} className="flex flex-col gap-4">
+            {/* 최종 합의금 챔피언 카드 */}
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 dark:from-blue-700 dark:to-indigo-900 p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
+              <div className="relative z-10 flex flex-col justify-between">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 bg-black/15 backdrop-blur-md px-3 py-1.5 rounded-full text-[11px] font-bold text-white/90 uppercase tracking-widest mb-4">
+                  <div className="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-xs px-2.5 py-1 rounded-none text-[10.5px] font-bold text-white/90 uppercase tracking-wider mb-3">
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-300 animate-pulse"></span>
-                    예상 합의금 (과실 상계 후)
+                    예상 합의금 (과실 상계 후 최종액)
                   </div>
                   <div className="flex items-end gap-2 mb-2">
-                    <div className="text-5xl sm:text-6xl font-black tracking-tight drop-shadow-sm">
+                    <div className="text-4xl sm:text-5xl font-black tracking-tight">
                       {result.finalTotal.toLocaleString()}
                     </div>
-                    <div className="text-2xl font-bold text-white/90 mb-1.5">원</div>
+                    <div className="text-xl font-bold text-white/90 mb-1">원</div>
                   </div>
                 </div>
                 
-                <div className="mt-8 pt-5 border-t border-white/20 flex flex-wrap gap-4 text-[13px] font-semibold text-white/90">
-                  <div className="flex items-center gap-1.5"><span className="text-white/60">피해 유형:</span><span>{[data.hasInjury && '부상', data.hasDisability && '장해', data.hasDeath && '사망'].filter(Boolean).join(', ') || '미입력'}</span></div>
-                  <div className="flex items-center gap-1.5"><span className="text-white/60">월 소득:</span><span>{data.income.toLocaleString()}원</span></div>
-                  <div className="flex items-center gap-1.5"><span className="text-white/60">본인 과실:</span><span className="bg-white/20 px-2 py-0.5 rounded text-white">{data.faultRatio}%</span></div>
+                <div className="mt-6 pt-4 border-t border-white/20 flex flex-wrap gap-4 text-[12px] font-medium text-white/90">
+                  <div><span className="text-white/60 mr-1">피해유형:</span><span className="font-bold">{[data.hasInjury && '부상', data.hasDisability && '장해', data.hasDeath && '사망'].filter(Boolean).join(', ') || '선택 없음'}</span></div>
+                  <div><span className="text-white/60 mr-1">월소득:</span><span className="font-bold">{data.income.toLocaleString()}원</span></div>
+                  <div><span className="text-white/60 mr-1">본인과실:</span><span className="bg-white/25 px-1.5 py-0.5 rounded text-white font-bold">{data.faultRatio}%</span></div>
                 </div>
               </div>
             </div>
 
-            {/* 세부 보상 내역 */}
-            <div className="bg-white dark:bg-[#202124] rounded-none border border-gray-200 dark:border-white/10 p-7 shadow-sm">
-              <h3 className="text-[13px] font-extrabold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2 mb-5">
-                <span className="w-1 h-4 bg-[#1A73E8] rounded-full"></span> 세부 보상 내역
+            {/* 세부 보상 내역서 */}
+            <div className="bg-white dark:bg-[#202124] border border-gray-200 dark:border-zinc-800 p-5 sm:p-6 shadow-xs space-y-3">
+              <h3 className="text-xs font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5 mb-3">
+                <span className="w-1 h-3.5 bg-blue-600 rounded-none"></span> 세부 산출 내역
               </h3>
               
-              <div className="space-y-4 text-[13px] font-medium text-gray-600 dark:text-gray-400">
+              <div className="space-y-2.5 text-[12.5px] text-gray-600 dark:text-gray-400">
                 {result.alimony > 0 && (
-                  <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-white/5">
-                    <span>{result.appliedAlimonyLabel} <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded ml-1">최대치</span></span>
-                    <span className="font-bold text-[#202124] dark:text-[#e8eaed]">{result.alimony.toLocaleString()} 원</span>
+                  <div className="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-zinc-800/80">
+                    <span>{result.appliedAlimonyLabel}</span>
+                    <span className="font-bold text-gray-900 dark:text-white">{result.alimony.toLocaleString()} 원</span>
                   </div>
                 )}
                 
                 {data.hasInjury && (
                   <>
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-white/5">
+                    <div className="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-zinc-800/80">
                       <span>휴업손해 (입원 {data.hospitalDays}일)</span>
-                      <span className="font-bold text-[#202124] dark:text-[#e8eaed]">{result.lostIncome.toLocaleString()} 원</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{result.lostIncome.toLocaleString()} 원</span>
                     </div>
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-white/5">
+                    <div className="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-zinc-800/80">
                       <span>기타손배금 (통원 {data.outpatientDays}일)</span>
-                      <span className="font-bold text-[#202124] dark:text-[#e8eaed]">{result.otherDamages.toLocaleString()} 원</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{result.otherDamages.toLocaleString()} 원</span>
                     </div>
                   </>
                 )}
                 
                 {data.hasDeath && (
                   <>
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-white/5">
-                      <span>사망 장례비</span><span className="font-bold text-[#202124] dark:text-[#e8eaed]">{result.funeralCost.toLocaleString()} 원</span>
+                    <div className="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-zinc-800/80">
+                      <span>사망 장례비</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{result.funeralCost.toLocaleString()} 원</span>
                     </div>
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-white/5">
-                      <span>상실수익액 (사망, {data.ageAtAccident}세)</span><span className="font-bold text-[#202124] dark:text-[#e8eaed]">{result.lostEarnings.toLocaleString()} 원</span>
+                    <div className="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-zinc-800/80">
+                      <span>상실수익액 (사망, {data.ageAtAccident}세)</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{result.lostEarnings.toLocaleString()} 원</span>
                     </div>
                   </>
                 )}
                 
                 {!data.hasDeath && data.hasDisability && (
-                  <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-white/5">
-                    <span>상실수익액 (장해 {data.disabilityRate}%)</span><span className="font-bold text-[#202124] dark:text-[#e8eaed]">{result.lostEarnings.toLocaleString()} 원</span>
+                  <div className="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-zinc-800/80">
+                    <span>상실수익액 (장해 {data.disabilityRate}%)</span>
+                    <span className="font-bold text-gray-900 dark:text-white">{result.lostEarnings.toLocaleString()} 원</span>
                   </div>
                 )}
 
                 {(data.directReceipts > 0 || data.futureTreatmentCost > 0) && (
-                  <div className="flex flex-col gap-2 py-2.5 border-b border-gray-100 dark:border-white/5">
-                    {data.directReceipts > 0 && <div className="flex justify-between"><span>직불 치료비</span><span className="font-bold text-[#202124] dark:text-[#e8eaed]">{data.directReceipts.toLocaleString()} 원</span></div>}
-                    {data.futureTreatmentCost > 0 && <div className="flex justify-between"><span>향후치료비</span><span className="font-bold text-[#202124] dark:text-[#e8eaed]">{data.futureTreatmentCost.toLocaleString()} 원</span></div>}
+                  <div className="flex flex-col gap-1.5 py-1.5 border-b border-gray-100 dark:border-zinc-800/80">
+                    {data.directReceipts > 0 && <div className="flex justify-between"><span>직불 치료비</span><span className="font-bold text-gray-900 dark:text-white">{data.directReceipts.toLocaleString()} 원</span></div>}
+                    {data.futureTreatmentCost > 0 && <div className="flex justify-between"><span>향후 치료비</span><span className="font-bold text-gray-900 dark:text-white">{data.futureTreatmentCost.toLocaleString()} 원</span></div>}
                   </div>
                 )}
 
-                <div className="flex justify-between items-center py-2.5">
-                  <span className="font-semibold">과실 상계 전 총액</span>
-                  <span className="font-bold text-[#202124] dark:text-[#e8eaed]">{result.totalBeforeFault.toLocaleString()} 원</span>
+                <div className="flex justify-between items-center py-2 font-medium">
+                  <span>과실 상계 전 총액</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{result.totalBeforeFault.toLocaleString()} 원</span>
                 </div>
 
                 {data.faultRatio > 0 && (
-                  <div className="flex justify-between items-center pt-2 text-red-500 font-bold">
+                  <div className="flex justify-between items-center py-1 text-red-500 font-bold">
                     <span>(-) 본인 과실 상계 ({data.faultRatio}%)</span>
                     <span>-{result.faultDeduction.toLocaleString()} 원</span>
                   </div>
                 )}
                 
-                <div className="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-white/5 mt-1">
-                  <span className="text-[15px] font-extrabold text-[#1A73E8]">최종 예상 합의금</span>
-                  <span className="text-[18px] font-black text-[#1A73E8]">{result.finalTotal.toLocaleString()} 원</span>
+                <div className="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-zinc-700 mt-2">
+                  <span className="text-sm font-extrabold text-blue-600 dark:text-blue-400">최종 예상 합의금</span>
+                  <span className="text-base font-black text-blue-600 dark:text-blue-400">{result.finalTotal.toLocaleString()} 원</span>
                 </div>
               </div>
 
               {/* 산출 계산식 */}
               {result.formulas.length > 0 && (
-                <div className="mt-6 bg-[#f8f9fa] dark:bg-[#2d2d2d] rounded-none p-4 border border-gray-100 dark:border-white/5">
-                  <h4 className="text-[12px] font-extrabold text-[#1A73E8] mb-2 flex items-center gap-1.5">
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg>
-                    적용된 산출 계산식
+                <div className="mt-4 bg-gray-50 dark:bg-zinc-900 p-3.5 border border-gray-200/80 dark:border-zinc-800 rounded-none">
+                  <h4 className="text-[11.5px] font-bold text-blue-600 dark:text-blue-400 mb-1.5 flex items-center gap-1">
+                    <AppIcon name="calculator" size={13} />
+                    적용된 실무 산출식
                   </h4>
-                  <ul className="list-disc list-inside text-[11px] text-gray-500 dark:text-gray-400 space-y-1.5 leading-relaxed break-keep">
+                  <ul className="list-disc list-inside text-[11px] text-gray-500 dark:text-gray-400 space-y-1 leading-relaxed break-keep">
                     {result.formulas.map((f, i) => <li key={i}>{f}</li>)}
                   </ul>
                 </div>
@@ -482,26 +584,36 @@ export default function AutoCalculator() {
             </div>
           </div>
 
-          <div className="bg-[#fce8e6]/80 dark:bg-[#d93025]/10 rounded-none p-4 border border-[#d93025]/20 flex gap-3 text-[12px] leading-relaxed text-[#d93025] dark:text-[#f28b82] font-semibold shadow-sm">
-            <span className="shrink-0 mt-0.5 flex items-center text-[#d93025]">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            </span>
-            <p>위 결과는 <strong>보험회사 약관 기준</strong> 참고용입니다. 실제 소송 기준(특인) 적용 시 수천만 원 이상 증액될 수 있으므로 합의 전 보상 전문가와 상담하세요.</p>
+          {/* 전문가 조언 알림 배너 */}
+          <div className="bg-amber-50 dark:bg-amber-950/30 p-3.5 border border-amber-200 dark:border-amber-800/60 flex gap-2.5 text-[11.5px] leading-relaxed text-amber-900 dark:text-amber-300 font-medium">
+            <AppIcon name="shield-alert" size={16} className="text-amber-600 shrink-0 mt-0.5" />
+            <p>위 결과는 <strong>보험회사 약관 기준</strong> 참고용입니다. 실제 소송 판례 기준(특인) 적용 시 수천만 원 이상 증액될 수 있으므로 합의 전 보상 전문가와 상담하시길 권합니다.</p>
           </div>
 
-          <div className="flex flex-col gap-2 mt-2">
-            <button onClick={() => { document.getElementById('chat-floating-btn')?.click(); }} className="flex items-center justify-center w-full gap-2 py-4 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-none font-bold text-[14px] sm:text-[15px] transition-all shadow-sm hover:shadow-md" id="auto-calc-chat-btn">
-              <AppIcon name="chat" size={20} />
-              보상스쿨 1:1 무료 상담 신청하기
+          {/* 상담 및 액션 버튼 그룹 */}
+          <div className="flex flex-col gap-2 pt-1">
+            <button 
+              onClick={() => { document.getElementById('chat-floating-btn')?.click(); }} 
+              className="flex items-center justify-center w-full gap-2 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-none font-extrabold text-[14px] transition-all shadow-md shadow-blue-500/20 cursor-pointer" 
+              id="auto-calc-chat-btn"
+            >
+              <AppIcon name="chat" size={18} />
+              손해사정사 1:1 무료 상담 신청
             </button>
             
             <div className="grid grid-cols-2 gap-2">
-              <button onClick={() => shareResult('자동차', result.finalTotal)} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#1a73e8] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#8ab4f8] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
-                <AppIcon name="link" size={16} className="group-hover:-translate-y-0.5 transition-transform" />
+              <button 
+                onClick={() => shareResult('자동차사고', result.finalTotal)} 
+                className="flex items-center justify-center gap-1.5 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-blue-500 text-gray-700 dark:text-gray-300 rounded-none font-bold text-[12px] transition-all cursor-pointer"
+              >
+                <AppIcon name="link" size={14} />
                 결과 공유하기
               </button>
-              <button onClick={() => exportPDF('보상스쿨_자동차사고_예상합의금.pdf')} className="flex items-center justify-center gap-1.5 py-3.5 bg-[#f8f9fa] border border-[#dadce0] hover:bg-[#f1f3f4] text-[#202124] dark:bg-[#303134] dark:border-[#5f6368] dark:text-[#e8eaed] dark:hover:bg-[#3c4043] rounded-none font-bold text-[13px] transition-all shadow-sm group">
-                <AppIcon name="file-text" size={16} className="group-hover:translate-y-0.5 transition-transform" />
+              <button 
+                onClick={() => exportPDF('보상스쿨_자동차사고_예상합의금.pdf')} 
+                className="flex items-center justify-center gap-1.5 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-blue-500 text-gray-700 dark:text-gray-300 rounded-none font-bold text-[12px] transition-all cursor-pointer"
+              >
+                <AppIcon name="file-text" size={14} />
                 PDF 다운로드
               </button>
             </div>

@@ -119,14 +119,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
 
   const blocks: string[] = [];
 
-  // ── [1단계] 최상단 시작 가로 구분선 ──
-  blocks.push(`
-    <table style="width: 100%; border: 0; border-collapse: collapse; margin: 10px 0 20px 0;">
-      <tr><td style="border-top: 1px solid #cbd5e1; height: 1px; padding: 0;"></td></tr>
-    </table>
-  `.trim());
-
-  // ── [2단계] 핵심 요약 박스 (W3C 표준 보상스쿨 시그니처 레드 프리미엄 카드) ──
+  // ── [1단계] 핵심 요약 박스 (W3C 표준 보상스쿨 시그니처 레드 프리미엄 카드) ──
   if (keyPoints.length > 0) {
     const redToken = BLOG_TONE_TOKENS.red.hex;
     const itemsHtml = keyPoints.map(item => {
@@ -135,7 +128,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     }).join('');
 
     const summaryBoxHtml = `
-      <table style="width: 100%; border: 1px solid ${redToken.border}; border-left: 5px solid ${redToken.borderAccent}; background-color: #ffffff; border-collapse: collapse; margin: 20px 0 24px 0;">
+      <table style="width: 100%; border: 1px solid ${redToken.border}; border-left: 5px solid ${redToken.borderAccent}; background-color: #ffffff; border-collapse: collapse; margin: 12px 0 20px 0;">
         <tr>
           <td style="padding: 11px 18px; background-color: ${redToken.headerBg}; border-bottom: 1px solid ${redToken.headerBorderBottom};">
             <span style="font-size: 15.5px; font-weight: bold; color: ${redToken.headerText};">
@@ -153,23 +146,15 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     blocks.push(summaryBoxHtml);
   }
 
-  // ── [3단계] 공감 오프닝 문단 ──
+  // ── [2단계] 공감 오프닝 문단 ──
   if (openingText) {
     const highlightedOpening = applyNaverHighlighter(openingText);
-    blocks.push(`<p style="font-size: 15.5px; line-height: 1.9; color: #27272a; margin: 20px 0; word-break: keep-all;">${highlightedOpening}</p>`);
+    blocks.push(`<p style="font-size: 15.5px; line-height: 1.9; color: #27272a; margin: 20px 0 28px 0; word-break: keep-all;">${highlightedOpening}</p>`);
   }
-
-  // ── [4단계] 본문 시작 직전 가로 구분선 ──
-  blocks.push(`
-    <table style="width: 100%; border: 0; border-collapse: collapse; margin: 32px 0 24px 0;">
-      <tr><td style="border-top: 1px solid #cbd5e1; height: 1px; padding: 0;"></td></tr>
-    </table>
-  `.trim());
 
   // ── [5단계] 본문 챕터 순차 파싱 ──
   const lines = bodyMd.split('\n');
   let i = 0;
-  let isFirstH2 = true;
 
   while (i < lines.length) {
     const rawLine = lines[i];
@@ -217,18 +202,11 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       continue;
     }
 
-    // 2. 대제목 H2 (## ...) -> 상단 구분선 + 좌측 6px 에메랄드 라인 헤더 카드
+    // 2. 대제목 H2 (## ...) -> 좌측 6px 에메랄드 라인 헤더 카드
     if (trimmed.startsWith('## ') && !/1분\s*자가진단|자가진단|체크리스트|FAQ|자주\s*묻는\s*질문/i.test(trimmed)) {
       const titleText = trimmed.replace(/^##\s+/, '').trim();
-      
-      const dividerHtml = isFirstH2 
-        ? '' 
-        : `<table style="width: 100%; border: 0; border-collapse: collapse; margin: 40px 0 24px 0;"><tr><td style="border-top: 1px solid #cbd5e1; height: 1px; padding: 0;"></td></tr></table>`;
-      isFirstH2 = false;
-
       const h2Html = `
-        ${dividerHtml}
-        <table style="width: 100%; border-left: 6px solid #03c75a; background-color: #f8fafc; border-collapse: collapse; margin: 0 0 16px 0;">
+        <table style="width: 100%; border-left: 6px solid #03c75a; background-color: #f8fafc; border-collapse: collapse; margin: 36px 0 16px 0;">
           <tr>
             <td style="padding: 12px 18px;">
               <p style="font-size: 18.5px; font-weight: bold; color: #0f172a; margin: 0; line-height: 1.4;">
@@ -594,9 +572,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
 
   // 11. 하단 보상스쿨 공식 배너 이미지 CTA
   const footerHtml = `
-    <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 40px 0 24px 0;" />
-
-    <p style="text-align: center; margin: 30px auto 20px auto;">
+    <p style="text-align: center; margin: 40px auto 20px auto;">
       <a href="https://claim-works.com/consultation" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
         <img src="https://claim-works.com/images/bosangschool-cta-banner.png" alt="보상스쿨 보험금 분쟁 무료 상담 신청하기" style="max-width: 100%; width: 620px; height: auto; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); display: block; margin: 0 auto;" />
       </a>

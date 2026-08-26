@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useCalculatorExport } from "@/hooks/useCalculatorExport";
 import AppIcon from '@/components/ui/AppIcon';
 import PremiumHeading from '@/components/ui/PremiumHeading';
+import PremiumCard from '@/components/ui/PremiumCard';
 
 export type MedicalInsuranceData = {
   generation: number;
@@ -214,44 +215,11 @@ export default function MedicalCalculator() {
         </p>
       </div>
 
-      {/* 2. 🏆 상단 실시간 예상 실손금 챔피언 카드 */}
-      <div ref={resultRef} className="bg-gradient-to-br from-emerald-600 to-teal-700 dark:from-emerald-700 dark:to-teal-900 p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-        <div className="relative z-10 flex flex-col justify-between">
-          <div className="flex items-center justify-between gap-2 mb-4">
-            <span className="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-xs px-3 py-1.5 text-xs font-extrabold text-white/90 uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-              실시간 예상 실손 보험금 (추정 수령액)
-            </span>
-            <span className="text-xs sm:text-[13px] text-white/80 font-bold">
-              총 발생비용 대비 보장률 {result.coveragePct}%
-            </span>
-          </div>
-
-          <div className="flex items-end gap-2 mb-5">
-            <div className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-xs">
-              {result.totalPayout.toLocaleString()}
-            </div>
-            <div className="text-2xl sm:text-3xl font-bold text-white/90 mb-1">원</div>
-          </div>
-
-          <div className="pt-4 border-t border-white/20 flex flex-wrap items-center justify-between text-xs sm:text-sm text-white/90 font-medium gap-3">
-            <div>
-              <span className="text-white/60 mr-1.5">가입 세대:</span>
-              <span className="font-bold text-white">{data.generation}세대 실손 ({selectedGen.period})</span>
-            </div>
-            <div>
-              <span className="text-white/60 mr-1.5">진료 형태:</span>
-              <span className="font-bold text-white">{data.treatmentType === 'inpatient' ? '입원 치료' : `외래 통원 (${data.outpatientDays}일)`}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. 🛠️ 스마트 인터랙티브 입력 카드 (단일 스트림) */}
+      {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
       <div className="space-y-4">
         
-        {/* [섹션 1] 실손 가입 세대 5단 칩 */}
-        <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-emerald-200/90 dark:border-emerald-900/50 shadow-xs space-y-4">
+        {/* [STEP 1] 실손 가입 세대 5단 칩 */}
+        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="hospital" className="!p-5 sm:!p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
               <AppIcon name="hospital" size={18} className="text-emerald-600" />
@@ -283,10 +251,10 @@ export default function MedicalCalculator() {
             <AppIcon name="shield-check" size={16} className="shrink-0 text-emerald-600" />
             <span>{selectedGen.note}</span>
           </div>
-        </div>
+        </PremiumCard>
 
-        {/* [섹션 2] 진료 형태 & 병원 규모 */}
-        <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/90 dark:border-zinc-800 shadow-xs space-y-4">
+        {/* [STEP 2] 진료 형태 & 병원 규모 */}
+        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="compass" className="!p-5 sm:!p-6 space-y-4">
           <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
             <AppIcon name="compass" size={18} className="text-emerald-600" />
             2. 진료 형태 및 방문 병원
@@ -360,10 +328,10 @@ export default function MedicalCalculator() {
               </div>
             )}
           </div>
-        </div>
+        </PremiumCard>
 
-        {/* [섹션 3] 발생 진료비 입력 */}
-        <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/90 dark:border-zinc-800 shadow-xs space-y-4">
+        {/* [STEP 3] 발생 진료비 입력 */}
+        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-6 space-y-4">
           <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
             <AppIcon name="file-text" size={18} className="text-emerald-600" />
             3. 병원 영수증 발생 금액 입력
@@ -443,15 +411,15 @@ export default function MedicalCalculator() {
               </div>
             )}
           </div>
-        </div>
+        </PremiumCard>
       </div>
 
-      {/* 4. 📋 세부 산출 명세서 (상시 100% 노출) */}
-      <div className="bg-white dark:bg-[#202124] border border-gray-200 dark:border-zinc-800 shadow-xs p-5 sm:p-6 space-y-4">
+      {/* 3. 📋 세부 공제 내역서 (상시 100% 노출) */}
+      <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-6 space-y-4">
         <div className="flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-3">
           <AppIcon name="file-text" size={18} className="text-emerald-600" />
           <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
-            세부 공제 내역서 및 세대별 산정 공식
+            세부 공제 내역서 & 세대별 산정 공식
           </h3>
         </div>
 
@@ -471,10 +439,6 @@ export default function MedicalCalculator() {
               <div className="flex justify-between"><span>- 3대 비급여 특약 지급액</span><span>{result.specialPayout.toLocaleString()} 원</span></div>
             )}
           </div>
-          <div className="flex justify-between py-3 font-black text-sm sm:text-base text-emerald-600 dark:text-emerald-400 border-t-2 border-emerald-600/30 dark:border-emerald-400/30">
-            <span>최종 예상 실손 보험금</span>
-            <span>{result.totalPayout.toLocaleString()} 원</span>
-          </div>
         </div>
 
         {/* 계산 공식 */}
@@ -489,6 +453,39 @@ export default function MedicalCalculator() {
             </ul>
           </div>
         )}
+      </PremiumCard>
+
+      {/* 4. 🏆 [최하단 배치] 최종 예상 실손금 챔피언 카드 */}
+      <div ref={resultRef} className="bg-gradient-to-br from-emerald-600 to-teal-700 dark:from-emerald-700 dark:to-teal-900 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden transition-transform duration-200 hover:scale-[1.005]">
+        <div className="relative z-10 flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <span className="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-xs px-3 py-1.5 text-xs font-extrabold text-white/90 uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+              최종 예상 실손 보험금 (추정 실수령액)
+            </span>
+            <span className="text-xs sm:text-[13px] text-white/80 font-bold">
+              총 발생비용 대비 보장률 {result.coveragePct}%
+            </span>
+          </div>
+
+          <div className="flex items-end gap-2 mb-5">
+            <div className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-xs">
+              {result.totalPayout.toLocaleString()}
+            </div>
+            <div className="text-2xl sm:text-3xl font-bold text-white/90 mb-1">원</div>
+          </div>
+
+          <div className="pt-4 border-t border-white/20 flex flex-wrap items-center justify-between text-xs sm:text-sm text-white/90 font-medium gap-3">
+            <div>
+              <span className="text-white/60 mr-1.5">가입 세대:</span>
+              <span className="font-bold text-white">{data.generation}세대 실손 ({selectedGen.period})</span>
+            </div>
+            <div>
+              <span className="text-white/60 mr-1.5">진료 형태:</span>
+              <span className="font-bold text-white">{data.treatmentType === 'inpatient' ? '입원 치료' : `외래 통원 (${data.outpatientDays}일)`}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 5. 🛡️ 전문가 조언 및 액션 버튼 바 */}

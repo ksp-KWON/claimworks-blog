@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useCalculatorExport } from "@/hooks/useCalculatorExport";
 import AppIcon from '@/components/ui/AppIcon';
 import PremiumHeading from '@/components/ui/PremiumHeading';
+import PremiumCard from '@/components/ui/PremiumCard';
 
 export interface LiabilityData {
   ageAtAccident: number;
@@ -148,44 +149,11 @@ export default function LiabilityCalculator() {
         </p>
       </div>
 
-      {/* 2. 🏆 상단 실시간 예상 손해배상액 챔피언 카드 */}
-      <div ref={resultRef} className="bg-gradient-to-br from-rose-600 to-red-700 dark:from-rose-700 dark:to-red-900 p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-        <div className="relative z-10 flex flex-col justify-between">
-          <div className="flex items-center justify-between gap-2 mb-4">
-            <span className="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-xs px-3 py-1.5 text-xs font-extrabold text-white/90 uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-rose-300 animate-pulse"></span>
-              실시간 예상 총 배상액 (과실 상계 후 최종액)
-            </span>
-            <span className="text-xs sm:text-[13px] text-white/80 font-bold">
-              본인 과실 {data.faultRatio}% 반영
-            </span>
-          </div>
-
-          <div className="flex items-end gap-2 mb-5">
-            <div className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-xs">
-              {Math.floor(result.totalAmount).toLocaleString()}
-            </div>
-            <div className="text-2xl sm:text-3xl font-bold text-white/90 mb-1">원</div>
-          </div>
-
-          <div className="pt-4 border-t border-white/20 flex flex-wrap items-center justify-between text-xs sm:text-sm text-white/90 font-medium gap-3">
-            <div>
-              <span className="text-white/60 mr-1.5">피해 유형:</span>
-              <span className="font-bold text-white">{[data.hasInjury && '부상(치료)', data.hasDisability && '후유장해', data.hasDeath && '사망', data.hasCare && '개호(간병)'].filter(Boolean).join(', ') || '선택 없음'}</span>
-            </div>
-            <div>
-              <span className="text-white/60 mr-1.5">월 평균 소득:</span>
-              <span className="font-bold text-white">{data.income.toLocaleString()}원</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. 🛠️ 스마트 인터랙티브 입력 카드 (단일 스트림) */}
+      {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
       <div className="space-y-4">
         
-        {/* [섹션 1] 피해 유형 선택 4단 칩 */}
-        <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-rose-200/90 dark:border-rose-900/50 shadow-xs space-y-4">
+        {/* [STEP 1] 피해 유형 선택 4단 칩 */}
+        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="scale" className="!p-5 sm:!p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
               <AppIcon name="scale" size={18} className="text-rose-600" />
@@ -218,10 +186,10 @@ export default function LiabilityCalculator() {
               );
             })}
           </div>
-        </div>
+        </PremiumCard>
 
-        {/* [섹션 2] 연령, 소득, 과실비율 */}
-        <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/90 dark:border-zinc-800 shadow-xs space-y-4">
+        {/* [STEP 2] 연령, 소득, 과실비율 */}
+        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="chart" className="!p-5 sm:!p-6 space-y-4">
           <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
             <AppIcon name="chart" size={18} className="text-rose-600" />
             2. 사고 당시 연령 & 소득 & 과실비율
@@ -286,11 +254,11 @@ export default function LiabilityCalculator() {
               </div>
             </div>
           </div>
-        </div>
+        </PremiumCard>
 
-        {/* [섹션 3] 세부 손해배상 항목 */}
+        {/* [STEP 3] 세부 손해배상 항목 */}
         {(data.hasInjury || data.hasDisability || data.hasDeath || data.hasCare) && (
-          <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/90 dark:border-zinc-800 shadow-xs space-y-4 animate-in fade-in duration-200">
+          <PremiumCard borderColor="rose" hoverEffect={true} watermarkIcon="crutches" className="!p-5 sm:!p-6 space-y-4 animate-in fade-in duration-200">
             <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
               <AppIcon name="crutches" size={18} className="text-rose-600" />
               3. 세부 손해배상 항목 상세 입력
@@ -387,12 +355,12 @@ export default function LiabilityCalculator() {
                 </div>
               </div>
             </div>
-          </div>
+          </PremiumCard>
         )}
       </div>
 
-      {/* 4. 📋 세부 산출 명세서 (상시 100% 노출) */}
-      <div className="bg-white dark:bg-[#202124] border border-gray-200 dark:border-zinc-800 shadow-xs p-5 sm:p-6 space-y-4">
+      {/* 3. 📋 세부 손해배상 산출 명세서 (상시 100% 노출) */}
+      <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-6 space-y-4">
         <div className="flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-3">
           <AppIcon name="file-text" size={18} className="text-rose-600" />
           <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
@@ -431,10 +399,16 @@ export default function LiabilityCalculator() {
               <span className="font-extrabold text-gray-900 dark:text-white">{Math.floor(result.treatment).toLocaleString()} 원</span>
             </div>
           )}
-          <div className="flex justify-between py-3 font-black text-sm sm:text-base text-rose-600 dark:text-rose-400 border-t-2 border-rose-600/30 dark:border-rose-400/30">
-            <span>최종 예상 총 손해배상액</span>
-            <span>{Math.floor(result.totalAmount).toLocaleString()} 원</span>
+          <div className="flex justify-between py-2 font-bold text-gray-900 dark:text-white border-t border-gray-200 dark:border-zinc-700">
+            <span>과실 상계 전 손해액 총합</span>
+            <span>{Math.floor(result.totalAmount / (1 - (data.faultRatio / 100) || 1)).toLocaleString()} 원</span>
           </div>
+          {data.faultRatio > 0 && (
+            <div className="flex justify-between py-2 text-red-500 font-extrabold">
+              <span>(-) 본인 과실 상계 ({data.faultRatio}%)</span>
+              <span>적용 완료</span>
+            </div>
+          )}
         </div>
 
         {/* 계산 공식 */}
@@ -449,6 +423,39 @@ export default function LiabilityCalculator() {
             </ul>
           </div>
         )}
+      </PremiumCard>
+
+      {/* 4. 🏆 [최하단 배치] 최종 예상 손해배상액 챔피언 카드 */}
+      <div ref={resultRef} className="bg-gradient-to-br from-rose-600 to-red-700 dark:from-rose-700 dark:to-red-900 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden transition-transform duration-200 hover:scale-[1.005]">
+        <div className="relative z-10 flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <span className="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-xs px-3 py-1.5 text-xs font-extrabold text-white/90 uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-rose-300 animate-pulse"></span>
+              최종 예상 총 손해배상액 (과실 상계 후 실수령액)
+            </span>
+            <span className="text-xs sm:text-[13px] text-white/80 font-bold">
+              본인 과실 {data.faultRatio}% 반영
+            </span>
+          </div>
+
+          <div className="flex items-end gap-2 mb-5">
+            <div className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-xs">
+              {Math.floor(result.totalAmount).toLocaleString()}
+            </div>
+            <div className="text-2xl sm:text-3xl font-bold text-white/90 mb-1">원</div>
+          </div>
+
+          <div className="pt-4 border-t border-white/20 flex flex-wrap items-center justify-between text-xs sm:text-sm text-white/90 font-medium gap-3">
+            <div>
+              <span className="text-white/60 mr-1.5">피해 유형:</span>
+              <span className="font-bold text-white">{[data.hasInjury && '부상(치료)', data.hasDisability && '후유장해', data.hasDeath && '사망', data.hasCare && '개호(간병)'].filter(Boolean).join(', ') || '선택 없음'}</span>
+            </div>
+            <div>
+              <span className="text-white/60 mr-1.5">월 평균 소득:</span>
+              <span className="font-bold text-white">{data.income.toLocaleString()}원</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 5. 🛡️ 전문가 조언 및 액션 버튼 바 */}

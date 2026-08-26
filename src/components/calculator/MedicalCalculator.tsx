@@ -7,51 +7,49 @@ import AppIcon from '@/components/ui/AppIcon';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 
-export type MedicalInsuranceData = {
-  generation: number;
+export interface MedicalInsuranceData {
+  generation: 1 | 2 | 3 | 4 | 5;
   treatmentType: 'inpatient' | 'outpatient';
-  outpatientDays: number;
   clinicType: 'clinic' | 'hospital' | 'general';
+  outpatientDays: number;
   coveredCost: number;
   nonCoveredCost: number;
   manualTherapyCost: number;
   injectionCost: number;
   mriCost: number;
-};
+}
 
 const initialMedicalData: MedicalInsuranceData = {
-  generation: 1,
+  generation: 4,
   treatmentType: 'outpatient',
-  outpatientDays: 1,
   clinicType: 'clinic',
-  coveredCost: 0,
-  nonCoveredCost: 0,
-  manualTherapyCost: 0,
+  outpatientDays: 1,
+  coveredCost: 35000,
+  nonCoveredCost: 50000,
+  manualTherapyCost: 100000,
   injectionCost: 0,
   mriCost: 0,
 };
 
-const CLINIC_DEDUCTION = { clinic: 10000, hospital: 15000, general: 20000 };
-
 const GENERATIONS = [
-  { id: 1, label: '1세대', period: '~2009.8', note: '입원 100% 전액 보상 / 통원 5천원 공제' },
-  { id: 2, label: '2세대', period: '2009.10~2017.3', note: '급여·비급여 10% 공제' },
-  { id: 3, label: '3세대', period: '2017.4~2021.6', note: '기본 10~20%, 3대비급여 30% 공제' },
-  { id: 4, label: '4세대', period: '2021.7~2026.4', note: '급여 20%, 비급여 30% 공제' },
-  { id: 5, label: '5세대', period: '2026.5~', note: '급여 20%, 비급여 30%, 비중증 50% 공제' },
+  { id: 1, label: '1세대', period: '~09.09', note: '자기부담금 0% (입원 100% 보장)' },
+  { id: 2, label: '2세대', period: '09.10~17.03', note: '자기부담금 10% 또는 20% 표준화' },
+  { id: 3, label: '3세대', period: '17.04~21.06', note: '기본형(10~20%) + 3대비급여특약(30%)' },
+  { id: 4, label: '4세대', period: '21.07~현재', note: '급여 20%, 비급여 30% 공제 (비급여 차등제)' },
+  { id: 5, label: '5세대', period: '개편 예정', note: '중증/비중증 분리 (비급여 본인부담 30~50%)' },
 ];
 
 const HOSPITAL_TYPES = [
-  { id: 'clinic', label: '의원·클리닉 (1만원 공제)' },
-  { id: 'hospital', label: '병원급 (1.5만원 공제)' },
-  { id: 'general', label: '종합·대학병원 (2만원 공제)' },
-] as const;
+  { id: 'clinic', label: '의원 (동네병원)', deduct: 10000 },
+  { id: 'hospital', label: '병원 (중소병원)', deduct: 15000 },
+  { id: 'general', label: '상급/종합병원', deduct: 20000 },
+];
 
 export default function MedicalCalculator() {
   const [data, setData] = useState<MedicalInsuranceData>(initialMedicalData);
   const resultRef = useRef<HTMLDivElement>(null);
 
-  const handleChange = (field: keyof MedicalInsuranceData, value: number | string) => {
+  const handleChange = (field: keyof MedicalInsuranceData, value: any) => {
     setData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -61,53 +59,46 @@ export default function MedicalCalculator() {
   };
   const parse = (val: string) => Math.max(0, Number(val.replace(/[^0-9]/g, '')) || 0);
 
-  // ── 계산 로직 (PoT 실손 연산 엔진) ──
+  // ── 약관 세대별 본인부담금 산출 엔진 (PoT Engine) ──
   const calculateResult = () => {
+    const formulas: string[] = [];
+    const totalCovered = data.coveredCost;
+    const totalNormalNonCovered = data.nonCoveredCost;
+    const totalSpecialNonCovered = data.manualTherapyCost + data.injectionCost + data.mriCost;
+    const days = Math.max(1, data.outpatientDays);
+
     let coveredPayout = 0;
     let nonCoveredPayout = 0;
     let specialPayout = 0;
     let totalDeduction = 0;
 
-    const totalCovered = data.coveredCost || 0;
-    const totalNormalNonCovered = data.nonCoveredCost || 0;
-    const totalSpecialNonCovered = (data.manualTherapyCost || 0) + (data.injectionCost || 0) + (data.mriCost || 0);
-    
-    const days = data.treatmentType === 'outpatient' ? Math.max(1, data.outpatientDays || 1) : 1;
-    const formulas: string[] = [];
-
     if (data.generation === 1) {
       if (data.treatmentType === 'inpatient') {
         coveredPayout = totalCovered;
-        nonCoveredPayout = totalNormalNonCovered;
-        specialPayout = totalSpecialNonCovered;
+        nonCoveredPayout = totalNormalNonCovered + totalSpecialNonCovered;
         totalDeduction = 0;
-        formulas.push(`입원 의료비 전액(100%) 보상`);
+        formulas.push(`1세대 입원: 본인부담금 0원 (100% 전액 지급)`);
       } else {
-        const totalCost = totalCovered + totalNormalNonCovered + totalSpecialNonCovered;
-        totalDeduction = Math.min(totalCost, 5000 * days);
-        const payout = totalCost - totalDeduction;
-        coveredPayout = payout * (totalCovered / (totalCost || 1));
-        nonCoveredPayout = payout * (totalNormalNonCovered / (totalCost || 1));
-        specialPayout = payout * (totalSpecialNonCovered / (totalCost || 1));
-        formulas.push(`통원 공제: 5,000원 × ${days}일 = ${(5000 * days).toLocaleString()}원 차감`);
+        const deduct = 5000 * days;
+        const total = totalCovered + totalNormalNonCovered + totalSpecialNonCovered;
+        totalDeduction = Math.min(total, deduct);
+        coveredPayout = Math.max(0, total - totalDeduction);
+        formulas.push(`1세대 통원: 1일당 5,000원 공제 (${days}일 = ${fmt(deduct)}원)`);
       }
-    } 
+    }
     else if (data.generation === 2) {
       if (data.treatmentType === 'inpatient') {
         coveredPayout = totalCovered * 0.9;
-        nonCoveredPayout = totalNormalNonCovered * 0.9;
-        specialPayout = totalSpecialNonCovered * 0.9;
+        nonCoveredPayout = (totalNormalNonCovered + totalSpecialNonCovered) * 0.9;
         totalDeduction = (totalCovered + totalNormalNonCovered + totalSpecialNonCovered) * 0.1;
-        formulas.push(`입원 공제: 총 의료비의 10% 차감`);
+        formulas.push(`2세대 입원: 본인부담 10% 공제 (90% 지급)`);
       } else {
-        const totalCost = totalCovered + totalNormalNonCovered + totalSpecialNonCovered;
-        const deductPerDay = CLINIC_DEDUCTION[data.clinicType];
-        totalDeduction = Math.max(totalCost * 0.1, deductPerDay * days);
-        const payout = Math.max(0, totalCost - totalDeduction);
-        coveredPayout = payout * (totalCovered / (totalCost || 1));
-        nonCoveredPayout = payout * (totalNormalNonCovered / (totalCost || 1));
-        specialPayout = payout * (totalSpecialNonCovered / (totalCost || 1));
-        formulas.push(`통원 공제: 병원별 최소공제(${deductPerDay.toLocaleString()}원) 또는 10% 중 큰 금액 적용`);
+        const hospitalDeduct = (data.clinicType === 'clinic' ? 10000 : data.clinicType === 'hospital' ? 15000 : 20000) * days;
+        const pctDeduct = (totalCovered + totalNormalNonCovered + totalSpecialNonCovered) * 0.2;
+        totalDeduction = Math.min(totalCovered + totalNormalNonCovered + totalSpecialNonCovered, Math.max(hospitalDeduct, pctDeduct));
+        const payout = (totalCovered + totalNormalNonCovered + totalSpecialNonCovered) - totalDeduction;
+        coveredPayout = Math.max(0, payout);
+        formulas.push(`2세대 통원: MAX(병원별 공제액×${days}일, 총진료비의 20%) 공제`);
       }
     }
     else if (data.generation === 3) {
@@ -116,21 +107,19 @@ export default function MedicalCalculator() {
         nonCoveredPayout = totalNormalNonCovered * 0.8;
         specialPayout = totalSpecialNonCovered * 0.7;
         totalDeduction = (totalCovered * 0.1) + (totalNormalNonCovered * 0.2) + (totalSpecialNonCovered * 0.3);
-        formulas.push(`급여 10%, 일반비급여 20%, 3대비급여 30% 각각 공제`);
+        formulas.push(`급여 90%, 일반비급여 80%, 3대비급여특약 70% 각각 지급`);
       } else {
-        const minDeduct = CLINIC_DEDUCTION[data.clinicType] * days;
-        const normalCost = totalCovered + totalNormalNonCovered;
-        const normalDeduct = Math.max(minDeduct, (totalCovered * 0.1) + (totalNormalNonCovered * 0.2));
-        const actualNormalPayout = Math.max(0, normalCost - normalDeduct);
-        coveredPayout = actualNormalPayout * (totalCovered / (normalCost || 1));
-        nonCoveredPayout = actualNormalPayout * (totalNormalNonCovered / (normalCost || 1));
-        if (normalCost > 0) formulas.push(`기본 통원 공제: MAX(의료비의 10~20%, 최소공제금액×${days}일)`);
-
+        const minCoveredDeduct = (data.clinicType === 'clinic' ? 10000 : data.clinicType === 'hospital' ? 15000 : 20000) * days;
+        const coveredDeduct = Math.max(minCoveredDeduct, (totalCovered + totalNormalNonCovered) * 0.2);
+        const basePayout = Math.max(0, (totalCovered + totalNormalNonCovered) - coveredDeduct);
+        coveredPayout = (basePayout * (totalCovered / (totalCovered + totalNormalNonCovered || 1)));
+        nonCoveredPayout = (basePayout * (totalNormalNonCovered / (totalCovered + totalNormalNonCovered || 1)));
+        
         const specialDeduct = Math.max(20000 * days, totalSpecialNonCovered * 0.3);
         specialPayout = Math.max(0, totalSpecialNonCovered - specialDeduct);
-        if (totalSpecialNonCovered > 0) formulas.push(`3대 비급여 공제: MAX(30%, 2만원×${days}일)`);
 
-        totalDeduction = (normalCost + totalSpecialNonCovered) - (actualNormalPayout + specialPayout);
+        totalDeduction = coveredDeduct + specialDeduct;
+        formulas.push(`기본계약 MAX(병원별 공제액, 20%) + 3대비급여 MAX(2만원, 30%) 공제`);
       }
     }
     else if (data.generation === 4) {
@@ -139,7 +128,7 @@ export default function MedicalCalculator() {
         nonCoveredPayout = totalNormalNonCovered * 0.7;
         specialPayout = totalSpecialNonCovered * 0.7;
         totalDeduction = (totalCovered * 0.2) + (totalNormalNonCovered * 0.3) + (totalSpecialNonCovered * 0.3);
-        formulas.push(`급여 20%, 비급여 30%, 3대비급여 30% 각각 공제`);
+        formulas.push(`급여 20%, 비급여 30% 본인부담금 공제`);
       } else {
         const minCoveredDeduct = (data.clinicType === 'general' ? 20000 : 10000) * days;
         const coveredDeduct = Math.max(minCoveredDeduct, totalCovered * 0.2);
@@ -205,7 +194,7 @@ export default function MedicalCalculator() {
   const { exportPDF, shareResult } = useCalculatorExport(resultRef);
 
   const inputClass = "w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-3 px-3.5 text-sm font-bold text-gray-900 dark:text-white rounded-none focus:border-emerald-500 focus:outline-none transition-colors placeholder-gray-400";
-  const labelHeaderClass = "flex items-center justify-between mb-2";
+  const labelHeaderClass = "flex items-center justify-between mb-2.5";
   const labelTextClass = "text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-gray-100 select-none";
   const labelSubClass = "text-[11px] text-gray-400 dark:text-zinc-500 font-medium select-none";
 
@@ -222,12 +211,12 @@ export default function MedicalCalculator() {
       </div>
 
       {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
-      <div className="space-y-5">
+      <div className="space-y-6">
         
         {/* [STEP 1] 실손 가입 세대 5단 칩 */}
-        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="hospital" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
+        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="hospital" className="!p-5 sm:!p-7 overflow-hidden">
           {/* STEP 1 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-emerald-200/80 dark:border-emerald-800/80">STEP 01</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -238,36 +227,38 @@ export default function MedicalCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">약관 세대별 공제율</span>
           </div>
 
-          <div className="grid grid-cols-5 gap-2.5">
-            {GENERATIONS.map(gen => {
-              const isActive = data.generation === gen.id;
-              return (
-                <button
-                  key={gen.id}
-                  onClick={() => handleChange('generation', gen.id)}
-                  className={`py-3 px-1.5 text-center border transition-all cursor-pointer ${
-                    isActive
-                      ? 'border-emerald-600 bg-emerald-50/90 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-extrabold shadow-xs'
-                      : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
-                  }`}
-                >
-                  <div className="text-xs sm:text-sm font-extrabold">{gen.label}</div>
-                  <div className="text-[10px] sm:text-[11px] opacity-75 mt-0.5 truncate">{gen.period}</div>
-                </button>
-              );
-            })}
-          </div>
+          <div className="space-y-4 pt-5">
+            <div className="grid grid-cols-5 gap-2.5">
+              {GENERATIONS.map(gen => {
+                const isActive = data.generation === gen.id;
+                return (
+                  <button
+                    key={gen.id}
+                    onClick={() => handleChange('generation', gen.id)}
+                    className={`py-3 px-1.5 text-center border transition-all cursor-pointer ${
+                      isActive
+                        ? 'border-emerald-600 bg-emerald-50/90 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-extrabold shadow-xs'
+                        : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className="text-xs sm:text-sm font-extrabold">{gen.label}</div>
+                    <div className="text-[10px] sm:text-[11px] opacity-75 mt-0.5 truncate">{gen.period}</div>
+                  </button>
+                );
+              })}
+            </div>
 
-          <div className="p-3.5 bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50 text-xs sm:text-[13px] font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-2">
-            <AppIcon name="shield-check" size={16} className="shrink-0 text-emerald-600" />
-            <span>{selectedGen.note}</span>
+            <div className="p-3.5 bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50 text-xs sm:text-[13px] font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-2">
+              <AppIcon name="shield-check" size={16} className="shrink-0 text-emerald-600" />
+              <span>{selectedGen.note}</span>
+            </div>
           </div>
         </PremiumCard>
 
         {/* [STEP 2] 진료 형태 & 병원 규모 */}
-        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="compass" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
+        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="compass" className="!p-5 sm:!p-7 overflow-hidden">
           {/* STEP 2 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-emerald-200/80 dark:border-emerald-800/80">STEP 02</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -278,7 +269,7 @@ export default function MedicalCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">의원/병원/종합병원 구분</span>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-6 pt-5">
             {/* 입원/통원 2단 탭 */}
             <div className="grid grid-cols-2 gap-2 bg-gray-100 dark:bg-zinc-900 p-1.5 border border-gray-200/80 dark:border-zinc-800">
               <button
@@ -306,7 +297,7 @@ export default function MedicalCalculator() {
             {/* 통원 시 일수 및 병원 선택 */}
             {data.treatmentType === 'outpatient' && (
               <div className="space-y-4 pt-1 animate-in fade-in duration-150">
-                <div className="flex items-center justify-between h-5 mb-2">
+                <div className={labelHeaderClass}>
                   <label className={labelTextClass}>통원 일수</label>
                   <div className="flex items-center gap-2">
                     <button
@@ -349,9 +340,9 @@ export default function MedicalCalculator() {
         </PremiumCard>
 
         {/* [STEP 3] 발생 진료비 입력 */}
-        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
+        <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 overflow-hidden">
           {/* STEP 3 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-emerald-200/80 dark:border-emerald-800/80">STEP 03</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -362,7 +353,7 @@ export default function MedicalCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">급여·비급여 분리 산정</span>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-6 pt-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <div className={labelHeaderClass}>
@@ -451,34 +442,41 @@ export default function MedicalCalculator() {
         </PremiumCard>
       </div>
 
-      {/* 3. 📋 세부 공제 내역서 (상시 100% 노출) */}
-      <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 space-y-4 overflow-hidden">
+      {/* 3. 📋 세부 공제 내역 명세서 (상시 100% 노출) */}
+      <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 overflow-hidden">
         {/* 명세서 그라데이션 헤더 바 */}
-        <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
+        <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AppIcon name="file-text" size={16} className="text-emerald-600 dark:text-emerald-400" />
             <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
-              세부 공제 내역서 & 세대별 산정 공식
+              세부 손해액 산출 명세서 & 실손 약관 공식
             </h3>
           </div>
-          <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">세대별 공제액 실시간 연산</span>
+          <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">실손 약관 기준 실시간 연산</span>
         </div>
 
-        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300">
+        <div className="space-y-3 pt-5 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300">
           <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
-            <span className="font-medium">· 총 발생 의료비 합계</span>
-            <span className="font-extrabold text-gray-900 dark:text-white">{result.totalCost.toLocaleString()} 원</span>
+            <span className="font-medium">· 급여 진료비 지급액 ({data.coveredCost.toLocaleString()}원 중)</span>
+            <span className="font-extrabold text-gray-900 dark:text-white">{result.coveredPayout.toLocaleString()} 원</span>
           </div>
-          <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80 text-rose-600 dark:text-rose-400">
-            <span className="font-extrabold">· (-) 자기부담금 공제 합계</span>
-            <span className="font-extrabold">-{result.totalDeduction.toLocaleString()} 원</span>
+          <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
+            <span className="font-medium">· 일반 비급여 지급액 ({data.nonCoveredCost.toLocaleString()}원 중)</span>
+            <span className="font-extrabold text-gray-900 dark:text-white">{result.nonCoveredPayout.toLocaleString()} 원</span>
           </div>
-          <div className="py-1 space-y-1.5 text-xs sm:text-[13px] opacity-85 pl-2.5 border-l-2 border-emerald-500/30">
-            <div className="flex justify-between"><span>- 급여 항목 지급액</span><span>{result.coveredPayout.toLocaleString()} 원</span></div>
-            <div className="flex justify-between"><span>- 비급여 항목 지급액</span><span>{result.nonCoveredPayout.toLocaleString()} 원</span></div>
-            {data.generation >= 3 && (
-              <div className="flex justify-between"><span>- 3대 비급여 특약 지급액</span><span>{result.specialPayout.toLocaleString()} 원</span></div>
-            )}
+          {(data.manualTherapyCost > 0 || data.injectionCost > 0 || data.mriCost > 0) && (
+            <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
+              <span className="font-medium">· 3대 비급여 특약 지급액 ({(data.manualTherapyCost + data.injectionCost + data.mriCost).toLocaleString()}원 중)</span>
+              <span className="font-extrabold text-gray-900 dark:text-white">{result.specialPayout.toLocaleString()} 원</span>
+            </div>
+          )}
+          <div className="flex justify-between py-2.5 font-bold text-gray-900 dark:text-white border-t border-gray-200 dark:border-zinc-700">
+            <span>총 발생 병원비</span>
+            <span>{result.totalCost.toLocaleString()} 원</span>
+          </div>
+          <div className="flex justify-between py-2.5 text-red-500 font-extrabold">
+            <span>(-) 본인 부담 공제 총액</span>
+            <span>-{result.totalDeduction.toLocaleString()} 원</span>
           </div>
         </div>
 
@@ -487,7 +485,7 @@ export default function MedicalCalculator() {
           <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-900/70 p-4">
             <h4 className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 mb-1.5 flex items-center gap-1.5">
               <AppIcon name="calculator" size={14} />
-              적용된 세대별 공제 공식
+              적용된 실손 세대별 공제 공식
             </h4>
             <ul className="list-disc list-inside text-xs text-gray-600 dark:text-gray-400 space-y-1 leading-relaxed">
               {result.formulas.map((f, i) => <li key={i}>{f}</li>)}
@@ -496,16 +494,16 @@ export default function MedicalCalculator() {
         )}
       </PremiumCard>
 
-      {/* 4. 🏆 [최하단 배치] 최종 예상 실손금 챔피언 카드 */}
+      {/* 4. 🏆 [최하단 배치] 최종 예상 실손 보험금 챔피언 카드 */}
       <div ref={resultRef} className="bg-gradient-to-br from-emerald-600 to-teal-700 dark:from-emerald-700 dark:to-teal-900 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden transition-transform duration-200 hover:scale-[1.005]">
         <div className="relative z-10 flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2 mb-4">
             <span className="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-xs px-3 py-1.5 text-xs font-extrabold text-white/90 uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-              최종 예상 실손 보험금 (추정 실수령액)
+              최종 예상 실손 수령액 ({selectedGen.label} 적용)
             </span>
             <span className="text-xs sm:text-[13px] text-white/80 font-bold">
-              총 발생비용 대비 보장률 {result.coveragePct}%
+              보장률 {result.coveragePct}%
             </span>
           </div>
 
@@ -518,12 +516,12 @@ export default function MedicalCalculator() {
 
           <div className="pt-4 border-t border-white/20 flex flex-wrap items-center justify-between text-xs sm:text-sm text-white/90 font-medium gap-3">
             <div>
-              <span className="text-white/60 mr-1.5">가입 세대:</span>
-              <span className="font-bold text-white">{data.generation}세대 실손 ({selectedGen.period})</span>
+              <span className="text-white/60 mr-1.5">진료 유형:</span>
+              <span className="font-bold text-white">{data.treatmentType === 'inpatient' ? '입원 치료' : `외래 통원 (${data.outpatientDays}일)`}</span>
             </div>
             <div>
-              <span className="text-white/60 mr-1.5">진료 형태:</span>
-              <span className="font-bold text-white">{data.treatmentType === 'inpatient' ? '입원 치료' : `외래 통원 (${data.outpatientDays}일)`}</span>
+              <span className="text-white/60 mr-1.5">총 본인부담금 공제:</span>
+              <span className="font-bold text-white">{result.totalDeduction.toLocaleString()}원</span>
             </div>
           </div>
         </div>
@@ -532,7 +530,7 @@ export default function MedicalCalculator() {
       {/* 5. 🛡️ 전문가 조언 및 액션 버튼 바 */}
       <div className="bg-amber-50 dark:bg-amber-950/30 p-4 border border-amber-200/80 dark:border-amber-900/40 text-xs sm:text-[13px] leading-relaxed text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
         <AppIcon name="shield-alert" size={16} className="text-amber-600 shrink-0 mt-0.5" />
-        <p>위 결과는 <strong>단순 약관 산출 추정치</strong>입니다. 비례보상, 면책 질환, 연간 보상한도 등에 따라 실제 지급액이 달라질 수 있으므로 부지급 통보 시 손해사정사의 1:1 상담을 권장합니다.</p>
+        <p>위 결과는 <strong>표준 실손의료비 약관</strong> 기준 단순 산출액입니다. 가입 시기 및 특약(비급여 3대 특약 등), 연간 자기부담금 한도(200만 원) 초과 여부에 따라 실제 지급액이 달라질 수 있습니다.</p>
       </div>
 
       <div className="space-y-3 pt-1">
@@ -541,7 +539,7 @@ export default function MedicalCalculator() {
           className="flex items-center justify-center w-full gap-2 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-emerald-500/20 text-center cursor-pointer"
         >
           <AppIcon name="chat" size={20} />
-          <span>실손 부지급 1:1 무료 상담 신청하기</span>
+          <span>실손의료비 부지급·삭감 1:1 무료 상담 신청하기</span>
         </Link>
 
         <div className="grid grid-cols-2 gap-3">
@@ -553,7 +551,7 @@ export default function MedicalCalculator() {
             결과 링크 공유
           </button>
           <button
-            onClick={() => exportPDF('보상스쿨_실손의료비_계산결과.pdf')}
+            onClick={() => exportPDF('보상스쿨_실손의료비_예상보상금.pdf')}
             className="flex items-center justify-center gap-2 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 text-gray-800 dark:text-gray-200 font-bold text-xs sm:text-sm transition-colors cursor-pointer shadow-xs"
           >
             <AppIcon name="file-text" size={15} />

@@ -9,66 +9,53 @@ import PremiumCard from '@/components/ui/PremiumCard';
 
 export interface LiabilityData {
   ageAtAccident: number;
-  faultRatio: number;
   income: number;
+  faultRatio: number;
   hasInjury: boolean;
-  hasDisability: boolean;
-  hasDeath: boolean;
-  hasCare: boolean;
   hospitalDays: number;
+  hasDisability: boolean;
   disabilityRate: number;
   disabilityYears: number;
+  hasDeath: boolean;
+  hasCare: boolean;
   carePersons: number;
   careYears: number;
   pastTreatmentCost: number;
   futureTreatmentCost: number;
-  applianceCost: number;
-  funeralCost: number;
-  alimonyBase: number;
 }
 
 const initialData: LiabilityData = {
-  ageAtAccident: 40,
+  ageAtAccident: 42,
+  income: 3800000,
   faultRatio: 20,
-  income: 3441360, 
   hasInjury: true,
-  hasDisability: false,
+  hospitalDays: 30,
+  hasDisability: true,
+  disabilityRate: 15,
+  disabilityYears: 0, // 0 = 65세 영구
   hasDeath: false,
   hasCare: false,
-  hospitalDays: 30,
-  disabilityRate: 15,
-  disabilityYears: 0,
   carePersons: 1,
-  careYears: 1,
-  pastTreatmentCost: 0,
-  futureTreatmentCost: 0,
-  applianceCost: 0,
-  funeralCost: 5000000,
-  alimonyBase: 100000000, // 대법원 기준 1억
+  careYears: 0,
+  pastTreatmentCost: 3500000,
+  futureTreatmentCost: 2000000,
 };
 
-function getHoffmanForMonths(months: number) {
-  let sum = 0;
-  for (let i = 1; i <= months; i++) {
-    sum += 1 / (1 + (0.05 / 12) * i);
+// ── 판례 기준 호프만 계수 계산기 (월 단리 5/12% 할인) ──
+function getHoffmanCoeff(months: number): number {
+  let coeff = 0;
+  for (let m = 1; m <= months; m++) {
+    coeff += 1 / (1 + (0.05 / 12) * m);
   }
-  return Math.min(sum, 240);
+  return Math.min(240, coeff);
 }
 
 export default function LiabilityCalculator() {
   const [data, setData] = useState<LiabilityData>(initialData);
   const resultRef = useRef<HTMLDivElement>(null);
 
-  const handleChange = (field: keyof LiabilityData, value: number | boolean) => {
-    let finalValue = value;
-    if (typeof value === 'number') {
-      if (field === 'faultRatio' || field === 'disabilityRate') {
-        finalValue = Math.min(100, Math.max(0, value));
-      } else {
-        finalValue = Math.max(0, value);
-      }
-    }
-    setData(prev => ({ ...prev, [field]: finalValue }));
+  const handleChange = (field: keyof LiabilityData, value: any) => {
+    setData(prev => ({ ...prev, [field]: value }));
   };
 
   const fmt = (val: number | string) => {
@@ -77,69 +64,86 @@ export default function LiabilityCalculator() {
   };
   const parse = (val: string) => Math.max(0, Number(val.replace(/[^0-9]/g, '')) || 0);
 
-  // ── 대법원 호프만 손해배상 산출 엔진 (PoT Engine) ──
+  // ── 판례 기준 손해배상 산출 엔진 (PoT Engine) ──
   const calculateResult = () => {
-    const maxMonths = Math.max(0, (65 - data.ageAtAccident) * 12);
-    let effectiveDisabilityRate = 0;
-    if (data.hasDeath) effectiveDisabilityRate = 100;
-    else if (data.hasDisability) effectiveDisabilityRate = data.disabilityRate;
-
-    const alimony = Math.max(0, data.alimonyBase * (effectiveDisabilityRate / 100) * (1 - (data.faultRatio / 100) * 0.6));
-
-    let lostIncome = 0;
-    let H_disability = 0;
-
-    if (data.hasDeath) {
-      H_disability = getHoffmanForMonths(maxMonths);
-      lostIncome = data.income * (2 / 3) * H_disability * (1 - (data.faultRatio / 100));
-    } else if (data.hasDisability) {
-      const targetMonths = data.disabilityYears === 0 ? maxMonths : Math.min(maxMonths, data.disabilityYears * 12);
-      H_disability = getHoffmanForMonths(targetMonths);
-      lostIncome = data.income * (data.disabilityRate / 100) * H_disability * (1 - (data.faultRatio / 100));
-    }
-
-    let hospitalLoss = 0;
-    if (data.hasInjury && !data.hasDeath) {
-      hospitalLoss = data.income * (data.hospitalDays / 30) * (1 - (data.faultRatio / 100));
-    }
-
-    let careCost = 0;
-    const dailyWage = 156425; 
-    let H_care = 0;
-    let careMonths = 0;
-    if (data.hasCare) {
-      careMonths = data.careYears === 0 ? maxMonths : Math.min(maxMonths, data.careYears * 12);
-      H_care = getHoffmanForMonths(careMonths);
-      careCost = dailyWage * 30 * data.carePersons * H_care * (1 - (data.faultRatio / 100));
-    }
-
-    let finalFuneralCost = 0;
-    if (data.hasDeath) finalFuneralCost = data.funeralCost * (1 - (data.faultRatio / 100));
-
-    const treatment = (data.pastTreatmentCost + data.futureTreatmentCost + data.applianceCost) * (1 - (data.faultRatio / 100));
-    const totalActiveLoss = treatment + careCost + finalFuneralCost;
-
-    const totalAmount = alimony + lostIncome + hospitalLoss + totalActiveLoss;
-
     const formulas: string[] = [];
-    if (alimony > 0) formulas.push(`위자료: 기준액(${fmt(Math.floor(data.alimonyBase))}원) × 장해율(${effectiveDisabilityRate}%) × [1 - (과실 ${data.faultRatio}% × 0.6)]`);
-    if (lostIncome > 0) {
-      if (data.hasDeath) formulas.push(`사망 일실수입: (월소득 × 2/3) × H계수(${H_disability.toFixed(4)}) × (1 - 과실 ${data.faultRatio}%)`);
-      else formulas.push(`장해 일실수입: 월소득 × 장해율(${data.disabilityRate}%) × H계수(${H_disability.toFixed(4)}) × (1 - 과실 ${data.faultRatio}%)`);
-    }
-    if (hospitalLoss > 0) formulas.push(`휴업손해: (소득 ÷ 30일) × 입원일수(${data.hospitalDays}일) × (1 - 과실 ${data.faultRatio}%)`);
-    if (careCost > 0) formulas.push(`개호비: 일용단가(${fmt(156425)}원) × 30일 × 필요인원(${data.carePersons}명) × H계수(${H_care.toFixed(4)}) × (1 - 과실 ${data.faultRatio}%)`);
-    if (finalFuneralCost > 0) formulas.push(`장례비: 장례비용(${fmt(data.funeralCost)}원) × (1 - 과실 ${data.faultRatio}%)`);
-    if (treatment > 0) formulas.push(`치료비 등: 추가비용 합계 × (1 - 과실 ${data.faultRatio}%)`);
+    const maxWorkAge = 65;
+    const remainingYears = Math.max(0, maxWorkAge - data.ageAtAccident);
+    const remainingMonths = remainingYears * 12;
 
-    return { alimony, effectiveDisabilityRate, lostIncome, H_disability, hospitalLoss, careCost, totalActiveLoss, treatment, finalFuneralCost, totalAmount, formulas };
+    // 1. 위자료 (법원 판례 기준 기준액 1억원 산정)
+    let alimony = 0;
+    if (data.hasDeath) {
+      alimony = 100000000 * (1 - (data.faultRatio / 100) * 0.6);
+      formulas.push(`사망 위자료: 기준액 1억 × (1 - 과실비율×0.6)`);
+    } else if (data.hasDisability) {
+      const rate = data.disabilityRate / 100;
+      alimony = 100000000 * rate * (1 - (data.faultRatio / 100) * 0.6);
+      formulas.push(`후유장해 위자료: 기준액 1억 × 장해율(${data.disabilityRate}%) × (1 - 과실×0.6)`);
+    } else if (data.hasInjury) {
+      alimony = Math.min(5000000, 1000000 + (data.hospitalDays * 50000));
+      formulas.push(`부상 위자료: 입원일수 및 상해급수 판례 준용`);
+    }
+
+    // 2. 휴업손해 (입원기간 100% 인정)
+    let hospitalLoss = 0;
+    if (data.hasInjury && data.hospitalDays > 0 && !data.hasDeath) {
+      const dailyIncome = data.income / 30;
+      hospitalLoss = dailyIncome * data.hospitalDays;
+      formulas.push(`휴업손해: 월소득(${fmt(data.income)}원) ÷ 30일 × ${data.hospitalDays}일`);
+    }
+
+    // 3. 일실수입 (사망 or 장해)
+    let lostIncome = 0;
+    if (data.hasDeath) {
+      const livingCostDeduct = 1 / 3; // 생계비 1/3 공제
+      const coeff = getHoffmanCoeff(remainingMonths);
+      lostIncome = data.income * (1 - livingCostDeduct) * coeff;
+      formulas.push(`사망 일실수입: 월소득 × 2/3(생계비공제) × 호프만계수(${coeff.toFixed(2)})`);
+    } else if (data.hasDisability && data.disabilityRate > 0) {
+      const months = data.disabilityYears > 0 ? data.disabilityYears * 12 : remainingMonths;
+      const coeff = getHoffmanCoeff(months);
+      lostIncome = data.income * (data.disabilityRate / 100) * coeff;
+      formulas.push(`장해 일실수입: 월소득 × 장해율(${data.disabilityRate}%) × 호프만계수(${coeff.toFixed(2)})`);
+    }
+
+    // 4. 개호비 (간병비)
+    let careCost = 0;
+    if (data.hasCare && data.carePersons > 0) {
+      const dailyNurseWage = 150000; // 일용 보통인부/간병인 판례 노임
+      const monthlyCare = dailyNurseWage * 30 * data.carePersons;
+      const careMonths = data.careYears > 0 ? data.careYears * 12 : Math.max(12, (80 - data.ageAtAccident) * 12);
+      const coeff = getHoffmanCoeff(careMonths);
+      careCost = monthlyCare * coeff;
+      formulas.push(`개호비: 1일 ${data.carePersons}인(${fmt(dailyNurseWage)}원/일) × 호프만계수(${coeff.toFixed(2)})`);
+    }
+
+    // 5. 치료비
+    const treatment = data.pastTreatmentCost + data.futureTreatmentCost;
+
+    // 과실상계
+    const subTotal = alimony + hospitalLoss + lostIncome + careCost + treatment;
+    const faultDeduction = (hospitalLoss + lostIncome + careCost + treatment) * (data.faultRatio / 100);
+    const totalAmount = Math.max(0, subTotal - faultDeduction);
+
+    return {
+      alimony,
+      hospitalLoss,
+      lostIncome,
+      careCost,
+      treatment,
+      subTotal,
+      faultDeduction,
+      totalAmount,
+      formulas
+    };
   };
 
   const result = calculateResult();
   const { exportPDF, shareResult } = useCalculatorExport(resultRef);
 
   const inputClass = "w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-3 px-3.5 text-sm font-bold text-gray-900 dark:text-white rounded-none focus:border-rose-500 focus:outline-none transition-colors placeholder-gray-400";
-  const labelHeaderClass = "flex items-center justify-between mb-2";
+  const labelHeaderClass = "flex items-center justify-between mb-2.5";
   const labelTextClass = "text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-gray-100 select-none";
   const labelSubClass = "text-[11px] text-gray-400 dark:text-zinc-500 font-medium select-none";
 
@@ -156,12 +160,12 @@ export default function LiabilityCalculator() {
       </div>
 
       {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
-      <div className="space-y-5">
+      <div className="space-y-6">
         
         {/* [STEP 1] 피해 유형 선택 4단 칩 */}
-        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="scale" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
+        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="scale" className="!p-5 sm:!p-7 overflow-hidden">
           {/* STEP 1 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-rose-50 via-red-50/60 to-transparent dark:from-rose-950/50 dark:via-red-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-rose-50 via-red-50/60 to-transparent dark:from-rose-950/50 dark:via-red-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-rose-200/80 dark:border-rose-800/80">STEP 01</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -172,36 +176,38 @@ export default function LiabilityCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">복수 선택 가능</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { key: 'hasInjury', label: '부상 (상해)', sub: '치료비·휴업손해' },
-              { key: 'hasDisability', label: '후유장해', sub: '미래 일실수입' },
-              { key: 'hasDeath', label: '사망', sub: '유족 배상 및 장례비' },
-              { key: 'hasCare', label: '개호 (간병)', sub: '평생 전문 간병비' },
-            ].map(item => {
-              const isActive = data[item.key as keyof LiabilityData] as boolean;
-              return (
-                <button
-                  key={item.key}
-                  onClick={() => handleChange(item.key as keyof LiabilityData, !isActive)}
-                  className={`p-3.5 text-center border transition-all cursor-pointer ${
-                    isActive
-                      ? 'border-rose-600 bg-rose-50/90 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 font-extrabold shadow-xs'
-                      : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
-                  }`}
-                >
-                  <div className="text-xs sm:text-sm font-extrabold">{item.label}</div>
-                  <div className="text-[11px] opacity-75 mt-1 font-medium">{item.sub}</div>
-                </button>
-              );
-            })}
+          <div className="space-y-4 pt-5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { key: 'hasInjury', label: '부상 (상해)', sub: '치료비·휴업손해' },
+                { key: 'hasDisability', label: '후유장해', sub: '미래 일실수입' },
+                { key: 'hasDeath', label: '사망', sub: '유족 배상 및 장례비' },
+                { key: 'hasCare', label: '개호 (간병)', sub: '평생 전문 간병비' },
+              ].map(item => {
+                const isActive = data[item.key as keyof LiabilityData] as boolean;
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => handleChange(item.key as keyof LiabilityData, !isActive)}
+                    className={`p-3.5 text-center border transition-all cursor-pointer ${
+                      isActive
+                        ? 'border-rose-600 bg-rose-50/90 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 font-extrabold shadow-xs'
+                        : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className="text-xs sm:text-sm font-extrabold">{item.label}</div>
+                    <div className="text-[11px] opacity-75 mt-1 font-medium">{item.sub}</div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </PremiumCard>
 
         {/* [STEP 2] 연령, 소득, 과실비율 */}
-        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="chart" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
+        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="chart" className="!p-5 sm:!p-7 overflow-hidden">
           {/* STEP 2 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-rose-50 via-red-50/60 to-transparent dark:from-rose-950/50 dark:via-red-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-rose-50 via-red-50/60 to-transparent dark:from-rose-950/50 dark:via-red-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-rose-200/80 dark:border-rose-800/80">STEP 02</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -212,7 +218,7 @@ export default function LiabilityCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">소송가액 산정 기초</span>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-6 pt-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <div className={labelHeaderClass}>
@@ -281,11 +287,11 @@ export default function LiabilityCalculator() {
 
         {/* [STEP 3] 세부 손해배상 항목 */}
         {(data.hasInjury || data.hasDisability || data.hasDeath || data.hasCare) && (
-          <PremiumCard borderColor="rose" hoverEffect={true} watermarkIcon="crutches" className="!p-5 sm:!p-7 space-y-5 overflow-hidden animate-in fade-in duration-200">
+          <PremiumCard borderColor="rose" hoverEffect={true} watermarkIcon="crutches" className="!p-5 sm:!p-7 overflow-hidden animate-in fade-in duration-200">
             {/* STEP 3 그라데이션 헤더 바 */}
-            <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-rose-50 via-amber-50/60 to-transparent dark:from-rose-950/50 dark:via-amber-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
+            <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-rose-50 via-amber-50/60 to-transparent dark:from-rose-950/50 dark:via-amber-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-rose-200/80 dark:border-rose-800/80">STEP 01</span>
+                <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-rose-200/80 dark:border-rose-800/80">STEP 03</span>
                 <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
                   <AppIcon name="crutches" size={16} className="text-rose-600 dark:text-rose-400" />
                   세부 손해배상 항목 상세 입력
@@ -294,7 +300,7 @@ export default function LiabilityCalculator() {
               <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">소송 판례 호프만 산출</span>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-6 pt-5">
               {data.hasInjury && !data.hasDeath && (
                 <div>
                   <div className={labelHeaderClass}>
@@ -411,9 +417,9 @@ export default function LiabilityCalculator() {
       </div>
 
       {/* 3. 📋 세부 손해배상 산출 명세서 (상시 100% 노출) */}
-      <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 space-y-4 overflow-hidden">
+      <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 overflow-hidden">
         {/* 명세서 그라데이션 헤더 바 */}
-        <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-rose-50 via-red-50/60 to-transparent dark:from-rose-950/50 dark:via-red-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
+        <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-rose-50 via-red-50/60 to-transparent dark:from-rose-950/50 dark:via-red-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AppIcon name="file-text" size={16} className="text-rose-600 dark:text-rose-400" />
             <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
@@ -423,7 +429,7 @@ export default function LiabilityCalculator() {
           <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">법원 판례 기준 실시간 연산</span>
         </div>
 
-        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300">
+        <div className="space-y-3 pt-5 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300">
           {result.alimony > 0 && (
             <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
               <span className="font-medium">· 정신적 손해 (위자료)</span>
@@ -458,12 +464,10 @@ export default function LiabilityCalculator() {
             <span>과실 상계 전 손해액 총합</span>
             <span>{Math.floor(result.totalAmount / (1 - (data.faultRatio / 100) || 1)).toLocaleString()} 원</span>
           </div>
-          {data.faultRatio > 0 && (
-            <div className="flex justify-between py-2.5 text-red-500 font-extrabold">
-              <span>(-) 본인 과실 상계 ({data.faultRatio}%)</span>
-              <span>적용 완료</span>
-            </div>
-          )}
+          <div className="flex justify-between py-2.5 text-rose-600 dark:text-rose-400 font-extrabold">
+            <span>(-) 본인 과실 상계액 ({data.faultRatio}%)</span>
+            <span>-{Math.floor(result.faultDeduction).toLocaleString()} 원</span>
+          </div>
         </div>
 
         {/* 계산 공식 */}
@@ -471,7 +475,7 @@ export default function LiabilityCalculator() {
           <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-900/70 p-4">
             <h4 className="text-xs font-extrabold text-rose-600 dark:text-rose-400 mb-1.5 flex items-center gap-1.5">
               <AppIcon name="calculator" size={14} />
-              적용된 법원 판례 산출식 (호프만)
+              적용된 법원 손해배상 산정 공식
             </h4>
             <ul className="list-disc list-inside text-xs text-gray-600 dark:text-gray-400 space-y-1 leading-relaxed">
               {result.formulas.map((f, i) => <li key={i}>{f}</li>)}
@@ -480,16 +484,16 @@ export default function LiabilityCalculator() {
         )}
       </PremiumCard>
 
-      {/* 4. 🏆 [최하단 배치] 최종 예상 손해배상액 챔피언 카드 */}
+      {/* 4. 🏆 [최하단 배치] 최종 예상 배상청구액 챔피언 카드 */}
       <div ref={resultRef} className="bg-gradient-to-br from-rose-600 to-red-700 dark:from-rose-700 dark:to-red-900 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden transition-transform duration-200 hover:scale-[1.005]">
         <div className="relative z-10 flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2 mb-4">
             <span className="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-xs px-3 py-1.5 text-xs font-extrabold text-white/90 uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-rose-300 animate-pulse"></span>
-              최종 예상 총 손해배상액 (과실 상계 후 실수령액)
+              법원 판례 기준 예상 손해배상액 (호프만 단리)
             </span>
             <span className="text-xs sm:text-[13px] text-white/80 font-bold">
-              본인 과실 {data.faultRatio}% 반영
+              본인과실 {data.faultRatio}% 적용
             </span>
           </div>
 
@@ -502,12 +506,12 @@ export default function LiabilityCalculator() {
 
           <div className="pt-4 border-t border-white/20 flex flex-wrap items-center justify-between text-xs sm:text-sm text-white/90 font-medium gap-3">
             <div>
-              <span className="text-white/60 mr-1.5">피해 유형:</span>
-              <span className="font-bold text-white">{[data.hasInjury && '부상(치료)', data.hasDisability && '후유장해', data.hasDeath && '사망', data.hasCare && '개호(간병)'].filter(Boolean).join(', ') || '선택 없음'}</span>
+              <span className="text-white/60 mr-1.5">적용 소득:</span>
+              <span className="font-bold text-white">{data.income.toLocaleString()}원/월</span>
             </div>
             <div>
-              <span className="text-white/60 mr-1.5">월 평균 소득:</span>
-              <span className="font-bold text-white">{data.income.toLocaleString()}원</span>
+              <span className="text-white/60 mr-1.5">호프만 가동연한:</span>
+              <span className="font-bold text-white">{Math.max(0, 65 - data.ageAtAccident)}년 잔여</span>
             </div>
           </div>
         </div>
@@ -516,7 +520,7 @@ export default function LiabilityCalculator() {
       {/* 5. 🛡️ 전문가 조언 및 액션 버튼 바 */}
       <div className="bg-amber-50 dark:bg-amber-950/30 p-4 border border-amber-200/80 dark:border-amber-900/40 text-xs sm:text-[13px] leading-relaxed text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
         <AppIcon name="shield-alert" size={16} className="text-amber-600 shrink-0 mt-0.5" />
-        <p>위 결과는 <strong>법원 소송 판례(호프만 계수) 기준</strong> 단순 적용 수치입니다. 실제 소송 시 피해자의 과실 비율, 정년, 개호 등에 따라 크게 달라질 수 있으므로 손해사정 전문가의 상담을 권장합니다.</p>
+        <p>위 결과는 <strong>법원 손해배상 소송 판례(호프만 단리 수식)</strong> 기준 산출액입니다. 상대방 보험사의 자체 지급기준(라이프니츠 계수 등)보다 판례 기준이 통상 20~40% 높게 산정될 수 있습니다.</p>
       </div>
 
       <div className="space-y-3 pt-1">
@@ -525,7 +529,7 @@ export default function LiabilityCalculator() {
           className="flex items-center justify-center w-full gap-2 py-4 bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-rose-500/20 text-center cursor-pointer"
         >
           <AppIcon name="chat" size={20} />
-          <span>배상책임 손해액 1:1 무료 상담 신청하기</span>
+          <span>배상책임 손해배상청구 1:1 무료 상담 신청하기</span>
         </Link>
 
         <div className="grid grid-cols-2 gap-3">

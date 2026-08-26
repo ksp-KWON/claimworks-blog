@@ -1,22 +1,14 @@
 /**
  * naver-formatter.ts
- * 네이버 블로그 스마트에디터 ONE(SmartEditor ONE) 전용 6대 인용구 & 무결점 테이블 변환 엔진 2.0
- *
- * [핵심 아키텍처: 오류 없는 표(Table) 기반 카드 레이아웃]
- * 1. 무결점 표(Table) 기반 레이아웃:
- *    - 네이버 에디터에서 왜곡이나 서식 깨짐이 전혀 없는 <table>을 핵심 컨테이너로 채택.
- *    - FAQ: 상하 2단 파스텔 카드 테이블 (Q: #eff6ff 연파랑 / A: #ffffff 화이트).
- *    - 1분 자가진단: 헤더(#f1f5f9) + 내용(#f8fafc)의 단일 통합 체크보드 테이블.
- *    - 용어사전/요약: 좌측 초록 라인 + 연초록(#f0fdf4) 배경의 안전한 카드 테이블.
- *    - 하단 CTA 배너: 스크린샷과 100% 동일한 [공식 썸네일 이미지 + 타이틀 + 설명 + 초록 URL]의 스마트 OG 프리뷰 카드 테이블.
- * 2. 인용구 툴 기반 헤딩 위계:
- *    - 대제목(H2): 상단 구분선(<hr>) + 좌측 초록 라인 인용구 박스 + 19px 대형 볼드.
- *    - 중제목(H3): 16.5px 중형 볼드 + 포인트 불릿(■).
- *    - 소제목/솔루션(H6): 15px 포인트 볼드 + 넘버링(✔ ①, ②...).
- * 3. 형광펜 및 호흡:
- *    - 노란색 형광펜(#fef08a) 키워드 하이라이트.
- *    - 2~3줄 단위의 부드러운 줄간격(1.85) 유지.
+ * 네이버 블로그 스마트에디터 ONE(SmartEditor ONE) 전용 무결점 W3C 테이블 변환 엔진 3.0
+ * 
+ * [원칙: 표준, 범용, 콤팩트, 통합, 공유, 공통]
+ * - blog-tokens.ts와 완전 연동되는 단일 진실 공급원(Single Source of Truth)
+ * - 보상스쿨 글로벌 헌법 제1조(순수 텍스트 미니멀리즘, 이모지 전면 배제) 및 제12조 준수
+ * - 웹의 CommonBox와 100% 동일한 비주얼 룩앤필의 [상단 톤온톤 헤더 스트립 + 하단 본문] 5대 Table 카드 시스템
  */
+
+import { BLOG_TONE_TOKENS, getToneColor, getKeywordTone, BlogTone } from './blog-tokens';
 
 export interface NaverFormatOptions {
   title?: string;
@@ -24,29 +16,22 @@ export interface NaverFormatOptions {
 }
 
 /**
- * 키워드 강조를 네이버 시그니처 노란색 형광펜으로 변환
+ * 키워드 강조(**텍스트**)를 5대 패밀리 톤온톤 스마트 하이라이터로 변환
  */
-function applyNaverHighlighter(text: string): string {
+export function applyNaverHighlighter(text: string): string {
   if (!text) return '';
-  return text.replace(
-    /\*\*(.*?)\*\*/g,
-    '<strong style="background-color: #fef08a; padding: 2px 4px; border-radius: 2px; color: #111827; font-weight: bold;">$1</strong>'
-  );
+  return text.replace(/\*\*(.*?)\*\*/g, (_, match) => {
+    const tone = getKeywordTone(match);
+    const token = BLOG_TONE_TOKENS[tone].hex;
+    return `<strong style="background-color: ${token.highlightBg}; color: ${token.highlightText}; padding: 2px 5px; border-radius: 3px; font-weight: bold; font-family: inherit;">${match}</strong>`;
+  });
 }
 
 /**
- * 마크다운 텍스트를 네이버 스마트에디터 ONE 전용 HTML로 완벽 변환 (정밀 파서)
- * 
- * [표준 출력 위계 (W3C & 네이버 스마트에디터 완벽 호환)]
- * 1. 최상단 시작 가로선 (<hr>)
- * 2. 핵심 요약 박스 (연초록 카드 테이블)
- * 3. 공감 오프닝 서술 문단
- * 4. 중간 가로 구분선 (<hr>)
- * 5. 본문 1번 (## H2 대제목)부터 순차적 본문 렌더링
- * 6. 하단 보상스쿨 공식 4대 통합 CTA 카드 배너
+ * 마크다운 텍스트를 네이버 스마트에디터 ONE 전용 HTML로 완벽 변환
  */
 export function convertMarkdownToNaverHtml(markdown: string, options: NaverFormatOptions = {}): string {
-  // 1. Frontmatter 및 주석 제거, 줄바꿈 표준화
+  // 1. Frontmatter 및 HTML 주석 제거, 줄바꿈 정규화
   let cleanMd = markdown
     .replace(/^---[\s\S]*?---\n*/, '')
     .replace(/<!--[\s\S]*?-->/g, '')
@@ -56,7 +41,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
 
   // 2. 핵심 요약 (Key Points) 추출
   let keyPoints: string[] = [];
-  const keyPointsHeaderRegex = /##\s*(?:💡|🎯)?\s*핵심\s*요약(?:[^\n]*)\n+((?:[ \t]*>?[ \t]*[-*+].*\n*)+)/i;
+  const keyPointsHeaderRegex = /##\s*(?:[💡🎯📌⭐\s]*)(?:핵심\s*요약|핵심요약|핵심\s*포인트)(?:[^\n]*)\n+((?:[ \t]*>?[ \t]*[-*+].*\n*)+)/i;
   const keyPointsMatch = cleanMd.match(keyPointsHeaderRegex);
 
   if (keyPointsMatch) {
@@ -68,11 +53,10 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       .map(l => l.replace(/^(?:>\s*)?[-*+]\s*/, '').trim())
       .filter(l => l.length > 0 && !l.startsWith('[ ]') && !l.startsWith('[x]'));
 
-    // cleanMd에서 해당 헤더와 불릿 블록 제거
     cleanMd = cleanMd.replace(keyPointsMatch[0], '\n\n');
   }
 
-  // 3. 첫 번째 본문 대제목(## H2) 찾기 (핵심 요약 헤더는 이미 제거됨)
+  // 3. 첫 번째 본문 대제목(## H2) 찾기 및 오프닝 분리
   const firstH2Match = cleanMd.match(/^##\s+.+$/m);
   let openingText = '';
   let bodyMd = cleanMd;
@@ -81,7 +65,6 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     const introPart = cleanMd.slice(0, firstH2Match.index).trim();
     bodyMd = cleanMd.slice(firstH2Match.index).trim();
 
-    // introPart에서 혹시 keyPoints가 아직 안 뽑혔는데 `> - ...` 가 있다면 추출
     if (keyPoints.length === 0) {
       const quoteMatches = introPart.match(/^>[ \t]*[-*+](.+)$/gm);
       if (quoteMatches) {
@@ -89,45 +72,49 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       }
     }
 
-    // introPart에서 일반 오프닝 문단만 추출
     const introLines = introPart.split('\n')
       .map(l => l.trim())
       .filter(l => {
         if (!l) return false;
-        if (l.startsWith('>')) return false; // 인용구는 오프닝에서 제외
+        if (l.startsWith('>')) return false;
         if (l.startsWith('#')) return false;
         if (l.startsWith('|')) return false;
-        if (l.startsWith('[') && l.includes('](')) return false; // 단독 링크 줄 제외
-        if (l.startsWith('![')) return false; // 단독 이미지 줄 제외
+        if (l.startsWith('[') && l.includes('](')) return false;
+        if (l.startsWith('![')) return false;
         return true;
       });
     openingText = introLines.join('<br/>');
   } else {
-    // H2가 없는 경우
     openingText = cleanMd;
     bodyMd = '';
   }
 
   const blocks: string[] = [];
 
-  // ── [1단계] 처음 시작할 때 최상단 가로선 ──
+  // ── [1단계] 최상단 시작 가로 구분선 ──
   blocks.push(`
     <table style="width: 100%; border: 0; border-collapse: collapse; margin: 10px 0 20px 0;">
       <tr><td style="border-top: 1px solid #cbd5e1; height: 1px; padding: 0;"></td></tr>
     </table>
   `.trim());
 
-  // ── [2단계] 그 다음 핵심요약 박스 ──
+  // ── [2단계] 핵심 요약 박스 (W3C 표준 톤온톤 에메랄드 카드) ──
   if (keyPoints.length > 0) {
+    const greenToken = BLOG_TONE_TOKENS.green.hex;
     const itemsHtml = keyPoints.map(item => {
       const highlighted = applyNaverHighlighter(item);
-      return `<div style="margin: 6px 0; font-size: 14.5px; color: #166534; line-height: 1.8;"><span style="color: #059669; font-weight: bold; margin-right: 8px;">•</span>${highlighted}</div>`;
+      return `<div style="margin: 8px 0; font-size: 14.5px; color: ${greenToken.bodyText}; line-height: 1.8;"><span style="color: ${greenToken.borderAccent}; font-weight: bold; margin-right: 8px;">•</span>${highlighted}</div>`;
     }).join('');
 
     const summaryBoxHtml = `
-      <table style="width: 100%; border: 1.5px solid #10b981; background-color: #f0fdf4; border-collapse: collapse; margin: 16px 0 20px 0; border-radius: 6px;">
+      <table style="width: 100%; border: 1.5px solid ${greenToken.border}; background-color: #f0fdf4; border-collapse: collapse; margin: 16px 0 20px 0; border-radius: 4px;">
         <tr>
-          <td style="padding: 16px 20px;">
+          <td style="padding: 10px 16px; background-color: ${greenToken.headerBg}; border-bottom: 1px solid ${greenToken.border}; font-weight: bold; color: ${greenToken.headerText}; font-size: 15px;">
+            핵심 요약
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 16px 20px; background-color: #f0fdf4;">
             ${itemsHtml}
           </td>
         </tr>
@@ -136,20 +123,20 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     blocks.push(summaryBoxHtml);
   }
 
-  // ── [3단계] 그 다음 오프닝 문단 ──
+  // ── [3단계] 공감 오프닝 문단 ──
   if (openingText) {
     const highlightedOpening = applyNaverHighlighter(openingText);
     blocks.push(`<p style="font-size: 15.5px; line-height: 1.9; color: #27272a; margin: 20px 0; word-break: keep-all;">${highlightedOpening}</p>`);
   }
 
-  // ── [4단계] 그 다음 가로선 (본문 1번 시작 직전) ──
+  // ── [4단계] 본문 시작 직전 가로 구분선 ──
   blocks.push(`
     <table style="width: 100%; border: 0; border-collapse: collapse; margin: 32px 0 24px 0;">
       <tr><td style="border-top: 1px solid #cbd5e1; height: 1px; padding: 0;"></td></tr>
     </table>
   `.trim());
 
-  // ── [5단계] 그 다음 본문 1번 시작부터 나머지 본문 파싱 ──
+  // ── [5단계] 본문 챕터 순차 파싱 ──
   const lines = bodyMd.split('\n');
   let i = 0;
   let isFirstH2 = true;
@@ -158,7 +145,6 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     const rawLine = lines[i];
     const trimmed = rawLine.trim();
 
-    // 0. 빈 줄 건너뛰기
     if (!trimmed) {
       i++;
       continue;
@@ -175,7 +161,6 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       if (tableLines.length >= 2) {
         let tableHtml = `<table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; margin: 24px 0; font-size: 13.5px; line-height: 1.5;">`;
         
-        // 헤더
         const headers = tableLines[0].split('|').map(s => s.trim()).filter(s => s.length > 0);
         tableHtml += `<thead><tr style="background-color: #f1f5f9;">`;
         headers.forEach(h => {
@@ -183,7 +168,6 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
         });
         tableHtml += `</tr></thead><tbody>`;
 
-        // 데이터 행
         const dataRows = tableLines.slice(2);
         dataRows.forEach((row, rIdx) => {
           const cells = row.split('|').map(s => s.trim()).filter(s => s.length > 0);
@@ -203,7 +187,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       continue;
     }
 
-    // 2. 대제목 H2 (## ...) ➔ 상단 확실한 가로 구분선 + [라인형 인용구 툴 1]
+    // 2. 대제목 H2 (## ...) -> 상단 구분선 + 좌측 6px 에메랄드 라인 헤더 카드
     if (trimmed.startsWith('## ')) {
       const titleText = trimmed.replace(/^##\s+/, '').trim();
       
@@ -217,38 +201,38 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
         <table style="width: 100%; border-left: 6px solid #03c75a; background-color: #f8fafc; border-collapse: collapse; margin: 0 0 16px 0;">
           <tr>
             <td style="padding: 12px 18px;">
-              <p style="font-size: 19px; font-weight: bold; color: #0f172a; margin: 0; line-height: 1.4;">
-                📌 <strong>${titleText}</strong>
+              <p style="font-size: 18.5px; font-weight: bold; color: #0f172a; margin: 0; line-height: 1.4;">
+                ${titleText}
               </p>
             </td>
           </tr>
         </table>
-      `;
+      `.trim();
       blocks.push(h2Html);
       i++;
       continue;
     }
 
-    // 3. 중제목 H3 (### ...) ➔ [포스트잇/박스형 인용구 툴 2] (FAQ Q 라인은 FAQ 파서로 위임)
+    // 3. 중제목 H3 (### ...) -> 좌측 4px 블루 라인 헤더 박스 (FAQ 제외)
     if (trimmed.startsWith('### ') && !trimmed.includes('Q :') && !trimmed.includes('Q:') && !trimmed.startsWith('### Q')) {
       const titleText = trimmed.replace(/^###\s+/, '').trim();
       const h3Html = `
         <table style="width: 100%; border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; background-color: #f8fafc; border-collapse: collapse; margin: 26px 0 12px 0;">
           <tr>
             <td style="padding: 10px 15px;">
-              <span style="font-size: 16.5px; font-weight: bold; color: #1e3a8a;">
-                ■ <strong>${titleText}</strong>
+              <span style="font-size: 16px; font-weight: bold; color: #1e3a8a;">
+                ${titleText}
               </span>
             </td>
           </tr>
         </table>
-      `;
+      `.trim();
       blocks.push(h3Html);
       i++;
       continue;
     }
 
-    // 4. 소제목 / 솔루션 H6 (###### ...) ➔ [버블/뱃지형 인용구 툴 3] (핵심솔루션 문구 삭제, ✔ ①, ②...)
+    // 4. 소제목 / 다단계 솔루션 H6 (###### ...) -> 뱃지형 에메랄드 카드
     if (trimmed.startsWith('###### ') || trimmed.startsWith('#### ') || trimmed.startsWith('##### ')) {
       let titleText = trimmed.replace(/^#{4,6}\s+/, '').trim();
       titleText = titleText.replace(/^핵심\s*솔루션\s*/, '');
@@ -258,25 +242,24 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
           <tr>
             <td style="padding: 10px 14px;">
               <p style="font-size: 15px; font-weight: bold; color: #065f46; margin: 0;">
-                <span style="color: #059669; margin-right: 6px;">✔</span><strong>${titleText}</strong>
+                <span style="display: inline-block; background-color: #10b981; color: #ffffff; padding: 2px 6px; border-radius: 2px; font-size: 12px; margin-right: 8px; font-weight: bold;">솔루션</span>${titleText}
               </p>
             </td>
           </tr>
         </table>
-      `;
+      `.trim();
       blocks.push(h6Html);
       i++;
       continue;
     }
 
-    // 5. FAQ (Q&A) 질문-답변 블록 ➔ [상하 2단 파스텔 카드 테이블]
+    // 5. FAQ (Q&A) 질문-답변 블록 -> 상하 2단 파스텔 카드 테이블
     const cleanQLine = trimmed.replace(/^###\s+/, '');
     if (cleanQLine.includes('Q :') || cleanQLine.includes('Q:') || cleanQLine.startsWith('■Q') || cleanQLine.startsWith('Q.')) {
       let qText = cleanQLine.replace(/^[■\s]*Q\s*[:.]\s*/, '').trim();
       let aText = '';
       i++;
 
-      // 다음 답변 행 찾기
       while (i < lines.length && !lines[i].trim().includes('Q :') && !lines[i].trim().includes('Q:') && !lines[i].trim().startsWith('■Q') && !lines[i].trim().startsWith('Q.') && !lines[i].trim().startsWith('##')) {
         const lineVal = lines[i].trim();
         if (lineVal.startsWith('A :') || lineVal.startsWith('A:') || lineVal.startsWith('A.')) {
@@ -296,72 +279,48 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
         <table style="width: 100%; border: 1px solid #bfdbfe; border-collapse: collapse; margin: 18px 0; font-size: 14px;">
           <tr>
             <td style="padding: 12px 16px; background-color: #eff6ff; border-bottom: 1px solid #bfdbfe; font-weight: bold; color: #1e40af; line-height: 1.5;">
-              ❓ ${qHighlighted}
+              <span style="display: inline-block; background-color: #3b82f6; color: #ffffff; padding: 2px 6px; border-radius: 2px; font-size: 12px; margin-right: 8px; font-weight: bold;">질문</span>${qHighlighted}
             </td>
           </tr>
           <tr>
             <td style="padding: 14px 16px; background-color: #ffffff; color: #334155; line-height: 1.85;">
-              💡 ${aHighlighted}
+              ${aHighlighted}
             </td>
           </tr>
         </table>
-      `;
+      `.trim();
       blocks.push(faqTable);
       continue;
     }
 
-    // 6. 인용구 블록 (> ...)
+    // 6. 인용구 블록 (> ...) -> 통합 구조적 블록 파서 엔진 (AST 기반)
     if (trimmed.startsWith('>')) {
-      const quoteLines: string[] = [];
+      const rawQuoteLines: string[] = [];
       while (i < lines.length && lines[i].trim().startsWith('>')) {
-        quoteLines.push(lines[i].trim().replace(/^>\s?/, '').replace(/^#{1,6}\s+/, '').trim());
+        rawQuoteLines.push(lines[i].trim().replace(/^>\s?/, ''));
         i++;
       }
 
-      // 6-NEW: 보상스쿨 실무인사이트 클로징 박스 (> ### 헤딩 + 본문)
-      // 패턴: > ### 보상스쿨 가이드 & 실무 인사이트 또는 유사 헤딩
-      // 수집된 quoteLines[0]이 이미 헤딩 텍스트 (### prefix는 L317에서 제거됨)
-      if (quoteLines.length >= 1 && /보상스쿨|실무\s*인사이트|실무인사이트/.test(quoteLines[0])) {
-        const boxTitle = quoteLines[0];
-        const bodyLines = quoteLines.slice(1).filter(l => l.trim());
-        const bodyItems = bodyLines.map(l => {
-          const highlighted = applyNaverHighlighter(l);
-          return `<div style="margin: 10px 0; font-size: 14.5px; color: #334155; line-height: 1.85;">${highlighted}</div>`;
-        }).join('');
-
-        const insightBox = `
-          <table style="width: 100%; border: 1px solid #e9d5ff; border-left: 5px solid #9333ea; background-color: #faf5ff; border-collapse: collapse; margin: 26px 0 12px 0;">
-            <tr>
-              <td style="padding: 10px 16px; background-color: #f5f3ff; border-bottom: 1px solid #ddd6fe;">
-                <span style="font-size: 15.5px; font-weight: bold; color: #7c3aed;">💡 ${boxTitle}</span>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding: 14px 16px; background-color: #faf5ff; color: #4c1d95; line-height: 1.85; font-size: 14.5px;">
-                ${bodyItems || '<div style="font-size: 14.5px; color: #334155;">전문 손해사정사가 직접 작성한 실무 인사이트입니다.</div>'}
-              </td>
-            </tr>
-          </table>
-        `;
-        blocks.push(insightBox);
-        continue;
-      }
-
-      // 6-A. 1분 자가진단 체크리스트 ➔ [체크보드 카드 인용구 툴 6]
-      if (quoteLines.some(l => l.startsWith('- [ ]') || l.startsWith('- [x]'))) {
-        const checkItems = quoteLines
+      // 6-A. 1분 자가진단 체크리스트 블록
+      if (rawQuoteLines.some(l => l.startsWith('- [ ]') || l.startsWith('- [x]'))) {
+        const checkItems = rawQuoteLines
           .filter(l => (l.startsWith('- [ ]') || l.startsWith('- [x]')) && !/^[-=_*~]{2,}$/.test(l.replace(/^- \[( |x)\]\s*/, '').trim()))
           .map(l => {
+            const isChecked = l.startsWith('- [x]');
             const itemText = l.replace(/^- \[( |x)\]\s*/, '');
             const highlighted = applyNaverHighlighter(itemText);
-            return `<div style="margin: 12px 0; font-size: 14.5px; color: #334155; line-height: 1.85; padding-left: 2px;"><span style="color: #059669; font-weight: bold; margin-right: 8px; font-size: 16px; vertical-align: middle;">☑️</span><span style="vertical-align: middle;">${highlighted}</span></div>`;
+            const checkSymbol = isChecked 
+              ? '<span style="display: inline-block; background-color: #10b981; color: white; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 3px; font-size: 12px; margin-right: 8px; vertical-align: middle;">✓</span>'
+              : '<span style="display: inline-block; border: 1.5px solid #94a3b8; width: 15px; height: 15px; border-radius: 3px; margin-right: 8px; vertical-align: middle;"></span>';
+            
+            return `<div style="margin: 10px 0; font-size: 14.5px; color: #334155; line-height: 1.85; padding-left: 2px;">${checkSymbol}<span style="vertical-align: middle;">${highlighted}</span></div>`;
           }).join('');
 
         const checklistTable = `
           <table style="width: 100%; border: 1px solid #cbd5e1; border-collapse: collapse; margin: 22px 0; font-size: 14px;">
             <tr>
               <td style="padding: 12px 18px; background-color: #f1f5f9; border-bottom: 1px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 14.5px;">
-                📋 <strong>1분 자가진단 체크리스트</strong>
+                1분 자가진단 체크리스트
               </td>
             </tr>
             <tr>
@@ -370,40 +329,83 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
               </td>
             </tr>
           </table>
-        `;
+        `.trim();
         blocks.push(checklistTable);
         continue;
       }
 
-      // 6-B. 인라인 용어사전 (용어 설명 인용구) ➔ [메모/점선형 인용구 툴 5 - 앰버/노란색 고정]
-      const joinedQuote = quoteLines.join('<br/>');
-      if (joinedQuote.includes('용어') || (joinedQuote.includes('**') && joinedQuote.includes(' : '))) {
-        const highlighted = applyNaverHighlighter(joinedQuote);
-        const glossaryTable = `
-          <table style="width: 100%; border: 1px dashed #fcd34d; background-color: #fffbeb; border-collapse: collapse; margin: 16px 0;">
+      // 6-B. 헤딩이 포함된 인용구 (예: > ### 보상스쿨 피드백 & 실무 인사이트 등)
+      // 첫 번째 유효 줄이 ### 헤딩인지 검사
+      const firstLine = rawQuoteLines[0] || '';
+      const headingMatch = firstLine.match(/^#{1,6}\s+(.+)$/);
+
+      if (headingMatch) {
+        const headerTitle = headingMatch[1].trim();
+        const bodyLines = rawQuoteLines.slice(1).filter(l => l.trim());
+        const fullContent = `${headerTitle} ${bodyLines.join(' ')}`;
+        
+        // 공통 톤 판별기로 톤 결정 (Purple, Green, Yellow, Red, Blue)
+        const tone = getToneColor(fullContent);
+        const token = BLOG_TONE_TOKENS[tone].hex;
+
+        const bodyHtml = bodyLines.map(l => {
+          const highlighted = applyNaverHighlighter(l);
+          return `<p style="margin: 8px 0; font-size: 14.5px; color: ${token.bodyText}; line-height: 1.85;">${highlighted}</p>`;
+        }).join('') || `<p style="margin: 8px 0; font-size: 14.5px; color: ${token.bodyText};">전문 손해사정사가 직접 진단한 실무 핵심 법리입니다.</p>`;
+
+        const insightCardHtml = `
+          <table style="width: 100%; border: 1px solid ${token.border}; border-collapse: collapse; margin: 26px 0 16px 0;">
             <tr>
-              <td style="padding: 12px 18px; font-size: 14px; color: #92400e; line-height: 1.75;">
+              <td style="padding: 10px 16px; background-color: ${token.headerBg}; border-bottom: 1px solid ${token.headerBorderBottom};">
+                <span style="font-size: 15px; font-weight: bold; color: ${token.headerText};">
+                  ${headerTitle}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 18px; background-color: ${token.bodyBg}; line-height: 1.85;">
+                ${bodyHtml}
+              </td>
+            </tr>
+          </table>
+        `.trim();
+        blocks.push(insightCardHtml);
+        continue;
+      }
+
+      // 6-C. 인라인 용어 사전 (> **용어명** : 설명)
+      const joinedQuote = rawQuoteLines.join('<br/>');
+      if (joinedQuote.includes('용어') || (joinedQuote.includes('**') && (joinedQuote.includes(' : ') || joinedQuote.includes(':')))) {
+        const highlighted = applyNaverHighlighter(joinedQuote);
+        const yellowToken = BLOG_TONE_TOKENS.yellow.hex;
+        const glossaryTable = `
+          <table style="width: 100%; border: 1px dashed ${yellowToken.border}; background-color: #fffbeb; border-collapse: collapse; margin: 16px 0;">
+            <tr>
+              <td style="padding: 12px 18px; font-size: 14px; color: ${yellowToken.headerText}; line-height: 1.75;">
                 ${highlighted}
               </td>
             </tr>
           </table>
-        `;
+        `.trim();
         blocks.push(glossaryTable);
         continue;
       }
 
-      // 6-C. 핵심 요약 (상하 초록 라인) ➔ [따옴표/상하 라인 인용구 툴 4]
-      const summaryHighlighted = applyNaverHighlighter(joinedQuote);
-      const summaryTable = `
-        <table style="width: 100%; border-top: 2px solid #03c75a; border-bottom: 2px solid #03c75a; background-color: #f8fafc; border-collapse: collapse; margin: 20px 0;">
+      // 6-D. 일반 인용구 (좌측 톤온톤 라인 카드)
+      const tone = getToneColor(joinedQuote);
+      const token = BLOG_TONE_TOKENS[tone].hex;
+      const highlighted = applyNaverHighlighter(joinedQuote);
+
+      const standardQuoteTable = `
+        <table style="width: 100%; border-left: 4px solid ${token.borderAccent}; background-color: ${token.headerBg}; border-collapse: collapse; margin: 18px 0;">
           <tr>
-            <td style="padding: 16px 20px; font-size: 14.5px; line-height: 1.8; color: #334155;">
-              ${summaryHighlighted}
+            <td style="padding: 14px 18px; font-size: 14.5px; line-height: 1.8; color: ${token.headerText};">
+              ${highlighted}
             </td>
           </tr>
         </table>
-      `;
-      blocks.push(summaryTable);
+      `.trim();
+      blocks.push(standardQuoteTable);
       continue;
     }
 
@@ -441,7 +443,20 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
 
     // 8. 일반 본문 문단 (2~3줄 단위 부드러운 줄간격)
     const pLines: string[] = [];
-    while (i < lines.length && lines[i].trim() && !lines[i].trim().startsWith('#') && !lines[i].trim().startsWith('>') && !lines[i].trim().startsWith('|') && !lines[i].trim().startsWith('- ') && !lines[i].trim().startsWith('* ') && !/^\d+\.\s+/.test(lines[i].trim()) && !lines[i].trim().includes('Q :') && !lines[i].trim().includes('Q:') && !lines[i].trim().startsWith('■Q') && !lines[i].trim().startsWith('Q.')) {
+    while (
+      i < lines.length && 
+      lines[i].trim() && 
+      !lines[i].trim().startsWith('#') && 
+      !lines[i].trim().startsWith('>') && 
+      !lines[i].trim().startsWith('|') && 
+      !lines[i].trim().startsWith('- ') && 
+      !lines[i].trim().startsWith('* ') && 
+      !/^\d+\.\s+/.test(lines[i].trim()) && 
+      !lines[i].trim().includes('Q :') && 
+      !lines[i].trim().includes('Q:') && 
+      !lines[i].trim().startsWith('■Q') && 
+      !lines[i].trim().startsWith('Q.')
+    ) {
       pLines.push(lines[i].trim());
       i++;
     }
@@ -452,16 +467,16 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     }
   }
 
-  // 9. 하단 보상스쿨 공식 배너 이미지 CTA (네이버 스마트에디터 100% 호환 무결점 아키텍처)
+  // 9. 하단 보상스쿨 공식 배너 이미지 CTA
   const footerHtml = `
     <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 40px 0 24px 0;" />
 
     <p style="text-align: center; margin: 30px auto 20px auto;">
       <a href="https://claim-works.com/consultation" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
-        <img src="https://claim-works.com/images/bosangschool-cta-banner.png" alt="보상스쿨tv 보험금분쟁 손해사정 무료상담 신청하기" style="max-width: 100%; width: 620px; height: auto; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); display: block; margin: 0 auto;" />
+        <img src="https://claim-works.com/images/bosangschool-cta-banner.png" alt="보상스쿨 보험금 분쟁 무료 상담 신청하기" style="max-width: 100%; width: 620px; height: auto; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); display: block; margin: 0 auto;" />
       </a>
     </p>
-  `;
+  `.trim();
 
   blocks.push(footerHtml);
 

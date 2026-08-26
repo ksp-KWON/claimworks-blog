@@ -13,17 +13,20 @@ import PremiumHeading from '../ui/PremiumHeading';
 import PremiumCard from '../ui/PremiumCard';
 import AppIcon from '../ui/AppIcon';
 
+import { BLOG_TONE_TOKENS, getToneColor as getTokenTone, getKeywordTone, BlogTone } from '@/lib/blog-tokens';
+
 const SCROLL_OFFSET = 140;
+
+const extractTextFromNode = (n: any): string => {
+  if (typeof n === 'string') return n;
+  if (Array.isArray(n)) return n.map(extractTextFromNode).join('');
+  if (n?.props?.children) return extractTextFromNode(n.props.children);
+  return '';
+};
 
 // 헤딩 톤온톤 컬러 매핑 (헌법 제10조 시맨틱 위계)
 const getHeadingTone = (level: number, node?: React.ReactNode): 'red' | 'blue' | 'yellow' | 'green' | 'purple' | 'gray' => {
-  const getText = (n: any): string => {
-    if (typeof n === 'string') return n;
-    if (Array.isArray(n)) return n.map(getText).join('');
-    if (n?.props?.children) return getText(n.props.children);
-    return '';
-  };
-  const text = node ? getText(node).trim() : '';
+  const text = node ? extractTextFromNode(node).trim() : '';
 
   // 특수 섹션 전용 컬러 매핑
   if (/(1분\s*자가진단|자가진단|체크리스트|진단\s*체크)/i.test(text)) return 'green';
@@ -76,31 +79,10 @@ const UnifiedHeadingRenderer = ({ level, children, id }: { level: 1|2|3|4|5|6, c
   );
 };
 
-// 인용구(Blockquote) 톤 컬러 결정
-const getToneColor = (node: React.ReactNode): 'red' | 'green' | 'yellow' | 'purple' | 'blue' => {
-  const getText = (n: any): string => {
-    if (typeof n === 'string') return n;
-    if (Array.isArray(n)) return n.map(getText).join('');
-    if (n?.props?.children) return getText(n.props.children);
-    return '';
-  };
-  const fullText = getText(node).trim();
-  
-  // 1. [헌법 제12조] 보상스쿨 피드백 & 실무 인사이트 -> 독보적인 프리미엄 보라색(Purple) 톤 배정
-  if (/보상스쿨\s*피드백|실무\s*인사이트|실무인사이트/.test(fullText)) return 'purple';
-  
-  // 2. [헌법 제4조] 인라인 용어 사전 (> **용어명** : 설명) -> 항상 따뜻하고 명확한 노란색/앰버(Yellow) 톤 배정
-  // 용어 정의 형식인 '**용어** :' 또는 '용어명 :' 형태인 경우 항상 노란색으로 일관되게 고정
-  if (/(?:^|\n)\s*(?:\*\*[^*]+\*\*|[^\n:]+)\s*[:：]/.test(fullText) || /(?:용어\s*사전|단어\s*설명|용어\s*정의)/.test(fullText)) {
-    return 'yellow';
-  }
-  
-  // 3. 일반 인용구 톤온톤 매핑
-  if (/(주의|경고|위험|금지|부지급|면책)/.test(fullText)) return 'red';
-  if (/(해결|승소|지급|보상|확보)/.test(fullText)) return 'green';
-  if (/(핵심|팁|포인트|체크)/.test(fullText)) return 'yellow';
-  
-  return 'blue';
+// 인용구(Blockquote) 톤 컬러 결정 (blog-tokens 엔진과 100% 통합)
+const getToneColor = (node: React.ReactNode): BlogTone => {
+  const fullText = extractTextFromNode(node).trim();
+  return getTokenTone(fullText);
 };
 
 // 표준 마크다운 컴포넌트 맵 (단일 통합 & 공유)
@@ -125,25 +107,9 @@ export const sharedComponents: Components & Record<string, any> = {
 
   // 헌법 제1조 톤온톤 파스텔 키워드 강조 자동 매핑
   strong: ({ children }) => {
-    const getText = (n: any): string => {
-      if (typeof n === 'string') return n;
-      if (Array.isArray(n)) return n.map(getText).join('');
-      if (n?.props?.children) return getText(n.props.children);
-      return '';
-    };
-    const text = getText(children).trim();
-    
-    let toneClass = 'text-[#1A73E8] dark:text-[#8ab4f8] bg-blue-50 dark:bg-blue-900/20'; // 기본: Blue
-    
-    if (/(거절|면책|부지급|삭감|주의|경고|위험|금지|불리|과실|기왕증|불가|제한|악용|분쟁|소송|실패|거부|위반|처벌|구상|압박|피해)/.test(text)) {
-      toneClass = 'text-[#d93025] dark:text-[#f28b82] bg-red-50 dark:bg-red-900/20'; // Red: 위험/면책/손해
-    } else if (/(지급|보상|합의|성공|가능|해결|유리|승소|안전|권리|인정|전액|확보|부책|방어|수령|구제|무죄)/.test(text)) {
-      toneClass = 'text-[#137333] dark:text-[#81c995] bg-emerald-50 dark:bg-emerald-900/20'; // Green: 승소/해결/권익
-    } else if (/(핵심|중요|필수|확인|점검|기준|원칙|주의사항|팁|노하우|명심|포인트|체크|절차|방법|동선)/.test(text)) {
-      toneClass = 'text-[#e37400] dark:text-[#fde293] bg-amber-50 dark:bg-amber-900/20'; // Amber/Orange: 핵심/체크
-    } else if (/(전문가|손해사정사|손해사정|의학|법률|판례|자문|소견|감정|진단|포렌식|맥브라이드|자배법)/.test(text)) {
-      toneClass = 'text-[#9333ea] dark:text-[#c084fc] bg-purple-50 dark:bg-purple-900/20'; // Purple: 전문성/법리/의학
-    }
+    const text = extractTextFromNode(children).trim();
+    const tone = getKeywordTone(text);
+    const toneClass = BLOG_TONE_TOKENS[tone].tailwind.highlightClass;
 
     return (
       <strong className={`font-bold px-1.5 py-0.5 mx-0.5 rounded-md ${toneClass}`}>
@@ -155,7 +121,9 @@ export const sharedComponents: Components & Record<string, any> = {
   // 헌법 제4조 인라인 용어 사전 및 손해사정사 실무 조언/팁 박스 (CommonBox 일체화)
   blockquote: ({ children }) => {
     const tone = getToneColor(children);
-    const boxHoverBorders: Record<string, string> = {
+    const token = BLOG_TONE_TOKENS[tone].tailwind;
+
+    const boxHoverBorders: Record<BlogTone, string> = {
       blue: 'border-blue-200 dark:border-blue-900/50 hover:border-[var(--google-blue)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.18)]',
       red: 'border-red-200 dark:border-red-900/50 hover:border-[var(--google-red)] hover:shadow-[0_12px_40px_rgba(234,67,53,0.18)]',
       green: 'border-green-200 dark:border-green-900/50 hover:border-[var(--google-green)] hover:shadow-[0_12px_40px_rgba(52,168,83,0.18)]',
@@ -163,7 +131,7 @@ export const sharedComponents: Components & Record<string, any> = {
       purple: 'border-purple-200 dark:border-purple-900/50 hover:border-purple-500 hover:shadow-[0_12px_40px_rgba(168,85,247,0.18)]',
     };
 
-    const headerGradients: Record<string, string> = {
+    const headerGradients: Record<BlogTone, string> = {
       blue: 'from-blue-50/90 to-transparent dark:from-blue-900/25 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40',
       red: 'from-red-50/90 to-transparent dark:from-red-900/25 dark:to-transparent border-b border-red-100 dark:border-red-900/40',
       green: 'from-green-50/90 to-transparent dark:from-green-900/25 dark:to-transparent border-b border-green-100 dark:border-green-900/40',
@@ -171,7 +139,7 @@ export const sharedComponents: Components & Record<string, any> = {
       purple: 'from-purple-50/90 to-transparent dark:from-purple-900/25 dark:to-transparent border-b border-purple-100 dark:border-purple-900/40',
     };
 
-    const titleColors: Record<string, string> = {
+    const titleColors: Record<BlogTone, string> = {
       blue: 'text-[var(--google-blue)] dark:text-blue-400',
       red: 'text-[var(--google-red)] dark:text-red-400',
       green: 'text-[var(--google-green)] dark:text-green-400',

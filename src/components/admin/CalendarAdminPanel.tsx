@@ -44,6 +44,10 @@ export interface ClaimsLedgerData {
   // 4. 날짜별 상담일지 & 진행사항
   progressLogs?: ClaimsProgressEntry[];
   
+  // 5. 기타 사항 및 외부 링크
+  memo?: string; // 기타 상세 실무 메모
+  link?: string; // 구글 드라이브, 클라우드, 웹 링크
+  
   // 기타/호환 필드
   text?: string;
   time?: string;
@@ -672,7 +676,7 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   <h3 className="font-extrabold text-sm text-gray-900 dark:text-white leading-snug">
                     {ev.title}
                   </h3>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-gray-600 dark:text-gray-300">
+                  <div className="flex items-center gap-2 mt-1 text-xs text-gray-600 dark:text-gray-300 flex-wrap">
                     {ledger.phone && (
                       <span className="font-mono font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
                         <AppIcon name="phone" size={12} /> {ledger.phone}
@@ -684,9 +688,22 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                       </span>
                     )}
                     {ledger.diagnosis && (
-                      <span className="truncate text-gray-500 text-[11px]">
+                      <span className="truncate text-gray-500 text-[11px] max-w-[150px]">
                         진단: {ledger.diagnosis}
                       </span>
+                    )}
+                    {ledger.link && (
+                      <a
+                        href={ledger.link.startsWith('http') || ledger.link.startsWith('tel:') ? ledger.link : `https://${ledger.link}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 text-[10.5px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded-none border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-colors shadow-2xs ml-auto"
+                        title="구글 드라이브 / 관련 링크 바로가기"
+                      >
+                        <AppIcon name="link" size={11} />
+                        <span>구글 드라이브 ↗</span>
+                      </a>
                     )}
                   </div>
                 </div>
@@ -714,6 +731,33 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                       {ledger.incomeNote && <div><span className="text-gray-400">소득사항:</span> <b className="text-gray-800 dark:text-gray-200">{ledger.incomeNote}</b></div>}
                       {ledger.insuranceCompany && <div className="col-span-2"><span className="text-gray-400">보험회사:</span> <b className="text-gray-800 dark:text-gray-200">{ledger.insuranceCompany}</b></div>}
                     </div>
+
+                    {ledger.link && (
+                      <div className="p-2 bg-blue-50/80 dark:bg-blue-950/40 rounded-none border border-blue-200 dark:border-blue-800 flex items-center justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-1.5 min-w-0 truncate">
+                          <AppIcon name="link" size={13} className="text-blue-600 shrink-0" />
+                          <span className="font-bold text-blue-900 dark:text-blue-200 shrink-0">구글드라이브/외부링크:</span>
+                          <span className="font-mono text-gray-600 dark:text-zinc-400 truncate text-[11px]">{ledger.link}</span>
+                        </div>
+                        <a
+                          href={ledger.link.startsWith('http') || ledger.link.startsWith('tel:') ? ledger.link : `https://${ledger.link}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2 py-0.5 bg-blue-600 text-white font-bold rounded-none text-[10.5px] shrink-0 hover:bg-blue-700 shadow-2xs"
+                        >
+                          열기 ↗
+                        </a>
+                      </div>
+                    )}
+
+                    {ledger.memo && (
+                      <div className="p-2.5 bg-amber-50/80 dark:bg-amber-950/30 rounded-none border border-amber-200 dark:border-amber-900/50 text-gray-800 dark:text-zinc-200 leading-relaxed text-xs">
+                        <div className="text-[10.5px] font-bold text-amber-800 dark:text-amber-400 mb-0.5 flex items-center gap-1">
+                          <AppIcon name="file-text" size={11} /> 기타 실무 메모
+                        </div>
+                        <div className="whitespace-pre-wrap">{ledger.memo}</div>
+                      </div>
+                    )}
 
                     {ledger.text && (
                       <div className="p-2 bg-white dark:bg-zinc-950 rounded-none border border-gray-200/50 dark:border-zinc-800 text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -1398,16 +1442,53 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                 </div>
               </div>
 
-              {/* 5. 소득사항 / 직업 */}
-              <div>
-                <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">소득사항 / 직업 (휴업손해 산정용)</label>
-                <input
-                  type="text"
-                  value={modalForm.ledger.incomeNote || ''}
-                  onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, incomeNote: e.target.value } }))}
-                  placeholder="예: 급여소득자 월 350만 원 (원천징수 영수증 확보)"
-                  className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none text-xs"
-                />
+              {/* 5. 기타 실무 메모 & 외부 링크 (구글 드라이브 / 관련 링크) */}
+              <div className="p-3 bg-gray-50 dark:bg-zinc-950 rounded-none border border-gray-200 dark:border-zinc-800 space-y-2.5">
+                <div className="font-bold text-gray-800 dark:text-gray-200 text-xs flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <AppIcon name="link" size={14} className="text-blue-600" />
+                    기타 사항 (구글 드라이브 / 참고 링크 & 실무 메모)
+                  </span>
+                  {modalForm.ledger.link && (
+                    <a
+                      href={modalForm.ledger.link.startsWith('http') || modalForm.ledger.link.startsWith('tel:') ? modalForm.ledger.link : `https://${modalForm.ledger.link}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10.5px] text-blue-600 dark:text-blue-400 font-bold underline hover:text-blue-800 flex items-center gap-1"
+                    >
+                      <span>링크 바로 열기 ↗</span>
+                    </a>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 font-bold text-[11px] mb-1">
+                    구글 드라이브 / 외장 클라우드 / 관련 링크 URL
+                  </label>
+                  <input
+                    type="text"
+                    value={modalForm.ledger.link || ''}
+                    onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, link: e.target.value } }))}
+                    placeholder="예: https://drive.google.com/drive/folders/... 또는 관련 링크"
+                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs font-mono text-gray-900 dark:text-white outline-none focus:border-blue-500"
+                  />
+                  <span className="text-[10px] text-gray-400 mt-0.5 block">
+                    * 구글 드라이브 문서/사진 폴더 링크를 입력하면 대장 카드에서 [구글 드라이브 ↗] 버튼으로 즉시 이동합니다.
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 font-bold text-[11px] mb-1">
+                    기타 실무 메모 (자유 기록)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={modalForm.ledger.memo || ''}
+                    onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, memo: e.target.value } }))}
+                    placeholder="손해사정 특이사항, 면담 내용, 추가 참고사항을 자유롭게 입력하세요..."
+                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs text-gray-900 dark:text-white outline-none focus:border-blue-500 custom-scrollbar leading-relaxed"
+                  />
+                </div>
               </div>
 
             </div>

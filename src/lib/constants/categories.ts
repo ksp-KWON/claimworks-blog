@@ -33,7 +33,7 @@ export const COLUMN_CATEGORIES: CategoryMeta[] = [
     name: '질병진단·실손', 
     slug: '질병진단-실손', 
     icon: '🏥', 
-    color: 'bg-blue-500', 
+    color: 'bg-indigo-500', 
     desc: '암, 뇌졸중, 급성심근경색 및 실손 분쟁',
     keywords: ['암', '뇌졸중', '심근경색', '질병']
   },

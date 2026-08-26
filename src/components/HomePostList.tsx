@@ -27,6 +27,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: Omit<Post
         const themeColorMap: Record<string, string> = {
           'bg-[var(--google-blue)]': 'blue',
           'bg-rose-500': 'rose',
+          'bg-indigo-500': 'indigo',
           'bg-blue-500': 'blue',
           'bg-red-500': 'red',
           'bg-green-500': 'green',

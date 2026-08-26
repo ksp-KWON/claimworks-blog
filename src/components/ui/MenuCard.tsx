@@ -4,7 +4,7 @@ import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import AppIcon from '@/components/ui/AppIcon';
 
-export type MenuThemeColor = 'blue' | 'red' | 'green' | 'yellow' | 'purple';
+export type MenuThemeColor = 'blue' | 'red' | 'green' | 'yellow' | 'purple' | 'teal' | 'indigo' | 'rose';
 
 export interface MenuCardProps {
   href?: string;
@@ -36,6 +36,24 @@ const THEME_STYLES: Record<MenuThemeColor, { textIcon: string; badgeBg: string; 
     buttonHoverBg: 'group-hover:bg-green-50 dark:group-hover:bg-green-950/20',
     buttonHoverText: 'group-hover:text-[#137333] dark:group-hover:text-[#81c995]'
   },
+  teal: {
+    textIcon: 'text-teal-600 dark:text-teal-400',
+    badgeBg: 'bg-teal-50 dark:bg-teal-950/20 text-teal-600 dark:text-teal-400 border-teal-100/30 dark:border-teal-950/30',
+    buttonHoverBg: 'group-hover:bg-teal-50 dark:group-hover:bg-teal-950/20',
+    buttonHoverText: 'group-hover:text-teal-600 dark:group-hover:text-teal-400'
+  },
+  indigo: {
+    textIcon: 'text-indigo-600 dark:text-indigo-400',
+    badgeBg: 'bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 border-indigo-100/30 dark:border-indigo-950/30',
+    buttonHoverBg: 'group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/20',
+    buttonHoverText: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+  },
+  rose: {
+    textIcon: 'text-rose-500',
+    badgeBg: 'bg-rose-50 dark:bg-rose-950/20 text-rose-500 dark:text-rose-400 border-rose-100/30 dark:border-rose-950/30',
+    buttonHoverBg: 'group-hover:bg-rose-50 dark:group-hover:bg-rose-950/20',
+    buttonHoverText: 'group-hover:text-rose-500 dark:group-hover:text-rose-400'
+  },
   yellow: {
     textIcon: 'text-[var(--google-yellow)]',
     badgeBg: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 border-yellow-100/30 dark:border-yellow-900/30',
@@ -54,6 +72,9 @@ const bgGradients: Record<string, string> = {
   blue: 'bg-gradient-to-r from-blue-100/80 to-transparent dark:from-blue-900/30 dark:to-transparent',
   red: 'bg-gradient-to-r from-red-100/80 to-transparent dark:from-red-900/30 dark:to-transparent',
   green: 'bg-gradient-to-r from-green-100/80 to-transparent dark:from-green-900/30 dark:to-transparent',
+  teal: 'bg-gradient-to-r from-teal-100/80 to-transparent dark:from-teal-900/30 dark:to-transparent',
+  indigo: 'bg-gradient-to-r from-indigo-100/80 to-transparent dark:from-indigo-900/30 dark:to-transparent',
+  rose: 'bg-gradient-to-r from-rose-100/80 to-transparent dark:from-rose-900/30 dark:to-transparent',
   yellow: 'bg-gradient-to-r from-yellow-100/80 to-transparent dark:from-yellow-900/30 dark:to-transparent',
   purple: 'bg-gradient-to-r from-purple-100/80 to-transparent dark:from-purple-900/30 dark:to-transparent',
 };

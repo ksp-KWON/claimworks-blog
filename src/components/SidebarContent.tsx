@@ -72,7 +72,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     href: '/regions',
     icon: <AppIcon name="compass" size={20} />,
     title: '지역별 의료기관',
-    themeColor: 'green',
+    themeColor: 'teal',
     badgeText: '전국 매핑',
     description: '전국 17개 시/도, 226개 시/군/구별 보상 전문 의료기관 및 협력 병원 정보를 제공합니다.',
     buttonText: '지역별 기관 찾기'

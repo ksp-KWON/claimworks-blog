@@ -19,6 +19,19 @@ export default function PremiumCard({
   watermarkIcon,
   ...props
 }: PremiumCardProps) {
+  // 기본 상태(모바일 포함)에서 시인성을 보장하는 은은한 톤온톤 테두리
+  const baseBorders: Record<BorderColor, string> = {
+    blue: 'border-blue-200/90 dark:border-blue-900/50',
+    red: 'border-red-200/90 dark:border-red-900/50',
+    green: 'border-emerald-200/90 dark:border-emerald-900/50',
+    teal: 'border-teal-200/90 dark:border-teal-900/50',
+    yellow: 'border-amber-200/90 dark:border-amber-900/50',
+    purple: 'border-purple-200/90 dark:border-purple-900/50',
+    rose: 'border-rose-200/90 dark:border-rose-900/50',
+    indigo: 'border-indigo-200/90 dark:border-indigo-900/50',
+    default: 'border-gray-200/80 dark:border-zinc-800'
+  };
+
   // CommonBox와 일치하는 세련된 톤별 호버 글로우 & 보더
   const hoverBorders: Record<BorderColor, string> = {
     blue: 'hover:border-[var(--google-blue)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.18)] dark:hover:shadow-[0_12px_40px_rgba(26,115,232,0.25)]',
@@ -32,7 +45,7 @@ export default function PremiumCard({
     default: 'hover:border-[var(--google-blue)] hover:shadow-[0_12px_40px_rgba(26,115,232,0.18)] dark:hover:shadow-[0_12px_40px_rgba(26,115,232,0.25)]'
   };
 
-  const baseClass = `bg-white dark:bg-[#202124] p-4 sm:p-5 border border-gray-200/80 dark:border-zinc-800 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-200 relative overflow-hidden rounded-none flex flex-col min-h-0 group ${
+  const baseClass = `bg-white dark:bg-[#202124] p-4 sm:p-5 border ${baseBorders[borderColor]} shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-200 relative overflow-hidden rounded-none flex flex-col min-h-0 group ${
     hoverEffect ? hoverBorders[borderColor] : ''
   }`;
 

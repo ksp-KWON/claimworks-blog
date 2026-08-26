@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ sido: str
   const decodedGugun = decodeURIComponent(gugun);
   
   return {
-    title: `${decodedSido} ${decodedGugun} 의료기관 네트워크 - 보상스쿨`,
+    title: `${decodedSido} ${decodedGugun} 의료기관 네트워크 | 보상스쿨`,
     description: `${decodedSido} ${decodedGugun} 지역의 병원 및 의료기관 리스트입니다. 실손, 산재, 교통사고 등 전문 보상 상담을 받아보세요.`,
     alternates: {
       canonical: `https://claim-works.com/regions/${encodeURIComponent(decodedSido)}/${encodeURIComponent(decodedGugun)}`,
@@ -37,8 +37,13 @@ export default async function GugunPage({ params }: { params: Promise<{ sido: st
   const decodedGugun = decodeURIComponent(gugun);
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-      <Suspense fallback={<div className="py-20 text-center"><div className="inline-block w-8 h-8 border-4 border-[var(--google-blue)] border-t-transparent rounded-none animate-spin mb-4" /><p className="text-[#5f6368] font-bold">로딩 중...</p></div>}>
+    <div className="w-full space-y-6">
+      <Suspense fallback={
+        <div className="py-20 text-center">
+          <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-none animate-spin mb-4" />
+          <p className="text-[#5f6368] font-bold">의료기관 데이터를 불러오는 중...</p>
+        </div>
+      }>
         <HospitalDataClient sido={decodedSido} gugun={decodedGugun} />
       </Suspense>
     </div>

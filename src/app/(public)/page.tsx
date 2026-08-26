@@ -3,7 +3,9 @@ import YouTubeBriefing from "@/components/YouTubeBriefing";
 import HomePostList from "@/components/HomePostList";
 import type { Metadata } from "next";
 import Link from "next/link";
+import PremiumCard from "@/components/ui/PremiumCard";
 import PremiumHeading from "@/components/ui/PremiumHeading";
+import PremiumBadge from "@/components/ui/PremiumBadge";
 import AppIcon from "@/components/ui/AppIcon";
 
 export const metadata: Metadata = {
@@ -88,37 +90,48 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
 
-      {/* 유튜브 전문가 브리핑 섹션 (소개글 위쪽 배치) */}
+      {/* 유튜브 전문가 브리핑 섹션 (미디어 센터) */}
       <YouTubeBriefing />
 
-      {/* 보상스쿨 매거진 글로벌 타이틀 (미디어 센터와 대칭 통일) */}
-      <section className="space-y-6 sm:space-y-8">
-        <div className="px-1 sm:px-2">
-          <div className="flex flex-wrap gap-y-2 items-end justify-between mb-3">
+      {/* 보상스쿨 매거진 글로벌 타이틀 (미디어 센터와 대칭 통일된 입체감 있는 블루 파스텔 PremiumCard) */}
+      <section className="space-y-6">
+        <PremiumCard 
+          borderColor="blue" 
+          hoverEffect={false} 
+          watermarkIcon="book" 
+          className="!p-5 sm:!p-7 !bg-gradient-to-r !from-blue-50/90 !via-indigo-50/50 !to-transparent dark:!from-blue-950/40 dark:!via-indigo-950/20 dark:!to-transparent border-blue-200/90 dark:border-blue-900/50"
+        >
+          <div className="relative z-10">
+            <div className="flex items-center justify-between gap-3 mb-2.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <PremiumBadge color="blue">대한민국 최고 손해사정 실무 칼럼</PremiumBadge>
+                <PremiumBadge color="gray">8대 전문 분야 300+ 심층 분석</PremiumBadge>
+              </div>
+              {/* 전체보기 링크 */}
+              <Link 
+                href="/blog" 
+                className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group/link shrink-0"
+              >
+                전체보기
+                <AppIcon name="chevron-right" size={14} className="group-hover/link:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+
             <PremiumHeading 
               level={1} 
               gradient="blue" 
               showLeftBorder={false} 
-              icon={<AppIcon name="book" size={24} className="text-[var(--google-blue)]" />}
-              className="!mb-0 !text-xl sm:!text-2xl"
+              icon={<AppIcon name="book" size={24} className="text-blue-600 dark:text-blue-400 shrink-0" />}
+              className="!mb-2 !text-xl sm:!text-2xl"
             >
               보상스쿨 매거진
             </PremiumHeading>
 
-            {/* 전체보기 링크 */}
-            <Link 
-              href="/blog" 
-              className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-[var(--google-blue)] dark:hover:text-[#8ab4f8] transition-colors group/link shrink-0"
-            >
-              전체보기
-              <AppIcon name="chevron-right" size={14} className="group-hover/link:translate-x-0.5 transition-transform" />
-            </Link>
+            <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
+              사망·후유장해부터 실손·질병 진단까지, 보상스쿨 전문가 그룹의 분야별 보상 가이드와 최신 판례 분석을 전달합니다.
+            </p>
           </div>
-
-          <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
-            사망·후유장해부터 실손·질병 진단까지, 보상스쿨 전문가 그룹의 분야별 보상 가이드와 최신 판례 분석을 전달합니다.
-          </p>
-        </div>
+        </PremiumCard>
 
         {/* 본문 영역: 가이드 카드 격자(Grid) 배치 및 실시간 카테고리 필터링 */}
         <HomePostList initialPosts={posts} />

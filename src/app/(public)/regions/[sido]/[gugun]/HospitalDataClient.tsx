@@ -30,25 +30,38 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
         
         let gugunCode = '';
         const cleanGugun = gugun.replace(/^(인천|대구|광주|대전|울산|부산|서울)\s*/, '');
-        const matchedKeys = Object.keys(gugunCodes)
-          .filter(k => cleanGugun.includes(k) || k.includes(cleanGugun))
-          .sort((a, b) => b.length - a.length);
-          
-        if (matchedKeys.length > 0) {
-          gugunCode = gugunCodes[matchedKeys[0]];
+        
+        // 1. 정확 일치 (Exact Match) 최우선 적용 (예: 수원시 -> 110, 성남시 -> 130)
+        if (gugunCodes[cleanGugun]) {
+          gugunCode = gugunCodes[cleanGugun];
+        } else if (gugunCodes[gugun]) {
+          gugunCode = gugunCodes[gugun];
         } else {
-          for (const [key, code] of Object.entries(gugunCodes)) {
-            if (key.substring(0,2) === cleanGugun.substring(0,2)) {
-              gugunCode = code as string;
-              break;
+          // 2. 일치하는 키가 없는 경우에만 포함 매칭
+          const matchedKeys = Object.keys(gugunCodes)
+            .filter(k => cleanGugun.includes(k) || k.includes(cleanGugun))
+            .sort((a, b) => b.length - a.length);
+            
+          if (matchedKeys.length > 0) {
+            gugunCode = gugunCodes[matchedKeys[0]];
+          } else {
+            for (const [key, code] of Object.entries(gugunCodes)) {
+              if (key.substring(0, 2) === cleanGugun.substring(0, 2)) {
+                gugunCode = code as string;
+                break;
+              }
             }
           }
         }
         
-        if (!gugunCode) throw new Error('Gugun not found');
+        if (!gugunCode) throw new Error(`Gugun not found for ${sido} ${gugun}`);
 
-        const res = await fetch(`/data/hospitals/${sidoCode}-${gugunCode}.json`);
-        if (!res.ok) throw new Error('Fetch failed');
+        let res = await fetch(`/data/hospitals/${sidoCode}-${gugunCode}.json`);
+        // 제주도 호환 폴백 (50 <-> 49)
+        if (!res.ok && sidoCode === '50') {
+          res = await fetch(`/data/hospitals/49-${gugunCode}.json`);
+        }
+        if (!res.ok) throw new Error(`Fetch failed for /data/hospitals/${sidoCode}-${gugunCode}.json`);
         
         const json = await res.json();
         setData(json);

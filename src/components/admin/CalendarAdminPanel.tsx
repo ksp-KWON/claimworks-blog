@@ -1087,27 +1087,87 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
 
             <div className="space-y-4 text-xs">
               
-              {/* 1. 기본 일정 및 고객명 */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="md:col-span-2">
-                  <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">고객명 / 대장 제목 *</label>
-                  <input
-                    type="text"
-                    value={modalForm.title}
-                    onChange={e => setModalForm(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="예: [예약접수] 박선미"
-                    className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none text-xs font-bold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
-                  />
+              {/* 1. 기본 인적 및 접수 정보 */}
+              <div className="p-3 bg-gray-50 dark:bg-zinc-950 rounded-none border border-gray-200 dark:border-zinc-800 space-y-2.5">
+                <div className="font-bold text-gray-800 dark:text-gray-200 text-xs flex items-center gap-1.5">
+                  <AppIcon name="user" size={14} className="text-blue-600" />
+                  고객 및 접수 기본 정보
                 </div>
-                <div>
-                  <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">전화번호</label>
-                  <input
-                    type="text"
-                    value={modalForm.ledger.phone || ''}
-                    onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, phone: e.target.value } }))}
-                    placeholder="010-0000-0000"
-                    className="w-full p-2 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none text-xs font-mono text-gray-900 dark:text-white outline-none"
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <div className="md:col-span-2">
+                    <label className="block font-bold text-gray-700 dark:text-gray-300 text-[11px] mb-1">고객명 / 대장 제목 *</label>
+                    <input
+                      type="text"
+                      value={modalForm.title}
+                      onChange={e => setModalForm(prev => ({ ...prev, title: e.target.value }))}
+                      placeholder="예: [예약접수] 박선미"
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs font-bold text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-gray-700 dark:text-gray-300 text-[11px] mb-1">전화번호</label>
+                    <input
+                      type="text"
+                      value={modalForm.ledger.phone || ''}
+                      onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, phone: e.target.value } }))}
+                      placeholder="010-0000-0000"
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs font-mono text-gray-900 dark:text-white outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+                  <div>
+                    <label className="block text-gray-500 text-[11px] mb-1">생년월일</label>
+                    <input
+                      type="text"
+                      value={modalForm.ledger.birthDate || ''}
+                      onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, birthDate: e.target.value } }))}
+                      placeholder="예: 1985-05-12"
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs font-mono text-gray-900 dark:text-white outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-500 text-[11px] mb-1">성별</label>
+                    <select
+                      value={modalForm.ledger.gender || ''}
+                      onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, gender: (e.target.value as '남' | '여') || undefined } }))}
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs font-bold text-gray-900 dark:text-white outline-none"
+                    >
+                      <option value="">성별 선택</option>
+                      <option value="남">남성 (남)</option>
+                      <option value="여">여성 (여)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-500 text-[11px] mb-1">유입경로</label>
+                    <select
+                      value={modalForm.ledger.inflowPath || '홈페이지'}
+                      onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, inflowPath: e.target.value } }))}
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs font-bold text-gray-900 dark:text-white outline-none"
+                    >
+                      <option value="홈페이지">홈페이지</option>
+                      <option value="1:1채팅">1:1채팅</option>
+                      <option value="블로그">블로그</option>
+                      <option value="전화">전화</option>
+                      <option value="지인소개">지인소개</option>
+                      <option value="기타">기타</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-500 text-[11px] mb-1">소득 / 직업 사항</label>
+                    <input
+                      type="text"
+                      value={modalForm.ledger.incomeNote || ''}
+                      onChange={e => setModalForm(prev => ({ ...prev, ledger: { ...prev.ledger, incomeNote: e.target.value } }))}
+                      placeholder="예: 급여소득자 월 350만"
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-xs text-gray-900 dark:text-white outline-none"
+                    />
+                  </div>
                 </div>
               </div>
 

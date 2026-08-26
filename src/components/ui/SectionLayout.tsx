@@ -20,6 +20,30 @@ interface SectionLayoutProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   children: React.ReactNode;
 }
 
+const gradientBackgrounds: Record<SectionThemeColor, string> = {
+  blue: '!bg-gradient-to-r !from-blue-50/90 !via-indigo-50/40 !to-transparent dark:!from-blue-950/40 dark:!via-indigo-950/20 dark:!to-transparent',
+  rose: '!bg-gradient-to-r !from-rose-50/90 !via-red-50/40 !to-transparent dark:!from-rose-950/40 dark:!via-red-950/20 dark:!to-transparent',
+  red: '!bg-gradient-to-r !from-red-50/90 !via-rose-50/40 !to-transparent dark:!from-red-950/40 dark:!via-rose-950/20 dark:!to-transparent',
+  green: '!bg-gradient-to-r !from-emerald-50/90 !via-teal-50/40 !to-transparent dark:!from-emerald-950/40 dark:!via-teal-950/20 dark:!to-transparent',
+  teal: '!bg-gradient-to-r !from-teal-50/90 !via-emerald-50/40 !to-transparent dark:!from-teal-950/40 dark:!via-emerald-950/20 dark:!to-transparent',
+  indigo: '!bg-gradient-to-r !from-indigo-50/90 !via-blue-50/40 !to-transparent dark:!from-indigo-950/40 dark:!via-blue-950/20 dark:!to-transparent',
+  purple: '!bg-gradient-to-r !from-purple-50/90 !via-indigo-50/40 !to-transparent dark:!from-purple-950/40 dark:!via-indigo-950/20 dark:!to-transparent',
+  yellow: '!bg-gradient-to-r !from-amber-50/90 !via-yellow-50/40 !to-transparent dark:!from-amber-950/40 dark:!via-yellow-950/20 dark:!to-transparent',
+  default: '!bg-gradient-to-r !from-blue-50/90 !via-indigo-50/40 !to-transparent dark:!from-blue-950/40 dark:!via-indigo-950/20 dark:to-transparent'
+};
+
+const hoverColorMap: Record<SectionThemeColor, string> = {
+  blue: 'hover:text-blue-600 dark:hover:text-blue-400',
+  rose: 'hover:text-rose-600 dark:hover:text-rose-400',
+  red: 'hover:text-red-600 dark:hover:text-red-400',
+  green: 'hover:text-emerald-600 dark:hover:text-emerald-400',
+  teal: 'hover:text-teal-600 dark:hover:text-teal-400',
+  indigo: 'hover:text-indigo-600 dark:hover:text-indigo-400',
+  purple: 'hover:text-purple-600 dark:hover:text-purple-400',
+  yellow: 'hover:text-amber-600 dark:hover:text-amber-400',
+  default: 'hover:text-blue-600 dark:hover:text-blue-400'
+};
+
 /**
  * 전역 공통 통합 섹션 컴포넌트
  * 타이틀 박스(PremiumCard)와 하단 컨텐츠 그리드를 일관된 간격(mb-6)으로 연결합니다.
@@ -35,11 +59,18 @@ export default function SectionLayout({
   className = '',
   ...props
 }: SectionLayoutProps) {
+  const gradientClass = gradientBackgrounds[themeColor] || gradientBackgrounds.default;
+  const linkHoverClass = hoverColorMap[themeColor] || hoverColorMap.default;
+
   return (
     <section className={`relative group/section ${className}`} {...props}>
-      {/* 타이틀 박스 영역 */}
-      <PremiumCard borderColor={themeColor} hoverEffect className="mb-6 !p-5 sm:!p-6 group/headerbox">
-        <div className={`flex items-end justify-between ${description ? 'mb-3' : ''} relative z-10 group/header`}>
+      {/* 타이틀 박스 영역 (시그니처 파스텔 톤온톤 그라데이션) */}
+      <PremiumCard 
+        borderColor={themeColor} 
+        hoverEffect={true} 
+        className={`mb-6 !p-5 sm:!p-6 group/headerbox ${gradientClass}`}
+      >
+        <div className={`flex items-end justify-between ${description ? 'mb-2.5' : ''} relative z-10 group/header`}>
           <PremiumHeading 
             level={headingLevel} 
             gradient={themeColor} 
@@ -57,7 +88,7 @@ export default function SectionLayout({
                 href={viewAllLink.href} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className={`flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-${themeColor === 'default' ? 'blue' : themeColor}-500 transition-colors group/link`}
+                className={`flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 dark:text-gray-400 ${linkHoverClass} transition-colors group/link`}
               >
                 {viewAllLink.text || '전체보기'}
                 <AppIcon name="chevron-right" size={14} className="group-hover/link:translate-x-0.5 transition-transform" strokeWidth={2.5} />
@@ -65,7 +96,7 @@ export default function SectionLayout({
             ) : (
               <Link 
                 href={viewAllLink.href}
-                className={`flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-${themeColor === 'default' ? 'blue' : themeColor}-500 transition-colors group/link`}
+                className={`flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 dark:text-gray-400 ${linkHoverClass} transition-colors group/link`}
               >
                 {viewAllLink.text || '전체보기'}
                 <AppIcon name="chevron-right" size={14} className="group-hover/link:translate-x-0.5 transition-transform" strokeWidth={2.5} />

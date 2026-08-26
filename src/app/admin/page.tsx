@@ -362,9 +362,9 @@ export default function AdminPage() {
             </span>
           </div>
 
-          {/* 중앙 검색창 (상담/채팅/원고 관리 시만 표시) */}
+          {/* 중앙 검색창 (상담/채팅/일정/원고 관리 공통 표시) */}
           <div className="flex-1 flex items-center justify-center px-2 min-w-0">
-            {(activeApp === 'consult-manage' || activeApp === 'post-list' || activeApp === 'chat-manage') && (
+            {(activeApp === 'consult-manage' || activeApp === 'post-list' || activeApp === 'chat-manage' || activeApp === 'calendar') && (
               <div className="flex items-center gap-1.5 w-full max-w-xs sm:max-w-sm">
                 <div className="relative flex-1">
                   <svg className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -372,7 +372,12 @@ export default function AdminPage() {
                   </svg>
                   <input
                     type="text"
-                    placeholder="제목/내용 검색..."
+                    placeholder={
+                      activeApp === 'calendar' ? '고객명/전화/진단명 검색...' :
+                      activeApp === 'chat-manage' ? '고객 닉네임/메시지 검색...' :
+                      activeApp === 'consult-manage' ? '고객명/내용/문의 검색...' :
+                      '제목/내용 검색...'
+                    }
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-8 pr-2.5 py-1.5 w-full bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-none text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm font-sans"

@@ -619,13 +619,19 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
               >
                 {/* 카드 상단: 상태, 시간, 버튼 */}
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <span className={`px-2 py-0.5 text-[10px] font-bold rounded-none border ${style.badge}`}>
                       {ev.category || '상담'}
                     </span>
-                    <span className="text-xs font-mono font-bold text-gray-500">
-                      {ev.time || '10:00'}
-                    </span>
+                    {ev.time === '종일' ? (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-none bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-mono">
+                        종일
+                      </span>
+                    ) : (
+                      <span className="text-xs font-mono font-bold text-gray-500 dark:text-zinc-400">
+                        {ev.time || '10:00'}
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-1">
@@ -989,6 +995,12 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
               const isToday = todayStr === day.dateStr;
               const isSunday = idx % 7 === 0;
               const isSaturday = idx % 7 === 6;
+              const hasSearchMatch = Boolean(searchQuery && dayEvents.some(e => 
+                e.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                (e.ledger?.phone || '').includes(searchQuery) ||
+                (e.ledger?.diagnosis || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (e.content || '').toLowerCase().includes(searchQuery.toLowerCase())
+              ));
 
               return (
                 <div
@@ -1000,7 +1012,9 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   className={`min-h-[85px] md:min-h-[100px] p-1.5 md:p-2 cursor-pointer transition-all flex flex-col justify-between ${
                     isSelected 
                       ? 'bg-blue-50/70 dark:bg-blue-950/40 ring-2 ring-blue-500 ring-inset z-10' 
-                      : 'hover:bg-white dark:hover:bg-zinc-900 bg-white/60 dark:bg-zinc-950/60'
+                      : hasSearchMatch
+                        ? 'bg-amber-50/70 dark:bg-amber-950/40 ring-2 ring-amber-400 ring-inset z-10'
+                        : 'hover:bg-white dark:hover:bg-zinc-900 bg-white/60 dark:bg-zinc-950/60'
                   } ${!day.isCurrentMonth ? 'opacity-35' : ''}`}
                 >
                   <div className="flex items-center justify-between">
@@ -1115,13 +1129,55 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
                   </span>
                 </div>
                 <div>
-                  <label className="block font-bold text-blue-900 dark:text-blue-300 mb-1">시간</label>
-                  <input
-                    type="time"
-                    value={modalForm.time}
-                    onChange={e => setModalForm(prev => ({ ...prev, time: e.target.value }))}
-                    className="w-full p-2 bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-none text-xs font-mono text-gray-900 dark:text-white outline-none"
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold text-blue-900 dark:text-blue-300">시간 / 구분</label>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setModalForm(prev => ({ ...prev, time: '09:00' }))}
+                        className={`px-1.5 py-0.5 text-[10px] font-bold rounded-none border transition-colors ${modalForm.time === '09:00' ? 'bg-blue-600 text-white border-blue-600 shadow-2xs' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-zinc-700 hover:bg-blue-50'}`}
+                      >
+                        오전
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setModalForm(prev => ({ ...prev, time: '14:00' }))}
+                        className={`px-1.5 py-0.5 text-[10px] font-bold rounded-none border transition-colors ${modalForm.time === '14:00' ? 'bg-blue-600 text-white border-blue-600 shadow-2xs' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-zinc-700 hover:bg-blue-50'}`}
+                      >
+                        오후
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setModalForm(prev => ({ ...prev, time: '종일' }))}
+                        className={`px-1.5 py-0.5 text-[10px] font-bold rounded-none border transition-colors ${modalForm.time === '종일' ? 'bg-blue-600 text-white border-blue-600 shadow-2xs' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-zinc-700 hover:bg-blue-50'}`}
+                      >
+                        종일
+                      </button>
+                    </div>
+                  </div>
+
+                  {modalForm.time === '종일' ? (
+                    <div className="w-full p-2 bg-blue-100/70 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 rounded-none text-xs font-bold text-blue-800 dark:text-blue-200 flex items-center justify-between">
+                      <span>하루 종일 업무 (시간 미지정)</span>
+                      <button
+                        type="button"
+                        onClick={() => setModalForm(prev => ({ ...prev, time: '14:00' }))}
+                        className="text-[10px] text-blue-600 dark:text-blue-400 underline font-normal"
+                      >
+                        시간 지정
+                      </button>
+                    </div>
+                  ) : (
+                    <input
+                      type="time"
+                      value={modalForm.time}
+                      onChange={e => setModalForm(prev => ({ ...prev, time: e.target.value }))}
+                      className="w-full p-2 bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-none text-xs font-mono text-gray-900 dark:text-white outline-none"
+                    />
+                  )}
+                  <span className="text-[10px] text-gray-400 mt-1 block">
+                    * 오전(09:00), 오후(14:00), 종일 버튼으로 빠르게 설정 가능합니다.
+                  </span>
                 </div>
               </div>
 

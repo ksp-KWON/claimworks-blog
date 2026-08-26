@@ -9,6 +9,7 @@ import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import { AdminStatusSelect } from './AdminStatusSelect';
 import AppIcon from '@/components/ui/AppIcon';
+import { formatAdminDateTime } from '@/lib/admin-utils';
 
 interface SessionWithMeta extends ChatSession {
   last_content?: string;
@@ -358,8 +359,8 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
                         <span className="font-extrabold text-xs text-gray-900 dark:text-gray-100 truncate flex-1">
                           {sess.visitor_nickname || '익명 방문자'}
                         </span>
-                        <span className="text-[10px] text-gray-400 shrink-0 font-mono font-medium">
-                          {new Date(sess.last_message_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        <span className="text-[10.5px] text-gray-400 shrink-0 font-mono font-medium">
+                          {formatAdminDateTime(sess.last_message_at)}
                         </span>
                       </div>
                     </div>

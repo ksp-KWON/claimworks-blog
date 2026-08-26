@@ -9,6 +9,7 @@ import AppIcon from '@/components/ui/AppIcon';
 import { AdminStatusSelect } from './AdminStatusSelect';
 import AdminPanelLayout from './AdminPanelLayout';
 import { AdminTableHeader } from './AdminHeader';
+import { formatAdminDateTime, formatAdminDate } from '@/lib/admin-utils';
 
 interface ConsultationAdminPanelProps {
   isSplitView: boolean;
@@ -151,21 +152,6 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
 
   const handleRowClick = (id: string) => {
     setSelectedId(prev => prev === id ? null : id);
-  };
-
-  const formatDateTime = (dateString: string) => {
-    if (!dateString) return '';
-    const d = new Date(dateString);
-    const MM = String(d.getMonth() + 1).padStart(2, '0');
-    const DD = String(d.getDate()).padStart(2, '0');
-    const HH = String(d.getHours()).padStart(2, '0');
-    const mm = String(d.getMinutes()).padStart(2, '0');
-    return `${MM}.${DD}.${HH}:${mm}`;
-  };
-
-  const formatAccidentDate = (dateString: string) => {
-    if (!dateString) return '';
-    return dateString.replace(/-/g, '.') + '.';
   };
 
   const activeConsultation = consultations.find(c => c.id === selectedId);
@@ -313,7 +299,7 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
                         />
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-xs font-mono font-medium text-gray-500 dark:text-zinc-400 text-center">
-                        {formatDateTime(item.created_at)}
+                        {formatAdminDateTime(item.created_at)}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-center">
                         <div className="flex items-center justify-center gap-2.5 text-xs">
@@ -327,7 +313,7 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
                             <PremiumBadge color="blue" className="!px-2 !py-0.5 !text-[11px] rounded-none whitespace-nowrap">{item.accident_type}</PremiumBadge>
                           </div>
                           <span className="text-gray-500 dark:text-zinc-400 whitespace-nowrap shrink-0 font-mono text-[11px]">
-                            {formatAccidentDate(item.accident_date)}
+                            {formatAdminDate(item.accident_date)}
                           </span>
                           <span className="text-gray-300 dark:text-zinc-700 shrink-0">|</span>
                           <span className="text-gray-500 dark:text-zinc-400 font-bold whitespace-nowrap">장소:</span>
@@ -376,7 +362,7 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
                         onDelete={() => deleteConsultation(item.id)}
                         className="!text-xs !px-2 !py-0.5"
                       />
-                      <span className="text-[11px] font-medium text-gray-400 font-mono shrink-0">{formatDateTime(item.created_at)}</span>
+                      <span className="text-[11px] font-medium text-gray-400 font-mono shrink-0">{formatAdminDateTime(item.created_at)}</span>
                       <div className="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5 ml-auto">
                         {item.name} <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">{item.phone}</span>
                       </div>
@@ -385,7 +371,7 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
                   <div className="bg-gray-50 dark:bg-zinc-950/80 p-2 border border-gray-100 dark:border-zinc-800 rounded-none text-xs text-gray-700 dark:text-zinc-300">
                     <div className="flex items-center gap-2 mb-1">
                       <PremiumBadge color="blue" className="!px-1.5 !py-0.2 !text-[10px] rounded-none">{item.accident_type}</PremiumBadge>
-                      <span className="text-[11px] font-mono">일자 : {formatAccidentDate(item.accident_date)}</span>
+                      <span className="text-[11px] font-mono">일자 : {formatAdminDate(item.accident_date)}</span>
                       <span className="text-gray-300 dark:text-zinc-700">|</span>
                       <span className="text-[11px] truncate max-w-[100px]" title={item.accident_location || '미상'}>장소 : {item.accident_location || '미상'}</span>
                     </div>

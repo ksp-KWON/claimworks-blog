@@ -24,6 +24,7 @@ import {
 } from '@/lib/admin-api';
 import { runAutoGenerationWorkflow, runManualGenerationWorkflow } from '@/lib/auto-writer';
 import { parseMarkdown } from '@/lib/markdown-utils';
+import { authenticateAdmin, checkAdminSession, clearAdminSession, getLockoutState, LockoutState } from '@/lib/admin-auth';
 
 function normalizeCategory(val: string) {
   if (!val) return '보상가이드';
@@ -60,6 +61,8 @@ export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
+  const [lockout, setLockout] = useState<LockoutState>({ isLocked: false, remainingSeconds: 0, failedCount: 0 });
+  const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
 
   // Posting Center Data State
   const [postList, setPostList] = useState<any[]>([]);
@@ -70,25 +73,52 @@ export default function AdminPage() {
   const [geminiKey, setGeminiKey] = useState('');
   const [githubToken, setGithubToken] = useState('');
 
+  // 세션 유효성 및 잠금 상태 초기화
   useEffect(() => {
-    const auth = sessionStorage.getItem('admin_auth');
-    if (auth === 'true') {
+    if (checkAdminSession()) {
       setIsLoggedIn(true);
     }
+    setLockout(getLockoutState());
+
     const savedGemini = localStorage.getItem('gemini_api_key') || '';
     const savedGithub = localStorage.getItem('github_token') || '';
     setGeminiKey(savedGemini);
     setGithubToken(savedGithub);
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  // 잠금 시 1초마다 카운트다운 갱신
+  useEffect(() => {
+    if (!lockout.isLocked) return;
+
+    const timer = setInterval(() => {
+      const state = getLockoutState();
+      setLockout(state);
+      if (!state.isLocked) {
+        setAuthError('');
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [lockout.isLocked]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === '9913006' || passwordInput === '1234' || passwordInput === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
-      sessionStorage.setItem('admin_auth', 'true');
-      setIsLoggedIn(true);
-      setAuthError('');
-    } else {
-      setAuthError('비밀번호가 올바르지 않습니다.');
+    if (!passwordInput.trim() || isAuthSubmitting || lockout.isLocked) return;
+
+    setIsAuthSubmitting(true);
+    try {
+      const result = await authenticateAdmin(passwordInput);
+      setLockout(result.lockoutState);
+
+      if (result.success) {
+        setIsLoggedIn(true);
+        setAuthError('');
+        setPasswordInput('');
+      } else {
+        setAuthError(result.error || '비밀번호가 올바르지 않습니다.');
+      }
+    } finally {
+      setIsAuthSubmitting(false);
     }
   };
 
@@ -330,19 +360,29 @@ export default function AdminPage() {
             <div>
               <input
                 type="password"
-                placeholder="비밀번호 입력"
+                placeholder={lockout.isLocked ? `시스템 잠김 (${lockout.remainingSeconds}초 대기)` : "비밀번호 입력"}
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-sm focus:outline-none focus:ring-2 focus:ring-[var(--google-blue)] transition-all text-center font-mono"
-                autoFocus
+                disabled={lockout.isLocked || isAuthSubmitting}
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none text-sm focus:outline-none focus:ring-2 focus:ring-[var(--google-blue)] disabled:opacity-50 disabled:cursor-not-allowed transition-all text-center font-mono"
+                autoFocus={!lockout.isLocked}
               />
-              {authError && <p className="text-red-500 text-xs mt-2 text-center font-bold">{authError}</p>}
+              {authError && (
+                <div className={`text-xs mt-2.5 p-2 rounded-none border text-center font-bold break-keep ${
+                  lockout.isLocked 
+                    ? 'bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400 animate-pulse' 
+                    : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/50 text-amber-700 dark:text-amber-400'
+                }`}>
+                  {authError}
+                </div>
+              )}
             </div>
             <button
               type="submit"
-              className="w-full py-3 bg-[var(--google-blue)] hover:bg-[#1557b0] text-white font-bold rounded-none text-sm transition-all shadow-[0_8px_20px_rgba(26,115,232,0.3)] active:scale-[0.99]"
+              disabled={lockout.isLocked || isAuthSubmitting || !passwordInput.trim()}
+              className="w-full py-3 bg-[var(--google-blue)] hover:bg-[#1557b0] disabled:bg-gray-400 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white font-bold rounded-none text-sm transition-all shadow-[0_8px_20px_rgba(26,115,232,0.3)] active:scale-[0.99]"
             >
-              로그인
+              {isAuthSubmitting ? '인증 확인 중...' : lockout.isLocked ? `잠금 해제 대기 중 (${lockout.remainingSeconds}s)` : '로그인'}
             </button>
           </form>
         </div>
@@ -454,7 +494,7 @@ export default function AdminPage() {
 
               <button 
                 onClick={() => {
-                  sessionStorage.removeItem('admin_auth');
+                  clearAdminSession();
                   setIsLoggedIn(false);
                 }}
                 className="px-2.5 py-1 rounded-none text-xs font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors border border-transparent hover:border-red-200 dark:hover:border-red-900/50"

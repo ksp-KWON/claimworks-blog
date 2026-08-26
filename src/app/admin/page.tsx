@@ -501,11 +501,18 @@ export default function AdminPage() {
               >
                 로그아웃
               </button>
+
+              <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-0.5" />
+
+              {/* 다크/라이트 테마 토글 버튼 (메뉴 바 일체형) */}
+              <div className="flex items-center justify-center">
+                <ThemeToggle compact />
+              </div>
             </div>
 
-            {/* 다크/라이트 테마 토글 공통 버튼 (모바일/PC 공통) */}
-            <div className="flex items-center shrink-0 border border-gray-200/80 dark:border-zinc-800 bg-gray-50/80 dark:bg-zinc-950 shadow-sm">
-              <ThemeToggle />
+            {/* 모바일 뷰 전용 테마 토글 버튼 */}
+            <div className="flex md:hidden items-center shrink-0 border border-gray-200/80 dark:border-zinc-800 bg-gray-50/80 dark:bg-zinc-950 shadow-sm">
+              <ThemeToggle compact />
             </div>
           </div>
         </div>

@@ -5,7 +5,12 @@ import AppIcon from "@/components/ui/AppIcon";
 
 type Theme = "light" | "dark" | "system";
 
-export default function ThemeToggle() {
+interface ThemeToggleProps {
+  compact?: boolean;
+  className?: string;
+}
+
+export default function ThemeToggle({ compact = false, className = "" }: ThemeToggleProps) {
   const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
@@ -48,14 +53,17 @@ export default function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="w-[36px] h-[36px] sm:w-[42px] sm:h-[42px] rounded-none animate-pulse bg-gray-100 dark:bg-[#202124]" />
+      <div className={compact ? "w-[26px] h-[26px] rounded-none animate-pulse bg-gray-200/60 dark:bg-zinc-800" : "w-[36px] h-[36px] sm:w-[42px] sm:h-[42px] rounded-none animate-pulse bg-gray-100 dark:bg-[#202124]"} />
     );
   }
+
+  const iconSize = compact ? 15 : 20;
+  const paddingClass = compact ? "p-1 sm:p-1.5" : "p-2 sm:p-2.5";
 
   return (
     <button
       onClick={cycleTheme}
-      className="p-2 sm:p-2.5 rounded-none border border-transparent hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 text-[#3c4043] dark:text-[#e8eaed] hover:bg-gradient-to-br hover:from-red-50/50 hover:to-blue-50/50 dark:hover:from-red-900/20 dark:hover:to-blue-900/20 hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:shadow-sm transition-all duration-200 flex items-center justify-center group cursor-pointer"
+      className={`${paddingClass} rounded-none border border-transparent hover:border-[#1a73e8]/30 dark:hover:border-[#8ab4f8]/30 text-[#3c4043] dark:text-[#e8eaed] hover:bg-gradient-to-br hover:from-red-50/50 hover:to-blue-50/50 dark:hover:from-red-900/20 dark:hover:to-blue-900/20 hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:shadow-sm transition-all duration-200 flex items-center justify-center group cursor-pointer ${className}`}
       title={`테마 변경 (현재: ${
         theme === "light" ? "라이트 모드" : theme === "dark" ? "다크 모드" : "시스템 기본값"
       })`}
@@ -63,21 +71,21 @@ export default function ThemeToggle() {
     >
       {/* 라이트 모드 (해 아이콘) */}
       {theme === "light" && (
-        <AppIcon name="sun" size={20} className="transition-transform duration-300 rotate-0 scale-100" />
+        <AppIcon name="sun" size={iconSize} className="transition-transform duration-300 rotate-0 scale-100" />
       )}
 
       {/* 다크 모드 (달 아이콘) */}
       {theme === "dark" && (
-        <AppIcon name="moon" size={20} className="transition-transform duration-300 rotate-0 scale-100" />
+        <AppIcon name="moon" size={iconSize} className="transition-transform duration-300 rotate-0 scale-100" />
       )}
 
       {/* 시스템 기본값 (모니터 아이콘) */}
       {theme === "system" && (
         <div className="relative flex items-center justify-center">
-          <AppIcon name="monitor" size={20} className="transition-transform duration-300 rotate-0 scale-100" />
-          <span className="absolute -top-1 -right-1 flex h-2 w-2">
+          <AppIcon name="monitor" size={iconSize} className="transition-transform duration-300 rotate-0 scale-100" />
+          <span className="absolute -top-1 -right-1 flex h-1.5 w-1.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
           </span>
         </div>
       )}

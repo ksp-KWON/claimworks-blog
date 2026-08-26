@@ -313,24 +313,54 @@ export default function AdminPage() {
   };
 
   const handleRunAutoBatch = async (category: string, autoPublish?: boolean): Promise<boolean> => {
-    if (!geminiKey || !githubToken) {
-      alert('시스템 설정에서 Google Gemini API Key와 GitHub Personal Token을 먼저 설정해주세요.');
+    if (!geminiKey) {
+      alert('시스템 설정에서 Google Gemini API Key를 먼저 설정해주세요.');
       setActiveApp('analytics');
       return false;
     }
     setIsLoading(true);
-    setAutoProgress('자동 글쓰기 파이프라인 시작...');
+    setAutoProgress(`[${category}] 자동 글쓰기 파이프라인 시작...`);
 
     const mode: 'trend' | 'precedent' = (category === '판례·분쟁조정' || category === '판례·법률 해석') ? 'precedent' : 'trend';
 
     try {
-      await runAutoGenerationWorkflow(
+      const finalMarkdown = await runAutoGenerationWorkflow(
         mode,
         geminiKey,
         (msg: string) => setAutoProgress(msg),
         category
       );
-      alert('원고 작성이 완료되었습니다.');
+
+      // Frontmatter와 본문 완벽 분리
+      const { data: meta, content: pureContent } = parseMarkdown(finalMarkdown);
+      
+      const safeSlug = meta.slug || `post-${Date.now()}`;
+      const newPostData = {
+        title: meta.title || '새 문서',
+        summary: meta.summary || '',
+        date: meta.date || new Date().toISOString().split('T')[0],
+        category: normalizeCategory(meta.category || category),
+        specialtyCategory: meta.specialtyCategory || '',
+        caseNumber: meta.caseNumber || '',
+        tags: Array.isArray(meta.tags) ? meta.tags.join(', ') : (meta.tags || ''),
+        content: pureContent,
+        currentSha: null,
+        currentFilename: `${safeSlug}.md`,
+        published: meta.published !== false
+      };
+
+      // 좌측 에디터 상태에 즉시 로드
+      setPostMeta(newPostData);
+
+      // autoPublish가 true이고 GitHub Token이 있으면 즉시 자동 발행 처리
+      if (autoPublish && githubToken) {
+        setAutoProgress('GitHub 원격 저장소에 자동 발행 중...');
+        await savePost(githubToken, newPostData);
+        alert(`[${newPostData.title}]\n원고가 성공적으로 작성 및 공식 발행되었습니다!`);
+      } else {
+        alert(`[${newPostData.title}]\n원고 작성이 완료되어 에디터에 로드되었습니다! 좌측에서 확인 후 '웹사이트 공식 발행하기' 또는 '네이버 서식 복사'를 진행하세요.`);
+      }
+
       return true;
     } catch (e: any) {
       alert(`원고 작성 실패: ${e.message}`);

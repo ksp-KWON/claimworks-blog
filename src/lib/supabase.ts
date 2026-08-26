@@ -41,6 +41,7 @@ export interface Consultation {
   name: string;
   phone: string;
   birth_date?: string;
+  income?: string;
   accident_type: string;
   accident_date: string;
   accident_location: string;

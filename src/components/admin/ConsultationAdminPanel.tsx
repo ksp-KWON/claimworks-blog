@@ -159,19 +159,39 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
   const renderAccordionDetail = () => {
     if (!activeConsultation) return null;
     return (
-      <div className="bg-gradient-to-b from-blue-50/30 to-transparent dark:from-blue-950/20 dark:to-transparent p-3 sm:p-4 border-b border-gray-200/80 dark:border-zinc-800 animate-in slide-in-from-top-2 fade-in duration-200 w-full" onClick={e => e.stopPropagation()}>
+      <div className="bg-gradient-to-b from-blue-50/30 to-transparent dark:from-blue-950/20 dark:to-transparent p-3 sm:p-4 border-b border-gray-200/80 dark:border-zinc-800 animate-in slide-in-from-top-2 fade-in duration-200 w-full space-y-3" onClick={e => e.stopPropagation()}>
+        {/* 사전 분석 핵심 지표 바 (생년월일 / 월 소득) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-white dark:bg-zinc-900 p-2.5 border border-gray-200/80 dark:border-zinc-800 text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-400 font-bold">생년월일:</span>
+            <span className="font-extrabold text-gray-900 dark:text-white font-mono">{activeConsultation.birth_date || '미입력'}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-400 font-bold">월 소득:</span>
+            <span className="font-extrabold text-blue-600 dark:text-blue-400 font-mono">{activeConsultation.income ? `${activeConsultation.income}원` : '미입력'}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-400 font-bold">사고일자:</span>
+            <span className="font-bold text-gray-900 dark:text-white font-mono">{activeConsultation.accident_date || '미상'}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-400 font-bold">사고장소:</span>
+            <span className="font-bold text-gray-900 dark:text-white truncate" title={activeConsultation.accident_location}>{activeConsultation.accident_location || '미상'}</span>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
           <div className="bg-white dark:bg-[#202124] border border-blue-200/80 dark:border-blue-900/50 rounded-none shadow-sm flex flex-col justify-between overflow-hidden">
             <div>
               <div className="px-4 py-2.5 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-blue-100 dark:border-blue-900/30 flex justify-between items-center">
                 <span className="text-xs font-extrabold text-[var(--google-blue)] dark:text-[#8ab4f8] flex items-center gap-1.5">
                   <AppIcon name="car" size={14} className="text-[var(--google-blue)]" />
-                  <span>사고 상세 내용</span>
+                  <span>사고 경위 및 진단 상세</span>
                 </span>
                 <button
                   onClick={() => {
                     const title = `[예약접수] ${activeConsultation.name}`;
-                    const contentText = `연락처: ${activeConsultation.phone}\n사고유형: ${activeConsultation.accident_type}\n사고일자: ${activeConsultation.accident_date}\n진단명: ${activeConsultation.diagnosis}\n\n내용:\n${activeConsultation.content}\n\n문의사항:\n${activeConsultation.inquiry || '-'}`;
+                    const contentText = `연락처: ${activeConsultation.phone}\n생년월일: ${activeConsultation.birth_date || '-'}\n월소득: ${activeConsultation.income || '-'}\n사고유형: ${activeConsultation.accident_type}\n사고일자: ${activeConsultation.accident_date}\n사고장소: ${activeConsultation.accident_location}\n진단명: ${activeConsultation.diagnosis}\n\n내용:\n${activeConsultation.content}\n\n문의사항:\n${activeConsultation.inquiry || '-'}`;
                     const payload = {
                       title,
                       text: contentText,
@@ -181,15 +201,18 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
                     sessionStorage.setItem('pending_calendar_event', JSON.stringify(payload));
                     window.dispatchEvent(new CustomEvent('navigate-admin-app', { detail: { app: 'calendar' } }));
                   }}
-                  className="flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800 hover:bg-blue-50 transition-colors shadow-2xs"
+                  className="flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800 hover:bg-blue-50 transition-colors shadow-2xs cursor-pointer"
                   title="캘린더 일정으로 보내기"
                 >
                   <AppIcon name="calendar" size={12} />
                   <span>일정 등록</span>
                 </button>
               </div>
-              <div className="p-4 text-xs text-gray-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed">
-                {activeConsultation.content || '등록된 상세 내용이 없습니다.'}
+              <div className="p-4 text-xs text-gray-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed space-y-2">
+                <div>
+                  <strong className="text-gray-900 dark:text-white block mb-1">진단 병명: {activeConsultation.diagnosis}</strong>
+                </div>
+                <div>{activeConsultation.content || '등록된 상세 내용이 없습니다.'}</div>
               </div>
             </div>
           </div>
@@ -199,7 +222,7 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
               <div className="px-4 py-2.5 bg-gradient-to-r from-purple-50/80 to-transparent dark:from-purple-900/20 dark:to-transparent border-b border-purple-100 dark:border-purple-900/30 flex justify-between items-center">
                 <span className="text-xs font-extrabold text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
                   <AppIcon name="chat" size={14} className="text-purple-600" />
-                  <span>문의 및 요청사항</span>
+                  <span>고객 문의 및 요청사항</span>
                 </span>
               </div>
               <div className="p-4 text-xs text-gray-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed">
@@ -302,9 +325,18 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
                         {formatAdminDateTime(item.created_at)}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-center">
-                        <div className="flex items-center justify-center gap-2.5 text-xs">
-                          <span className="font-extrabold text-gray-900 dark:text-white w-20 truncate">{item.name}</span>
-                          <span className="text-[var(--google-blue)] dark:text-[#8ab4f8] font-bold font-mono bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800/50">{item.phone}</span>
+                        <div className="flex flex-col items-center justify-center gap-1 text-xs">
+                          <div className="flex items-center gap-2">
+                            <span className="font-extrabold text-gray-900 dark:text-white max-w-[100px] truncate">{item.name}</span>
+                            <span className="text-[var(--google-blue)] dark:text-[#8ab4f8] font-bold font-mono bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-none border border-blue-200 dark:border-blue-800/50">{item.phone}</span>
+                          </div>
+                          {(item.birth_date || item.income) && (
+                            <div className="flex items-center gap-1.5 text-[10.5px] text-gray-500 dark:text-zinc-400 font-mono">
+                              {item.birth_date && <span>{item.birth_date}</span>}
+                              {item.birth_date && item.income && <span>·</span>}
+                              {item.income && <span className="text-emerald-600 dark:text-emerald-400 font-bold">{item.income}원</span>}
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td className="px-4 py-3 max-w-md truncate">
@@ -365,6 +397,11 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
                       <span className="text-[11px] font-medium text-gray-400 font-mono shrink-0">{formatAdminDateTime(item.created_at)}</span>
                       <div className="text-sm font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5 ml-auto">
                         {item.name} <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">{item.phone}</span>
+                        {(item.birth_date || item.income) && (
+                          <span className="text-[10px] text-gray-400 font-mono font-normal">
+                            ({item.birth_date ? `${item.birth_date}` : ''}{item.birth_date && item.income ? ' / ' : ''}{item.income ? `${item.income}원` : ''})
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

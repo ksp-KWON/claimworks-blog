@@ -24,6 +24,7 @@ export default function ConsultationPage() {
     name: '',
     phone: '',
     birth_date: '',
+    income: '',
     accident_type: '교통사고',
     accident_date: '',
     accident_location: '',
@@ -52,22 +53,33 @@ export default function ConsultationPage() {
     setIsSubmitting(true);
     
     try {
-      const { error } = await supabase
-        .from('consultations')
-        .insert([{
-          name: formData.name,
-          phone: formData.phone,
-          birth_date: formData.birth_date || null,
-          accident_type: formData.accident_type,
-          accident_date: formData.accident_date,
-          accident_location: formData.accident_location,
-          diagnosis: formData.diagnosis,
-          content: formData.content,
-          inquiry: formData.inquiry || null,
-          status: '대기'
-        }]);
+      const payload: any = {
+        name: formData.name,
+        phone: formData.phone,
+        birth_date: formData.birth_date || null,
+        income: formData.income || null,
+        accident_type: formData.accident_type,
+        accident_date: formData.accident_date,
+        accident_location: formData.accident_location,
+        diagnosis: formData.diagnosis,
+        content: formData.content,
+        inquiry: formData.inquiry || null,
+        status: '대기'
+      };
 
-      if (error) throw error;
+      let { error } = await supabase.from('consultations').insert([payload]);
+
+      // 만약 DB 스키마에 income 컬럼이 없는 경우의 안전한 Fallback
+      if (error && error.message?.includes('income')) {
+        delete payload.income;
+        if (formData.income) {
+          payload.content = `[사전 소득정보: ${formData.income}]\n` + payload.content;
+        }
+        const retry = await supabase.from('consultations').insert([payload]);
+        if (retry.error) throw retry.error;
+      } else if (error) {
+        throw error;
+      }
       
       // 알림 전송 (에러가 나도 사용자 흐름에는 영향 없도록 catch 처리)
       fetch('/api/push/notify', {
@@ -212,21 +224,42 @@ export default function ConsultationPage() {
             </div>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="birth_date" className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300">
-                생년월일 <span className="text-gray-400 font-normal">(선택)</span>
-              </label>
-              <span className="text-xs text-gray-400 font-medium">대법원 호프만 취업가능연한 산정용</span>
+          {/* 생년월일 & 월 소득 (2열 균형 배치) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="birth_date" className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300">
+                  생년월일 <span className="text-gray-400 font-normal">(선택)</span>
+                </label>
+                <span className="text-[11px] text-gray-400 font-medium">호프만 취업연한 산정용</span>
+              </div>
+              <input 
+                type="date" 
+                name="birth_date" 
+                id="birth_date"
+                className={inputClass}
+                value={formData.birth_date} 
+                onChange={handleChange} 
+              />
             </div>
-            <input 
-              type="date" 
-              name="birth_date" 
-              id="birth_date"
-              className={inputClass}
-              value={formData.birth_date} 
-              onChange={handleChange} 
-            />
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="income" className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300">
+                  월 평균 소득 <span className="text-gray-400 font-normal">(선택)</span>
+                </label>
+                <span className="text-[11px] text-gray-400 font-medium">휴업손해·일실수입 산정용</span>
+              </div>
+              <input 
+                type="text" 
+                name="income" 
+                id="income"
+                className={inputClass}
+                placeholder="예: 3,500,000"
+                value={formData.income} 
+                onChange={handleChange} 
+              />
+            </div>
           </div>
         </PremiumCard>
 

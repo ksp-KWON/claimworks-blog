@@ -289,12 +289,16 @@ const CONTENT_SCHEMA = {
       type: "STRING",
       description: "콘텐츠 작성 시 고려한 W3C 시맨틱 마크다운 위계, 의학/법리 쟁점, 플랫폼별 최적화(구글 E-E-A-T 또는 네이버 D.I.A.+ 공감 스토리텔링) 및 6대 무기 설계 논리 서술 (Chain-of-Thought)"
     },
+    title: {
+      type: "STRING",
+      description: "플랫폼 성격(구글 E-E-A-T 전문성 또는 네이버 D.I.A.+ 공감 스토리텔링)과 본문 핵심 쟁점을 가장 강력하게 후킹하는 SEO 최적화 포스트 최종 완성 제목"
+    },
     markdownContent: {
       type: "STRING",
       description: "글로벌 마크다운 헌법 규칙을 100% 준수한 블로그 본문 마크다운 전문 (Frontmatter 제외)"
     }
   },
-  required: ["thoughtProcess", "markdownContent"]
+  required: ["thoughtProcess", "title", "markdownContent"]
 };
 
 // ── 6. 기획 프롬프트 헬퍼들 ──────────────────────────────────────────
@@ -359,32 +363,39 @@ ${feedbackSection}
 }
 
 
-function getManualPlanningPrompt(arg1, arg2, arg3, arg4) {
-  let topicTitle, rawInput, existingPosts, targetCategory;
+function getManualPlanningPrompt(arg1, arg2, arg3, arg4, arg5) {
+  let topicTitle, rawInput, existingPosts, targetCategory, isNaver;
   if (arguments.length <= 2) {
     rawInput = String(arg1 || '');
     topicTitle = rawInput.slice(0, 60);
     existingPosts = arg2 || '- (없음)';
     targetCategory = '보상가이드';
+    isNaver = false;
   } else {
     topicTitle = arg1 || '';
     rawInput = String(arg2 || '');
     existingPosts = arg3 || '- (없음)';
     targetCategory = arg4 || '보상가이드';
+    isNaver = Boolean(arg5);
   }
 
+  const titleGuideline = isNaver
+    ? "네이버 블로그 D.I.A.+ 독자의 시선을 사로잡는 친근하고 매력적인 후킹 제목 (예: '손목이 저리고 아픈데 산재 될까? 수근관증후군 보상금 완벽 정리')"
+    : "구글 E-E-A-T 검색엔진 최적화 및 전문성을 드러내는 명확하고 권위 있는 칼럼 제목 (예: '수근관증후군 산재 장해등급 판정 및 개인보험 후유장해 보상 기준')";
+
   return `당신은 '보상스쿨'의 최정상 콘텐츠 기획자이자 수석 에디터입니다.
-사용자가 제공한 원문/주제/자료를 바탕으로 블로그 포스팅 기획안을 수립하십시오.
+사용자가 제공한 원문/주제/자료를 바탕으로 블로그 포스팅 기획안 및 최적의 제목을 수립하십시오.
 반드시 **[${targetCategory}]** 카테고리에 맞는 관점으로 기획하세요.
 
-사용자 입력 주제/제목: ${topicTitle}
-사용자 입력 원문/자료 요약: ${rawInput.slice(0, 500)}
+사용자 입력 주제/기존제목: ${topicTitle || '(사용자 미입력 - 원문 내용으로 최적 제목 창작 필요)'}
+사용자 입력 원문/자료 요약: ${rawInput.slice(0, 800)}
 
 기존 슬러그 (중복 금지) : [${existingPosts}]
 
-1. thoughtProcess: 원문의 핵심 메시지를 살려 최상의 SEO 칼럼으로 기획하는 논리
+[기획 핵심 지시사항]
+1. thoughtProcess: 원문의 핵심 메시지를 분석하여 최상의 ${isNaver ? '네이버 D.I.A.+' : '구글 E-E-A-T'} 기획과 제목을 도출하는 논리
 2. slug: 영문 소문자와 하이픈(-)으로 구성된 고유 주소
-3. title: 매력적인 최종 포스트 제목
+3. title: ${titleGuideline}
 4. summary: 150자 이내의 메타 디스크립션 요약문
 5. category: 판례·분쟁조정|사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1개
 6. specialtyCategory: 전문 진료과목

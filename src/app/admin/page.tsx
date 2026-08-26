@@ -282,13 +282,14 @@ export default function AdminPage() {
       return;
     }
     setIsLoading(true);
-    setAutoProgress('AI가 헌법 뼈대에 맞추어 글을 작성 중입니다...');
+    setAutoProgress('AI가 플랫폼 최적화 제목 및 헌법 뼈대에 맞추어 글을 작성 중입니다...');
     try {
       const finalMarkdown = await runManualGenerationWorkflow(
         mode,
         inputText,
         geminiKey,
-        (msg: string) => setAutoProgress(msg)
+        (msg: string) => setAutoProgress(msg),
+        postMeta
       );
 
       // Frontmatter와 본문 완벽 분리
@@ -296,7 +297,7 @@ export default function AdminPage() {
 
       setPostMeta(prev => ({
         ...prev,
-        title: meta.title || prev.title,
+        title: meta.title || prev.title || '새 칼럼 제목',
         summary: meta.summary || prev.summary,
         category: normalizeCategory(meta.category || prev.category),
         specialtyCategory: meta.specialtyCategory || prev.specialtyCategory,

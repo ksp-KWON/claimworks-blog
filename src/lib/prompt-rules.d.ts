@@ -18,7 +18,7 @@ export function getPrecedentPlanningPrompt(
 export function getQueryGenerationPrompt(targetCategory: string, existingTitles: string): string;
 export function getKeywordExtractionPrompt(targetCategory: string, existingTitles: string, headlines: string[]): string;
 export function getNovelTopicPrompt(targetCategory: string, existingTitles: string, retryFeedback?: string): string;
-export function getManualPlanningPrompt(arg1: any, arg2?: any, arg3?: any, arg4?: any): string;
+export function getManualPlanningPrompt(arg1: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any): string;
 export function getRenewalPrompt(currentTitle: string, query: string): string;
 export const TOPIC_SCHEMA: any;
 export const CONTENT_SCHEMA: any;

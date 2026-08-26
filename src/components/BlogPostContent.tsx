@@ -90,7 +90,7 @@ export default function BlogPostContent({ content, relatedPostsNode, authorBioNo
   const faqTargetIdx = N >= 2 ? N - 1 : 0; // 본문 전개의 마지막 직전/직후
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 select-none">
       {/* 1. 핵심 요약 포인트 박스 */}
       {keyPoints.length > 0 && <KeyPointsBox points={keyPoints} />}
 

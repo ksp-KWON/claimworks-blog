@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TailwindSafelist from "@/components/TailwindSafelist";
+import ContentGuard from "@/components/ContentGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -141,6 +142,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-50 transition-colors duration-300 overflow-x-clip">
         <TailwindSafelist />
+        <ContentGuard />
         {children}
       </body>
     </html>

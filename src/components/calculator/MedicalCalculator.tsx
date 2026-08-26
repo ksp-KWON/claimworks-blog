@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Link from 'next/link';
 import { useCalculatorExport } from "@/hooks/useCalculatorExport";
 import AppIcon from '@/components/ui/AppIcon';
 import PremiumHeading from '@/components/ui/PremiumHeading';
@@ -495,13 +496,13 @@ export default function MedicalCalculator() {
       </div>
 
       <div className="space-y-2.5 pt-1">
-        <button
-          onClick={() => { document.getElementById('chat-floating-btn')?.click(); }}
-          className="flex items-center justify-center w-full gap-2 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-emerald-500/20 cursor-pointer"
+        <Link
+          href="/consultation"
+          className="flex items-center justify-center w-full gap-2 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-emerald-500/20 text-center cursor-pointer"
         >
           <AppIcon name="chat" size={20} />
-          실손 부지급 1:1 무료 상담 신청하기
-        </button>
+          <span>실손 부지급 1:1 무료 상담 신청하기</span>
+        </Link>
 
         <div className="grid grid-cols-2 gap-2.5">
           <button

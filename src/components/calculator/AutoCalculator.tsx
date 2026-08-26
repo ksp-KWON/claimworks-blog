@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import { useCalculatorExport } from "@/hooks/useCalculatorExport";
 import { AutoInsuranceData, initialAutoData, INJURY_ALIMONY_TABLE } from './auto/calculator-types';
 import { INJURY_DB } from './auto/injury-db';
@@ -501,13 +502,13 @@ export default function AutoCalculator() {
       </div>
 
       <div className="space-y-2.5 pt-1">
-        <button
-          onClick={() => { document.getElementById('chat-floating-btn')?.click(); }}
-          className="flex items-center justify-center w-full gap-2 py-4 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-blue-500/20 cursor-pointer"
+        <Link
+          href="/consultation"
+          className="flex items-center justify-center w-full gap-2 py-4 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-blue-500/20 text-center cursor-pointer"
         >
           <AppIcon name="chat" size={20} />
-          손해사정사 1:1 무료 상담 신청하기
-        </button>
+          <span>손해사정사 1:1 무료 상담 신청하기</span>
+        </Link>
 
         <div className="grid grid-cols-2 gap-2.5">
           <button

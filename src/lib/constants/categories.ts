@@ -17,7 +17,7 @@ export const COLUMN_CATEGORIES: CategoryMeta[] = [
     name: '판례·분쟁조정', 
     slug: '판례-분쟁조정', 
     icon: '⚖️', 
-    color: 'bg-[var(--google-blue)]', 
+    color: 'bg-blue-600', 
     desc: '대법원 판례 및 금융분쟁조정위원회 결정례',
     keywords: ['판례', '대법원', '분조위', '분쟁조정', '결정례', '소송', '금융감독원', '법률']
   },
@@ -33,7 +33,7 @@ export const COLUMN_CATEGORIES: CategoryMeta[] = [
     name: '질병진단·실손', 
     slug: '질병진단-실손', 
     icon: '🏥', 
-    color: 'bg-indigo-500', 
+    color: 'bg-sky-500', 
     desc: '암, 뇌졸중, 급성심근경색 및 실손 분쟁',
     keywords: ['암', '뇌졸중', '심근경색', '질병']
   },
@@ -41,7 +41,7 @@ export const COLUMN_CATEGORIES: CategoryMeta[] = [
     name: '교통사고 보상', 
     slug: '교통사고-보상', 
     icon: '🚗', 
-    color: 'bg-red-500', 
+    color: 'bg-red-600', 
     desc: '자동차보험 대인배상 및 무보험차상해',
     keywords: ['교통사고', '대인배상', '무보험차', '합의금']
   },
@@ -49,7 +49,7 @@ export const COLUMN_CATEGORIES: CategoryMeta[] = [
     name: '배상책임·의료', 
     slug: '배상책임-의료', 
     icon: '🛡️', 
-    color: 'bg-green-500', 
+    color: 'bg-emerald-600', 
     desc: '일상생활배상책임 및 의료사고 과실',
     keywords: ['배상책임', '의료사고', '일배책', '영업배상', '낙상']
   },
@@ -57,7 +57,7 @@ export const COLUMN_CATEGORIES: CategoryMeta[] = [
     name: '근재·산재 사고', 
     slug: '근재-산재-사고', 
     icon: '👷', 
-    color: 'bg-teal-500', 
+    color: 'bg-orange-500', 
     desc: '산업재해 및 근로자재해보장책임보험',
     keywords: ['산재', '근재', '산업재해', '업무상', '초과손해']
   },
@@ -65,7 +65,7 @@ export const COLUMN_CATEGORIES: CategoryMeta[] = [
     name: '장해평가·면책', 
     slug: '장해평가-면책', 
     icon: '♿', 
-    color: 'bg-purple-500', 
+    color: 'bg-purple-600', 
     desc: 'AMA, 맥브라이드 장해 및 고지의무 위반',
     keywords: ['후유장해', '맥브라이드', 'ama', '면책', '고지의무', '장해']
   },
@@ -73,7 +73,7 @@ export const COLUMN_CATEGORIES: CategoryMeta[] = [
     name: '보상가이드', 
     slug: '보상가이드', 
     icon: '💡', 
-    color: 'bg-yellow-600', 
+    color: 'bg-amber-500', 
     desc: '손해사정 실무 및 보험금 청구 꿀팁',
     keywords: ['꿀팁', '실무', '가이드']
   }

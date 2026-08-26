@@ -24,15 +24,22 @@ export default function HomePostList({ initialPosts }: { initialPosts: Omit<Post
   return (
     <div className="space-y-12 sm:space-y-16">
       {categoriesWithPosts.map(({ category, posts }) => {
-        const themeColorMap: Record<string, string> = {
+        const themeColorMap: Record<string, SectionThemeColor> = {
+          'bg-blue-600': 'blue',
           'bg-[var(--google-blue)]': 'blue',
           'bg-rose-500': 'rose',
-          'bg-indigo-500': 'indigo',
-          'bg-blue-500': 'blue',
+          'bg-sky-500': 'cyan',
+          'bg-cyan-600': 'cyan',
+          'bg-indigo-500': 'cyan',
+          'bg-red-600': 'red',
           'bg-red-500': 'red',
+          'bg-emerald-600': 'green',
           'bg-green-500': 'green',
-          'bg-teal-500': 'teal',
+          'bg-orange-500': 'orange',
+          'bg-teal-500': 'orange',
+          'bg-purple-600': 'purple',
           'bg-purple-500': 'purple',
+          'bg-amber-500': 'yellow',
           'bg-yellow-600': 'yellow'
         };
         const themeColor = themeColorMap[category.color] || 'blue';

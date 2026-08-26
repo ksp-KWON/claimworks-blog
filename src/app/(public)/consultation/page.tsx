@@ -103,7 +103,9 @@ export default function ConsultationPage() {
   };
 
   const inputClass = "w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2.5 px-3.5 text-sm font-bold text-gray-900 dark:text-white rounded-none focus:border-blue-500 focus:outline-none transition-colors placeholder-gray-400";
-  const labelClass = "block text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5";
+  const labelHeaderClass = "flex items-center justify-between h-5 mb-2";
+  const labelTextClass = "text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200 select-none";
+  const labelSubClass = "text-[11px] text-gray-400 dark:text-zinc-500 font-medium select-none";
 
   if (isSuccess) {
     return (
@@ -157,10 +159,15 @@ export default function ConsultationPage() {
         </ol>
       </nav>
 
-      {/* 헤더 배너 */}
-      <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="chat" className="!p-6 sm:!p-8">
+      {/* 헤더 배너 (좌->우 프리미엄 그라데이션 배경) */}
+      <PremiumCard 
+        borderColor="blue" 
+        hoverEffect={true} 
+        watermarkIcon="chat" 
+        className="!p-6 sm:!p-8 !bg-gradient-to-r !from-blue-50/90 !via-indigo-50/70 !to-blue-50/40 dark:!from-blue-950/50 dark:!via-indigo-950/40 dark:!to-blue-950/20 border-blue-200 dark:border-blue-900/60"
+      >
         <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-2.5">
             <PremiumBadge color="blue">국가공인 손해사정사 직접 검토</PremiumBadge>
             <PremiumBadge color="green">100% 비밀 보장</PremiumBadge>
           </div>
@@ -169,7 +176,7 @@ export default function ConsultationPage() {
             gradient="blue" 
             showLeftBorder={false}
             icon={<AppIcon name="chat" size={24} className="text-blue-600 dark:text-blue-400 shrink-0" />}
-            className="!mb-2 !text-2xl sm:!text-3xl"
+            className="!mb-2.5 !text-2xl sm:!text-3xl"
           >
             보상스쿨 1:1 무료 정밀 상담 신청
           </PremiumHeading>
@@ -189,13 +196,17 @@ export default function ConsultationPage() {
               <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded">STEP 01</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">신청인 기본 정보</h2>
             </div>
+            <span className="text-xs text-gray-400 font-medium">기본 인적사항</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="name" className={labelClass}>
-                고객 성함 <span className="text-red-500">*</span>
-              </label>
+              <div className={labelHeaderClass}>
+                <label htmlFor="name" className={labelTextClass}>
+                  고객 성함 <span className="text-red-500">*</span>
+                </label>
+                <span className={labelSubClass}>안심 실명 확인</span>
+              </div>
               <input 
                 type="text" 
                 name="name" 
@@ -207,10 +218,14 @@ export default function ConsultationPage() {
                 onChange={handleChange} 
               />
             </div>
+
             <div>
-              <label htmlFor="phone" className={labelClass}>
-                전화번호 <span className="text-red-500">*</span>
-              </label>
+              <div className={labelHeaderClass}>
+                <label htmlFor="phone" className={labelTextClass}>
+                  전화번호 <span className="text-red-500">*</span>
+                </label>
+                <span className={labelSubClass}>상담 안내용 연락처</span>
+              </div>
               <input 
                 type="tel" 
                 name="phone" 
@@ -227,11 +242,11 @@ export default function ConsultationPage() {
           {/* 생년월일 & 월 소득 (2열 균형 배치) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="birth_date" className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300">
+              <div className={labelHeaderClass}>
+                <label htmlFor="birth_date" className={labelTextClass}>
                   생년월일 <span className="text-gray-400 font-normal">(선택)</span>
                 </label>
-                <span className="text-[11px] text-gray-400 font-medium">호프만 취업연한 산정용</span>
+                <span className={labelSubClass}>호프만 취업연한 산정용</span>
               </div>
               <input 
                 type="date" 
@@ -244,11 +259,11 @@ export default function ConsultationPage() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="income" className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300">
+              <div className={labelHeaderClass}>
+                <label htmlFor="income" className={labelTextClass}>
                   월 평균 소득 <span className="text-gray-400 font-normal">(선택)</span>
                 </label>
-                <span className="text-[11px] text-gray-400 font-medium">휴업손해·일실수입 산정용</span>
+                <span className={labelSubClass}>휴업손해·일실수입 산정용</span>
               </div>
               <input 
                 type="text" 
@@ -275,9 +290,12 @@ export default function ConsultationPage() {
 
           {/* 사고 원인 4대 칩 선택 */}
           <div>
-            <label className={labelClass}>
-              사고 원인 / 분쟁 유형 <span className="text-red-500">*</span>
-            </label>
+            <div className={labelHeaderClass}>
+              <label className={labelTextClass}>
+                사고 원인 / 분쟁 유형 <span className="text-red-500">*</span>
+              </label>
+              <span className={labelSubClass}>손해사정 분야 분류</span>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {ACCIDENT_TYPES.map(type => {
                 const isActive = formData.accident_type === type.id;
@@ -305,11 +323,11 @@ export default function ConsultationPage() {
           {/* 사고 일자 & 사고 장소 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="accident_date" className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300">
+              <div className={labelHeaderClass}>
+                <label htmlFor="accident_date" className={labelTextClass}>
                   사고 일자 <span className="text-red-500">*</span>
                 </label>
-                <span className="text-[11px] text-gray-400">소멸시효(3년) 확인</span>
+                <span className={labelSubClass}>소멸시효(3년) 확인</span>
               </div>
               <input 
                 type="date" 
@@ -323,11 +341,11 @@ export default function ConsultationPage() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="accident_location" className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300">
+              <div className={labelHeaderClass}>
+                <label htmlFor="accident_location" className={labelTextClass}>
                   사고 장소 <span className="text-red-500">*</span>
                 </label>
-                <span className="text-[11px] text-gray-400">과실비율 판단</span>
+                <span className={labelSubClass}>과실비율 판단 기준</span>
               </div>
               <input 
                 type="text" 
@@ -344,11 +362,11 @@ export default function ConsultationPage() {
 
           {/* 진단 병명 */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="diagnosis" className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300">
+            <div className={labelHeaderClass}>
+              <label htmlFor="diagnosis" className={labelTextClass}>
                 진단 병명 <span className="text-red-500">*</span>
               </label>
-              <span className="text-xs text-gray-400 font-medium">질병분류코드·후유장해 판정</span>
+              <span className={labelSubClass}>질병분류코드·후유장해 판정</span>
             </div>
             <input 
               type="text" 
@@ -364,9 +382,12 @@ export default function ConsultationPage() {
 
           {/* 사고 내용 */}
           <div>
-            <label htmlFor="content" className={labelClass}>
-              사고 경위 및 내용 <span className="text-red-500">*</span>
-            </label>
+            <div className={labelHeaderClass}>
+              <label htmlFor="content" className={labelTextClass}>
+                사고 경위 및 내용 <span className="text-red-500">*</span>
+              </label>
+              <span className={labelSubClass}>육하원칙 상세 기재</span>
+            </div>
             <textarea 
               name="content" 
               id="content" 
@@ -381,9 +402,12 @@ export default function ConsultationPage() {
 
           {/* 문의 사항 */}
           <div>
-            <label htmlFor="inquiry" className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300 block mb-1.5">
-              궁금하신 점 / 요청 사항 <span className="text-gray-400 font-normal">(선택)</span>
-            </label>
+            <div className={labelHeaderClass}>
+              <label htmlFor="inquiry" className={labelTextClass}>
+                궁금하신 점 / 요청 사항 <span className="text-gray-400 font-normal">(선택)</span>
+              </label>
+              <span className={labelSubClass}>핵심 쟁점 사전 분석</span>
+            </div>
             <textarea 
               name="inquiry" 
               id="inquiry" 
@@ -398,9 +422,12 @@ export default function ConsultationPage() {
 
         {/* STEP 3: 3대 안심 보장 & 개인정보 수집 동의 */}
         <PremiumCard borderColor="green" hoverEffect={true} className="!p-5 sm:!p-6 space-y-4">
-          <div className="flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-3">
-            <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">STEP 03</span>
-            <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">보상스쿨 3대 고객 안심 보장</h2>
+          <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">STEP 03</span>
+              <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">보상스쿨 3대 고객 안심 보장</h2>
+            </div>
+            <span className="text-xs text-gray-400 font-medium">안심 보안 원칙</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">

@@ -53,13 +53,13 @@ export default function CTABanner() {
           {/* 카드 3: 보상스쿨 소개 */}
           <Link
             href="/about"
-            className="flex items-center gap-3 p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-[0_8px_25px_rgba(26,115,232,0.15)] hover:border-[#1A73E8] hover:bg-gradient-to-br hover:from-blue-50/80 hover:to-indigo-50/80 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10 hover:-translate-y-0.5 transition-all duration-300 group"
+            className="flex items-center gap-3 p-3 rounded-none bg-white dark:bg-[#202124] border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-[0_8px_25px_rgba(147,51,234,0.15)] hover:border-purple-600 dark:hover:border-purple-400 hover:bg-gradient-to-br hover:from-purple-50/80 hover:to-indigo-50/80 dark:hover:from-purple-900/10 dark:hover:to-indigo-900/10 hover:-translate-y-0.5 transition-all duration-300 group"
           >
-            <div className="w-10 h-10 rounded-none bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-[#174ea6]/20 dark:to-indigo-900/40 border border-blue-200 dark:border-indigo-800/30 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-              <AppIcon name="users" size={20} className="text-[var(--google-blue)] dark:text-[#8ab4f8]" />
+            <div className="w-10 h-10 rounded-none bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-[#9333ea]/20 dark:to-indigo-900/40 border border-purple-200 dark:border-purple-800/30 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+              <AppIcon name="users" size={20} className="text-purple-600 dark:text-purple-400" />
             </div>
             <div className="min-w-0 flex-1">
-              <span className="block text-sm font-bold text-[#202124] dark:text-[#e8eaed] truncate group-hover:text-[var(--google-blue)] transition-colors">보상스쿨 소개</span>
+              <span className="block text-sm font-bold text-[#202124] dark:text-[#e8eaed] truncate group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">보상스쿨 소개</span>
               <span className="block text-xs text-[#5f6368] dark:text-[#9aa0a6] truncate mt-0.5">자격 및 경력사항</span>
             </div>
           </Link>

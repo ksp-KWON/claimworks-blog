@@ -154,16 +154,20 @@ export default function LiabilityCalculator() {
       <div className="space-y-4">
         
         {/* [STEP 1] 피해 유형 선택 4단 칩 */}
-        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="scale" className="!p-5 sm:!p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-              <AppIcon name="scale" size={18} className="text-rose-600" />
-              1. 발생한 피해 유형 선택
-            </h2>
-            <span className="text-xs text-gray-400 font-medium">복수 선택 가능</span>
+        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="scale" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+          {/* STEP 1 그라데이션 헤더 바 */}
+          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-rose-50 via-red-50/60 to-transparent dark:from-rose-950/50 dark:via-red-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-rose-200/80 dark:border-rose-800/80">STEP 01</span>
+              <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <AppIcon name="scale" size={16} className="text-rose-600 dark:text-rose-400" />
+                발생한 피해 유형 선택
+              </h2>
+            </div>
+            <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">복수 선택 가능</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
             {[
               { key: 'hasInjury', label: '부상 (상해)', sub: '치료비·휴업손해' },
               { key: 'hasDisability', label: '후유장해', sub: '미래 일실수입' },
@@ -190,16 +194,26 @@ export default function LiabilityCalculator() {
         </PremiumCard>
 
         {/* [STEP 2] 연령, 소득, 과실비율 */}
-        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="chart" className="!p-5 sm:!p-6 space-y-4">
-          <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-            <AppIcon name="chart" size={18} className="text-rose-600" />
-            2. 사고 당시 연령 & 소득 & 과실비율
-          </h2>
+        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="chart" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+          {/* STEP 2 그라데이션 헤더 바 */}
+          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-rose-50 via-red-50/60 to-transparent dark:from-rose-950/50 dark:via-red-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-rose-200/80 dark:border-rose-800/80">STEP 02</span>
+              <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <AppIcon name="chart" size={16} className="text-rose-600 dark:text-rose-400" />
+                사고 당시 연령 & 소득 & 과실비율
+              </h2>
+            </div>
+            <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">소송가액 산정 기초</span>
+          </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 pt-1">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">피해자 연령 (만 나이)</label>
+                <div className="flex items-center justify-between h-5 mb-2">
+                  <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">피해자 연령 (만 나이)</label>
+                  <span className="text-[11px] text-gray-400 font-medium">가동연한(65세)</span>
+                </div>
                 <div className="relative">
                   <input
                     type="number"
@@ -211,7 +225,10 @@ export default function LiabilityCalculator() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">월 평균 소득</label>
+                <div className="flex items-center justify-between h-5 mb-2">
+                  <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">월 평균 소득</label>
+                  <span className="text-[11px] text-gray-400 font-medium">세전 실질소득</span>
+                </div>
                 <div className="relative">
                   <input
                     type="text"
@@ -234,8 +251,8 @@ export default function LiabilityCalculator() {
 
             {/* 과실 비율 퀵 칩 */}
             <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300">본인 과실 비율</label>
+              <div className="flex items-center justify-between h-5 mb-2">
+                <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">본인 과실 비율</label>
                 <span className="text-xs sm:text-sm font-extrabold text-rose-600 dark:text-rose-400">{data.faultRatio}%</span>
               </div>
               <div className="grid grid-cols-5 gap-2">
@@ -259,16 +276,26 @@ export default function LiabilityCalculator() {
 
         {/* [STEP 3] 세부 손해배상 항목 */}
         {(data.hasInjury || data.hasDisability || data.hasDeath || data.hasCare) && (
-          <PremiumCard borderColor="rose" hoverEffect={true} watermarkIcon="crutches" className="!p-5 sm:!p-6 space-y-4 animate-in fade-in duration-200">
-            <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-              <AppIcon name="crutches" size={18} className="text-rose-600" />
-              3. 세부 손해배상 항목 상세 입력
-            </h2>
+          <PremiumCard borderColor="rose" hoverEffect={true} watermarkIcon="crutches" className="!p-5 sm:!p-6 space-y-4 overflow-hidden animate-in fade-in duration-200">
+            {/* STEP 3 그라데이션 헤더 바 */}
+            <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-rose-50 via-amber-50/60 to-transparent dark:from-rose-950/50 dark:via-amber-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-rose-200/80 dark:border-rose-800/80">STEP 03</span>
+                <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
+                  <AppIcon name="crutches" size={16} className="text-rose-600 dark:text-rose-400" />
+                  세부 손해배상 항목 상세 입력
+                </h2>
+              </div>
+              <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">소송 판례 호프만 산출</span>
+            </div>
 
             <div className="space-y-4 pt-1">
               {data.hasInjury && !data.hasDeath && (
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">입원 일수 (휴업손해)</label>
+                  <div className="flex items-center justify-between h-5 mb-2">
+                    <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">입원 일수 (휴업손해)</label>
+                    <span className="text-[11px] text-gray-400 font-medium">100% 실질 손해액</span>
+                  </div>
                   <input
                     type="number"
                     value={data.hospitalDays === 0 ? '0' : (data.hospitalDays || '')}
@@ -282,7 +309,10 @@ export default function LiabilityCalculator() {
               {data.hasDisability && !data.hasDeath && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">노동능력상실률 (%)</label>
+                    <div className="flex items-center justify-between h-5 mb-2">
+                      <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">노동능력상실률 (%)</label>
+                      <span className="text-[11px] text-rose-600 font-bold">맥브라이드 기준</span>
+                    </div>
                     <input
                       type="number"
                       value={data.disabilityRate === 0 ? '0' : (data.disabilityRate || '')}
@@ -292,7 +322,10 @@ export default function LiabilityCalculator() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">장해 기간 (0=영구)</label>
+                    <div className="flex items-center justify-between h-5 mb-2">
+                      <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">장해 기간 (0=영구)</label>
+                      <span className="text-[11px] text-gray-400 font-medium">호프만 적용</span>
+                    </div>
                     <input
                       type="number"
                       value={data.disabilityYears === 0 ? '0' : (data.disabilityYears || '')}
@@ -307,7 +340,10 @@ export default function LiabilityCalculator() {
               {data.hasCare && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">필요 개호인 (명)</label>
+                    <div className="flex items-center justify-between h-5 mb-2">
+                      <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">필요 개호인 (명)</label>
+                      <span className="text-[11px] text-gray-400 font-medium">1일 필요 간병인원</span>
+                    </div>
                     <input
                       type="number"
                       step="0.5"
@@ -318,7 +354,10 @@ export default function LiabilityCalculator() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">개호 기간 (0=여명)</label>
+                    <div className="flex items-center justify-between h-5 mb-2">
+                      <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">개호 기간 (0=여명)</label>
+                      <span className="text-[11px] text-gray-400 font-medium">평생 간병 기간</span>
+                    </div>
                     <input
                       type="number"
                       value={data.careYears === 0 ? '0' : (data.careYears || '')}
@@ -333,7 +372,10 @@ export default function LiabilityCalculator() {
               {/* 기왕/향후 치료비 */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">기왕 치료비 (병원비)</label>
+                  <div className="flex items-center justify-between h-5 mb-2">
+                    <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">기왕 치료비 (병원비)</label>
+                    <span className="text-[11px] text-gray-400 font-medium">실제 지출 치료비</span>
+                  </div>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -344,7 +386,10 @@ export default function LiabilityCalculator() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">향후 치료비 (수술/성형)</label>
+                  <div className="flex items-center justify-between h-5 mb-2">
+                    <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">향후 치료비 (수술/성형)</label>
+                    <span className="text-[11px] text-gray-400 font-medium">추정 향후 수술비</span>
+                  </div>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -361,15 +406,19 @@ export default function LiabilityCalculator() {
       </div>
 
       {/* 3. 📋 세부 손해배상 산출 명세서 (상시 100% 노출) */}
-      <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-6 space-y-4">
-        <div className="flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-3">
-          <AppIcon name="file-text" size={18} className="text-rose-600" />
-          <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
-            세부 손해배상 산출 명세서 & 호프만 법리 공식
-          </h3>
+      <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+        {/* 명세서 그라데이션 헤더 바 */}
+        <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-rose-50 via-red-50/60 to-transparent dark:from-rose-950/50 dark:via-red-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AppIcon name="file-text" size={16} className="text-rose-600 dark:text-rose-400" />
+            <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
+              세부 손해배상 산출 명세서 & 호프만 법리 공식
+            </h3>
+          </div>
+          <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">법원 판례 기준 실시간 연산</span>
         </div>
 
-        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300">
+        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300 pt-1">
           {result.alimony > 0 && (
             <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
               <span className="font-medium">· 정신적 손해 (위자료)</span>

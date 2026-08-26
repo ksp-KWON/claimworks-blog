@@ -174,16 +174,20 @@ export default function AutoCalculator() {
       <div className="space-y-4">
         
         {/* [STEP 1] 피해 유형 선택 */}
-        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="bandaid" className="!p-5 sm:!p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-              <AppIcon name="bandaid" size={18} className="text-blue-600" />
-              1. 발생한 피해 유형 선택
-            </h2>
-            <span className="text-xs text-gray-400 font-medium">복수 선택 가능</span>
+        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="bandaid" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+          {/* STEP 1 그라데이션 헤더 바 */}
+          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-blue-200/80 dark:border-blue-800/80">STEP 01</span>
+              <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <AppIcon name="bandaid" size={16} className="text-blue-600 dark:text-blue-400" />
+                발생한 피해 유형 선택
+              </h2>
+            </div>
+            <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">복수 선택 가능</span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-3 gap-2.5 pt-1">
             {[
               { key: 'hasInjury', label: '부상 (치료)', sub: '입원·통원 치료비', color: 'blue' },
               { key: 'hasDisability', label: '후유장해', sub: '노동력 상실수익액', color: 'purple' },
@@ -209,16 +213,28 @@ export default function AutoCalculator() {
         </PremiumCard>
 
         {/* [STEP 2] 기본 정보 (소득 및 과실) */}
-        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="chart" className="!p-5 sm:!p-6 space-y-4">
-          <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-            <AppIcon name="chart" size={18} className="text-blue-600" />
-            2. 월 소득 및 피해자 과실 비율
-          </h2>
+        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="chart" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+          {/* STEP 2 그라데이션 헤더 바 */}
+          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-blue-200/80 dark:border-blue-800/80">STEP 02</span>
+              <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <AppIcon name="chart" size={16} className="text-blue-600 dark:text-blue-400" />
+                월 소득 및 피해자 과실 비율
+              </h2>
+            </div>
+            <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">손해배상 산정 기초</span>
+          </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 pt-1">
             {/* 소득 입력 & 도시일용 퀵 버튼 */}
             <div>
-              <label className="block text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300 mb-1.5">월 소득 (세전 기준)</label>
+              <div className="flex items-center justify-between h-5 mb-2">
+                <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">
+                  월 소득 <span className="text-gray-400 font-normal">(세전 기준)</span>
+                </label>
+                <span className="text-[11px] text-gray-400 font-medium">일실수입 및 휴업손해 기준</span>
+              </div>
               <div className="flex gap-2.5">
                 <div className="relative flex-1">
                   <input
@@ -242,8 +258,8 @@ export default function AutoCalculator() {
 
             {/* 과실 비율 퀵 칩 */}
             <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs sm:text-[13px] font-bold text-gray-700 dark:text-gray-300">본인 과실 비율</label>
+              <div className="flex items-center justify-between h-5 mb-2">
+                <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">본인 과실 비율</label>
                 <span className="text-xs sm:text-sm font-extrabold text-blue-600 dark:text-blue-400">{data.faultRatio}%</span>
               </div>
               <div className="grid grid-cols-5 gap-2">
@@ -267,17 +283,28 @@ export default function AutoCalculator() {
 
         {/* [STEP 3] 세부 치료 & 장해 내역 */}
         {(data.hasInjury || data.hasDisability || data.hasDeath) && (
-          <PremiumCard borderColor="purple" hoverEffect={true} watermarkIcon="crutches" className="!p-5 sm:!p-6 space-y-4 animate-in fade-in duration-200">
-            <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-              <AppIcon name="crutches" size={18} className="text-purple-600" />
-              3. 세부 치료 및 장해 상세 입력
-            </h2>
+          <PremiumCard borderColor="purple" hoverEffect={true} watermarkIcon="crutches" className="!p-5 sm:!p-6 space-y-4 overflow-hidden animate-in fade-in duration-200">
+            {/* STEP 3 그라데이션 헤더 바 */}
+            <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-purple-50 via-indigo-50/60 to-transparent dark:from-purple-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-purple-100 dark:border-purple-900/40 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold text-purple-600 dark:text-purple-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-purple-200/80 dark:border-purple-800/80">STEP 03</span>
+                <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
+                  <AppIcon name="crutches" size={16} className="text-purple-600 dark:text-purple-400" />
+                  세부 치료 및 장해 상세 입력
+                </h2>
+              </div>
+              <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">의학적 항목 산정</span>
+            </div>
 
             <div className="space-y-4 pt-1">
               {/* 부상 치료 상세 */}
               {data.hasInjury && (
                 <div className="space-y-3 pb-4 border-b border-gray-100 dark:border-zinc-800 last:border-0">
                   <div className="relative" ref={searchRef}>
+                    <div className="flex items-center justify-between h-5 mb-2">
+                      <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">진단명 자동 검색 (약관 상해급수)</label>
+                      <span className="text-[11px] text-gray-400 font-medium">1~14급 자동 매핑</span>
+                    </div>
                     <input
                       type="text"
                       value={searchTerm}
@@ -315,7 +342,10 @@ export default function AutoCalculator() {
 
                   <div className="grid grid-cols-2 gap-3 pt-1">
                     <div>
-                      <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">입원 일수 (휴업손해)</label>
+                      <div className="flex items-center justify-between h-5 mb-2">
+                        <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">입원 일수</label>
+                        <span className="text-[11px] text-gray-400 font-medium">휴업손해(85%)</span>
+                      </div>
                       <input
                         type="number"
                         value={data.hospitalDays || ''}
@@ -325,7 +355,10 @@ export default function AutoCalculator() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">통원 일수 (기타손배금)</label>
+                      <div className="flex items-center justify-between h-5 mb-2">
+                        <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">통원 일수</label>
+                        <span className="text-[11px] text-gray-400 font-medium">기타손배금(8천원)</span>
+                      </div>
                       <input
                         type="number"
                         value={data.outpatientDays || ''}
@@ -342,7 +375,10 @@ export default function AutoCalculator() {
               {data.hasDisability && (
                 <div className="grid grid-cols-2 gap-3 pb-4 border-b border-gray-100 dark:border-zinc-800 last:border-0">
                   <div>
-                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">노동능력상실률 (%)</label>
+                    <div className="flex items-center justify-between h-5 mb-2">
+                      <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">노동능력상실률 (%)</label>
+                      <span className="text-[11px] text-purple-600 font-bold">맥브라이드 장해</span>
+                    </div>
                     <input
                       type="number"
                       min="0"
@@ -354,7 +390,10 @@ export default function AutoCalculator() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">장해 기간 (0=영구)</label>
+                    <div className="flex items-center justify-between h-5 mb-2">
+                      <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">장해 기간 (0=영구)</label>
+                      <span className="text-[11px] text-gray-400 font-medium">호프만 개월수</span>
+                    </div>
                     <input
                       type="number"
                       value={data.disabilityYears || ''}
@@ -369,7 +408,10 @@ export default function AutoCalculator() {
               {/* 직불/향후치료비 */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">직불 치료비</label>
+                  <div className="flex items-center justify-between h-5 mb-2">
+                    <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">직불 치료비</label>
+                    <span className="text-[11px] text-gray-400 font-medium">본인 부담 영수증</span>
+                  </div>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -380,7 +422,10 @@ export default function AutoCalculator() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">향후 치료비</label>
+                  <div className="flex items-center justify-between h-5 mb-2">
+                    <label className="text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200">향후 치료비</label>
+                    <span className="text-[11px] text-gray-400 font-medium">핀제거·성형 등</span>
+                  </div>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -397,15 +442,19 @@ export default function AutoCalculator() {
       </div>
 
       {/* 3. 📋 세부 손해배상 산출 명세서 (상시 100% 노출) */}
-      <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-6 space-y-4">
-        <div className="flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-3">
-          <AppIcon name="file-text" size={18} className="text-blue-600" />
-          <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
-            세부 손해배상 산출 명세서 & 실무 산정 공식
-          </h3>
+      <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+        {/* 명세서 그라데이션 헤더 바 */}
+        <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AppIcon name="file-text" size={16} className="text-blue-600 dark:text-blue-400" />
+            <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
+              세부 손해배상 산출 명세서 & 실무 산정 공식
+            </h3>
+          </div>
+          <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">약관 지급기준 실시간 연산</span>
         </div>
 
-        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300">
+        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300 pt-1">
           {result.alimony > 0 && (
             <div className="flex justify-between py-2 border-b border-gray-100 dark:border-zinc-800/80">
               <span className="font-medium">· {result.appliedAlimonyLabel}</span>

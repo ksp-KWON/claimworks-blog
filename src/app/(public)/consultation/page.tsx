@@ -190,16 +190,20 @@ export default function ConsultationPage() {
       <form onSubmit={handleSubmit} className="space-y-5">
         
         {/* STEP 1: 신청인 기본 정보 */}
-        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-5 sm:!p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
+        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+          {/* STEP 1 그라데이션 제목 헤더 바 */}
+          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded">STEP 01</span>
-              <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">신청인 기본 정보</h2>
+              <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-blue-200/80 dark:border-blue-800/80">STEP 01</span>
+              <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <AppIcon name="user" size={16} className="text-blue-600 dark:text-blue-400" />
+                신청인 기본 정보
+              </h2>
             </div>
-            <span className="text-xs text-gray-400 font-medium">기본 인적사항</span>
+            <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">기본 인적사항</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
             <div>
               <div className={labelHeaderClass}>
                 <label htmlFor="name" className={labelTextClass}>
@@ -279,17 +283,21 @@ export default function ConsultationPage() {
         </PremiumCard>
 
         {/* STEP 2: 사고 및 진단 상세 (손해사정 사전 분석용) */}
-        <PremiumCard borderColor="indigo" hoverEffect={true} className="!p-5 sm:!p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
+        <PremiumCard borderColor="indigo" hoverEffect={true} className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+          {/* STEP 2 그라데이션 제목 헤더 바 */}
+          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-indigo-50 via-purple-50/60 to-transparent dark:from-indigo-950/50 dark:via-purple-950/30 dark:to-transparent border-b border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded">STEP 02</span>
-              <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">사고 및 진단 상세 내용</h2>
+              <span className="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-indigo-200/80 dark:border-indigo-800/80">STEP 02</span>
+              <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <AppIcon name="file-text" size={16} className="text-indigo-600 dark:text-indigo-400" />
+                사고 및 진단 상세 내용
+              </h2>
             </div>
-            <span className="text-xs text-gray-400 font-medium">손해사정 사전 정밀 분석</span>
+            <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">손해사정 사전 정밀 분석</span>
           </div>
 
           {/* 사고 원인 4대 칩 선택 */}
-          <div>
+          <div className="pt-1">
             <div className={labelHeaderClass}>
               <label className={labelTextClass}>
                 사고 원인 / 분쟁 유형 <span className="text-red-500">*</span>
@@ -421,16 +429,20 @@ export default function ConsultationPage() {
         </PremiumCard>
 
         {/* STEP 3: 3대 안심 보장 & 개인정보 수집 동의 */}
-        <PremiumCard borderColor="green" hoverEffect={true} className="!p-5 sm:!p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
+        <PremiumCard borderColor="green" hoverEffect={true} className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+          {/* STEP 3 그라데이션 제목 헤더 바 */}
+          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">STEP 03</span>
-              <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">보상스쿨 3대 고객 안심 보장</h2>
+              <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-emerald-200/80 dark:border-emerald-800/80">STEP 03</span>
+              <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <AppIcon name="shield-check" size={16} className="text-emerald-600 dark:text-emerald-400" />
+                보상스쿨 3대 고객 안심 보장
+              </h2>
             </div>
-            <span className="text-xs text-gray-400 font-medium">안심 보안 원칙</span>
+            <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">안심 보안 원칙</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center pt-1">
             <div className="p-3.5 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1">
               <div className="text-xs sm:text-[13px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
                 <AppIcon name="shield-check" size={15} className="text-emerald-600" />

@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import standardData from '../../../../../../functions/api/taas-standard-data.json';
+import AppIcon from '@/components/ui/AppIcon';
 
 
 interface HospitalDataClientProps {
@@ -189,25 +190,36 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
           </div>
 
           <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-8">
-            <div className="bg-amber-50 dark:bg-amber-900/20 p-6 sm:p-8 rounded-none border border-amber-200 dark:border-amber-800 shadow-[0_8px_30px_rgba(251,191,36,0.15)] flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-white dark:bg-black rounded-full flex items-center justify-center text-amber-600 shadow-md mb-4 border border-amber-100 dark:border-amber-900">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2v20" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                </svg>
+            <div className="bg-blue-50/60 dark:bg-blue-950/20 p-6 sm:p-8 rounded-none border border-blue-200 dark:border-blue-800/60 shadow-[0_8px_30px_rgba(26,115,232,0.08)] flex flex-col items-center text-center">
+              <div className="w-14 h-14 bg-white dark:bg-zinc-900 rounded-none flex items-center justify-center text-[var(--google-blue)] shadow-md mb-4 border border-blue-100 dark:border-blue-800">
+                <AppIcon name="shield-check" size={28} />
               </div>
-              <h3 className="text-lg sm:text-xl font-extrabold text-[#202124] dark:text-[#e8eaed] mb-2">해당 병원 진단/보상 관련 분쟁이 있으신가요?</h3>
+              <h3 className="text-lg sm:text-xl font-extrabold text-[#202124] dark:text-[#e8eaed] mb-2 tracking-tight">
+                치료·진단 후 보험금 청구 및 정당한 보상이 고민되시나요?
+              </h3>
               <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] mb-6 font-medium leading-relaxed max-w-lg">
-                수술/입원 후 보험금 지급 거절, 후유장해 진단서 발급 문제 등 전문가의 도움이 필요하다면 실시간 무료 상담을 신청하세요.
+                병원에서 수술·치료 후 발생하는 실손·진단비 지급 거절, 후유장해 평가, 교통사고·산재 합의금 등 보험회사와의 분쟁에서 독립손해사정사가 정당한 권리를 찾아드립니다.
               </p>
-              <button 
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.dispatchEvent(new CustomEvent('open-chat'));
-                }}
-                className="w-full sm:w-auto px-8 py-3.5 bg-amber-400 hover:bg-amber-500 text-black font-extrabold text-sm transition-all duration-300 shadow-[0_4px_15px_rgba(251,191,36,0.4)] hover:shadow-[0_6px_25px_rgba(251,191,36,0.6)] hover:-translate-y-1 active:translate-y-0 text-center"
-              >
-                보상스쿨 실시간 채팅상담
-              </button>
+              
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.dispatchEvent(new CustomEvent('open-chat'));
+                  }}
+                  className="w-full sm:w-auto px-6 py-3.5 bg-[var(--google-blue)] hover:bg-blue-700 text-white font-extrabold text-sm transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 rounded-none cursor-pointer"
+                >
+                  <AppIcon name="chat" size={16} />
+                  <span>실시간 채팅 상담</span>
+                </button>
+                <Link
+                  href="/consultation"
+                  className="w-full sm:w-auto px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 rounded-none cursor-pointer text-center"
+                >
+                  <AppIcon name="phone" size={16} />
+                  <span>전화 상담 예약 / 접수</span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

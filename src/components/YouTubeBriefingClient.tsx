@@ -76,19 +76,18 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
         </div>
       </PremiumCard>
 
-      {/* 2. 비디오 리스트 레이아웃: 매거진 패밀리룩 2열 입체 인터랙티브 카드 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+      {/* 2. 비디오 리스트 레이아웃: 2열 콤팩트 슬림 입체 인터랙티브 카드 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
         {loading ? (
-          // 로딩 스켈레톤
+          // 로딩 스켈레톤 (슬림형)
           Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-white dark:bg-[#202124] p-4 sm:p-5 border border-gray-100 dark:border-white/10 shadow-[0_10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.6)] space-y-3.5 animate-pulse">
+            <div key={i} className="bg-white dark:bg-[#202124] p-3 sm:p-3.5 border border-gray-200/80 dark:border-zinc-800 shadow-[0_8px_25px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_25px_rgba(0,0,0,0.5)] space-y-2.5 animate-pulse">
               <div className="w-full aspect-video bg-gray-200 dark:bg-zinc-800"></div>
-              <div className="flex justify-between">
-                <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-1/4"></div>
-                <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-1/4"></div>
-              </div>
-              <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-full"></div>
               <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-3/4"></div>
+              <div className="flex justify-between pt-1">
+                <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-1/4"></div>
+                <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-16"></div>
+              </div>
             </div>
           ))
         ) : (
@@ -98,17 +97,17 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
               href={`https://youtu.be/${video.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative flex flex-col justify-between bg-white dark:bg-[#202124] p-4 sm:p-5 border border-gray-100 dark:border-white/10 shadow-[0_10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.6)] hover:border-red-500 hover:shadow-[0_16px_45px_rgba(239,68,68,0.15)] dark:hover:shadow-[0_16px_45px_rgba(239,68,68,0.25)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden outline-none"
+              className="group relative flex flex-col justify-between bg-white dark:bg-[#202124] p-3 sm:p-3.5 border border-gray-200/80 dark:border-zinc-800 shadow-[0_8px_25px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_25px_rgba(0,0,0,0.5)] hover:border-red-500 dark:hover:border-red-500 hover:shadow-[0_14px_35px_rgba(239,68,68,0.12)] dark:hover:shadow-[0_14px_35px_rgba(239,68,68,0.22)] hover:-translate-y-1 transition-all duration-300 overflow-hidden outline-none"
             >
               {/* 좌측 레드 포인트 바 (호버 시 등장) */}
-              <div className="absolute top-0 left-0 w-1.5 h-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-20"></div>
+              <div className="absolute top-0 left-0 w-1 h-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-20"></div>
 
-              {/* 배경 레드 파스텔 그라데이션 (호버 시 부드럽게 전환) */}
-              <div className="absolute inset-0 bg-gradient-to-br from-rose-50/90 via-red-50/40 to-transparent dark:from-rose-950/40 dark:via-red-950/20 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"></div>
+              {/* 배경 레드 파스텔 그라데이션 (호버 시 부드러운 색상 효과) */}
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-50/80 via-red-50/30 to-transparent dark:from-rose-950/30 dark:via-red-950/15 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"></div>
 
-              <div className="relative z-10 space-y-3.5">
-                {/* 16:9 와이드 썸네일 & 팝업 플레이 버튼 */}
-                <div className="relative w-full aspect-video overflow-hidden bg-gray-100 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50 shadow-inner">
+              <div className="relative z-10 space-y-2.5">
+                {/* 16:9 와이드 썸네일 (버블 팝업 없이 깔끔한 줌인 효과) */}
+                <div className="relative w-full aspect-video overflow-hidden bg-gray-100 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50">
                   <Image 
                     src={`https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`} 
                     alt={video.title} 
@@ -116,35 +115,29 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
                     unoptimized
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-black/15 group-hover:bg-black/35 transition-colors duration-300 flex items-center justify-center">
-                    <div className="w-11 h-11 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-110 transition-all duration-300">
-                      <AppIcon name="play" size={20} className="ml-0.5" />
-                    </div>
+                  {/* 우측 상단 슬림 유튜브 뱃지 오버레이 */}
+                  <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-black/70 backdrop-blur-xs text-white text-[9px] font-bold flex items-center gap-1 shadow-sm">
+                    <AppIcon name="youtube" size={11} className="text-red-500" />
+                    <span>영상</span>
                   </div>
                 </div>
 
-                {/* 뱃지 & 날짜 */}
-                <div className="flex items-center justify-between gap-2">
-                  <PremiumBadge color="red">YouTube 브리핑</PremiumBadge>
-                  <time className="text-[11px] sm:text-xs text-[#5f6368] dark:text-[#9aa0a6] font-medium flex items-center gap-1">
-                    <AppIcon name="calendar" size={13} className="text-gray-400" />
-                    <span>{video.published}</span>
-                  </time>
-                </div>
-
-                {/* 영상 제목 */}
-                <h4 className="text-sm sm:text-[15px] font-extrabold text-[#202124] dark:text-[#e8eaed] group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors line-clamp-2 leading-snug break-keep">
+                {/* 영상 제목 (콤팩트 2줄) */}
+                <h4 className="text-xs sm:text-[13.5px] font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors line-clamp-2 leading-snug break-keep">
                   {video.title}
                 </h4>
-              </div>
 
-              {/* 하단 시청하기 바 */}
-              <div className="mt-3.5 pt-3 border-t border-gray-100 dark:border-white/5 flex items-center justify-between text-xs font-bold text-red-600 dark:text-red-400 relative z-10">
-                <span className="text-[11px] text-gray-400 font-normal">보상스쿨 공식 채널</span>
-                <span className="flex items-center gap-1 group-hover:underline">
-                  <span>영상 시청하기</span>
-                  <AppIcon name="chevron-right" size={13} className="group-hover:translate-x-0.5 transition-transform" />
-                </span>
+                {/* 하단 메타데이터 (날짜 + 자세히보기 콤팩트 정렬) */}
+                <div className="flex items-center justify-between text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] pt-0.5">
+                  <time className="flex items-center gap-1">
+                    <AppIcon name="calendar" size={12} className="text-gray-400" />
+                    <span>{video.published}</span>
+                  </time>
+                  <span className="flex items-center gap-0.5 text-red-600 dark:text-red-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>시청</span>
+                    <AppIcon name="chevron-right" size={12} />
+                  </span>
+                </div>
               </div>
             </a>
           ))

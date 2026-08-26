@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useCalculatorExport } from "@/hooks/useCalculatorExport";
 import AppIcon from '@/components/ui/AppIcon';
+import PremiumHeading from '@/components/ui/PremiumHeading';
 
 // ── 데이터 타입 정의 ──
 export type MedicalInsuranceData = {
@@ -33,21 +34,22 @@ const initialMedicalData: MedicalInsuranceData = {
 const CLINIC_DEDUCTION = { clinic: 10000, hospital: 15000, general: 20000 };
 
 const GENERATIONS = [
-  { id: 1, label: '1세대 실손', period: '~2009년 8월', color: '#1A73E8', note: '입원 전액(100%) 보상 / 통원 5천원 공제' },
-  { id: 2, label: '2세대 실손', period: '2009년 10월 ~ 2017년 3월', color: '#137333', note: '급여/비급여 통합 자기부담금 10% 공제' },
-  { id: 3, label: '3세대 실손', period: '2017년 4월 ~ 2021년 6월', color: '#f29900', note: '기본형 10~20%, 3대 비급여 특약 30% 공제' },
-  { id: 4, label: '4세대 실손', period: '2021년 7월 ~ 2026년 4월', color: '#d93025', note: '급여 20%, 비급여 30%, 3대 비급여 특약 30% 공제' },
-  { id: 5, label: '5세대 실손', period: '2026년 5월 ~ 현재', color: '#7C4DFF', note: '급여 20%, 비급여 30%, 비중증(도수 등) 50% 공제' },
+  { id: 1, label: '1세대', period: '~2009.8', note: '입원 100% 보상 / 통원 5천원 공제' },
+  { id: 2, label: '2세대', period: '2009.10~2017.3', note: '급여·비급여 10% 공제' },
+  { id: 3, label: '3세대', period: '2017.4~2021.6', note: '기본 10~20%, 3대비급여 30%' },
+  { id: 4, label: '4세대', period: '2021.7~2026.4', note: '급여 20%, 비급여 30%' },
+  { id: 5, label: '5세대', period: '2026.5~', note: '급여 20%, 비급여 30%, 비중증 50%' },
 ];
 
 const HOSPITAL_TYPES = [
-  { id: 'clinic', label: '의원·클리닉', desc: '동네 병의원, 한의원 (1만 원 공제)' },
-  { id: 'hospital', label: '일반 병원', desc: '30병상 이상 병원급 (1.5만 원 공제)' },
-  { id: 'general', label: '상급·종합병원', desc: '대학병원, 대형 상급종합 (2만 원 공제)' },
+  { id: 'clinic', label: '의원·클리닉 (1만원 공제)' },
+  { id: 'hospital', label: '병원급 (1.5만원 공제)' },
+  { id: 'general', label: '종합·대학병원 (2만원 공제)' },
 ] as const;
 
 export default function MedicalCalculator() {
   const [data, setData] = useState<MedicalInsuranceData>(initialMedicalData);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
   const handleChange = (field: keyof MedicalInsuranceData, value: number | string) => {
@@ -204,349 +206,333 @@ export default function MedicalCalculator() {
   const { exportPDF, shareResult } = useCalculatorExport(resultRef);
 
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+    <div className="w-full space-y-5">
+      {/* 1. 타이틀 헤더 */}
+      <div className="text-center space-y-1.5 mb-2">
+        <PremiumHeading level={1} gradient="green" className="justify-center !text-2xl sm:!text-3xl">
+          실손의료비 보상 계산기
+        </PremiumHeading>
+        <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] max-w-lg mx-auto leading-relaxed">
+          1세대부터 5세대까지 세대별 약관 및 본인부담금을 공제한 예상 실손 보험금입니다.
+        </p>
+      </div>
 
-        {/* ── 좌측: 3-Step 구조화 입력 폼 (5열) ── */}
-        <div className="lg:col-span-5 flex flex-col gap-5">
-          
-          {/* STEP 1: 가입 세대 선택 */}
-          <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-emerald-200/90 dark:border-emerald-900/50 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded">STEP 01</span>
-                <h3 className="text-sm font-extrabold text-gray-900 dark:text-white">실손의료비 가입 세대</h3>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {GENERATIONS.map(gen => {
-                const isActive = data.generation === gen.id;
-                return (
-                  <button
-                    key={gen.id}
-                    onClick={() => handleChange('generation', gen.id)}
-                    className={`flex flex-col p-3 rounded-none border text-left transition-all cursor-pointer ${
-                      isActive
-                        ? 'border-emerald-600 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 shadow-xs font-bold'
-                        : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 hover:bg-gray-100/80 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300'
-                    }`}
-                  >
-                    <div className="flex justify-between items-center w-full mb-0.5">
-                      <span className="font-extrabold text-[13px]">{gen.label}</span>
-                      {isActive && <AppIcon name="check" size={12} className="text-emerald-600 dark:text-emerald-400" />}
-                    </div>
-                    <span className="text-[11px] opacity-75">{gen.period}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="p-3 bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/50 text-[11.5px] font-medium text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
-              <AppIcon name="shield-check" size={14} className="shrink-0 text-emerald-600" />
-              <span>{selectedGen.note}</span>
-            </div>
+      {/* 2. 🏆 상단 실시간 예상 실손금 챔피언 카드 */}
+      <div ref={resultRef} className="bg-gradient-to-br from-emerald-600 to-teal-700 dark:from-emerald-700 dark:to-teal-900 p-6 sm:p-7 text-white shadow-md relative overflow-hidden">
+        <div className="relative z-10 flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <span className="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-xs px-2.5 py-1 text-[11px] font-bold text-white/90 uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
+              실시간 예상 실손 보험금 (추정 수령액)
+            </span>
+            <span className="text-[11px] text-white/70 font-medium">
+              보장 비율 {result.coveragePct}%
+            </span>
           </div>
 
-          {/* STEP 2: 진료 형태 및 병원 규모 */}
-          <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/90 dark:border-zinc-800 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-bold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">STEP 02</span>
-                <h3 className="text-sm font-extrabold text-gray-900 dark:text-white">진료 형태 & 병원 규모</h3>
-              </div>
+          <div className="flex items-end gap-2 mb-4">
+            <div className="text-4xl sm:text-5xl font-black tracking-tight drop-shadow-xs">
+              {result.totalPayout.toLocaleString()}
             </div>
-            
+            <div className="text-xl sm:text-2xl font-bold text-white/90 mb-1">원</div>
+          </div>
+
+          <div className="pt-3 border-t border-white/20 flex flex-wrap items-center justify-between text-xs text-white/80 font-medium gap-2">
+            <div>
+              <span className="text-white/60 mr-1">가입세대:</span>
+              <span className="font-bold text-white">{data.generation}세대 실손</span>
+            </div>
+            <div>
+              <span className="text-white/60 mr-1">진료형태:</span>
+              <span className="font-bold text-white">{data.treatmentType === 'inpatient' ? '입원 치료' : `외래 통원 (${data.outpatientDays}일)`}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. 🛠️ 스마트 인터랙티브 입력 카드 (단일 스트림) */}
+      <div className="space-y-4">
+        
+        {/* [섹션 1] 실손 가입 세대 5단 칩 */}
+        <div className="bg-white dark:bg-[#202124] p-4 sm:p-5 border border-emerald-200/90 dark:border-emerald-900/50 shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+              <AppIcon name="hospital" size={14} className="text-emerald-600" />
+              1. 실손의료비 가입 시기 (세대 선택)
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-5 gap-1.5">
+            {GENERATIONS.map(gen => {
+              const isActive = data.generation === gen.id;
+              return (
+                <button
+                  key={gen.id}
+                  onClick={() => handleChange('generation', gen.id)}
+                  className={`py-2 px-1 text-center border transition-all cursor-pointer ${
+                    isActive
+                      ? 'border-emerald-600 bg-emerald-50/90 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-extrabold shadow-xs'
+                      : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-600 dark:text-zinc-400 hover:bg-gray-100'
+                  }`}
+                >
+                  <div className="text-xs font-bold">{gen.label}</div>
+                  <div className="text-[9.5px] opacity-70 truncate">{gen.period}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="p-2 bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/50 text-[11px] font-medium text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+            <AppIcon name="shield-check" size={13} className="shrink-0 text-emerald-600" />
+            <span>{selectedGen.note}</span>
+          </div>
+        </div>
+
+        {/* [섹션 2] 진료 형태 & 병원 규모 */}
+        <div className="bg-white dark:bg-[#202124] p-4 sm:p-5 border border-gray-200/90 dark:border-zinc-800 shadow-xs space-y-3">
+          <h2 className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+            <AppIcon name="compass" size={14} className="text-emerald-600" />
+            2. 진료 형태 및 방문 병원
+          </h2>
+
+          <div className="space-y-3">
             {/* 입원/통원 2단 탭 */}
-            <div className="grid grid-cols-2 gap-1.5 bg-gray-100 dark:bg-zinc-900 p-1 rounded-none border border-gray-200/80 dark:border-zinc-800">
-              <button 
-                onClick={() => handleChange('treatmentType', 'inpatient')} 
-                className={`py-2 rounded-none text-xs font-bold transition-all cursor-pointer ${
-                  data.treatmentType === 'inpatient' 
-                    ? 'bg-emerald-600 text-white shadow-xs' 
+            <div className="grid grid-cols-2 gap-1.5 bg-gray-100 dark:bg-zinc-900 p-1 border border-gray-200/80 dark:border-zinc-800">
+              <button
+                onClick={() => handleChange('treatmentType', 'inpatient')}
+                className={`py-2 text-xs font-bold transition-all cursor-pointer ${
+                  data.treatmentType === 'inpatient'
+                    ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 입원 치료
               </button>
-              <button 
-                onClick={() => handleChange('treatmentType', 'outpatient')} 
-                className={`py-2 rounded-none text-xs font-bold transition-all cursor-pointer ${
-                  data.treatmentType === 'outpatient' 
-                    ? 'bg-emerald-600 text-white shadow-xs' 
+              <button
+                onClick={() => handleChange('treatmentType', 'outpatient')}
+                className={`py-2 text-xs font-bold transition-all cursor-pointer ${
+                  data.treatmentType === 'outpatient'
+                    ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                통원 (외래 진료)
+                외래 통원
               </button>
             </div>
 
-            {/* 통원 시 일수 및 병원규모 */}
+            {/* 통원 시 일수 및 병원 선택 */}
             {data.treatmentType === 'outpatient' && (
-              <div className="space-y-4 pt-1 animate-in fade-in duration-150">
-                <div>
-                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1.5">통원(방문) 일수</label>
-                  <div className="flex items-center gap-2">
-                    <button 
-                      onClick={() => handleChange('outpatientDays', Math.max(1, data.outpatientDays - 1))} 
-                      className="w-10 h-10 bg-gray-100 dark:bg-zinc-800 rounded-none flex items-center justify-center font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-200 cursor-pointer"
+              <div className="space-y-2.5 pt-1 animate-in fade-in duration-150">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-[11px] font-medium text-gray-500">통원 일수</label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => handleChange('outpatientDays', Math.max(1, data.outpatientDays - 1))}
+                      className="w-8 h-8 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-xs hover:bg-gray-200 cursor-pointer"
                     >
                       -
                     </button>
-                    <div className="relative flex-1">
-                      <input 
-                        type="number" 
-                        value={data.outpatientDays || ''} 
-                        onChange={e => handleChange('outpatientDays', Math.max(1, Number(e.target.value)))} 
-                        className="w-full text-center bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none h-10 font-bold text-sm focus:border-emerald-500 focus:outline-none" 
-                      />
-                      <span className="absolute right-3 top-2.5 text-xs font-bold text-gray-400">일</span>
-                    </div>
-                    <button 
-                      onClick={() => handleChange('outpatientDays', data.outpatientDays + 1)} 
-                      className="w-10 h-10 bg-gray-100 dark:bg-zinc-800 rounded-none flex items-center justify-center font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-200 cursor-pointer"
+                    <span className="w-12 text-center text-xs font-black">{data.outpatientDays}일</span>
+                    <button
+                      onClick={() => handleChange('outpatientDays', data.outpatientDays + 1)}
+                      className="w-8 h-8 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-xs hover:bg-gray-200 cursor-pointer"
                     >
                       +
                     </button>
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1.5">방문 병원 규모</label>
-                  <div className="grid grid-cols-1 gap-1.5">
-                    {HOSPITAL_TYPES.map(ht => {
-                      const isActive = data.clinicType === ht.id;
-                      return (
-                        <button 
-                          key={ht.id} 
-                          onClick={() => handleChange('clinicType', ht.id)} 
-                          className={`flex items-center justify-between p-2.5 rounded-none border transition-all text-left cursor-pointer ${
-                            isActive 
-                              ? 'border-emerald-600 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold' 
-                              : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-gray-300 hover:bg-gray-100'
-                          }`}
-                        >
-                          <div className="text-xs">
-                            <span className="font-extrabold mr-1">{ht.label}</span>
-                            <span className="opacity-70 text-[11px]">({ht.desc})</span>
-                          </div>
-                          {isActive && <AppIcon name="check" size={12} className="text-emerald-600 shrink-0" />}
-                        </button>
-                      );
-                    })}
+                <div className="grid grid-cols-3 gap-1.5">
+                  {HOSPITAL_TYPES.map(ht => {
+                    const isActive = data.clinicType === ht.id;
+                    return (
+                      <button
+                        key={ht.id}
+                        onClick={() => handleChange('clinicType', ht.id)}
+                        className={`p-2 text-center border transition-all cursor-pointer ${
+                          isActive
+                            ? 'border-emerald-600 bg-emerald-50/90 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 font-bold'
+                            : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-600 dark:text-zinc-400 hover:bg-gray-100'
+                        }`}
+                      >
+                        <div className="text-[11px] leading-tight">{ht.label}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* [섹션 3] 발생 진료비 입력 */}
+        <div className="bg-white dark:bg-[#202124] p-4 sm:p-5 border border-gray-200/90 dark:border-zinc-800 shadow-xs space-y-3">
+          <h2 className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+            <AppIcon name="file-text" size={14} className="text-emerald-600" />
+            3. 병원 영수증 발생 금액 입력
+          </h2>
+
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[10.5px] text-gray-500 mb-1">급여 (본인부담금)</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={data.coveredCost ? fmt(data.coveredCost) : ''}
+                    onChange={e => handleChange('coveredCost', parse(e.target.value))}
+                    placeholder="0"
+                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1.5 px-2.5 pr-6 text-xs font-bold focus:border-emerald-500 focus:outline-none"
+                  />
+                  <span className="absolute right-2 top-2 text-[10.5px] text-gray-400">원</span>
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10.5px] text-gray-500 mb-1">비급여 (일반)</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={data.nonCoveredCost ? fmt(data.nonCoveredCost) : ''}
+                    onChange={e => handleChange('nonCoveredCost', parse(e.target.value))}
+                    placeholder="0"
+                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1.5 px-2.5 pr-6 text-xs font-bold focus:border-emerald-500 focus:outline-none"
+                  />
+                  <span className="absolute right-2 top-2 text-[10.5px] text-gray-400">원</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 3~5세대 3대 비급여 특약 */}
+            {data.generation >= 3 && (
+              <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 space-y-2">
+                <span className="text-[10.5px] font-bold text-rose-600 dark:text-rose-400">3대 비급여 특약 (해당 시 입력)</span>
+                <div className="grid grid-cols-3 gap-1.5">
+                  <div>
+                    <label className="block text-[10px] text-gray-500 mb-0.5">도수/체외충격파</label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={data.manualTherapyCost ? fmt(data.manualTherapyCost) : ''}
+                      onChange={e => handleChange('manualTherapyCost', parse(e.target.value))}
+                      placeholder="0"
+                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1 px-2 text-[11px] font-bold focus:border-emerald-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-gray-500 mb-0.5">비급여 주사료</label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={data.injectionCost ? fmt(data.injectionCost) : ''}
+                      onChange={e => handleChange('injectionCost', parse(e.target.value))}
+                      placeholder="0"
+                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1 px-2 text-[11px] font-bold focus:border-emerald-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-gray-500 mb-0.5">비급여 MRI/MRA</label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={data.mriCost ? fmt(data.mriCost) : ''}
+                      onChange={e => handleChange('mriCost', parse(e.target.value))}
+                      placeholder="0"
+                      className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1 px-2 text-[11px] font-bold focus:border-emerald-500 focus:outline-none"
+                    />
                   </div>
                 </div>
               </div>
             )}
           </div>
-
-          {/* STEP 3: 발생 진료비 입력 */}
-          <div className="bg-white dark:bg-[#202124] p-5 sm:p-6 border border-gray-200/90 dark:border-zinc-800 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded">STEP 03</span>
-                <h3 className="text-sm font-extrabold text-gray-900 dark:text-white">진료비 영수증 금액 입력</h3>
-              </div>
-            </div>
-            
-            <div className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1.5">급여 (본인부담금)</label>
-                <div className="relative">
-                  <input 
-                    type="text" 
-                    inputMode="numeric" 
-                    value={data.coveredCost ? fmt(data.coveredCost) : ''} 
-                    onChange={e => handleChange('coveredCost', parse(e.target.value))} 
-                    placeholder="0" 
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2.5 pl-3.5 pr-10 text-[14px] font-bold focus:border-emerald-500 focus:outline-none transition-all" 
-                  />
-                  <span className="absolute right-3.5 top-3 text-[12px] text-gray-400 font-bold">원</span>
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1.5">비급여 (일반 비급여)</label>
-                <div className="relative">
-                  <input 
-                    type="text" 
-                    inputMode="numeric" 
-                    value={data.nonCoveredCost ? fmt(data.nonCoveredCost) : ''} 
-                    onChange={e => handleChange('nonCoveredCost', parse(e.target.value))} 
-                    placeholder="0" 
-                    className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2.5 pl-3.5 pr-10 text-[14px] font-bold focus:border-emerald-500 focus:outline-none transition-all" 
-                  />
-                  <span className="absolute right-3.5 top-3 text-[12px] text-gray-400 font-bold">원</span>
-                </div>
-              </div>
-
-              {/* 3~5세대 3대 비급여 특약 */}
-              {data.generation >= 3 && (
-                <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 space-y-3">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-1.5 py-0.5 rounded">특약</span>
-                    <h4 className="text-xs font-bold text-gray-900 dark:text-white">3대 비급여 특약 병원비</h4>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                    <div>
-                      <label className="block text-[11px] font-medium text-gray-500 mb-1">도수/체외충격파</label>
-                      <input 
-                        type="text" 
-                        inputMode="numeric" 
-                        value={data.manualTherapyCost ? fmt(data.manualTherapyCost) : ''} 
-                        onChange={e => handleChange('manualTherapyCost', parse(e.target.value))} 
-                        placeholder="0" 
-                        className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2 px-2.5 text-[12px] font-bold focus:border-emerald-500 focus:outline-none" 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-medium text-gray-500 mb-1">비급여 주사료</label>
-                      <input 
-                        type="text" 
-                        inputMode="numeric" 
-                        value={data.injectionCost ? fmt(data.injectionCost) : ''} 
-                        onChange={e => handleChange('injectionCost', parse(e.target.value))} 
-                        placeholder="0" 
-                        className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2 px-2.5 text-[12px] font-bold focus:border-emerald-500 focus:outline-none" 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-medium text-gray-500 mb-1">비급여 MRI/MRA</label>
-                      <input 
-                        type="text" 
-                        inputMode="numeric" 
-                        value={data.mriCost ? fmt(data.mriCost) : ''} 
-                        onChange={e => handleChange('mriCost', parse(e.target.value))} 
-                        placeholder="0" 
-                        className="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-none py-2 px-2.5 text-[12px] font-bold focus:border-emerald-500 focus:outline-none" 
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
         </div>
+      </div>
 
-        {/* ── 우측: 실시간 실손 보상금 명세서 (7열, 스티키 고정) ── */}
-        <div className="lg:col-span-7 lg:sticky lg:top-[100px] flex flex-col gap-4">
-          
-          <div className="bg-gray-100 dark:bg-zinc-900 px-5 py-3.5 border border-gray-200 dark:border-zinc-800 flex items-center gap-2.5">
-            <AppIcon name="hospital" size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <div>
-              <h2 className="text-sm font-extrabold text-gray-900 dark:text-white">실손의료비 예상 산출 명세서</h2>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">입력하신 세대별 약관 및 본인부담금 공제 후 예상액입니다.</p>
-            </div>
+      {/* 4. 📋 접이식 세부 산출 명세서 아코디언 */}
+      <div className="bg-white dark:bg-[#202124] border border-gray-200 dark:border-zinc-800 shadow-xs overflow-hidden">
+        <button
+          onClick={() => setIsDetailOpen(!isDetailOpen)}
+          className="w-full flex items-center justify-between p-4 bg-gray-50/80 dark:bg-zinc-900/80 hover:bg-gray-100 transition-colors text-left cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <AppIcon name="file-text" size={16} className="text-emerald-600" />
+            <span className="text-xs sm:text-sm font-extrabold text-gray-900 dark:text-white">
+              세부 공제 내역 및 약관 공식 {isDetailOpen ? '접기' : '확인하기'}
+            </span>
           </div>
+          <span className="text-xs text-gray-400 font-bold">
+            {isDetailOpen ? '▲' : '▼'}
+          </span>
+        </button>
 
-          <div ref={resultRef} className="flex flex-col gap-4">
-            {/* 최종 수령액 챔피언 카드 */}
-            <div className="bg-gradient-to-br from-emerald-600 to-teal-700 dark:from-emerald-700 dark:to-teal-900 p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-              <div className="relative z-10 flex flex-col justify-between">
-                <div>
-                  <div className="inline-flex items-center gap-1.5 bg-black/20 backdrop-blur-xs px-2.5 py-1 rounded-none text-[10.5px] font-bold text-white/90 uppercase tracking-wider mb-3">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
-                    예상 실손 보험금 (공제 후 수령액)
-                  </div>
-                  <div className="flex items-end gap-2 mb-2">
-                    <div className="text-4xl sm:text-5xl font-black tracking-tight">
-                      {result.totalPayout.toLocaleString()}
-                    </div>
-                    <div className="text-xl font-bold text-white/90 mb-1">원</div>
-                  </div>
-                </div>
-                
-                <div className="mt-6 pt-4 border-t border-white/20 flex flex-wrap gap-4 text-[12px] font-medium text-white/90">
-                  <div><span className="text-white/60 mr-1">가입세대:</span><span className="font-bold">{data.generation}세대 실손</span></div>
-                  <div><span className="text-white/60 mr-1">진료구분:</span><span className="font-bold">{data.treatmentType === 'inpatient' ? '입원' : `통원(${data.outpatientDays}일)`}</span></div>
-                  <div><span className="text-white/60 mr-1">보장비율:</span><span className="bg-white/25 px-1.5 py-0.5 rounded text-white font-bold">{result.coveragePct}%</span></div>
-                </div>
+        {isDetailOpen && (
+          <div className="p-4 sm:p-5 space-y-3 text-xs border-t border-gray-100 dark:border-zinc-800 animate-in fade-in duration-150">
+            <div className="space-y-2 text-gray-600 dark:text-gray-300">
+              <div className="flex justify-between py-1 border-b border-gray-100 dark:border-zinc-800">
+                <span>· 총 발생 의료비</span>
+                <span className="font-bold text-gray-900 dark:text-white">{result.totalCost.toLocaleString()} 원</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-gray-100 dark:border-zinc-800 text-rose-600 dark:text-rose-400">
+                <span>· (-) 자기부담금 공제 합계</span>
+                <span className="font-bold">-{result.totalDeduction.toLocaleString()} 원</span>
+              </div>
+              <div className="py-0.5 space-y-1 text-[11.5px] opacity-80 pl-2">
+                <div className="flex justify-between"><span>- 급여 지급액</span><span>{result.coveredPayout.toLocaleString()} 원</span></div>
+                <div className="flex justify-between"><span>- 비급여 지급액</span><span>{result.nonCoveredPayout.toLocaleString()} 원</span></div>
+                {data.generation >= 3 && (
+                  <div className="flex justify-between"><span>- 3대 비급여 지급액</span><span>{result.specialPayout.toLocaleString()} 원</span></div>
+                )}
+              </div>
+              <div className="flex justify-between py-1.5 font-extrabold text-emerald-600 dark:text-emerald-400 border-t border-gray-200 dark:border-zinc-700">
+                <span>최종 예상 실손금</span>
+                <span>{result.totalPayout.toLocaleString()} 원</span>
               </div>
             </div>
 
-            {/* 세부 공제 및 지급 내역서 */}
-            <div className="bg-white dark:bg-[#202124] border border-gray-200 dark:border-zinc-800 p-5 sm:p-6 shadow-xs space-y-3">
-              <h3 className="text-xs font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5 mb-3">
-                <span className="w-1 h-3.5 bg-emerald-600 rounded-none"></span> 세부 공제 및 산정 내역
-              </h3>
-              
-              <div className="space-y-2.5 text-[12.5px] text-gray-600 dark:text-gray-400">
-                <div className="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-zinc-800/80">
-                  <span>총 발생 의료비</span>
-                  <span className="font-bold text-gray-900 dark:text-white">{result.totalCost.toLocaleString()} 원</span>
-                </div>
-                
-                <div className="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-zinc-800/80 text-rose-600 dark:text-rose-400">
-                  <span>(-) 자기부담금 공제 합계</span>
-                  <span className="font-bold">-{result.totalDeduction.toLocaleString()} 원</span>
-                </div>
-                
-                <div className="py-1 space-y-1.5 text-[12px] opacity-80">
-                  <div className="flex justify-between"><span>· 급여 지급액</span><span>{result.coveredPayout.toLocaleString()} 원</span></div>
-                  <div className="flex justify-between"><span>· 비급여 지급액</span><span>{result.nonCoveredPayout.toLocaleString()} 원</span></div>
-                  {data.generation >= 3 && (
-                    <div className="flex justify-between"><span>· 3대 비급여 특약 지급액</span><span>{result.specialPayout.toLocaleString()} 원</span></div>
-                  )}
-                </div>
-
-                <div className="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-zinc-700 mt-2">
-                  <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">최종 예상 실손금</span>
-                  <span className="text-base font-black text-emerald-600 dark:text-emerald-400">{result.totalPayout.toLocaleString()} 원</span>
-                </div>
+            {/* 계산 공식 */}
+            {result.formulas.length > 0 && (
+              <div className="pt-2 border-t border-gray-100 dark:border-zinc-800">
+                <h4 className="text-[11px] font-bold text-emerald-600 mb-1">적용된 세대별 공제 공식</h4>
+                <ul className="list-disc list-inside text-[10.5px] text-gray-500 space-y-0.5">
+                  {result.formulas.map((f, i) => <li key={i}>{f}</li>)}
+                </ul>
               </div>
-
-              {/* 산출 계산식 */}
-              {result.formulas.length > 0 && (
-                <div className="mt-4 bg-gray-50 dark:bg-zinc-900 p-3.5 border border-gray-200/80 dark:border-zinc-800 rounded-none">
-                  <h4 className="text-[11.5px] font-bold text-emerald-600 dark:text-emerald-400 mb-1.5 flex items-center gap-1">
-                    <AppIcon name="calculator" size={13} />
-                    적용된 세대별 공제 공식
-                  </h4>
-                  <ul className="list-disc list-inside text-[11px] text-gray-500 dark:text-gray-400 space-y-1 leading-relaxed break-keep">
-                    {result.formulas.map((f, i) => <li key={i}>{f}</li>)}
-                  </ul>
-                </div>
-              )}
-            </div>
+            )}
           </div>
+        )}
+      </div>
 
-          {/* 알림 배너 */}
-          <div className="bg-amber-50 dark:bg-amber-950/30 p-3.5 border border-amber-200 dark:border-amber-800/60 flex gap-2.5 text-[11.5px] leading-relaxed text-amber-900 dark:text-amber-300 font-medium">
-            <AppIcon name="shield-alert" size={16} className="text-amber-600 shrink-0 mt-0.5" />
-            <p>위 결과는 <strong>단순 약관 산출 추정치</strong>입니다. 비례보상, 면책 질환, 연간 통원 한도(180회/연간 5천만 원) 등에 따라 실제 지급액이 달라질 수 있습니다.</p>
-          </div>
+      {/* 5. 🛡️ 전문가 조언 및 액션 버튼 바 */}
+      <div className="bg-amber-50 dark:bg-amber-950/30 p-3 border border-amber-200/80 dark:border-amber-900/40 text-[11px] leading-relaxed text-amber-900 dark:text-amber-300 flex items-start gap-2">
+        <AppIcon name="shield-alert" size={14} className="text-amber-600 shrink-0 mt-0.5" />
+        <p>위 결과는 <strong>단순 약관 산출 추정치</strong>입니다. 비례보상, 면책 질환, 연간 보상한도 등에 따라 실제 지급액이 달라질 수 있습니다.</p>
+      </div>
 
-          {/* 상담 및 액션 버튼 그룹 */}
-          <div className="flex flex-col gap-2 pt-1">
-            <button 
-              onClick={() => { document.getElementById('chat-floating-btn')?.click(); }} 
-              className="flex items-center justify-center w-full gap-2 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-none font-extrabold text-[14px] transition-all shadow-md shadow-emerald-500/20 cursor-pointer" 
-              id="medical-calc-chat-btn"
-            >
-              <AppIcon name="chat" size={18} />
-              실손 부지급 1:1 무료 상담 신청
-            </button>
-            
-            <div className="grid grid-cols-2 gap-2">
-              <button 
-                onClick={() => shareResult('실손의료비', result.totalPayout)} 
-                className="flex items-center justify-center gap-1.5 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 text-gray-700 dark:text-gray-300 rounded-none font-bold text-[12px] transition-all cursor-pointer"
-              >
-                <AppIcon name="link" size={14} />
-                결과 공유하기
-              </button>
-              <button 
-                onClick={() => exportPDF('보상스쿨_실손의료비_계산결과.pdf')} 
-                className="flex items-center justify-center gap-1.5 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 text-gray-700 dark:text-gray-300 rounded-none font-bold text-[12px] transition-all cursor-pointer"
-              >
-                <AppIcon name="file-text" size={14} />
-                PDF 다운로드
-              </button>
-            </div>
-          </div>
+      <div className="space-y-2 pt-1">
+        <button
+          onClick={() => { document.getElementById('chat-floating-btn')?.click(); }}
+          className="flex items-center justify-center w-full gap-2 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm transition-all shadow-md shadow-emerald-500/20 cursor-pointer"
+        >
+          <AppIcon name="chat" size={18} />
+          실손 부지급 1:1 무료 상담 신청
+        </button>
 
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => shareResult('실손의료비', result.totalPayout)}
+            className="flex items-center justify-center gap-1.5 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 text-gray-700 dark:text-gray-300 font-bold text-xs transition-colors cursor-pointer"
+          >
+            <AppIcon name="link" size={13} />
+            결과 공유하기
+          </button>
+          <button
+            onClick={() => exportPDF('보상스쿨_실손의료비_계산결과.pdf')}
+            className="flex items-center justify-center gap-1.5 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 text-gray-700 dark:text-gray-300 font-bold text-xs transition-colors cursor-pointer"
+          >
+            <AppIcon name="file-text" size={13} />
+            PDF 다운로드
+          </button>
         </div>
       </div>
     </div>

@@ -285,7 +285,7 @@ export default function LiabilityCalculator() {
             {/* STEP 3 그라데이션 헤더 바 */}
             <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-rose-50 via-amber-50/60 to-transparent dark:from-rose-950/50 dark:via-amber-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-rose-200/80 dark:border-rose-800/80">STEP 03</span>
+                <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-rose-200/80 dark:border-rose-800/80">STEP 01</span>
                 <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
                   <AppIcon name="crutches" size={16} className="text-rose-600 dark:text-rose-400" />
                   세부 손해배상 항목 상세 입력

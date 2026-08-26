@@ -1,5 +1,5 @@
 import Link from "next/link";
-import LiabilityCalculator from "@/components/calculator/liability/LiabilityCalculator";
+import LiabilityCalculator from "@/components/calculator/LiabilityCalculator";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

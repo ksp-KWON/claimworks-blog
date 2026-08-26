@@ -102,9 +102,9 @@ export default function ConsultationPage() {
     }
   };
 
-  const inputClass = "w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-2.5 px-3.5 text-sm font-bold text-gray-900 dark:text-white rounded-none focus:border-blue-500 focus:outline-none transition-colors placeholder-gray-400";
-  const labelHeaderClass = "flex items-center justify-between h-5 mb-2";
-  const labelTextClass = "text-xs sm:text-[13px] font-bold text-gray-800 dark:text-gray-200 select-none";
+  const inputClass = "w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-3 px-3.5 text-sm font-bold text-gray-900 dark:text-white rounded-none focus:border-blue-500 focus:outline-none transition-colors placeholder-gray-400 shadow-2xs";
+  const labelHeaderClass = "flex items-center justify-between mb-2";
+  const labelTextClass = "text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-gray-100 select-none";
   const labelSubClass = "text-[11px] text-gray-400 dark:text-zinc-500 font-medium select-none";
 
   if (isSuccess) {
@@ -187,12 +187,12 @@ export default function ConsultationPage() {
       </PremiumCard>
 
       {/* 폼 컨테이너 */}
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* STEP 1: 신청인 기본 정보 */}
-        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
           {/* STEP 1 그라데이션 제목 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-blue-200/80 dark:border-blue-800/80">STEP 01</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -203,7 +203,7 @@ export default function ConsultationPage() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">기본 인적사항</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <div className={labelHeaderClass}>
                 <label htmlFor="name" className={labelTextClass}>
@@ -244,7 +244,7 @@ export default function ConsultationPage() {
           </div>
 
           {/* 생년월일 & 월 소득 (2열 균형 배치) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <div className={labelHeaderClass}>
                 <label htmlFor="birth_date" className={labelTextClass}>
@@ -283,9 +283,9 @@ export default function ConsultationPage() {
         </PremiumCard>
 
         {/* STEP 2: 사고 및 진단 상세 (손해사정 사전 분석용) */}
-        <PremiumCard borderColor="indigo" hoverEffect={true} className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+        <PremiumCard borderColor="indigo" hoverEffect={true} className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
           {/* STEP 2 그라데이션 제목 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-indigo-50 via-purple-50/60 to-transparent dark:from-indigo-950/50 dark:via-purple-950/30 dark:to-transparent border-b border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-indigo-50 via-purple-50/60 to-transparent dark:from-indigo-950/50 dark:via-purple-950/30 dark:to-transparent border-b border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-indigo-200/80 dark:border-indigo-800/80">STEP 02</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -297,14 +297,14 @@ export default function ConsultationPage() {
           </div>
 
           {/* 사고 원인 4대 칩 선택 */}
-          <div className="pt-1">
+          <div>
             <div className={labelHeaderClass}>
               <label className={labelTextClass}>
                 사고 원인 / 분쟁 유형 <span className="text-red-500">*</span>
               </label>
               <span className={labelSubClass}>손해사정 분야 분류</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {ACCIDENT_TYPES.map(type => {
                 const isActive = formData.accident_type === type.id;
                 return (
@@ -312,14 +312,14 @@ export default function ConsultationPage() {
                     key={type.id}
                     type="button"
                     onClick={() => handleTypeSelect(type.id)}
-                    className={`p-3 text-center border transition-all cursor-pointer ${
+                    className={`p-3.5 text-center border transition-all cursor-pointer ${
                       isActive
                         ? 'border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-extrabold shadow-xs'
                         : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
                     }`}
                   >
                     <div className="flex justify-center mb-1.5">
-                      <AppIcon name={type.icon} size={18} />
+                      <AppIcon name={type.icon} size={20} />
                     </div>
                     <div className="text-xs sm:text-[13px] font-bold">{type.label}</div>
                   </button>
@@ -329,7 +329,7 @@ export default function ConsultationPage() {
           </div>
 
           {/* 사고 일자 & 사고 장소 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <div className={labelHeaderClass}>
                 <label htmlFor="accident_date" className={labelTextClass}>
@@ -399,7 +399,7 @@ export default function ConsultationPage() {
             <textarea 
               name="content" 
               id="content" 
-              rows={3} 
+              rows={4} 
               required
               className={`${inputClass} leading-relaxed`}
               placeholder="사고가 발생한 경위와 현재 치료 상태, 보험사의 주장 등을 자유롭게 적어주세요."
@@ -419,7 +419,7 @@ export default function ConsultationPage() {
             <textarea 
               name="inquiry" 
               id="inquiry" 
-              rows={2}
+              rows={3}
               className={`${inputClass} leading-relaxed`}
               placeholder="보험금 지급 거절 사유, 예상 손해액 산정 등 가장 궁금하신 쟁점을 적어주세요."
               value={formData.inquiry} 
@@ -429,9 +429,9 @@ export default function ConsultationPage() {
         </PremiumCard>
 
         {/* STEP 3: 3대 안심 보장 & 개인정보 수집 동의 */}
-        <PremiumCard borderColor="green" hoverEffect={true} className="!p-5 sm:!p-6 space-y-4 overflow-hidden">
+        <PremiumCard borderColor="green" hoverEffect={true} className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
           {/* STEP 3 그라데이션 제목 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3.5 sm:px-6 sm:py-3.5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-emerald-200/80 dark:border-emerald-800/80">STEP 03</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -442,31 +442,31 @@ export default function ConsultationPage() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">안심 보안 원칙</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center pt-1">
-            <div className="p-3.5 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1">
-              <div className="text-xs sm:text-[13px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
-                <AppIcon name="shield-check" size={15} className="text-emerald-600" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-center">
+            <div className="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1.5">
+              <div className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
+                <AppIcon name="shield-check" size={16} className="text-emerald-600" />
                 스팸·영업 전화 0%
               </div>
               <div className="text-xs text-gray-500 font-medium">상담 완료 후 무단 마케팅 절대 금지</div>
             </div>
-            <div className="p-3.5 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1">
-              <div className="text-xs sm:text-[13px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
-                <AppIcon name="lock" size={15} className="text-emerald-600" />
+            <div className="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1.5">
+              <div className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
+                <AppIcon name="lock" size={16} className="text-emerald-600" />
                 100% 비밀 보장
               </div>
               <div className="text-xs text-gray-500 font-medium">담당 손해사정사 1인만 비공개 열람</div>
             </div>
-            <div className="p-3.5 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1">
-              <div className="text-xs sm:text-[13px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
-                <AppIcon name="trash" size={15} className="text-emerald-600" />
+            <div className="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1.5">
+              <div className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
+                <AppIcon name="trash" size={16} className="text-emerald-600" />
                 3개월 후 영구 파기
               </div>
               <div className="text-xs text-gray-500 font-medium">목적 달성 시 안전하게 자동 파기</div>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-gray-100 dark:border-zinc-800">
+          <div className="pt-4 border-t border-gray-100 dark:border-zinc-800">
             <label className="flex items-start gap-3 cursor-pointer select-none">
               <input 
                 type="checkbox" 

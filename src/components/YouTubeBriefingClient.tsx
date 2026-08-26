@@ -76,21 +76,20 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
         </div>
       </PremiumCard>
 
-      {/* 2. 비디오 리스트 레이아웃: 4줄 세로 단일열 와이드 슬림 바 (PremiumCard 표준 컴포넌트) */}
-      <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
+      {/* 2. 비디오 리스트 레이아웃: 매거진 패밀리룩 2열 입체 인터랙티브 카드 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
         {loading ? (
-          // 로딩 스켈레톤 (4줄 세로형)
+          // 로딩 스켈레톤
           Array.from({ length: 4 }).map((_, i) => (
-            <PremiumCard key={i} borderColor="default" hoverEffect={false} className="!p-3 sm:!p-3.5 flex gap-3 sm:gap-4.5 items-center animate-pulse">
-              <div className="w-32 sm:w-44 shrink-0 aspect-video bg-gray-200 dark:bg-zinc-800"></div>
-              <div className="flex flex-col flex-1 py-0.5 pr-1 space-y-2">
-                <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-3/4"></div>
-                <div className="mt-auto pt-2 flex justify-between">
-                  <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-1/4"></div>
-                  <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-16"></div>
-                </div>
+            <div key={i} className="bg-white dark:bg-[#202124] p-4 sm:p-5 border border-gray-100 dark:border-white/10 shadow-[0_10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.6)] space-y-3.5 animate-pulse">
+              <div className="w-full aspect-video bg-gray-200 dark:bg-zinc-800"></div>
+              <div className="flex justify-between">
+                <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-1/4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-1/4"></div>
               </div>
-            </PremiumCard>
+              <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-3/4"></div>
+            </div>
           ))
         ) : (
           videos.map((video) => (
@@ -99,15 +98,17 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
               href={`https://youtu.be/${video.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="group block outline-none"
+              className="group relative flex flex-col justify-between bg-white dark:bg-[#202124] p-4 sm:p-5 border border-gray-100 dark:border-white/10 shadow-[0_10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.6)] hover:border-red-500 hover:shadow-[0_16px_45px_rgba(239,68,68,0.15)] dark:hover:shadow-[0_16px_45px_rgba(239,68,68,0.25)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden outline-none"
             >
-              <PremiumCard 
-                borderColor="red" 
-                hoverEffect={true} 
-                className="!p-3 sm:!p-3.5 flex gap-3 sm:gap-4.5 items-center transition-all duration-200 group-hover:scale-[1.004]"
-              >
-                {/* 썸네일 (16:9 와이드 비율) */}
-                <div className="relative w-32 sm:w-44 shrink-0 aspect-video overflow-hidden bg-gray-100 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50">
+              {/* 좌측 레드 포인트 바 (호버 시 등장) */}
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-20"></div>
+
+              {/* 배경 레드 파스텔 그라데이션 (호버 시 부드럽게 전환) */}
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-50/90 via-red-50/40 to-transparent dark:from-rose-950/40 dark:via-red-950/20 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"></div>
+
+              <div className="relative z-10 space-y-3.5">
+                {/* 16:9 와이드 썸네일 & 팝업 플레이 버튼 */}
+                <div className="relative w-full aspect-video overflow-hidden bg-gray-100 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50 shadow-inner">
                   <Image 
                     src={`https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`} 
                     alt={video.title} 
@@ -115,29 +116,36 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
                     unoptimized
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                    <div className="w-8 h-8 bg-white/95 text-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300 shadow-md">
-                      <AppIcon name="play" size={15} className="ml-0.5" />
+                  <div className="absolute inset-0 bg-black/15 group-hover:bg-black/35 transition-colors duration-300 flex items-center justify-center">
+                    <div className="w-11 h-11 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-110 transition-all duration-300">
+                      <AppIcon name="play" size={20} className="ml-0.5" />
                     </div>
                   </div>
                 </div>
-                
-                {/* 텍스트 정보 (시원한 가로 폭으로 긴 제목도 가독성 극대화) */}
-                <div className="flex flex-col flex-1 py-0.5 pr-1 min-w-0">
-                  <h4 className="text-xs sm:text-[14px] font-extrabold text-[#202124] dark:text-[#e8eaed] group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors leading-snug mb-2 break-keep line-clamp-2 sm:line-clamp-1">
-                    {video.title}
-                  </h4>
-                  <div className="mt-auto flex items-center justify-between text-[11px] sm:text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6]">
-                    <time className="flex items-center gap-1.5">
-                      <AppIcon name="calendar" size={12} className="text-gray-400" />
-                      <span>{video.published}</span>
-                    </time>
-                    <span className="text-[10px] font-mono px-2 py-0.5 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200/60 dark:border-red-900/40 font-bold">
-                      YouTube 영상 브리핑
-                    </span>
-                  </div>
+
+                {/* 뱃지 & 날짜 */}
+                <div className="flex items-center justify-between gap-2">
+                  <PremiumBadge color="red">YouTube 브리핑</PremiumBadge>
+                  <time className="text-[11px] sm:text-xs text-[#5f6368] dark:text-[#9aa0a6] font-medium flex items-center gap-1">
+                    <AppIcon name="calendar" size={13} className="text-gray-400" />
+                    <span>{video.published}</span>
+                  </time>
                 </div>
-              </PremiumCard>
+
+                {/* 영상 제목 */}
+                <h4 className="text-sm sm:text-[15px] font-extrabold text-[#202124] dark:text-[#e8eaed] group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors line-clamp-2 leading-snug break-keep">
+                  {video.title}
+                </h4>
+              </div>
+
+              {/* 하단 시청하기 바 */}
+              <div className="mt-3.5 pt-3 border-t border-gray-100 dark:border-white/5 flex items-center justify-between text-xs font-bold text-red-600 dark:text-red-400 relative z-10">
+                <span className="text-[11px] text-gray-400 font-normal">보상스쿨 공식 채널</span>
+                <span className="flex items-center gap-1 group-hover:underline">
+                  <span>영상 시청하기</span>
+                  <AppIcon name="chevron-right" size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                </span>
+              </div>
             </a>
           ))
         )}

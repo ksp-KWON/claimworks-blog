@@ -9,6 +9,7 @@ import { cleanFssText } from '@/lib/cleaners';
 import AppIcon from '@/components/ui/AppIcon';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
 
 interface FssNewsItem {
@@ -272,31 +273,47 @@ export default function FssNewsPage() {
   };
 
   return (
-    <div className="space-y-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      
-      {/* 실시간 소비자 이슈 브리핑 상단 띠 배너 */}
-      <div className="bg-red-600 text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3 animate-pulse shadow-md">
-        <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          <AppIcon name="shield-alert" size={18} className="shrink-0 text-white" />
-          <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
-            <span className="underline decoration-wavy mr-1.5">[금감원 실시간 브리핑]</span>
-            금융감독원 최신 소비자경보 및 분쟁조정 가이드라인 실시간 안내 중
+    <div className="w-full space-y-6">
+      {/* 상단 브레드크럼 */}
+      <nav className="flex text-xs text-[#5f6368] dark:text-[#9aa0a6]" aria-label="Breadcrumb">
+        <ol className="inline-flex items-center space-x-1.5">
+          <li><Link href="/" className="hover:text-[var(--google-blue)] transition-colors">홈</Link></li>
+          <li><span className="mx-1">/</span></li>
+          <li className="text-[#202124] dark:text-[#e8eaed] font-medium" aria-current="page">금감원 소비자보호센터</li>
+        </ol>
+      </nav>
+
+      {/* 1. 상단 메인 헤더 배너 (입체감 있는 레드 파스텔 PremiumCard) */}
+      <PremiumCard 
+        borderColor="red" 
+        hoverEffect={false} 
+        watermarkIcon="shield-alert" 
+        className="!p-5 sm:!p-7 !bg-gradient-to-r !from-rose-50/90 !via-red-50/50 !to-transparent dark:!from-rose-950/40 dark:!via-red-950/20 dark:!to-transparent border-rose-200/90 dark:border-rose-900/50"
+      >
+        <div className="relative z-10">
+          <div className="flex flex-wrap items-center gap-2 mb-2.5">
+            <PremiumBadge color="red">금융감독원 공식 소비자 데이터 연동</PremiumBadge>
+            <PremiumBadge color="gray">소비자경보·분쟁조정·비교공시</PremiumBadge>
           </div>
+
+          <PremiumHeading 
+            level={1} 
+            gradient="red" 
+            showLeftBorder={false} 
+            icon={<AppIcon name="shield-alert" size={24} className="text-red-600 shrink-0" />}
+            className="!mb-2 !text-xl sm:!text-2xl font-black"
+          >
+            금감원 소비자보호센터
+          </PremiumHeading>
+
+          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
+            금융감독원 공식 데이터를 실시간 연동하여 소비자 경보, 민원 분쟁사례, 금융 실무 꿀팁 및 금융상품 비교공시를 원스톱 통합 대시보드로 제공합니다.
+          </p>
         </div>
-      </div>
+      </PremiumCard>
 
-      {/* 헤더 영역 */}
-      <div className="text-center space-y-3">
-        <PremiumHeading level={1} gradient="red" className="justify-center !text-3xl font-black">
-          금감원 소비자보호센터
-        </PremiumHeading>
-        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-2xl mx-auto leading-relaxed font-medium">
-          금융감독원 공식 데이터 연동을 통해 소비자 경보, 민원 분쟁사례, 금융꿀팁, 실시간 금융상품 비교공시 서비스를 하나의 통합 대시보드에서 제공합니다.
-        </p>
-      </div>
-
-      <PremiumCard hoverEffect={false} borderColor="red" className="p-5 sm:p-7">
-        {/* 검색 박스 영역 */}
+      {/* 2. 검색 및 탭 네비게이션 박스 */}
+      <PremiumCard hoverEffect={false} borderColor="red" className="!p-5 sm:!p-6">
         <div className="space-y-4">
           <form onSubmit={handleSearchSubmit} className="flex gap-2 flex-col sm:flex-row">
             <input
@@ -304,20 +321,20 @@ export default function FssNewsPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="검색어를 입력해 보세요 (예: 도수치료, 체외충격파, 대포통장, 여행자보험)"
-              className="flex-1 px-4 py-3 sm:py-3.5 rounded-none border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/5 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 dark:text-white text-sm font-medium shadow-inner"
+              className="flex-1 px-4 py-3 sm:py-3.5 rounded-none border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800/40 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 dark:text-white text-xs sm:text-sm font-medium shadow-inner"
             />
             <PremiumButton
               type="submit"
               disabled={loading && activeTab !== 'products'}
               color="red"
-              className="py-3 sm:py-3.5 min-w-[120px] flex items-center justify-center h-full !rounded-none font-bold"
+              className="py-3 sm:py-3.5 min-w-[120px] flex items-center justify-center h-full !rounded-none font-bold text-xs sm:text-sm"
             >
               {loading ? '연동 중...' : '실시간 조회'}
             </PremiumButton>
           </form>
 
           {/* 탭 카테고리 메뉴 */}
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2 mt-4 pt-4 border-t border-gray-150 dark:border-white/10">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800">
             {[
               { id: 'all', label: '전체보기', icon: 'list' as const },
               { id: 'alert', label: '소비자경보', icon: 'shield-alert' as const },
@@ -329,10 +346,10 @@ export default function FssNewsPage() {
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id as TabType)}
-                className={`py-2.5 rounded-none text-xs font-bold transition-all cursor-pointer truncate px-1 text-center flex items-center justify-center gap-1.5 ${
+                className={`py-2.5 rounded-none text-xs font-bold transition-all cursor-pointer truncate px-1 text-center flex items-center justify-center gap-1.5 border ${
                   activeTab === tab.id
-                    ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm font-black'
-                    : 'bg-gray-50 text-gray-600 hover:bg-gray-150 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10'
+                    ? 'bg-red-600 text-white border-red-600 dark:bg-red-600 dark:text-white dark:border-red-600 shadow-sm font-black'
+                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200/60 dark:bg-zinc-800/60 dark:text-gray-400 dark:border-zinc-700/60 dark:hover:bg-zinc-700/60'
                 }`}
               >
                 <AppIcon name={tab.icon} size={14} />

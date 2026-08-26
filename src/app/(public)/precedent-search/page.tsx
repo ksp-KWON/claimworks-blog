@@ -7,6 +7,7 @@ import AppIcon from '@/components/ui/AppIcon';
 
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
 interface Precedent {
   id: string;
@@ -299,28 +300,47 @@ export default function PrecedentSearchPage() {
   };
 
   return (
-    <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* 상단 띠 배너 */}
-      <div className="bg-[var(--google-blue)] text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3">
-        <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          <AppIcon name="lightbulb" size={18} className="shrink-0 text-white" />
-          <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
-            <span className="underline decoration-wavy mr-1.5">[보상 트렌드]</span>
-            법원의 실시간 대법원 판례 기준을 파악하면 보험사의 삭감 주장을 방어할 수 있습니다.
+    <div className="w-full space-y-6">
+      {/* 상단 브레드크럼 */}
+      <nav className="flex text-xs text-[#5f6368] dark:text-[#9aa0a6]" aria-label="Breadcrumb">
+        <ol className="inline-flex items-center space-x-1.5">
+          <li><Link href="/" className="hover:text-[var(--google-blue)] transition-colors">홈</Link></li>
+          <li><span className="mx-1">/</span></li>
+          <li className="text-[#202124] dark:text-[#e8eaed] font-medium" aria-current="page">판례검색센터</li>
+        </ol>
+      </nav>
+
+      {/* 1. 상단 메인 헤더 배너 (입체감 있는 블루 파스텔 PremiumCard) */}
+      <PremiumCard 
+        borderColor="blue" 
+        hoverEffect={false} 
+        watermarkIcon="scale" 
+        className="!p-5 sm:!p-7 !bg-gradient-to-r !from-blue-50/90 !via-indigo-50/50 !to-transparent dark:!from-blue-950/40 dark:!via-indigo-950/20 dark:!to-transparent border-blue-200/90 dark:border-blue-900/50"
+      >
+        <div className="relative z-10">
+          <div className="flex flex-wrap items-center gap-2 mb-2.5">
+            <PremiumBadge color="blue">법제처 국가법령정보 실시간 연동</PremiumBadge>
+            <PremiumBadge color="gray">대법원·하급심 주요 손해배상 판례</PremiumBadge>
           </div>
+
+          <PremiumHeading 
+            level={1} 
+            gradient="blue" 
+            showLeftBorder={false} 
+            icon={<AppIcon name="scale" size={24} className="text-blue-600 dark:text-blue-400 shrink-0" />}
+            className="!mb-2 !text-xl sm:!text-2xl"
+          >
+            손해사정 법률분석센터
+          </PremiumHeading>
+
+          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
+            보험사의 억울한 거절과 삭감 주장도 명확한 판례가 있다면 방어할 수 있습니다. 겪으신 상황이나 키워드를 검색하시면 실시간 부합하는 법원 판결 전문을 찾아드립니다.
+          </p>
         </div>
-      </div>
+      </PremiumCard>
 
-      <div className="text-center space-y-4">
-        <PremiumHeading level={1} gradient="blue" className="justify-center !text-3xl">
-          손해사정 법률분석센터
-        </PremiumHeading>
-        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-2xl mx-auto leading-relaxed font-medium">
-          보험사의 억울한 거절과 삭감 주장도 명확한 판례가 있다면 방어할 수 있습니다. 겪으신 상황을 검색하시면 부합하는 법원 판결을 찾아드립니다.
-        </p>
-      </div>
-
-      <PremiumCard hoverEffect={false} borderColor="blue" className="p-6 sm:p-8">
+      {/* 2. 판례 검색 인풋 박스 */}
+      <PremiumCard hoverEffect={false} borderColor="blue" className="!p-5 sm:!p-6">
         <div id="search-box-area" className="space-y-4">
           <div className="flex gap-2 flex-col sm:flex-row">
             <input
@@ -328,30 +348,30 @@ export default function PrecedentSearchPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch(query)}
-              placeholder="상황이나 키워드를 적어보세요 (예: 교통사고 합의금)"
-              className="flex-1 px-4 py-3 sm:py-3.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2 focus:outline-none focus:border-[var(--google-blue)] focus:ring-1 focus:ring-[var(--google-blue)] dark:text-white text-sm font-medium shadow-inner"
+              placeholder="상황이나 키워드를 적어보세요 (예: 교통사고 합의금, 뇌출혈 진단비, 척추 장해)"
+              className="flex-1 px-4 py-3 sm:py-3.5 rounded-none border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800/40 focus:outline-none focus:border-blue-600 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-600 dark:text-white text-xs sm:text-sm font-medium shadow-inner"
             />
             <PremiumButton
               onClick={() => handleSearch(query)}
               disabled={loading}
               color="blue"
-              className="py-3 sm:py-3.5 min-w-[120px] flex items-center justify-center h-full !rounded-none"
+              className="py-3 sm:py-3.5 min-w-[120px] flex items-center justify-center h-full !rounded-none font-bold text-xs sm:text-sm"
             >
               {loading ? '검색 중...' : '판례 검색'}
             </PremiumButton>
           </div>
 
           {recentSearches.length > 0 && (
-            <div className="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-white/5 text-[11px] font-bold">
+            <div className="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-zinc-800 text-[11px] font-bold">
               <span className="text-[#9aa0a6] shrink-0">최근 검색:</span>
               <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
                 {recentSearches.map((h, idx) => (
-                  <button key={idx} onClick={() => handleSearch(h)} className="px-2 py-0.5 rounded-none hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400 cursor-pointer text-[10px]">
+                  <button key={idx} onClick={() => handleSearch(h)} className="px-2 py-0.5 rounded-none bg-gray-100 dark:bg-zinc-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-400 cursor-pointer text-[10.5px] border border-gray-200/60 dark:border-zinc-700/60">
                     {h}
                   </button>
                 ))}
               </div>
-              <button onClick={clearRecent} className="text-gray-300 dark:text-gray-600 hover:text-[var(--google-red)] cursor-pointer shrink-0">지우기</button>
+              <button onClick={clearRecent} className="text-gray-400 dark:text-gray-500 hover:text-red-500 cursor-pointer shrink-0 text-[10.5px]">지우기</button>
             </div>
           )}
         </div>

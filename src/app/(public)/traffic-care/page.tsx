@@ -5,53 +5,11 @@ import Link from 'next/link';
 import AiCommentBox from '@/components/AiCommentBox';
 import standardData from '../../../../functions/api/taas-standard-data.json';
 
+import AppIcon from '@/components/ui/AppIcon';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
-
-// --- SVG Icons (이모지 대신 사용되는 고품격 전문 아이콘 세트) ---
-function IconShield({ className = 'w-4.5 h-4.5' }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  );
-}
-
-function IconBrain({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z" />
-    </svg>
-  );
-}
-
-function IconBriefcase({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-    </svg>
-  );
-}
-
-function IconHospital({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-    </svg>
-  );
-}
-
-function IconPhone({ className = 'w-3.5 h-3.5' }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-    </svg>
-  );
-}
-
-// IconAlertTriangle: 제거됨 (미사용 컴포넌트 정리)
 
 interface AccidentZone {
   id: string;
@@ -320,30 +278,47 @@ export default function TrafficCarePage() {
   const activeZone = zones.find(z => z.id === selectedZoneId) || zones[0] || null;
 
   return (
-    <div className="space-y-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      
-      {/* 🚗 교통사고 로컬 안심케어 센터 상단 띠 배너 */}
-      <div className="bg-[#137333] text-white px-5 py-3 flex items-center justify-between flex-nowrap gap-3 rounded-t-none">
-        <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          <span className="shrink-0 flex items-center"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17H5m14 0a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2m14 0v2m-14-2v2M7 11h2m6 0h2" /><circle cx="7.5" cy="17" r="1.5" /><circle cx="16.5" cy="17" r="1.5" /></svg></span>
-          <div className="text-xs sm:text-sm font-extrabold tracking-tight truncate">
-            <span className="underline decoration-wavy mr-1.5">[지역 안내]</span>
-            도로교통공단 안전 통계와 우수 추천 병원, 보상 지식을 통합 안내해 드립니다.
+    <div className="w-full space-y-6">
+      {/* 상단 브레드크럼 */}
+      <nav className="flex text-xs text-[#5f6368] dark:text-[#9aa0a6]" aria-label="Breadcrumb">
+        <ol className="inline-flex items-center space-x-1.5">
+          <li><Link href="/" className="hover:text-[var(--google-blue)] transition-colors">홈</Link></li>
+          <li><span className="mx-1">/</span></li>
+          <li className="text-[#202124] dark:text-[#e8eaed] font-medium" aria-current="page">교통사고 로컬케어</li>
+        </ol>
+      </nav>
+
+      {/* 1. 상단 메인 헤더 배너 (입체감 있는 에메랄드 그린 파스텔 PremiumCard) */}
+      <PremiumCard 
+        borderColor="green" 
+        hoverEffect={false} 
+        watermarkIcon="car" 
+        className="!p-5 sm:!p-7 !bg-gradient-to-r !from-emerald-50/90 !via-teal-50/50 !to-transparent dark:!from-emerald-950/40 dark:!via-teal-950/20 dark:!to-transparent border-emerald-200/90 dark:border-emerald-900/50"
+      >
+        <div className="relative z-10">
+          <div className="flex flex-wrap items-center gap-2 mb-2.5">
+            <PremiumBadge color="green">도로교통공단(TAAS) 실시간 공공 데이터</PremiumBadge>
+            <PremiumBadge color="gray">심평원 전국 250개 시군구 전문 의료망</PremiumBadge>
           </div>
+
+          <PremiumHeading 
+            level={1} 
+            gradient="green" 
+            showLeftBorder={false} 
+            icon={<AppIcon name="car" size={24} className="text-emerald-600 dark:text-emerald-400 shrink-0" />}
+            className="!mb-2 !text-xl sm:!text-2xl font-black"
+          >
+            교통사고 로컬 안심케어 센터
+          </PremiumHeading>
+
+          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
+            자주 오가는 길모퉁이와 집 근처 사거리는 안전할까요? 행정구역을 선택하시면 실시간 교통사고 다발지역 위험 통계와 인근 전문 의료기관을 안내해 드립니다.
+          </p>
         </div>
-      </div>
+      </PremiumCard>
 
-      {/* 헤더 영역 */}
-      <div className="text-center space-y-4">
-        <PremiumHeading level={1} gradient="green" className="justify-center !text-3xl">
-          교통사고 로컬 안심케어 센터
-        </PremiumHeading>
-        <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-2xl mx-auto leading-relaxed font-medium">
-          자주 오가는 길모퉁이와 집 근처 사거리는 안전할까요? 사시는 행정구역을 선택하시면 실시간 교통사고 다발지역 통계와 인근 전문 의료기관을 안내해 드립니다.
-        </p>
-      </div>
-
-      <PremiumCard hoverEffect={false} borderColor="green" className="p-6 sm:p-8">
+      {/* 2. 행정구역 선택 및 지역 분석 박스 */}
+      <PremiumCard hoverEffect={false} borderColor="green" className="!p-5 sm:!p-6">
         {/* 행정구역 선택 박스 영역 */}
         <div id="search-box-area" className="space-y-4">
           <div className="flex gap-3 flex-col sm:flex-row items-stretch">
@@ -529,7 +504,7 @@ export default function TrafficCarePage() {
                   className="w-full flex items-center justify-between px-5 py-3.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/2 dark:hover:bg-white/5 rounded-none border border-gray-250 dark:border-white/5 cursor-pointer transition-colors text-xs font-black text-gray-800 dark:text-gray-100"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-[#137333]"><IconHospital className="w-4.5 h-4.5" /></span>
+                    <span className="text-[#137333]"><AppIcon name="hospital" size={18} /></span>
                     <span>{loadedGugun} 추천 전문병원 ({filteredHospitals.length}곳)</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-gray-400 dark:text-gray-500 font-bold">
@@ -608,7 +583,7 @@ export default function TrafficCarePage() {
                               <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-white/5 shrink-0">
                                 {h.tel ? (
                                   <div className="text-[10px] font-bold text-[#137333] dark:text-[#81c995] flex items-center gap-1">
-                                    <IconPhone className="w-3.5 h-3.5" />
+                                    <AppIcon name="phone" size={14} />
                                     <span>{h.tel}</span>
                                   </div>
                                 ) : (
@@ -640,7 +615,7 @@ export default function TrafficCarePage() {
             {/* 🧠 AI 3줄 요약 카드 (에메랄드 그린 패밀리룩) */}
             <div className="bg-green-50/20 dark:bg-green-950/10 p-4 rounded-none border border-green-100/30 dark:border-green-900/25 space-y-2.5 mt-2">
               <div className="flex items-center gap-1.5 text-xs font-bold text-[#137333] dark:text-[#81c995]">
-                <span className="text-sm"><IconBrain className="w-4 h-4" /></span>
+                <span className="text-sm"><AppIcon name="brain" size={16} /></span>
                 빅데이터 실시간 사고위험 분석 보고
               </div>
               <ul className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium space-y-1.5 list-disc pl-4">

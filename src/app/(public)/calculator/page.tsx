@@ -176,10 +176,10 @@ export default function CalculatorIndex() {
 
                 {/* 본문 콘텐츠 & 액션 영역 */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-                  <div className="flex items-start sm:items-center gap-4 sm:gap-5 flex-1 min-w-0">
-                    {/* 테마 아이콘 (확대된 프리미엄 W3C SVG 심볼 박스) */}
-                    <div className={`w-13 h-13 sm:w-15 sm:h-15 flex items-center justify-center border ${theme.iconBg} ${theme.iconText} shrink-0 transition-transform duration-200 group-hover:scale-105 shadow-xs`}>
-                      <AppIcon name={calc.icon} size={30} className="sm:!w-8 sm:!h-8" />
+                  <div className="flex items-stretch gap-4 sm:gap-5 flex-1 min-w-0">
+                    {/* 테마 아이콘 (우측 4줄 글자 전체 높이에 1:1로 맞춘 대형 프리미엄 심볼 박스) */}
+                    <div className={`self-stretch w-16 sm:w-20 min-h-[96px] sm:min-h-[110px] flex items-center justify-center border ${theme.iconBg} ${theme.iconText} shrink-0 transition-transform duration-200 group-hover:scale-105 shadow-xs`}>
+                      <AppIcon name={calc.icon} size={36} className="sm:!w-10 sm:!h-10" />
                     </div>
 
                     {/* 텍스트 설명 */}

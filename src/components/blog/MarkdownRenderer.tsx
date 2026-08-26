@@ -128,7 +128,7 @@ export const sharedComponents: Components & Record<string, any> = {
       red: 'border-red-200 dark:border-red-900/50 hover:border-[var(--google-red)] hover:shadow-[0_12px_40px_rgba(234,67,53,0.18)]',
       green: 'border-green-200 dark:border-green-900/50 hover:border-[var(--google-green)] hover:shadow-[0_12px_40px_rgba(52,168,83,0.18)]',
       yellow: 'border-yellow-300 dark:border-yellow-900/50 hover:border-yellow-500 hover:shadow-[0_12px_40px_rgba(234,179,8,0.18)]',
-      purple: 'border-purple-200 dark:border-purple-900/50 hover:border-purple-500 hover:shadow-[0_12px_40px_rgba(168,85,247,0.18)]',
+      purple: 'border-indigo-200 dark:border-indigo-900/50 hover:border-indigo-500 hover:shadow-[0_12px_40px_rgba(99,102,241,0.18)]',
     };
 
     const headerGradients: Record<BlogTone, string> = {
@@ -136,7 +136,7 @@ export const sharedComponents: Components & Record<string, any> = {
       red: 'from-red-50/90 to-transparent dark:from-red-900/25 dark:to-transparent border-b border-red-100 dark:border-red-900/40',
       green: 'from-green-50/90 to-transparent dark:from-green-900/25 dark:to-transparent border-b border-green-100 dark:border-green-900/40',
       yellow: 'from-yellow-50/90 to-transparent dark:from-yellow-900/25 dark:to-transparent border-b border-yellow-200 dark:border-yellow-900/40',
-      purple: 'from-purple-50/90 to-transparent dark:from-purple-900/25 dark:to-transparent border-b border-purple-100 dark:border-purple-900/40',
+      purple: 'from-indigo-50/90 to-transparent dark:from-indigo-900/25 dark:to-transparent border-b border-indigo-100 dark:border-indigo-900/40',
     };
 
     const titleColors: Record<BlogTone, string> = {
@@ -144,7 +144,7 @@ export const sharedComponents: Components & Record<string, any> = {
       red: 'text-[var(--google-red)] dark:text-red-400',
       green: 'text-[var(--google-green)] dark:text-green-400',
       yellow: 'text-yellow-600 dark:text-yellow-400',
-      purple: 'text-purple-600 dark:text-purple-400',
+      purple: 'text-indigo-600 dark:text-indigo-400',
     };
 
     // 자식 요소 중 공백 문자열을 제외한 첫 번째 유효 요소가 헤딩(h1~h6)인지 검사

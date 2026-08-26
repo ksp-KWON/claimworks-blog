@@ -37,29 +37,29 @@ export interface ToneColorToken {
 }
 
 export const BLOG_TONE_TOKENS: Record<BlogTone, ToneColorToken> = {
-  // 1. Purple: 보상스쿨 피드백 & 실무 인사이트, 최고 권위 의학/법률 전문성
+  // 1. Purple (Indigo): 보상스쿨 피드백 & 실무 인사이트, 최고 권위 의학/법률 전문성
   purple: {
     name: 'purple',
     label: '실무 인사이트',
     hex: {
-      border: '#e9d5ff',
-      borderAccent: '#9333ea',
-      headerBg: '#f5f3ff',
-      headerText: '#7c3aed',
-      headerBorderBottom: '#ddd6fe',
+      border: '#c7d2fe',
+      borderAccent: '#4f46e5',
+      headerBg: '#eef2ff',
+      headerText: '#4338ca',
+      headerBorderBottom: '#c7d2fe',
       bodyBg: '#ffffff',
       bodyText: '#374151',
-      badgeBg: '#f3e8ff',
-      badgeText: '#7e22ce',
-      highlightBg: '#f3e8ff',
-      highlightText: '#6b21a8',
+      badgeBg: '#e0e7ff',
+      badgeText: '#3730a3',
+      highlightBg: '#e0e7ff',
+      highlightText: '#3730a3',
     },
     tailwind: {
-      border: 'border-purple-200 dark:border-purple-900/50',
-      hoverBorder: 'hover:border-purple-500 hover:shadow-[0_12px_40px_rgba(168,85,247,0.18)]',
-      headerGradient: 'from-purple-50/90 to-transparent dark:from-purple-900/25 dark:to-transparent border-b border-purple-100 dark:border-purple-900/40',
-      titleColor: 'text-purple-600 dark:text-purple-400',
-      highlightClass: 'text-[#9333ea] dark:text-[#c084fc] bg-purple-50 dark:bg-purple-900/20',
+      border: 'border-indigo-200 dark:border-indigo-900/50',
+      hoverBorder: 'hover:border-indigo-500 hover:shadow-[0_12px_40px_rgba(99,102,241,0.18)]',
+      headerGradient: 'from-indigo-50/90 to-transparent dark:from-indigo-900/25 dark:to-transparent border-b border-indigo-100 dark:border-indigo-900/40',
+      titleColor: 'text-indigo-600 dark:text-indigo-400',
+      highlightClass: 'text-[#4338ca] dark:text-[#a5b4fc] bg-indigo-50 dark:bg-indigo-900/20',
     },
   },
   // 2. Green / Emerald: 승소, 해결, 지급, 합의, 체크리스트, 맞춤 솔루션

@@ -76,18 +76,18 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
         </div>
       </PremiumCard>
 
-      {/* 2. 비디오 리스트 레이아웃: 가로형 2단 그리드 (PremiumCard 표준 컴포넌트 일체화) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+      {/* 2. 비디오 리스트 레이아웃: 4줄 세로 단일열 와이드 슬림 바 (PremiumCard 표준 컴포넌트) */}
+      <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
         {loading ? (
-          // 로딩 스켈레톤
+          // 로딩 스켈레톤 (4줄 세로형)
           Array.from({ length: 4 }).map((_, i) => (
-            <PremiumCard key={i} borderColor="default" hoverEffect={false} className="!p-2.5 sm:!p-3.5 flex gap-3 sm:gap-4 items-center animate-pulse">
-              <div className="w-32 sm:w-36 shrink-0 aspect-video bg-gray-200 dark:bg-zinc-800"></div>
+            <PremiumCard key={i} borderColor="default" hoverEffect={false} className="!p-3 sm:!p-3.5 flex gap-3 sm:gap-4.5 items-center animate-pulse">
+              <div className="w-32 sm:w-44 shrink-0 aspect-video bg-gray-200 dark:bg-zinc-800"></div>
               <div className="flex flex-col flex-1 py-0.5 pr-1 space-y-2">
-                <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-full"></div>
                 <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-3/4"></div>
-                <div className="mt-auto pt-2">
-                  <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-1/3"></div>
+                <div className="mt-auto pt-2 flex justify-between">
+                  <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-1/4"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded w-16"></div>
                 </div>
               </div>
             </PremiumCard>
@@ -104,10 +104,10 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
               <PremiumCard 
                 borderColor="red" 
                 hoverEffect={true} 
-                className="!p-2.5 sm:!p-3.5 flex gap-3 sm:gap-4 items-center h-full transition-all duration-200 group-hover:scale-[1.006]"
+                className="!p-3 sm:!p-3.5 flex gap-3 sm:gap-4.5 items-center transition-all duration-200 group-hover:scale-[1.004]"
               >
-                {/* 썸네일 */}
-                <div className="relative w-32 sm:w-36 shrink-0 aspect-video overflow-hidden bg-gray-100 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50">
+                {/* 썸네일 (16:9 와이드 비율) */}
+                <div className="relative w-32 sm:w-44 shrink-0 aspect-video overflow-hidden bg-gray-100 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50">
                   <Image 
                     src={`https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`} 
                     alt={video.title} 
@@ -122,9 +122,9 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
                   </div>
                 </div>
                 
-                {/* 텍스트 정보 */}
+                {/* 텍스트 정보 (시원한 가로 폭으로 긴 제목도 가독성 극대화) */}
                 <div className="flex flex-col flex-1 py-0.5 pr-1 min-w-0">
-                  <h4 className="text-xs sm:text-[13.5px] font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors leading-snug mb-2 break-keep line-clamp-2">
+                  <h4 className="text-xs sm:text-[14px] font-extrabold text-[#202124] dark:text-[#e8eaed] group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors leading-snug mb-2 break-keep line-clamp-2 sm:line-clamp-1">
                     {video.title}
                   </h4>
                   <div className="mt-auto flex items-center justify-between text-[11px] sm:text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6]">
@@ -132,8 +132,8 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
                       <AppIcon name="calendar" size={12} className="text-gray-400" />
                       <span>{video.published}</span>
                     </time>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200/60 dark:border-red-900/40 font-bold">
-                      YouTube
+                    <span className="text-[10px] font-mono px-2 py-0.5 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200/60 dark:border-red-900/40 font-bold">
+                      YouTube 영상 브리핑
                     </span>
                   </div>
                 </div>

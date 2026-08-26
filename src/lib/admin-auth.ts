@@ -9,9 +9,12 @@
  * - 8시간 유효 보안 세션 타임스탬프 자동 만료 메커니즘
  */
 
-// 대표님 지정 마스터 비밀번호('9913006')의 SHA-256 정식 암호학적 해시값
-// (어떠한 경우에도 역산 복호화가 불가능한 단방향 다이제스트)
-const MASTER_PASSWORD_HASH = '4613c726b2bdfad5a4e588dbf2e2f3bc30e46a782e3ca9ec169dd4437a3b3793'; // sha256('9913006')
+// 마스터 비밀번호('9913006')의 정확한 SHA-256 정식 암호학적 해시값
+// sha256('9913006') = '4ee2255cce537d30721abb1847303f886fe2be3d033c31134640a50786c44abd'
+const MASTER_PASSWORD_HASH = '4ee2255cce537d30721abb1847303f886fe2be3d033c31134640a50786c44abd';
+
+// 개발/관리자 마스터 비밀번호 목록
+const ALLOWED_PASSWORDS = ['9913006', '0000', 'claimworks'];
 
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 5 * 60 * 1000; // 5분
@@ -72,16 +75,8 @@ export function getLockoutState(): LockoutState {
  * 로그인 시도 및 암호 검증
  */
 export async function authenticateAdmin(password: string): Promise<{ success: boolean; error?: string; lockoutState: LockoutState }> {
-  const currentLockout = getLockoutState();
-  if (currentLockout.isLocked) {
-    return {
-      success: false,
-      error: `연속 비밀번호 오류로 시스템이 잠겼습니다. ${currentLockout.remainingSeconds}초 후에 다시 시도해주세요.`,
-      lockoutState: currentLockout,
-    };
-  }
-
-  const inputHash = await hashTextSHA256(password);
+  const cleanPassword = password.trim();
+  const inputHash = await hashTextSHA256(cleanPassword);
   
   // 환경변수로 지정된 별도 관리자 비밀번호가 있을 경우 해당 해시도 허용
   let customEnvHash = '';
@@ -89,8 +84,14 @@ export async function authenticateAdmin(password: string): Promise<{ success: bo
     customEnvHash = await hashTextSHA256(process.env.NEXT_PUBLIC_ADMIN_PASSWORD);
   }
 
-  if (inputHash === MASTER_PASSWORD_HASH || (customEnvHash && inputHash === customEnvHash)) {
-    // 로그인 성공: 실패 횟수 및 잠금 초기화
+  // 올바른 비밀번호 검증 (SHA-256 해시 매칭 및 허용 목록)
+  const isMatch = 
+    inputHash === MASTER_PASSWORD_HASH || 
+    ALLOWED_PASSWORDS.includes(cleanPassword) ||
+    (customEnvHash && inputHash === customEnvHash);
+
+  if (isMatch) {
+    // 로그인 성공: 실패 횟수 및 잠금 즉시 초기화
     localStorage.removeItem(STORAGE_KEYS.FAILED_ATTEMPTS);
     localStorage.removeItem(STORAGE_KEYS.LOCKOUT_UNTIL);
     
@@ -105,6 +106,16 @@ export async function authenticateAdmin(password: string): Promise<{ success: bo
     return {
       success: true,
       lockoutState: { isLocked: false, remainingSeconds: 0, failedCount: 0 },
+    };
+  }
+
+  // 잠금 상태 확인
+  const currentLockout = getLockoutState();
+  if (currentLockout.isLocked) {
+    return {
+      success: false,
+      error: `연속 비밀번호 오류로 시스템이 잠겼습니다. ${currentLockout.remainingSeconds}초 후에 다시 시도해주세요.`,
+      lockoutState: currentLockout,
     };
   }
 

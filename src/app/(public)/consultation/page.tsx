@@ -102,8 +102,8 @@ export default function ConsultationPage() {
     }
   };
 
-  const inputClass = "w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-3 px-3.5 text-sm font-bold text-gray-900 dark:text-white rounded-none focus:border-blue-500 focus:outline-none transition-colors placeholder-gray-400 shadow-2xs";
-  const labelHeaderClass = "flex items-center justify-between mb-2";
+  const inputClass = "w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-3 px-3.5 text-sm font-bold text-gray-900 dark:text-white rounded-none focus:border-blue-500 focus:outline-none transition-colors placeholder-gray-400";
+  const labelHeaderClass = "flex items-center justify-between mb-2.5";
   const labelTextClass = "text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-gray-100 select-none";
   const labelSubClass = "text-[11px] text-gray-400 dark:text-zinc-500 font-medium select-none";
 
@@ -162,7 +162,7 @@ export default function ConsultationPage() {
       {/* 헤더 배너 (좌->우 프리미엄 그라데이션 배경) */}
       <PremiumCard 
         borderColor="blue" 
-        hoverEffect={true} 
+        hoverEffect={false} 
         watermarkIcon="chat" 
         className="!p-6 sm:!p-8 !bg-gradient-to-r !from-blue-50/90 !via-indigo-50/70 !to-blue-50/40 dark:!from-blue-950/50 dark:!via-indigo-950/40 dark:!to-blue-950/20 border-blue-200 dark:border-blue-900/60"
       >
@@ -190,9 +190,9 @@ export default function ConsultationPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* STEP 1: 신청인 기본 정보 */}
-        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
+        <PremiumCard borderColor="blue" hoverEffect={true} className="!p-5 sm:!p-7 overflow-hidden">
           {/* STEP 1 그라데이션 제목 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-blue-200/80 dark:border-blue-800/80">STEP 01</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -203,89 +203,92 @@ export default function ConsultationPage() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">기본 인적사항</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div>
-              <div className={labelHeaderClass}>
-                <label htmlFor="name" className={labelTextClass}>
-                  고객 성함 <span className="text-red-500">*</span>
-                </label>
-                <span className={labelSubClass}>안심 실명 확인</span>
+          {/* 내부 폼 요소 컨테이너 (정확한 space-y-6 간격 보장) */}
+          <div className="space-y-6 pt-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <div className={labelHeaderClass}>
+                  <label htmlFor="name" className={labelTextClass}>
+                    고객 성함 <span className="text-red-500">*</span>
+                  </label>
+                  <span className={labelSubClass}>안심 실명 확인</span>
+                </div>
+                <input 
+                  type="text" 
+                  name="name" 
+                  id="name" 
+                  required
+                  className={inputClass}
+                  placeholder="홍길동"
+                  value={formData.name} 
+                  onChange={handleChange} 
+                />
               </div>
-              <input 
-                type="text" 
-                name="name" 
-                id="name" 
-                required
-                className={inputClass}
-                placeholder="홍길동"
-                value={formData.name} 
-                onChange={handleChange} 
-              />
+
+              <div>
+                <div className={labelHeaderClass}>
+                  <label htmlFor="phone" className={labelTextClass}>
+                    전화번호 <span className="text-red-500">*</span>
+                  </label>
+                  <span className={labelSubClass}>상담 안내용 연락처</span>
+                </div>
+                <input 
+                  type="tel" 
+                  name="phone" 
+                  id="phone" 
+                  required
+                  className={inputClass}
+                  placeholder="010-1234-5678"
+                  value={formData.phone} 
+                  onChange={handleChange} 
+                />
+              </div>
             </div>
 
-            <div>
-              <div className={labelHeaderClass}>
-                <label htmlFor="phone" className={labelTextClass}>
-                  전화번호 <span className="text-red-500">*</span>
-                </label>
-                <span className={labelSubClass}>상담 안내용 연락처</span>
+            {/* 생년월일 & 월 소득 (2열 균형 배치) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <div className={labelHeaderClass}>
+                  <label htmlFor="birth_date" className={labelTextClass}>
+                    생년월일 <span className="text-gray-400 font-normal">(선택)</span>
+                  </label>
+                  <span className={labelSubClass}>호프만 취업연한 산정용</span>
+                </div>
+                <input 
+                  type="date" 
+                  name="birth_date" 
+                  id="birth_date"
+                  className={inputClass}
+                  value={formData.birth_date} 
+                  onChange={handleChange} 
+                />
               </div>
-              <input 
-                type="tel" 
-                name="phone" 
-                id="phone" 
-                required
-                className={inputClass}
-                placeholder="010-1234-5678"
-                value={formData.phone} 
-                onChange={handleChange} 
-              />
-            </div>
-          </div>
 
-          {/* 생년월일 & 월 소득 (2열 균형 배치) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div>
-              <div className={labelHeaderClass}>
-                <label htmlFor="birth_date" className={labelTextClass}>
-                  생년월일 <span className="text-gray-400 font-normal">(선택)</span>
-                </label>
-                <span className={labelSubClass}>호프만 취업연한 산정용</span>
+              <div>
+                <div className={labelHeaderClass}>
+                  <label htmlFor="income" className={labelTextClass}>
+                    월 평균 소득 <span className="text-gray-400 font-normal">(선택)</span>
+                  </label>
+                  <span className={labelSubClass}>휴업손해·일실수입 산정용</span>
+                </div>
+                <input 
+                  type="text" 
+                  name="income" 
+                  id="income"
+                  className={inputClass}
+                  placeholder="예: 3,500,000"
+                  value={formData.income} 
+                  onChange={handleChange} 
+                />
               </div>
-              <input 
-                type="date" 
-                name="birth_date" 
-                id="birth_date"
-                className={inputClass}
-                value={formData.birth_date} 
-                onChange={handleChange} 
-              />
-            </div>
-
-            <div>
-              <div className={labelHeaderClass}>
-                <label htmlFor="income" className={labelTextClass}>
-                  월 평균 소득 <span className="text-gray-400 font-normal">(선택)</span>
-                </label>
-                <span className={labelSubClass}>휴업손해·일실수입 산정용</span>
-              </div>
-              <input 
-                type="text" 
-                name="income" 
-                id="income"
-                className={inputClass}
-                placeholder="예: 3,500,000"
-                value={formData.income} 
-                onChange={handleChange} 
-              />
             </div>
           </div>
         </PremiumCard>
 
         {/* STEP 2: 사고 및 진단 상세 (손해사정 사전 분석용) */}
-        <PremiumCard borderColor="indigo" hoverEffect={true} className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
+        <PremiumCard borderColor="indigo" hoverEffect={true} className="!p-5 sm:!p-7 overflow-hidden">
           {/* STEP 2 그라데이션 제목 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-indigo-50 via-purple-50/60 to-transparent dark:from-indigo-950/50 dark:via-purple-950/30 dark:to-transparent border-b border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-indigo-50 via-purple-50/60 to-transparent dark:from-indigo-950/50 dark:via-purple-950/30 dark:to-transparent border-b border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-indigo-200/80 dark:border-indigo-800/80">STEP 02</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -296,142 +299,145 @@ export default function ConsultationPage() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">손해사정 사전 정밀 분석</span>
           </div>
 
-          {/* 사고 원인 4대 칩 선택 */}
-          <div>
-            <div className={labelHeaderClass}>
-              <label className={labelTextClass}>
-                사고 원인 / 분쟁 유형 <span className="text-red-500">*</span>
-              </label>
-              <span className={labelSubClass}>손해사정 분야 분류</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {ACCIDENT_TYPES.map(type => {
-                const isActive = formData.accident_type === type.id;
-                return (
-                  <button
-                    key={type.id}
-                    type="button"
-                    onClick={() => handleTypeSelect(type.id)}
-                    className={`p-3.5 text-center border transition-all cursor-pointer ${
-                      isActive
-                        ? 'border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-extrabold shadow-xs'
-                        : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
-                    }`}
-                  >
-                    <div className="flex justify-center mb-1.5">
-                      <AppIcon name={type.icon} size={20} />
-                    </div>
-                    <div className="text-xs sm:text-[13px] font-bold">{type.label}</div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 사고 일자 & 사고 장소 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {/* 내부 폼 요소 컨테이너 (정확한 space-y-6 간격 보장) */}
+          <div className="space-y-6 pt-5">
+            {/* 사고 원인 4대 칩 선택 */}
             <div>
               <div className={labelHeaderClass}>
-                <label htmlFor="accident_date" className={labelTextClass}>
-                  사고 일자 <span className="text-red-500">*</span>
+                <label className={labelTextClass}>
+                  사고 원인 / 분쟁 유형 <span className="text-red-500">*</span>
                 </label>
-                <span className={labelSubClass}>소멸시효(3년) 확인</span>
+                <span className={labelSubClass}>손해사정 분야 분류</span>
               </div>
-              <input 
-                type="date" 
-                name="accident_date" 
-                id="accident_date" 
-                required
-                className={inputClass}
-                value={formData.accident_date} 
-                onChange={handleChange} 
-              />
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {ACCIDENT_TYPES.map(type => {
+                  const isActive = formData.accident_type === type.id;
+                  return (
+                    <button
+                      key={type.id}
+                      type="button"
+                      onClick={() => handleTypeSelect(type.id)}
+                      className={`p-3.5 text-center border transition-all cursor-pointer ${
+                        isActive
+                          ? 'border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-extrabold shadow-xs'
+                          : 'border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 text-gray-700 dark:text-zinc-300 hover:bg-gray-100'
+                      }`}
+                    >
+                      <div className="flex justify-center mb-1.5">
+                        <AppIcon name={type.icon} size={20} />
+                      </div>
+                      <div className="text-xs sm:text-[13px] font-bold">{type.label}</div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
+            {/* 사고 일자 & 사고 장소 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <div className={labelHeaderClass}>
+                  <label htmlFor="accident_date" className={labelTextClass}>
+                    사고 일자 <span className="text-red-500">*</span>
+                  </label>
+                  <span className={labelSubClass}>소멸시효(3년) 확인</span>
+                </div>
+                <input 
+                  type="date" 
+                  name="accident_date" 
+                  id="accident_date" 
+                  required
+                  className={inputClass}
+                  value={formData.accident_date} 
+                  onChange={handleChange} 
+                />
+              </div>
+
+              <div>
+                <div className={labelHeaderClass}>
+                  <label htmlFor="accident_location" className={labelTextClass}>
+                    사고 장소 <span className="text-red-500">*</span>
+                  </label>
+                  <span className={labelSubClass}>과실비율 판단 기준</span>
+                </div>
+                <input 
+                  type="text" 
+                  name="accident_location" 
+                  id="accident_location" 
+                  required
+                  className={inputClass}
+                  placeholder="예: 서울 강남구 역삼역 교차로"
+                  value={formData.accident_location} 
+                  onChange={handleChange} 
+                />
+              </div>
+            </div>
+
+            {/* 진단 병명 */}
             <div>
               <div className={labelHeaderClass}>
-                <label htmlFor="accident_location" className={labelTextClass}>
-                  사고 장소 <span className="text-red-500">*</span>
+                <label htmlFor="diagnosis" className={labelTextClass}>
+                  진단 병명 <span className="text-red-500">*</span>
                 </label>
-                <span className={labelSubClass}>과실비율 판단 기준</span>
+                <span className={labelSubClass}>질병분류코드·후유장해 판정</span>
               </div>
               <input 
                 type="text" 
-                name="accident_location" 
-                id="accident_location" 
+                name="diagnosis" 
+                id="diagnosis" 
                 required
                 className={inputClass}
-                placeholder="예: 서울 강남구 역삼역 교차로"
-                value={formData.accident_location} 
+                placeholder="예: 우측 무릎 전방십자인대 파열, 뇌경색증(I63), 요추 추간판탈출증"
+                value={formData.diagnosis} 
                 onChange={handleChange} 
               />
             </div>
-          </div>
 
-          {/* 진단 병명 */}
-          <div>
-            <div className={labelHeaderClass}>
-              <label htmlFor="diagnosis" className={labelTextClass}>
-                진단 병명 <span className="text-red-500">*</span>
-              </label>
-              <span className={labelSubClass}>질병분류코드·후유장해 판정</span>
+            {/* 사고 내용 */}
+            <div>
+              <div className={labelHeaderClass}>
+                <label htmlFor="content" className={labelTextClass}>
+                  사고 경위 및 내용 <span className="text-red-500">*</span>
+                </label>
+                <span className={labelSubClass}>육하원칙 상세 기재</span>
+              </div>
+              <textarea 
+                name="content" 
+                id="content" 
+                rows={4} 
+                required
+                className={`${inputClass} leading-relaxed`}
+                placeholder="사고가 발생한 경위와 현재 치료 상태, 보험사의 주장 등을 자유롭게 적어주세요."
+                value={formData.content} 
+                onChange={handleChange} 
+              />
             </div>
-            <input 
-              type="text" 
-              name="diagnosis" 
-              id="diagnosis" 
-              required
-              className={inputClass}
-              placeholder="예: 우측 무릎 전방십자인대 파열, 뇌경색증(I63), 요추 추간판탈출증"
-              value={formData.diagnosis} 
-              onChange={handleChange} 
-            />
-          </div>
 
-          {/* 사고 내용 */}
-          <div>
-            <div className={labelHeaderClass}>
-              <label htmlFor="content" className={labelTextClass}>
-                사고 경위 및 내용 <span className="text-red-500">*</span>
-              </label>
-              <span className={labelSubClass}>육하원칙 상세 기재</span>
+            {/* 문의 사항 */}
+            <div>
+              <div className={labelHeaderClass}>
+                <label htmlFor="inquiry" className={labelTextClass}>
+                  궁금하신 점 / 요청 사항 <span className="text-gray-400 font-normal">(선택)</span>
+                </label>
+                <span className={labelSubClass}>핵심 쟁점 사전 분석</span>
+              </div>
+              <textarea 
+                name="inquiry" 
+                id="inquiry" 
+                rows={3}
+                className={`${inputClass} leading-relaxed`}
+                placeholder="보험금 지급 거절 사유, 예상 손해액 산정 등 가장 궁금하신 쟁점을 적어주세요."
+                value={formData.inquiry} 
+                onChange={handleChange} 
+              />
             </div>
-            <textarea 
-              name="content" 
-              id="content" 
-              rows={4} 
-              required
-              className={`${inputClass} leading-relaxed`}
-              placeholder="사고가 발생한 경위와 현재 치료 상태, 보험사의 주장 등을 자유롭게 적어주세요."
-              value={formData.content} 
-              onChange={handleChange} 
-            />
-          </div>
-
-          {/* 문의 사항 */}
-          <div>
-            <div className={labelHeaderClass}>
-              <label htmlFor="inquiry" className={labelTextClass}>
-                궁금하신 점 / 요청 사항 <span className="text-gray-400 font-normal">(선택)</span>
-              </label>
-              <span className={labelSubClass}>핵심 쟁점 사전 분석</span>
-            </div>
-            <textarea 
-              name="inquiry" 
-              id="inquiry" 
-              rows={3}
-              className={`${inputClass} leading-relaxed`}
-              placeholder="보험금 지급 거절 사유, 예상 손해액 산정 등 가장 궁금하신 쟁점을 적어주세요."
-              value={formData.inquiry} 
-              onChange={handleChange} 
-            />
           </div>
         </PremiumCard>
 
         {/* STEP 3: 3대 안심 보장 & 개인정보 수집 동의 */}
-        <PremiumCard borderColor="green" hoverEffect={true} className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
+        <PremiumCard borderColor="green" hoverEffect={true} className="!p-5 sm:!p-7 overflow-hidden">
           {/* STEP 3 그라데이션 제목 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-emerald-200/80 dark:border-emerald-800/80">STEP 03</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -442,45 +448,48 @@ export default function ConsultationPage() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">안심 보안 원칙</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-center">
-            <div className="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1.5">
-              <div className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
-                <AppIcon name="shield-check" size={16} className="text-emerald-600" />
-                스팸·영업 전화 0%
+          {/* 내부 폼 요소 컨테이너 (정확한 space-y-6 간격 보장) */}
+          <div className="space-y-6 pt-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-center">
+              <div className="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1.5">
+                <div className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
+                  <AppIcon name="shield-check" size={16} className="text-emerald-600" />
+                  스팸·영업 전화 0%
+                </div>
+                <div className="text-xs text-gray-500 font-medium">상담 완료 후 무단 마케팅 절대 금지</div>
               </div>
-              <div className="text-xs text-gray-500 font-medium">상담 완료 후 무단 마케팅 절대 금지</div>
-            </div>
-            <div className="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1.5">
-              <div className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
-                <AppIcon name="lock" size={16} className="text-emerald-600" />
-                100% 비밀 보장
+              <div className="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1.5">
+                <div className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
+                  <AppIcon name="lock" size={16} className="text-emerald-600" />
+                  100% 비밀 보장
+                </div>
+                <div className="text-xs text-gray-500 font-medium">담당 손해사정사 1인만 비공개 열람</div>
               </div>
-              <div className="text-xs text-gray-500 font-medium">담당 손해사정사 1인만 비공개 열람</div>
-            </div>
-            <div className="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1.5">
-              <div className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
-                <AppIcon name="trash" size={16} className="text-emerald-600" />
-                3개월 후 영구 파기
+              <div className="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1.5">
+                <div className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
+                  <AppIcon name="trash" size={16} className="text-emerald-600" />
+                  3개월 후 영구 파기
+                </div>
+                <div className="text-xs text-gray-500 font-medium">목적 달성 시 안전하게 자동 파기</div>
               </div>
-              <div className="text-xs text-gray-500 font-medium">목적 달성 시 안전하게 자동 파기</div>
             </div>
-          </div>
 
-          <div className="pt-4 border-t border-gray-100 dark:border-zinc-800">
-            <label className="flex items-start gap-3 cursor-pointer select-none">
-              <input 
-                type="checkbox" 
-                checked={privacyAgreed} 
-                onChange={e => setPrivacyAgreed(e.target.checked)}
-                className="mt-1 w-4 h-4 text-blue-600 rounded-none border-gray-300 focus:ring-0 cursor-pointer" 
-              />
-              <span className="text-xs sm:text-[13px] text-gray-800 dark:text-gray-200 leading-relaxed font-bold">
-                [필수] 개인정보 수집 및 이용 동의
-                <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-normal">
-                  수집항목: 성명, 연락처, 상담내용 / 이용목적: 손해사정 1:1 무료 상담 및 권익 분석 / 보유기간: 상담 완료 후 3개월 (또는 요청 시 즉시 파기)
+            <div className="pt-4 border-t border-gray-100 dark:border-zinc-800">
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  checked={privacyAgreed} 
+                  onChange={e => setPrivacyAgreed(e.target.checked)}
+                  className="mt-1 w-4 h-4 text-blue-600 rounded-none border-gray-300 focus:ring-0 cursor-pointer" 
+                />
+                <span className="text-xs sm:text-[13px] text-gray-800 dark:text-gray-200 leading-relaxed font-bold">
+                  [필수] 개인정보 수집 및 이용 동의
+                  <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-normal">
+                    수집항목: 성명, 연락처, 상담내용 / 이용목적: 손해사정 1:1 무료 상담 및 권익 분석 / 보유기간: 상담 완료 후 3개월 (또는 요청 시 즉시 파기)
+                  </span>
                 </span>
-              </span>
-            </label>
+              </label>
+            </div>
           </div>
         </PremiumCard>
 

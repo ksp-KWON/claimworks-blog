@@ -159,7 +159,7 @@ export default function AutoCalculator() {
   const { exportPDF, shareResult } = useCalculatorExport(resultRef);
 
   const inputClass = "w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-3 px-3.5 text-sm font-bold text-gray-900 dark:text-white rounded-none focus:border-blue-500 focus:outline-none transition-colors placeholder-gray-400";
-  const labelHeaderClass = "flex items-center justify-between mb-2";
+  const labelHeaderClass = "flex items-center justify-between mb-2.5";
   const labelTextClass = "text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-gray-100 select-none";
   const labelSubClass = "text-[11px] text-gray-400 dark:text-zinc-500 font-medium select-none";
 
@@ -176,12 +176,12 @@ export default function AutoCalculator() {
       </div>
 
       {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
-      <div className="space-y-5">
+      <div className="space-y-6">
         
         {/* [STEP 1] 피해 유형 선택 */}
-        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="bandaid" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
+        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="bandaid" className="!p-5 sm:!p-7 overflow-hidden">
           {/* STEP 1 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-blue-200/80 dark:border-blue-800/80">STEP 01</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -192,7 +192,7 @@ export default function AutoCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">복수 선택 가능</span>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 pt-5">
             {[
               { key: 'hasInjury', label: '부상 (치료)', sub: '입원·통원 치료비', color: 'blue' },
               { key: 'hasDisability', label: '후유장해', sub: '노동력 상실수익액', color: 'purple' },
@@ -218,9 +218,9 @@ export default function AutoCalculator() {
         </PremiumCard>
 
         {/* [STEP 2] 기본 정보 (소득 및 과실) */}
-        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="chart" className="!p-5 sm:!p-7 space-y-5 overflow-hidden">
+        <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="chart" className="!p-5 sm:!p-7 overflow-hidden">
           {/* STEP 2 그라데이션 헤더 바 */}
-          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+          <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-blue-200/80 dark:border-blue-800/80">STEP 02</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -231,7 +231,7 @@ export default function AutoCalculator() {
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">손해배상 산정 기초</span>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-6 pt-5">
             {/* 소득 입력 & 도시일용 퀵 버튼 */}
             <div>
               <div className={labelHeaderClass}>
@@ -288,9 +288,9 @@ export default function AutoCalculator() {
 
         {/* [STEP 3] 세부 치료 & 장해 내역 */}
         {(data.hasInjury || data.hasDisability || data.hasDeath) && (
-          <PremiumCard borderColor="purple" hoverEffect={true} watermarkIcon="crutches" className="!p-5 sm:!p-7 space-y-5 overflow-hidden animate-in fade-in duration-200">
+          <PremiumCard borderColor="purple" hoverEffect={true} watermarkIcon="crutches" className="!p-5 sm:!p-7 overflow-hidden animate-in fade-in duration-200">
             {/* STEP 3 그라데이션 헤더 바 */}
-            <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-purple-50 via-indigo-50/60 to-transparent dark:from-purple-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-purple-100 dark:border-purple-900/40 flex items-center justify-between">
+            <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-purple-50 via-indigo-50/60 to-transparent dark:from-purple-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-purple-100 dark:border-purple-900/40 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono font-bold text-purple-600 dark:text-purple-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-purple-200/80 dark:border-purple-800/80">STEP 03</span>
                 <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
@@ -301,7 +301,7 @@ export default function AutoCalculator() {
               <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">의학적 항목 산정</span>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-6 pt-5">
               {/* 부상 치료 상세 */}
               {data.hasInjury && (
                 <div className="space-y-4 pb-5 border-b border-gray-100 dark:border-zinc-800 last:border-0">
@@ -447,9 +447,9 @@ export default function AutoCalculator() {
       </div>
 
       {/* 3. 📋 세부 손해배상 산출 명세서 (상시 100% 노출) */}
-      <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 space-y-4 overflow-hidden">
+      <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 overflow-hidden">
         {/* 명세서 그라데이션 헤더 바 */}
-        <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-4 sm:px-7 sm:py-4 mb-5 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+        <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AppIcon name="file-text" size={16} className="text-blue-600 dark:text-blue-400" />
             <h3 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white">
@@ -459,7 +459,7 @@ export default function AutoCalculator() {
           <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">약관 지급기준 실시간 연산</span>
         </div>
 
-        <div className="space-y-3 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300">
+        <div className="space-y-3 pt-5 text-xs sm:text-[13.5px] text-gray-700 dark:text-gray-300">
           {result.alimony > 0 && (
             <div className="flex justify-between py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
               <span className="font-medium">· {result.appliedAlimonyLabel}</span>

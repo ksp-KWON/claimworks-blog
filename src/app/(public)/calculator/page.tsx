@@ -175,17 +175,17 @@ export default function CalculatorIndex() {
                 </div>
 
                 {/* 본문 콘텐츠 & 액션 영역 */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-start gap-3.5">
-                    {/* 테마 아이콘 */}
-                    <div className={`p-3 border ${theme.iconBg} ${theme.iconText} shrink-0 mt-0.5`}>
-                      <AppIcon name={calc.icon} size={24} />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                  <div className="flex items-start sm:items-center gap-4 sm:gap-5 flex-1 min-w-0">
+                    {/* 테마 아이콘 (확대된 프리미엄 W3C SVG 심볼 박스) */}
+                    <div className={`w-13 h-13 sm:w-15 sm:h-15 flex items-center justify-center border ${theme.iconBg} ${theme.iconText} shrink-0 transition-transform duration-200 group-hover:scale-105 shadow-xs`}>
+                      <AppIcon name={calc.icon} size={30} className="sm:!w-8 sm:!h-8" />
                     </div>
 
                     {/* 텍스트 설명 */}
                     <div className="space-y-1.5 min-w-0 flex-1">
                       <div>
-                        <p className="text-xs sm:text-[13px] font-extrabold text-gray-900 dark:text-white">
+                        <p className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white">
                           {calc.subtitle}
                         </p>
                       </div>

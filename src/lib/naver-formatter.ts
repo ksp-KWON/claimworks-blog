@@ -260,8 +260,8 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
           const itemText = l.replace(/^[-*]\s*(?:\[[ xX]\]\s*)?/, '').trim();
           const highlighted = applyNaverHighlighter(itemText);
           const checkSymbol = isChecked 
-            ? '<span style="display: inline-block; background-color: #10b981; color: white; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 3px; font-size: 12px; margin-right: 8px; vertical-align: middle;">✓</span>'
-            : '<span style="display: inline-block; border: 1.5px solid #94a3b8; width: 15px; height: 15px; border-radius: 3px; margin-right: 8px; vertical-align: middle;"></span>';
+            ? '<strong style="color: #059669; font-size: 15px; margin-right: 8px; font-family: inherit;">[✓]</strong>'
+            : '<strong style="color: #94a3b8; font-size: 15px; margin-right: 8px; font-family: inherit;">[  ]</strong>';
           
           return `<div style="margin: 10px 0; font-size: 14.5px; color: #334155; line-height: 1.85; padding-left: 2px;">${checkSymbol}<span style="vertical-align: middle;">${highlighted}</span></div>`;
         }).join('');
@@ -326,7 +326,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
         <table style="width: 100%; border: 1px solid #bfdbfe; border-collapse: collapse; margin: 18px 0; font-size: 14px;">
           <tr>
             <td style="padding: 12px 16px; background-color: #eff6ff; border-bottom: 1px solid #bfdbfe; font-weight: bold; color: #1e40af; line-height: 1.5;">
-              <span style="display: inline-block; background-color: #3b82f6; color: #ffffff; padding: 2px 6px; border-radius: 2px; font-size: 12px; margin-right: 8px; font-weight: bold;">Q</span>${qHighlighted}
+              <strong style="color: #2563eb; font-size: 16px; margin-right: 8px; font-family: inherit;">Q.</strong><span style="color: #1e40af; font-weight: bold;">${qHighlighted}</span>
             </td>
           </tr>
           <tr>
@@ -392,7 +392,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
           <tr>
             <td style="padding: 10px 14px;">
               <p style="font-size: 15px; font-weight: bold; color: #065f46; margin: 0;">
-                <span style="display: inline-block; background-color: #10b981; color: #ffffff; padding: 2px 6px; border-radius: 2px; font-size: 12px; margin-right: 8px; font-weight: bold;">솔루션</span>${titleText}
+                <strong style="color: #059669; font-size: 15px; margin-right: 8px; font-family: inherit;">솔루션</strong><span style="color: #065f46; font-weight: bold;">${titleText}</span>
               </p>
             </td>
           </tr>
@@ -439,8 +439,8 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
             const itemText = l.replace(/^- \[( |x)\]\s*/, '');
             const highlighted = applyNaverHighlighter(itemText);
             const checkSymbol = isChecked 
-              ? '<span style="display: inline-block; background-color: #10b981; color: white; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 3px; font-size: 12px; margin-right: 8px; vertical-align: middle;">✓</span>'
-              : '<span style="display: inline-block; border: 1.5px solid #94a3b8; width: 15px; height: 15px; border-radius: 3px; margin-right: 8px; vertical-align: middle;"></span>';
+              ? '<strong style="color: #059669; font-size: 15px; margin-right: 8px; font-family: inherit;">[✓]</strong>'
+              : '<strong style="color: #94a3b8; font-size: 15px; margin-right: 8px; font-family: inherit;">[  ]</strong>';
             
             return `<div style="margin: 10px 0; font-size: 14.5px; color: #334155; line-height: 1.85; padding-left: 2px;">${checkSymbol}<span style="vertical-align: middle;">${highlighted}</span></div>`;
           }).join('');

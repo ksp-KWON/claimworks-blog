@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import ConsultationAdminPanel from '@/components/admin/ConsultationAdminPanel';
 import ChatAdminPanel from '@/components/admin/ChatAdminPanel';
 import CalendarAdminPanel from '@/components/admin/CalendarAdminPanel';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const AnalyticsDashboardPanel = dynamic(() => import('@/components/admin/AnalyticsDashboardPanel'), { ssr: false });
 const AiWritingStudio = dynamic(() => import('@/components/admin/posts/AiWritingStudio'), { ssr: false });
@@ -312,7 +313,12 @@ export default function AdminPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex flex-col justify-center items-center p-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex flex-col justify-center items-center p-4 relative">
+        {/* 로그인 화면 테마 토글 버튼 */}
+        <div className="absolute top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
+
         <div className="max-w-md w-full bg-white dark:bg-[#202124] rounded-none shadow-[0_0_50px_rgba(0,0,0,0.12),0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_0_60px_rgba(0,0,0,0.75)] p-8 border border-gray-200/80 dark:border-white/10 relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--google-blue)] via-indigo-500 to-purple-500" />
           <div className="text-center mb-8">
@@ -400,60 +406,67 @@ export default function AdminPage() {
           </div>
 
           {/* 우측 메인 네비게이션 메뉴 (하단 작업영역 우측 라인과 일치) */}
-          <div className="hidden md:flex items-center gap-1 shrink-0 bg-gray-100/80 dark:bg-zinc-950 p-1 rounded-none border border-gray-200/80 dark:border-zinc-800 shadow-sm">
-            <button 
-              onClick={() => setActiveApp('analytics')}
-              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'analytics' || activeApp === 'post-settings' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
-            >
-              통계 관리
-            </button>
-            
-            <button 
-              onClick={() => setActiveApp('consult-manage')}
-              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'consult-manage' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
-            >
-              상담 관리
-            </button>
-            
-            <button 
-              onClick={() => setActiveApp('chat-manage')}
-              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'chat-manage' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
-            >
-              채팅 관리
-            </button>
-            
-            <button 
-              onClick={() => setActiveApp('calendar')}
-              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'calendar' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
-            >
-              일정 관리
-            </button>
-            
-            <button 
-              onClick={() => setActiveApp('post-list')}
-              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'post-list' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
-            >
-              원고 관리
-            </button>
-   
-            <button 
-              onClick={() => setActiveApp('post-ai')}
-              className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'post-ai' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
-            >
-              작업 관리
-            </button>
-            
-            <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-0.5" />
+          <div className="flex items-center gap-1.5 shrink-0">
+            <div className="hidden md:flex items-center gap-1 shrink-0 bg-gray-100/80 dark:bg-zinc-950 p-1 rounded-none border border-gray-200/80 dark:border-zinc-800 shadow-sm">
+              <button 
+                onClick={() => setActiveApp('analytics')}
+                className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'analytics' || activeApp === 'post-settings' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+              >
+                통계 관리
+              </button>
+              
+              <button 
+                onClick={() => setActiveApp('consult-manage')}
+                className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'consult-manage' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+              >
+                상담 관리
+              </button>
+              
+              <button 
+                onClick={() => setActiveApp('chat-manage')}
+                className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'chat-manage' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+              >
+                채팅 관리
+              </button>
+              
+              <button 
+                onClick={() => setActiveApp('calendar')}
+                className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'calendar' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+              >
+                일정 관리
+              </button>
+              
+              <button 
+                onClick={() => setActiveApp('post-list')}
+                className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'post-list' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+              >
+                원고 관리
+              </button>
+     
+              <button 
+                onClick={() => setActiveApp('post-ai')}
+                className={`px-3 py-1 text-xs font-bold transition-all rounded-none border ${activeApp === 'post-ai' ? 'bg-white dark:bg-zinc-900 text-[var(--google-blue)] dark:text-[#8ab4f8] border-blue-300/80 dark:border-blue-700 shadow-sm font-extrabold' : 'text-gray-600 dark:text-zinc-400 border-transparent hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:text-gray-900'}`}
+              >
+                작업 관리
+              </button>
+              
+              <div className="w-px h-3.5 bg-gray-300 dark:bg-zinc-700 mx-0.5" />
 
-            <button 
-              onClick={() => {
-                sessionStorage.removeItem('admin_auth');
-                setIsLoggedIn(false);
-              }}
-              className="px-2.5 py-1 rounded-none text-xs font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors border border-transparent hover:border-red-200 dark:hover:border-red-900/50"
-            >
-              로그아웃
-            </button>
+              <button 
+                onClick={() => {
+                  sessionStorage.removeItem('admin_auth');
+                  setIsLoggedIn(false);
+                }}
+                className="px-2.5 py-1 rounded-none text-xs font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors border border-transparent hover:border-red-200 dark:hover:border-red-900/50"
+              >
+                로그아웃
+              </button>
+            </div>
+
+            {/* 다크/라이트 테마 토글 공통 버튼 (모바일/PC 공통) */}
+            <div className="flex items-center shrink-0 border border-gray-200/80 dark:border-zinc-800 bg-gray-50/80 dark:bg-zinc-950 shadow-sm">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </div>

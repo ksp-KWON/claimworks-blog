@@ -251,16 +251,33 @@ export default function AdminPage() {
       return;
     }
     setIsLoading(true);
+    setAutoProgress('AI가 헌법 뼈대에 맞추어 글을 작성 중입니다...');
     try {
-      const resultText = await callGeminiAPI(geminiKey, inputText, mode);
+      const finalMarkdown = await runManualGenerationWorkflow(
+        mode,
+        inputText,
+        geminiKey,
+        (msg: string) => setAutoProgress(msg)
+      );
+
+      // Frontmatter와 본문 완벽 분리
+      const { data: meta, content: pureContent } = parseMarkdown(finalMarkdown);
+
       setPostMeta(prev => ({
         ...prev,
-        content: resultText
+        title: meta.title || prev.title,
+        summary: meta.summary || prev.summary,
+        category: normalizeCategory(meta.category || prev.category),
+        specialtyCategory: meta.specialtyCategory || prev.specialtyCategory,
+        caseNumber: meta.caseNumber || prev.caseNumber,
+        tags: Array.isArray(meta.tags) ? meta.tags.join(', ') : (meta.tags || prev.tags),
+        content: pureContent
       }));
     } catch (e: any) {
       alert(`AI 생성 실패: ${e.message}`);
     } finally {
       setIsLoading(false);
+      setAutoProgress('');
     }
   };
 

@@ -13,23 +13,49 @@ import {
 import { stringifyMarkdown } from './markdown-utils';
 
 function parseGeneratedContent(text: string) {
+  if (!text) return { content: '', thoughtProcess: '' };
+
+  // 1. 직접 JSON 객체이거나 순수 JSON 문자열인 경우
   try {
     const parsed = typeof text === 'string' ? JSON.parse(text) : text;
-    if (parsed && parsed.markdownContent) {
-      return { content: parsed.markdownContent, thoughtProcess: parsed.thoughtProcess };
+    if (parsed && (parsed.markdownContent || parsed.content)) {
+      return { 
+        content: (parsed.markdownContent || parsed.content || '').trim(), 
+        thoughtProcess: parsed.thoughtProcess || '' 
+      };
     }
-  } catch (e) {
-    // JSON 파싱 실패 시 기존 마크다운 필터링 폴백
-  }
-  const content = text.replace(/^```(markdown)?/im, '').replace(/```$/im, '').trim();
+  } catch (e) {}
+
+  // 2. 텍스트 내에 JSON 코드블록이 포함된 경우
+  try {
+    const match = text.match(/```(?:json)?\s*\n([\s\S]*?)\n```/) || text.match(/\{[\s\S]*"(?:markdownContent|content)"[\s\S]*\}/);
+    if (match) {
+      const jsonCandidate = match[1] || match[0];
+      const parsed = JSON.parse(jsonCandidate);
+      if (parsed && (parsed.markdownContent || parsed.content)) {
+        return { 
+          content: (parsed.markdownContent || parsed.content || '').trim(), 
+          thoughtProcess: parsed.thoughtProcess || '' 
+        };
+      }
+    }
+  } catch (e) {}
+
+  // 3. 백틱(```markdown) 코드블록 래핑 및 thoughtProcess 잔재 제거
+  let content = text
+    .replace(/^```(?:markdown)?\s*\n?/i, '')
+    .replace(/\n?```\s*$/i, '')
+    .replace(/^(?:thoughtProcess|사고\s*과정|생각의\s*사슬)[\s\S]*?(?=\n##|\n#)/i, '')
+    .trim();
+
   return { content, thoughtProcess: '' };
 }
 
 function safeJsonParse(jsonStr: string, fallback: any = null) {
   try {
-    const match = jsonStr.match(/```(?:json)?\n([\s\S]*?)\n```/) || jsonStr.match(/{[\s\S]*}/);
-    const extracted = match ? match[0].replace(/```json/g, '').replace(/```/g, '') : jsonStr;
-    return JSON.parse(extracted);
+    const match = jsonStr.match(/```(?:json)?\s*\n([\s\S]*?)\n```/) || jsonStr.match(/\{[\s\S]*\}/);
+    const extracted = match ? (match[1] || match[0]).replace(/```json/g, '').replace(/```/g, '') : jsonStr;
+    return JSON.parse(extracted.trim());
   } catch (e) {
     if (fallback !== null) return fallback;
     throw new Error('JSON 파싱 실패');

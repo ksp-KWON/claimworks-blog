@@ -31,7 +31,7 @@ const getHeadingTone = (level: number, node?: React.ReactNode): 'red' | 'blue' |
   // 특수 섹션 전용 컬러 매핑
   if (/(1분\s*자가진단|자가진단|체크리스트|진단\s*체크)/i.test(text)) return 'green';
   if (/(FAQ|자주\s*묻는\s*질문|자주묻는질문|질문과\s*답변|Q&A)/i.test(text)) return 'purple';
-  if (/(핵심\s*요약|요약)/i.test(text)) return 'yellow';
+  if (/(핵심\s*요약|핵심요약|3줄\s*요약)/i.test(text)) return 'red';
 
   // 제목 영역 기본 색상 위계: 빨(H2) - 파(H3) - 노(H4/H5) - 초록(H6: 맞춤솔루션)
   switch (level) {

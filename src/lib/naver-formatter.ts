@@ -126,23 +126,25 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     </table>
   `.trim());
 
-  // ── [2단계] 핵심 요약 박스 (W3C 표준 톤온톤 에메랄드 카드) ──
+  // ── [2단계] 핵심 요약 박스 (W3C 표준 보상스쿨 시그니처 레드 프리미엄 카드) ──
   if (keyPoints.length > 0) {
-    const greenToken = BLOG_TONE_TOKENS.green.hex;
+    const redToken = BLOG_TONE_TOKENS.red.hex;
     const itemsHtml = keyPoints.map(item => {
       const highlighted = applyNaverHighlighter(item);
-      return `<div style="margin: 8px 0; font-size: 14.5px; color: ${greenToken.bodyText}; line-height: 1.8;"><span style="color: ${greenToken.borderAccent}; font-weight: bold; margin-right: 8px;">•</span>${highlighted}</div>`;
+      return `<div style="margin: 9px 0; font-size: 14.5px; color: ${redToken.bodyText}; line-height: 1.85; padding-left: 2px;"><span style="color: ${redToken.borderAccent}; font-weight: bold; margin-right: 8px; font-size: 15px;">•</span><span style="vertical-align: middle;">${highlighted}</span></div>`;
     }).join('');
 
     const summaryBoxHtml = `
-      <table style="width: 100%; border: 1.5px solid ${greenToken.border}; background-color: #f0fdf4; border-collapse: collapse; margin: 16px 0 20px 0; border-radius: 4px;">
+      <table style="width: 100%; border: 1px solid ${redToken.border}; border-left: 5px solid ${redToken.borderAccent}; background-color: #ffffff; border-collapse: collapse; margin: 20px 0 24px 0;">
         <tr>
-          <td style="padding: 10px 16px; background-color: ${greenToken.headerBg}; border-bottom: 1px solid ${greenToken.border}; font-weight: bold; color: ${greenToken.headerText}; font-size: 15px;">
-            핵심 요약
+          <td style="padding: 11px 18px; background-color: ${redToken.headerBg}; border-bottom: 1px solid ${redToken.headerBorderBottom};">
+            <span style="font-size: 15.5px; font-weight: bold; color: ${redToken.headerText};">
+              보상스쿨 핵심 요약
+            </span>
           </td>
         </tr>
         <tr>
-          <td style="padding: 16px 20px; background-color: #f0fdf4;">
+          <td style="padding: 16px 20px; background-color: #ffffff;">
             ${itemsHtml}
           </td>
         </tr>

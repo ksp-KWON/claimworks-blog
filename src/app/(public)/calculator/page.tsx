@@ -25,15 +25,14 @@ interface CalculatorItem {
   href: string;
   color: CalculatorTheme;
   btnText: string;
-  badgeText: string;
 }
 
 const THEME_MAP: Record<CalculatorTheme, {
   headerGradient: string;
   headerBorder: string;
   badgeBorder: string;
-  hoverText: string;
-  hoverBtnBg: string;
+  headerTitleColor: string;
+  btnBg: string;
   iconBg: string;
   iconText: string;
   chevronHover: string;
@@ -42,31 +41,31 @@ const THEME_MAP: Record<CalculatorTheme, {
     headerGradient: 'from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent',
     headerBorder: 'border-blue-100 dark:border-blue-900/40',
     badgeBorder: 'text-blue-600 dark:text-blue-400 border-blue-200/80 dark:border-blue-800/80',
-    hoverText: 'group-hover:text-blue-600 dark:group-hover:text-blue-400',
-    hoverBtnBg: 'group-hover:bg-blue-600 dark:group-hover:bg-blue-500',
+    headerTitleColor: 'text-blue-700 dark:text-blue-300',
+    btnBg: 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20',
     iconBg: 'bg-blue-50/80 dark:bg-blue-950/40 border-blue-200/60 dark:border-blue-900/50',
     iconText: 'text-blue-600 dark:text-blue-400',
-    chevronHover: 'group-hover:text-blue-600 dark:group-hover:text-blue-400'
+    chevronHover: 'text-blue-600 dark:text-blue-400'
   },
   green: {
     headerGradient: 'from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent',
     headerBorder: 'border-emerald-100 dark:border-emerald-900/40',
     badgeBorder: 'text-emerald-600 dark:text-emerald-400 border-emerald-200/80 dark:border-emerald-800/80',
-    hoverText: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400',
-    hoverBtnBg: 'group-hover:bg-emerald-600 dark:group-hover:bg-emerald-500',
+    headerTitleColor: 'text-emerald-700 dark:text-emerald-300',
+    btnBg: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20',
     iconBg: 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-200/60 dark:border-emerald-900/50',
     iconText: 'text-emerald-600 dark:text-emerald-400',
-    chevronHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
+    chevronHover: 'text-emerald-600 dark:text-emerald-400'
   },
   red: {
     headerGradient: 'from-rose-50 via-red-50/60 to-transparent dark:from-rose-950/50 dark:via-red-950/30 dark:to-transparent',
     headerBorder: 'border-rose-100 dark:border-rose-900/40',
     badgeBorder: 'text-rose-600 dark:text-rose-400 border-rose-200/80 dark:border-rose-800/80',
-    hoverText: 'group-hover:text-rose-600 dark:group-hover:text-rose-400',
-    hoverBtnBg: 'group-hover:bg-rose-600 dark:group-hover:bg-rose-500',
+    headerTitleColor: 'text-rose-700 dark:text-rose-300',
+    btnBg: 'bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-500/20',
     iconBg: 'bg-rose-50/80 dark:bg-rose-950/40 border-rose-200/60 dark:border-rose-900/50',
     iconText: 'text-rose-600 dark:text-rose-400',
-    chevronHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400'
+    chevronHover: 'text-rose-600 dark:text-rose-400'
   }
 };
 
@@ -81,8 +80,7 @@ const CALCULATORS: CalculatorItem[] = [
     icon: 'car',
     href: '/calculator/auto',
     color: 'blue',
-    btnText: '합의금 계산하기',
-    badgeText: '약관·호프만계수 적용'
+    btnText: '합의금 계산하기'
   },
   {
     id: 'medical',
@@ -94,8 +92,7 @@ const CALCULATORS: CalculatorItem[] = [
     icon: 'hospital',
     href: '/calculator/medical',
     color: 'green',
-    btnText: '실손의료비 계산하기',
-    badgeText: '1~5세대 전 세대 지원'
+    btnText: '실손의료비 계산하기'
   },
   {
     id: 'liability',
@@ -107,8 +104,7 @@ const CALCULATORS: CalculatorItem[] = [
     icon: 'scale',
     href: '/calculator/liability',
     color: 'red',
-    btnText: '배상책임 손해액 계산하기',
-    badgeText: '법원 판례 기준 산정'
+    btnText: '배상책임 손해액 계산하기'
   }
 ];
 
@@ -152,7 +148,7 @@ export default function CalculatorIndex() {
         </div>
       </PremiumCard>
 
-      {/* 2. 3대 계산기 인터랙티브 액션 카드 (우측 메뉴 및 딥링크 페이지와 완벽한 폰트 스케일 조율) */}
+      {/* 2. 3대 계산기 인터랙티브 액션 카드 */}
       <div className="space-y-4 pt-1">
         {CALCULATORS.map((calc) => {
           const theme = THEME_MAP[calc.color];
@@ -163,19 +159,18 @@ export default function CalculatorIndex() {
                 hoverEffect={true} 
                 className="!p-5 sm:!p-6 space-y-4 overflow-hidden transition-all duration-200 group-hover:scale-[1.004]"
               >
-                {/* 상단 풀블리드 테마 헤더 바 */}
+                {/* 상단 풀블리드 테마 헤더 바 (시그니처 컬러 제목 + 깔끔한 Chevron) */}
                 <div className={`-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 px-5 py-3 sm:px-6 sm:py-3.5 mb-4 bg-gradient-to-r ${theme.headerGradient} border-b ${theme.headerBorder} flex items-center justify-between`}>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2.5">
                     <span className={`text-[10px] font-mono font-bold bg-white dark:bg-zinc-800 px-2 py-0.5 border ${theme.badgeBorder}`}>
                       {calc.step}
                     </span>
-                    <span className="text-xs sm:text-[12.5px] font-extrabold text-gray-800 dark:text-gray-200">
-                      {calc.badgeText}
-                    </span>
+                    <h2 className={`text-xs sm:text-[13.5px] font-extrabold ${theme.headerTitleColor}`}>
+                      {calc.title}
+                    </h2>
                   </div>
-                  <div className={`flex items-center gap-1 text-xs font-bold text-gray-500 ${theme.chevronHover} transition-colors`}>
-                    <span>계산기 시작</span>
-                    <AppIcon name="chevron-right" size={13} className="group-hover:translate-x-1 transition-transform" />
+                  <div className={`flex items-center ${theme.chevronHover}`}>
+                    <AppIcon name="chevron-right" size={16} className="group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
 
@@ -187,13 +182,10 @@ export default function CalculatorIndex() {
                       <AppIcon name={calc.icon} size={24} />
                     </div>
 
-                    {/* 텍스트 설명 (우측 메뉴와 최적의 폰트 비례) */}
+                    {/* 텍스트 설명 */}
                     <div className="space-y-1.5 min-w-0 flex-1">
                       <div>
-                        <h2 className={`text-sm sm:text-base font-extrabold text-gray-900 dark:text-white ${theme.hoverText} transition-colors`}>
-                          {calc.title}
-                        </h2>
-                        <p className="text-[11.5px] sm:text-xs font-bold text-gray-500 dark:text-zinc-400 mt-0.5">
+                        <p className="text-xs sm:text-[13px] font-extrabold text-gray-900 dark:text-white">
                           {calc.subtitle}
                         </p>
                       </div>
@@ -216,9 +208,9 @@ export default function CalculatorIndex() {
                     </div>
                   </div>
 
-                  {/* 우측 액션 버튼 (콤팩트 & 프리미엄 스케일) */}
+                  {/* 우측 액션 버튼 (각 테마별 시그니처 컬러 적용) */}
                   <div className="shrink-0 pt-2 sm:pt-0 sm:pl-4 border-t sm:border-t-0 sm:border-l border-gray-100 dark:border-zinc-800 flex sm:flex-col items-center justify-end">
-                    <div className={`w-full sm:w-auto px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 ${theme.hoverBtnBg} dark:${theme.hoverBtnBg} dark:group-hover:text-white font-extrabold text-xs sm:text-[12.5px] text-center transition-all shadow-xs flex items-center justify-center gap-1.5`}>
+                    <div className={`w-full sm:w-auto px-4 py-2.5 ${theme.btnBg} font-extrabold text-xs sm:text-[12.5px] text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer`}>
                       <span>{calc.btnText}</span>
                       <AppIcon name="chevron-right" size={13} className="group-hover:translate-x-0.5 transition-transform" />
                     </div>

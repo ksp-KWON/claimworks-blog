@@ -57,9 +57,9 @@ function CategoryWideCard({ item, index }: { item: CategoryMeta; index: number }
         </div>
       </div>
 
-      {/* 4. 우측 고유 테마 뱃지 및 이동 화살표 (하드코딩 0% 완전 동적 연동) */}
+      {/* 4. 우측 단정 가이드 뱃지 및 이동 화살표 */}
       <div className="relative z-10 flex items-center gap-2 shrink-0">
-        <PremiumBadge color={theme.badgeColor} className="hidden sm:inline-flex text-[10px] py-0.5 px-2 font-bold shadow-xs">
+        <PremiumBadge color="gray" className="hidden sm:inline-flex text-[10px] py-0.5 px-2 font-medium shadow-xs">
           가이드
         </PremiumBadge>
         <div className={`w-6 h-6 flex items-center justify-center text-gray-400 ${theme.titleHover} transition-colors`}>

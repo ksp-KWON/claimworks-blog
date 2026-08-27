@@ -56,20 +56,35 @@
 ### 제7조 — 에러 우선 처리 규칙
 - "에러가 발생했습니다", "관리자에게 문의하세요" 등의 문구가 출력될 때, 발생 원인을 즉시 파악하고 불필요한 오류 메시지를 방지합니다.
 
-### 제8조 — 마스터 명령 수행 및 옴니-인지 에이전트(Omni-Cognitive Framework) 의무 규정
-AI(수석 개발자 및 콘텐츠 창작 엔진)는 일시적인 단선적 땜방 사고를 전면 금지하며, 국제 표준(Google DeepMind, MIT, ISO/IEC AI Trustworthiness)에 부합하는 **8대 다차원 인지 기법(Step-Back, ToT, GoT, CoT, ReAct, PoT, Reflexion, Self-Consistency)**을 시스템 엔지니어링 및 콘텐츠 창작 전반의 필수 3단계 라이프사이클로 가동해야 합니다.
+### 제8조 — 마스터 명령 수행 및 14대 전사 영역 옴니-인지(Omni-Cognitive) 의무 규정
+AI(수석 개발자 및 콘텐츠 창작 엔진)는 일시적인 단선적 땜방 사고를 전면 금지하며, 국제 표준(Google DeepMind, MIT, ISO/IEC AI Trustworthiness)에 부합하는 **8대 다차원 인지 기법(Step-Back, ToT, GoT, CoT, ReAct, PoT, Reflexion, Self-Consistency)**을 **보상스쿨 14대 전사 세부 영역(Full-Stack 14 Pillars)** 전반의 필수 라이프사이클로 가동해야 합니다.
 
+#### 1. 옴니-인지 3단계 핵심 라이프사이클
 1. **[1단계: 거시적 본질 및 입체 전략 탐색 — Step-Back & ToT/GoT]**:
    - 세부 코드나 개별 사안에 성급히 뛰어들지 않고, 상위 시스템 아키텍처 및 상법/약관의 대원칙을 먼저 규정(`Step-Back`)합니다.
    - 단일 경로를 넘어 다각도의 해결 대안 및 보험사 면책 주장 vs 손해사정사 반박 논리를 분기(`ToT`)하고 입체적 네트워크로 결합(`GoT`)합니다.
-
 2. **[2단계: 정밀 도구 실행 및 연쇄 행동 — CoT & ReAct & PoT]**:
    - 논리적 인과관계를 빈틈없는 생각의 사슬(`CoT`)로 완결성 있게 전개합니다.
    - 생각과 도구 실행(코드 수정, 타입 검사 `tsc`, 빌드 `npm run build`, API 호출)을 즉각 교차 수행(`ReAct`)하며, 복잡한 보상금 산정, 과실비율, 호프만 계수는 프로그램 연산(`PoT`)으로 처리하여 오차 0%를 달성합니다.
-
 3. **[3단계: 자가 비판 및 국제표준 일관성 검증 — Reflexion & Self-Consistency]**:
    - 결과물을 확정하기 전, 보상스쿨 글로벌 헌법(제1조 순수 텍스트/이모지 배제, 제10조 W3C 시맨틱 위계, 네이버 스마트에디터 100% 호환성) 기준으로 자체 비판 및 교정(`Reflexion`)합니다.
    - 다각도 교차 검증(`Self-Consistency`)을 통해 AI 환각(오답)과 논리적 비약을 원천 차단한 뒤 최종 확정합니다.
+
+#### 2. 보상스쿨 14대 전사 세부 영역(Full-Stack 14 Pillars) 옴니-인지 매핑 표준
+1. **백엔드 & RESTful API (`src/app/api`, `functions/api`)**: `[ReAct & Reflexion]` 25단계 무중단 릴레이 및 장애 자가 치유(Self-Healing).
+2. **콘텐츠 데이터베이스 (`src/content/posts`, `posts.ts`)**: `[Self-Consistency]` 단일 진실 공급원(SSOT) 및 30일 중복 키워드 가드레일.
+3. **UI/UX 렌더링 & 전환 퍼널 (`BlogPostContent`, 6대 무기)**: `[CoT & CRO]` 의식 흐름(인지➔학습➔의문해소➔금액확인➔상담) 기반 최적 전환 렌더링.
+4. **카테고리 & 지역 라우팅 (`/categories`, `/regions`)**: `[GoT (Graph)]` 8대 분야 + 10개 진료과 + 250개 시군구 다차원 그래프망 연결.
+5. **AI 자동생성 엔진 (`select-daily-topic`, `prompt-rules`)**: `[8대 옴니-인지 3단계]` 거시원칙(Step-Back) ➔ 다각분기(ToT) ➔ 수치연산(PoT) ➔ 자가검증(Reflexion).
+6. **디자인 & 심볼 시스템 (`AppIcon`, 5대 톤온톤, `globals.css`)**: `[Step-Back]` W3C 단색 라인 SVG + 샤프 모던 룩(`rounded-none`) 표준화.
+7. **프로덕션 빌드 & CI/CD (`check-quality.js`, SSG, Actions)**: `[PoT & CQF]` 품질검증 ➔ 타입검사 ➔ Turbopack 무결 빌드 파이프라인.
+8. **실시간 상담 & 소통 (`ChatWidget`, `/consultation`, Push)**: `[ReAct 실시간성]` Supabase Realtime 소켓 기반 1:1 비공개 상담 관제.
+9. **검색엔진 최적화 (SEO) (`sitemap.ts`, `robots.ts`, `rss.xml`, OG)**: `[Self-Consistency]` 전역 메타데이터 및 캐노니컬 일관성 유지.
+10. **인터랙티브 계산기 (`/calculator` 3종)**: `[PoT 정밀 연산]` 호프만 계수 + 과실비율 + 비급여 실손 오차 0% 시뮬레이터.
+11. **어드민 관리 센터 (`/admin`, `naver-formatter.ts`)**: `[ReAct & PoT]` JWT 보안 인증 + 실시간 상담 관제 + 네이버 블로그 D.I.A.+ 원클릭 변환.
+12. **보안 & 콘텐츠 보호 (`ContentGuard.tsx`)**: `[Reflexion & Self-Consistency]` 무단 크롤링/복제 방어 및 지적재산권 수호.
+13. **공공데이터 & 판례 시스템 (`generate-fss-news`, `taas-accidents`)**: `[ReAct & GoT]` 금감원 보도자료, 도로교통공단 TAAS, 유튜브 미디어 연동.
+14. **특화 서비스 & 전역 검색 (`/traffic-care`, `/about`, `/search`)**: `[Step-Back & CoT]` 교통사고 전문 케어 센터 및 실시간 키워드 검색 허브.
 
 ### 제9조 — 개발 슬로건 및 최적화 원칙
 - **개발 슬로건**: "표준, 범용, 콤팩트, 통합, 공유, 공통"

@@ -151,36 +151,16 @@ function assembleArticlePrompt({
   const topicTags = Array.isArray(safeTopic.tags) ? safeTopic.tags.join(', ') : (safeTopic.tags || '');
 
   let modeInstruction = '';
-  if (mode === 'manual-naver') {
-    modeInstruction = `[네이버 블로그 D.I.A.+ 전용 원고 각색 특명 (옴니-인지 3단계 라이프사이클)]
-1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 원문의 쟁점을 분석하여 네이버 독자가 공감할 수 있는 1:1 상담 대화체와 스토리텔링으로 재구성하는 전략, 모바일 가독성 호흡 설계를 thoughtProcess에 심층 기술하십시오.
-2. [2단계: 정밀 실행 (CoT & PoT)]: 인과관계에 입각한 생각의 사슬과 정밀한 손해액 산정으로 6대 헌법 무기(핵심요약/오프닝/비교표/인라인사전/자가진단/FAQ/맞춤솔루션)를 완벽 장착하십시오.
-3. [3단계: 자가 비판 및 검증 (Reflexion & Self-Consistency)]: 네이버 스마트에디터 호환성 및 이모지 배제 규칙을 자체 점검하십시오.`;
-  } else if (mode === 'naver-expand') {
-    modeInstruction = `[네이버 블로그 D.I.A.+ 신규 확장 창작 특명 (옴니-인지 3단계 라이프사이클)]
-1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 실제 피해자의 고충과 검색 의도를 분석하고, 상위 법리 원칙과 공감 스토리텔링 기획을 thoughtProcess에 심층 기술하십시오.
-2. [2단계: 정밀 실행 (CoT & PoT)]: 2~3줄 단위의 부드러운 줄간격과 정밀한 손해사정 실무 법리를 6대 헌법 무기 틀에 담아 작성하십시오.
-3. [3단계: 자가 비판 및 검증 (Reflexion & Self-Consistency)]: 네이버 D.I.A.+ 신뢰도와 헌법 규칙 준수 여부를 자체 검증하십시오.`;
-  } else if (mode === 'semi-auto-naver') {
-    modeInstruction = `[네이버 블로그 D.I.A.+ 링크/키워드 기획 창작 특명 (옴니-인지 3단계 라이프사이클)]
-1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 제공된 키워드/링크의 핵심 쟁점과 유입 극대화 스토리텔링 설계를 thoughtProcess에 심층 기술하십시오.
-2. [2단계: 정밀 실행 (CoT & PoT)]: 전문 손해사정사의 따뜻한 상담체와 생생한 사례로 6대 헌법 무기를 완벽하게 장착하십시오.
-3. [3단계: 자가 비판 및 검증 (Reflexion & Self-Consistency)]: 모바일 최적 가독성과 일관된 법리를 자체 감수하십시오.`;
-  } else if (mode === 'manual-preserve') {
-    modeInstruction = `[구글 E-E-A-T 초안 다듬기 모드 특명 (옴니-인지 3단계 라이프사이클)]
-1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 원문의 사실관계와 핵심 논리를 상위 원칙에 입각해 정밀 분석하여 thoughtProcess에 기술하십시오.
-2. [2단계: 정밀 실행 (CoT & PoT)]: 원문의 부족한 부분을 보강하여 6대 헌법 무기(공감 오프닝, 핵심 요약, 인라인 용어사전, 마크다운 표, 1분 자가진단, FAQ 3개, 결론 맞춤형 솔루션)의 완결된 틀로 다듬으십시오.
-3. [3단계: 자가 비판 및 검증 (Reflexion & Self-Consistency)]: 구글 E-E-A-T 기준과 W3C 시맨틱 위계를 자체 비판하고 확정하십시오.`;
-  } else if (mode === 'manual-expand') {
-    modeInstruction = `[구글 E-E-A-T 초안 확장 모드 특명 (옴니-인지 3단계 라이프사이클)]
-1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 최신 대법원 판례, 의학 장해평가 기준(맥브라이드/AMA), 약관 면책 방어 논리를 다각도로 수읽기하여 thoughtProcess에 기술하십시오.
-2. [2단계: 정밀 실행 (CoT & PoT)]: 5,000자 이상의 최고 권위 심층 전문 칼럼으로 6대 헌법 무기를 100% 장착하십시오.
-3. [3단계: 자가 비판 및 검증 (Reflexion & Self-Consistency)]: 의학/법률 전문성과 일관성을 교차 검증하십시오.`;
+  if (mode.includes('naver')) {
+    modeInstruction = `[네이버 블로그 D.I.A.+ 전용 원고 각색 특명 (8대 옴니-인지 프로토콜)]
+1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 상법/약관 대원칙(Step-Back)과 피해자 고충을 먼저 규정하고, 1:1 상담 대화체와 모바일 스토리텔링 전략을 thoughtProcess에 1~2문장으로 콤팩트하게 기술하십시오.
+2. [2단계: 정밀 실행 및 연쇄 추론 (CoT & ReAct & PoT)]: 인과관계 사슬(CoT)과 수치 연산(PoT)으로 2~3줄 단위의 부드러운 가독성과 4대 본문 챕터 + 6대 헌법 무기를 완벽 집필하십시오.
+3. [3단계: 자가 비판 및 일관성 검증 (Reflexion & Self-Consistency)]: 네이버 스마트에디터 호환성, 팩트 무결성, 순수 텍스트(이모지 전면 배제)를 자체 검증하십시오.`;
   } else {
-    modeInstruction = `[구글 E-E-A-T 전문 칼럼 창작 모드 특명 (옴니-인지 3단계 라이프사이클)]
-1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 최고 권위의 손해사정 기획안을 도출하여 thoughtProcess에 기술하십시오.
-2. [2단계: 정밀 실행 (CoT & PoT)]: 구글 E-E-A-T 기준을 충족하는 6대 헌법 무기 칼럼을 집필하십시오.
-3. [3단계: 자가 비판 및 검증 (Reflexion & Self-Consistency)]: 환각 없는 무결점 판례와 전문성을 자체 검증하십시오.`;
+    modeInstruction = `[구글 E-E-A-T 최고 권위 전문 칼럼 창작 특명 (8대 옴니-인지 프로토콜)]
+1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 사안의 세부 사실 이전에 상법/표준약관의 대원칙(Step-Back)을 먼저 규정하고, 보험사 면책 주장 vs 손해사정사 반박 논리를 2갈래 이상 분기 탐색(ToT/GoT)하여 thoughtProcess에 1~2문장으로 콤팩트하게 기술하십시오.
+2. [2단계: 정밀 실행 및 연쇄 추론 (CoT & ReAct & PoT)]: 원인 ➔ 진단 ➔ 면책 ➔ 반박 ➔ 장해 ➔ 보상의 필연적 인과관계 사슬(CoT)과 정확한 손해액 산출(PoT)을 4대 본문 챕터(1·2·3·4번)와 6대 무기에 담아 정밀 집필하십시오.
+3. [3단계: 자가 비판 및 일관성 검증 (Reflexion & Self-Consistency)]: 헌법 제10조(GFM 시맨틱 위계), 제1조(이모지 전면 배제), 대법원 판례 팩트 무결성을 스스로 교차 검증(Reflexion)하십시오.`;
   }
 
   const precedentInfo = precedent

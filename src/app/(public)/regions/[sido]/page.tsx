@@ -72,7 +72,7 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
             gradient="teal" 
             showLeftBorder={false} 
             icon={<AppIcon name="compass" size={24} className="text-teal-600 dark:text-teal-400 shrink-0" />}
-            className="!mb-2 !text-2xl sm:!text-3xl"
+            className="!mb-2 !text-xl sm:!text-2xl"
           >
             {decodedSido} 의료기관 네트워크
           </PremiumHeading>

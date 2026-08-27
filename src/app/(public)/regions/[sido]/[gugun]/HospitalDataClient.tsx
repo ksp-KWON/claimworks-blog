@@ -185,7 +185,7 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
               gradient="teal" 
               showLeftBorder={false}
               icon={<AppIcon name="hospital" size={24} className="text-teal-600 dark:text-teal-400 shrink-0" />}
-              className="!mb-2 !text-2xl sm:!text-3xl"
+              className="!mb-2 !text-xl sm:!text-2xl"
             >
               {deepLinkedHospitalData.name}
             </PremiumHeading>
@@ -269,9 +269,9 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
       </nav>
 
       {/* 헤더 배너 (Teal 시그니처) */}
-      <PremiumCard borderColor="teal" hoverEffect={true} watermarkIcon="hospital" className="!p-6 sm:!p-8">
+      <PremiumCard borderColor="teal" hoverEffect={false} watermarkIcon="hospital" className="!p-5 sm:!p-7">
         <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-2.5">
             <PremiumBadge color="teal">{sido} {gugun}</PremiumBadge>
             <PremiumBadge color="gray">총 {hospitalsToDisplay.length}개 기관 매핑</PremiumBadge>
           </div>
@@ -280,7 +280,7 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
             gradient="teal" 
             showLeftBorder={false}
             icon={<AppIcon name="hospital" size={24} className="text-teal-600 dark:text-teal-400 shrink-0" />}
-            className="!mb-2 !text-2xl sm:!text-3xl"
+            className="!mb-2 !text-xl sm:!text-2xl"
           >
             {sido} {gugun} 의료기관 네트워크
           </PremiumHeading>

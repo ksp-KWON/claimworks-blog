@@ -51,9 +51,9 @@ export default function RegionsIndex() {
           <PremiumHeading 
             level={1} 
             gradient="teal" 
-            showLeftBorder={false}
+            showLeftBorder={false} 
             icon={<AppIcon name="compass" size={24} className="text-teal-600 dark:text-teal-400 shrink-0" />}
-            className="!mb-2 !text-2xl sm:!text-3xl"
+            className="!mb-2 !text-xl sm:!text-2xl"
           >
             지역별 의료기관 네트워크
           </PremiumHeading>

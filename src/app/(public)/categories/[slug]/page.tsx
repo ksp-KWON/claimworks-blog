@@ -129,7 +129,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             gradient={category.themeColor as any} 
             showLeftBorder={false} 
             icon={<AppIcon name={category.iconName} size={24} className="shrink-0" />}
-            className="!mb-2 !text-2xl sm:!text-3xl"
+            className="!mb-2 !text-xl sm:!text-2xl"
           >
             {category.name} 전문 보상가이드
           </PremiumHeading>

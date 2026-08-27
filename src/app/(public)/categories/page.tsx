@@ -215,7 +215,7 @@ export default function CategoriesIndex() {
             gradient="indigo" 
             showLeftBorder={false} 
             icon={<AppIcon name="book" size={24} className="text-indigo-600 dark:text-indigo-400 shrink-0" />}
-            className="!mb-2 !text-2xl sm:!text-3xl"
+            className="!mb-2 !text-xl sm:!text-2xl"
           >
             분야별 전문 보상 가이드
           </PremiumHeading>

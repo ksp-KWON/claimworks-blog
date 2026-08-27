@@ -183,9 +183,10 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
         const errorText = await res.text().catch(() => '');
         lastError = `[${model}] HTTP ${res.status}: ${errorText.slice(0, 100)}`;
 
-        // 429(할당량) 또는 404(모델 중단) → 지체 없이 다음 차선책 모델로 즉시 바통 터치
+        // 429(할당량) 또는 404(모델 중단) → 1초 쿨다운 후 다음 차선책 모델로 즉시 바통 터치
         if (res.status === 429 || res.status === 404) {
-          console.warn(`  [전환] ${model} 상태 ${res.status} — 즉각 다음 차선책 모델로 릴레이 전환합니다.`);
+          console.warn(`  [전환] ${model} 상태 ${res.status} — 쿨다운 후 다음 차선책 모델로 릴레이 전환합니다.`);
+          await sleep(1000);
           continue modelLoop;
         }
 

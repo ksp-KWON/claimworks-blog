@@ -164,7 +164,7 @@ export default function ConsultationPage() {
       <PremiumHeaderBanner
         theme="blue"
         icon="chat"
-        title="보상스쿨 1:1 무료 정밀 상담 신청"
+        title="보상스쿨 1:1 무료 상담 신청"
         badges={['국가공인 손해사정사 직접 검토', { text: '100% 비밀 보장', color: 'green' }]}
         description="보험사의 일방적인 삭감·면책 주장, 혼자 고민하지 마세요. 손해사정사가 사고 경위와 의학적 판례를 사전에 정밀 분석하여 명쾌한 권익 수호 솔루션을 제시해 드립니다."
       />
@@ -491,7 +491,7 @@ export default function ConsultationPage() {
             ) : (
               <>
                 <AppIcon name="send" size={18} />
-                손해사정사 1:1 무료 정밀 상담 신청하기
+                손해사정사 1:1 무료 상담 신청하기
               </>
             )}
           </button>

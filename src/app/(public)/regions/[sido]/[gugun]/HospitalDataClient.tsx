@@ -234,7 +234,7 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
               className="w-full sm:w-auto px-6 py-3.5 bg-gray-900 hover:bg-black dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white font-extrabold text-sm transition-all shadow-md flex items-center justify-center gap-2 text-center"
             >
               <AppIcon name="phone" size={16} />
-              <span>1:1 무료 정밀 상담 접수</span>
+              <span>1:1 무료 상담 접수</span>
             </Link>
           </div>
         </PremiumCard>

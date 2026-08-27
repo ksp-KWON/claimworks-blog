@@ -318,12 +318,12 @@ export default function ChatWidget() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95, transition: { duration: 0.2 } }}
-            className="fixed bottom-0 sm:bottom-6 right-0 sm:right-6 w-full sm:w-[380px] h-[100dvh] sm:h-[620px] max-h-[100dvh] sm:max-h-[85vh] bg-[#fcfcfd] dark:bg-[#18181b] sm:rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.6)] z-[300] flex flex-col overflow-hidden border border-gray-200/80 dark:border-zinc-800"
+            className="fixed bottom-0 sm:bottom-6 right-0 sm:right-6 w-full sm:w-[380px] h-[100dvh] sm:h-[620px] max-h-[100dvh] sm:max-h-[85vh] bg-[#fcfcfd] dark:bg-[#18181b] rounded-none shadow-[0_20px_60px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.6)] z-[300] flex flex-col overflow-hidden border border-gray-200/80 dark:border-zinc-800"
           >
             {/* Header (미니멀 & 모던 헤더) */}
             <div className="bg-white/90 dark:bg-[#18181b]/90 backdrop-blur-md border-b border-gray-100 dark:border-zinc-800/80 px-4 py-3.5 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full border border-gray-200 dark:border-zinc-700 bg-white overflow-hidden flex items-center justify-center p-1 shadow-sm">
+                <div className="w-8 h-8 rounded-none border border-gray-200 dark:border-zinc-700 bg-white overflow-hidden flex items-center justify-center p-1 shadow-xs">
                   <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain" />
                 </div>
                 <div>
@@ -338,7 +338,7 @@ export default function ChatWidget() {
               </div>
               <button 
                 onClick={handleClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
+                className="w-8 h-8 rounded-none flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
                 aria-label="닫기"
               >
                 <AppIcon name="close" size={16} />
@@ -364,7 +364,7 @@ export default function ChatWidget() {
                     )}
                   </span>
                 </div>
-                <span className="text-[10.5px] font-semibold text-blue-600 dark:text-blue-400 bg-white/80 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-blue-200/50 dark:border-zinc-700 shadow-2xs">
+                <span className="text-[10.5px] font-semibold text-blue-600 dark:text-blue-400 bg-white/80 dark:bg-zinc-800 px-2 py-0.5 rounded-none border border-blue-200/50 dark:border-zinc-700 shadow-2xs">
                   {!hasAdminReplied ? '약 3분 소요' : '상담 진행 중'}
                 </span>
               </div>
@@ -372,7 +372,7 @@ export default function ChatWidget() {
 
             {!isNicknameSet ? (
               <div className="flex-1 flex flex-col items-center justify-center p-6 bg-white dark:bg-[#18181b]">
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-[var(--google-blue)] flex items-center justify-center mb-3 shadow-xs">
+                <div className="w-12 h-12 rounded-none bg-blue-50 dark:bg-blue-950/40 text-[var(--google-blue)] flex items-center justify-center mb-3 shadow-xs border border-blue-100 dark:border-blue-900/50">
                   <AppIcon name="chat" size={24} />
                 </div>
                 <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-1 tracking-tight">실시간 무료 상담 접수</h3>
@@ -388,7 +388,7 @@ export default function ChatWidget() {
                       value={nicknameInput}
                       onChange={e => setNicknameInput(e.target.value)}
                       placeholder="홍길동"
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-[#202024] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[var(--google-blue)] focus:bg-white transition-all text-xs"
+                      className="w-full px-3 py-2 rounded-none border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-[#202024] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[var(--google-blue)] focus:bg-white transition-all text-xs"
                       maxLength={10}
                       required
                     />
@@ -399,7 +399,7 @@ export default function ChatWidget() {
                       <select
                         value={accidentType}
                         onChange={e => setAccidentType(e.target.value)}
-                        className="w-full pl-3 pr-8 py-2 appearance-none rounded-lg border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-[#202024] text-gray-900 dark:text-white focus:outline-none focus:border-[var(--google-blue)] focus:bg-white transition-all text-xs cursor-pointer"
+                        className="w-full pl-3 pr-8 py-2 appearance-none rounded-none border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-[#202024] text-gray-900 dark:text-white focus:outline-none focus:border-[var(--google-blue)] focus:bg-white transition-all text-xs cursor-pointer"
                       >
                         <option value="자동차 사고">자동차 사고 합의금/과실</option>
                         <option value="실손/질병/상해">실손의료비/질병진단비 분쟁</option>
@@ -420,7 +420,7 @@ export default function ChatWidget() {
                       value={inquiryText}
                       onChange={e => setInquiryText(e.target.value)}
                       placeholder="사고 경위나 분쟁 내용을 간략히 적어주세요."
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-[#202024] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[var(--google-blue)] focus:bg-white transition-all text-xs resize-none"
+                      className="w-full px-3 py-2 rounded-none border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-[#202024] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[var(--google-blue)] focus:bg-white transition-all text-xs resize-none"
                       rows={3}
                       required
                     />
@@ -428,7 +428,7 @@ export default function ChatWidget() {
                   <button
                     type="submit"
                     disabled={!nicknameInput.trim() || !inquiryText.trim()}
-                    className="w-full bg-[var(--google-blue)] hover:bg-blue-700 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 text-white font-bold py-2.5 rounded-lg text-xs transition-all shadow-sm hover:shadow-md mt-2"
+                    className="w-full bg-[var(--google-blue)] hover:bg-blue-700 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 text-white font-bold py-2.5 rounded-none text-xs transition-all shadow-sm hover:shadow-md mt-2"
                   >
                     상담 시작하기
                   </button>
@@ -441,7 +441,7 @@ export default function ChatWidget() {
                   
                   {/* Status Error */}
                   {status === 'error' && (
-                    <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-xl p-2.5 text-xs text-red-600 dark:text-red-400 text-center font-medium">
+                    <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-none p-2.5 text-xs text-red-600 dark:text-red-400 text-center font-medium">
                       네트워크 연결이 원활하지 않습니다.
                       <button onClick={checkExistingSession} className="ml-2 underline font-bold">다시 시도</button>
                     </div>
@@ -457,7 +457,7 @@ export default function ChatWidget() {
                     </div>
                   )}
 
-                  {/* Dynamic Messages (모던 카카오/채널톡 버블 스타일) */}
+                  {/* Dynamic Messages (모던 카카오/채널톡 버블 스타일 - 각진 디자인) */}
                   {messages.map(msg => {
                     const isVisitor = msg.sender === 'visitor';
                     const isSystem = msg.sender === 'system';
@@ -471,9 +471,9 @@ export default function ChatWidget() {
 
                       return (
                         <div key={msg.id} className="flex flex-col items-end w-full">
-                          <div className="w-full max-w-[280px] bg-white dark:bg-[#1f1f23] rounded-2xl rounded-tr-xs border border-blue-100 dark:border-zinc-700/60 shadow-sm p-3.5 text-left">
+                          <div className="w-full max-w-[280px] bg-white dark:bg-[#1f1f23] rounded-none border border-blue-100 dark:border-zinc-700/60 shadow-sm p-3.5 text-left">
                             <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-2 mb-2.5">
-                              <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md">
+                              <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-none border border-blue-200/50">
                                 상담 접수 내역
                               </span>
                               <span className="text-[10px] text-gray-400">{formatTime(msg.created_at)}</span>
@@ -482,7 +482,7 @@ export default function ChatWidget() {
                               <div><span className="font-semibold text-gray-400 mr-2">의뢰인</span><span className="font-bold text-gray-800 dark:text-white">{name}</span></div>
                               <div><span className="font-semibold text-gray-400 mr-2">분류</span><span className="font-bold text-gray-800 dark:text-white">{type}</span></div>
                               <div className="pt-2 border-t border-gray-100 dark:border-zinc-800/80 mt-2">
-                                <p className="text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-[#151518] p-2 rounded-lg text-xs leading-relaxed whitespace-pre-wrap">{text}</p>
+                                <p className="text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-[#151518] p-2 rounded-none text-xs leading-relaxed whitespace-pre-wrap">{text}</p>
                               </div>
                             </div>
                           </div>
@@ -493,15 +493,15 @@ export default function ChatWidget() {
                     return (
                       <div key={msg.id} className={`flex items-end gap-2 ${isVisitor ? 'flex-row-reverse' : 'flex-row'}`}>
                         {!isVisitor && (
-                          <div className="w-7 h-7 rounded-full bg-white dark:bg-[#202124] border border-gray-200 dark:border-zinc-700 flex items-center justify-center shrink-0 overflow-hidden mb-4 shadow-2xs p-0.5">
+                          <div className="w-7 h-7 rounded-none bg-white dark:bg-[#202124] border border-gray-200 dark:border-zinc-700 flex items-center justify-center shrink-0 overflow-hidden mb-4 shadow-2xs p-0.5">
                             <img src="/logo.png" alt="보상스쿨" className="w-full h-full object-contain" />
                           </div>
                         )}
                         <div className={`max-w-[78%] flex flex-col ${isVisitor ? 'items-end' : 'items-start'}`}>
                           <div className={`px-3.5 py-2.5 shadow-2xs text-xs sm:text-sm leading-relaxed whitespace-pre-wrap ${
                             isVisitor 
-                              ? 'bg-[var(--google-blue)] text-white rounded-2xl rounded-tr-xs font-normal' 
-                              : 'bg-white dark:bg-[#222226] text-gray-800 dark:text-gray-100 border border-gray-200/70 dark:border-zinc-700/60 rounded-2xl rounded-tl-xs'
+                              ? 'bg-[var(--google-blue)] text-white rounded-none font-normal' 
+                              : 'bg-white dark:bg-[#222226] text-gray-800 dark:text-gray-100 border border-gray-200/70 dark:border-zinc-700/60 rounded-none'
                           }`}>
                             <p>{msg.content}</p>
                           </div>
@@ -514,12 +514,12 @@ export default function ChatWidget() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Quick Action Pills (세련된 라운드 칩 바) */}
+                {/* Quick Action Pills (세련된 각진 칩 바) */}
                 <div className="px-3.5 py-2 bg-white dark:bg-[#18181b] border-t border-gray-100 dark:border-zinc-800/80 shrink-0">
                   <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
                     <button 
                       onClick={() => router.push('/calculator')}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-blue-50/90 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 py-1.5 px-3 rounded-full border border-blue-200 dark:border-blue-800/50 transition-all text-xs font-bold text-blue-700 dark:text-blue-300 shrink-0 shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-blue-50/90 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 py-1.5 px-3 rounded-none border border-blue-200 dark:border-blue-800/50 transition-all text-xs font-bold text-blue-700 dark:text-blue-300 shrink-0 shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer"
                     >
                       <AppIcon name="calculator" size={13} className="shrink-0 text-blue-600 dark:text-blue-400" />
                       <span>예상 합의금 계산기</span>
@@ -527,7 +527,7 @@ export default function ChatWidget() {
                     
                     <button 
                       onClick={() => router.push('/consultation')}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-50/90 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 py-1.5 px-3 rounded-full border border-emerald-200 dark:border-emerald-800/50 transition-all text-xs font-bold text-emerald-700 dark:text-emerald-300 shrink-0 shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-50/90 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 py-1.5 px-3 rounded-none border border-emerald-200 dark:border-emerald-800/50 transition-all text-xs font-bold text-emerald-700 dark:text-emerald-300 shrink-0 shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer"
                     >
                       <AppIcon name="phone" size={13} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
                       <span>전화 상담 예약</span>
@@ -535,9 +535,9 @@ export default function ChatWidget() {
                   </div>
                 </div>
 
-                {/* Input Area (모던 캡슐 인풋 바) */}
+                {/* Input Area (모던 각진 인풋 바) */}
                 <div className="p-3 bg-white dark:bg-[#18181b] shrink-0 border-t border-gray-100 dark:border-zinc-800">
-                  <div className="flex items-center gap-2 bg-gray-100/80 dark:bg-[#202024] rounded-full border border-transparent focus-within:border-[var(--google-blue)] focus-within:bg-white dark:focus-within:bg-[#202024] px-4 py-1.5 transition-all shadow-inner">
+                  <div className="flex items-center gap-2 bg-gray-100/80 dark:bg-[#202024] rounded-none border border-transparent focus-within:border-[var(--google-blue)] focus-within:bg-white dark:focus-within:bg-[#202024] px-3.5 py-1.5 transition-all shadow-inner">
                     <textarea
                       ref={inputRef}
                       value={inputText}
@@ -552,7 +552,7 @@ export default function ChatWidget() {
                     <button
                       onClick={() => sendMessage(inputText)}
                       disabled={!inputText.trim() || isSending || status === 'error'}
-                      className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                      className={`w-7 h-7 rounded-none flex items-center justify-center shrink-0 transition-all ${
                         inputText.trim() && !isSending 
                           ? 'bg-[var(--google-blue)] text-white shadow-xs hover:scale-105' 
                           : 'bg-gray-200 dark:bg-zinc-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
@@ -573,7 +573,7 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* Floating Button (원형 프리미엄 3D 런처) */}
+      {/* Floating Button (각진 프리미엄 런처) */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -585,7 +585,7 @@ export default function ChatWidget() {
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.06 }}
             whileTap={{ scale: 0.94 }}
-            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-full flex items-center justify-center transition-colors focus:outline-none bg-blue-50 dark:bg-[#202124] focus:ring-4 focus:ring-blue-300"
+            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-none flex items-center justify-center transition-colors focus:outline-none bg-blue-50 dark:bg-[#202124] focus:ring-2 focus:ring-blue-300"
             style={{ 
               boxShadow: '0 8px 30px rgba(26,115,232,0.25), inset 0 -3px 6px rgba(0,0,0,0.06), inset 0 3px 6px rgba(255,255,255,1)',
               border: '1px solid rgba(229,231,235,0.8)'
@@ -598,7 +598,7 @@ export default function ChatWidget() {
 
             {/* Red Glow Pulse */}
             <motion.div 
-              className="absolute inset-0 rounded-full pointer-events-none"
+              className="absolute inset-0 rounded-none pointer-events-none"
               animate={{ 
                 boxShadow: [
                   '0 0 0px 0px rgba(239,68,68,0)', 
@@ -621,7 +621,7 @@ export default function ChatWidget() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-zinc-900 z-10"
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-none flex items-center justify-center shadow-md border-2 border-white dark:border-zinc-900 z-10"
                 >
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </motion.span>

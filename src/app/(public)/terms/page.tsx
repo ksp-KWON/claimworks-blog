@@ -3,6 +3,7 @@ import Link from 'next/link';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 import AppIcon from '@/components/ui/AppIcon';
 
 export const metadata: Metadata = {
@@ -26,26 +27,13 @@ export default function TermsPage() {
       </nav>
 
       {/* 헤더 배너 */}
-      <PremiumCard borderColor="blue" hoverEffect={false} watermarkIcon="file-text" className="!p-6 sm:!p-8">
-        <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <PremiumBadge color="blue">공식 정책</PremiumBadge>
-            <PremiumBadge color="gray">시행일: 2024. 01. 01</PremiumBadge>
-          </div>
-          <PremiumHeading 
-            level={1} 
-            gradient="blue" 
-            showLeftBorder={false}
-            icon={<AppIcon name="file-text" size={24} className="text-blue-600 dark:text-blue-400 shrink-0" />}
-            className="!mb-2 !text-xl sm:!text-2xl"
-          >
-            보상스쿨 서비스 이용약관
-          </PremiumHeading>
-          <p className="text-xs sm:text-[13.5px] text-[#5f6368] dark:text-[#9aa0a6] font-medium leading-relaxed break-keep">
-            보상스쿨 전문 손해사정 그룹(이하 &quot;사이트&quot;)의 서비스 이용 조건, 절차 및 권리·의무에 관한 기본 규정입니다.
-          </p>
-        </div>
-      </PremiumCard>
+      <PremiumHeaderBanner
+        theme="blue"
+        icon="file-text"
+        title="보상스쿨 서비스 이용약관"
+        badges={['공식 정책', { text: '시행일: 2024. 01. 01', color: 'gray' }]}
+        description="보상스쿨 전문 손해사정 그룹(이하 &quot;사이트&quot;)의 서비스 이용 조건, 절차 및 권리·의무에 관한 기본 규정입니다."
+      />
 
       {/* 본문 내용 */}
       <div className="space-y-5">

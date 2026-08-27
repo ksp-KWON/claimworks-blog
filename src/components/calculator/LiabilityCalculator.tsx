@@ -50,7 +50,7 @@ function getHoffmanCoeff(months: number): number {
   return Math.min(240, coeff);
 }
 
-export default function LiabilityCalculator() {
+export default function LiabilityCalculator({ hideHeader = false }: { hideHeader?: boolean }) {
   const [data, setData] = useState<LiabilityData>(initialData);
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -150,14 +150,16 @@ export default function LiabilityCalculator() {
   return (
     <div className="w-full space-y-6">
       {/* 1. 타이틀 헤더 */}
-      <div className="text-center space-y-2 mb-2">
-        <PremiumHeading level={1} gradient="red" className="justify-center !text-2xl sm:!text-3xl">
-          배상책임 소송가액 계산기
-        </PremiumHeading>
-        <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
-          법원 손해배상 판례 기준(호프만계수)을 적용한 위자료, 일실수입, 개호비 산출 도구입니다.
-        </p>
-      </div>
+      {!hideHeader && (
+        <div className="text-center space-y-2 mb-2">
+          <PremiumHeading level={1} gradient="red" className="justify-center !text-2xl sm:!text-3xl">
+            배상책임 소송가액 계산기
+          </PremiumHeading>
+          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
+            법원 손해배상 판례 기준(호프만계수)을 적용한 위자료, 일실수입, 개호비 산출 도구입니다.
+          </p>
+        </div>
+      )}
 
       {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
       <div className="space-y-6">

@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import BlogPostContent from '@/components/BlogPostContent';
 import AuthorBioCard from '@/components/blog/AuthorBioCard';
 import { parseBlogPost } from '@/lib/blog-utils';
+import { getCategoryMeta } from '@/lib/constants/categories';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumBadge from '@/components/ui/PremiumBadge';
@@ -181,7 +182,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <PremiumButton 
           variant="ghost" 
           href="/blog" 
-          icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>}
+          icon={<AppIcon name="chevron-left" size={15} />}
         >
           목록으로 돌아가기
         </PremiumButton>
@@ -190,8 +191,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       {/* 글 헤더 */}
       <header className="border-b border-[var(--google-border)] pb-8 mb-8 sm:mb-10">
         <div className="flex flex-wrap items-center gap-3 text-xs mb-4">
-          <PremiumBadge color="gray">
-            {post.category}
+          <PremiumBadge color={getCategoryMeta(post.category || '').themeColor as any}>
+            {post.category || '보상가이드'}
           </PremiumBadge>
           {post.caseNumber && (
             <span className="px-2.5 py-1 font-bold rounded-none bg-[#fce8e6] dark:bg-[#c5221f]/10 text-[#c5221f] dark:text-[#f28b82] border border-[#f28b82]/30 flex items-center gap-1.5">

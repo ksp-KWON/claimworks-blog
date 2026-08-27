@@ -25,20 +25,10 @@ import {
 import { runAutoGenerationWorkflow, runManualGenerationWorkflow } from '@/lib/auto-writer';
 import { parseMarkdown } from '@/lib/markdown-utils';
 import { authenticateAdmin, checkAdminSession, clearAdminSession, getLockoutState, LockoutState } from '@/lib/admin-auth';
+import { getCategoryMeta } from '@/lib/constants/categories';
 
 function normalizeCategory(val: string) {
-  if (!val) return '보상가이드';
-  const allowed = ['사망·자살 보험금', '질병진단·실손', '교통사고 보상', '배상책임·의료', '근재·산재 사고', '장해평가·면책', '보상가이드', '판례·분쟁조정', '판례·법률 해석'];
-  if (allowed.includes(val)) return val;
-  
-  if (val.includes('교통')) return '교통사고 보상';
-  if (val.includes('사망') || val.includes('자살')) return '사망·자살 보험금';
-  if (val.includes('질병') || val.includes('실손')) return '질병진단·실손';
-  if (val.includes('배상') || val.includes('의료')) return '배상책임·의료';
-  if (val.includes('산재') || val.includes('근재')) return '근재·산재 사고';
-  if (val.includes('장해') || val.includes('면책') || val.includes('후유')) return '장해평가·면책';
-  if (val.includes('판례') || val.includes('법률') || val.includes('분쟁')) return '판례·분쟁조정';
-  return '보상가이드';
+  return getCategoryMeta(val).name;
 }
 
 export default function AdminPage() {

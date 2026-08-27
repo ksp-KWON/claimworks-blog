@@ -3,6 +3,7 @@ import Link from 'next/link';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 import AppIcon from '@/components/ui/AppIcon';
 
 export const metadata: Metadata = {
@@ -26,26 +27,13 @@ export default function PrivacyPage() {
       </nav>
 
       {/* 헤더 배너 */}
-      <PremiumCard borderColor="green" hoverEffect={false} watermarkIcon="shield-check" className="!p-6 sm:!p-8">
-        <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <PremiumBadge color="green">개인정보보호법 준수</PremiumBadge>
-            <PremiumBadge color="gray">시행일: 2024. 01. 01</PremiumBadge>
-          </div>
-          <PremiumHeading 
-            level={1} 
-            gradient="green" 
-            showLeftBorder={false}
-            icon={<AppIcon name="shield-check" size={24} className="text-emerald-600 dark:text-emerald-400 shrink-0" />}
-            className="!mb-2 !text-xl sm:!text-2xl"
-          >
-            보상스쿨 개인정보처리방침
-          </PremiumHeading>
-          <p className="text-xs sm:text-[13.5px] text-[#5f6368] dark:text-[#9aa0a6] font-medium leading-relaxed break-keep">
-            보상스쿨은 이용자의 소중한 개인정보를 철저히 보호하며, 별도의 불필요한 개인정보 저장을 지양하는 안전한 플랫폼입니다.
-          </p>
-        </div>
-      </PremiumCard>
+      <PremiumHeaderBanner
+        theme="green"
+        icon="shield-check"
+        title="보상스쿨 개인정보처리방침"
+        badges={['개인정보보호법 준수', { text: '시행일: 2024. 01. 01', color: 'gray' }]}
+        description="보상스쿨은 이용자의 소중한 개인정보를 철저히 보호하며, 별도의 불필요한 개인정보 저장을 지양하는 안전한 플랫폼입니다."
+      />
 
       {/* 본문 내용 */}
       <div className="space-y-5">
@@ -55,8 +43,11 @@ export default function PrivacyPage() {
             <p>
               &quot;보상스쿨 전문 손해사정 그룹&quot;(이하 &quot;사이트&quot;)은 「개인정보보호법」 및 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」을 준수하고 있습니다.
             </p>
-            <div className="p-3.5 bg-blue-50/70 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-900/40 rounded-none text-xs sm:text-[13px] text-blue-900 dark:text-blue-300 font-medium">
-              💡 <strong>회원가입 없는 안심 이용:</strong> 본 사이트는 별도의 회원가입 없이 모든 콘텐츠와 계산기 서비스를 무료로 이용할 수 있으며, 이 과정에서 <strong>식별 가능한 민감한 개인정보를 수집하거나 서버에 저장하지 않습니다.</strong>
+            <div className="p-3.5 bg-blue-50/70 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-900/40 text-xs sm:text-[13px] text-blue-900 dark:text-blue-300 font-medium flex items-start gap-2">
+              <AppIcon name="info" size={16} className="text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+              <div>
+                <strong>회원가입 없는 안심 이용:</strong> 본 사이트는 별도의 회원가입 없이 모든 콘텐츠와 계산기 서비스를 무료로 이용할 수 있으며, 이 과정에서 <strong>식별 가능한 민감한 개인정보를 수집하거나 서버에 저장하지 않습니다.</strong>
+              </div>
             </div>
           </div>
         </PremiumCard>

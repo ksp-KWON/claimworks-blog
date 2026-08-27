@@ -45,7 +45,7 @@ const HOSPITAL_TYPES = [
   { id: 'general', label: '상급/종합병원', deduct: 20000 },
 ];
 
-export default function MedicalCalculator() {
+export default function MedicalCalculator({ hideHeader = false }: { hideHeader?: boolean }) {
   const [data, setData] = useState<MedicalInsuranceData>(initialMedicalData);
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -201,14 +201,16 @@ export default function MedicalCalculator() {
   return (
     <div className="w-full space-y-6">
       {/* 1. 타이틀 헤더 */}
-      <div className="text-center space-y-2 mb-2">
-        <PremiumHeading level={1} gradient="green" className="justify-center !text-2xl sm:!text-3xl">
-          실손의료비 보상 계산기
-        </PremiumHeading>
-        <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
-          1세대부터 5세대까지 세대별 약관 및 본인부담금을 공제한 예상 실손 보험금입니다.
-        </p>
-      </div>
+      {!hideHeader && (
+        <div className="text-center space-y-2 mb-2">
+          <PremiumHeading level={1} gradient="green" className="justify-center !text-2xl sm:!text-3xl">
+            실손의료비 보상 계산기
+          </PremiumHeading>
+          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
+            1세대부터 5세대까지 세대별 약관 및 본인부담금을 공제한 예상 실손 보험금입니다.
+          </p>
+        </div>
+      )}
 
       {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
       <div className="space-y-6">

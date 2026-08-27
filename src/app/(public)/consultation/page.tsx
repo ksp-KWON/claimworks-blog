@@ -6,6 +6,7 @@ import Link from 'next/link';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 import AppIcon, { AppIconName } from '@/components/ui/AppIcon';
 
 const ACCIDENT_TYPES: { id: string; label: string; icon: AppIconName; color: string }[] = [
@@ -159,32 +160,14 @@ export default function ConsultationPage() {
         </ol>
       </nav>
 
-      {/* 헤더 배너 (좌->우 프리미엄 그라데이션 배경) */}
-      <PremiumCard 
-        borderColor="blue" 
-        hoverEffect={false} 
-        watermarkIcon="chat" 
-        className="!p-6 sm:!p-8 !bg-gradient-to-r !from-blue-50/90 !via-indigo-50/70 !to-blue-50/40 dark:!from-blue-950/50 dark:!via-indigo-950/40 dark:!to-blue-950/20 border-blue-200 dark:border-blue-900/60"
-      >
-        <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-            <PremiumBadge color="blue">국가공인 손해사정사 직접 검토</PremiumBadge>
-            <PremiumBadge color="green">100% 비밀 보장</PremiumBadge>
-          </div>
-          <PremiumHeading 
-            level={1} 
-            gradient="blue" 
-            showLeftBorder={false}
-            icon={<AppIcon name="chat" size={24} className="text-blue-600 dark:text-blue-400 shrink-0" />}
-            className="!mb-2.5 !text-2xl sm:!text-3xl"
-          >
-            보상스쿨 1:1 무료 정밀 상담 신청
-          </PremiumHeading>
-          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium leading-relaxed break-keep">
-            보험사의 일방적인 삭감·면책 주장, 혼자 고민하지 마세요. 손해사정사가 사고 경위와 의학적 판례를 사전에 정밀 분석하여 명쾌한 권익 수호 솔루션을 제시해 드립니다.
-          </p>
-        </div>
-      </PremiumCard>
+      {/* 헤더 배너 */}
+      <PremiumHeaderBanner
+        theme="blue"
+        icon="chat"
+        title="보상스쿨 1:1 무료 정밀 상담 신청"
+        badges={['국가공인 손해사정사 직접 검토', { text: '100% 비밀 보장', color: 'green' }]}
+        description="보험사의 일방적인 삭감·면책 주장, 혼자 고민하지 마세요. 손해사정사가 사고 경위와 의학적 판례를 사전에 정밀 분석하여 명쾌한 권익 수호 솔루션을 제시해 드립니다."
+      />
 
       {/* 폼 컨테이너 */}
       <form onSubmit={handleSubmit} className="space-y-6">

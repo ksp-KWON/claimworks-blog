@@ -9,7 +9,7 @@ import AppIcon from '@/components/ui/AppIcon';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 
-export default function AutoCalculator() {
+export default function AutoCalculator({ hideHeader = false }: { hideHeader?: boolean }) {
   const [data, setData] = useState<AutoInsuranceData>(initialAutoData);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -166,14 +166,16 @@ export default function AutoCalculator() {
   return (
     <div className="w-full space-y-6">
       {/* 1. 타이틀 헤더 */}
-      <div className="text-center space-y-2 mb-2">
-        <PremiumHeading level={1} gradient="blue" className="justify-center !text-2xl sm:!text-3xl">
-          자동차보험 합의금 계산기
-        </PremiumHeading>
-        <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
-          대인배상 약관 기준(부상·장해·사망) 및 과실상계를 적용한 실시간 예상 합의금입니다.
-        </p>
-      </div>
+      {!hideHeader && (
+        <div className="text-center space-y-2 mb-2">
+          <PremiumHeading level={1} gradient="blue" className="justify-center !text-2xl sm:!text-3xl">
+            자동차보험 합의금 계산기
+          </PremiumHeading>
+          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-xl mx-auto leading-relaxed font-medium">
+            대인배상 약관 기준(부상·장해·사망) 및 과실상계를 적용한 실시간 예상 합의금입니다.
+          </p>
+        </div>
+      )}
 
       {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
       <div className="space-y-6">

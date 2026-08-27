@@ -9,6 +9,7 @@ import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 interface Precedent {
   id: string;
   title: string;
@@ -310,34 +311,14 @@ export default function PrecedentSearchPage() {
         </ol>
       </nav>
 
-      {/* 1. 상단 메인 헤더 배너 (입체감 있는 블루 파스텔 PremiumCard) */}
-      <PremiumCard 
-        borderColor="blue" 
-        hoverEffect={false} 
-        watermarkIcon="scale" 
-        className="!p-5 sm:!p-7 !bg-gradient-to-r !from-blue-50/90 !via-indigo-50/50 !to-transparent dark:!from-blue-950/40 dark:!via-indigo-950/20 dark:!to-transparent border-blue-200/90 dark:border-blue-900/50"
-      >
-        <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-            <PremiumBadge color="blue">법제처 국가법령정보 실시간 연동</PremiumBadge>
-            <PremiumBadge color="gray">대법원·하급심 주요 손해배상 판례</PremiumBadge>
-          </div>
-
-          <PremiumHeading 
-            level={1} 
-            gradient="blue" 
-            showLeftBorder={false} 
-            icon={<AppIcon name="scale" size={24} className="text-blue-600 dark:text-blue-400 shrink-0" />}
-            className="!mb-2 !text-xl sm:!text-2xl"
-          >
-            손해사정 법률분석센터
-          </PremiumHeading>
-
-          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
-            보험사의 억울한 거절과 삭감 주장도 명확한 판례가 있다면 방어할 수 있습니다. 겪으신 상황이나 키워드를 검색하시면 실시간 부합하는 법원 판결 전문을 찾아드립니다.
-          </p>
-        </div>
-      </PremiumCard>
+      {/* 1. 상단 메인 헤더 배너 */}
+      <PremiumHeaderBanner
+        theme="blue"
+        icon="scale"
+        title="손해사정 법률분석센터"
+        badges={['법제처 국가법령정보 실시간 연동', { text: '대법원·하급심 주요 손해배상 판례', color: 'gray' }]}
+        description="보험사의 억울한 거절과 삭감 주장도 명확한 판례가 있다면 방어할 수 있습니다. 겪으신 상황이나 키워드를 검색하시면 실시간 부합하는 법원 판결 전문을 찾아드립니다."
+      />
 
       {/* 2. 판례 검색 인풋 박스 */}
       <PremiumCard hoverEffect={false} borderColor="blue" className="!p-5 sm:!p-6">

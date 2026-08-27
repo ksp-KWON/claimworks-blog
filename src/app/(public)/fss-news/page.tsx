@@ -11,6 +11,7 @@ import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 
 interface FssNewsItem {
   id: string;
@@ -283,34 +284,14 @@ export default function FssNewsPage() {
         </ol>
       </nav>
 
-      {/* 1. 상단 메인 헤더 배너 (입체감 있는 레드 파스텔 PremiumCard) */}
-      <PremiumCard 
-        borderColor="red" 
-        hoverEffect={false} 
-        watermarkIcon="shield-alert" 
-        className="!p-5 sm:!p-7 !bg-gradient-to-r !from-rose-50/90 !via-red-50/50 !to-transparent dark:!from-rose-950/40 dark:!via-red-950/20 dark:!to-transparent border-rose-200/90 dark:border-rose-900/50"
-      >
-        <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-            <PremiumBadge color="red">금융감독원 공식 소비자 데이터 연동</PremiumBadge>
-            <PremiumBadge color="gray">소비자경보·분쟁조정·비교공시</PremiumBadge>
-          </div>
-
-          <PremiumHeading 
-            level={1} 
-            gradient="red" 
-            showLeftBorder={false} 
-            icon={<AppIcon name="shield-alert" size={24} className="text-red-600 shrink-0" />}
-            className="!mb-2 !text-xl sm:!text-2xl font-black"
-          >
-            금감원 소비자보호센터
-          </PremiumHeading>
-
-          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
-            금융감독원 공식 데이터를 실시간 연동하여 소비자 경보, 민원 분쟁사례, 금융 실무 꿀팁 및 금융상품 비교공시를 원스톱 통합 대시보드로 제공합니다.
-          </p>
-        </div>
-      </PremiumCard>
+      {/* 1. 상단 메인 헤더 배너 */}
+      <PremiumHeaderBanner
+        theme="red"
+        icon="shield-alert"
+        title="금감원 소비자보호센터"
+        badges={['금융감독원 공식 소비자 데이터 연동', { text: '소비자경보·분쟁조정·비교공시', color: 'gray' }]}
+        description="금융감독원 공식 데이터를 실시간 연동하여 소비자 경보, 민원 분쟁사례, 금융 실무 꿀팁 및 금융상품 비교공시를 원스톱 통합 대시보드로 제공합니다."
+      />
 
       {/* 2. 검색 및 탭 네비게이션 박스 */}
       <PremiumCard hoverEffect={false} borderColor="red" className="!p-5 sm:!p-6">

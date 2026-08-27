@@ -2,6 +2,7 @@ import Link from 'next/link';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 import AppIcon, { AppIconName } from '@/components/ui/AppIcon';
 
 export const metadata = {
@@ -120,32 +121,14 @@ export default function CalculatorIndex() {
         </ol>
       </nav>
 
-      {/* 1. 상단 메인 헤더 배너 (보라색/퍼플 시그니처 PremiumCard) */}
-      <PremiumCard 
-        borderColor="purple" 
-        hoverEffect={false} 
-        watermarkIcon="calculator" 
-        className="!p-5 sm:!p-7 !bg-gradient-to-r !from-purple-50/90 !via-indigo-50/50 !to-transparent dark:!from-purple-950/40 dark:!via-indigo-950/20 dark:!to-transparent border-purple-200/90 dark:border-purple-900/50"
-      >
-        <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-            <PremiumBadge color="purple">국가공인 손해사정 실무 연산</PremiumBadge>
-            <PremiumBadge color="gray">대법원 판례·약관 100% 반영</PremiumBadge>
-          </div>
-          <PremiumHeading 
-            level={1} 
-            gradient="purple" 
-            showLeftBorder={false}
-            icon={<AppIcon name="calculator" size={24} className="text-purple-600 dark:text-purple-400 shrink-0" />}
-            className="!mb-2 !text-xl sm:!text-2xl"
-          >
-            스마트 보상금·합의금 계산기 센터
-          </PremiumHeading>
-          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium leading-relaxed break-keep">
-            복잡한 보험 약관과 판례 산정식을 손해사정 실무 알고리즘으로 체계화했습니다. 해당하는 사고 유형의 계산기를 선택하시면 예상 보상금과 세부 산출 명세서를 1분 만에 실시간으로 확인하실 수 있습니다.
-          </p>
-        </div>
-      </PremiumCard>
+      {/* 1. 상단 메인 헤더 배너 */}
+      <PremiumHeaderBanner
+        theme="purple"
+        icon="calculator"
+        title="스마트 보상금·합의금 계산기 센터"
+        badges={['국가공인 손해사정 실무 연산', { text: '대법원 판례·약관 100% 반영', color: 'gray' }]}
+        description="복잡한 보험 약관과 판례 산정식을 손해사정 실무 알고리즘으로 체계화했습니다. 해당하는 사고 유형의 계산기를 선택하시면 예상 보상금과 세부 산출 명세서를 1분 만에 실시간으로 확인하실 수 있습니다."
+      />
 
       {/* 2. 3대 계산기 인터랙티브 액션 카드 */}
       <div className="space-y-4 pt-1">

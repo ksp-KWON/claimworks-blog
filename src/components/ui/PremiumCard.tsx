@@ -1,9 +1,9 @@
 import React from 'react';
 import AppIcon, { type AppIconName } from './AppIcon';
 
-type BorderColor = 'red' | 'rose' | 'blue' | 'cyan' | 'green' | 'teal' | 'orange' | 'purple' | 'indigo' | 'yellow' | 'default';
+export type BorderColor = 'red' | 'rose' | 'blue' | 'cyan' | 'green' | 'teal' | 'orange' | 'purple' | 'indigo' | 'yellow' | 'default';
 
-interface PremiumCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface PremiumCardProps extends React.HTMLAttributes<HTMLDivElement> {
   borderColor?: BorderColor;
   hoverEffect?: boolean;
   watermarkEmoji?: string;

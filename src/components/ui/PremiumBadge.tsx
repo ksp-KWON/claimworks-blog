@@ -1,8 +1,8 @@
 import React from 'react';
 
-type BadgeColor = 'red' | 'rose' | 'blue' | 'green' | 'teal' | 'purple' | 'indigo' | 'yellow' | 'gray';
+export type BadgeColor = 'red' | 'rose' | 'blue' | 'green' | 'teal' | 'purple' | 'indigo' | 'yellow' | 'gray';
 
-interface PremiumBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface PremiumBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   color?: BadgeColor;
 }
 

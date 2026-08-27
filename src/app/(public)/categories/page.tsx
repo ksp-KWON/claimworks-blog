@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 import AppIcon from '@/components/ui/AppIcon';
 import { COLUMN_CATEGORIES, SPECIALTIES, CategoryMeta } from '@/lib/constants/categories';
 
@@ -197,34 +198,14 @@ export default function CategoriesIndex() {
         </ol>
       </nav>
 
-      {/* 2. 메인 헤더 배너 (인디고/블루 파스텔 PremiumCard) */}
-      <PremiumCard 
-        borderColor="indigo" 
-        hoverEffect={false} 
-        watermarkIcon="book" 
-        className="!p-5 sm:!p-7 !bg-gradient-to-r !from-indigo-50/90 !via-blue-50/50 !to-transparent dark:!from-indigo-950/40 dark:!via-blue-950/20 dark:!to-transparent border-indigo-200/90 dark:border-indigo-900/50"
-      >
-        <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-            <PremiumBadge color="indigo">보상스쿨 핵심 실무</PremiumBadge>
-            <PremiumBadge color="gray">8대 법리 칼럼 · 10대 의학 분과</PremiumBadge>
-          </div>
-
-          <PremiumHeading 
-            level={1} 
-            gradient="indigo" 
-            showLeftBorder={false} 
-            icon={<AppIcon name="book" size={24} className="text-indigo-600 dark:text-indigo-400 shrink-0" />}
-            className="!mb-2 !text-xl sm:!text-2xl"
-          >
-            분야별 전문 보상 가이드
-          </PremiumHeading>
-
-          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
-            대법원 판례와 금융분쟁조정위원회 결정례부터, 10대 진료과목별 의학 분쟁 쟁점까지 보상스쿨 손해사정사의 풍부한 실무 노하우를 엄선하여 제공합니다.
-          </p>
-        </div>
-      </PremiumCard>
+      {/* 2. 메인 헤더 배너 */}
+      <PremiumHeaderBanner
+        theme="indigo"
+        icon="book"
+        title="분야별 전문 보상 가이드"
+        badges={['보상스쿨 핵심 실무', { text: '8대 법리 칼럼 · 10대 의학 분과', color: 'gray' }]}
+        description="대법원 판례와 금융분쟁조정위원회 결정례부터, 10대 진료과목별 의학 분쟁 쟁점까지 보상스쿨 손해사정사의 풍부한 실무 노하우를 엄선하여 제공합니다."
+      />
 
       {/* 3. 섹션 1: 8대 핵심 법리 보상 칼럼 */}
       <section className="space-y-4 sm:space-y-5">

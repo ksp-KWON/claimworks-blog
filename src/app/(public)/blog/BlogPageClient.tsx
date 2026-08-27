@@ -14,6 +14,8 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import PostCard from '@/components/ui/PostCard';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
+import AppIcon from '@/components/ui/AppIcon';
 
 import { PostData as Post } from '@/lib/posts';
 
@@ -49,40 +51,30 @@ export default function BlogPageClient() {
   // ─── 기본 블로그 목록 ───
   return (
     <div className="space-y-6">
-      {/* 블로그 페이지 헤더 (SEO H1) */}
-      <div className="border-b border-[var(--google-border)] pb-4 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2">
-          <svg className="w-6 h-6 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 20h9" />
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-          </svg>
-          보상 실무 가이드 & 칼럼 목록
-        </h1>
-        <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-1.5">
-          교통사고, 후유장해, 실손보험 청구 등 손해사정 실무 가이드를 모아서 제공합니다.
-        </p>
-      </div>
+      {/* 1. 상단 메인 헤더 배너 */}
+      <PremiumHeaderBanner
+        theme="blue"
+        icon="book"
+        title="보상 실무 가이드 & 칼럼 목록"
+        badges={['손해사정 실무 판례 분석', { text: `총 ${displayPosts.length}개 칼럼 발행`, color: 'gray' }]}
+        description="교통사고, 후유장해, 실손보험 청구, 질병 진단비 및 배상책임까지 보상스쿨 손해사정사의 모든 실무 가이드를 모아서 제공합니다."
+        rightLink={{ href: '/categories', text: '분야별 가이드 보기' }}
+      />
 
       {/* 태그 필터 활성 표시 */}
       {tagFilter && (
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 px-3 py-2 bg-[#e8f0fe] dark:bg-[#174ea6]/30 rounded-none border border-[var(--google-blue)]/30">
-            <svg className="w-4 h-4 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
-              <line x1="7" y1="7" x2="7.01" y2="7" />
-            </svg>
-            <span className="text-sm font-bold text-[var(--google-blue)]">#{tagFilter}</span>
-            <span className="text-xs text-[#5f6368] dark:text-[#9aa0a6]">{displayPosts.length}개 게시글</span>
+          <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300">
+            <AppIcon name="pin" size={15} className="text-blue-600 dark:text-blue-400" />
+            <span className="text-xs sm:text-sm font-bold">#{tagFilter}</span>
+            <span className="text-[11px] text-gray-500 dark:text-zinc-400">({displayPosts.length}개 칼럼)</span>
           </div>
           <Link
             href="/blog"
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-[#5f6368] dark:text-[#9aa0a6] bg-[var(--google-surface-variant)] dark:bg-[#303134] rounded-none hover:text-[var(--google-blue)] hover:border-[var(--google-blue)] border border-transparent transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 hover:text-blue-600 dark:hover:text-blue-400 border border-gray-200 dark:border-zinc-700 transition-colors"
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-            필터 해제
+            <AppIcon name="close" size={13} />
+            <span>필터 해제</span>
           </Link>
         </div>
       )}

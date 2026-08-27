@@ -7,6 +7,7 @@ import Link from 'next/link';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 import AppIcon from '@/components/ui/AppIcon';
 
 export const dynamicParams = false;
@@ -102,43 +103,15 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         </ol>
       </nav>
 
-      {/* 2. 헤더 배너 (카테고리 테마 색상 PremiumCard) */}
-      <PremiumCard 
-        borderColor={category.themeColor as any} 
-        hoverEffect={false} 
-        watermarkIcon={category.iconName} 
-        className="!p-5 sm:!p-7"
-      >
-        <div className="relative z-10">
-          <div className="flex items-center justify-between gap-3 mb-2.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <PremiumBadge color={category.themeColor as any}>{category.name} 전문 가이드</PremiumBadge>
-              <PremiumBadge color="gray">총 {filteredPosts.length}개 심층 칼럼</PremiumBadge>
-            </div>
-            <Link 
-              href="/categories" 
-              className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors shrink-0"
-            >
-              <span>전체 분야 보기</span>
-              <AppIcon name="chevron-right" size={14} />
-            </Link>
-          </div>
-
-          <PremiumHeading 
-            level={1} 
-            gradient={category.themeColor as any} 
-            showLeftBorder={false} 
-            icon={<AppIcon name={category.iconName} size={24} className="shrink-0" />}
-            className="!mb-2 !text-xl sm:!text-2xl"
-          >
-            {category.name} 전문 보상가이드
-          </PremiumHeading>
-
-          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
-            {category.desc} 관련 보험사 면책 분쟁 대응과 손해사정 성공 실무 사례를 안내합니다.
-          </p>
-        </div>
-      </PremiumCard>
+      {/* 2. 헤더 배너 */}
+      <PremiumHeaderBanner
+        theme={category.themeColor as any}
+        icon={category.iconName}
+        title={`${category.name} 전문 보상가이드`}
+        badges={[`${category.name} 전문 가이드`, { text: `총 ${filteredPosts.length}개 심층 칼럼`, color: 'gray' }]}
+        description={`${category.desc} 관련 보험사 면책 분쟁 대응과 손해사정 성공 실무 사례를 안내합니다.`}
+        rightLink={{ href: '/categories', text: '전체 분야 보기' }}
+      />
 
       {/* 3. 칼럼 목록 렌더링 */}
       {filteredPosts.length === 0 ? (

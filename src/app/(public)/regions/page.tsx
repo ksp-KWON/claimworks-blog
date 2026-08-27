@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 import AppIcon from '@/components/ui/AppIcon';
 import { REGIONS_DATA } from '@/lib/constants';
 
@@ -35,34 +36,14 @@ export default function RegionsIndex() {
         </ol>
       </nav>
 
-      {/* 2. 헤더 배너 (Teal 시그니처 PremiumCard) */}
-      <PremiumCard 
-        borderColor="teal" 
-        hoverEffect={false} 
-        watermarkIcon="compass" 
-        className="!p-5 sm:!p-7 !bg-gradient-to-r !from-teal-50/90 !via-emerald-50/50 !to-transparent dark:!from-teal-950/40 dark:!via-emerald-950/20 dark:!to-transparent border-teal-200/90 dark:border-teal-900/50"
-      >
-        <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-            <PremiumBadge color="teal">HIRA 공공 빅데이터 연계</PremiumBadge>
-            <PremiumBadge color="gray">전국 17개 시·도 226개 시·군·구</PremiumBadge>
-          </div>
-
-          <PremiumHeading 
-            level={1} 
-            gradient="teal" 
-            showLeftBorder={false} 
-            icon={<AppIcon name="compass" size={24} className="text-teal-600 dark:text-teal-400 shrink-0" />}
-            className="!mb-2 !text-xl sm:!text-2xl"
-          >
-            지역별 의료기관 네트워크
-          </PremiumHeading>
-
-          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium leading-relaxed break-keep">
-            교통사고, 산업재해, 질병 실손, 의료분쟁 등 보상 처리에 필수적인 전국 17개 시·도의 우수 병의원 및 협력 의료기관 정보를 실시간 매핑하여 안내합니다.
-          </p>
-        </div>
-      </PremiumCard>
+      {/* 2. 헤더 배너 */}
+      <PremiumHeaderBanner
+        theme="teal"
+        icon="compass"
+        title="지역별 의료기관 네트워크"
+        badges={['HIRA 공공 빅데이터 연계', { text: '전국 17개 시·도 226개 시·군·구', color: 'gray' }]}
+        description="교통사고, 산업재해, 질병 실손, 의료분쟁 등 보상 처리에 필수적인 전국 17개 시·도의 우수 병의원 및 협력 의료기관 정보를 실시간 매핑하여 안내합니다."
+      />
 
       {/* 3. 전국 17개 시도 인터랙티브 카드 그리드 */}
       <section className="space-y-4">

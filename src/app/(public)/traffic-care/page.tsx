@@ -10,6 +10,7 @@ import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 
 interface AccidentZone {
   id: string;
@@ -288,34 +289,14 @@ export default function TrafficCarePage() {
         </ol>
       </nav>
 
-      {/* 1. 상단 메인 헤더 배너 (입체감 있는 에메랄드 그린 파스텔 PremiumCard) */}
-      <PremiumCard 
-        borderColor="green" 
-        hoverEffect={false} 
-        watermarkIcon="car" 
-        className="!p-5 sm:!p-7 !bg-gradient-to-r !from-emerald-50/90 !via-teal-50/50 !to-transparent dark:!from-emerald-950/40 dark:!via-teal-950/20 dark:!to-transparent border-emerald-200/90 dark:border-emerald-900/50"
-      >
-        <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-            <PremiumBadge color="green">도로교통공단(TAAS) 실시간 공공 데이터</PremiumBadge>
-            <PremiumBadge color="gray">심평원 전국 250개 시군구 전문 의료망</PremiumBadge>
-          </div>
-
-          <PremiumHeading 
-            level={1} 
-            gradient="green" 
-            showLeftBorder={false} 
-            icon={<AppIcon name="car" size={24} className="text-emerald-600 dark:text-emerald-400 shrink-0" />}
-            className="!mb-2 !text-xl sm:!text-2xl font-black"
-          >
-            교통사고 로컬 안심케어 센터
-          </PremiumHeading>
-
-          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
-            자주 오가는 길모퉁이와 집 근처 사거리는 안전할까요? 행정구역을 선택하시면 실시간 교통사고 다발지역 위험 통계와 인근 전문 의료기관을 안내해 드립니다.
-          </p>
-        </div>
-      </PremiumCard>
+      {/* 1. 상단 메인 헤더 배너 */}
+      <PremiumHeaderBanner
+        theme="green"
+        icon="car"
+        title="교통사고 로컬 안심케어 센터"
+        badges={['도로교통공단(TAAS) 실시간 공공 데이터', { text: '심평원 전국 250개 시군구 전문 의료망', color: 'gray' }]}
+        description="자주 오가는 길모퉁이와 집 근처 사거리는 안전할까요? 행정구역을 선택하시면 실시간 교통사고 다발지역 위험 통계와 인근 전문 의료기관을 안내해 드립니다."
+      />
 
       {/* 2. 행정구역 선택 및 지역 분석 박스 */}
       <PremiumCard hoverEffect={false} borderColor="green" className="!p-5 sm:!p-6">

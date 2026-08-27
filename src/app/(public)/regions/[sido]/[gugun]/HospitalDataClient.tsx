@@ -8,6 +8,7 @@ import AppIcon from '@/components/ui/AppIcon';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 
 interface HospitalDataClientProps {
   sido: string;
@@ -173,24 +174,13 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
           </ol>
         </nav>
 
-        {/* 병원 상세 헤더 카드 */}
-        <PremiumCard borderColor="teal" hoverEffect={true} watermarkIcon="hospital" className="!p-6 sm:!p-8">
-          <div className="relative z-10 space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <PremiumBadge color="teal">{sido} {gugun} 의료기관</PremiumBadge>
-              <PremiumBadge color="gray">HIRA 연계 기관</PremiumBadge>
-            </div>
-            <PremiumHeading 
-              level={1} 
-              gradient="teal" 
-              showLeftBorder={false}
-              icon={<AppIcon name="hospital" size={24} className="text-teal-600 dark:text-teal-400 shrink-0" />}
-              className="!mb-2 !text-xl sm:!text-2xl"
-            >
-              {deepLinkedHospitalData.name}
-            </PremiumHeading>
-          </div>
-        </PremiumCard>
+        {/* 딥링크 병원 상세 헤더 배너 */}
+        <PremiumHeaderBanner
+          theme="teal"
+          icon="hospital"
+          title={deepLinkedHospitalData.name}
+          badges={[`${sido} ${gugun} 의료기관`, { text: 'HIRA 연계 기관', color: 'gray' }]}
+        />
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <PremiumCard borderColor="teal" hoverEffect={true} className="!p-5 space-y-1.5">
@@ -268,27 +258,14 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
         </ol>
       </nav>
 
-      {/* 헤더 배너 (Teal 시그니처) */}
-      <PremiumCard borderColor="teal" hoverEffect={false} watermarkIcon="hospital" className="!p-5 sm:!p-7">
-        <div className="relative z-10">
-          <div className="flex flex-wrap items-center gap-2 mb-2.5">
-            <PremiumBadge color="teal">{sido} {gugun}</PremiumBadge>
-            <PremiumBadge color="gray">총 {hospitalsToDisplay.length}개 기관 매핑</PremiumBadge>
-          </div>
-          <PremiumHeading 
-            level={1} 
-            gradient="teal" 
-            showLeftBorder={false}
-            icon={<AppIcon name="hospital" size={24} className="text-teal-600 dark:text-teal-400 shrink-0" />}
-            className="!mb-2 !text-xl sm:!text-2xl"
-          >
-            {sido} {gugun} 의료기관 네트워크
-          </PremiumHeading>
-          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium leading-relaxed break-keep">
-            진료과목별 필터를 선택하여 {gugun} 내 우수 병의원 정보와 손해사정 연계 지식을 확인하세요.
-          </p>
-        </div>
-      </PremiumCard>
+      {/* 헤더 배너 */}
+      <PremiumHeaderBanner
+        theme="teal"
+        icon="hospital"
+        title={`${sido} ${gugun} 의료기관 네트워크`}
+        badges={[`${sido} ${gugun}`, { text: `총 ${hospitalsToDisplay.length}개 기관 매핑`, color: 'gray' }]}
+        description={`진료과목별 필터를 선택하여 ${gugun} 내 우수 병의원 정보와 손해사정 연계 지식을 확인하세요.`}
+      />
 
       {/* 진료과목 필터링 칩 */}
       <PremiumCard borderColor="teal" hoverEffect={false} className="!p-4 sm:!p-5 space-y-3">

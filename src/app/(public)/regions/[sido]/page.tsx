@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 import AppIcon from '@/components/ui/AppIcon';
 
 export async function generateStaticParams() {
@@ -45,43 +46,15 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
         </ol>
       </nav>
 
-      {/* 2. 헤더 배너 (Teal 시그니처 PremiumCard) */}
-      <PremiumCard 
-        borderColor="teal" 
-        hoverEffect={false} 
-        watermarkIcon="compass" 
-        className="!p-5 sm:!p-7 !bg-gradient-to-r !from-teal-50/90 !via-emerald-50/50 !to-transparent dark:!from-teal-950/40 dark:!via-emerald-950/20 dark:!to-transparent border-teal-200/90 dark:border-teal-900/50"
-      >
-        <div className="relative z-10">
-          <div className="flex items-center justify-between gap-3 mb-2.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <PremiumBadge color="teal">{decodedSido} 광역 네트워크</PremiumBadge>
-              <PremiumBadge color="gray">총 {regionData.districts.length}개 시·군·구 매핑</PremiumBadge>
-            </div>
-            <Link 
-              href="/regions" 
-              className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-teal-600 dark:hover:text-teal-400 transition-colors shrink-0"
-            >
-              <span>전국 시·도 보기</span>
-              <AppIcon name="chevron-right" size={14} />
-            </Link>
-          </div>
-
-          <PremiumHeading 
-            level={1} 
-            gradient="teal" 
-            showLeftBorder={false} 
-            icon={<AppIcon name="compass" size={24} className="text-teal-600 dark:text-teal-400 shrink-0" />}
-            className="!mb-2 !text-xl sm:!text-2xl"
-          >
-            {decodedSido} 의료기관 네트워크
-          </PremiumHeading>
-
-          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium leading-relaxed break-keep">
-            {decodedSido} 내 세부 시·군·구를 선택하시면 진료과목별 우수 병원 정보와 손해사정 맞춤형 상담을 확인하실 수 있습니다.
-          </p>
-        </div>
-      </PremiumCard>
+      {/* 2. 헤더 배너 */}
+      <PremiumHeaderBanner
+        theme="teal"
+        icon="compass"
+        title={`${decodedSido} 의료기관 네트워크`}
+        badges={[`${decodedSido} 광역 네트워크`, { text: `총 ${regionData.districts.length}개 시·군·구 매핑`, color: 'gray' }]}
+        description={`${decodedSido} 내 세부 시·군·구를 선택하시면 진료과목별 우수 병원 정보와 손해사정 맞춤형 상담을 확인하실 수 있습니다.`}
+        rightLink={{ href: '/regions', text: '전국 시·도 보기' }}
+      />
 
       {/* 3. 시·군·구 그리드 */}
       <section className="space-y-4">

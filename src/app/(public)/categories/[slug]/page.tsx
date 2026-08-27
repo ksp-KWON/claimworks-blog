@@ -2,9 +2,12 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getSortedPostsData } from '@/lib/posts';
 import { ALL_CATEGORIES, getCategoryBySlug, isCategoryMatch, STOP_WORDS } from '@/lib/constants/categories';
-import { CATEGORY_ICONS } from '@/components/ui/CategoryIcons';
 import PostCard from '@/components/ui/PostCard';
 import Link from 'next/link';
+import PremiumHeading from '@/components/ui/PremiumHeading';
+import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumBadge from '@/components/ui/PremiumBadge';
+import AppIcon from '@/components/ui/AppIcon';
 
 export const dynamicParams = false;
 
@@ -87,64 +90,86 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   });
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div className="mb-4">
-        <Link 
-          href="/categories" 
-          className="inline-flex items-center text-sm font-bold text-[#5f6368] hover:text-[var(--google-blue)] transition-colors"
-        >
-          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-          카테고리 홈으로
-        </Link>
-      </div>
+    <div className="w-full space-y-6 sm:space-y-8">
+      {/* 1. 상단 브레드크럼 */}
+      <nav className="flex text-xs text-[#5f6368] dark:text-[#9aa0a6]" aria-label="Breadcrumb">
+        <ol className="inline-flex items-center space-x-1.5">
+          <li><Link href="/" className="hover:text-[var(--google-blue)] transition-colors">홈</Link></li>
+          <li><span className="mx-1">/</span></li>
+          <li><Link href="/categories" className="hover:text-[var(--google-blue)] transition-colors">분야별 전문 보상가이드</Link></li>
+          <li><span className="mx-1">/</span></li>
+          <li className="text-[#202124] dark:text-[#e8eaed] font-medium" aria-current="page">{category.name}</li>
+        </ol>
+      </nav>
 
-      <div className="border-b border-[var(--google-border)] pb-4 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-[#202124] dark:text-[#e8eaed] flex items-center gap-2">
-          <span className="flex items-center text-[var(--google-blue)] dark:text-[#8ab4f8]">{(() => { const I = CATEGORY_ICONS[category.slug]; return I ? <I /> : null; })()}</span>
-          {category.name} 보상가이드
-        </h1>
-        <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-1.5">
-          {category.desc}
-        </p>
-      </div>
-
-      <div className="flex items-center gap-3 flex-wrap mb-6">
-        <div className="flex items-center gap-2 px-3 py-2 bg-[#e8f0fe] dark:bg-[#174ea6]/30 rounded-none border border-[var(--google-blue)]/30">
-          <svg className="w-4 h-4 text-[var(--google-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-          </svg>
-          <span className="text-sm font-bold text-[var(--google-blue)]">{category.name}</span>
-          <span className="text-xs text-[#5f6368] dark:text-[#9aa0a6]">{filteredPosts.length}개 게시글</span>
-        </div>
-      </div>
-
-      {filteredPosts.length === 0 ? (
-        <div className="bg-white dark:bg-[#202124] rounded-none p-8 sm:p-10 text-center border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)]">
-          <svg className="w-12 h-12 text-[#dadce0] dark:text-[#5f6368] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-          <h3 className="text-lg font-bold text-[#202124] dark:text-[#e8eaed] mb-2">
-            해당 진료과목과 관련된 칼럼이 없습니다.
-          </h3>
-          <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] mb-6 leading-relaxed">
-            관련 보상 가이드 칼럼을 정성껏 준비 중입니다.<br />
-            궁금하신 사항은 아래 버튼을 통해 언제든 실시간 상담을 이용해 주세요.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/chat"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-white font-bold rounded-none text-sm transition-colors cursor-pointer"
+      {/* 2. 헤더 배너 (카테고리 테마 색상 PremiumCard) */}
+      <PremiumCard 
+        borderColor={category.themeColor as any} 
+        hoverEffect={false} 
+        watermarkIcon={category.iconName} 
+        className="!p-5 sm:!p-7"
+      >
+        <div className="relative z-10">
+          <div className="flex items-center justify-between gap-3 mb-2.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <PremiumBadge color={category.themeColor as any}>{category.name} 전문 가이드</PremiumBadge>
+              <PremiumBadge color="gray">총 {filteredPosts.length}개 심층 칼럼</PremiumBadge>
+            </div>
+            <Link 
+              href="/categories" 
+              className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors shrink-0"
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-5.5 0-10 3.5-10 7.8 0 2.7 1.7 5.1 4.2 6.5l-1.1 4.1c-.1.3.2.5.4.4l4.8-3.2c.5.1 1.1.1 1.7.1 5.5 0 10-3.5 10-7.8s-4.5-7.8-10-7.8z"/></svg>
-              실시간 채팅상담
-            </Link>
-            <Link
-              href="/consultation"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[var(--google-blue)] hover:bg-[#1557b0] text-white font-bold rounded-none text-sm transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-              예약 상담 신청
+              <span>전체 분야 보기</span>
+              <AppIcon name="chevron-right" size={14} />
             </Link>
           </div>
+
+          <PremiumHeading 
+            level={1} 
+            gradient={category.themeColor as any} 
+            showLeftBorder={false} 
+            icon={<AppIcon name={category.iconName} size={24} className="shrink-0" />}
+            className="!mb-2 !text-2xl sm:!text-3xl"
+          >
+            {category.name} 전문 보상가이드
+          </PremiumHeading>
+
+          <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] break-keep leading-relaxed font-medium">
+            {category.desc} 관련 보험사 면책 분쟁 대응과 손해사정 성공 실무 사례를 안내합니다.
+          </p>
         </div>
+      </PremiumCard>
+
+      {/* 3. 칼럼 목록 렌더링 */}
+      {filteredPosts.length === 0 ? (
+        <PremiumCard borderColor="default" hoverEffect={false} className="!p-8 sm:!p-10 text-center">
+          <div className="flex flex-col items-center justify-center space-y-3">
+            <div className="w-12 h-12 flex items-center justify-center text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700">
+              <AppIcon name="file-text" size={24} />
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed]">
+              해당 분야와 관련된 칼럼을 정성껏 준비 중입니다.
+            </h3>
+            <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-md leading-relaxed font-medium">
+              관련 사안으로 빠른 검토가 필요하신 경우 아래 버튼을 통해 실시간 상담을 이용해 주세요.
+            </p>
+            <div className="pt-2 flex flex-wrap gap-2.5 justify-center">
+              <Link
+                href="/consultation"
+                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition-all"
+              >
+                <span>1:1 무료상담 신청</span>
+                <AppIcon name="chevron-right" size={14} />
+              </Link>
+              <Link
+                href="/categories"
+                className="px-4 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-[#202124] dark:text-[#e8eaed] border border-gray-300 dark:border-zinc-700 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all"
+              >
+                <span>다른 카테고리 둘러보기</span>
+              </Link>
+            </div>
+          </div>
+        </PremiumCard>
       ) : (
         <div className="space-y-4">
           {filteredPosts.map((post) => (

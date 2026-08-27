@@ -331,7 +331,7 @@ export default function ChatWidget() {
                     보상스쿨 1:1 상담
                   </h3>
                   <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="w-1.5 h-1.5 rounded-none bg-emerald-500 animate-pulse"></span>
                     손해사정사 실시간 상담 가능
                   </p>
                 </div>
@@ -349,7 +349,7 @@ export default function ChatWidget() {
             {isNicknameSet && (
               <div className="bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-blue-50/70 dark:from-blue-950/30 dark:via-zinc-900/40 dark:to-blue-950/30 border-b border-blue-100/60 dark:border-blue-900/20 px-4 py-2 flex items-center justify-between text-[11.5px] shrink-0">
                 <div className="flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${!hasAdminReplied ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`}></span>
+                  <span className={`w-2 h-2 rounded-none ${!hasAdminReplied ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`}></span>
                   <span className="font-bold text-gray-700 dark:text-gray-300">
                     {!hasAdminReplied ? (
                       <span className="flex items-center gap-1.5">

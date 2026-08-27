@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import PremiumHeading from '@/components/ui/PremiumHeading';
+import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
+import SectionLayout from '@/components/ui/SectionLayout';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
-import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 import AppIcon from '@/components/ui/AppIcon';
 import { COLUMN_CATEGORIES, SPECIALTIES, CategoryMeta } from '@/lib/constants/categories';
 
@@ -29,9 +29,9 @@ const THEME_STYLES: Record<string, {
   indigo: {
     border: 'border-indigo-200/80 dark:border-indigo-900/50',
     hoverBorder: 'hover:border-indigo-500 dark:hover:border-indigo-500',
-    hoverShadow: 'hover:shadow-[0_12px_36px_rgba(99,102,241,0.14)] dark:hover:shadow-[0_12px_36px_rgba(99,102,241,0.22)]',
+    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(99,102,241,0.12)] dark:hover:shadow-[0_8px_24px_rgba(99,102,241,0.2)]',
     accentBar: 'bg-indigo-600',
-    gradient: 'from-indigo-50/80 via-indigo-50/20 to-transparent dark:from-indigo-950/30 dark:via-indigo-950/10 dark:to-transparent',
+    gradient: 'from-indigo-50/70 via-indigo-50/20 to-transparent dark:from-indigo-950/30 dark:via-indigo-950/10 dark:to-transparent',
     iconBg: 'bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-200/80 dark:border-indigo-900/60',
     iconText: 'text-indigo-600 dark:text-indigo-400',
     titleHover: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400',
@@ -40,9 +40,9 @@ const THEME_STYLES: Record<string, {
   rose: {
     border: 'border-rose-200/80 dark:border-rose-900/50',
     hoverBorder: 'hover:border-rose-500 dark:hover:border-rose-500',
-    hoverShadow: 'hover:shadow-[0_12px_36px_rgba(244,63,94,0.14)] dark:hover:shadow-[0_12px_36px_rgba(244,63,94,0.22)]',
+    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(244,63,94,0.12)] dark:hover:shadow-[0_8px_24px_rgba(244,63,94,0.2)]',
     accentBar: 'bg-rose-600',
-    gradient: 'from-rose-50/80 via-rose-50/20 to-transparent dark:from-rose-950/30 dark:via-rose-950/10 dark:to-transparent',
+    gradient: 'from-rose-50/70 via-rose-50/20 to-transparent dark:from-rose-950/30 dark:via-rose-950/10 dark:to-transparent',
     iconBg: 'bg-rose-50/80 dark:bg-rose-950/50 border-rose-200/80 dark:border-rose-900/60',
     iconText: 'text-rose-600 dark:text-rose-400',
     titleHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400',
@@ -51,9 +51,9 @@ const THEME_STYLES: Record<string, {
   sky: {
     border: 'border-sky-200/80 dark:border-sky-900/50',
     hoverBorder: 'hover:border-sky-500 dark:hover:border-sky-500',
-    hoverShadow: 'hover:shadow-[0_12px_36px_rgba(14,165,233,0.14)] dark:hover:shadow-[0_12px_36px_rgba(14,165,233,0.22)]',
+    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(14,165,233,0.12)] dark:hover:shadow-[0_8px_24px_rgba(14,165,233,0.2)]',
     accentBar: 'bg-sky-600',
-    gradient: 'from-sky-50/80 via-sky-50/20 to-transparent dark:from-sky-950/30 dark:via-sky-950/10 dark:to-transparent',
+    gradient: 'from-sky-50/70 via-sky-50/20 to-transparent dark:from-sky-950/30 dark:via-sky-950/10 dark:to-transparent',
     iconBg: 'bg-sky-50/80 dark:bg-sky-950/50 border-sky-200/80 dark:border-sky-900/60',
     iconText: 'text-sky-600 dark:text-sky-400',
     titleHover: 'group-hover:text-sky-600 dark:group-hover:text-sky-400',
@@ -62,9 +62,9 @@ const THEME_STYLES: Record<string, {
   red: {
     border: 'border-red-200/80 dark:border-red-900/50',
     hoverBorder: 'hover:border-red-500 dark:hover:border-red-500',
-    hoverShadow: 'hover:shadow-[0_12px_36px_rgba(239,68,68,0.14)] dark:hover:shadow-[0_12px_36px_rgba(239,68,68,0.22)]',
+    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(239,68,68,0.12)] dark:hover:shadow-[0_8px_24px_rgba(239,68,68,0.2)]',
     accentBar: 'bg-red-600',
-    gradient: 'from-red-50/80 via-red-50/20 to-transparent dark:from-red-950/30 dark:via-red-950/10 dark:to-transparent',
+    gradient: 'from-red-50/70 via-red-50/20 to-transparent dark:from-red-950/30 dark:via-red-950/10 dark:to-transparent',
     iconBg: 'bg-red-50/80 dark:bg-red-950/50 border-red-200/80 dark:border-red-900/60',
     iconText: 'text-red-600 dark:text-red-400',
     titleHover: 'group-hover:text-red-600 dark:group-hover:text-red-400',
@@ -73,9 +73,9 @@ const THEME_STYLES: Record<string, {
   emerald: {
     border: 'border-emerald-200/80 dark:border-emerald-900/50',
     hoverBorder: 'hover:border-emerald-500 dark:hover:border-emerald-500',
-    hoverShadow: 'hover:shadow-[0_12px_36px_rgba(16,185,129,0.14)] dark:hover:shadow-[0_12px_36px_rgba(16,185,129,0.22)]',
+    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(16,185,129,0.12)] dark:hover:shadow-[0_8px_24px_rgba(16,185,129,0.2)]',
     accentBar: 'bg-emerald-600',
-    gradient: 'from-emerald-50/80 via-emerald-50/20 to-transparent dark:from-emerald-950/30 dark:via-emerald-950/10 dark:to-transparent',
+    gradient: 'from-emerald-50/70 via-emerald-50/20 to-transparent dark:from-emerald-950/30 dark:via-emerald-950/10 dark:to-transparent',
     iconBg: 'bg-emerald-50/80 dark:bg-emerald-950/50 border-emerald-200/80 dark:border-emerald-900/60',
     iconText: 'text-emerald-600 dark:text-emerald-400',
     titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400',
@@ -84,9 +84,9 @@ const THEME_STYLES: Record<string, {
   orange: {
     border: 'border-orange-200/80 dark:border-orange-900/50',
     hoverBorder: 'hover:border-orange-500 dark:hover:border-orange-500',
-    hoverShadow: 'hover:shadow-[0_12px_36px_rgba(249,115,22,0.14)] dark:hover:shadow-[0_12px_36px_rgba(249,115,22,0.22)]',
+    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(249,115,22,0.12)] dark:hover:shadow-[0_8px_24px_rgba(249,115,22,0.2)]',
     accentBar: 'bg-orange-600',
-    gradient: 'from-orange-50/80 via-orange-50/20 to-transparent dark:from-orange-950/30 dark:via-orange-950/10 dark:to-transparent',
+    gradient: 'from-orange-50/70 via-orange-50/20 to-transparent dark:from-orange-950/30 dark:via-orange-950/10 dark:to-transparent',
     iconBg: 'bg-orange-50/80 dark:bg-orange-950/50 border-orange-200/80 dark:border-orange-900/60',
     iconText: 'text-orange-600 dark:text-orange-400',
     titleHover: 'group-hover:text-orange-600 dark:group-hover:text-orange-400',
@@ -95,9 +95,9 @@ const THEME_STYLES: Record<string, {
   purple: {
     border: 'border-purple-200/80 dark:border-purple-900/50',
     hoverBorder: 'hover:border-purple-500 dark:hover:border-purple-500',
-    hoverShadow: 'hover:shadow-[0_12px_36px_rgba(168,85,247,0.14)] dark:hover:shadow-[0_12px_36px_rgba(168,85,247,0.22)]',
+    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(168,85,247,0.12)] dark:hover:shadow-[0_8px_24px_rgba(168,85,247,0.2)]',
     accentBar: 'bg-purple-600',
-    gradient: 'from-purple-50/80 via-purple-50/20 to-transparent dark:from-purple-950/30 dark:via-purple-950/10 dark:to-transparent',
+    gradient: 'from-purple-50/70 via-purple-50/20 to-transparent dark:from-purple-950/30 dark:via-purple-950/10 dark:to-transparent',
     iconBg: 'bg-purple-50/80 dark:bg-purple-950/50 border-purple-200/80 dark:border-purple-900/60',
     iconText: 'text-purple-600 dark:text-purple-400',
     titleHover: 'group-hover:text-purple-600 dark:group-hover:text-purple-400',
@@ -106,9 +106,9 @@ const THEME_STYLES: Record<string, {
   amber: {
     border: 'border-amber-200/80 dark:border-amber-900/50',
     hoverBorder: 'hover:border-amber-500 dark:hover:border-amber-500',
-    hoverShadow: 'hover:shadow-[0_12px_36px_rgba(245,158,11,0.14)] dark:hover:shadow-[0_12px_36px_rgba(245,158,11,0.22)]',
+    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(245,158,11,0.12)] dark:hover:shadow-[0_8px_24px_rgba(245,158,11,0.2)]',
     accentBar: 'bg-amber-600',
-    gradient: 'from-amber-50/80 via-amber-50/20 to-transparent dark:from-amber-950/30 dark:via-amber-950/10 dark:to-transparent',
+    gradient: 'from-amber-50/70 via-amber-50/20 to-transparent dark:from-amber-950/30 dark:via-amber-950/10 dark:to-transparent',
     iconBg: 'bg-amber-50/80 dark:bg-amber-950/50 border-amber-200/80 dark:border-amber-900/60',
     iconText: 'text-amber-600 dark:text-amber-400',
     titleHover: 'group-hover:text-amber-600 dark:group-hover:text-amber-400',
@@ -117,9 +117,9 @@ const THEME_STYLES: Record<string, {
   blue: {
     border: 'border-blue-200/80 dark:border-blue-900/50',
     hoverBorder: 'hover:border-blue-500 dark:hover:border-blue-500',
-    hoverShadow: 'hover:shadow-[0_12px_36px_rgba(59,130,246,0.14)] dark:hover:shadow-[0_12px_36px_rgba(59,130,246,0.22)]',
+    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(59,130,246,0.12)] dark:hover:shadow-[0_8px_24px_rgba(59,130,246,0.2)]',
     accentBar: 'bg-blue-600',
-    gradient: 'from-blue-50/80 via-blue-50/20 to-transparent dark:from-blue-950/30 dark:via-blue-950/10 dark:to-transparent',
+    gradient: 'from-blue-50/70 via-blue-50/20 to-transparent dark:from-blue-950/30 dark:via-blue-950/10 dark:to-transparent',
     iconBg: 'bg-blue-50/80 dark:bg-blue-950/50 border-blue-200/80 dark:border-blue-900/60',
     iconText: 'text-blue-600 dark:text-blue-400',
     titleHover: 'group-hover:text-blue-600 dark:group-hover:text-blue-400',
@@ -128,9 +128,9 @@ const THEME_STYLES: Record<string, {
   teal: {
     border: 'border-teal-200/80 dark:border-teal-900/50',
     hoverBorder: 'hover:border-teal-500 dark:hover:border-teal-500',
-    hoverShadow: 'hover:shadow-[0_12px_36px_rgba(20,184,166,0.14)] dark:hover:shadow-[0_12px_36px_rgba(20,184,166,0.22)]',
+    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(20,184,166,0.12)] dark:hover:shadow-[0_8px_24px_rgba(20,184,166,0.2)]',
     accentBar: 'bg-teal-600',
-    gradient: 'from-teal-50/80 via-teal-50/20 to-transparent dark:from-teal-950/30 dark:via-teal-950/10 dark:to-transparent',
+    gradient: 'from-teal-50/70 via-teal-50/20 to-transparent dark:from-teal-950/30 dark:via-teal-950/10 dark:to-transparent',
     iconBg: 'bg-teal-50/80 dark:bg-teal-950/50 border-teal-200/80 dark:border-teal-900/60',
     iconText: 'text-teal-600 dark:text-teal-400',
     titleHover: 'group-hover:text-teal-600 dark:group-hover:text-teal-400',
@@ -138,49 +138,56 @@ const THEME_STYLES: Record<string, {
   }
 };
 
-function CategoryGridCard({ item, index }: { item: CategoryMeta; index: number }) {
+/**
+ * CategoryWideCard
+ * 가로로 시원하고 높이는 슬림한 콤팩트 와이드 로우(Row) 카드
+ * - [PC 2열 / 모바일 1열] 레이아웃에 최적화
+ */
+function CategoryWideCard({ item, index }: { item: CategoryMeta; index: number }) {
   const theme = THEME_STYLES[item.themeColor] || THEME_STYLES['indigo'];
 
   return (
     <Link
       href={`/categories/${encodeURIComponent(item.slug)}`}
-      className={`group relative flex flex-col justify-between bg-white dark:bg-[#202124] p-4 sm:p-5 border ${theme.border} shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] ${theme.hoverBorder} ${theme.hoverShadow} hover:-translate-y-0.5 transition-all duration-300 overflow-hidden outline-none`}
+      className={`group relative flex items-center justify-between p-3.5 sm:p-4 bg-white dark:bg-[#202124] border ${theme.border} shadow-[0_1px_4px_rgba(0,0,0,0.02)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.15)] ${theme.hoverBorder} ${theme.hoverShadow} hover:scale-[1.004] transition-all duration-200 overflow-hidden outline-none`}
     >
       {/* 1. 좌측 컬러 포인트 액센트 바 (호버 시 점등) */}
       <div className={`absolute top-0 left-0 w-1 h-full ${theme.accentBar} opacity-0 group-hover:opacity-100 transition-opacity z-20`}></div>
 
       {/* 2. 배경 파스텔 앰비언트 그라데이션 */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0`}></div>
+      <div className={`absolute inset-0 bg-gradient-to-r ${theme.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0`}></div>
 
-      <div className="relative z-10 space-y-3">
-        {/* 상단 뱃지 및 아이콘 헤더 */}
-        <div className="flex items-center justify-between gap-2">
-          <div className={`w-10 h-10 flex items-center justify-center ${theme.iconBg} ${theme.iconText} border shadow-xs group-hover:scale-105 transition-transform duration-300`}>
-            <AppIcon name={item.iconName} size={20} />
-          </div>
-          <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 tracking-wider">
-            NO.{String(index + 1).padStart(2, '0')}
-          </span>
+      {/* 3. 본문 콘텐츠 영역 (아이콘 + 제목 + 설명문) */}
+      <div className="relative z-10 flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1 pr-3">
+        {/* 테마 아이콘 박스 (정사각형 W3C SVG 심볼) */}
+        <div className={`w-10 h-10 sm:w-11 sm:h-11 aspect-square flex items-center justify-center ${theme.iconBg} ${theme.iconText} border shrink-0 group-hover:scale-105 transition-transform duration-200 shadow-xs`}>
+          <AppIcon name={item.iconName} size={20} />
         </div>
 
-        {/* 카테고리 제목 */}
-        <div>
-          <h3 className={`text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] ${theme.titleHover} transition-colors line-clamp-1`}>
-            {item.name}
-          </h3>
-          <p className="text-xs sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed mt-1 line-clamp-2 break-keep font-medium">
+        {/* 텍스트 내용 */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className="text-[10px] font-mono font-bold text-gray-400 dark:text-gray-500">
+              NO.{String(index + 1).padStart(2, '0')}
+            </span>
+            <h3 className={`text-xs sm:text-sm font-extrabold text-[#202124] dark:text-[#e8eaed] ${theme.titleHover} transition-colors truncate`}>
+              {item.name}
+            </h3>
+          </div>
+          <p className="text-[11px] sm:text-xs text-[#5f6368] dark:text-[#9aa0a6] font-medium truncate">
             {item.desc}
           </p>
         </div>
       </div>
 
-      {/* 하단 바로가기 액션 바 */}
-      <div className="relative z-10 mt-4 pt-3 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-between text-xs">
-        <PremiumBadge color={theme.badgeColor}>칼럼 분석</PremiumBadge>
-        <span className={`flex items-center gap-1 font-bold ${theme.titleHover} transition-colors`}>
-          <span>가이드 보기</span>
-          <AppIcon name="chevron-right" size={14} className="group-hover:translate-x-0.5 transition-transform" />
-        </span>
+      {/* 4. 우측 뱃지 및 이동 화살표 */}
+      <div className="relative z-10 flex items-center gap-2 shrink-0">
+        <PremiumBadge color={theme.badgeColor} className="hidden sm:inline-flex text-[10px] py-0.5 px-2">
+          분석
+        </PremiumBadge>
+        <div className={`w-6 h-6 flex items-center justify-center text-gray-400 ${theme.titleHover} transition-colors`}>
+          <AppIcon name="chevron-right" size={15} className="group-hover:translate-x-0.5 transition-transform" />
+        </div>
       </div>
     </Link>
   );
@@ -188,7 +195,7 @@ function CategoryGridCard({ item, index }: { item: CategoryMeta; index: number }
 
 export default function CategoriesIndex() {
   return (
-    <div className="w-full space-y-8 sm:space-y-10">
+    <div className="w-full space-y-10 sm:space-y-12">
       {/* 1. 상단 브레드크럼 */}
       <nav className="flex text-xs text-[#5f6368] dark:text-[#9aa0a6]" aria-label="Breadcrumb">
         <ol className="inline-flex items-center space-x-1.5">
@@ -198,7 +205,7 @@ export default function CategoriesIndex() {
         </ol>
       </nav>
 
-      {/* 2. 메인 헤더 배너 */}
+      {/* 2. 메인 헤더 배너 (전역 표준 컴포넌트) */}
       <PremiumHeaderBanner
         theme="indigo"
         icon="book"
@@ -207,43 +214,33 @@ export default function CategoriesIndex() {
         description="대법원 판례와 금융분쟁조정위원회 결정례부터, 10대 진료과목별 의학 분쟁 쟁점까지 보상스쿨 손해사정사의 풍부한 실무 노하우를 엄선하여 제공합니다."
       />
 
-      {/* 3. 섹션 1: 8대 핵심 법리 보상 칼럼 */}
-      <section className="space-y-4 sm:space-y-5">
-        <div className="flex items-center justify-between gap-3 pb-2 border-b border-gray-200/80 dark:border-zinc-800">
-          <div className="flex items-center gap-2">
-            <AppIcon name="scale" size={20} className="text-indigo-600 dark:text-indigo-400" />
-            <h2 className="text-lg sm:text-xl font-bold text-[#202124] dark:text-[#e8eaed]">
-              8대 핵심 법리 보상 칼럼
-            </h2>
-          </div>
-          <span className="text-xs text-[#5f6368] dark:text-[#9aa0a6] font-medium">총 8개 전문 분야</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+      {/* 3. 섹션 1: 8대 핵심 법리 보상 칼럼 (메인 홈 SectionLayout 패밀리룩) */}
+      <SectionLayout
+        title="8대 핵심 법리 보상 칼럼"
+        icon={<AppIcon name="scale" size={20} />}
+        themeColor="indigo"
+        description="대법원 판례 및 금융분쟁조정위원회 결정례를 바탕으로 보험사의 삭감·면책 주장을 방어하는 핵심 법리 가이드입니다."
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
           {COLUMN_CATEGORIES.map((cat, idx) => (
-            <CategoryGridCard key={cat.slug} item={cat} index={idx} />
+            <CategoryWideCard key={cat.slug} item={cat} index={idx} />
           ))}
         </div>
-      </section>
+      </SectionLayout>
 
-      {/* 4. 섹션 2: 10대 진료과목별 의학 분쟁 가이드 */}
-      <section className="space-y-4 sm:space-y-5">
-        <div className="flex items-center justify-between gap-3 pb-2 border-b border-gray-200/80 dark:border-zinc-800">
-          <div className="flex items-center gap-2">
-            <AppIcon name="stethoscope" size={20} className="text-blue-600 dark:text-blue-400" />
-            <h2 className="text-lg sm:text-xl font-bold text-[#202124] dark:text-[#e8eaed]">
-              10대 진료과목별 의학 분쟁 가이드
-            </h2>
-          </div>
-          <span className="text-xs text-[#5f6368] dark:text-[#9aa0a6] font-medium">총 10개 의학 분과</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4">
+      {/* 4. 섹션 2: 10대 진료과목별 의학 분쟁 가이드 (메인 홈 SectionLayout 패밀리룩) */}
+      <SectionLayout
+        title="10대 진료과목별 의학분쟁 가이드"
+        icon={<AppIcon name="stethoscope" size={20} />}
+        themeColor="green"
+        description="10대 주요 진료과목별 상해·질병 분류코드와 병리 검사결과지 판독 및 의학 분쟁 쟁점을 체계적으로 분석합니다."
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
           {SPECIALTIES.map((spec, idx) => (
-            <CategoryGridCard key={spec.slug} item={spec} index={idx} />
+            <CategoryWideCard key={spec.slug} item={spec} index={idx} />
           ))}
         </div>
-      </section>
+      </SectionLayout>
 
       {/* 5. 하단 1:1 전문 상담 연계 배너 */}
       <PremiumCard 

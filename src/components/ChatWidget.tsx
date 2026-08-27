@@ -573,7 +573,7 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* Floating Button (각진 프리미엄 런처) */}
+      {/* Floating Button (동그란 원형 프리미엄 런처) */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -585,7 +585,7 @@ export default function ChatWidget() {
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.06 }}
             whileTap={{ scale: 0.94 }}
-            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-none flex items-center justify-center transition-colors focus:outline-none bg-blue-50 dark:bg-[#202124] focus:ring-2 focus:ring-blue-300"
+            className="fixed bottom-[88px] sm:bottom-6 right-4 sm:right-6 z-[200] w-14 h-14 rounded-full flex items-center justify-center transition-colors focus:outline-none bg-blue-50 dark:bg-[#202124] focus:ring-4 focus:ring-blue-300"
             style={{ 
               boxShadow: '0 8px 30px rgba(26,115,232,0.25), inset 0 -3px 6px rgba(0,0,0,0.06), inset 0 3px 6px rgba(255,255,255,1)',
               border: '1px solid rgba(229,231,235,0.8)'
@@ -598,7 +598,7 @@ export default function ChatWidget() {
 
             {/* Red Glow Pulse */}
             <motion.div 
-              className="absolute inset-0 rounded-none pointer-events-none"
+              className="absolute inset-0 rounded-full pointer-events-none"
               animate={{ 
                 boxShadow: [
                   '0 0 0px 0px rgba(239,68,68,0)', 
@@ -621,7 +621,7 @@ export default function ChatWidget() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-none flex items-center justify-center shadow-md border-2 border-white dark:border-zinc-900 z-10"
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-zinc-900 z-10"
                 >
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </motion.span>

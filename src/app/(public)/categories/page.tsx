@@ -5,7 +5,7 @@ import SectionLayout from '@/components/ui/SectionLayout';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import AppIcon from '@/components/ui/AppIcon';
-import { COLUMN_CATEGORIES, SPECIALTIES, CategoryMeta } from '@/lib/constants/categories';
+import { COLUMN_CATEGORIES, SPECIALTIES, CategoryMeta, getCategoryThemeStyle } from '@/lib/constants/categories';
 
 export const metadata: Metadata = {
   title: '분야별 전문 보상가이드 | 보상스쿨 전문 손해사정 그룹',
@@ -18,24 +18,26 @@ export const metadata: Metadata = {
 /**
  * CategoryWideCard
  * 가로로 시원하고 높이는 슬림한 콤팩트 와이드 로우(Row) 카드
- * - [단정하고 품격 있는 프리미엄 모노톤 + 앰버 골드 포인트 표준 시스템]
+ * - [단정한 프리미엄 모노톤 베이스 + 우측 고유 테마 뱃지 포인트 + 호버 시 톤온톤 점등]
  */
 function CategoryWideCard({ item, index }: { item: CategoryMeta; index: number }) {
+  const theme = getCategoryThemeStyle(item.themeColor);
+
   return (
     <Link
       href={`/categories/${encodeURIComponent(item.slug)}`}
-      className="group relative flex items-center justify-between p-3.5 sm:p-4 bg-white dark:bg-[#202124] border border-gray-200/90 dark:border-zinc-800 shadow-[0_1px_4px_rgba(0,0,0,0.02)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.15)] hover:border-amber-400 dark:hover:border-amber-500 hover:shadow-[0_6px_20px_rgba(245,158,11,0.08)] dark:hover:shadow-[0_6px_20px_rgba(245,158,11,0.15)] hover:scale-[1.004] transition-all duration-200 overflow-hidden outline-none"
+      className={`group relative flex items-center justify-between p-3.5 sm:p-4 bg-white dark:bg-[#202124] border border-gray-200/90 dark:border-zinc-800 shadow-[0_1px_4px_rgba(0,0,0,0.02)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.15)] ${theme.hoverBorder} ${theme.hoverShadow} hover:scale-[1.004] transition-all duration-200 overflow-hidden outline-none`}
     >
-      {/* 1. 좌측 앰버 골드 액센트 바 (호버 시 점등) */}
-      <div className="absolute top-0 left-0 w-1 h-full bg-amber-500 opacity-0 group-hover:opacity-100 transition-opacity z-20"></div>
+      {/* 1. 좌측 고유 컬러 포인트 액센트 바 (호버 시 점등) */}
+      <div className={`absolute top-0 left-0 w-1 h-full ${theme.accentBar} opacity-0 group-hover:opacity-100 transition-opacity z-20`}></div>
 
-      {/* 2. 배경 은은한 앰버 앰비언트 그라데이션 */}
-      <div className="absolute inset-0 bg-gradient-to-r from-amber-50/70 via-amber-50/20 to-transparent dark:from-amber-950/25 dark:via-amber-950/5 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0"></div>
+      {/* 2. 배경 은은한 파스텔 앰비언트 그라데이션 */}
+      <div className={`absolute inset-0 bg-gradient-to-r ${theme.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0`}></div>
 
       {/* 3. 본문 콘텐츠 영역 (단색 W3C 아이콘 + 제목 + 설명문) */}
       <div className="relative z-10 flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1 pr-3">
-        {/* 단색 정밀 아이콘 박스 */}
-        <div className="w-10 h-10 sm:w-11 sm:h-11 aspect-square flex items-center justify-center bg-gray-50 dark:bg-zinc-800/80 border border-gray-200/80 dark:border-zinc-700 text-gray-700 dark:text-gray-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 group-hover:border-amber-300 dark:group-hover:border-amber-600/50 shrink-0 group-hover:scale-105 transition-all duration-200 shadow-xs">
+        {/* 단색 정밀 아이콘 박스 (호버 시 고유 톤온톤 점등) */}
+        <div className={`w-10 h-10 sm:w-11 sm:h-11 aspect-square flex items-center justify-center bg-gray-50 dark:bg-zinc-800/80 border border-gray-200/80 dark:border-zinc-700 text-gray-700 dark:text-gray-300 ${theme.titleHover} group-hover:border-current shrink-0 group-hover:scale-105 transition-all duration-200 shadow-xs`}>
           <AppIcon name={item.iconName} size={20} />
         </div>
 
@@ -45,7 +47,7 @@ function CategoryWideCard({ item, index }: { item: CategoryMeta; index: number }
             <span className="text-[10px] font-mono font-bold text-gray-400 dark:text-gray-500">
               NO.{String(index + 1).padStart(2, '0')}
             </span>
-            <h3 className="text-xs sm:text-sm font-extrabold text-[#202124] dark:text-[#e8eaed] group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
+            <h3 className={`text-xs sm:text-sm font-extrabold text-[#202124] dark:text-[#e8eaed] ${theme.titleHover} transition-colors truncate`}>
               {item.name}
             </h3>
           </div>
@@ -55,12 +57,12 @@ function CategoryWideCard({ item, index }: { item: CategoryMeta; index: number }
         </div>
       </div>
 
-      {/* 4. 우측 뱃지 및 이동 화살표 */}
+      {/* 4. 우측 고유 테마 뱃지 및 이동 화살표 (하드코딩 0% 완전 동적 연동) */}
       <div className="relative z-10 flex items-center gap-2 shrink-0">
-        <PremiumBadge color="gray" className="hidden sm:inline-flex text-[10px] py-0.5 px-2 group-hover:border-amber-300 dark:group-hover:border-amber-700/50 transition-colors">
+        <PremiumBadge color={theme.badgeColor} className="hidden sm:inline-flex text-[10px] py-0.5 px-2 font-bold shadow-xs">
           가이드
         </PremiumBadge>
-        <div className="w-6 h-6 flex items-center justify-center text-gray-400 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+        <div className={`w-6 h-6 flex items-center justify-center text-gray-400 ${theme.titleHover} transition-colors`}>
           <AppIcon name="chevron-right" size={15} className="group-hover:translate-x-0.5 transition-transform" />
         </div>
       </div>

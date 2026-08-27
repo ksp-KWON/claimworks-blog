@@ -35,7 +35,7 @@ export const COLUMN_CATEGORIES: CategoryMeta[] = [
     name: '질병진단·실손', 
     slug: '질병진단-실손', 
     iconName: 'heart', 
-    themeColor: 'sky', 
+    themeColor: 'blue', 
     desc: '암, 뇌졸중, 급성심근경색 및 실손 분쟁 완전 정복',
     keywords: ['암', '뇌졸중', '심근경색', '질병']
   },
@@ -43,7 +43,7 @@ export const COLUMN_CATEGORIES: CategoryMeta[] = [
     name: '교통사고 보상', 
     slug: '교통사고-보상', 
     iconName: 'car', 
-    themeColor: 'red', 
+    themeColor: 'emerald', 
     desc: '자동차보험 대인배상 및 무보험차상해 정밀 산정',
     keywords: ['교통사고', '대인배상', '무보험차', '합의금']
   },
@@ -51,7 +51,7 @@ export const COLUMN_CATEGORIES: CategoryMeta[] = [
     name: '배상책임·의료', 
     slug: '배상책임-의료', 
     iconName: 'shield', 
-    themeColor: 'emerald', 
+    themeColor: 'teal', 
     desc: '일상생활배상책임 및 의료사고 과실 입증 솔루션',
     keywords: ['배상책임', '의료사고', '일배책', '영업배상', '낙상']
   },

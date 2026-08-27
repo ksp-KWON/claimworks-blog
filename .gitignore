@@ -53,4 +53,5 @@ next-env.d.ts
 
 # Temporary daily topic JSON (generated during blog build)
 scripts/daily-topic.json
+scripts/.fallback-state.json
 scratch/

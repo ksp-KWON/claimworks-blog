@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
+import SectionLayout from '@/components/ui/SectionLayout';
 import AppIcon from '@/components/ui/AppIcon';
 import { REGIONS_DATA } from '@/lib/constants';
 
@@ -26,7 +26,7 @@ function getRegionZone(name: string): string {
 
 export default function RegionsIndex() {
   return (
-    <div className="w-full space-y-8 sm:space-y-10">
+    <div className="w-full space-y-6 sm:space-y-8">
       {/* 1. 상단 브레드크럼 */}
       <nav className="flex text-xs text-[#5f6368] dark:text-[#9aa0a6]" aria-label="Breadcrumb">
         <ol className="inline-flex items-center space-x-1.5">
@@ -45,18 +45,13 @@ export default function RegionsIndex() {
         description="교통사고, 산업재해, 질병 실손, 의료분쟁 등 보상 처리에 필수적인 전국 17개 시·도의 우수 병의원 및 협력 의료기관 정보를 실시간 매핑하여 안내합니다."
       />
 
-      {/* 3. 전국 17개 시도 인터랙티브 카드 그리드 */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between gap-3 pb-2 border-b border-gray-200/80 dark:border-zinc-800">
-          <div className="flex items-center gap-2">
-            <AppIcon name="hospital" size={20} className="text-teal-600 dark:text-teal-400" />
-            <h2 className="text-lg sm:text-xl font-bold text-[#202124] dark:text-[#e8eaed]">
-              전국 광역 네트워크 허브
-            </h2>
-          </div>
-          <span className="text-xs text-[#5f6368] dark:text-[#9aa0a6] font-medium">전국 17개 시·도</span>
-        </div>
-
+      {/* 3. 전국 17개 시도 인터랙티브 카드 그리드 (SectionLayout 패밀리룩) */}
+      <SectionLayout
+        title="전국 광역 네트워크 허브"
+        icon={<AppIcon name="hospital" size={20} />}
+        themeColor="teal"
+        description="전국 17개 시·도 및 226개 시·군·구 보상 전문 우수 병의원과 공공데이터 연계 협력 네트워크입니다."
+      >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
           {REGIONS_DATA.map((region, idx) => {
             const zone = getRegionZone(region.name);
@@ -98,15 +93,15 @@ export default function RegionsIndex() {
                     NO.{String(idx + 1).padStart(2, '0')}
                   </span>
                   <span className="flex items-center gap-1 font-bold text-teal-600 dark:text-teal-400 group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">
-                    <span>병원 조회</span>
-                    <AppIcon name="chevron-right" size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                    <span>상세보기</span>
+                    <AppIcon name="chevron-right" size={13} className="group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </div>
               </Link>
             );
           })}
         </div>
-      </section>
+      </SectionLayout>
 
       {/* 4. 하단 교통사고 로컬케어 및 상담 연계 배너 */}
       <PremiumCard 

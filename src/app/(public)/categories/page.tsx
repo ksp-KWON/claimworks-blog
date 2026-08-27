@@ -34,10 +34,10 @@ function CategoryWideCard({ item, index }: { item: CategoryMeta; index: number }
       {/* 2. 배경 은은한 파스텔 앰비언트 그라데이션 */}
       <div className={`absolute inset-0 bg-gradient-to-r ${theme.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0`}></div>
 
-      {/* 3. 본문 콘텐츠 영역 (단색 W3C 아이콘 + 제목 + 설명문) */}
+      {/* 3. 본문 콘텐츠 영역 (고유 심볼 아이콘 + 제목 + 설명문) */}
       <div className="relative z-10 flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1 pr-3">
-        {/* 단색 정밀 아이콘 박스 (호버 시 고유 톤온톤 점등) */}
-        <div className={`w-10 h-10 sm:w-11 sm:h-11 aspect-square flex items-center justify-center bg-gray-50 dark:bg-zinc-800/80 border border-gray-200/80 dark:border-zinc-700 text-gray-700 dark:text-gray-300 ${theme.titleHover} group-hover:border-current shrink-0 group-hover:scale-105 transition-all duration-200 shadow-xs`}>
+        {/* 고유 심볼 아이콘 박스 (모바일 기본 컬러 + 호버 시 스케일업) */}
+        <div className={`w-10 h-10 sm:w-11 sm:h-11 aspect-square flex items-center justify-center ${theme.iconBg} ${theme.iconText} border shrink-0 group-hover:scale-105 transition-all duration-200 shadow-xs`}>
           <AppIcon name={item.iconName} size={20} />
         </div>
 

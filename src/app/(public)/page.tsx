@@ -75,7 +75,7 @@ export default function Home() {
   const posts = getSortedPostsData();
 
   return (
-    <div className="space-y-12 sm:space-y-16 sm:px-0">
+    <div className="space-y-8 sm:space-y-12 sm:px-0">
       {/* Organization & WebSite 구조화 데이터 (구글 지식그래프 & AI Overview 대응) */}
       <script
         type="application/ld+json"

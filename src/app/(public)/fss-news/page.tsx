@@ -274,7 +274,7 @@ export default function FssNewsPage() {
   };
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-6 sm:space-y-8">
       {/* 상단 브레드크럼 */}
       <nav className="flex text-xs text-[#5f6368] dark:text-[#9aa0a6]" aria-label="Breadcrumb">
         <ol className="inline-flex items-center space-x-1.5">

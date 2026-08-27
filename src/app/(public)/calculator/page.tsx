@@ -111,7 +111,7 @@ const CALCULATORS: CalculatorItem[] = [
 
 export default function CalculatorIndex() {
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-6 sm:space-y-8">
       {/* 상단 브레드크럼 */}
       <nav className="flex text-xs text-[#5f6368] dark:text-[#9aa0a6]" aria-label="Breadcrumb">
         <ol className="inline-flex items-center space-x-1.5">
@@ -131,7 +131,7 @@ export default function CalculatorIndex() {
       />
 
       {/* 2. 3대 계산기 인터랙티브 액션 카드 */}
-      <div className="space-y-4 pt-1">
+      <div className="space-y-4">
         {CALCULATORS.map((calc) => {
           const theme = THEME_MAP[calc.color];
           return (

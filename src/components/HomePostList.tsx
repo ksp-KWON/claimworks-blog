@@ -22,7 +22,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: Omit<Post
   }).filter(item => item.posts.length > 0);
 
   return (
-    <div className="space-y-12 sm:space-y-16">
+    <div className="space-y-8 sm:space-y-10">
       {categoriesWithPosts.map(({ category, posts }) => {
         const themeMap: Record<string, SectionThemeColor> = {
           sky: 'cyan',

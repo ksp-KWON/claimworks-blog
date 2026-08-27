@@ -79,7 +79,7 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
                   <AppIcon name="hospital" size={20} />
                 </div>
 
-                <div>
+                <div className="text-center">
                   <h3 className="text-sm sm:text-base font-extrabold text-[#202124] dark:text-[#e8eaed] group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                     {gugun}
                   </h3>

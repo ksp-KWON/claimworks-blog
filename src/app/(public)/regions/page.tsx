@@ -76,8 +76,8 @@ export default function RegionsIndex() {
                     <PremiumBadge color="teal">{zone}</PremiumBadge>
                   </div>
 
-                  {/* 시도명 및 설명 */}
-                  <div>
+                  {/* 시도명 및 설명 (중간정렬) */}
+                  <div className="text-center">
                     <h3 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-1">
                       {region.name}
                     </h3>

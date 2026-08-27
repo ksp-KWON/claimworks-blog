@@ -89,6 +89,9 @@ export default function Home() {
       {/* 유튜브 전문가 브리핑 섹션 (미디어 센터) */}
       <YouTubeBriefing />
 
+      {/* 미디어 센터 ↔ 매거진 섹션 분리 프리미엄 디바이더 */}
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200/90 dark:via-zinc-800 to-transparent" role="separator" />
+
       {/* 보상스쿨 매거진 글로벌 타이틀 */}
       <section className="space-y-6">
         <PremiumHeaderBanner

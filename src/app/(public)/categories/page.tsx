@@ -82,20 +82,20 @@ export default function CategoriesIndex() {
         </ol>
       </nav>
 
-      {/* 2. 메인 헤더 배너 (전역 표준 컴포넌트) */}
+      {/* 2. 메인 헤더 배너 (전역 표준 컴포넌트 - Yellow/Amber 테마 동기화) */}
       <PremiumHeaderBanner
-        theme="indigo"
-        icon="book"
+        theme="yellow"
+        icon="folder"
         title="분야별 전문 보상 가이드"
         badges={['보상스쿨 핵심 실무', { text: '8대 법리 칼럼 · 10대 의학 분과', color: 'gray' }]}
         description="대법원 판례와 금융분쟁조정위원회 결정례부터, 10대 진료과목별 의학 분쟁 쟁점까지 보상스쿨 손해사정사의 풍부한 실무 노하우를 엄선하여 제공합니다."
       />
 
-      {/* 3. 섹션 1: 8대 핵심 법리 보상 칼럼 (메인 홈 SectionLayout 패밀리룩) */}
+      {/* 3. 섹션 1: 8대 핵심 법리 보상 칼럼 (Yellow/Amber 톤온톤 패밀리룩) */}
       <SectionLayout
         title="8대 핵심 법리 보상 칼럼"
         icon={<AppIcon name="scale" size={20} />}
-        themeColor="indigo"
+        themeColor="yellow"
         description="대법원 판례 및 금융분쟁조정위원회 결정례를 바탕으로 보험사의 삭감·면책 주장을 방어하는 핵심 법리 가이드입니다."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
@@ -105,11 +105,11 @@ export default function CategoriesIndex() {
         </div>
       </SectionLayout>
 
-      {/* 4. 섹션 2: 10대 진료과목별 의학 분쟁 가이드 (메인 홈 SectionLayout 패밀리룩) */}
+      {/* 4. 섹션 2: 10대 진료과목별 의학 분쟁 가이드 (Yellow/Amber 톤온톤 패밀리룩) */}
       <SectionLayout
         title="10대 진료과목별 의학분쟁 가이드"
         icon={<AppIcon name="stethoscope" size={20} />}
-        themeColor="green"
+        themeColor="yellow"
         description="10대 주요 진료과목별 상해·질병 분류코드와 병리 검사결과지 판독 및 의학 분쟁 쟁점을 체계적으로 분석합니다."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">

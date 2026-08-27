@@ -5,7 +5,7 @@ import PremiumHeading from './PremiumHeading';
 import PremiumBadge, { type BadgeColor } from './PremiumBadge';
 import AppIcon, { type AppIconName } from './AppIcon';
 
-export type HeaderBannerTheme = 'blue' | 'red' | 'green' | 'purple' | 'teal' | 'indigo' | 'amber' | 'rose' | 'sky' | 'default';
+export type HeaderBannerTheme = 'blue' | 'red' | 'green' | 'purple' | 'teal' | 'indigo' | 'amber' | 'yellow' | 'rose' | 'sky' | 'default';
 
 export interface HeaderBadgeItem {
   text: string;
@@ -86,6 +86,12 @@ const THEME_CONFIGS: Record<HeaderBannerTheme, ThemeConfig> = {
     defaultBadgeColor: 'purple'
   },
   amber: {
+    cardBorder: 'yellow',
+    bgGradient: '!bg-gradient-to-r !from-amber-50/90 !via-yellow-50/50 !to-transparent dark:!from-amber-950/40 dark:!via-yellow-950/20 dark:!to-transparent border-amber-200/90 dark:border-amber-900/50',
+    iconColor: 'text-amber-600 dark:text-amber-400',
+    defaultBadgeColor: 'yellow'
+  },
+  yellow: {
     cardBorder: 'yellow',
     bgGradient: '!bg-gradient-to-r !from-amber-50/90 !via-yellow-50/50 !to-transparent dark:!from-amber-950/40 dark:!via-yellow-950/20 dark:!to-transparent border-amber-200/90 dark:border-amber-900/50',
     iconColor: 'text-amber-600 dark:text-amber-400',

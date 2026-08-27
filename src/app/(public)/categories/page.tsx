@@ -5,7 +5,7 @@ import SectionLayout from '@/components/ui/SectionLayout';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import AppIcon from '@/components/ui/AppIcon';
-import { COLUMN_CATEGORIES, SPECIALTIES, CategoryMeta } from '@/lib/constants/categories';
+import { COLUMN_CATEGORIES, SPECIALTIES, CategoryMeta, getCategoryThemeStyle } from '@/lib/constants/categories';
 
 export const metadata: Metadata = {
   title: '분야별 전문 보상가이드 | 보상스쿨 전문 손해사정 그룹',
@@ -15,136 +15,13 @@ export const metadata: Metadata = {
   },
 };
 
-const THEME_STYLES: Record<string, {
-  border: string;
-  hoverBorder: string;
-  hoverShadow: string;
-  accentBar: string;
-  gradient: string;
-  iconBg: string;
-  iconText: string;
-  titleHover: string;
-  badgeColor: 'blue' | 'rose' | 'red' | 'green' | 'teal' | 'purple' | 'indigo' | 'yellow' | 'gray';
-}> = {
-  indigo: {
-    border: 'border-indigo-200/80 dark:border-indigo-900/50',
-    hoverBorder: 'hover:border-indigo-500 dark:hover:border-indigo-500',
-    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(99,102,241,0.12)] dark:hover:shadow-[0_8px_24px_rgba(99,102,241,0.2)]',
-    accentBar: 'bg-indigo-600',
-    gradient: 'from-indigo-50/70 via-indigo-50/20 to-transparent dark:from-indigo-950/30 dark:via-indigo-950/10 dark:to-transparent',
-    iconBg: 'bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-200/80 dark:border-indigo-900/60',
-    iconText: 'text-indigo-600 dark:text-indigo-400',
-    titleHover: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400',
-    badgeColor: 'indigo'
-  },
-  rose: {
-    border: 'border-rose-200/80 dark:border-rose-900/50',
-    hoverBorder: 'hover:border-rose-500 dark:hover:border-rose-500',
-    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(244,63,94,0.12)] dark:hover:shadow-[0_8px_24px_rgba(244,63,94,0.2)]',
-    accentBar: 'bg-rose-600',
-    gradient: 'from-rose-50/70 via-rose-50/20 to-transparent dark:from-rose-950/30 dark:via-rose-950/10 dark:to-transparent',
-    iconBg: 'bg-rose-50/80 dark:bg-rose-950/50 border-rose-200/80 dark:border-rose-900/60',
-    iconText: 'text-rose-600 dark:text-rose-400',
-    titleHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400',
-    badgeColor: 'rose'
-  },
-  sky: {
-    border: 'border-sky-200/80 dark:border-sky-900/50',
-    hoverBorder: 'hover:border-sky-500 dark:hover:border-sky-500',
-    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(14,165,233,0.12)] dark:hover:shadow-[0_8px_24px_rgba(14,165,233,0.2)]',
-    accentBar: 'bg-sky-600',
-    gradient: 'from-sky-50/70 via-sky-50/20 to-transparent dark:from-sky-950/30 dark:via-sky-950/10 dark:to-transparent',
-    iconBg: 'bg-sky-50/80 dark:bg-sky-950/50 border-sky-200/80 dark:border-sky-900/60',
-    iconText: 'text-sky-600 dark:text-sky-400',
-    titleHover: 'group-hover:text-sky-600 dark:group-hover:text-sky-400',
-    badgeColor: 'blue'
-  },
-  red: {
-    border: 'border-red-200/80 dark:border-red-900/50',
-    hoverBorder: 'hover:border-red-500 dark:hover:border-red-500',
-    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(239,68,68,0.12)] dark:hover:shadow-[0_8px_24px_rgba(239,68,68,0.2)]',
-    accentBar: 'bg-red-600',
-    gradient: 'from-red-50/70 via-red-50/20 to-transparent dark:from-red-950/30 dark:via-red-950/10 dark:to-transparent',
-    iconBg: 'bg-red-50/80 dark:bg-red-950/50 border-red-200/80 dark:border-red-900/60',
-    iconText: 'text-red-600 dark:text-red-400',
-    titleHover: 'group-hover:text-red-600 dark:group-hover:text-red-400',
-    badgeColor: 'red'
-  },
-  emerald: {
-    border: 'border-emerald-200/80 dark:border-emerald-900/50',
-    hoverBorder: 'hover:border-emerald-500 dark:hover:border-emerald-500',
-    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(16,185,129,0.12)] dark:hover:shadow-[0_8px_24px_rgba(16,185,129,0.2)]',
-    accentBar: 'bg-emerald-600',
-    gradient: 'from-emerald-50/70 via-emerald-50/20 to-transparent dark:from-emerald-950/30 dark:via-emerald-950/10 dark:to-transparent',
-    iconBg: 'bg-emerald-50/80 dark:bg-emerald-950/50 border-emerald-200/80 dark:border-emerald-900/60',
-    iconText: 'text-emerald-600 dark:text-emerald-400',
-    titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400',
-    badgeColor: 'green'
-  },
-  orange: {
-    border: 'border-orange-200/80 dark:border-orange-900/50',
-    hoverBorder: 'hover:border-orange-500 dark:hover:border-orange-500',
-    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(249,115,22,0.12)] dark:hover:shadow-[0_8px_24px_rgba(249,115,22,0.2)]',
-    accentBar: 'bg-orange-600',
-    gradient: 'from-orange-50/70 via-orange-50/20 to-transparent dark:from-orange-950/30 dark:via-orange-950/10 dark:to-transparent',
-    iconBg: 'bg-orange-50/80 dark:bg-orange-950/50 border-orange-200/80 dark:border-orange-900/60',
-    iconText: 'text-orange-600 dark:text-orange-400',
-    titleHover: 'group-hover:text-orange-600 dark:group-hover:text-orange-400',
-    badgeColor: 'yellow'
-  },
-  purple: {
-    border: 'border-purple-200/80 dark:border-purple-900/50',
-    hoverBorder: 'hover:border-purple-500 dark:hover:border-purple-500',
-    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(168,85,247,0.12)] dark:hover:shadow-[0_8px_24px_rgba(168,85,247,0.2)]',
-    accentBar: 'bg-purple-600',
-    gradient: 'from-purple-50/70 via-purple-50/20 to-transparent dark:from-purple-950/30 dark:via-purple-950/10 dark:to-transparent',
-    iconBg: 'bg-purple-50/80 dark:bg-purple-950/50 border-purple-200/80 dark:border-purple-900/60',
-    iconText: 'text-purple-600 dark:text-purple-400',
-    titleHover: 'group-hover:text-purple-600 dark:group-hover:text-purple-400',
-    badgeColor: 'purple'
-  },
-  amber: {
-    border: 'border-amber-200/80 dark:border-amber-900/50',
-    hoverBorder: 'hover:border-amber-500 dark:hover:border-amber-500',
-    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(245,158,11,0.12)] dark:hover:shadow-[0_8px_24px_rgba(245,158,11,0.2)]',
-    accentBar: 'bg-amber-600',
-    gradient: 'from-amber-50/70 via-amber-50/20 to-transparent dark:from-amber-950/30 dark:via-amber-950/10 dark:to-transparent',
-    iconBg: 'bg-amber-50/80 dark:bg-amber-950/50 border-amber-200/80 dark:border-amber-900/60',
-    iconText: 'text-amber-600 dark:text-amber-400',
-    titleHover: 'group-hover:text-amber-600 dark:group-hover:text-amber-400',
-    badgeColor: 'yellow'
-  },
-  blue: {
-    border: 'border-blue-200/80 dark:border-blue-900/50',
-    hoverBorder: 'hover:border-blue-500 dark:hover:border-blue-500',
-    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(59,130,246,0.12)] dark:hover:shadow-[0_8px_24px_rgba(59,130,246,0.2)]',
-    accentBar: 'bg-blue-600',
-    gradient: 'from-blue-50/70 via-blue-50/20 to-transparent dark:from-blue-950/30 dark:via-blue-950/10 dark:to-transparent',
-    iconBg: 'bg-blue-50/80 dark:bg-blue-950/50 border-blue-200/80 dark:border-blue-900/60',
-    iconText: 'text-blue-600 dark:text-blue-400',
-    titleHover: 'group-hover:text-blue-600 dark:group-hover:text-blue-400',
-    badgeColor: 'blue'
-  },
-  teal: {
-    border: 'border-teal-200/80 dark:border-teal-900/50',
-    hoverBorder: 'hover:border-teal-500 dark:hover:border-teal-500',
-    hoverShadow: 'hover:shadow-[0_8px_24px_rgba(20,184,166,0.12)] dark:hover:shadow-[0_8px_24px_rgba(20,184,166,0.2)]',
-    accentBar: 'bg-teal-600',
-    gradient: 'from-teal-50/70 via-teal-50/20 to-transparent dark:from-teal-950/30 dark:via-teal-950/10 dark:to-transparent',
-    iconBg: 'bg-teal-50/80 dark:bg-teal-950/50 border-teal-200/80 dark:border-teal-900/60',
-    iconText: 'text-teal-600 dark:text-teal-400',
-    titleHover: 'group-hover:text-teal-600 dark:group-hover:text-teal-400',
-    badgeColor: 'teal'
-  }
-};
-
 /**
  * CategoryWideCard
  * 가로로 시원하고 높이는 슬림한 콤팩트 와이드 로우(Row) 카드
  * - [PC 2열 / 모바일 1열] 레이아웃에 최적화
  */
 function CategoryWideCard({ item, index }: { item: CategoryMeta; index: number }) {
-  const theme = THEME_STYLES[item.themeColor] || THEME_STYLES['indigo'];
+  const theme = getCategoryThemeStyle(item.themeColor);
 
   return (
     <Link

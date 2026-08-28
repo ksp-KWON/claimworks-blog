@@ -359,6 +359,8 @@ export default function AiWritingStudio({
           <MarkdownEditor
             title={postMeta.title || ''}
             setTitle={(val) => setPostMeta((prev: any) => ({ ...prev, title: val }))}
+            slug={postMeta.slug || ''}
+            setSlug={(val) => setPostMeta((prev: any) => ({ ...prev, slug: val }))}
             content={postMeta.content || ''}
             setContent={(val) => setPostMeta((prev: any) => ({ ...prev, content: typeof val === 'function' ? val(prev.content) : val }))}
           />

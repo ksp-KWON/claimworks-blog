@@ -8,12 +8,15 @@ const WysiwygEditor = dynamic(() => import('./WysiwygEditor'), { ssr: false });
 interface MarkdownEditorProps {
   title: string;
   setTitle: (val: string) => void;
+  slug?: string;
+  setSlug?: (val: string) => void;
   content: string;
   setContent: (val: string | ((prev: string) => string)) => void;
 }
 
 export default function MarkdownEditor({
   title, setTitle,
+  slug = '', setSlug,
   content, setContent
 }: MarkdownEditorProps) {
   
@@ -30,8 +33,8 @@ export default function MarkdownEditor({
       {/* Editor Canvas */}
       <div className="w-full max-w-4xl mx-auto px-3 sm:px-6 md:px-8">
         
-        {/* Document Title */}
-        <div className="pt-4 sm:pt-8 md:pt-12 pb-4 sm:pb-6 shrink-0 border-b border-gray-200 dark:border-zinc-800 mb-4">
+        {/* Document Title & SEO Slug */}
+        <div className="pt-4 sm:pt-8 md:pt-12 pb-4 sm:pb-6 shrink-0 border-b border-gray-200 dark:border-zinc-800 mb-4 space-y-2">
           <input 
             type="text" 
             value={title}
@@ -39,6 +42,18 @@ export default function MarkdownEditor({
             placeholder="제목을 입력하세요" 
             className="text-2xl sm:text-3xl md:text-[38px] leading-tight font-medium text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-zinc-700 bg-transparent outline-none w-full tracking-tight"
           />
+
+          {/* 영문 시맨틱 URL(슬러그) 입력 바 */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-zinc-400 bg-gray-50/80 dark:bg-zinc-900/60 p-2 border border-gray-200/80 dark:border-zinc-800 rounded-none font-mono">
+            <span className="shrink-0 text-gray-400 dark:text-zinc-500 font-bold select-none">URL: https://claim-works.com/blog/</span>
+            <input
+              type="text"
+              value={slug}
+              onChange={e => setSlug?.(e.target.value)}
+              placeholder="영문-슬러그-입력 (예: traffic-accident-settlement-guide)"
+              className="flex-1 bg-transparent border-none outline-none text-blue-600 dark:text-blue-400 font-semibold placeholder-gray-400 dark:placeholder-zinc-600 text-xs min-w-0"
+            />
+          </div>
         </div>
 
         {/* MDX Editor */}

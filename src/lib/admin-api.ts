@@ -96,13 +96,32 @@ export async function loadPost(githubToken: string, filename: string) {
     specialtyCategory: meta.specialtyCategory || '',
     caseNumber: meta.caseNumber || '',
     published: meta.published !== false,
-    content: rawContent
+    content: rawContent,
+    slug: filename.replace('.md', '')
   };
+}
+
+export function generateSemanticSlug(title: string, customSlug?: string): string {
+  if (customSlug && customSlug.trim()) {
+    return customSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  }
+  const cleanTitle = (title || '').trim().toLowerCase()
+    .replace(/[^\w\s가-힣-]/g, '')
+    .replace(/\s+/g, '-');
+  return cleanTitle || `article-${Date.now()}`;
 }
 
 export async function savePost(githubToken: string, data: any) {
   if (!githubToken) throw new Error('GitHub Token이 없습니다.');
-  const finalSlug = data.currentFilename ? data.currentFilename.replace('.md', '') : `post-${Date.now()}`;
+  
+  let finalSlug = '';
+  if (data.slug && data.slug.trim()) {
+    finalSlug = data.slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  } else if (data.currentFilename) {
+    finalSlug = data.currentFilename.replace('.md', '');
+  } else {
+    finalSlug = generateSemanticSlug(data.title, data.slug);
+  }
   
   const compiledTags = data.tags ? data.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
   

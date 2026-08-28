@@ -41,7 +41,7 @@ export default function AdminPage() {
   
   // Editor State
   const [postMeta, setPostMeta] = useState({
-    title: '', summary: '', date: '', category: '', tags: '',
+    title: '', slug: '', summary: '', date: '', category: '', tags: '',
     specialtyCategory: '', caseNumber: '',
     content: '', currentSha: null as string | null, currentFilename: null as string | null,
     published: false
@@ -192,6 +192,7 @@ export default function AdminPage() {
 
       setPostMeta({
         title: data.title || '',
+        slug: data.slug || filename.replace('.md', ''),
         summary: data.summary || '',
         date: safeDateStr,
         category: normalizeCategory(data.category),
@@ -213,7 +214,7 @@ export default function AdminPage() {
 
   const handleCreateBlankPost = () => {
     setPostMeta({
-      title: '', summary: '', date: new Date().toISOString().split('T')[0],
+      title: '', slug: '', summary: '', date: new Date().toISOString().split('T')[0],
       category: '보상가이드', specialtyCategory: '', caseNumber: '',
       tags: '', content: '', currentSha: null, currentFilename: null,
       published: true
@@ -328,6 +329,7 @@ export default function AdminPage() {
       const safeSlug = meta.slug || `post-${Date.now()}`;
       const newPostData = {
         title: meta.title || '새 문서',
+        slug: safeSlug,
         summary: meta.summary || '',
         date: meta.date || new Date().toISOString().split('T')[0],
         category: normalizeCategory(meta.category || category),

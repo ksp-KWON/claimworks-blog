@@ -203,22 +203,22 @@ export const sharedComponents: Components & Record<string, any> = {
     );
   },
 
-  // 헌법 제2조 표준 마크다운 테이블
+  // 헌법 제2조 표준 마크다운 테이블 (1열 자동 볼드 & 샤프 모던 톤온톤 렌더링)
   table: ({ children }) => (
     <div className="my-8">
-      <PremiumCard hoverEffect={false} className="!p-0 overflow-x-auto shadow-sm">
-        <table className="w-full text-[14px] border-collapse">{children}</table>
+      <PremiumCard hoverEffect={false} className="!p-0 overflow-x-auto shadow-sm rounded-none border border-gray-200/80 dark:border-zinc-800">
+        <table className="w-full text-[13.5px] sm:text-[14px] border-collapse min-w-[500px] sm:min-w-full">{children}</table>
       </PremiumCard>
     </div>
   ),
   th: ({ children }) => (
-    <th className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-3.5 text-center font-bold text-[#1a73e8] dark:text-[#8ab4f8] border-b border-[#dadce0]">{children}</th>
+    <th className="bg-slate-100/90 dark:bg-zinc-800/90 p-3.5 text-center font-extrabold text-[#111827] dark:text-[#f3f4f6] border-b-2 border-slate-300 dark:border-zinc-700 tracking-tight whitespace-nowrap">{children}</th>
   ),
   td: ({ children }) => (
-    <td className="p-3.5 border-b border-[#f1f3f4] dark:border-[#3c4043] align-middle text-center text-[#202124] dark:text-[#e8eaed]">{children}</td>
+    <td className="p-3.5 border-b border-[#f1f3f4] dark:border-[#3c4043] align-middle text-center text-[#202124] dark:text-[#e8eaed] leading-relaxed first:font-bold first:bg-slate-50/70 dark:first:bg-zinc-800/40 first:text-[#111827] dark:first:text-[#f3f4f6] first:border-r first:border-slate-200/60 dark:first:border-zinc-800">{children}</td>
   ),
   tr: ({ children }) => (
-    <tr className="hover:bg-[#f8f9fa] dark:hover:bg-[#303134]/50 transition-colors">{children}</tr>
+    <tr className="hover:bg-slate-50/60 dark:hover:bg-zinc-800/30 transition-colors last:[&>td]:border-b-0">{children}</tr>
   ),
 
   a: ({ href = '', children }) => (

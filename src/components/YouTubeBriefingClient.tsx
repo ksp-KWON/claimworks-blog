@@ -68,23 +68,23 @@ export default function YouTubeBriefingClient({ fallbackVideos }: { fallbackVide
               href={`https://youtu.be/${video.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative flex flex-col justify-between bg-white dark:bg-[#202124] p-3.5 sm:p-4 border border-gray-200/80 dark:border-zinc-800 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] hover:border-red-500 dark:hover:border-red-500 hover:shadow-[0_12px_36px_rgba(239,68,68,0.14)] dark:hover:shadow-[0_12px_36px_rgba(239,68,68,0.22)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden outline-none"
+              className="group relative flex flex-col justify-between bg-white dark:bg-[#202124] p-3.5 sm:p-4 border border-gray-200/80 dark:border-zinc-800 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] hover:border-red-500 dark:hover:border-red-500 hover:shadow-[0_8px_24px_rgba(239,68,68,0.12)] dark:hover:shadow-[0_8px_24px_rgba(239,68,68,0.18)] active:scale-[0.98] transition-all duration-200 overflow-hidden outline-none"
             >
               {/* 1. 좌측 레드 포인트 바 (호버 시 점등) */}
               <div className="absolute top-0 left-0 w-1 h-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-20"></div>
 
               {/* 2. 배경 레드 파스텔 그라데이션 (호버 시 은은한 앰비언트 효과) */}
-              <div className="absolute inset-0 bg-gradient-to-br from-rose-50/80 via-red-50/30 to-transparent dark:from-rose-950/30 dark:via-red-950/15 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-50/80 via-red-50/30 to-transparent dark:from-rose-950/30 dark:via-red-950/15 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0"></div>
 
               <div className="relative z-10 space-y-2.5">
-                {/* 16:9 와이드 썸네일 (버블/과장 효과 없는 미니멀 줌인) */}
+                {/* 16:9 와이드 썸네일 (고화질 HD 썸네일 및 단정한 고정 뷰) */}
                 <div className="relative w-full aspect-video overflow-hidden bg-gray-100 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50">
                   <Image 
-                    src={`https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`} 
+                    src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`} 
                     alt={video.title} 
                     fill
                     unoptimized
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover"
                   />
                   {/* 우측 상단 단정 유튜브 뱃지 */}
                   <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold flex items-center gap-1 shadow-sm">

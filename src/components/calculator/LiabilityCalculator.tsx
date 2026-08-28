@@ -474,7 +474,7 @@ export default function LiabilityCalculator({ hideHeader = false }: { hideHeader
 
         {/* 계산 공식 */}
         {result.formulas.length > 0 && (
-          <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-900/70 p-4">
+          <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 bg-rose-50/40 dark:bg-rose-950/20 p-4">
             <h4 className="text-xs font-extrabold text-rose-600 dark:text-rose-400 mb-1.5 flex items-center gap-1.5">
               <AppIcon name="calculator" size={14} />
               적용된 법원 손해배상 산정 공식

@@ -86,7 +86,7 @@ export default function MenuCard({ href, onClick, icon, title, description, badg
     <PremiumCard borderColor={themeColor} hoverEffect className="!p-4 sm:!p-5 relative overflow-hidden group">
       <div className="relative z-10 space-y-2 flex flex-col min-w-0">
         <div className="flex items-center justify-between min-w-0 gap-2">
-          <div className={`flex items-center gap-2 min-w-0 flex-1 pr-2 rounded-r-xl ${bgGradients[themeColor]}`}>
+          <div className={`flex items-center gap-2 min-w-0 flex-1 pr-2 rounded-none ${bgGradients[themeColor]}`}>
             <span className={`${theme.textIcon} shrink-0 flex items-center justify-center`}>
               {icon}
             </span>
@@ -95,7 +95,7 @@ export default function MenuCard({ href, onClick, icon, title, description, badg
             </h3>
           </div>
           {badgeText && (
-            <span className={`${theme.badgeBg} shrink-0 text-[10px] font-extrabold px-2 py-0.5 rounded-md border`}>
+            <span className={`${theme.badgeBg} shrink-0 text-[10px] font-extrabold px-2 py-0.5 rounded-none border`}>
               {badgeText}
             </span>
           )}
@@ -104,11 +104,11 @@ export default function MenuCard({ href, onClick, icon, title, description, badg
           {description}
         </p>
         {buttonText && (
-          <div className={`mt-3 w-full text-[13px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50 dark:bg-white/5 ${theme.buttonHoverBg} ${theme.buttonHoverText}`}>
+          <div className={`mt-3 w-full text-xs sm:text-[12.5px] font-bold text-[#202124] dark:text-[#e8eaed] flex items-center justify-between transition-colors p-2.5 rounded-none bg-gray-50/90 dark:bg-white/5 border border-gray-100 dark:border-zinc-800/80 ${theme.buttonHoverBg} ${theme.buttonHoverText}`}>
             <div className="flex items-center gap-2 truncate">
               {buttonText}
             </div>
-            <AppIcon name="chevron-right" size={16} className="shrink-0 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.5} />
+            <AppIcon name="chevron-right" size={14} className="shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.5} />
           </div>
         )}
       </div>

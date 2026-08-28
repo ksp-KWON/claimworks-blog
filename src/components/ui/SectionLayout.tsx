@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
-import AppIcon from '@/components/ui/AppIcon';
+import AppIcon, { type AppIconName } from '@/components/ui/AppIcon';
 
 export type SectionThemeColor = 'red' | 'rose' | 'blue' | 'cyan' | 'green' | 'teal' | 'orange' | 'purple' | 'indigo' | 'yellow' | 'default';
 
@@ -18,6 +18,7 @@ interface SectionLayoutProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
     isExternal?: boolean;
   };
   children: React.ReactNode;
+  watermarkIcon?: AppIconName;
 }
 
 const gradientBackgrounds: Record<SectionThemeColor, string> = {
@@ -60,6 +61,7 @@ export default function SectionLayout({
   headingLevel = 2,
   viewAllLink,
   children,
+  watermarkIcon,
   className = '',
   ...props
 }: SectionLayoutProps) {
@@ -68,10 +70,11 @@ export default function SectionLayout({
 
   return (
     <section className={`relative group/section ${className}`} {...props}>
-      {/* 타이틀 박스 영역 (시그니처 파스텔 톤온톤 그라데이션) */}
+      {/* 타이틀 박스 영역 (시그니처 파스텔 톤온톤 그라데이션 및 은은한 워터마크) */}
       <PremiumCard 
         borderColor={themeColor} 
         hoverEffect={true} 
+        watermarkIcon={watermarkIcon}
         className={`mb-6 !p-5 sm:!p-6 group/headerbox ${gradientClass}`}
       >
         <div className={`flex items-end justify-between ${description ? 'mb-2.5' : ''} relative z-10 group/header`}>

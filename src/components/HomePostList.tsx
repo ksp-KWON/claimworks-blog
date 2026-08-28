@@ -44,6 +44,7 @@ export default function HomePostList({ initialPosts }: { initialPosts: Omit<Post
             key={category.slug}
             title={category.name}
             icon={<AppIcon name={category.iconName} size={22} />}
+            watermarkIcon={category.iconName}
             themeColor={themeColor}
             viewAllLink={{ href: `/categories/${category.slug}` }}
           >

@@ -66,6 +66,11 @@ function CategoryWideCard({ item, index }: { item: CategoryMeta; index: number }
           <AppIcon name="chevron-right" size={15} className="group-hover:translate-x-0.5 transition-transform" />
         </div>
       </div>
+
+      {/* 5. 우측 배경 은은한 워터마크 아이콘 (CommonBox 일체화) */}
+      <div className="absolute right-[-6px] bottom-[-10px] opacity-[0.03] dark:opacity-[0.05] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 z-0">
+        <AppIcon name={item.iconName} size={76} strokeWidth={1} />
+      </div>
     </Link>
   );
 }

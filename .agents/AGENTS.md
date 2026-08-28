@@ -86,6 +86,12 @@ AI(수석 개발자 및 콘텐츠 창작 엔진)는 일시적인 단선적 땜�
 13. **공공데이터 & 판례 시스템 (`generate-fss-news`, `taas-accidents`)**: `[ReAct & GoT]` 금감원 보도자료, 도로교통공단 TAAS, 유튜브 미디어 연동.
 14. **특화 서비스 & 전역 검색 (`/traffic-care`, `/about`, `/search`)**: `[Step-Back & CoT]` 교통사고 전문 케어 센터 및 실시간 키워드 검색 허브.
 
+#### 3. 옴니-엔지니어링 4대 실행 안전 수칙 (Execution & Safety Guardrails)
+9. **Self-Debugging (실행 결과 자가 검증)**: 코드 작성 후 추측에 의존하지 않고, 반드시 타입 검사(`tsc --noEmit`), 빌드(`npm run build`), 스크립트 실행 결과를 직접 확인한 뒤에만 작업을 완료로 간주합니다. (예: `select-daily-topic.js`, `generate-post.js` 수정 후 실제 실행 테스트 필수)
+10. **Grounding-before-Editing (원천 데이터 선확인 원칙)**: 파일 수정 전 반드시 대상 파일의 현재 전체 코드를 먼저 읽고(`view_file`), 그 구조와 컨텍스트를 완벽히 근거로 삼아 수정합니다. (예: `src/lib/posts.ts`, `prebuild.js`, `posts-data.json` 등 SSOT 핵심 데이터 수정 시 필수 적용)
+11. **Minimal Diff Principle (최소 변경 원칙)**: 요청받은 핵심 요구사항과 무관한 주변 코드는 절대 임의로 건드리지 않으며, 변경 범위를 가장 콤팩트하고 안전한 최소 단위로 제한합니다.
+12. **Active Prompting (위험 작업 사전 경고 및 확인)**: 되돌리기 어렵거나 전사적 파급력이 큰 핵심 영역(`admin-auth.ts`, 보안 헤더 설정, `ContentGuard.tsx`, `push_subscriptions.sql`, `.github/workflows/auto-post.yml` 등)을 수정할 때는 작업 착수 전 반드시 위험 요소를 먼저 설명하고 대표님의 최종 승인을 받습니다.
+
 ### 제9조 — 개발 슬로건 및 최적화 원칙
 - **개발 슬로건**: "표준, 범용, 콤팩트, 통합, 공유, 공통"
 - **운동장의 테두리**: "운동장의 테두리는 견고하게 표준화하되, 그 안에서 AI의 창작 자유도를 최대 보장한다."

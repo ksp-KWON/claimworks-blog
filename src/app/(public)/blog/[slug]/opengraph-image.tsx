@@ -30,10 +30,13 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     console.error('Error reading logo file for OG image:', error);
   }
 
+  const category = Array.isArray(post?.category) ? post.category[0] : (post?.category || '보상가이드');
+
   return new ImageResponse(
     (
       <SharedOGImage
         title={title}
+        category={category}
         label="보상스쿨 전문가 칼럼"
         logoBase64={logoBase64}
       />

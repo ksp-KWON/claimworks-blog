@@ -5,6 +5,7 @@ import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
 import SectionLayout from '@/components/ui/SectionLayout';
 import AppIcon from '@/components/ui/AppIcon';
+import RegionGridCard from '@/components/ui/RegionGridCard';
 import { REGIONS_DATA } from '@/lib/constants';
 
 export const metadata: Metadata = {
@@ -45,59 +46,26 @@ export default function RegionsIndex() {
         description="교통사고, 산업재해, 질병 실손, 의료분쟁 등 보상 처리에 필수적인 전국 17개 시·도의 우수 병의원 및 협력 의료기관 정보를 실시간 매핑하여 안내합니다."
       />
 
-      {/* 3. 전국 17개 시도 인터랙티브 카드 그리드 (SectionLayout 패밀리룩) */}
+      {/* 3. 전국 17개 시도 인터랙티브 카드 그리드 (모바일 2열 통일) */}
       <SectionLayout
         title="전국 광역 네트워크 허브"
         icon={<AppIcon name="hospital" size={20} />}
         themeColor="teal"
         description="전국 17개 시·도 및 226개 시·군·구 보상 전문 우수 병의원과 공공데이터 연계 협력 네트워크입니다."
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
           {REGIONS_DATA.map((region, idx) => {
             const zone = getRegionZone(region.name);
             return (
-              <Link 
-                key={region.name} 
-                href={`/regions/${encodeURIComponent(region.name)}`} 
-                className="group relative flex flex-col justify-between bg-white dark:bg-[#202124] p-4 sm:p-5 border border-teal-200/80 dark:border-teal-900/50 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] hover:border-teal-500 dark:hover:border-teal-500 hover:shadow-[0_12px_36px_rgba(20,184,166,0.14)] dark:hover:shadow-[0_12px_36px_rgba(20,184,166,0.22)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden outline-none"
-              >
-                {/* 1. 좌측 틸 포인트 바 */}
-                <div className="absolute top-0 left-0 w-1 h-full bg-teal-600 opacity-0 group-hover:opacity-100 transition-opacity z-20"></div>
-
-                {/* 2. 배경 틸 파스텔 그라데이션 */}
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-50/80 via-teal-50/20 to-transparent dark:from-teal-950/30 dark:via-teal-950/10 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0"></div>
-
-                <div className="relative z-10 space-y-3">
-                  {/* 상단 아이콘 & 권역 뱃지 */}
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="w-10 h-10 flex items-center justify-center bg-teal-50/80 dark:bg-teal-950/50 border border-teal-200/80 dark:border-teal-900/60 text-teal-600 dark:text-teal-400 shadow-xs group-hover:scale-105 transition-transform duration-300">
-                      <AppIcon name="compass" size={20} />
-                    </div>
-                    <PremiumBadge color="teal">{zone}</PremiumBadge>
-                  </div>
-
-                  {/* 시도명 및 설명 (중간정렬) */}
-                  <div className="text-center">
-                    <h3 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-1">
-                      {region.name}
-                    </h3>
-                    <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] font-medium mt-1">
-                      {region.districts.length}개 시·군·구 세부 네트워크
-                    </p>
-                  </div>
-                </div>
-
-                {/* 하단 액션 */}
-                <div className="relative z-10 mt-4 pt-3 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-between text-xs">
-                  <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 tracking-wider">
-                    NO.{String(idx + 1).padStart(2, '0')}
-                  </span>
-                  <span className="flex items-center gap-1 font-bold text-teal-600 dark:text-teal-400 group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">
-                    <span>상세보기</span>
-                    <AppIcon name="chevron-right" size={13} className="group-hover:translate-x-0.5 transition-transform" />
-                  </span>
-                </div>
-              </Link>
+              <RegionGridCard
+                key={region.name}
+                href={`/regions/${encodeURIComponent(region.name)}`}
+                title={region.name}
+                countLabel={`${region.districts.length}개 시·군·구 네트워크`}
+                icon="compass"
+                badge={zone}
+                indexNumber={`NO.${String(idx + 1).padStart(2, '0')}`}
+              />
             );
           })}
         </div>

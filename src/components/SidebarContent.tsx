@@ -109,16 +109,20 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
 
       {/* 인기 키워드 태그 (layout.tsx 서버에서 전달된 정적 데이터) */}
       {tags.length > 0 && (
-        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="pin" className="!p-5">
-          <PremiumHeading 
-            level={3} 
-            gradient="red" 
-            showLeftBorder={false}
-            className={`!mb-4 !text-sm pr-2 rounded-none bg-gradient-to-r from-red-100/80 to-transparent dark:from-red-900/30 dark:to-transparent`}
-            icon={<AppIcon name="pin" size={16} className="text-[var(--google-red)]" />}
-          >
-            인기 키워드 태그
-          </PremiumHeading>
+        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="pin" className="!p-4 sm:!p-5">
+          <div className="flex items-center justify-between min-w-0 gap-2 mb-3.5">
+            <div className="flex items-center gap-2 min-w-0 flex-1 pr-2 rounded-none bg-gradient-to-r from-red-100/80 to-transparent dark:from-red-900/30 dark:to-transparent">
+              <span className="text-red-500 shrink-0 flex items-center justify-center">
+                <AppIcon name="pin" size={18} />
+              </span>
+              <h3 className="text-sm font-extrabold text-[#202124] dark:text-white truncate">
+                인기 키워드 태그
+              </h3>
+            </div>
+            <span className="bg-red-50 dark:bg-red-950/20 text-red-500 dark:text-red-400 border-red-100/30 dark:border-red-950/30 shrink-0 text-[10px] font-extrabold px-2 py-0.5 rounded-none border">
+              실시간 태그
+            </span>
+          </div>
           <div className="flex flex-wrap gap-2 text-xs font-bold">
             {visibleTags.map((tag) => (
               <Link

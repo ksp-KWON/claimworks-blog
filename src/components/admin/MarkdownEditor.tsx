@@ -34,18 +34,17 @@ export default function MarkdownEditor({
       <div className="w-full max-w-4xl mx-auto px-3 sm:px-6 md:px-8">
         
         {/* Document Title & SEO Slug */}
-        <div className="pt-4 sm:pt-8 md:pt-12 pb-4 sm:pb-6 shrink-0 border-b border-gray-200 dark:border-zinc-800 mb-4 space-y-2">
-          <input 
-            type="text" 
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder="제목을 입력하세요" 
-            className="text-2xl sm:text-3xl md:text-[38px] leading-tight font-medium text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-zinc-700 bg-transparent outline-none w-full tracking-tight"
-          />
-
-          {/* 영문 시맨틱 URL(슬러그) 입력 바 */}
+        <div className="pt-4 sm:pt-6 md:pt-8 pb-3 sm:pb-4 shrink-0 border-b border-gray-200 dark:border-zinc-800 mb-4 space-y-3">
+          {/* 영문 시맨틱 URL(슬러그) 입력 바 (제목 상단 메타 바 배치) */}
           <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-zinc-400 bg-gray-50/80 dark:bg-zinc-900/60 p-2 border border-gray-200/80 dark:border-zinc-800 rounded-none font-mono">
-            <span className="shrink-0 text-gray-400 dark:text-zinc-500 font-bold select-none">URL: https://claim-works.com/blog/</span>
+            <span className="shrink-0 text-gray-400 dark:text-zinc-500 font-bold select-none flex items-center gap-1">
+              <svg className="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              URL: https://claim-works.com/blog/
+            </span>
             <input
               type="text"
               value={slug}
@@ -54,6 +53,15 @@ export default function MarkdownEditor({
               className="flex-1 bg-transparent border-none outline-none text-blue-600 dark:text-blue-400 font-semibold placeholder-gray-400 dark:placeholder-zinc-600 text-xs min-w-0"
             />
           </div>
+
+          {/* 거대한 시맨틱 포스트 제목 입력창 */}
+          <input 
+            type="text" 
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder="제목을 입력하세요" 
+            className="text-2xl sm:text-3xl md:text-[36px] leading-tight font-extrabold text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-zinc-700 bg-transparent outline-none w-full tracking-tight pt-1"
+          />
         </div>
 
         {/* MDX Editor */}

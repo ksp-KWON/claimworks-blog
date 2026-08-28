@@ -13,7 +13,7 @@ import SidebarTagMore from './SidebarTagMore';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import MenuCard from '@/components/ui/MenuCard';
-import AppIcon from '@/components/ui/AppIcon';
+import AppIcon, { type AppIconName } from '@/components/ui/AppIcon';
 import type { MenuThemeColor } from '@/components/ui/MenuCard';
 
 interface SidebarContentProps {
@@ -28,9 +28,10 @@ interface SidebarItem {
   badgeText: string;
   description: string;
   buttonText: string;
+  watermarkIcon: AppIconName;
 }
 
-// ── 사이드바 6대 메뉴 — W3C 표준 AppIcon 라인 심볼 탑재 ──
+// ── 사이드바 6대 메뉴 — W3C 표준 AppIcon 라인 심볼 & 은은한 워터마크 탑재 ──
 const SIDEBAR_ITEMS: SidebarItem[] = [
   {
     href: '/precedent-search',
@@ -39,7 +40,8 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     themeColor: 'blue',
     badgeText: '실시간 연동',
     description: '일상어로 검색하여 나에게 가장 유리한 대법원 핵심 판례를 찾아보세요.',
-    buttonText: '빅데이터 판례 검색 시작하기'
+    buttonText: '빅데이터 판례 검색 시작하기',
+    watermarkIcon: 'search'
   },
   {
     href: '/fss-news',
@@ -48,7 +50,8 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     themeColor: 'red',
     badgeText: '실시간 연동',
     description: '금감원 소비자경보, 분쟁조정사례, 금융꿀팁, 약관 보도자료를 실시간 분석하여 권리를 지켜드립니다.',
-    buttonText: '소비자보호 데이터 조회하기'
+    buttonText: '소비자보호 데이터 조회하기',
+    watermarkIcon: 'shield-check'
   },
   {
     href: '/traffic-care',
@@ -57,7 +60,8 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     themeColor: 'green',
     badgeText: '지역 안내',
     description: '도로교통공단 안전 통계와 우수 신경/정형외과 병원 및 사고 맞춤형 손해사정 지식을 안내해 드립니다.',
-    buttonText: '내 지역 교통사고 케어 가기'
+    buttonText: '내 지역 교통사고 케어 가기',
+    watermarkIcon: 'car'
   },
   {
     href: '/calculator',
@@ -66,7 +70,8 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     themeColor: 'purple',
     badgeText: '통합 계산',
     description: '약관 지급기준 및 법원 판례 기준을 적용한 예상 합의금과 소송가액을 한 번에 확인하세요.',
-    buttonText: '계산기 시작하기'
+    buttonText: '계산기 시작하기',
+    watermarkIcon: 'calculator'
   },
   {
     href: '/regions',
@@ -75,7 +80,8 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     themeColor: 'teal',
     badgeText: '전국 매핑',
     description: '전국 17개 시/도, 226개 시/군/구별 보상 전문 의료기관 및 협력 병원 정보를 제공합니다.',
-    buttonText: '지역별 기관 찾기'
+    buttonText: '지역별 기관 찾기',
+    watermarkIcon: 'compass'
   },
   {
     href: '/categories',
@@ -84,7 +90,8 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     themeColor: 'yellow',
     badgeText: '핵심 실무',
     description: '보상스쿨 손해사정사의 핵심 전문 칼럼들과 진료과목별 주요 의료분쟁 가이드를 통합 제공합니다.',
-    buttonText: '전체 가이드 보기'
+    buttonText: '전체 가이드 보기',
+    watermarkIcon: 'folder'
   }
 ];
 
@@ -102,12 +109,12 @@ export default function SidebarContent({ tags = [] }: SidebarContentProps) {
 
       {/* 인기 키워드 태그 (layout.tsx 서버에서 전달된 정적 데이터) */}
       {tags.length > 0 && (
-        <PremiumCard borderColor="red" hoverEffect={true} className="!p-5">
+        <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="pin" className="!p-5">
           <PremiumHeading 
             level={3} 
             gradient="red" 
             showLeftBorder={false}
-            className={`!mb-4 !text-sm pr-2 rounded-r-xl bg-gradient-to-r from-red-100/80 to-transparent dark:from-red-900/30 dark:to-transparent`}
+            className={`!mb-4 !text-sm pr-2 rounded-none bg-gradient-to-r from-red-100/80 to-transparent dark:from-red-900/30 dark:to-transparent`}
             icon={<AppIcon name="pin" size={16} className="text-[var(--google-red)]" />}
           >
             인기 키워드 태그

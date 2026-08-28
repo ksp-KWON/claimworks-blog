@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
-import AppIcon from '@/components/ui/AppIcon';
+import AppIcon, { type AppIconName } from '@/components/ui/AppIcon';
 
 export type MenuThemeColor = 'blue' | 'red' | 'green' | 'yellow' | 'purple' | 'teal' | 'indigo' | 'rose';
 
@@ -15,6 +15,7 @@ export interface MenuCardProps {
   badgeText?: string;
   description: string;
   buttonText?: string;
+  watermarkIcon?: AppIconName;
 }
 
 const THEME_STYLES: Record<MenuThemeColor, { textIcon: string; badgeBg: string; buttonHoverBg: string; buttonHoverText: string }> = {
@@ -79,11 +80,11 @@ const bgGradients: Record<string, string> = {
   purple: 'bg-gradient-to-r from-purple-100/80 to-transparent dark:from-purple-900/30 dark:to-transparent',
 };
 
-export default function MenuCard({ href, onClick, icon, title, description, badgeText, themeColor, buttonText }: MenuCardProps) {
+export default function MenuCard({ href, onClick, icon, title, description, badgeText, themeColor, buttonText, watermarkIcon }: MenuCardProps) {
   const theme = THEME_STYLES[themeColor] || THEME_STYLES.blue;
 
   const content = (
-    <PremiumCard borderColor={themeColor} hoverEffect className="!p-4 sm:!p-5 relative overflow-hidden group">
+    <PremiumCard borderColor={themeColor} hoverEffect watermarkIcon={watermarkIcon} className="!p-4 sm:!p-5 relative overflow-hidden group">
       <div className="relative z-10 space-y-2 flex flex-col min-w-0">
         <div className="flex items-center justify-between min-w-0 gap-2">
           <div className={`flex items-center gap-2 min-w-0 flex-1 pr-2 rounded-none ${bgGradients[themeColor]}`}>

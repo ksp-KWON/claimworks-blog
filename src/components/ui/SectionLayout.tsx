@@ -36,17 +36,17 @@ const gradientBackgrounds: Record<SectionThemeColor, string> = {
 };
 
 const hoverColorMap: Record<SectionThemeColor, string> = {
-  blue: 'hover:text-blue-600 dark:hover:text-blue-400',
-  rose: 'hover:text-rose-600 dark:hover:text-rose-400',
-  cyan: 'hover:text-sky-600 dark:hover:text-sky-400',
-  red: 'hover:text-red-600 dark:hover:text-red-400',
-  green: 'hover:text-emerald-600 dark:hover:text-emerald-400',
-  orange: 'hover:text-orange-600 dark:hover:text-orange-400',
-  teal: 'hover:text-teal-600 dark:hover:text-teal-400',
-  indigo: 'hover:text-indigo-600 dark:hover:text-indigo-400',
-  purple: 'hover:text-purple-600 dark:hover:text-purple-400',
-  yellow: 'hover:text-amber-600 dark:hover:text-amber-400',
-  default: 'hover:text-blue-600 dark:hover:text-blue-400'
+  blue: 'hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-800/80',
+  rose: 'hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-300 dark:hover:border-rose-800/80',
+  cyan: 'hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-800/80',
+  red: 'hover:text-red-600 dark:hover:text-red-400 hover:border-red-300 dark:hover:border-red-800/80',
+  green: 'hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-800/80',
+  orange: 'hover:text-orange-600 dark:hover:text-orange-400 hover:border-orange-300 dark:hover:border-orange-800/80',
+  teal: 'hover:text-teal-600 dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-800/80',
+  indigo: 'hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-800/80',
+  purple: 'hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300 dark:hover:border-purple-800/80',
+  yellow: 'hover:text-amber-600 dark:hover:text-amber-400 hover:border-amber-300 dark:hover:border-amber-800/80',
+  default: 'hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-800/80'
 };
 
 /**
@@ -67,6 +67,7 @@ export default function SectionLayout({
 }: SectionLayoutProps) {
   const gradientClass = gradientBackgrounds[themeColor] || gradientBackgrounds.default;
   const linkHoverClass = hoverColorMap[themeColor] || hoverColorMap.default;
+  const linkButtonClass = `inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-bold text-gray-600 dark:text-gray-300 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border border-gray-200/90 dark:border-zinc-700/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.2)] rounded-none ${linkHoverClass} transition-all duration-200 group/link shrink-0`;
 
   return (
     <section className={`relative group/section ${className}`} {...props}>
@@ -77,7 +78,7 @@ export default function SectionLayout({
         watermarkIcon={watermarkIcon}
         className={`mb-6 !p-5 sm:!p-6 group/headerbox ${gradientClass}`}
       >
-        <div className={`flex items-end justify-between ${description ? 'mb-2.5' : ''} relative z-10 group/header`}>
+        <div className={`flex items-center justify-between gap-3 ${description ? 'mb-2.5' : ''} relative z-10 group/header`}>
           <PremiumHeading 
             level={headingLevel} 
             gradient={themeColor} 
@@ -88,25 +89,25 @@ export default function SectionLayout({
             {title}
           </PremiumHeading>
           
-          {/* 전체보기 링크 */}
+          {/* 전체보기 링크 (샤프 모던 캡슐 칩 레이어드) */}
           {viewAllLink && (
             viewAllLink.isExternal ? (
               <a 
                 href={viewAllLink.href} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className={`flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 dark:text-gray-400 ${linkHoverClass} transition-colors group/link`}
+                className={linkButtonClass}
               >
                 {viewAllLink.text || '전체보기'}
-                <AppIcon name="chevron-right" size={14} className="group-hover/link:translate-x-0.5 transition-transform" strokeWidth={2.5} />
+                <AppIcon name="chevron-right" size={13} className="group-hover/link:translate-x-0.5 transition-transform" strokeWidth={2.5} />
               </a>
             ) : (
               <Link 
                 href={viewAllLink.href}
-                className={`flex items-center gap-1 text-[11px] sm:text-xs font-bold text-gray-500 dark:text-gray-400 ${linkHoverClass} transition-colors group/link`}
+                className={linkButtonClass}
               >
                 {viewAllLink.text || '전체보기'}
-                <AppIcon name="chevron-right" size={14} className="group-hover/link:translate-x-0.5 transition-transform" strokeWidth={2.5} />
+                <AppIcon name="chevron-right" size={13} className="group-hover/link:translate-x-0.5 transition-transform" strokeWidth={2.5} />
               </Link>
             )
           )}

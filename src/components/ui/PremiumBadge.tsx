@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type BadgeColor = 'red' | 'rose' | 'blue' | 'green' | 'teal' | 'purple' | 'indigo' | 'yellow' | 'gray';
+export type BadgeColor = 'red' | 'rose' | 'blue' | 'green' | 'teal' | 'purple' | 'indigo' | 'yellow' | 'charcoal' | 'ink' | 'gray';
 
 export interface PremiumBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   color?: BadgeColor;
@@ -38,6 +38,10 @@ export default function PremiumBadge({
       break;
     case 'yellow':
       colorClass = 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400';
+      break;
+    case 'charcoal':
+    case 'ink':
+      colorClass = 'bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700';
       break;
     default:
       colorClass = 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';

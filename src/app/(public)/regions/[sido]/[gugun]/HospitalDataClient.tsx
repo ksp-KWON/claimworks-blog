@@ -176,15 +176,15 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
 
         {/* 딥링크 병원 상세 헤더 배너 */}
         <PremiumHeaderBanner
-          theme="teal"
+          theme="charcoal"
           icon="hospital"
           title={deepLinkedHospitalData.name}
-          badges={[`${sido} ${gugun} 의료기관`, { text: 'HIRA 연계 기관', color: 'gray' }]}
+          badges={[`${sido} ${gugun} 의료기관`, { text: 'HIRA 연계 기관', color: 'charcoal' }]}
         />
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <PremiumCard borderColor="teal" hoverEffect={true} className="!p-5 space-y-1.5">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-teal-700 dark:text-teal-400">
+          <PremiumCard borderColor="charcoal" hoverEffect={true} className="!p-5 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-700 dark:text-zinc-300">
               <AppIcon name="compass" size={14} />
               기관 주소
             </div>
@@ -193,8 +193,8 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
             </div>
           </PremiumCard>
 
-          <PremiumCard borderColor="teal" hoverEffect={true} className="!p-5 space-y-1.5">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-teal-700 dark:text-teal-400">
+          <PremiumCard borderColor="charcoal" hoverEffect={true} className="!p-5 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-700 dark:text-zinc-300">
               <AppIcon name="phone" size={14} />
               대표 전화번호
             </div>
@@ -205,8 +205,8 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
         </div>
 
         {/* 보상 상담 액션 배너 */}
-        <PremiumCard borderColor="teal" hoverEffect={true} watermarkIcon="shield-check" className="!p-6 sm:!p-8 text-center space-y-4">
-          <div className="w-12 h-12 mx-auto flex items-center justify-center text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/50 border border-teal-200/80 dark:border-teal-800">
+        <PremiumCard borderColor="charcoal" hoverEffect={true} watermarkIcon="shield-check" className="!p-6 sm:!p-8 text-center space-y-4">
+          <div className="w-12 h-12 mx-auto flex items-center justify-center text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700">
             <AppIcon name="shield-check" size={24} />
           </div>
           <div className="space-y-2">
@@ -224,7 +224,7 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
                 e.preventDefault();
                 window.dispatchEvent(new CustomEvent('open-chat'));
               }}
-              className="w-full sm:w-auto px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 bg-zinc-900 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-white font-bold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
             >
               <AppIcon name="chat" size={16} />
               <span>실시간 채팅 상담</span>

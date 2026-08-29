@@ -5,7 +5,7 @@ import PremiumHeading from './PremiumHeading';
 import PremiumBadge, { type BadgeColor } from './PremiumBadge';
 import AppIcon, { type AppIconName } from './AppIcon';
 
-export type HeaderBannerTheme = 'blue' | 'red' | 'green' | 'purple' | 'teal' | 'indigo' | 'amber' | 'yellow' | 'rose' | 'sky' | 'default';
+export type HeaderBannerTheme = 'blue' | 'red' | 'green' | 'purple' | 'teal' | 'indigo' | 'amber' | 'yellow' | 'rose' | 'sky' | 'charcoal' | 'ink' | 'default';
 
 export interface HeaderBadgeItem {
   text: string;
@@ -102,6 +102,18 @@ const THEME_CONFIGS: Record<HeaderBannerTheme, ThemeConfig> = {
     bgGradient: '!bg-gradient-to-r !from-sky-50/90 !via-blue-50/50 !to-transparent dark:!from-sky-950/40 dark:!via-blue-950/20 dark:!to-transparent border-sky-200/90 dark:border-sky-900/50',
     iconColor: 'text-sky-600 dark:text-sky-400',
     defaultBadgeColor: 'blue'
+  },
+  charcoal: {
+    cardBorder: 'charcoal',
+    bgGradient: '!bg-gradient-to-r !from-zinc-100/90 !via-zinc-50/50 !to-transparent dark:!from-zinc-900/50 dark:!via-zinc-900/20 dark:!to-transparent border-gray-200/90 dark:border-zinc-800',
+    iconColor: 'text-zinc-900 dark:text-zinc-100',
+    defaultBadgeColor: 'gray'
+  },
+  ink: {
+    cardBorder: 'ink',
+    bgGradient: '!bg-gradient-to-r !from-zinc-100/90 !via-zinc-50/50 !to-transparent dark:!from-zinc-900/50 dark:!via-zinc-900/20 dark:!to-transparent border-gray-200/90 dark:border-zinc-800',
+    iconColor: 'text-zinc-900 dark:text-zinc-100',
+    defaultBadgeColor: 'gray'
   },
   default: {
     cardBorder: 'blue',

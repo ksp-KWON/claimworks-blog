@@ -4,7 +4,7 @@ import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import AppIcon, { type AppIconName } from '@/components/ui/AppIcon';
 
-export type SectionThemeColor = 'red' | 'rose' | 'blue' | 'cyan' | 'green' | 'teal' | 'orange' | 'purple' | 'indigo' | 'yellow' | 'default';
+export type SectionThemeColor = 'red' | 'rose' | 'blue' | 'cyan' | 'green' | 'teal' | 'orange' | 'purple' | 'indigo' | 'yellow' | 'charcoal' | 'ink' | 'default';
 
 interface SectionLayoutProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title: React.ReactNode;
@@ -32,7 +32,9 @@ const gradientBackgrounds: Record<SectionThemeColor, string> = {
   indigo: '!bg-gradient-to-r !from-indigo-50/90 !via-blue-50/40 !to-transparent dark:!from-indigo-950/40 dark:!via-blue-950/20 dark:!to-transparent',
   purple: '!bg-gradient-to-r !from-purple-50/90 !via-indigo-50/40 !to-transparent dark:!from-purple-950/40 dark:!via-indigo-950/20 dark:!to-transparent',
   yellow: '!bg-gradient-to-r !from-amber-50/90 !via-yellow-50/40 !to-transparent dark:!from-amber-950/40 dark:!via-yellow-950/20 dark:!to-transparent',
-  default: '!bg-gradient-to-r !from-blue-50/90 !via-indigo-50/40 !to-transparent dark:!from-blue-950/40 dark:!via-indigo-950/20 dark:to-transparent'
+  charcoal: '!bg-gradient-to-r !from-zinc-100/90 !via-zinc-50/40 !to-transparent dark:!from-zinc-900/40 dark:!via-zinc-900/20 dark:!to-transparent',
+  ink: '!bg-gradient-to-r !from-zinc-100/90 !via-zinc-50/40 !to-transparent dark:!from-zinc-900/40 dark:!via-zinc-900/20 dark:!to-transparent',
+  default: '!bg-gradient-to-r !from-blue-50/90 !via-indigo-50/40 !to-transparent dark:!from-blue-950/40 dark:!via-indigo-950/20 dark:!to-transparent'
 };
 
 const hoverColorMap: Record<SectionThemeColor, string> = {
@@ -46,6 +48,8 @@ const hoverColorMap: Record<SectionThemeColor, string> = {
   indigo: 'hover:text-indigo-600 dark:hover:text-indigo-400',
   purple: 'hover:text-purple-600 dark:hover:text-purple-400',
   yellow: 'hover:text-amber-600 dark:hover:text-amber-400',
+  charcoal: 'hover:text-zinc-900 dark:hover:text-zinc-100',
+  ink: 'hover:text-zinc-900 dark:hover:text-zinc-100',
   default: 'hover:text-blue-600 dark:hover:text-blue-400'
 };
 

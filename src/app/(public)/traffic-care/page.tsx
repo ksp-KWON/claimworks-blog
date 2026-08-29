@@ -510,11 +510,14 @@ export default function TrafficCarePage() {
                           const isBig = h.name.includes('종합') || (h.name.includes('병원') && !h.name.includes('의원'));
                           
                           return (
-                            <div 
+                            <PremiumCard 
                               key={idx}
-                              className="p-4 rounded-none border border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-[#202124] flex flex-col justify-between space-y-3 shadow-xs hover:border-emerald-500/60 dark:hover:border-emerald-500/60 transition-all duration-200"
+                              borderColor="charcoal"
+                              hoverEffect={true}
+                              watermarkIcon="hospital"
+                              className="!p-4 flex flex-col justify-between space-y-3 relative overflow-hidden"
                             >
-                              <div className="space-y-1.5">
+                              <div className="space-y-1.5 relative z-10">
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <span className="text-xs font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-tight">{h.name}</span>
                                   {isWeekend && (
@@ -531,9 +534,9 @@ export default function TrafficCarePage() {
                                 <p className="text-[10.5px] text-[#5f6368] dark:text-[#9aa0a6] font-medium leading-relaxed line-clamp-2 min-h-[30px]">{h.address}</p>
                               </div>
                               
-                              <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-zinc-800 shrink-0">
+                              <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-zinc-800 shrink-0 relative z-10">
                                 {h.tel ? (
-                                  <div className="text-[11px] font-bold text-[#137333] dark:text-[#81c995] flex items-center gap-1">
+                                  <div className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
                                     <AppIcon name="phone" size={13} />
                                     <span>{h.tel}</span>
                                   </div>
@@ -543,13 +546,13 @@ export default function TrafficCarePage() {
                                 {h.tel && (
                                   <a
                                     href={`tel:${h.tel}`}
-                                    className="px-2.5 py-1 text-[10px] font-bold text-white bg-[#137333] hover:bg-[#0b6623] rounded-none transition-colors cursor-pointer"
+                                    className="px-2.5 py-1 text-[10px] font-bold text-white bg-zinc-900 hover:bg-black dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-none transition-colors cursor-pointer"
                                   >
                                     전화 연결
                                   </a>
                                 )}
                               </div>
-                            </div>
+                            </PremiumCard>
                           );
                         })}
                       </div>

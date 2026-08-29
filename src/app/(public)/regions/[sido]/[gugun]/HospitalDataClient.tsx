@@ -309,17 +309,17 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
             onClick={() => router.push(`/regions/${encodeURIComponent(sido)}/${encodeURIComponent(gugun)}?hospital=${encodeURIComponent(hospital.name)}`)}
             className="group text-left outline-none block w-full cursor-pointer"
           >
-            <PremiumCard borderColor="teal" hoverEffect={true} className="!p-4 sm:!p-5 h-full relative overflow-hidden">
-              <div className="flex flex-col justify-between h-full space-y-2">
+            <PremiumCard borderColor="charcoal" hoverEffect={true} watermarkIcon="hospital" className="!p-4 sm:!p-5 h-full relative overflow-hidden">
+              <div className="flex flex-col justify-between h-full space-y-2 relative z-10">
                 <div>
-                  <h2 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-1">
+                  <h2 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors line-clamp-1">
                     {hospital.name}
                   </h2>
                   <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1 line-clamp-1 font-medium">
                     {hospital.address}
                   </p>
                 </div>
-                <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-zinc-800 text-xs font-bold text-teal-600 dark:text-teal-400">
+                <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-zinc-800 text-xs font-bold text-zinc-700 dark:text-zinc-300">
                   <span>{hospital.tel || '전화번호 미제공'}</span>
                   <AppIcon name="chevron-right" size={14} className="group-hover:translate-x-1 transition-transform" />
                 </div>

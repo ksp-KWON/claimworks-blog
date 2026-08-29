@@ -40,7 +40,7 @@ export default async function GugunPage({ params }: { params: Promise<{ sido: st
     <div className="w-full space-y-6">
       <Suspense fallback={
         <div className="py-20 text-center">
-          <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-none animate-spin mb-4" />
+          <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mb-4" />
           <p className="text-[#5f6368] font-bold">의료기관 데이터를 불러오는 중...</p>
         </div>
       }>

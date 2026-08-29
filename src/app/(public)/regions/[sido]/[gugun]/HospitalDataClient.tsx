@@ -123,7 +123,7 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
   if (loading) {
     return (
       <div className="py-20 text-center space-y-3">
-        <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-none animate-spin" />
+        <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] font-bold">
           {sido} {gugun} 의료기관 데이터를 불러오는 중...
         </p>
@@ -138,7 +138,7 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
           <div className="flex items-center justify-center text-teal-600 dark:text-teal-400">
             <AppIcon name="hospital" size={48} />
           </div>
-          <h2 className="text-xl font-extrabold text-gray-900 dark:text-white">데이터 동기화 준비중</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">데이터 동기화 준비중</h2>
           <p className="text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium max-w-md mx-auto">
             해당 지역의 HIRA 공공 의료기관 데이터가 업데이트되고 있습니다.
           </p>
@@ -206,11 +206,11 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
 
         {/* 보상 상담 액션 배너 */}
         <PremiumCard borderColor="teal" hoverEffect={true} watermarkIcon="shield-check" className="!p-6 sm:!p-8 text-center space-y-4">
-          <div className="w-12 h-12 mx-auto flex items-center justify-center text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800">
+          <div className="w-12 h-12 mx-auto flex items-center justify-center text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/50 border border-teal-200/80 dark:border-teal-800">
             <AppIcon name="shield-check" size={24} />
           </div>
           <div className="space-y-2">
-            <h2 className="text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
               치료·진단 후 보험금 청구 및 정당한 보상이 고민되시나요?
             </h2>
             <p className="text-xs sm:text-sm text-[#5f6368] dark:text-[#9aa0a6] max-w-lg mx-auto leading-relaxed font-medium">
@@ -224,14 +224,14 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
                 e.preventDefault();
                 window.dispatchEvent(new CustomEvent('open-chat'));
               }}
-              className="w-full sm:w-auto px-6 py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-sm transition-all shadow-md shadow-teal-500/20 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
             >
               <AppIcon name="chat" size={16} />
               <span>실시간 채팅 상담</span>
             </button>
             <Link
               href="/consultation"
-              className="w-full sm:w-auto px-6 py-3.5 bg-gray-900 hover:bg-black dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white font-extrabold text-sm transition-all shadow-md flex items-center justify-center gap-2 text-center"
+              className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-gray-50 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-900 dark:text-white border border-gray-300 dark:border-zinc-700 font-bold text-sm transition-all shadow-xs flex items-center justify-center gap-2 text-center"
             >
               <AppIcon name="phone" size={16} />
               <span>1:1 무료 상담 접수</span>
@@ -269,17 +269,17 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
 
       {/* 진료과목 필터링 칩 */}
       <PremiumCard borderColor="teal" hoverEffect={false} className="!p-4 sm:!p-5 space-y-3">
-        <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-extrabold text-gray-900 dark:text-white">
+        <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-gray-900 dark:text-white">
           <AppIcon name="list" size={15} className="text-teal-600" />
           진료과목 필터링
         </div>
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setSelectedSpecialty(null)}
-            className={`px-3 py-1.5 text-xs font-extrabold transition-all border cursor-pointer ${
+            className={`px-3 py-1.5 text-xs font-bold transition-all border cursor-pointer ${
               selectedSpecialty === null 
                 ? 'bg-teal-600 text-white border-teal-600 shadow-xs' 
-                : 'bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700 hover:border-teal-500'
+                : 'bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border-gray-200/80 dark:border-zinc-700 hover:border-teal-500'
             }`}
           >
             전체보기
@@ -288,10 +288,10 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
             <button
               key={spec.name}
               onClick={() => setSelectedSpecialty(spec.name)}
-              className={`px-3 py-1.5 text-xs font-extrabold transition-all border flex items-center gap-1 cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-bold transition-all border flex items-center gap-1 cursor-pointer ${
                 selectedSpecialty === spec.name
                   ? 'bg-teal-600 text-white border-teal-600 shadow-xs'
-                  : 'bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700 hover:border-teal-500'
+                  : 'bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border-gray-200/80 dark:border-zinc-700 hover:border-teal-500'
               }`}
             >
               <span>{spec.name}</span>
@@ -312,7 +312,7 @@ export default function HospitalDataClient({ sido, gugun }: HospitalDataClientPr
             <PremiumCard borderColor="teal" hoverEffect={true} className="!p-4 sm:!p-5 h-full relative overflow-hidden">
               <div className="flex flex-col justify-between h-full space-y-2">
                 <div>
-                  <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-1">
+                  <h2 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-1">
                     {hospital.name}
                   </h2>
                   <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1 line-clamp-1 font-medium">

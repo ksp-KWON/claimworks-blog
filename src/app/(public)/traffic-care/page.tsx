@@ -6,7 +6,6 @@ import AiCommentBox from '@/components/AiCommentBox';
 import standardData from '../../../../functions/api/taas-standard-data.json';
 
 import AppIcon from '@/components/ui/AppIcon';
-import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
@@ -65,8 +64,6 @@ const SIDO_GUGUN_MAP: Record<string, string[]> = {
   '제주특별자치도': ['서귀포시', '제주시']
 };
 
-// HOSPITAL_SIDO_PREFIX: 제거됨 (법정코드 기반 파일명으로 대체됨, 미사용 상수 정리)
-
 export default function TrafficCarePage() {
   const [selectedSido, setSelectedSido] = useState('경기도');
   const [selectedGugun, setSelectedGugun] = useState('의정부시');
@@ -86,7 +83,7 @@ export default function TrafficCarePage() {
   // 로컬 블로그 포스트 데이터 (칼럼 매핑용)
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
 
-  // 초기 로드 시 블로그 포스트만 가져오기 (지도는 사용자가 직접 지역 선택 후 분석 버튼 누를 때ꭌ 로드)
+  // 초기 로드 시 블로그 포스트만 가져오기
   useEffect(() => {
     fetch('/api/posts')
       .then(res => res.ok ? res.json() : [])
@@ -119,7 +116,6 @@ export default function TrafficCarePage() {
     const delayPromise = new Promise(resolve => setTimeout(resolve, 800));
 
     try {
-      // 로컬 개발 환경(3000포트)에서는 백엔드 wrangler dev 포트(8788)를 직접 찌르고, 그 외에는 상대경로 사용
       const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
       const apiBase = isLocal ? 'http://localhost:8788' : '';
       const taasUrl = `${apiBase}/api/taas-accidents?sido=${encodeURIComponent(sidoName)}&gugun=${encodeURIComponent(gugunName)}`;
@@ -132,7 +128,6 @@ export default function TrafficCarePage() {
       const cleanZones = taasData.filter((z: any) => !z._debug);
       setZones(cleanZones);
       
-      // 사고 데이터를 정상 수신했으므로 지도 렌더링용 지역 상태를 즉시 갱신
       setLoadedSido(sidoName);
       setLoadedGugun(gugunName);
       
@@ -149,7 +144,6 @@ export default function TrafficCarePage() {
         if (codes[gugunName]) {
           gugunCode = codes[gugunName];
         } else {
-          // 정교한 부분 일치 매핑 (글자 수 기준 정렬하여 대도시 하위 구 오매칭 원천 차단)
           const matchedKeys = Object.keys(codes)
             .filter(k => gugunName.includes(k) || k.includes(gugunName))
             .sort((a, b) => b.length - a.length);
@@ -165,7 +159,6 @@ export default function TrafficCarePage() {
         if (hiraRes.ok) {
           const hiraData: DistrictHospitals = await hiraRes.json();
           
-          // 정형외과, 신경외과, 재활의학과, 마취통증의학과 등 주요 과목의 병원들만 병합
           const targetSpecialties = ['정형외과', '신경외과', '재활의학과', '마취통증의학과', '응급의학과'];
           const mergedHospitals: Hospital[] = [];
 
@@ -177,7 +170,6 @@ export default function TrafficCarePage() {
             });
           }
           
-          // 병원 이름 중복 제거
           const uniqueHospitals = mergedHospitals.filter((item, index, self) =>
             self.findIndex(t => t.name === item.name) === index
           );
@@ -185,8 +177,6 @@ export default function TrafficCarePage() {
           setHospitals(uniqueHospitals);
         }
       }
-      
-      // 병원 데이터 로드 단계를 완전히 마침
       
       await delayPromise;
     } catch (e: any) {
@@ -219,8 +209,6 @@ export default function TrafficCarePage() {
       `차량 통행량 대비 보행자 및 교차로 꼬리물기로 인한 골절/추간판탈출 손상 비율이 매우 높게 나타납니다.`
     ];
   };
-
-  // 손해사정사 맞춤형 실무 코멘트 기능은 AiCommentBox 모듈로 통합되어 삭제되었습니다.
 
   // 지능형 보상 칼럼 매칭
   const getMatchedColumn = (zone: AccidentZone) => {
@@ -304,7 +292,7 @@ export default function TrafficCarePage() {
         <div id="search-box-area" className="space-y-4">
           <div className="flex gap-3 flex-col sm:flex-row items-stretch">
             <div className="flex-1 grid grid-cols-2 gap-3">
-              <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2">
+              <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-none border border-gray-200/80 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
                 <label className="block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">시/도 선택</label>
                 <select
                   value={selectedSido}
@@ -316,7 +304,7 @@ export default function TrafficCarePage() {
                   ))}
                 </select>
               </div>
-              <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-none border border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/2">
+              <div className="flex flex-col justify-center px-3.5 py-2.5 rounded-none border border-gray-200/80 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
                 <label className="block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">구/군 선택</label>
                 <select
                   value={selectedGugun}
@@ -333,7 +321,7 @@ export default function TrafficCarePage() {
               onClick={handleSearch}
               disabled={loading}
               color="green"
-              className="py-3 sm:py-3.5 min-w-[120px] flex items-center justify-center h-full !rounded-none"
+              className="py-3 sm:py-3.5 min-w-[120px] flex items-center justify-center h-full"
             >
               {loading ? '분석 중...' : '실시간 지역 분석'}
             </PremiumButton>
@@ -343,10 +331,10 @@ export default function TrafficCarePage() {
 
       {/* 실시간 로딩바 (에메랄드 그린 테마) */}
       {loading && (
-        <div className="bg-white dark:bg-[#202124] rounded-none py-16 px-4 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4">
+        <div className="bg-white dark:bg-[#202124] rounded-none py-16 px-4 text-center border border-gray-200/80 dark:border-zinc-800 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] space-y-4">
           <div className="inline-block w-9 h-9 border-4 border-[#137333] border-t-transparent rounded-full animate-spin" />
           <div className="text-sm font-bold text-[#202124] dark:text-[#e8eaed]">도로교통공단 실시간 교통 데이터 및 지역 의료망 분석 중...</div>
-          <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] max-w-xs mx-auto leading-relaxed">
+          <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] max-w-xs mx-auto leading-relaxed font-medium">
             전국 도로의 위험 위치 좌표와 상해 요인을 융합하고, 인근 신경/정형외과 병원 정보를 실시간으로 매칭하고 있습니다.
           </p>
         </div>
@@ -354,15 +342,15 @@ export default function TrafficCarePage() {
 
       {/* 에러 피드백 */}
       {error && !loading && (
-        <div className="bg-white dark:bg-[#202124] rounded-none py-12 px-5 border border-gray-100 dark:border-white/5 shadow-sm text-center font-bold text-sm text-rose-600 dark:text-rose-400">
-          <span className="flex items-center justify-center gap-1.5"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>{error}</span></span>
+        <div className="bg-white dark:bg-[#202124] rounded-none py-12 px-5 border border-red-200/80 dark:border-red-900/50 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] text-center font-bold text-sm text-rose-600 dark:text-rose-400">
+          <span className="flex items-center justify-center gap-1.5"><AppIcon name="warning" size={16} /><span>{error}</span></span>
         </div>
       )}
 
       {/* 분석 결과 단일 카드 및 상단 구역 드롭다운 선택 */}
       {!loading && zones.length > 0 && activeZone && (
         <div className="space-y-6">
-          <h2 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] border-b border-gray-100 dark:border-white/5 pb-2 flex justify-between items-center">
+          <h2 className="text-base sm:text-lg font-bold text-[#202124] dark:text-[#e8eaed] border-b border-gray-200/80 dark:border-zinc-800 pb-2 flex justify-between items-center">
             <span className="text-[#137333] dark:text-[#81c995] font-extrabold">
               {loadedGugun} 실시간 교통사고 다발 위험 분석 리포트
             </span>
@@ -373,31 +361,31 @@ export default function TrafficCarePage() {
 
           {/* 데이터 출처 안내 배너 */}
           {activeZone.isSafeZone ? (
-            <div className="flex items-start gap-2.5 px-4 py-3 rounded-none bg-blue-50 dark:bg-blue-950/15 border border-blue-200/50 dark:border-blue-700/30 text-xs text-blue-700 dark:text-blue-400 font-semibold leading-relaxed">
-              <span className="shrink-0 mt-0.5 flex items-center"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+            <div className="flex items-start gap-2.5 px-4 py-3 rounded-none bg-blue-50 dark:bg-blue-950/15 border border-blue-200/60 dark:border-blue-700/30 text-xs text-blue-700 dark:text-blue-400 font-semibold leading-relaxed">
+              <span className="shrink-0 mt-0.5 flex items-center"><AppIcon name="shield-check" size={16} /></span>
               <span>선택하신 <strong>{loadedGugun} 전역</strong>은 최근 3개년 동안 도로교통공단 지정 법규위반 및 보행사고 다발지역 이력이 존재하지 않는 안심 관리 구역입니다.</span>
             </div>
           ) : (
-            <div className="flex items-start gap-2.5 px-4 py-3 rounded-none bg-green-50 dark:bg-green-950/15 border border-green-200/50 dark:border-green-700/30 text-xs text-[#137333] dark:text-[#81c995] font-semibold leading-relaxed">
-              <span className="shrink-0 mt-0.5 flex items-center"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <div className="flex items-start gap-2.5 px-4 py-3 rounded-none bg-emerald-50 dark:bg-emerald-950/15 border border-emerald-200/60 dark:border-emerald-700/30 text-xs text-[#137333] dark:text-[#81c995] font-semibold leading-relaxed">
+              <span className="shrink-0 mt-0.5 flex items-center"><AppIcon name="shield-check" size={16} /></span>
               <span><strong>도로교통공단(TAAS) 실시간 공식 데이터</strong>를 기반으로 합니다. 지도 핀포인트는 실제 교통사고 다발 지점의 공식 GPS 좌표입니다.</span>
             </div>
           )}
 
-          {/* 단일 카드 완결형 레이아웃 */}
-          <article className="bg-white dark:bg-[#202124] rounded-none border border-gray-100 dark:border-white/5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.7)] hover:shadow-[0_16px_50px_rgba(19,115,51,0.2)] hover:border-[#137333]/50 p-6 sm:p-7 flex flex-col space-y-5">
+          {/* 단일 카드 완결형 레이아웃 (헌법 표준 샤프 모던 룩) */}
+          <PremiumCard borderColor="green" hoverEffect={false} className="!p-6 sm:!p-7 space-y-5">
             
-            {/* 위험 구역 선택 드롭다운 박스 (탑3를 드롭다운 형태로 한박스에 통합 - 안심구역이 아닐 때만 노출) */}
+            {/* 위험 구역 선택 드롭다운 박스 */}
             {!activeZone.isSafeZone && (
-              <div className="bg-green-50/10 dark:bg-green-950/5 p-4.5 rounded-none border border-green-100/20 dark:border-white/5 space-y-2">
-                <label className="block text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">
+              <div className="bg-emerald-50/40 dark:bg-emerald-950/20 p-4 rounded-none border border-emerald-200/70 dark:border-emerald-900/50 space-y-2">
+                <label className="block text-[11px] font-bold text-emerald-800 dark:text-emerald-300 tracking-wide">
                   위험 다발 구역 선택 (교차로별 위험 순위 Top {zones.length})
                 </label>
                 <div className="relative">
                   <select
                     value={selectedZoneId || ''}
                     onChange={(e) => setSelectedZoneId(e.target.value)}
-                    className="w-full bg-white dark:bg-[#303134] text-xs sm:text-sm font-extrabold text-gray-800 dark:text-gray-100 px-3.5 py-3 rounded-none border border-gray-200 dark:border-white/5 focus:outline-none focus:border-[#137333] cursor-pointer appearance-none shadow-sm pr-10"
+                    className="w-full bg-white dark:bg-[#303134] text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-100 px-3.5 py-2.5 rounded-none border border-gray-200/80 dark:border-zinc-700 focus:outline-none focus:border-[#137333] cursor-pointer appearance-none shadow-xs pr-10"
                   >
                     {zones.map((zone, index) => (
                       <option key={zone.id} value={zone.id}>
@@ -406,47 +394,31 @@ export default function TrafficCarePage() {
                     ))}
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-gray-500">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                    </svg>
+                    <AppIcon name="chevron-down" size={16} />
                   </div>
                 </div>
               </div>
             )}
 
             {/* 카드 본문 콘텐츠: 상단 메타 바 */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-white/5">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-200/80 dark:border-zinc-800">
               {activeZone.isSafeZone ? (
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 text-[10px] font-bold border border-blue-100/30 flex items-center gap-1">
-                    교통사고 안심 행정구역
-                  </span>
-                  <span className="px-2.5 py-1 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-bold border border-green-100/30">
-                    다발위험지 0개소
-                  </span>
+                  <PremiumBadge color="blue">교통사고 안심 행정구역</PremiumBadge>
+                  <PremiumBadge color="green">다발위험지 0개소</PremiumBadge>
                 </div>
               ) : (
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2.5 py-1 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[10px] font-bold border border-green-100/30">
-                    사고 {activeZone.occurCount}건
-                  </span>
-                  <span className="px-2.5 py-1 rounded bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold border border-rose-100/30">
-                    사상자 {activeZone.casualtyCount}명
-                  </span>
+                  <PremiumBadge color="green">사고 {activeZone.occurCount}건</PremiumBadge>
+                  <PremiumBadge color="rose">사상자 {activeZone.casualtyCount}명</PremiumBadge>
                   {activeZone.deathCount > 0 && (
-                    <span className="px-2.5 py-1 rounded bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 text-[10px] font-bold border border-red-100/30">
-                      사망 {activeZone.deathCount}명
-                    </span>
+                    <PremiumBadge color="red">사망 {activeZone.deathCount}명</PremiumBadge>
                   )}
                   {activeZone.seriousCount > 0 && (
-                    <span className="px-2.5 py-1 rounded bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-100/30">
-                      중상 {activeZone.seriousCount}명
-                    </span>
+                    <PremiumBadge color="yellow">중상 {activeZone.seriousCount}명</PremiumBadge>
                   )}
                   {activeZone.slightCount > 0 && (
-                    <span className="px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 text-[10px] font-bold border border-blue-100/30">
-                      경상 {activeZone.slightCount}명
-                    </span>
+                    <PremiumBadge color="blue">경상 {activeZone.slightCount}명</PremiumBadge>
                   )}
                 </div>
               )}
@@ -463,7 +435,7 @@ export default function TrafficCarePage() {
             </div>
 
             {/* 구글 지도 임베드 시각화 — 위경도 좌표 직접 방식으로 100% 핀포인트 보장 */}
-            <div className="w-full h-[320px] rounded-none overflow-hidden border border-gray-150 dark:border-white/5 shadow-sm mt-1 bg-gray-50">
+            <div className="w-full h-[320px] rounded-none overflow-hidden border border-gray-200/80 dark:border-zinc-800 shadow-xs mt-1 bg-gray-50">
               <iframe
                 key={`${loadedSido}-${loadedGugun}-${activeZone.id}`}
                 width="100%"
@@ -476,13 +448,13 @@ export default function TrafficCarePage() {
               />
             </div>
 
-            {/* 📋 안심 의료기관 정보 아코디언 접이식 리스트 (대표님 피드백 반영 2안) */}
+            {/* 📋 안심 의료기관 정보 아코디언 접이식 리스트 */}
             {hospitals.length > 0 && (
               <div className="space-y-3 mt-2">
                 {/* 토글 버튼 바 */}
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="w-full flex items-center justify-between px-5 py-3.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/2 dark:hover:bg-white/5 rounded-none border border-gray-250 dark:border-white/5 cursor-pointer transition-colors text-xs font-black text-gray-800 dark:text-gray-100"
+                  className="w-full flex items-center justify-between px-4 sm:px-5 py-3.5 bg-white hover:bg-gray-50 dark:bg-[#202124] dark:hover:bg-[#303134] rounded-none border border-gray-200/80 dark:border-zinc-800 cursor-pointer transition-colors text-xs font-bold text-gray-800 dark:text-gray-100 shadow-xs"
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-[#137333]"><AppIcon name="hospital" size={18} /></span>
@@ -490,51 +462,49 @@ export default function TrafficCarePage() {
                   </div>
                   <div className="flex items-center gap-1.5 text-gray-400 dark:text-gray-500 font-bold">
                     <span>{isExpanded ? '접기' : '목록 보기'}</span>
-                    <svg
-                      className={`w-4 h-4 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2.5"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                    </svg>
+                    <AppIcon 
+                      name="chevron-down" 
+                      size={16} 
+                      className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                    />
                   </div>
                 </button>
 
                 {/* 펼쳐졌을 때의 병원 리스트 */}
                 {isExpanded && (
-                  <div className="p-4 rounded-none border border-gray-100 dark:border-white/5 bg-gray-50/10 dark:bg-white/1 space-y-4">
+                  <div className="p-4 rounded-none border border-gray-200/80 dark:border-zinc-800 bg-gray-50/30 dark:bg-zinc-900/30 space-y-4">
                     {/* 필터 칩 */}
-                    <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-gray-100 dark:border-white/5">
+                    <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-gray-200/80 dark:border-zinc-800">
                       <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500">원하시는 진료 조건의 병원만 걸러볼 수 있습니다.</span>
                       <div className="flex gap-2">
                         <button
                           onClick={() => setOnlyNight(!onlyNight)}
-                          className={`px-3 py-1.5 rounded-none text-[10px] font-extrabold transition-all border cursor-pointer flex items-center gap-1 ${
+                          className={`px-3 py-1.5 rounded-none text-xs font-bold transition-all border cursor-pointer flex items-center gap-1 ${
                             onlyNight 
-                              ? 'bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] border-[#137333]/30' 
-                              : 'bg-white dark:bg-[#303134] text-gray-500 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5'
+                              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' 
+                              : 'bg-white dark:bg-[#303134] text-gray-600 dark:text-gray-300 border-gray-200/80 dark:border-zinc-700 hover:border-emerald-500'
                           }`}
                         >
-                          <span className="flex items-center gap-1"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span>주말진료</span></span>
+                          <AppIcon name="shield-check" size={13} />
+                          <span>주말진료</span>
                         </button>
                         <button
                           onClick={() => setOnlyEmergency(!onlyEmergency)}
-                          className={`px-3 py-1.5 rounded-none text-[10px] font-extrabold transition-all border cursor-pointer flex items-center gap-1 ${
+                          className={`px-3 py-1.5 rounded-none text-xs font-bold transition-all border cursor-pointer flex items-center gap-1 ${
                             onlyEmergency 
-                              ? 'bg-emerald-50 dark:bg-emerald-950/20 text-[#0b6623] dark:text-[#81c995] border-[#0b6623]/30' 
-                              : 'bg-white dark:bg-[#303134] text-gray-500 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5'
+                              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' 
+                              : 'bg-white dark:bg-[#303134] text-gray-600 dark:text-gray-300 border-gray-200/80 dark:border-zinc-700 hover:border-emerald-500'
                           }`}
                         >
-                          <span className="flex items-center gap-1"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>대형병원</span></span>
+                          <AppIcon name="hospital" size={13} />
+                          <span>대형병원</span>
                         </button>
                       </div>
                     </div>
 
-                    {/* 세로형 병원 목록 그리드 (2열 구조로 PC와 모바일 모두에 시원하게 매칭) */}
+                    {/* 세로형 병원 목록 그리드 */}
                     {filteredHospitals.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 max-h-[360px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:rounded-full">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 max-h-[360px] overflow-y-auto pr-1 custom-scrollbar">
                         {filteredHospitals.map((h, idx) => {
                           const isWeekend = h.name.includes('한방') || h.name.includes('한의');
                           const isBig = h.name.includes('종합') || (h.name.includes('병원') && !h.name.includes('의원'));
@@ -542,38 +512,38 @@ export default function TrafficCarePage() {
                           return (
                             <div 
                               key={idx}
-                              className="p-4 rounded-none border border-gray-250 dark:border-white/5 bg-white dark:bg-[#202124] flex flex-col justify-between space-y-3 shadow-sm hover:border-[#137333]/30 dark:hover:border-[#137333]/50 transition-all duration-200"
+                              className="p-4 rounded-none border border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-[#202124] flex flex-col justify-between space-y-3 shadow-xs hover:border-emerald-500/60 dark:hover:border-emerald-500/60 transition-all duration-200"
                             >
                               <div className="space-y-1.5">
                                 <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="text-xs font-black text-gray-800 dark:text-gray-100 tracking-tight leading-tight">{h.name}</span>
+                                  <span className="text-xs font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-tight">{h.name}</span>
                                   {isWeekend && (
-                                    <span className="px-1.5 py-0.5 rounded bg-green-50 dark:bg-green-950/20 text-[#137333] dark:text-[#81c995] text-[8px] font-black border border-green-100/10">
+                                    <PremiumBadge color="green" className="!px-1.5 !py-0.2 !text-[9.5px]">
                                       주말진료
-                                    </span>
+                                    </PremiumBadge>
                                   )}
                                   {isBig && (
-                                    <span className="px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/20 text-[#0b6623] dark:text-[#81c995] text-[8px] font-black border border-emerald-100/10">
+                                    <PremiumBadge color="teal" className="!px-1.5 !py-0.2 !text-[9.5px]">
                                       대형병원
-                                    </span>
+                                    </PremiumBadge>
                                   )}
                                 </div>
-                                <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed line-clamp-2 min-h-[30px]">{h.address}</p>
+                                <p className="text-[10.5px] text-[#5f6368] dark:text-[#9aa0a6] font-medium leading-relaxed line-clamp-2 min-h-[30px]">{h.address}</p>
                               </div>
                               
-                              <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-white/5 shrink-0">
+                              <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-zinc-800 shrink-0">
                                 {h.tel ? (
-                                  <div className="text-[10px] font-bold text-[#137333] dark:text-[#81c995] flex items-center gap-1">
-                                    <AppIcon name="phone" size={14} />
+                                  <div className="text-[11px] font-bold text-[#137333] dark:text-[#81c995] flex items-center gap-1">
+                                    <AppIcon name="phone" size={13} />
                                     <span>{h.tel}</span>
                                   </div>
                                 ) : (
-                                  <span className="text-[9px] text-gray-400 font-medium">전화번호 정보 없음</span>
+                                  <span className="text-[9.5px] text-gray-400 font-medium">전화번호 정보 없음</span>
                                 )}
                                 {h.tel && (
                                   <a
                                     href={`tel:${h.tel}`}
-                                    className="px-2.5 py-1 text-[9px] font-black text-white bg-[#137333] hover:bg-[#0b6623] rounded-none transition-colors cursor-pointer"
+                                    className="px-2.5 py-1 text-[10px] font-bold text-white bg-[#137333] hover:bg-[#0b6623] rounded-none transition-colors cursor-pointer"
                                   >
                                     전화 연결
                                   </a>
@@ -584,7 +554,7 @@ export default function TrafficCarePage() {
                         })}
                       </div>
                     ) : (
-                      <div className="py-12 text-center text-xs font-bold text-gray-400 dark:text-gray-500 bg-white dark:bg-[#202124] rounded-none border border-dashed border-gray-200 dark:border-white/5">
+                      <div className="py-12 text-center text-xs font-bold text-gray-400 dark:text-gray-500 bg-white dark:bg-[#202124] rounded-none border border-dashed border-gray-200/80 dark:border-zinc-800">
                         필터 조건에 부합하는 병원 정보가 없습니다.
                       </div>
                     )}
@@ -594,10 +564,10 @@ export default function TrafficCarePage() {
             )}
 
             {/* 🧠 AI 3줄 요약 카드 (에메랄드 그린 패밀리룩) */}
-            <div className="bg-green-50/20 dark:bg-green-950/10 p-4 rounded-none border border-green-100/30 dark:border-green-900/25 space-y-2.5 mt-2">
+            <div className="bg-emerald-50/30 dark:bg-emerald-950/20 p-4 rounded-none border border-emerald-200/60 dark:border-emerald-900/40 space-y-2.5 mt-2">
               <div className="flex items-center gap-1.5 text-xs font-bold text-[#137333] dark:text-[#81c995]">
-                <span className="text-sm"><AppIcon name="brain" size={16} /></span>
-                빅데이터 실시간 사고위험 분석 보고
+                <AppIcon name="brain" size={16} />
+                <span>빅데이터 실시간 사고위험 분석 보고</span>
               </div>
               <ul className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium space-y-1.5 list-disc pl-4">
                 {getAiSummary(activeZone).map((line, sumIdx) => (
@@ -613,8 +583,8 @@ export default function TrafficCarePage() {
               className="mt-1"
             />
 
-            {/* 액션 버튼 영역 (가로 분할 가독성 극대화) */}
-            <div className="flex items-center gap-3 pt-3 border-t border-gray-55 dark:border-white/2 flex-wrap sm:flex-nowrap">
+            {/* 액션 버튼 영역 */}
+            <div className="flex items-center gap-3 pt-3 border-t border-gray-200/80 dark:border-zinc-800 flex-wrap sm:flex-nowrap">
               {(() => {
                 const matchedCol = getMatchedColumn(activeZone);
                 return matchedCol ? (
@@ -622,7 +592,7 @@ export default function TrafficCarePage() {
                     href={`/blog/${matchedCol.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer border border-gray-200/40 dark:border-white/5"
+                    className="flex-1 text-center py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-800/80 dark:hover:bg-zinc-800 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer border border-gray-200/80 dark:border-zinc-700"
                   >
                     사고원인 맞춤 칼럼 읽기 (1건)
                   </Link>
@@ -631,7 +601,7 @@ export default function TrafficCarePage() {
                     href="/blog"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 text-center py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer border border-gray-200/40 dark:border-white/5"
+                    className="flex-1 text-center py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-800/80 dark:hover:bg-zinc-800 text-[#202124] dark:text-[#e8eaed] text-xs font-bold rounded-none transition-colors cursor-pointer border border-gray-200/80 dark:border-zinc-700"
                   >
                     보상스쿨 전체 칼럼 읽기
                   </Link>
@@ -640,13 +610,13 @@ export default function TrafficCarePage() {
               <a
                 href="#"
                 onClick={(e) => { e.preventDefault(); openChat(); }}
-                className="flex-1 text-center py-2.5 bg-[#137333] hover:bg-[#0b6623] text-white text-xs font-bold rounded-none shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="flex-1 text-center py-2.5 bg-[#137333] hover:bg-[#0b6623] text-white text-xs font-bold rounded-none shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 내 과실·보상 무료 상담 (실시간 채팅)
               </a>
             </div>
-          </article>
-        </div>
+          </PremiumCard>
+        </div>
       )}
     </div>
   );

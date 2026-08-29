@@ -55,17 +55,49 @@ export default function PremiumCard({
 
   const isInk = borderColor === 'charcoal' || borderColor === 'ink';
 
+  const themeGradients: Record<BorderColor, string> = {
+    blue: 'from-blue-100/70 via-blue-50/20 to-transparent dark:from-blue-950/30 dark:via-blue-950/10 dark:to-transparent',
+    cyan: 'from-sky-100/70 via-sky-50/20 to-transparent dark:from-sky-950/30 dark:via-sky-950/10 dark:to-transparent',
+    red: 'from-red-100/70 via-red-50/20 to-transparent dark:from-red-950/30 dark:via-red-950/10 dark:to-transparent',
+    rose: 'from-rose-100/70 via-rose-50/20 to-transparent dark:from-rose-950/30 dark:via-rose-950/10 dark:to-transparent',
+    green: 'from-emerald-100/70 via-emerald-50/20 to-transparent dark:from-emerald-950/30 dark:via-emerald-950/10 dark:to-transparent',
+    teal: 'from-teal-100/70 via-teal-50/20 to-transparent dark:from-teal-950/30 dark:via-teal-950/10 dark:to-transparent',
+    orange: 'from-orange-100/70 via-orange-50/20 to-transparent dark:from-orange-950/30 dark:via-orange-950/10 dark:to-transparent',
+    yellow: 'from-amber-100/70 via-amber-50/20 to-transparent dark:from-amber-950/30 dark:via-amber-950/10 dark:to-transparent',
+    purple: 'from-purple-100/70 via-purple-50/20 to-transparent dark:from-purple-950/30 dark:via-purple-950/10 dark:to-transparent',
+    indigo: 'from-indigo-100/70 via-indigo-50/20 to-transparent dark:from-indigo-950/30 dark:via-indigo-950/10 dark:to-transparent',
+    charcoal: 'from-zinc-100/60 via-zinc-50/20 to-transparent dark:from-zinc-800/40 dark:via-zinc-800/10 dark:to-transparent',
+    ink: 'from-zinc-100/60 via-zinc-50/20 to-transparent dark:from-zinc-800/40 dark:via-zinc-800/10 dark:to-transparent',
+    default: 'from-gray-100/50 via-gray-50/20 to-transparent dark:from-zinc-800/30 dark:via-zinc-800/10 dark:to-transparent'
+  };
+
+  const themeAccentBars: Record<BorderColor, string> = {
+    blue: 'bg-[var(--google-blue)]',
+    cyan: 'bg-sky-500',
+    red: 'bg-[var(--google-red)]',
+    rose: 'bg-rose-500',
+    green: 'bg-[var(--google-green)]',
+    teal: 'bg-teal-500',
+    orange: 'bg-orange-500',
+    yellow: 'bg-[var(--google-yellow)]',
+    purple: 'bg-purple-500',
+    indigo: 'bg-indigo-500',
+    charcoal: 'bg-zinc-900 dark:bg-zinc-100',
+    ink: 'bg-zinc-900 dark:bg-zinc-100',
+    default: 'bg-gray-400 dark:bg-zinc-400'
+  };
+
   const baseClass = `bg-white dark:bg-[#202124] p-4 sm:p-5 border ${baseBorders[borderColor]} shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-200 relative overflow-hidden rounded-none flex flex-col min-h-0 group ${
     hoverEffect ? hoverBorders[borderColor] : ''
   }`;
 
   return (
     <div className={`${baseClass} ${className}`} {...props}>
-      {/* 수묵화(Ink Wash) 전용 은은한 먹물 번짐 워시 & 좌측 포인트 획 */}
-      {isInk && (
+      {/* 호버 시 은은한 배경 톤온톤 그라데이션 워시 & 좌측 포인트 바 */}
+      {hoverEffect && (
         <>
-          <div className="absolute top-0 left-0 w-1 h-full bg-zinc-900 dark:bg-zinc-100 opacity-0 group-hover:opacity-100 transition-opacity z-20" />
-          <div className="absolute inset-0 bg-gradient-to-br from-zinc-100/60 via-zinc-50/20 to-transparent dark:from-zinc-800/40 dark:via-zinc-800/10 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0" />
+          <div className={`absolute top-0 left-0 w-1 h-full ${themeAccentBars[borderColor]} opacity-0 group-hover:opacity-100 transition-opacity z-20`} />
+          <div className={`absolute inset-0 bg-gradient-to-br ${themeGradients[borderColor]} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0`} />
         </>
       )}
       {/* 워터마크 SVG 아이콘 (CommonBox 3D 일체화 — 잘림 없는 68px 황금 콤팩트 엠블럼) */}

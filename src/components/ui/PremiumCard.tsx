@@ -55,10 +55,10 @@ export default function PremiumCard({
 
   return (
     <div className={`${baseClass} ${className}`} {...props}>
-      {/* 워터마크 SVG 아이콘 (CommonBox 3D 일체화) */}
+      {/* 워터마크 SVG 아이콘 (CommonBox 3D 일체화 — 잘림 없는 68px 황금 콤팩트 엠블럼) */}
       {watermarkIcon && (
-        <div className="absolute right-[-10px] bottom-[-14px] opacity-[0.03] dark:opacity-[0.05] select-none pointer-events-none group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 z-0">
-          <AppIcon name={watermarkIcon} size={100} strokeWidth={1.5} />
+        <div className="absolute right-3.5 bottom-2.5 opacity-[0.035] dark:opacity-[0.055] select-none pointer-events-none group-hover:scale-105 group-hover:-translate-y-0.5 transition-all duration-300 z-0">
+          <AppIcon name={watermarkIcon} size={68} strokeWidth={1.5} />
         </div>
       )}
       {/* 레거시 워터마크 이모지 지원 */}

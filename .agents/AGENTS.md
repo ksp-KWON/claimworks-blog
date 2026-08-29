@@ -91,6 +91,12 @@
 - **9.3 네오 브루탈리즘 잔재 영구 금지**:
   - 하드 섀도우(`shadow-[4px_4px_0px_#000]`), 2px 투박한 검정 테두리, 네모 스피너(`rounded-none animate-spin`), 비표준 클래스(`border-gray-250` 등)는 전면 금지하며, 원형 스피너(`rounded-full animate-spin`)와 샤프 모던 엣지(`rounded-none`)를 엄격히 준수합니다.
 - **9.4 절제된 타이포그래피**: `font-black` 남발을 금지하며, 시맨틱 가독성 위계에 맞추어 `font-bold` 및 `font-extrabold`를 표준으로 적용합니다.
+- **9.5 수묵화 4단계 농담(濃淡) 타이포그래피 표준**:
+  - H2~H5 모노톤 제목 영역은 한국 전통 수묵화의 농담(濃淡) 원리를 적용하여 명확한 시맨틱 위계를 확립합니다.
+  - **H2 (대주제 / 농묵 濃墨)**: `text-xl sm:text-2xl font-extrabold`, 흑요석 먹빛 그라데이션(`from-zinc-950 to-zinc-600`), 좌측 4px 흑묵 획(`border-l-4 border-zinc-900 dark:border-zinc-100`), 넓은 수묵 번짐 배경.
+  - **H3 (중주제 / 중묵 中墨)**: `text-lg sm:text-xl font-bold text-zinc-800 dark:text-zinc-200`, 좌측 2.5px 정밀 먹선(`border-l-[2.5px] border-zinc-600`), 슬림 수묵 번짐 배경.
+  - **H4 (소주제 / 담묵 淡墨)**: `text-base sm:text-lg font-bold text-zinc-700 dark:text-zinc-300`, 좌측 2px 옅은 먹선 또는 먹빛 점, 텍스트 중심 정갈함.
+  - **H5 (세부항목 / 안개먹 淡灰)**: `text-sm sm:text-base font-semibold text-zinc-600 dark:text-zinc-400`, 배경 및 외곽선 없이 단락 구분 여백 활용.
 
 ### 제10조 — 로컬 공공데이터 & 핀포인트 사용자 경험 (Local Data & Funnel Framework)
 - **10.1 공공데이터 실시간 연계 무결성**: 건강보험심사평가원(HIRA) 전문 병의원 데이터 및 도로교통공단(TAAS) 사고 다발지 위경도 좌표를 구글 지도와 100% 핀포인트로 연계합니다.

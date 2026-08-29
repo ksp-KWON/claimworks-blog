@@ -51,6 +51,8 @@ const getHeadingBgClass = (tone: string) => {
     case 'yellow': return 'from-yellow-100/80 dark:from-yellow-900/30';
     case 'purple': return 'from-purple-100/80 dark:from-purple-900/30';
     case 'gray': return 'from-gray-100/80 dark:from-gray-800/30';
+    case 'charcoal':
+    case 'ink': return 'from-zinc-100/90 via-zinc-50/40 dark:from-zinc-800/40 dark:via-zinc-800/10';
     default: return 'from-blue-100/80 dark:from-blue-900/30';
   }
 };

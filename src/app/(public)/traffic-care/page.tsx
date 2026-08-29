@@ -448,7 +448,7 @@ export default function TrafficCarePage() {
               />
             </div>
 
-            {/* 📋 안심 의료기관 정보 아코디언 접이식 리스트 */}
+            {/* 안심 의료기관 정보 아코디언 접이식 리스트 */}
             {hospitals.length > 0 && (
               <div className="space-y-3 mt-2">
                 {/* 토글 버튼 바 */}
@@ -566,7 +566,7 @@ export default function TrafficCarePage() {
               </div>
             )}
 
-            {/* 🧠 AI 3줄 요약 카드 (에메랄드 그린 패밀리룩) */}
+            {/* AI 3줄 요약 카드 (에메랄드 그린 패밀리룩) */}
             <div className="bg-emerald-50/30 dark:bg-emerald-950/20 p-4 rounded-none border border-emerald-200/60 dark:border-emerald-900/40 space-y-2.5 mt-2">
               <div className="flex items-center gap-1.5 text-xs font-bold text-[#137333] dark:text-[#81c995]">
                 <AppIcon name="brain" size={16} />

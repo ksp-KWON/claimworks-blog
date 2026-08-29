@@ -177,7 +177,7 @@ export default function AutoCalculator({ hideHeader = false }: { hideHeader?: bo
         </div>
       )}
 
-      {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
+      {/* 2. 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
       <div className="space-y-6">
         
         {/* [STEP 1] 피해 유형 선택 */}
@@ -448,7 +448,7 @@ export default function AutoCalculator({ hideHeader = false }: { hideHeader?: bo
         )}
       </div>
 
-      {/* 3. 📋 세부 손해배상 산출 명세서 (상시 100% 노출) */}
+      {/* 3. 세부 손해배상 산출 명세서 (상시 100% 노출) */}
       <PremiumCard borderColor="blue" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 overflow-hidden">
         {/* 명세서 그라데이션 헤더 바 */}
         <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-blue-50 via-indigo-50/60 to-transparent dark:from-blue-950/50 dark:via-indigo-950/30 dark:to-transparent border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
@@ -518,7 +518,7 @@ export default function AutoCalculator({ hideHeader = false }: { hideHeader?: bo
         )}
       </PremiumCard>
 
-      {/* 4. 🏆 [최하단 배치] 최종 예상 합의금 챔피언 카드 */}
+      {/* 4. [최하단 배치] 최종 예상 합의금 챔피언 카드 */}
       <div ref={resultRef} className="bg-gradient-to-br from-blue-600 to-indigo-700 dark:from-blue-700 dark:to-indigo-900 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden transition-transform duration-200 hover:scale-[1.005]">
         <div className="relative z-10 flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2 mb-4">
@@ -551,7 +551,7 @@ export default function AutoCalculator({ hideHeader = false }: { hideHeader?: bo
         </div>
       </div>
 
-      {/* 5. 🛡️ 전문가 조언 및 액션 버튼 바 */}
+      {/* 5. 전문가 조언 및 액션 버튼 바 */}
       <div className="bg-amber-50 dark:bg-amber-950/30 p-4 border border-amber-200/80 dark:border-amber-900/40 text-xs sm:text-[13px] leading-relaxed text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
         <AppIcon name="shield-alert" size={16} className="text-amber-600 shrink-0 mt-0.5" />
         <p>위 결과는 <strong>보험회사 대인배상 약관 지급기준</strong> 참고용입니다. 실제 소송 판례 기준(특인) 적용 시 수천만 원 이상 증액될 수 있으므로 조기 합의 전 손해사정 전문가와의 상담을 적극 권장합니다.</p>

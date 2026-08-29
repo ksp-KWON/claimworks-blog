@@ -161,7 +161,7 @@ export default function LiabilityCalculator({ hideHeader = false }: { hideHeader
         </div>
       )}
 
-      {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
+      {/* 2. 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
       <div className="space-y-6">
         
         {/* [STEP 1] 피해 유형 선택 4단 칩 */}
@@ -418,7 +418,7 @@ export default function LiabilityCalculator({ hideHeader = false }: { hideHeader
         )}
       </div>
 
-      {/* 3. 📋 세부 손해배상 산출 명세서 (상시 100% 노출) */}
+      {/* 3. 세부 손해배상 산출 명세서 (상시 100% 노출) */}
       <PremiumCard borderColor="red" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 overflow-hidden">
         {/* 명세서 그라데이션 헤더 바 */}
         <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-rose-50 via-red-50/60 to-transparent dark:from-rose-950/50 dark:via-red-950/30 dark:to-transparent border-b border-rose-100 dark:border-rose-900/40 flex items-center justify-between">
@@ -486,7 +486,7 @@ export default function LiabilityCalculator({ hideHeader = false }: { hideHeader
         )}
       </PremiumCard>
 
-      {/* 4. 🏆 [최하단 배치] 최종 예상 배상청구액 챔피언 카드 */}
+      {/* 4. [최하단 배치] 최종 예상 배상청구액 챔피언 카드 */}
       <div ref={resultRef} className="bg-gradient-to-br from-rose-600 to-red-700 dark:from-rose-700 dark:to-red-900 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden transition-transform duration-200 hover:scale-[1.005]">
         <div className="relative z-10 flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2 mb-4">
@@ -519,7 +519,7 @@ export default function LiabilityCalculator({ hideHeader = false }: { hideHeader
         </div>
       </div>
 
-      {/* 5. 🛡️ 전문가 조언 및 액션 버튼 바 */}
+      {/* 5. 전문가 조언 및 액션 버튼 바 */}
       <div className="bg-amber-50 dark:bg-amber-950/30 p-4 border border-amber-200/80 dark:border-amber-900/40 text-xs sm:text-[13px] leading-relaxed text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
         <AppIcon name="shield-alert" size={16} className="text-amber-600 shrink-0 mt-0.5" />
         <p>위 결과는 <strong>법원 손해배상 소송 판례(호프만 단리 수식)</strong> 기준 산출액입니다. 상대방 보험사의 자체 지급기준(라이프니츠 계수 등)보다 판례 기준이 통상 20~40% 높게 산정될 수 있습니다.</p>

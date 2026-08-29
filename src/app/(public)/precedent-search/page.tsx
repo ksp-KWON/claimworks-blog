@@ -20,7 +20,7 @@ interface Precedent {
   caseContent: string;
   caseType: string;
   officialUrl: string;
-  casePoints: string; // ⚖️ 공식 판시사항
+  casePoints: string; // 공식 판시사항
 }
 
 // 텍스트 클리닝 헬퍼: 법제처 판결요지 및 판례본문의 HTML 태그와 엔티티를 정제하여 줄바꿈을 깔끔하게 유지합니다.
@@ -70,7 +70,7 @@ const setCachedSearch = (query: string, data: Precedent[]) => {
   } catch {}
 };
 
-// 🧠 지능형 판례 요약 알고리즘
+// 지능형 판례 요약 알고리즘
 function getSmartSummary(summary: string, content: string): string {
   if (!summary && !content) return '판례 상세 내용을 확인해 주세요.';
   if (summary) {
@@ -228,7 +228,7 @@ export default function PrecedentSearchPage() {
     setLoadingMore(false);
   };
 
-  // 💡 사용자가 클릭했을 때 호출되는 온디맨드 상세 조회 로직 (지연 로딩)
+  // 온디맨드 상세 조회 로직 (지연 로딩)
   const handleToggleDetail = async (prec: Precedent) => {
     // 닫기
     if (openDetailId === prec.id) {
@@ -386,7 +386,7 @@ export default function PrecedentSearchPage() {
               const isLoadingDetail = detailLoadingId === prec.id;
               const relatedPosts = getRelatedBlogPosts(prec);
               
-              // 💡 초압축 리스트 뷰 UI
+              // 초압축 리스트 뷰 UI
               return (
                 <div key={prec.id} className="flex flex-col group transition-colors">
                   {/* 리스트 헤더 (클릭 가능 영역) */}

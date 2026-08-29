@@ -212,7 +212,7 @@ export default function MedicalCalculator({ hideHeader = false }: { hideHeader?:
         </div>
       )}
 
-      {/* 2. 🛠️ 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
+      {/* 2. 스마트 인터랙티브 입력 카드 (STEP 1, 2, 3) */}
       <div className="space-y-6">
         
         {/* [STEP 1] 실손 가입 세대 5단 칩 */}
@@ -444,7 +444,7 @@ export default function MedicalCalculator({ hideHeader = false }: { hideHeader?:
         </PremiumCard>
       </div>
 
-      {/* 3. 📋 세부 공제 내역 명세서 (상시 100% 노출) */}
+      {/* 3. 세부 공제 내역 명세서 (상시 100% 노출) */}
       <PremiumCard borderColor="green" hoverEffect={true} watermarkIcon="file-text" className="!p-5 sm:!p-7 overflow-hidden">
         {/* 명세서 그라데이션 헤더 바 */}
         <div className="-mx-5 -mt-5 sm:-mx-7 sm:-mt-7 px-5 py-3.5 sm:px-7 sm:py-4 bg-gradient-to-r from-emerald-50 via-teal-50/60 to-transparent dark:from-emerald-950/50 dark:via-teal-950/30 dark:to-transparent border-b border-emerald-100 dark:border-emerald-900/40 flex items-center justify-between">
@@ -496,7 +496,7 @@ export default function MedicalCalculator({ hideHeader = false }: { hideHeader?:
         )}
       </PremiumCard>
 
-      {/* 4. 🏆 [최하단 배치] 최종 예상 실손 보험금 챔피언 카드 */}
+      {/* 4. [최하단 배치] 최종 예상 실손 보험금 챔피언 카드 */}
       <div ref={resultRef} className="bg-gradient-to-br from-emerald-600 to-teal-700 dark:from-emerald-700 dark:to-teal-900 p-6 sm:p-8 text-white shadow-lg relative overflow-hidden transition-transform duration-200 hover:scale-[1.005]">
         <div className="relative z-10 flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2 mb-4">
@@ -529,7 +529,7 @@ export default function MedicalCalculator({ hideHeader = false }: { hideHeader?:
         </div>
       </div>
 
-      {/* 5. 🛡️ 전문가 조언 및 액션 버튼 바 */}
+      {/* 5. 전문가 조언 및 액션 버튼 바 */}
       <div className="bg-amber-50 dark:bg-amber-950/30 p-4 border border-amber-200/80 dark:border-amber-900/40 text-xs sm:text-[13px] leading-relaxed text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
         <AppIcon name="shield-alert" size={16} className="text-amber-600 shrink-0 mt-0.5" />
         <p>위 결과는 <strong>표준 실손의료비 약관</strong> 기준 단순 산출액입니다. 가입 시기 및 특약(비급여 3대 특약 등), 연간 자기부담금 한도(200만 원) 초과 여부에 따라 실제 지급액이 달라질 수 있습니다.</p>

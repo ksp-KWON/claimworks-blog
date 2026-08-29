@@ -94,7 +94,7 @@ export default function RegionsIndex() {
           <div className="flex flex-wrap gap-2.5 shrink-0">
             <Link
               href="/traffic-care"
-              className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-teal-500/20 flex items-center gap-1.5 transition-all"
+              className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-bold shadow-xs flex items-center gap-1.5 transition-all"
             >
               <AppIcon name="car" size={15} />
               <span>교통로컬케어 바로가기</span>

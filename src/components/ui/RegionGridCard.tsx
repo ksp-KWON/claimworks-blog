@@ -22,7 +22,7 @@ export default function RegionGridCard({
   return (
     <Link
       href={href}
-      className="group relative flex flex-col justify-between bg-white dark:bg-[#202124] p-3.5 sm:p-5 border border-teal-200/80 dark:border-teal-900/50 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] hover:border-teal-500 dark:hover:border-teal-500 hover:shadow-[0_10px_30px_rgba(20,184,166,0.12)] dark:hover:shadow-[0_10px_30px_rgba(20,184,166,0.2)] active:scale-[0.98] transition-all duration-200 overflow-hidden outline-none"
+      className="group relative flex flex-col justify-between bg-white dark:bg-[#202124] p-3.5 sm:p-5 border border-teal-200/80 dark:border-teal-900/50 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)] hover:border-teal-500 dark:hover:border-teal-500 hover:shadow-[0_12px_40px_rgba(20,184,166,0.18)] dark:hover:shadow-[0_12px_40px_rgba(20,184,166,0.25)] active:scale-[0.98] transition-all duration-200 overflow-hidden outline-none"
     >
       {/* 1. 좌측 틸 포인트 바 */}
       <div className="absolute top-0 left-0 w-1 h-full bg-teal-600 opacity-0 group-hover:opacity-100 transition-opacity z-20" />
@@ -45,10 +45,10 @@ export default function RegionGridCard({
 
       {/* 4. 중앙 지역명 및 핵심 실데이터 칩 */}
       <div className="relative z-10 text-center py-1 sm:py-2">
-        <h3 className="text-sm sm:text-base font-extrabold text-[#202124] dark:text-[#e8eaed] group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors truncate">
+        <h3 className="text-sm sm:text-base font-bold text-[#202124] dark:text-[#e8eaed] group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors truncate">
           {title}
         </h3>
-        <p className="text-[11px] sm:text-xs text-[#5f6368] dark:text-[#9aa0a6] font-semibold mt-1 truncate">
+        <p className="text-[11px] sm:text-xs text-[#5f6368] dark:text-[#9aa0a6] font-medium mt-1 truncate">
           {countLabel}
         </p>
       </div>

@@ -184,12 +184,22 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
         tableHtml += `</tr></thead><tbody>`;
 
         const dataRows = tableLines.slice(2);
+        const delimiterCols = tableLines[1] ? tableLines[1].split('|').map(s => s.trim()).filter(s => s.length > 0) : [];
+        const alignments = delimiterCols.map(col => {
+          const starts = col.startsWith(':');
+          const ends = col.endsWith(':');
+          if (starts && ends) return 'center';
+          if (ends) return 'right';
+          if (starts) return 'left';
+          return 'left';
+        });
+
         dataRows.forEach((row, rIdx) => {
           const cells = row.split('|').map(s => s.trim()).filter(s => s.length > 0);
           const bg = rIdx % 2 === 1 ? '#f8fafc' : '#ffffff';
           tableHtml += `<tr style="background-color: ${bg};">`;
           cells.forEach((c, cIdx) => {
-            const align = cIdx === 0 ? 'center' : 'left';
+            const align = alignments[cIdx] || 'left';
             const cellText = applyNaverHighlighter(c);
             tableHtml += `<td style="padding: 10px 12px; color: #334155; border: 1px solid #cbd5e1; text-align: ${align}; vertical-align: middle; line-height: 1.5;">${cellText}</td>`;
           });

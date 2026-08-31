@@ -32,7 +32,7 @@ export default function FAQBox({ items }: FAQBoxProps) {
                 Q{i + 1}
               </span>
               <span className={`flex-1 text-[14.5px] transition-colors break-keep ${openIdx === i ? 'font-bold text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'font-medium text-gray-800 dark:text-[#e8eaed] group-hover/btn:text-[var(--google-blue)] dark:group-hover/btn:text-[#8ab4f8]'}`}>
-                {item.q}
+                <MarkdownRenderer content={item.q} inline={true} />
               </span>
               <svg
                 className={`w-4 h-4 shrink-0 transition-transform duration-300 ${openIdx === i ? 'rotate-180 text-[var(--google-blue)] dark:text-[#8ab4f8]' : 'text-gray-400 group-hover/btn:text-[var(--google-blue)] dark:group-hover/btn:text-[#8ab4f8]'}`}

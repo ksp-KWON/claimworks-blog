@@ -233,12 +233,24 @@ export function parseBlogPost(content: string): ParsedBlogPost {
     pushCurrentSection();
   }
 
-  const applyBold = (str: string) => str.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+  const normalizeMarkdownBold = (str: string): string => {
+    if (!str) return '';
+    let normalized = str;
+    normalized = normalized.replace(/\*{3,}([^*]+?)\*{2,}/g, '**$1**');
+    normalized = normalized.replace(/\*{2,}([^*]+?)\*{3,}/g, '**$1**');
+    normalized = normalized.replace(/\*\*\s+([^*]+?)\*\*/g, '**$1**');
+    normalized = normalized.replace(/\*\*([^*]+?)\s+\*\*/g, '**$1**');
+    normalized = normalized.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+    return normalized;
+  };
   
-  result.sections = result.sections.map(applyBold);
-  result.keyPoints = result.keyPoints.map(applyBold);
-  result.checklistItems = result.checklistItems.map(applyBold);
-  result.faqItems = result.faqItems.map(faq => ({ ...faq, a: applyBold(faq.a) }));
+  result.sections = result.sections.map(normalizeMarkdownBold);
+  result.keyPoints = result.keyPoints.map(normalizeMarkdownBold);
+  result.checklistItems = result.checklistItems.map(normalizeMarkdownBold);
+  result.faqItems = result.faqItems.map(faq => ({ 
+    q: normalizeMarkdownBold(faq.q), 
+    a: normalizeMarkdownBold(faq.a) 
+  }));
 
   const groupRelatedLinks = (text: string) => {
     return text.replace(/(<calloutlink[^>]+>\s*<\/calloutlink>\s*)+/g, (match) => {
@@ -247,12 +259,12 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   };
 
   if (result.opening) {
-    result.opening = groupRelatedLinks(applyBold(result.opening));
+    result.opening = groupRelatedLinks(normalizeMarkdownBold(result.opening));
   }
   result.sections = result.sections.map(groupRelatedLinks);
 
   if (!result.opening && result.sections.length === 0 && content.trim()) {
-    result.sections = [groupRelatedLinks(applyBold(content.trim()))];
+    result.sections = [groupRelatedLinks(normalizeMarkdownBold(content.trim()))];
   }
 
   return result;

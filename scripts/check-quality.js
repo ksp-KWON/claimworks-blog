@@ -213,6 +213,13 @@ function processPost(filePath) {
   body = body.replace(/\*\*\s*:\s*/g, '** : ');
   body = body.replace(/(\d+\.\s*\*\*[^*]+\*\*\s*:[^\n]+)(\n)(\d+\.)/g, '$1\n\n$3');
 
+  // ── [13-2. 마크다운 별표(Bold) 문법 정밀 표준화] ──────────────────────
+  body = body.replace(/\*{3,}([^*]+?)\*{2,}/g, '**$1**');
+  body = body.replace(/\*{2,}([^*]+?)\*{3,}/g, '**$1**');
+  body = body.replace(/\*\*\s+([^*]+?)\*\*/g, '**$1**');
+  body = body.replace(/\*\*([^*]+?)\s+\*\*/g, '**$1**');
+  body = body.replace(/^>\s*\*\*([^*:\n]+)\*\s*:/gm, '> **$1** :');
+
   // ── [14. 스마트 문단 호흡 정규화 (GFM Paragraph Breathing Rule)] ─────────
   // 4문장 이상의 긴 텍스트 단락을 2~3문장 단위로 쾌적하게 \n\n 분리
   const blocks = body.split(/\r?\n\r?\n/);

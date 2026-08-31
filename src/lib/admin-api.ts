@@ -108,9 +108,11 @@ export async function savePost(githubToken: string, data: any) {
   if (!githubToken) throw new Error('GitHub Token이 없습니다.');
   
   let finalSlug = '';
-  if (data.slug && data.slug.trim()) {
-    finalSlug = data.slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-  } else if (data.currentFilename) {
+  const cleanSlug = data.slug ? data.slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') : '';
+  
+  if (cleanSlug && cleanSlug !== 'post' && !cleanSlug.startsWith('post-') && cleanSlug.length > 3) {
+    finalSlug = cleanSlug;
+  } else if (data.currentFilename && !data.currentFilename.startsWith('post') && !/[^\x00-\x7F]/.test(data.currentFilename)) {
     finalSlug = data.currentFilename.replace('.md', '');
   } else {
     finalSlug = generateSemanticSlug(data.title, data.slug);

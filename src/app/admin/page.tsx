@@ -24,6 +24,7 @@ import {
 } from '@/lib/admin-api';
 import { runAutoGenerationWorkflow, runManualGenerationWorkflow } from '@/lib/auto-writer';
 import { parseMarkdown } from '@/lib/markdown-utils';
+import { generateSemanticSlug } from '@/lib/slug-utils';
 import { authenticateAdmin, checkAdminSession, clearAdminSession, getLockoutState, LockoutState } from '@/lib/admin-auth';
 import { getCategoryMeta } from '@/lib/constants/categories';
 
@@ -289,9 +290,13 @@ export default function AdminPage() {
       // Frontmatter와 본문 완벽 분리
       const { data: meta, content: pureContent } = parseMarkdown(finalMarkdown);
 
+      const generatedTitle = meta.title || postMeta.title || '새 칼럼 제목';
+      const generatedSlug = meta.slug || generateSemanticSlug(generatedTitle);
+
       setPostMeta(prev => ({
         ...prev,
-        title: meta.title || prev.title || '새 칼럼 제목',
+        title: generatedTitle,
+        slug: generatedSlug,
         summary: meta.summary || prev.summary,
         category: normalizeCategory(meta.category || prev.category),
         specialtyCategory: meta.specialtyCategory || prev.specialtyCategory,
@@ -329,9 +334,10 @@ export default function AdminPage() {
       // Frontmatter와 본문 완벽 분리
       const { data: meta, content: pureContent } = parseMarkdown(finalMarkdown);
       
-      const safeSlug = meta.slug || `post-${Date.now()}`;
+      const targetTitle = meta.title || '새 문서';
+      const safeSlug = meta.slug || generateSemanticSlug(targetTitle);
       const newPostData = {
-        title: meta.title || '새 문서',
+        title: targetTitle,
         slug: safeSlug,
         summary: meta.summary || '',
         date: meta.date || new Date().toISOString().split('T')[0],

@@ -221,7 +221,7 @@ export default function AdminPage() {
     });
   };
 
-  const handleSavePost = async () => {
+  const handleSavePost = async (isDraft: boolean = false) => {
     if (!postMeta.title.trim()) {
       alert('제목을 입력해주세요.');
       return;
@@ -234,11 +234,14 @@ export default function AdminPage() {
 
     setIsLoading(true);
     try {
+      const isPublished = !isDraft;
       await savePost(githubToken, {
         ...postMeta,
+        published: isPublished,
         category: normalizeCategory(postMeta.category)
       });
-      alert('저장되었습니다.');
+      setPostMeta(prev => ({ ...prev, published: isPublished }));
+      alert(isDraft ? '임시저장되었습니다. (비공개)' : '웹사이트에 공식 발행되었습니다!');
     } catch (e: any) {
       alert(`저장 실패: ${e.message}`);
     } finally {

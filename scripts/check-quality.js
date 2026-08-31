@@ -295,13 +295,38 @@ function processPost(filePath) {
   return false;
 }
 
+function normalizeFilename(filename) {
+  const baseName = filename.replace(/\.md$/, '');
+  // 구글 SEO 표준: 소문자 영문, 숫자, 하이픈만 허용
+  if (/^[a-z0-9]+(-[a-z0-9]+)*$/.test(baseName)) {
+    return filename;
+  }
+  // 비표준 파일명 소문자 케밥케이스로 정규화
+  const clean = baseName
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-|-$/g, '');
+  return `${clean || 'post'}.md`;
+}
+
 function main() {
   if (!fs.existsSync(POSTS_DIR)) return;
   const files = fs.readdirSync(POSTS_DIR).filter((f) => f.endsWith('.md'));
   let modifiedCount = 0;
 
   files.forEach((f) => {
-    const fullPath = path.join(POSTS_DIR, f);
+    let fullPath = path.join(POSTS_DIR, f);
+    const standardName = normalizeFilename(f);
+    if (standardName !== f) {
+      const newPath = path.join(POSTS_DIR, standardName);
+      fs.renameSync(fullPath, newPath);
+      fullPath = newPath;
+      modifiedCount++;
+      console.log(`  [SEO 파일명 교정] ${f} -> ${standardName}`);
+    }
+
     if (processPost(fullPath)) {
       modifiedCount++;
     }
@@ -314,3 +339,4 @@ function main() {
 }
 
 main();
+

@@ -11,6 +11,7 @@ import {
   CONTENT_SCHEMA
 } from './prompt-rules';
 import { stringifyMarkdown } from './markdown-utils';
+import { generateSemanticSlug } from './slug-utils';
 
 function parseGeneratedContent(text: string) {
   if (!text) return { content: '', thoughtProcess: '', title: '' };
@@ -87,7 +88,7 @@ function buildPostFrontmatter(topic: any, content: string, generatedTitle?: stri
   const kstDate = new Date(Date.now() + 9 * 3600 * 1000).toISOString().split('T')[0];
   const frontmatterData: any = {
     title: finalTitle,
-    slug: topic.slug || '',
+    slug: generateSemanticSlug(finalTitle, topic.slug),
     date: kstDate,
     updatedAt: kstDate,
     summary: summary,

@@ -101,41 +101,8 @@ export async function loadPost(githubToken: string, filename: string) {
   };
 }
 
-const SLUG_KEYWORD_MAP: Record<string, string> = {
-  '추간판': 'herniated-disc', '디스크': 'disc', '탈출증': 'herniation',
-  '외상기여도': 'trauma-contribution', '기왕증': 'pre-existing-condition',
-  '합의금': 'settlement', '손해배상': 'compensation', '실손': 'silbi',
-  '보험금': 'insurance-claim', '소득': 'income', '일실수익': 'loss-of-income',
-  '휴업손해': 'loss-of-work', '맥브라이드': 'mcbride', '장해': 'disability',
-  '후유장해': 'permanent-disability', '교통사고': 'car-accident', '판례': 'precedent',
-  '대법원': 'supreme-court', '분쟁조정': 'dispute-resolution', '암': 'cancer',
-  '뇌졸중': 'stroke', '뇌출혈': 'brain-hemorrhage', '심근경색': 'myocardial-infarction',
-  '사망': 'death', '자살': 'suicide', '배상책임': 'liability', '산재': 'industrial-accident',
-  '근재': 'workers-compensation', '백내장': 'cataract', '도수치료': 'manual-therapy',
-  '비급여': 'non-reimbursable', '부지급': 'denial', '면책': 'exemption', '가이드': 'guide',
-  '분석': 'analysis', '기준': 'standard', '판정': 'evaluation', '산정': 'calculation',
-  '입원': 'inpatient', '통원': 'outpatient', '수술': 'surgery', '진단': 'diagnosis'
-};
-
-export function generateSemanticSlug(title: string, customSlug?: string): string {
-  if (customSlug && customSlug.trim()) {
-    return customSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-  }
-
-  let slug = (title || '').trim().toLowerCase();
-  for (const [kr, en] of Object.entries(SLUG_KEYWORD_MAP)) {
-    slug = slug.replace(new RegExp(kr, 'g'), `-${en}-`);
-  }
-
-  slug = slug
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/[\s_]+/g, '-')
-    .replace(/-{2,}/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 60);
-
-  return slug || `claim-guide-${Date.now()}`;
-}
+import { generateSemanticSlug } from './slug-utils';
+export { generateSemanticSlug };
 
 export async function savePost(githubToken: string, data: any) {
   if (!githubToken) throw new Error('GitHub Token이 없습니다.');

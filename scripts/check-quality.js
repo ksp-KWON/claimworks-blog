@@ -206,6 +206,13 @@ function processPost(filePath) {
   // ── [13. 표와 인용구 사이 빈 줄 강제 확보] ────────────────────────────
   body = body.replace(/(\|.*\|)\r?\n(>[^\n]+)/g, '$1\n\n$2');
 
+  // ── [13-1. 리스트 및 마크다운 목록 문법 정밀 표준화 (공백 누락 방지)] ────────
+  body = body.replace(/(\d+)\.\s*\*\*/g, '$1. **');
+  body = body.replace(/>\s*-\s*\*\*/g, '> - **');
+  body = body.replace(/^>\s*\*\*/gm, '> **');
+  body = body.replace(/\*\*\s*:\s*/g, '** : ');
+  body = body.replace(/(\d+\.\s*\*\*[^*]+\*\*\s*:[^\n]+)(\n)(\d+\.)/g, '$1\n\n$3');
+
   // ── [14. 스마트 문단 호흡 정규화 (GFM Paragraph Breathing Rule)] ─────────
   // 4문장 이상의 긴 텍스트 단락을 2~3문장 단위로 쾌적하게 \n\n 분리
   const blocks = body.split(/\r?\n\r?\n/);

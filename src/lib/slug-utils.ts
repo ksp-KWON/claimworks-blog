@@ -32,6 +32,7 @@ const DOMAIN_DICTIONARY: Record<string, string> = {
   '맘모톰': 'mammotome', '로봇수술': 'robotic-surgery', '하이푸': 'hifu',
   '비밸브': 'nasal-valve', '다빈치': 'davinci', '전립선비대증': 'bph',
   '하지정맥류': 'varicose-veins', '압박골절': 'compression-fracture', '골절': 'fracture',
+  '삼복사골절': 'trimalleolar-fracture', '삼복사': 'trimalleolar', '발목': 'ankle',
   '십자인대': 'cruciate-ligament', '회전근개': 'rotator-cuff', '치매': 'dementia',
 
   // [보험/보상/손해사정 법리]

@@ -210,14 +210,30 @@ function resolveUniqueSlug(baseSlug) {
   return slug;
 }
 
+/**
+ * 정확한 한국 표준시(KST, UTC+9) ISO 8601 타임스탬프 생성기 (전 세계 러너/서버 완벽 호환)
+ */
+function getKSTDateTimeString(date = new Date()) {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+  const parts = formatter.formatToParts(date);
+  const get = (type) => parts.find(p => p.type === type)?.value || '00';
+  return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}+09:00`;
+}
+
 function saveMarkdownPost(topic, summary, content, additionalFrontmatter = {}) {
   const uniqueSlug = resolveUniqueSlug(topic.slug);
   topic.slug = uniqueSlug;
 
-  const today = new Date();
-  const dateStr = today.toISOString().split('T')[0] + 'T' + 
-                  String(today.getHours()).padStart(2, '0') + ':' + 
-                  String(today.getMinutes()).padStart(2, '0') + ':00+09:00';
+  const dateStr = getKSTDateTimeString();
 
   const fmData = {
     title: topic.title,
@@ -249,6 +265,7 @@ module.exports = {
   isDuplicateTopic,
   verifyTopicPlan,
   resolveUniqueSlug,
+  getKSTDateTimeString,
   saveMarkdownPost,
   DOMAIN_COMMON_WORDS
 };

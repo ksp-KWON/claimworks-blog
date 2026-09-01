@@ -5,7 +5,9 @@ import PremiumHeading from './PremiumHeading';
 import PremiumBadge, { type BadgeColor } from './PremiumBadge';
 import AppIcon, { type AppIconName } from './AppIcon';
 
-export type HeaderBannerTheme = 'blue' | 'red' | 'green' | 'purple' | 'teal' | 'indigo' | 'amber' | 'yellow' | 'rose' | 'sky' | 'charcoal' | 'ink' | 'default';
+import { HEADER_BOX_GRADIENTS, type UIThemeColor } from '@/lib/blog-tokens';
+
+export type HeaderBannerTheme = UIThemeColor;
 
 export interface HeaderBadgeItem {
   text: string;
@@ -35,92 +37,28 @@ export interface PremiumHeaderBannerProps {
   className?: string;
 }
 
-interface ThemeConfig {
+interface ThemeMeta {
   cardBorder: BorderColor;
-  bgGradient: string;
   iconColor: string;
   defaultBadgeColor: BadgeColor;
 }
 
-const THEME_CONFIGS: Record<HeaderBannerTheme, ThemeConfig> = {
-  blue: {
-    cardBorder: 'blue',
-    bgGradient: '!bg-gradient-to-r !from-blue-50/90 !via-indigo-50/50 !to-transparent dark:!from-blue-950/40 dark:!via-indigo-950/20 dark:!to-transparent border-blue-200/90 dark:border-blue-900/50',
-    iconColor: 'text-blue-600 dark:text-blue-400',
-    defaultBadgeColor: 'blue'
-  },
-  indigo: {
-    cardBorder: 'indigo',
-    bgGradient: '!bg-gradient-to-r !from-indigo-50/90 !via-blue-50/50 !to-transparent dark:!from-indigo-950/40 dark:!via-blue-950/20 dark:!to-transparent border-indigo-200/90 dark:border-indigo-900/50',
-    iconColor: 'text-indigo-600 dark:text-indigo-400',
-    defaultBadgeColor: 'indigo'
-  },
-  red: {
-    cardBorder: 'red',
-    bgGradient: '!bg-gradient-to-r !from-red-50/90 !via-rose-50/50 !to-transparent dark:!from-red-950/40 dark:!via-rose-950/20 dark:!to-transparent border-red-200/90 dark:border-red-900/50',
-    iconColor: 'text-red-600 dark:text-red-400',
-    defaultBadgeColor: 'red'
-  },
-  rose: {
-    cardBorder: 'rose',
-    bgGradient: '!bg-gradient-to-r !from-rose-50/90 !via-pink-50/50 !to-transparent dark:!from-rose-950/40 dark:!via-pink-950/20 dark:!to-transparent border-rose-200/90 dark:border-rose-900/50',
-    iconColor: 'text-rose-600 dark:text-rose-400',
-    defaultBadgeColor: 'rose'
-  },
-  green: {
-    cardBorder: 'green',
-    bgGradient: '!bg-gradient-to-r !from-emerald-50/90 !via-teal-50/50 !to-transparent dark:!from-emerald-950/40 dark:!via-teal-950/20 dark:!to-transparent border-emerald-200/90 dark:border-emerald-900/50',
-    iconColor: 'text-emerald-600 dark:text-emerald-400',
-    defaultBadgeColor: 'green'
-  },
-  teal: {
-    cardBorder: 'teal',
-    bgGradient: '!bg-gradient-to-r !from-teal-50/90 !via-emerald-50/50 !to-transparent dark:!from-teal-950/40 dark:!via-emerald-950/20 dark:!to-transparent border-teal-200/90 dark:border-teal-900/50',
-    iconColor: 'text-teal-600 dark:text-teal-400',
-    defaultBadgeColor: 'teal'
-  },
-  purple: {
-    cardBorder: 'purple',
-    bgGradient: '!bg-gradient-to-r !from-purple-50/90 !via-indigo-50/50 !to-transparent dark:!from-purple-950/40 dark:!via-indigo-950/20 dark:!to-transparent border-purple-200/90 dark:border-purple-900/50',
-    iconColor: 'text-purple-600 dark:text-purple-400',
-    defaultBadgeColor: 'purple'
-  },
-  amber: {
-    cardBorder: 'yellow',
-    bgGradient: '!bg-gradient-to-r !from-amber-50/90 !via-yellow-50/50 !to-transparent dark:!from-amber-950/40 dark:!via-yellow-950/20 dark:!to-transparent border-amber-200/90 dark:border-amber-900/50',
-    iconColor: 'text-amber-600 dark:text-amber-400',
-    defaultBadgeColor: 'yellow'
-  },
-  yellow: {
-    cardBorder: 'yellow',
-    bgGradient: '!bg-gradient-to-r !from-amber-50/90 !via-yellow-50/50 !to-transparent dark:!from-amber-950/40 dark:!via-yellow-950/20 dark:!to-transparent border-amber-200/90 dark:border-amber-900/50',
-    iconColor: 'text-amber-600 dark:text-amber-400',
-    defaultBadgeColor: 'yellow'
-  },
-  sky: {
-    cardBorder: 'blue',
-    bgGradient: '!bg-gradient-to-r !from-sky-50/90 !via-blue-50/50 !to-transparent dark:!from-sky-950/40 dark:!via-blue-950/20 dark:!to-transparent border-sky-200/90 dark:border-sky-900/50',
-    iconColor: 'text-sky-600 dark:text-sky-400',
-    defaultBadgeColor: 'blue'
-  },
-  charcoal: {
-    cardBorder: 'charcoal',
-    bgGradient: '!bg-gradient-to-r !from-zinc-100/90 !via-zinc-50/50 !to-transparent dark:!from-zinc-900/50 dark:!via-zinc-900/20 dark:!to-transparent border-gray-200/90 dark:border-zinc-800',
-    iconColor: 'text-zinc-900 dark:text-zinc-100',
-    defaultBadgeColor: 'gray'
-  },
-  ink: {
-    cardBorder: 'ink',
-    bgGradient: '!bg-gradient-to-r !from-zinc-100/90 !via-zinc-50/50 !to-transparent dark:!from-zinc-900/50 dark:!via-zinc-900/20 dark:!to-transparent border-gray-200/90 dark:border-zinc-800',
-    iconColor: 'text-zinc-900 dark:text-zinc-100',
-    defaultBadgeColor: 'gray'
-  },
-  default: {
-    cardBorder: 'blue',
-    bgGradient: '!bg-gradient-to-r !from-blue-50/90 !via-indigo-50/50 !to-transparent dark:!from-blue-950/40 dark:!via-indigo-950/20 dark:!to-transparent border-blue-200/90 dark:border-blue-900/50',
-    iconColor: 'text-blue-600 dark:text-blue-400',
-    defaultBadgeColor: 'blue'
-  }
+const THEME_METAS: Record<HeaderBannerTheme, ThemeMeta> = {
+  blue: { cardBorder: 'blue', iconColor: 'text-blue-600 dark:text-blue-400', defaultBadgeColor: 'blue' },
+  indigo: { cardBorder: 'indigo', iconColor: 'text-indigo-600 dark:text-indigo-400', defaultBadgeColor: 'indigo' },
+  red: { cardBorder: 'red', iconColor: 'text-red-600 dark:text-red-400', defaultBadgeColor: 'red' },
+  rose: { cardBorder: 'rose', iconColor: 'text-rose-600 dark:text-rose-400', defaultBadgeColor: 'rose' },
+  green: { cardBorder: 'green', iconColor: 'text-emerald-600 dark:text-emerald-400', defaultBadgeColor: 'green' },
+  teal: { cardBorder: 'teal', iconColor: 'text-teal-600 dark:text-teal-400', defaultBadgeColor: 'teal' },
+  purple: { cardBorder: 'purple', iconColor: 'text-purple-600 dark:text-purple-400', defaultBadgeColor: 'purple' },
+  amber: { cardBorder: 'yellow', iconColor: 'text-amber-600 dark:text-amber-400', defaultBadgeColor: 'yellow' },
+  yellow: { cardBorder: 'yellow', iconColor: 'text-amber-600 dark:text-amber-400', defaultBadgeColor: 'yellow' },
+  orange: { cardBorder: 'orange', iconColor: 'text-orange-600 dark:text-orange-400', defaultBadgeColor: 'yellow' },
+  cyan: { cardBorder: 'blue', iconColor: 'text-sky-600 dark:text-sky-400', defaultBadgeColor: 'blue' },
+  sky: { cardBorder: 'blue', iconColor: 'text-sky-600 dark:text-sky-400', defaultBadgeColor: 'blue' },
+  charcoal: { cardBorder: 'charcoal', iconColor: 'text-zinc-900 dark:text-zinc-100', defaultBadgeColor: 'gray' },
+  ink: { cardBorder: 'ink', iconColor: 'text-zinc-900 dark:text-zinc-100', defaultBadgeColor: 'gray' },
+  default: { cardBorder: 'blue', iconColor: 'text-blue-600 dark:text-blue-400', defaultBadgeColor: 'blue' },
 };
 
 /**
@@ -140,14 +78,15 @@ export default function PremiumHeaderBanner({
   level = 1,
   className = ''
 }: PremiumHeaderBannerProps) {
-  const config = THEME_CONFIGS[theme] || THEME_CONFIGS.default;
+  const meta = THEME_METAS[theme] || THEME_METAS.default;
+  const bgGradient = HEADER_BOX_GRADIENTS[theme] || HEADER_BOX_GRADIENTS.default;
 
   return (
     <PremiumCard
-      borderColor={config.cardBorder}
+      borderColor={meta.cardBorder}
       hoverEffect={false}
       watermarkIcon={icon}
-      className={`!p-5 sm:!p-7 ${config.bgGradient} ${className}`}
+      className={`!p-5 sm:!p-7 ${bgGradient} ${className}`}
     >
       <div className="relative z-10">
         {/* 상단 뱃지 및 우측 액션 링크 영역 */}
@@ -157,8 +96,8 @@ export default function PremiumHeaderBanner({
               {badges.map((badge, idx) => {
                 const text = typeof badge === 'string' ? badge : badge.text;
                 const color = typeof badge === 'string' 
-                  ? (idx === 0 ? config.defaultBadgeColor : 'gray') 
-                  : (badge.color || config.defaultBadgeColor);
+                  ? (idx === 0 ? meta.defaultBadgeColor : 'gray') 
+                  : (badge.color || meta.defaultBadgeColor);
 
                 return (
                   <PremiumBadge key={idx} color={color}>
@@ -187,7 +126,7 @@ export default function PremiumHeaderBanner({
           level={level}
           gradient={theme as any}
           showLeftBorder={false}
-          icon={<AppIcon name={icon} size={24} className={`${config.iconColor} shrink-0`} />}
+          icon={<AppIcon name={icon} size={24} className={`${meta.iconColor} shrink-0`} />}
           className="!mb-2 !text-xl sm:!text-2xl"
         >
           {title}

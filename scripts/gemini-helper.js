@@ -12,21 +12,23 @@
 
 const { sleep } = require('./pipeline-utils.js');
 
-// ── 모델 계열 정의 ────────────────────────────────────────────────────────────
+// ── 모델 계열 정의 (순수 텍스트 생성 가능 모델만 정밀 필터링) ─────────────────
+const isPureTextModel = (name) => !/image|tts|audio|customtools|robotics|embedding/i.test(name);
+
 const MODEL_TIERS = [
   {
     tier: 'flash',
-    match: name => /gemini/i.test(name) && /flash/i.test(name) && !/lite/i.test(name),
+    match: name => /gemini/i.test(name) && /flash/i.test(name) && !/lite/i.test(name) && isPureTextModel(name),
     maxTokensFallback: 32768,
   },
   {
     tier: 'lite',
-    match: name => /gemini/i.test(name) && /flash/i.test(name) && /lite/i.test(name),
+    match: name => /gemini/i.test(name) && /flash/i.test(name) && /lite/i.test(name) && isPureTextModel(name),
     maxTokensFallback: 16384,
   },
   {
     tier: 'pro',
-    match: name => /gemini/i.test(name) && /pro/i.test(name) && !/lite/i.test(name),
+    match: name => /gemini/i.test(name) && /pro/i.test(name) && !/lite/i.test(name) && isPureTextModel(name),
     maxTokensFallback: 32768,
   },
 ];
@@ -53,14 +55,13 @@ function compareVersionsDesc(a, b) {
 
 // ── 내장 기본값 폴백 (탐색 실패 시 안전망) ───────────────────────────────────
 const FALLBACK_MODELS = [
-  { name: 'gemini-flash-latest',   maxTokens: 32768, tier: 'flash' },
-  { name: 'gemini-3.6-flash',      maxTokens: 32768, tier: 'flash' },
-  { name: 'gemini-3.5-flash',      maxTokens: 32768, tier: 'flash' },
   { name: 'gemini-2.5-flash',      maxTokens: 32768, tier: 'flash' },
-  { name: 'gemini-flash-lite-latest', maxTokens: 16384, tier: 'lite' },
-  { name: 'gemini-3.5-flash-lite', maxTokens: 16384, tier: 'lite' },
-  { name: 'gemini-3.1-flash-lite', maxTokens: 16384, tier: 'lite' },
-  { name: 'gemini-pro-latest',     maxTokens: 32768, tier: 'pro' },
+  { name: 'gemini-2.0-flash',      maxTokens: 32768, tier: 'flash' },
+  { name: 'gemini-1.5-flash',      maxTokens: 32768, tier: 'flash' },
+  { name: 'gemini-2.5-flash-lite', maxTokens: 16384, tier: 'lite' },
+  { name: 'gemini-2.0-flash-lite', maxTokens: 16384, tier: 'lite' },
+  { name: 'gemini-1.5-flash-lite', maxTokens: 16384, tier: 'lite' },
+  { name: 'gemini-2.5-pro',        maxTokens: 32768, tier: 'pro' },
 ];
 
 let _discoveredModels = null;
@@ -159,7 +160,7 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
 
     for (let attempt = 0; attempt <= RETRY_CONFIG.maxRetries; attempt++) {
       const controller = new AbortController();
-      const timeoutId  = setTimeout(() => controller.abort(), 90000);
+      const timeoutId  = setTimeout(() => controller.abort(), 35000);
       let res;
 
       try {

@@ -8,24 +8,26 @@
  * — 429(할당량) / 404(구버전 중단) 발생 시 0.1초 만에 차순위 모델로 무중단 릴레이
  */
 
-// ── 모델 계열 패턴 정의 ──────────────────────────────────────────────
+// ── 모델 계열 패턴 정의 (순수 텍스트 모델만 정밀 필터링) ──────────────
+const isPureTextModel = (name: string) => !/image|tts|audio|customtools|robotics|embedding/i.test(name);
+
 const MODEL_TIERS = [
   {
     tier: 'flash' as const,
     // "flash"가 있고 "lite"가 없는 모델 = 풀사이즈 Flash 계열
-    match: (name: string) => /gemini/i.test(name) && /flash/i.test(name) && !/lite/i.test(name),
+    match: (name: string) => /gemini/i.test(name) && /flash/i.test(name) && !/lite/i.test(name) && isPureTextModel(name),
     maxTokensFallback: 32768,
   },
   {
     tier: 'lite' as const,
     // "flash"와 "lite"가 모두 포함된 모델 = Flash-Lite 계열
-    match: (name: string) => /gemini/i.test(name) && /flash/i.test(name) && /lite/i.test(name),
+    match: (name: string) => /gemini/i.test(name) && /flash/i.test(name) && /lite/i.test(name) && isPureTextModel(name),
     maxTokensFallback: 16384,
   },
   {
     tier: 'pro' as const,
     // "pro" 계열 (비상 대타)
-    match: (name: string) => /gemini/i.test(name) && /pro/i.test(name) && !/lite/i.test(name),
+    match: (name: string) => /gemini/i.test(name) && /pro/i.test(name) && !/lite/i.test(name) && isPureTextModel(name),
     maxTokensFallback: 32768,
   },
 ];
@@ -45,14 +47,13 @@ function compareDesc(a: { name: string }, b: { name: string }) {
 
 // ── 내장 기본값 폴백 (탐색 실패 시 안전망) ───────────────────────────
 const FALLBACK_MODELS = [
-  { name: 'gemini-flash-latest',   maxTokens: 32768, tier: 'flash' as const },
-  { name: 'gemini-3.6-flash',      maxTokens: 32768, tier: 'flash' as const },
-  { name: 'gemini-3.5-flash',      maxTokens: 32768, tier: 'flash' as const },
   { name: 'gemini-2.5-flash',      maxTokens: 32768, tier: 'flash' as const },
-  { name: 'gemini-flash-lite-latest', maxTokens: 16384, tier: 'lite' as const },
-  { name: 'gemini-3.5-flash-lite', maxTokens: 16384, tier: 'lite' as const },
-  { name: 'gemini-3.1-flash-lite', maxTokens: 16384, tier: 'lite' as const },
-  { name: 'gemini-pro-latest',     maxTokens: 32768, tier: 'pro' as const },
+  { name: 'gemini-2.0-flash',      maxTokens: 32768, tier: 'flash' as const },
+  { name: 'gemini-1.5-flash',      maxTokens: 32768, tier: 'flash' as const },
+  { name: 'gemini-2.5-flash-lite', maxTokens: 16384, tier: 'lite' as const },
+  { name: 'gemini-2.0-flash-lite', maxTokens: 16384, tier: 'lite' as const },
+  { name: 'gemini-1.5-flash-lite', maxTokens: 16384, tier: 'lite' as const },
+  { name: 'gemini-2.5-pro',        maxTokens: 32768, tier: 'pro' as const },
 ];
 
 let _cachedModels: typeof FALLBACK_MODELS | null = null;

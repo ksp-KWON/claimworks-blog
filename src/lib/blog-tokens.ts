@@ -36,6 +36,44 @@ export interface ToneColorToken {
   };
 }
 
+export type UIThemeColor = 
+  | 'blue' 
+  | 'red' 
+  | 'green' 
+  | 'purple' 
+  | 'teal' 
+  | 'indigo' 
+  | 'yellow' 
+  | 'amber' 
+  | 'rose' 
+  | 'cyan' 
+  | 'sky' 
+  | 'orange' 
+  | 'charcoal' 
+  | 'ink' 
+  | 'default';
+
+/**
+ * 전사 공통 챕터별 제목 박스 & 헤더 배너 시그니처 톤온톤 그라데이션 (좌측 짙고 우측 연한 W3C 표준 룩)
+ */
+export const HEADER_BOX_GRADIENTS: Record<UIThemeColor, string> = {
+  blue: '!bg-gradient-to-r !from-blue-100/90 !via-indigo-50/40 !to-transparent dark:!from-blue-950/70 dark:!via-indigo-950/20 dark:!to-transparent border-blue-200/90 dark:border-blue-900/50',
+  indigo: '!bg-gradient-to-r !from-indigo-100/90 !via-blue-50/40 !to-transparent dark:!from-indigo-950/70 dark:!via-blue-950/20 dark:!to-transparent border-indigo-200/90 dark:border-indigo-900/50',
+  red: '!bg-gradient-to-r !from-red-100/90 !via-rose-50/40 !to-transparent dark:!from-red-950/70 dark:!via-rose-950/20 dark:!to-transparent border-red-200/90 dark:border-red-900/50',
+  rose: '!bg-gradient-to-r !from-rose-100/90 !via-pink-50/40 !to-transparent dark:!from-rose-950/70 dark:!via-pink-950/20 dark:!to-transparent border-rose-200/90 dark:border-rose-900/50',
+  green: '!bg-gradient-to-r !from-emerald-100/90 !via-teal-50/40 !to-transparent dark:!from-emerald-950/70 dark:!via-teal-950/20 dark:!to-transparent border-emerald-200/90 dark:border-emerald-900/50',
+  teal: '!bg-gradient-to-r !from-teal-100/90 !via-emerald-50/40 !to-transparent dark:!from-teal-950/70 dark:!via-emerald-950/20 dark:!to-transparent border-teal-200/90 dark:border-teal-900/50',
+  purple: '!bg-gradient-to-r !from-purple-100/90 !via-indigo-50/40 !to-transparent dark:!from-purple-950/70 dark:!via-indigo-950/20 dark:!to-transparent border-purple-200/90 dark:border-purple-900/50',
+  amber: '!bg-gradient-to-r !from-amber-100/90 !via-yellow-50/40 !to-transparent dark:!from-amber-950/70 dark:!via-yellow-950/20 dark:!to-transparent border-amber-200/90 dark:border-amber-900/50',
+  yellow: '!bg-gradient-to-r !from-amber-100/90 !via-yellow-50/40 !to-transparent dark:!from-amber-950/70 dark:!via-yellow-950/20 dark:!to-transparent border-amber-200/90 dark:border-amber-900/50',
+  orange: '!bg-gradient-to-r !from-orange-100/90 !via-amber-50/40 !to-transparent dark:!from-orange-950/70 dark:!via-amber-950/20 dark:!to-transparent border-orange-200/90 dark:border-orange-900/50',
+  cyan: '!bg-gradient-to-r !from-sky-100/90 !via-cyan-50/40 !to-transparent dark:!from-sky-950/70 dark:!via-cyan-950/20 dark:!to-transparent border-sky-200/90 dark:border-sky-900/50',
+  sky: '!bg-gradient-to-r !from-sky-100/90 !via-blue-50/40 !to-transparent dark:!from-sky-950/70 dark:!via-blue-950/20 dark:!to-transparent border-sky-200/90 dark:border-sky-900/50',
+  charcoal: '!bg-gradient-to-r !from-zinc-200/80 !via-zinc-100/40 !to-transparent dark:!from-zinc-900/80 dark:!via-zinc-900/30 dark:!to-transparent border-gray-200/90 dark:border-zinc-800',
+  ink: '!bg-gradient-to-r !from-zinc-200/80 !via-zinc-100/40 !to-transparent dark:!from-zinc-900/80 dark:!via-zinc-900/30 dark:!to-transparent border-gray-200/90 dark:border-zinc-800',
+  default: '!bg-gradient-to-r !from-blue-100/90 !via-indigo-50/40 !to-transparent dark:!from-blue-950/70 dark:!via-indigo-950/20 dark:!to-transparent border-blue-200/90 dark:border-blue-900/50',
+};
+
 export const BLOG_TONE_TOKENS: Record<BlogTone, ToneColorToken> = {
   // 1. Purple (Indigo): 보상스쿨 피드백 & 실무 인사이트, 최고 권위 의학/법률 전문성
   purple: {

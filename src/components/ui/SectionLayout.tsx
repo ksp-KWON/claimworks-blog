@@ -3,8 +3,9 @@ import Link from 'next/link';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumHeading from '@/components/ui/PremiumHeading';
 import AppIcon, { type AppIconName } from '@/components/ui/AppIcon';
+import { HEADER_BOX_GRADIENTS, type UIThemeColor } from '@/lib/blog-tokens';
 
-export type SectionThemeColor = 'red' | 'rose' | 'blue' | 'cyan' | 'green' | 'teal' | 'orange' | 'purple' | 'indigo' | 'yellow' | 'charcoal' | 'ink' | 'default';
+export type SectionThemeColor = UIThemeColor;
 
 interface SectionLayoutProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title: React.ReactNode;
@@ -21,26 +22,11 @@ interface SectionLayoutProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   watermarkIcon?: AppIconName;
 }
 
-const gradientBackgrounds: Record<SectionThemeColor, string> = {
-  blue: '!bg-gradient-to-r !from-blue-50/90 !via-indigo-50/40 !to-transparent dark:!from-blue-950/40 dark:!via-indigo-950/20 dark:!to-transparent',
-  rose: '!bg-gradient-to-r !from-rose-50/90 !via-pink-50/40 !to-transparent dark:!from-rose-950/40 dark:!via-pink-950/20 dark:!to-transparent',
-  cyan: '!bg-gradient-to-r !from-sky-50/90 !via-cyan-50/40 !to-transparent dark:!from-sky-950/40 dark:!via-cyan-950/20 dark:!to-transparent',
-  red: '!bg-gradient-to-r !from-red-50/90 !via-rose-50/40 !to-transparent dark:!from-red-950/40 dark:!via-rose-950/20 dark:!to-transparent',
-  green: '!bg-gradient-to-r !from-emerald-50/90 !via-teal-50/40 !to-transparent dark:!from-emerald-950/40 dark:!via-teal-950/20 dark:!to-transparent',
-  orange: '!bg-gradient-to-r !from-orange-50/90 !via-amber-50/40 !to-transparent dark:!from-orange-950/40 dark:!via-amber-950/20 dark:!to-transparent',
-  teal: '!bg-gradient-to-r !from-teal-50/90 !via-emerald-50/40 !to-transparent dark:!from-teal-950/40 dark:!via-emerald-950/20 dark:!to-transparent',
-  indigo: '!bg-gradient-to-r !from-indigo-50/90 !via-blue-50/40 !to-transparent dark:!from-indigo-950/40 dark:!via-blue-950/20 dark:!to-transparent',
-  purple: '!bg-gradient-to-r !from-purple-50/90 !via-indigo-50/40 !to-transparent dark:!from-purple-950/40 dark:!via-indigo-950/20 dark:!to-transparent',
-  yellow: '!bg-gradient-to-r !from-amber-50/90 !via-yellow-50/40 !to-transparent dark:!from-amber-950/40 dark:!via-yellow-950/20 dark:!to-transparent',
-  charcoal: '!bg-gradient-to-r !from-zinc-100/90 !via-zinc-50/40 !to-transparent dark:!from-zinc-900/40 dark:!via-zinc-900/20 dark:!to-transparent',
-  ink: '!bg-gradient-to-r !from-zinc-100/90 !via-zinc-50/40 !to-transparent dark:!from-zinc-900/40 dark:!via-zinc-900/20 dark:!to-transparent',
-  default: '!bg-gradient-to-r !from-blue-50/90 !via-indigo-50/40 !to-transparent dark:!from-blue-950/40 dark:!via-indigo-950/20 dark:!to-transparent'
-};
-
 const hoverColorMap: Record<SectionThemeColor, string> = {
   blue: 'hover:text-blue-600 dark:hover:text-blue-400',
   rose: 'hover:text-rose-600 dark:hover:text-rose-400',
   cyan: 'hover:text-sky-600 dark:hover:text-sky-400',
+  sky: 'hover:text-sky-600 dark:hover:text-sky-400',
   red: 'hover:text-red-600 dark:hover:text-red-400',
   green: 'hover:text-emerald-600 dark:hover:text-emerald-400',
   orange: 'hover:text-orange-600 dark:hover:text-orange-400',
@@ -48,6 +34,7 @@ const hoverColorMap: Record<SectionThemeColor, string> = {
   indigo: 'hover:text-indigo-600 dark:hover:text-indigo-400',
   purple: 'hover:text-purple-600 dark:hover:text-purple-400',
   yellow: 'hover:text-amber-600 dark:hover:text-amber-400',
+  amber: 'hover:text-amber-600 dark:hover:text-amber-400',
   charcoal: 'hover:text-zinc-900 dark:hover:text-zinc-100',
   ink: 'hover:text-zinc-900 dark:hover:text-zinc-100',
   default: 'hover:text-blue-600 dark:hover:text-blue-400'
@@ -69,14 +56,14 @@ export default function SectionLayout({
   className = '',
   ...props
 }: SectionLayoutProps) {
-  const gradientClass = gradientBackgrounds[themeColor] || gradientBackgrounds.default;
+  const gradientClass = HEADER_BOX_GRADIENTS[themeColor] || HEADER_BOX_GRADIENTS.default;
   const linkHoverClass = hoverColorMap[themeColor] || hoverColorMap.default;
 
   return (
     <section className={`relative group/section ${className}`} {...props}>
       {/* 타이틀 박스 영역 (시그니처 파스텔 톤온톤 그라데이션) */}
       <PremiumCard 
-        borderColor={themeColor} 
+        borderColor={themeColor as any} 
         hoverEffect={true} 
         watermarkIcon={watermarkIcon}
         className={`mb-6 !p-5 sm:!p-6 group/headerbox ${gradientClass}`}
@@ -84,7 +71,7 @@ export default function SectionLayout({
         <div className={`flex items-center justify-between gap-3 ${description ? 'mb-2.5' : ''} relative z-10 group/header`}>
           <PremiumHeading 
             level={headingLevel} 
-            gradient={themeColor} 
+            gradient={themeColor as any} 
             icon={icon} 
             className="!mb-0 !text-xl sm:!text-2xl" 
             showLeftBorder={false}

@@ -65,12 +65,14 @@ function getAllPosts(): PostData[] {
         const fileContents = fs.readFileSync(fullPath, 'utf8');
         const { data, content } = matter(fileContents);
 
-        // YAML frontmatter에서 category가 문자열 또는 배열로 올 수 있어 문자열로 정규화
-        const normalizeToString = (val: unknown): string => {
-          if (Array.isArray(val)) return val.filter(Boolean).join(', ');
-          if (typeof val === 'string') return val;
-          return val ? String(val) : '';
-        };
+        // YAML frontmatter 단일 표준 (category: string[])
+        const rawCategory = data.category;
+        const categories: string[] = Array.isArray(rawCategory)
+          ? rawCategory.filter(Boolean).map(String)
+          : (typeof rawCategory === 'string' && rawCategory.trim() ? [rawCategory.trim()] : ['보상가이드']);
+
+        const mainCategory = categories[0] || '보상가이드';
+        const specialtyCat = categories[1] || (typeof data.specialtyCategory === 'string' ? data.specialtyCategory : '');
 
         return {
           slug,
@@ -79,10 +81,10 @@ function getAllPosts(): PostData[] {
           isoDate: data.date ? new Date(data.date).toISOString() : '',
           updatedAt: data.updatedAt ? formatDate(data.updatedAt) : undefined,
           summary: data.summary || '',
-          category: normalizeToString(data.category),
+          category: mainCategory,
           caseNumber: data.caseNumber || '',
-          regionCategory: normalizeToString(data.regionCategory),
-          specialtyCategory: normalizeToString(data.specialtyCategory),
+          regionCategory: typeof data.regionCategory === 'string' ? data.regionCategory : '',
+          specialtyCategory: specialtyCat,
           tags: Array.isArray(data.tags)
             ? data.tags.filter((t): t is string => typeof t === 'string')
             : [],

@@ -34,6 +34,35 @@ function processPost(filePath) {
     data.summary = s;
   }
 
+  // ── [1-1. Frontmatter category 단일 표준화 (string[] Monomorphic SSOT)] ──
+  let categories = [];
+  if (Array.isArray(data.category)) {
+    categories = data.category.map(c => String(c).trim()).filter(Boolean);
+  } else if (typeof data.category === 'string' && data.category.trim()) {
+    categories = [data.category.trim()];
+  }
+
+  if (data.specialtyCategory && typeof data.specialtyCategory === 'string' && data.specialtyCategory.trim()) {
+    const spec = data.specialtyCategory.trim();
+    if (!categories.includes(spec)) {
+      categories.push(spec);
+    }
+  }
+
+  if (categories.length === 0) {
+    categories = ['보상가이드'];
+  }
+
+  data.category = categories;
+  delete data.specialtyCategory; // 단일 표준 배열로 완전 통합 후 레거시 키 영구 삭제
+
+  // ── [1-2. Frontmatter tags 정규화 (string[] 표준)] ────────────────────
+  if (typeof data.tags === 'string') {
+    data.tags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
+  } else if (!Array.isArray(data.tags)) {
+    data.tags = [];
+  }
+
   // ── [2. 상투적 더미 멘트 박스 및 AI 메모 청소] ──────────────────────────
   body = body.replace(
     />\s*###\s*(?:💡|👨‍⚖️|⚖️)?\s*보상스쿨\s*실무쟁점[\s\S]*?(?=\r?\n\r?\n(?:##|#|[^\n>])|$)/gi,

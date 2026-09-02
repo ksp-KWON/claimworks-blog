@@ -150,24 +150,32 @@ function assembleArticlePrompt({
   const topicSpecialty = safeTopic.specialtyCategory || '(해당 없음)';
   const topicTags = Array.isArray(safeTopic.tags) ? safeTopic.tags.join(', ') : (safeTopic.tags || '');
 
-  let modeInstruction = '';
-  if (mode.includes('naver')) {
-    modeInstruction = `[네이버 블로그 D.I.A.+ 전용 원고 각색 특명 (8대 옴니-인지 프로토콜)]
-1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 상법/약관 대원칙(Step-Back)과 피해자 고충을 먼저 규정하고, 1:1 상담 대화체와 모바일 스토리텔링 전략을 thoughtProcess에 1~2문장으로 콤팩트하게 기술하십시오.
-2. [2단계: 정밀 실행 및 연쇄 추론 (CoT & ReAct & PoT)]: 인과관계 사슬(CoT)과 수치 연산(PoT)으로 2~3줄 단위의 부드러운 가독성과 4대 본문 챕터 + 6대 헌법 무기를 완벽 집필하십시오.
-3. [3단계: 자가 비판 및 일관성 검증 (Reflexion & Self-Consistency)]: 네이버 스마트에디터 호환성, 팩트 무결성, 순수 텍스트(이모지 전면 배제)를 자체 검증하십시오.`;
-  } else {
-    modeInstruction = `[구글 E-E-A-T 최고 권위 전문 칼럼 창작 특명 (8대 옴니-인지 프로토콜)]
-1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 사안의 세부 사실 이전에 상법/표준약관의 대원칙(Step-Back)을 먼저 규정하고, 보험사 면책 주장 vs 손해사정사 반박 논리를 2갈래 이상 분기 탐색(ToT/GoT)하여 thoughtProcess에 1~2문장으로 콤팩트하게 기술하십시오.
-2. [2단계: 정밀 실행 및 연쇄 추론 (CoT & ReAct & PoT)]: 원인 ➔ 진단 ➔ 면책 ➔ 반박 ➔ 장해 ➔ 보상의 필연적 인과관계 사슬(CoT)과 정확한 손해액 산출(PoT)을 4대 본문 챕터(1·2·3·4번)와 6대 무기에 담아 정밀 집필하십시오.
-3. [3단계: 자가 비판 및 일관성 검증 (Reflexion & Self-Consistency)]: 헌법 제10조(GFM 시맨틱 위계), 제1조(이모지 전면 배제), 대법원 판례 팩트 무결성을 스스로 교차 검증(Reflexion)하십시오.`;
-  }
-
   const precedentInfo = precedent
     ? `\n* 분석 대상 판례: ${precedent.caseName || precedent.title || ''} (${precedent.caseNumber || precedent.caseNo || precedent.id || ''})\n* 판례 요지: ${precedent.summary || precedent.judgmentSummary || precedent.content || ''}\n`
     : '';
 
   const rawSection = rawInput ? `\n[사용자 원문 / 참고 자료]\n${rawInput}\n` : '';
+
+  // 🟢 [네이버 모드 100% 무손실 격리 분기] : 구글 STRICT_RULES와 뼈대를 일절 섞지 않고 네이버 마스터 전문만 주입!
+  if (mode.includes('naver')) {
+    const { naverBlogPrompt } = require('./naver-blog-prompt.js');
+    return `${naverBlogPrompt}
+
+[기획안 메타데이터 및 원본 자료]
+* 제목/주제: ${topicTitle}
+* 카테고리: ${topicCategory}
+* 전문 진료과목: ${topicSpecialty}
+* 태그: ${topicTags}
+${precedentInfo}${rawSection}
+
+위의 네이버 블로그 전용 규칙과 인용 원칙을 100% 엄격히 준수하여 네이버 블로그 원고를 완성하십시오.`;
+  }
+
+  // 🟢 [구글 모드 100% 격리 분기] : 기존의 최고 권위 E-E-A-T 구조 100% 보존
+  const modeInstruction = `[구글 E-E-A-T 최고 권위 전문 칼럼 창작 특명 (8대 옴니-인지 프로토콜)]
+1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 사안의 세부 사실 이전에 상법/표준약관의 대원칙(Step-Back)을 먼저 규정하고, 보험사 면책 주장 vs 손해사정사 반박 논리를 2갈래 이상 분기 탐색(ToT/GoT)하여 thoughtProcess에 1~2문장으로 콤팩트하게 기술하십시오.
+2. [2단계: 정밀 실행 및 연쇄 추론 (CoT & ReAct & PoT)]: 원인 ➔ 진단 ➔ 면책 ➔ 반박 ➔ 장해 ➔ 보상의 필연적 인과관계 사슬(CoT)과 정확한 손해액 산출(PoT)을 4대 본문 챕터(1·2·3·4번)와 6대 무기에 담아 정밀 집필하십시오.
+3. [3단계: 자가 비판 및 일관성 검증 (Reflexion & Self-Consistency)]: 헌법 제10조(GFM 시맨틱 위계), 제1조(이모지 전면 배제), 대법원 판례 팩트 무결성을 스스로 교차 검증(Reflexion)하십시오.`;
 
   return `${getExpertRole()}
 

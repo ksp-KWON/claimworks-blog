@@ -134,6 +134,27 @@ A : 손해사정 전문가 관점의 명쾌하고 친절한 답변
 `;
 }
 
+// ── 3-1. 네이버 3대 오프닝 진입 유형 지침 (추상적 역할 지침 정의) ───────────
+const NAVER_OPENING_HOOKS = [
+  {
+    type: '상반된 두 사례 병치형 (CONTRAST)',
+    instruction: '유사한 사고나 진단 상황임에도 불구하고 초기 대응과 의무기록 입증 방식의 차이로 인해 전혀 다른 보상 결과를 맞이한 두 가상 사례를 대조하며 문을 여십시오. (인물과 1인칭 화자는 2~3번째 문장 이후에 배치)'
+  },
+  {
+    type: '구체적 딜레마 질문형 (DILEMMA)',
+    instruction: '피해자가 일상이나 치료 과정에서 실제로 마주하게 되는 구체적인 진단명·약관 해석상의 딜레마 질문을 던지며 문을 여십시오. (인물과 1인칭 화자는 2~3번째 문장 이후에 배치)'
+  },
+  {
+    type: '특정 수치·사건 직진입형 (METRIC)',
+    instruction: '최초 청구액과 보험사 삭감액의 구체적 차이나 결정적인 사고 순간의 팩트 서술로 지체 없이 곧바로 진입하십시오. (인물과 1인칭 화자는 2~3번째 문장 이후에 배치)'
+  }
+];
+
+function getRandomNaverOpeningHook() {
+  const idx = Math.floor(Math.random() * NAVER_OPENING_HOOKS.length);
+  return NAVER_OPENING_HOOKS[idx];
+}
+
 // ── 4. [단일 통합 프롬프트 팩토리] (Unified Prompt Factory) ───────────
 function assembleArticlePrompt({
   mode = 'auto-generate',
@@ -159,7 +180,13 @@ function assembleArticlePrompt({
   // 🟢 [네이버 모드 100% 무손실 격리 분기] : 구글 STRICT_RULES와 뼈대를 일절 섞지 않고 네이버 마스터 전문만 주입!
   if (mode.includes('naver')) {
     const { naverBlogPrompt } = require('./naver-blog-prompt.js');
+    const selectedHook = getRandomNaverOpeningHook();
+
     return `${naverBlogPrompt}
+
+[이번 글의 필수 오프닝 진입 유형 지정]
+* 지정된 오프닝 유형 : ${selectedHook.type}
+* 오프닝 집필 지침 : ${selectedHook.instruction}
 
 [기획안 메타데이터 및 원본 자료]
 * 제목/주제: ${topicTitle}
@@ -168,7 +195,7 @@ function assembleArticlePrompt({
 * 태그: ${topicTags}
 ${precedentInfo}${rawSection}
 
-위의 네이버 블로그 전용 규칙과 인용 원칙을 100% 엄격히 준수하여 네이버 블로그 원고를 완성하십시오.`;
+위의 네이버 블로그 전용 규칙과 [지정된 오프닝 진입 유형]을 100% 엄격히 준수하여 네이버 블로그 원고를 완성하십시오.`;
   }
 
   // 🟢 [구글 모드 100% 격리 분기] : 기존의 최고 권위 E-E-A-T 구조 100% 보존

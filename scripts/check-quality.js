@@ -136,10 +136,12 @@ function processPost(filePath) {
         .filter(Boolean)
         .map((l) => {
           let text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').replace(/^>\s*/, '').trim();
-          text = text.replace(/^(?:\*\*)?\[?\s*핵심\s*쟁점\s*\d+\s*\]?(?:\*\*)?\s*\*+\s*:\s*/gi, '');
-          text = text.replace(/^\[?\s*핵심\s*쟁점\s*\d+\s*\]?\s*:\s*/gi, '');
+          text = text.replace(/^(?:\*\*)?\[?\s*핵심\s*쟁점\s*\d*\s*\]?(?:\*\*)?\s*\*+\s*:\s*/gi, '');
+          text = text.replace(/^\[?\s*핵심\s*쟁점\s*\d*\s*\]?\s*:\s*/gi, '');
           text = text.replace(/^\[[^\n\]]+\]\s*\*+\s*:\s*/, '');
           text = text.replace(/^[💡🎯📌⭐🛡️✅☑️✔]+\s*/, '');
+          // '핵심 키워드 1 : ', '핵심 키워드 : ' 등 무의미한 더미 키워드 접두사 제거
+          text = text.replace(/^(?:\*\*)?핵심\s*키워드\s*\d*(?:\*\*)?\s*[:：]\s*/i, '');
           if (!text) return '';
           return `> - ${text.trim()}`;
         })

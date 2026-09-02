@@ -247,11 +247,9 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   const normalizeMarkdownBold = (str: string): string => {
     if (!str) return '';
     let normalized = str;
-    normalized = normalized.replace(/\*{3,}([^*]+?)\*{2,}/g, '**$1**');
-    normalized = normalized.replace(/\*{2,}([^*]+?)\*{3,}/g, '**$1**');
-    normalized = normalized.replace(/\*\*\s+([^*]+?)\*\*/g, '**$1**');
-    normalized = normalized.replace(/\*\*([^*]+?)\s+\*\*/g, '**$1**');
-    normalized = normalized.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+    normalized = normalized.replace(/\*{3,}([^\n*]+?)\*{2,}/g, '**$1**');
+    normalized = normalized.replace(/\*{2,}([^\n*]+?)\*{3,}/g, '**$1**');
+    normalized = normalized.replace(/\*\*([^\n*]+?)\*\*/g, '<strong>$1</strong>');
     return normalized;
   };
   

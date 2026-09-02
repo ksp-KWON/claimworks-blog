@@ -250,10 +250,8 @@ function processPost(filePath) {
   body = body.replace(/(\d+\.\s*\*\*[^*]+\*\*\s*:[^\n]+)(\n)(\d+\.)/g, '$1\n\n$3');
 
   // ── [13-2. 마크다운 별표(Bold) 문법 정밀 표준화] ──────────────────────
-  body = body.replace(/\*{3,}([^*]+?)\*{2,}/g, '**$1**');
-  body = body.replace(/\*{2,}([^*]+?)\*{3,}/g, '**$1**');
-  body = body.replace(/\*\*\s+([^*]+?)\*\*/g, '**$1**');
-  body = body.replace(/\*\*([^*]+?)\s+\*\*/g, '**$1**');
+  body = body.replace(/\*{3,}([^\n*]+?)\*{2,}/g, '**$1**');
+  body = body.replace(/\*{2,}([^\n*]+?)\*{3,}/g, '**$1**');
   body = body.replace(/^>\s*\*\*([^*:\n]+)\*\s*:/gm, '> **$1** :');
 
   // ── [14. 스마트 문단 호흡 정규화 (GFM Paragraph Breathing Rule)] ─────────

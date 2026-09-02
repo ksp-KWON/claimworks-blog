@@ -244,21 +244,21 @@ export function parseBlogPost(content: string): ParsedBlogPost {
     pushCurrentSection();
   }
 
-  const normalizeMarkdownBold = (str: string): string => {
+  const sanitizeMarkdownInline = (str: string): string => {
     if (!str) return '';
     let normalized = str;
+    // 3개 이상 과도한 별표 오타만 마크다운 표준 볼드(**)로 정돈
     normalized = normalized.replace(/\*{3,}([^\n*]+?)\*{2,}/g, '**$1**');
     normalized = normalized.replace(/\*{2,}([^\n*]+?)\*{3,}/g, '**$1**');
-    normalized = normalized.replace(/\*\*([^\n*]+?)\*\*/g, '<strong>$1</strong>');
     return normalized;
   };
   
-  result.sections = result.sections.map(normalizeMarkdownBold);
-  result.keyPoints = result.keyPoints.map(normalizeMarkdownBold);
-  result.checklistItems = result.checklistItems.map(normalizeMarkdownBold);
+  result.sections = result.sections.map(sanitizeMarkdownInline);
+  result.keyPoints = result.keyPoints.map(sanitizeMarkdownInline);
+  result.checklistItems = result.checklistItems.map(sanitizeMarkdownInline);
   result.faqItems = result.faqItems.map(faq => ({ 
-    q: normalizeMarkdownBold(faq.q), 
-    a: normalizeMarkdownBold(faq.a) 
+    q: sanitizeMarkdownInline(faq.q), 
+    a: sanitizeMarkdownInline(faq.a) 
   }));
 
   const groupRelatedLinks = (text: string) => {
@@ -268,12 +268,12 @@ export function parseBlogPost(content: string): ParsedBlogPost {
   };
 
   if (result.opening) {
-    result.opening = groupRelatedLinks(normalizeMarkdownBold(result.opening));
+    result.opening = groupRelatedLinks(sanitizeMarkdownInline(result.opening));
   }
   result.sections = result.sections.map(groupRelatedLinks);
 
   if (!result.opening && result.sections.length === 0 && content.trim()) {
-    result.sections = [groupRelatedLinks(normalizeMarkdownBold(content.trim()))];
+    result.sections = [groupRelatedLinks(sanitizeMarkdownInline(content.trim()))];
   }
 
   return result;

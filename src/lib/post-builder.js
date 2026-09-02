@@ -229,6 +229,26 @@ function getKSTDateTimeString(date = new Date()) {
   return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}+09:00`;
 }
 
+/**
+ * 저장 직전 마크다운 W3C 시맨틱 무결성 게이트키퍼 (Ingestion Gatekeeper)
+ * - AI가 작성한 본문이 디스크에 저장되기 직전, 헤딩 유착 및 표준 빈 줄을 사전 정제
+ */
+function sanitizeMarkdownBeforeSave(rawContent) {
+  if (!rawContent) return '';
+  let body = String(rawContent).trim();
+
+  // 1. 헤딩 뒤에 엔터 없이 본문/볼드가 붙어버린 결함 사전 분리 (예: ### 소제목**본문**)
+  body = body.replace(/^(#{2,4}[^\n\r*]+)(\*\*[가-힣A-Za-z0-9])/gm, '$1\n\n$2');
+
+  // 2. 헤딩(##, ###) 뒤에 바로 다음 줄에 본문이 붙은 경우 표준 빈 줄 1개(\n\n) 보장
+  body = body.replace(/^(#{2,4}[^\n\r]+)\r?\n([^\r\n#>-|])/gm, '$1\n\n$2');
+
+  // 3. 3개 이상 과도한 빈 줄을 2개(표준 빈 줄 1개)로 정돈
+  body = body.replace(/(?:\r?\n){3,}/g, '\n\n');
+
+  return body.trim();
+}
+
 function saveMarkdownPost(topic, summary, content, additionalFrontmatter = {}) {
   const uniqueSlug = resolveUniqueSlug(topic.slug);
   topic.slug = uniqueSlug;
@@ -248,8 +268,11 @@ function saveMarkdownPost(topic, summary, content, additionalFrontmatter = {}) {
     fmData.category.push(topic.specialtyCategory);
   }
 
+  // 저장 직전 사전 예방 무결성 정제 적용
+  const sanitizedContent = sanitizeMarkdownBeforeSave(content);
+
   // gray-matter를 이용한 직렬화
-  const fullContent = matter.stringify(content, fmData);
+  const fullContent = matter.stringify(sanitizedContent, fmData);
 
   const filePath = path.join(POSTS_DIR, `${uniqueSlug}.md`);
   if (!fs.existsSync(POSTS_DIR)) fs.mkdirSync(POSTS_DIR, { recursive: true });

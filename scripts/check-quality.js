@@ -232,6 +232,9 @@ function processPost(filePath) {
   body = body.replace(/##\s*([1-9])\.\s*\[([^\]\n]+)\]/g, '## $1. $2');
   body = body.replace(/##\s*1분\s*자가진단\s*:\s*\[([^\]\n]+)\]/g, '## 1분 자가진단 : $1');
 
+  // ── [11-4. H2/H3/H4 헤딩 뒤에 본문 볼드(**)가 줄바꿈 없이 붙은 결함 분리] ─
+  body = body.replace(/^(#{2,4}[^\n\r*]+)(\*\*[가-힣A-Za-z0-9])/gm, '$1\n\n$2');
+
   // ── [12. 마크다운 표(Table) 구분선 및 행 오타 자동 교정] ────────────────
   body = body.replace(/(\|(?:\s*:?-+:?\s*\|)+)\s*>[ \t]*/g, '$1\n');
   body = body.replace(/(\|.*\|)\r?\n[ \t]*\r?\n+(\s*\|)/g, '$1\n$2');

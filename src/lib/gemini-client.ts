@@ -16,19 +16,19 @@ const MODEL_TIERS = [
     tier: 'flash' as const,
     // "flash"가 있고 "lite"가 없는 모델 = 풀사이즈 Flash 계열
     match: (name: string) => /gemini/i.test(name) && /flash/i.test(name) && !/lite/i.test(name) && isPureTextModel(name),
-    maxTokensFallback: 32768,
+    maxTokensFallback: 65536,
   },
   {
     tier: 'lite' as const,
     // "flash"와 "lite"가 모두 포함된 모델 = Flash-Lite 계열
     match: (name: string) => /gemini/i.test(name) && /flash/i.test(name) && /lite/i.test(name) && isPureTextModel(name),
-    maxTokensFallback: 16384,
+    maxTokensFallback: 32768,
   },
   {
     tier: 'pro' as const,
     // "pro" 계열 (비상 대타)
     match: (name: string) => /gemini/i.test(name) && /pro/i.test(name) && !/lite/i.test(name) && isPureTextModel(name),
-    maxTokensFallback: 32768,
+    maxTokensFallback: 65536,
   },
 ];
 
@@ -47,13 +47,13 @@ function compareDesc(a: { name: string }, b: { name: string }) {
 
 // ── 내장 기본값 폴백 (탐색 실패 시 안전망) ───────────────────────────
 const FALLBACK_MODELS = [
-  { name: 'gemini-2.5-flash',      maxTokens: 32768, tier: 'flash' as const },
-  { name: 'gemini-2.0-flash',      maxTokens: 32768, tier: 'flash' as const },
-  { name: 'gemini-1.5-flash',      maxTokens: 32768, tier: 'flash' as const },
-  { name: 'gemini-2.5-flash-lite', maxTokens: 16384, tier: 'lite' as const },
-  { name: 'gemini-2.0-flash-lite', maxTokens: 16384, tier: 'lite' as const },
-  { name: 'gemini-1.5-flash-lite', maxTokens: 16384, tier: 'lite' as const },
-  { name: 'gemini-2.5-pro',        maxTokens: 32768, tier: 'pro' as const },
+  { name: 'gemini-2.5-flash',      maxTokens: 65536, tier: 'flash' as const },
+  { name: 'gemini-2.0-flash',      maxTokens: 65536, tier: 'flash' as const },
+  { name: 'gemini-1.5-flash',      maxTokens: 65536, tier: 'flash' as const },
+  { name: 'gemini-2.5-flash-lite', maxTokens: 32768, tier: 'lite' as const },
+  { name: 'gemini-2.0-flash-lite', maxTokens: 32768, tier: 'lite' as const },
+  { name: 'gemini-1.5-flash-lite', maxTokens: 32768, tier: 'lite' as const },
+  { name: 'gemini-2.5-pro',        maxTokens: 65536, tier: 'pro' as const },
 ];
 
 let _cachedModels: typeof FALLBACK_MODELS | null = null;
@@ -181,7 +181,17 @@ export async function callGeminiClient(
         const data = await res.json();
         if (data.error) throw new Error(data.error.message);
 
-        const text = (data.candidates?.[0]?.content?.parts ?? [])
+        const candidate = data.candidates?.[0];
+        const finishReason = candidate?.finishReason;
+
+        // Google 공식 표준: 정상 완료('STOP')가 아니면(예: 'MAX_TOKENS', 'SAFETY') 미완결로 판정하고 릴레이 전환
+        if (finishReason && finishReason !== 'STOP') {
+          lastErrorMessage = `[${model}] 생성 미완결 (finishReason: ${finishReason})`;
+          if (attempt < MAX_RETRIES) { await sleep(1500); continue; }
+          break; // 다음 모델로 바통 터치
+        }
+
+        const text = (candidate?.content?.parts ?? [])
           .map((p: any) => p.text ?? '')
           .join('');
 

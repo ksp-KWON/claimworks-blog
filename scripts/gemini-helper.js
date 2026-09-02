@@ -19,17 +19,17 @@ const MODEL_TIERS = [
   {
     tier: 'flash',
     match: name => /gemini/i.test(name) && /flash/i.test(name) && !/lite/i.test(name) && isPureTextModel(name),
-    maxTokensFallback: 32768,
+    maxTokensFallback: 65536,
   },
   {
     tier: 'lite',
     match: name => /gemini/i.test(name) && /flash/i.test(name) && /lite/i.test(name) && isPureTextModel(name),
-    maxTokensFallback: 16384,
+    maxTokensFallback: 32768,
   },
   {
     tier: 'pro',
     match: name => /gemini/i.test(name) && /pro/i.test(name) && !/lite/i.test(name) && isPureTextModel(name),
-    maxTokensFallback: 32768,
+    maxTokensFallback: 65536,
   },
 ];
 
@@ -55,13 +55,13 @@ function compareVersionsDesc(a, b) {
 
 // ── 내장 기본값 폴백 (탐색 실패 시 안전망) ───────────────────────────────────
 const FALLBACK_MODELS = [
-  { name: 'gemini-2.5-flash',      maxTokens: 32768, tier: 'flash' },
-  { name: 'gemini-2.0-flash',      maxTokens: 32768, tier: 'flash' },
-  { name: 'gemini-1.5-flash',      maxTokens: 32768, tier: 'flash' },
-  { name: 'gemini-2.5-flash-lite', maxTokens: 16384, tier: 'lite' },
-  { name: 'gemini-2.0-flash-lite', maxTokens: 16384, tier: 'lite' },
-  { name: 'gemini-1.5-flash-lite', maxTokens: 16384, tier: 'lite' },
-  { name: 'gemini-2.5-pro',        maxTokens: 32768, tier: 'pro' },
+  { name: 'gemini-2.5-flash',      maxTokens: 65536, tier: 'flash' },
+  { name: 'gemini-2.0-flash',      maxTokens: 65536, tier: 'flash' },
+  { name: 'gemini-1.5-flash',      maxTokens: 65536, tier: 'flash' },
+  { name: 'gemini-2.5-flash-lite', maxTokens: 32768, tier: 'lite' },
+  { name: 'gemini-2.0-flash-lite', maxTokens: 32768, tier: 'lite' },
+  { name: 'gemini-1.5-flash-lite', maxTokens: 32768, tier: 'lite' },
+  { name: 'gemini-2.5-pro',        maxTokens: 65536, tier: 'pro' },
 ];
 
 let _discoveredModels = null;
@@ -211,6 +211,16 @@ async function callGemini(prompt, schema = null, targetTier = 'auto') {
       }
 
       const candidate    = data?.candidates?.[0];
+      const finishReason = candidate?.finishReason;
+
+      // Google 공식 표준: 정상 완료('STOP')가 아니면(예: 'MAX_TOKENS', 'SAFETY') 미완결로 판정하고 릴레이 전환
+      if (finishReason && finishReason !== 'STOP') {
+        lastError = `[${model}] 생성 미완결 (finishReason: ${finishReason})`;
+        console.warn(`  [절단 감지] ${model} 비정상 종료 (${finishReason}) — 차순위 최적 모델로 릴레이 전환합니다.`);
+        if (attempt < RETRY_CONFIG.maxRetries) { await sleep(1500); continue; }
+        continue modelLoop;
+      }
+
       const text         = (candidate?.content?.parts ?? []).map(p => p.text ?? '').join('');
 
       if (!text) {

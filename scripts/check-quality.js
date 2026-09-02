@@ -47,7 +47,7 @@ function processPost(filePath) {
 
   // ── [3. 오프닝 & 핵심 요약 순서 교정 및 배치 보장] ───────────────────
   // 오프닝 문단이 ## 핵심 요약보다 위에 있는 경우 순서를 표준(## 핵심 요약 -> 오프닝)으로 자동 교정
-  const keyPointOrderMatch = body.match(/(?:^|\r?\n)(##\s*(?:💡|🎯)?\s*(?:핵심\s*요약|핵심요약|핵심\s*포인트)[^\n]*\r?\n+(?:[ \t]*>?[ \t]*[-*+].*\r?\n*)+)/i);
+  const keyPointOrderMatch = body.match(/(?:^|\r?\n)(##\s*(?:💡|🎯)?\s*(?:핵심\s*요약|핵심요약|핵심\s*포인트)[^\n]*\r?\n+(?:[ \t]*>.*(?:\r?\n|$))+)/i);
   if (keyPointOrderMatch && keyPointOrderMatch.index > 0) {
     const beforeKeyPoints = body.slice(0, keyPointOrderMatch.index).trim();
     const keyPointsBlock = keyPointOrderMatch[1].trim();
@@ -64,7 +64,7 @@ function processPost(filePath) {
     hasOpeningText = true;
   } else if (/^##\s*(?:💡|🎯)?\s*핵심\s*요약/i.test(trimmedBody)) {
     // 핵심 요약 블록 제거 후 첫 번째 ## H2 이전 영역에 일반 문단이 있는지 확인
-    const afterSummary = trimmedBody.replace(/^##\s*(?:💡|🎯)?\s*핵심\s*요약[^\n]*\r?\n+(?:[ \t]*>?[ \t]*[-*+].*\r?\n*)+/i, '').trim();
+    const afterSummary = trimmedBody.replace(/^##\s*(?:💡|🎯)?\s*핵심\s*요약[^\n]*\r?\n+(?:[ \t]*>.*(?:\r?\n|$))+/i, '').trim();
     const firstH2Match = afterSummary.match(/^##\s+/m);
     const introPart = firstH2Match && firstH2Match.index !== undefined ? afterSummary.slice(0, firstH2Match.index).trim() : afterSummary;
     const hasParagraph = introPart.split(/\r?\n/).some(l => {
@@ -79,7 +79,7 @@ function processPost(filePath) {
   if (!hasOpeningText) {
     const fallbackOpening = data.summary || '보험금 청구와 손해사정 실무에서 피보험자의 정당한 권익을 보호하기 위한 핵심 법리와 대응 전략을 상세히 안내해 드립니다.';
     if (/^##\s*(?:💡|🎯)?\s*핵심\s*요약/i.test(trimmedBody)) {
-      body = body.replace(/(##\s*(?:💡|🎯)?\s*핵심\s*요약[^\n]*\r?\n+(?:[ \t]*>?[ \t]*[-*+].*\r?\n*)+)/i, `$1\n${fallbackOpening}\n\n`);
+      body = body.replace(/(##\s*(?:💡|🎯)?\s*핵심\s*요약[^\n]*\r?\n+(?:[ \t]*>.*(?:\r?\n|$))+)/i, `$1\n${fallbackOpening}\n\n`);
     } else {
       body = `${fallbackOpening}\n\n${body.trim()}`;
     }
@@ -99,20 +99,22 @@ function processPost(filePath) {
 
   // ── [5. 핵심 요약 박스 순수 텍스트 정규화 (💡 제거 및 불릿 래핑)] ─────────
   body = body.replace(
-    /(##\s*(?:💡\s*|🎯\s*)?(?:핵심\s*요약|핵심요약|핵심\s*포인트)\s*\r?\n+)((?:[ \t]*>?[ \t]*[-*+].*\r?\n*)+)/g,
+    /(##\s*(?:💡\s*|🎯\s*)?(?:핵심\s*요약|핵심요약|핵심\s*포인트)\s*\r?\n+)((?:[ \t]*>.*(?:\r?\n|$))+)/gi,
     (m, head, bullets) => {
       const cleanBullets = bullets
         .split(/\r?\n/)
         .map((l) => l.trim())
         .filter(Boolean)
         .map((l) => {
-          let text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').trim();
+          let text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').replace(/^>\s*/, '').trim();
           text = text.replace(/^(?:\*\*)?\[?\s*핵심\s*쟁점\s*\d+\s*\]?(?:\*\*)?\s*\*+\s*:\s*/gi, '');
           text = text.replace(/^\[?\s*핵심\s*쟁점\s*\d+\s*\]?\s*:\s*/gi, '');
           text = text.replace(/^\[[^\n\]]+\]\s*\*+\s*:\s*/, '');
           text = text.replace(/^[💡🎯📌⭐🛡️✅☑️✔]+\s*/, '');
+          if (!text) return '';
           return `> - ${text.trim()}`;
         })
+        .filter(Boolean)
         .join('\n');
       return `## 핵심 요약\n${cleanBullets}\n\n`;
     }

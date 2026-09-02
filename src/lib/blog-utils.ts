@@ -141,23 +141,34 @@ export function parseBlogPost(content: string): ParsedBlogPost {
     // 2. 상태별 라인 처리
     if (currentSectionType === 'KEY_POINTS') {
       const cleanLine = trimmed.replace(/^[> \t]+/, '').trim();
-      const isBullet = /^[-*+]\s+/.test(cleanLine) || /^[🛡️💡✅☑️⭐]/.test(cleanLine);
 
-      if (isBullet && result.keyPoints.length < 3 && cleanLine) {
-        const text = cleanLine.replace(/^[-*+]\s*/, '').replace(/^[🛡️💡✅☑️⭐]+\s*/, '').trim();
+      // 빈 줄이면 계속 KEY_POINTS 상태를 유지하며 다음 라인 대기 (조기 탈출 방지)
+      if (!cleanLine) {
+        continue;
+      }
+
+      // 인용구/불릿 여부 검사 (-, *, +, 이모지, > 인용구 내 볼드 등)
+      const isBulletOrQuote =
+        /^[-*+]\s*/.test(cleanLine) ||
+        /^[🛡️💡✅☑️⭐📌]/.test(cleanLine) ||
+        trimmed.startsWith('>') ||
+        /^\*\*[^*]+\*\*/.test(cleanLine);
+
+      if (isBulletOrQuote) {
+        const text = cleanLine
+          .replace(/^[-*+]\s*/, '')
+          .replace(/^[🛡️💡✅☑️⭐📌]+\s*/, '')
+          .trim();
         if (text && !/^[-=_*~]{2,}$/.test(text)) {
           result.keyPoints.push(text);
           continue;
         }
       }
 
-      // 불릿이 아닌 일반 텍스트 및 빈 줄은 KEY_POINTS를 해제하고 오프닝에 온전히 보존
-      if (!isBullet) {
-        currentSectionType = 'NONE';
-        if (!hasFirstHeading) {
-          currentSectionLines.push(line);
-        }
-        continue;
+      // 불릿/인용구가 아닌 순수 일반 본문 문단이 시작되면 KEY_POINTS를 정상 종료하고 오프닝에 보존
+      currentSectionType = 'NONE';
+      if (!hasFirstHeading) {
+        currentSectionLines.push(line);
       }
       continue;
     }

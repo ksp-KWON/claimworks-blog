@@ -28,7 +28,7 @@ import { generateSemanticSlug } from '@/lib/slug-utils';
 import { authenticateAdmin, checkAdminSession, clearAdminSession, getLockoutState, LockoutState } from '@/lib/admin-auth';
 import { getCategoryMeta } from '@/lib/constants/categories';
 
-function normalizeCategory(val: string) {
+function normalizeCategory(val: any) {
   return getCategoryMeta(val).name;
 }
 

@@ -170,9 +170,11 @@ export const ALL_CATEGORIES = [...COLUMN_CATEGORIES, ...SPECIALTIES];
  * getCategoryMeta
  * 카테고리명, 슬러그, 태그 등 어떤 문자열이 들어와도 18대 정규 카테고리 메타데이터를 정확히 매핑하는 단일 표준 함수
  */
-export function getCategoryMeta(input: string): CategoryMeta {
+export function getCategoryMeta(input: string | string[] | any): CategoryMeta {
   if (!input) return COLUMN_CATEGORIES[7]; // 기본 보상가이드
-  const trimmed = input.trim();
+  const raw = Array.isArray(input) ? (input[0] || '') : (typeof input === 'string' ? input : String(input));
+  if (!raw || typeof raw !== 'string') return COLUMN_CATEGORIES[7];
+  const trimmed = raw.trim();
   const decoded = decodeURIComponent(trimmed);
 
   // 1. 정확한 slug 매칭
@@ -203,19 +205,24 @@ export function getCategoryMeta(input: string): CategoryMeta {
   return COLUMN_CATEGORIES[7];
 }
 
-export function isCategoryMatch(postCategory: string, targetCategoryName: string): boolean {
+export function isCategoryMatch(postCategory: string | string[] | any, targetCategoryName: string): boolean {
   if (!postCategory || !targetCategoryName) return false;
-  const pCat = postCategory.trim();
+  const cats: string[] = Array.isArray(postCategory) 
+    ? postCategory.map((c: any) => String(c).trim()) 
+    : [String(postCategory).trim()];
   const tCat = targetCategoryName.trim();
   
-  if (tCat === '판례·분쟁조정' || tCat === '판례·법률 해석') {
-    if (pCat.includes('판례') || pCat.includes('분쟁조정') || pCat.includes('분조위') || pCat.includes('법률 해석') || pCat.includes('법률')) {
-      return true;
+  for (const pCat of cats) {
+    if (tCat === '판례·분쟁조정' || tCat === '판례·법률 해석') {
+      if (pCat.includes('판례') || pCat.includes('분쟁조정') || pCat.includes('분조위') || pCat.includes('법률 해석') || pCat.includes('법률')) {
+        return true;
+      }
     }
-  }
 
-  if (pCat === tCat) return true;
-  return pCat.includes(tCat) || tCat.includes(pCat);
+    if (pCat === tCat) return true;
+    if (pCat.includes(tCat) || tCat.includes(pCat)) return true;
+  }
+  return false;
 }
 
 export function getCategoryBySlug(slug: string): CategoryMeta | undefined {

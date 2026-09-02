@@ -87,13 +87,28 @@ export async function loadPost(githubToken: string, filename: string) {
   const rawMarkdown = decodeURIComponent(escape(window.atob(data.content)));
   
   const { content: rawContent, data: meta } = parseMarkdown(rawMarkdown);
+
+  let primaryCategory = '';
+  let specialtyCategory = meta.specialtyCategory || '';
+
+  if (Array.isArray(meta.category)) {
+    primaryCategory = meta.category[0] || '보상가이드';
+    if (!specialtyCategory && meta.category.length > 1) {
+      specialtyCategory = meta.category[1] || '';
+    }
+  } else if (typeof meta.category === 'string') {
+    primaryCategory = meta.category;
+  } else {
+    primaryCategory = '보상가이드';
+  }
+
   return {
     title: meta.title || '',
     summary: meta.summary || '',
-    category: meta.category || '기타',
+    category: primaryCategory,
     date: meta.date || new Date().toISOString().split('T')[0],
     tags: Array.isArray(meta.tags) ? meta.tags.join(', ') : (meta.tags || ''),
-    specialtyCategory: meta.specialtyCategory || '',
+    specialtyCategory: specialtyCategory,
     caseNumber: meta.caseNumber || '',
     published: meta.published !== false,
     content: rawContent,
@@ -120,16 +135,23 @@ export async function savePost(githubToken: string, data: any) {
   
   const compiledTags = data.tags ? data.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
   
-  const frontmatterData = {
+  let finalCategory: string | string[] = data.category || '보상가이드';
+  if (data.specialtyCategory && data.specialtyCategory.trim()) {
+    finalCategory = [data.category || '보상가이드', data.specialtyCategory.trim()];
+  }
+
+  const frontmatterData: Record<string, any> = {
     title: data.title,
     summary: data.summary || '',
-    category: data.category || '기타',
+    category: finalCategory,
     date: data.date || new Date().toISOString().split('T')[0],
-    specialtyCategory: data.specialtyCategory || '',
-    caseNumber: data.caseNumber || '',
     published: data.published !== false,
     tags: compiledTags
   };
+
+  if (data.caseNumber && data.caseNumber.trim()) {
+    frontmatterData.caseNumber = data.caseNumber.trim();
+  }
 
   const compiledMarkdown = stringifyMarkdown(frontmatterData, data.content);
 

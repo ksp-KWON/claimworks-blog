@@ -11,6 +11,8 @@
 
 'use strict';
 
+const { naverBlogPrompt } = require('./naver-blog-prompt.js');
+
 // ── 1. 절대 헌법 규칙 (STRICT WRITING RULES) ───────────────────────────
 const STRICT_RULES = `
 ## 1. 글로벌 표준 마크다운(GFM) & W3C 시맨틱 위계 규칙 (절대 헌법)
@@ -179,7 +181,6 @@ function assembleArticlePrompt({
 
   // 🟢 [네이버 모드 100% 무손실 격리 분기] : 구글 STRICT_RULES와 뼈대를 일절 섞지 않고 네이버 마스터 전문만 주입!
   if (mode.includes('naver')) {
-    const { naverBlogPrompt } = require('./naver-blog-prompt.js');
     const selectedHook = getRandomNaverOpeningHook();
 
     return `${naverBlogPrompt}
@@ -194,6 +195,11 @@ function assembleArticlePrompt({
 * 전문 진료과목: ${topicSpecialty}
 * 태그: ${topicTags}
 ${precedentInfo}${rawSection}
+
+[🚨 네이버 D.I.A.+ 각색 필수 원칙 (절대 준수)]
+1. [구글 6대 챕터 골격 완전 폐기]: 원본 자료에 포함된 '## 핵심 요약', '## 1. 사안의 핵심 쟁점...', '## 2. 보험사의 면책 주장...', '## 3. 의학적 발생 기전...', '## 4. 후유장해 평가 척도...', '## 1분 자가진단', '## 자주 묻는 질문', '## 결론 및 맞춤형 솔루션' 등의 구글식 챕터 번호와 헤더 구조를 100% 전면 폐기하십시오.
+2. [서사형 흐름 완결]: 번호 매겨진 대주제 대신, 발단(오프닝 훅) ➔ 전개(사건 분석 및 인과관계) ➔ 절정(구체적 전후 수치 반전) ➔ 결말(인사이트 및 CTA)의 매끄러운 1인칭 공감 스토리텔링 서사로 작성하십시오.
+3. [인물·수치 100% 각색]: 원본의 인물(나이, 성별, 직업)과 수치를 완전히 새롭게 가공하여 독창적인 네이버 블로그 원고로 완성하십시오.
 
 위의 네이버 블로그 전용 규칙과 [지정된 오프닝 진입 유형]을 100% 엄격히 준수하여 네이버 블로그 원고를 완성하십시오.`;
   }
@@ -249,12 +255,13 @@ function buildArticlePrompt(topic, arg2, arg3, arg4) {
   });
 }
 
-function buildManualPrompt(mode, aiInput, angle, existingPosts) {
+function buildManualPrompt(mode, aiInput, angle, existingPosts, topic = null) {
   return assembleArticlePrompt({
     mode,
     rawInput: aiInput,
     angle,
-    existingPosts
+    existingPosts,
+    topic
   });
 }
 

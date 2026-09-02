@@ -212,7 +212,7 @@ export async function runManualGenerationWorkflow(
   const topic = safeJsonParse(topicPlanStr);
 
   onProgress('3/3: 전문 칼럼 및 제목 창작 중 (약 25초 소요)...');
-  const generated = await callGeminiAPI(geminiKey, aiInput, mode, CONTENT_SCHEMA, ['flash', 'pro']);
+  const generated = await callGeminiAPI(geminiKey, aiInput, mode, CONTENT_SCHEMA, ['flash', 'pro'], topic);
   const { content, thoughtProcess, title: generatedTitle } = parseGeneratedContent(generated);
   if (thoughtProcess) {
     onProgress(`🧠 [사고 과정] : ${thoughtProcess.substring(0, 150)}...`);

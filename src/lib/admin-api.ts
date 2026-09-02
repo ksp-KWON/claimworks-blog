@@ -211,7 +211,7 @@ export async function deletePost(githubToken: string, filename: string, sha: str
 }
 
 
-export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: string, schema?: any, tierLimit?: ('pro'|'flash'|'lite')[]) {
+export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: string, schema?: any, tierLimit?: ('pro'|'flash'|'lite')[], topic?: any) {
   if (!geminiKey) throw new Error('Gemini API 키가 없습니다.');
   
   const angle = getRandomAngle();
@@ -221,7 +221,7 @@ export async function callGeminiAPI(geminiKey: string, aiInput: string, mode: st
   if (mode === 'auto-generate' || mode === 'keyword-extraction') {
     prompt = aiInput;
   } else {
-    prompt = buildManualPrompt(mode, aiInput, angle, []);
+    prompt = buildManualPrompt(mode, aiInput, angle, [], topic);
   }
 
   // [핵심] gemini-client.ts 의 자동 탐색(Dynamic Discovery)으로 위임

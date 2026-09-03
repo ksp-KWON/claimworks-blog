@@ -113,6 +113,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "auto: [${{ steps.set_category.outputs.category }}] 자동글쓰기 및 판례풀/금감원 뉴스 업데이트"
-          file_pattern: 'src/content/posts/*.md public/data/*.json'
+          file_pattern: 'src/content/posts/ public/data/'
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"

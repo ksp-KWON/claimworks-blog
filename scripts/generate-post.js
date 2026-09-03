@@ -23,6 +23,79 @@ const {
   saveMarkdownPost
 } = require('../src/lib/post-builder.js');
 
+// ── [판례·분쟁조정 전용 법제처 실시간 1회 안전 검증 게이트] ──────────
+async function fetchPrecedentQuick(query) {
+  if (!query) return null;
+  const endpoint = process.env.LAW_PROXY_ENDPOINT;
+  const token = process.env.LAW_PROXY_TOKEN;
+  const apiKey = process.env.LAW_API_KEY;
+
+  let listUrl = '';
+  const headers = { 'User-Agent': 'Mozilla/5.0' };
+
+  if (endpoint) {
+    listUrl = `${endpoint.trim()}/api/precedent?query=${encodeURIComponent(query)}&page=1`;
+    if (token) headers['X-Proxy-Token'] = token.trim();
+  } else if (apiKey) {
+    listUrl = `https://www.law.go.kr/DRF/lawSearch.do?target=prec&type=XML&OC=${apiKey}&search=2&query=${encodeURIComponent(query)}`;
+  } else {
+    return null;
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6000);
+    const res = await fetch(listUrl, { headers, signal: controller.signal });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+
+    const xml = await res.text();
+    if (xml.includes('사용자 정보 검증에 실패하였습니다') || !xml.includes('<판례일련번호>')) return null;
+
+    const idMatch = xml.match(/<판례일련번호>([^<]+)<\/판례일련번호>/);
+    const caseNoMatch = xml.match(/<사건번호>([^<]+)<\/사건번호>/);
+    const caseNameMatch = xml.match(/<사건명>([^<]+)<\/사건명>/);
+
+    if (!idMatch) return null;
+    const precId = idMatch[1].trim();
+    const caseNo = caseNoMatch ? caseNoMatch[1].trim() : '';
+    const caseName = caseNameMatch ? caseNameMatch[1].trim() : '';
+
+    let detailUrl = '';
+    if (endpoint) {
+      detailUrl = `${endpoint.trim()}/api/precedent-detail?ID=${precId}`;
+    } else if (apiKey) {
+      detailUrl = `https://www.law.go.kr/DRF/lawService.do?target=prec&type=XML&OC=${apiKey}&ID=${precId}`;
+    }
+
+    const detailController = new AbortController();
+    const detailTimeout = setTimeout(() => detailController.abort(), 6000);
+    const detailRes = await fetch(detailUrl, { headers, signal: detailController.signal });
+    clearTimeout(detailTimeout);
+    if (!detailRes.ok) return null;
+
+    const detailXml = await detailRes.text();
+    const summaryMatch = detailXml.match(/<판결요지>([\s\S]*?)<\/판결요지>/);
+    const contentMatch = detailXml.match(/<판례내용>([\s\S]*?)<\/판례내용>/);
+
+    const summary = summaryMatch ? summaryMatch[1].replace(/<[^>]+>/g, '').trim() : '';
+    const content = contentMatch ? contentMatch[1].replace(/<[^>]+>/g, '').trim() : '';
+
+    if (!summary && !content) return null;
+
+    return {
+      id: precId,
+      caseNo,
+      caseName,
+      judgmentSummary: summary.slice(0, 1500),
+      content: content.slice(0, 2000)
+    };
+  } catch (err) {
+    console.warn('    ⚠️ 법제처 실시간 조회 예외 발생 (안전 강등 모드 유지):', err.message);
+    return null;
+  }
+}
+
 async function generateSinglePost() {
   console.log(`=== 자동글쓰기 통합 컴포넌트 시작 (${new Date().toISOString()}) ===`);
 
@@ -71,9 +144,21 @@ async function generateSinglePost() {
     }
   }
 
-  // 3. 본문 생성 (단 1개의 불변 헌법 뼈대)
+  // 3. 본문 생성 (판례 카테고리 1회 안전 게이트 연동)
   console.log('[3] 블로그 본문 칼럼 작성 중...');
-  const articlePrompt = buildArticlePrompt(topic, currentAngle, existingPosts);
+  
+  let precedentData = null;
+  if (dailyTopic.category === '판례·분쟁조정') {
+    console.log(`  ⚖️ [판례 게이트] 주제("${dailyTopic.keyword}")로 법제처 실시간 판례 1회 검증 탐색 중...`);
+    precedentData = await fetchPrecedentQuick(dailyTopic.keyword);
+    if (precedentData) {
+      console.log(`    ✅ [판례 확보] 실존 판례 주입: ${precedentData.caseNo} (${precedentData.caseName})`);
+    } else {
+      console.log(`    ℹ️ [안전 강등] 일치 판례 부재 → 파이프라인 무중단 유지 및 사건번호 없는 원칙명 모드로 자동 강등`);
+    }
+  }
+
+  const articlePrompt = buildArticlePrompt(topic, currentAngle, existingPosts, precedentData);
   const contentResult = await callGemini(articlePrompt, CONTENT_SCHEMA, 'flash');
   console.log(`    🧠 [본문 집필 사고 과정] : \n${contentResult.thoughtProcess}`);
 
@@ -84,7 +169,8 @@ async function generateSinglePost() {
   }
   console.log(`[4] 파싱 완료 (${content.length}자) | 기획: ${topic.title}`);
 
-  const additionalFm = topic.caseNumber ? { caseNumber: topic.caseNumber } : {};
+  const confirmedCaseNo = precedentData?.caseNo || topic.caseNumber;
+  const additionalFm = confirmedCaseNo ? { caseNumber: confirmedCaseNo } : {};
   const saved = saveMarkdownPost(topic, topic.summary, content, additionalFm);
   
   console.log(`[5] 저장 완료 : ${saved.filePath}`);

@@ -44,8 +44,12 @@ function cleanText(str) {
     .trim();
 }
 
-function parseTitleAndCaseNumber(rawTitle) {
+function parseTitleAndCaseNumber(rawTitle, itemUrl = '') {
   const clean = cleanText(rawTitle);
+  const urlIdMatch = itemUrl.match(/\/(\d+)$/);
+  const articleId = urlIdMatch ? urlIdMatch[1] : '';
+
+  // 패턴 1: 제2023-2호] 일본뇌염의 상해사고 인정여부
   const match1 = clean.match(/(제?\d{4}-\d+호\]?|제?\d{4}-\d+|제?\d{2}-\d+호)/);
   if (match1) {
     const caseNumber = match1[1].replace(/[\[\]]/g, '');
@@ -53,31 +57,49 @@ function parseTitleAndCaseNumber(rawTitle) {
     return { caseNumber: `금융분쟁조정위원회 ${caseNumber}`, caseName };
   }
 
-  const match2 = clean.match(/(\d{6}분조위무번호\]?|\d{6}\])/);
+  // 패턴 2: 240220분조위무번호] 또는 221130] 
+  const match2 = clean.match(/(\d{6}(?:분조위무번호|조위무번호)?\]?|\d{6}\])/);
   if (match2) {
-    const caseNumber = `금융분쟁조정사례 (${match2[1].replace(/[\[\]]/g, '')})`;
+    const numStr = match2[1].replace(/[\[\]]/g, '').trim();
+    const caseNumber = articleId ? `금융분쟁조정사례 (${numStr}-${articleId})` : `금융분쟁조정사례 (${numStr})`;
     const caseName = clean.replace(match2[0], '').replace(/^\]\s*/, '').trim();
     return { caseNumber, caseName };
   }
 
-  return { caseNumber: `금융분쟁조정사례`, caseName: clean };
+  // 패턴 3: 소보원24120] 또는 소보원221027]
+  const match3 = clean.match(/(소보원\d+\]?)/);
+  if (match3) {
+    const numStr = match3[1].replace(/[\[\]]/g, '').trim();
+    const caseNumber = articleId ? `소비자원 조정사례 (${numStr}-${articleId})` : `소비자원 조정사례 (${numStr})`;
+    const caseName = clean.replace(match3[0], '').replace(/^\]\s*/, '').trim();
+    return { caseNumber, caseName };
+  }
+
+  // 패턴 4: 기타 일반 분쟁사례 (URL 글 번호 기반 고유화)
+  const uniqueId = articleId ? `no.${articleId}` : clean.substring(0, 15);
+  return { caseNumber: `금융분쟁조정사례 [${uniqueId}]`, caseName: clean };
 }
 
 function parseDecisionContent(html) {
-  const containerIdx = html.indexOf('tt_article_useless_p_margin');
+  let containerIdx = html.indexOf('tt_article_useless_p_margin');
+  if (containerIdx === -1) containerIdx = html.indexOf('contents_style');
+  if (containerIdx === -1) containerIdx = html.indexOf('entry-content');
   if (containerIdx === -1) return '';
 
   const snippet = html.substring(containerIdx, containerIdx + 6000);
   const text = cleanText(snippet);
 
   let summary = '';
-  const judgmentIdx = text.indexOf('위원회 판단') !== -1 ? text.indexOf('위원회 판단') : text.indexOf('위원회의 판단');
-  if (judgmentIdx !== -1) {
-    summary = text.substring(judgmentIdx, judgmentIdx + 1000);
-  } else if (text.indexOf('처리 결과') !== -1 || text.indexOf('처리결과') !== -1) {
-    const rIdx = text.indexOf('처리 결과') !== -1 ? text.indexOf('처리 결과') : text.indexOf('처리결과');
-    summary = text.substring(rIdx, rIdx + 800);
-  } else {
+  const keywords = ['사례 요약', '위원회 판단', '위원회의 판단', '처리 결과', '처리결과', '결론', '쟁점'];
+  for (const kw of keywords) {
+    const idx = text.indexOf(kw);
+    if (idx !== -1) {
+      summary = text.substring(idx, idx + 1000);
+      break;
+    }
+  }
+
+  if (!summary) {
     summary = text.substring(0, 800);
   }
 
@@ -131,11 +153,11 @@ async function ingestAllDisputes(startPage = 1, endPage = 60) {
 
     // 해당 페이지 내 글들 병렬 수집 (속도 10배 향상)
     const promises = pageItems.map(async (item) => {
-      const { caseNumber, caseName } = parseTitleAndCaseNumber(item.rawTitle);
-      
-      if (existingCaseNumbers.has(caseNumber) || existingUrls.has(item.url)) {
-        return null; // 이미 존재하는 건 건너뜀
+      if (existingUrls.has(item.url)) {
+        return null; // 이미 존재하는 글은 URL로 정확히 판별하여 건너뜀
       }
+
+      const { caseNumber, caseName } = parseTitleAndCaseNumber(item.rawTitle, item.url);
 
       const detailHtml = await fetchHtml(item.url);
       const summary = parseDecisionContent(detailHtml);

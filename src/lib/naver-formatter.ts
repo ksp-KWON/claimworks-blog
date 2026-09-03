@@ -176,23 +176,11 @@ function createNaverRenderer() {
     return out;
   };
 
-  // 5. 일반 본문 문단 및 해시태그 분기
+  // 5. 일반 본문 문단 (해시태그 역슬래시 자동 제거하여 순수 #태그 빈칸 유지)
   renderer.paragraph = function({ tokens }) {
     const text = this.parser.parseInline(tokens);
-
-    // 해시태그 줄 감지 (#태그1 #태그2 ...)
-    if (/^#[^\s#]/.test(text.trim())) {
-      const tags = text.trim().split(/\s+/).filter(t => t.startsWith('#'));
-      if (tags.length > 0) {
-        return `
-          <p style="margin: 24px 0 16px 0; font-size: 13.5px; color: #64748b; line-height: 1.8; word-break: keep-all;">
-            ${tags.map(t => `<span style="display: inline-block; margin-right: 8px; color: #0284c7; font-weight: 500;">${t}</span>`).join('')}
-          </p>
-        `.trim() + '\n';
-      }
-    }
-
-    return `<p style="font-size: 15.5px; line-height: 1.9; color: #27272a; margin-bottom: 16px; word-break: keep-all;">${text}</p>\n`;
+    const cleanText = text.replace(/\\#/g, '#');
+    return `<p style="font-size: 15.5px; line-height: 1.9; color: #27272a; margin-bottom: 16px; word-break: keep-all;">${cleanText}</p>\n`;
   };
 
   // 6. 리스트 및 체크박스
@@ -254,6 +242,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     .replace(/^```(?:markdown|json)?\s*\n?/i, '')
     .replace(/\n?```\s*$/i, '')
     .replace(/^(?:thoughtProcess|사고\s*과정|생각의\s*사슬)[\s\S]*?(?=\n##|\n#)/i, '')
+    .replace(/\\#/g, '#')
     .trim();
 
   // 최상단 중복 H1 제거

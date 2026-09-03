@@ -146,7 +146,7 @@ export async function callGeminiClient(
   for (const { name: model, maxTokens } of prioritizedModels) {
     const generationConfig = {
       ...baseConfig,
-      maxOutputTokens: options.maxOutputTokens ?? (options.schema ? Math.min(4096, maxTokens) : maxTokens),
+      maxOutputTokens: options.maxOutputTokens ?? (options.schema ? Math.min(16384, maxTokens) : maxTokens),
     };
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {

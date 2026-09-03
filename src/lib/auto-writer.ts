@@ -13,6 +13,20 @@ import {
 import { stringifyMarkdown } from './markdown-utils';
 import { generateSemanticSlug } from './slug-utils';
 
+function sanitizeGeneratedContent(raw: string): string {
+  if (!raw) return '';
+  return raw
+    .replace(/^```(?:markdown)?\s*\n?/i, '')
+    .replace(/\n?```\s*$/i, '')
+    .replace(/^(?:thoughtProcess|사고\s*과정|생각의\s*사슬)[\s\S]*?(?=\n##|\n#)/i, '')
+    .replace(/^#\s+.+\n+/, '') // 최상단 H1 제목 분리
+    .replace(/\[\s*작성\s*완료\s*후\s*자체\s*검수\s*체크리스트[\s\S]*$/i, '') // 네이버 자체 검수 체크리스트 블록 절단
+    .replace(/□\s+1인칭\s+화자[\s\S]*$/i, '') // 체크박스 목록 절단
+    .replace(/^##\s*\[\s*패턴\s*[A-C][\s\S]*?\]\s*/im, '') // 패턴 메모 제목 분리
+    .replace(/\\#/g, '#') // 역슬래시 이스케이프 해시태그 복원 (\# -> #)
+    .trim();
+}
+
 function parseGeneratedContent(text: string) {
   if (!text) return { content: '', thoughtProcess: '', title: '' };
 
@@ -21,7 +35,7 @@ function parseGeneratedContent(text: string) {
     const parsed = typeof text === 'string' ? JSON.parse(text) : text;
     if (parsed && (parsed.markdownContent || parsed.content)) {
       return { 
-        content: (parsed.markdownContent || parsed.content || '').trim(), 
+        content: sanitizeGeneratedContent(parsed.markdownContent || parsed.content || ''), 
         thoughtProcess: parsed.thoughtProcess || '',
         title: (parsed.title || '').trim()
       };
@@ -36,7 +50,7 @@ function parseGeneratedContent(text: string) {
       const parsed = JSON.parse(jsonCandidate);
       if (parsed && (parsed.markdownContent || parsed.content)) {
         return { 
-          content: (parsed.markdownContent || parsed.content || '').trim(), 
+          content: sanitizeGeneratedContent(parsed.markdownContent || parsed.content || ''), 
           thoughtProcess: parsed.thoughtProcess || '',
           title: (parsed.title || '').trim()
         };
@@ -51,13 +65,8 @@ function parseGeneratedContent(text: string) {
     extractedTitle = titleMatch[1].trim();
   }
 
-  // 4. 백틱(```markdown) 코드블록 래핑 및 thoughtProcess 잔재 제거
-  let content = text
-    .replace(/^```(?:markdown)?\s*\n?/i, '')
-    .replace(/\n?```\s*$/i, '')
-    .replace(/^(?:thoughtProcess|사고\s*과정|생각의\s*사슬)[\s\S]*?(?=\n##|\n#)/i, '')
-    .replace(/^#\s+.+\n+/, '') // 최상단 H1 제목이 본문에 있으면 분리
-    .trim();
+  // 4. 백틱 코드블록 및 thoughtProcess 잔재 제거
+  const content = sanitizeGeneratedContent(text);
 
   return { content, thoughtProcess: '', title: extractedTitle };
 }

@@ -144,22 +144,44 @@ async function generateSinglePost() {
     }
   }
 
-  // 3. 본문 생성 (판례 카테고리 1회 안전 게이트 연동)
+  // 3. 본문 생성 (판례 카테고리 자가 검증 풀 우선 연동)
   console.log('[3] 블로그 본문 칼럼 작성 중...');
   
   let precedentData = null;
+  let markPrecedentUsed = null;
+
   if (dailyTopic.category === '판례·분쟁조정') {
-    console.log(`  ⚖️ [판례 게이트] 주제("${dailyTopic.keyword}")로 법제처 실시간 판례 1회 검증 탐색 중...`);
-    precedentData = await fetchPrecedentQuick(dailyTopic.keyword);
-    if (precedentData) {
-      console.log(`    ✅ [판례 확보] 실존 판례 주입: ${precedentData.caseNo} (${precedentData.caseName})`);
+    const { getVerifiedPrecedent } = require('../src/lib/precedent-pool.js');
+    console.log(`  ⚖️ [판례 게이트] 주제("${dailyTopic.keyword}")로 검증된 판례 풀(Pool) 탐색 중...`);
+    
+    const poolResult = getVerifiedPrecedent(dailyTopic.keyword);
+    if (poolResult && poolResult.item) {
+      const p = poolResult.item;
+      precedentData = {
+        id: p.id,
+        caseNo: p.caseNumber,
+        caseName: p.caseName,
+        judgmentSummary: p.summary,
+        courtName: p.courtName
+      };
+      markPrecedentUsed = poolResult.markAsUsed;
+      console.log(`    ✅ [판례 확보] 검증된 실존 판례/분조위 주입: [${p.courtName}] ${p.caseNumber} - ${p.caseName}`);
     } else {
-      console.log(`    ℹ️ [안전 강등] 일치 판례 부재 → 파이프라인 무중단 유지 및 사건번호 없는 원칙명 모드로 자동 강등`);
+      console.log(`  ℹ️ 풀 내 미사용 매칭 부재 → 법제처 실시간 1회 안전 탐색으로 폴백...`);
+      precedentData = await fetchPrecedentQuick(dailyTopic.keyword);
+      if (precedentData) {
+        console.log(`    ✅ [실시간 확보] 법제처 판례 주입: ${precedentData.caseNo} (${precedentData.caseName})`);
+      } else {
+        console.log(`    ℹ️ [안전 강등] 일치 판례 부재 → 파이프라인 무중단 유지 및 사건번호 없는 원칙명 모드로 자동 강등`);
+      }
     }
   }
 
   const articlePrompt = buildArticlePrompt(topic, currentAngle, existingPosts, precedentData);
   const contentResult = await callGemini(articlePrompt, CONTENT_SCHEMA, 'flash');
+  if (markPrecedentUsed) {
+    markPrecedentUsed();
+  }
   console.log(`    🧠 [본문 집필 사고 과정] : \n${contentResult.thoughtProcess}`);
 
   // 4. 파싱 및 저장

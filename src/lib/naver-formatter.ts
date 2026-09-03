@@ -157,6 +157,7 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
   let i = 0;
 
   while (i < lines.length) {
+    const loopStartIndex = i;
     const rawLine = lines[i];
     const trimmed = rawLine.trim();
 
@@ -553,6 +554,38 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
       continue;
     }
 
+    // 9-C. 해시태그 라인 (#키워드1 #키워드2 ...)
+    if (/^#[^\s#]/.test(trimmed)) {
+      const tags = trimmed.split(/\s+/).filter(t => t.startsWith('#'));
+      if (tags.length > 0) {
+        const tagHtml = `<p style="margin: 24px 0 16px 0; font-size: 13.5px; color: #64748b; line-height: 1.8; word-break: keep-all;">` +
+          tags.map(t => `<span style="display: inline-block; margin-right: 8px; color: #0284c7; font-weight: 500;">${t}</span>`).join('') +
+          `</p>`;
+        blocks.push(tagHtml);
+      }
+      i++;
+      continue;
+    }
+
+    // 9-D. 단독 H1 (# 제목)
+    if (trimmed.startsWith('# ')) {
+      const titleText = trimmed.replace(/^#\s+/, '').trim();
+      const h1Html = `
+        <table style="width: 100%; border-left: 6px solid #1a73e8; background-color: #f8fafc; border-collapse: collapse; margin: 32px 0 16px 0;">
+          <tr>
+            <td style="padding: 12px 18px;">
+              <p style="font-size: 18.5px; font-weight: bold; color: #0f172a; margin: 0; line-height: 1.4;">
+                ${titleText}
+              </p>
+            </td>
+          </tr>
+        </table>
+      `.trim();
+      blocks.push(h1Html);
+      i++;
+      continue;
+    }
+
     // 10. 일반 본문 문단 (2~3줄 단위 부드러운 줄간격)
     const pLines: string[] = [];
     while (
@@ -577,6 +610,14 @@ export function convertMarkdownToNaverHtml(markdown: string, options: NaverForma
     if (pLines.length > 0) {
       const pText = applyNaverHighlighter(pLines.join('<br/>'));
       blocks.push(`<p style="font-size: 15.5px; line-height: 1.9; color: #27272a; margin-bottom: 16px; word-break: keep-all;">${pText}</p>`);
+    }
+
+    // 10-B. 최후의 무한 루프 방어 안전 밸브 (Loop Invariant Safety Guard)
+    // 어떤 분기문도 i를 증가시키지 못했을 때 브라우저 멈춤(Freezing)을 100% 원천 차단
+    if (i === loopStartIndex) {
+      const fallbackText = applyNaverHighlighter(trimmed);
+      blocks.push(`<p style="font-size: 15.5px; line-height: 1.9; color: #27272a; margin-bottom: 16px; word-break: keep-all;">${fallbackText}</p>`);
+      i++;
     }
   }
 

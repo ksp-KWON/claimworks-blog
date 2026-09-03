@@ -261,12 +261,10 @@ async function main() {
   if (isIncremental) {
     // GitHub Actions 정기 워크플로우: 1초 만에 최신 1페이지 증분 동기화
     await ingestFssDisputes(1, 1);
-  } else if (sourceArg === 'fss') {
-    await ingestFssDisputes(1, 60);
   } else if (sourceArg === 'law') {
     await ingestLawPrecedents();
   } else {
-    await ingestLawPrecedents();
+    // 기본 디폴트: 금융감독원 분조위 공식 결정문 전건 수집
     await ingestFssDisputes(1, 60);
   }
 

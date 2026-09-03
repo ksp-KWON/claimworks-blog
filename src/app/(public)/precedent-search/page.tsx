@@ -10,6 +10,7 @@ import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
 import PremiumHeaderBanner from '@/components/ui/PremiumHeaderBanner';
+
 interface Precedent {
   id: string;
   title: string;
@@ -20,10 +21,10 @@ interface Precedent {
   caseContent: string;
   caseType: string;
   officialUrl: string;
-  casePoints: string; // 공식 판시사항
+  casePoints: string; // 공식 판시사항 / 결정사항
 }
 
-// 텍스트 클리닝 헬퍼: 법제처 판결요지 및 판례본문의 HTML 태그와 엔티티를 정제하여 줄바꿈을 깔끔하게 유지합니다.
+// 텍스트 클리닝 헬퍼
 function cleanLawText(text: string): string {
   if (!text) return '';
   return text
@@ -33,11 +34,11 @@ function cleanLawText(text: string): string {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&')
+    .replace(/&middot;/g, '·')
+    .replace(/&quot;/g, '"')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
-
-// AI 코멘트 모듈로 분리되었습니다.
 
 // 날짜 포맷팅 헬퍼
 function formatJudgmentDate(dateStr: string): string {
@@ -53,9 +54,9 @@ function formatJudgmentDate(dateStr: string): string {
 }
 
 // 세션 스토리지 기반 검색 캐싱
-const getCachedSearch = (query: string): Precedent[] | null => {
+const getCachedSearch = (keyStr: string): Precedent[] | null => {
   try {
-    const key = `prec_cache_list_${query.trim()}`;
+    const key = `prec_cache_list_${keyStr.trim()}`;
     const cached = sessionStorage.getItem(key);
     return cached ? JSON.parse(cached) : null;
   } catch {
@@ -63,9 +64,9 @@ const getCachedSearch = (query: string): Precedent[] | null => {
   }
 };
 
-const setCachedSearch = (query: string, data: Precedent[]) => {
+const setCachedSearch = (keyStr: string, data: Precedent[]) => {
   try {
-    const key = `prec_cache_list_${query.trim()}`;
+    const key = `prec_cache_list_${keyStr.trim()}`;
     sessionStorage.setItem(key, JSON.stringify(data));
   } catch {}
 };
@@ -94,11 +95,11 @@ function getSmartSummary(summary: string, content: string): string {
     if (coreSentences.length > 0) return coreSentences.join('. ').slice(0, 220) + '...';
     return content.length > 180 ? content.slice(0, 180) + '...' : content;
   }
-  return '판례 정보를 읽어올 수 없습니다.';
+  return '상세 정보를 읽어올 수 없습니다.';
 }
 
-
 export default function PrecedentSearchPage() {
+  const [searchTab, setSearchTab] = useState<'court' | 'dispute'>('court');
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -114,11 +115,9 @@ export default function PrecedentSearchPage() {
     return [];
   });
   
-  // 지연 로딩을 위한 상태 관리
   const [openDetailId, setOpenDetailId] = useState<string | null>(null);
   const [detailLoadingId, setDetailLoadingId] = useState<string | null>(null);
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
-
 
   useEffect(() => {
     fetch('/api/posts')
@@ -139,6 +138,7 @@ export default function PrecedentSearchPage() {
     localStorage.removeItem('recent_prec_searches');
   };
 
+  // 1. 대한민국 법원 판례 검색 (법제처 실시간 API)
   const fetchPrecedents = async (searchQuery: string, pageNum: number, isLoadMore = false) => {
     try {
       const listRes = await fetch(`/api/precedent?query=${encodeURIComponent(searchQuery)}&page=${pageNum}`);
@@ -168,7 +168,7 @@ export default function PrecedentSearchPage() {
       const types = Array.from(xmlDoc.getElementsByTagName('사건종류명')).map(el => el.textContent?.trim() || '');
 
       if (ids.length === 0 && !isLoadMore) {
-        setError('입력하신 조건과 일치하는 판례 데이터를 찾을 수 없습니다.');
+        setError('입력하신 조건과 일치하는 법원 판례를 찾을 수 없습니다.');
         return;
       }
 
@@ -178,7 +178,7 @@ export default function PrecedentSearchPage() {
         caseNo: caseNos[i] || '',
         judgmentDate: dates[i] || '',
         courtName: courts[i] || '',
-        caseType: types[i] || '',
+        caseType: types[i] || '법원판례',
         judgmentSummary: '', 
         caseContent: '',
         casePoints: '',
@@ -189,11 +189,68 @@ export default function PrecedentSearchPage() {
         setResults(prev => [...prev, ...parsedData]);
       } else {
         setResults(parsedData);
-        setCachedSearch(searchQuery, parsedData); // 캐시 업데이트 (첫 페이지만)
+        setCachedSearch(`court_${searchQuery}`, parsedData);
       }
     } catch (err: any) {
       console.error(err);
       setError('법제처 API 조회 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+    }
+  };
+
+  // 2. 금융감독원 분쟁조정 전문 검색 (Cloudflare API + 정적 폴백)
+  const fetchDisputes = async (searchQuery: string, pageNum: number, isLoadMore = false) => {
+    try {
+      let items: any[] = [];
+      let total = 0;
+
+      // 1차 시도: /api/disputes API 호출
+      let res = await fetch(`/api/disputes?query=${encodeURIComponent(searchQuery)}&page=${pageNum}&pageSize=10`);
+      if (res.ok) {
+        const data = await res.json();
+        items = data.items || [];
+        total = data.total || 0;
+      } else {
+        // 정적 폴백: 로컬 환경 호환
+        const staticRes = await fetch('/data/fss-disputes-full.json');
+        if (!staticRes.ok) throw new Error('분쟁조정 데이터를 불러올 수 없습니다.');
+        const all: any[] = await staticRes.json();
+        const q = searchQuery.toLowerCase().trim();
+        const filtered = q
+          ? all.filter(item => `${item.caseNumber || ''} ${item.caseName || ''} ${item.summary || ''} ${item.fullText || ''}`.toLowerCase().includes(q))
+          : all;
+        total = filtered.length;
+        items = filtered.slice((pageNum - 1) * 10, pageNum * 10);
+      }
+
+      setTotalCount(total);
+
+      if (items.length === 0 && !isLoadMore) {
+        setError('입력하신 조건과 일치하는 금융분쟁조정 결정례를 찾을 수 없습니다.');
+        return;
+      }
+
+      const parsedData: Precedent[] = items.map(d => ({
+        id: d.id,
+        title: d.caseName || '분쟁조정 결정례',
+        caseNo: d.caseNumber || '금융분쟁조정',
+        judgmentDate: d.judgmentDate || '',
+        courtName: d.courtName || '금융감독원 금융분쟁조정위원회',
+        caseType: '금융분쟁조정',
+        judgmentSummary: cleanLawText(d.summary || ''),
+        caseContent: cleanLawText(d.fullText || ''),
+        casePoints: '금융감독원 분쟁조정위원회 결정례',
+        officialUrl: d.url || 'https://www.fss.or.kr'
+      }));
+
+      if (isLoadMore) {
+        setResults(prev => [...prev, ...parsedData]);
+      } else {
+        setResults(parsedData);
+        setCachedSearch(`dispute_${searchQuery}`, parsedData);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError('분쟁조정 데이터 조회 중 오류가 발생했습니다.');
     }
   };
 
@@ -208,14 +265,20 @@ export default function PrecedentSearchPage() {
     setOpenDetailId(null);
     saveSearch(trimmedQuery);
 
-    const cached = getCachedSearch(trimmedQuery);
+    const cacheKey = `${searchTab}_${trimmedQuery}`;
+    const cached = getCachedSearch(cacheKey);
     if (cached) {
       setResults(cached);
-      setTotalCount(cached.length); // 임시 할당
+      setTotalCount(cached.length);
       setLoading(false);
+      return;
     }
 
-    await fetchPrecedents(trimmedQuery, 1, false);
+    if (searchTab === 'court') {
+      await fetchPrecedents(trimmedQuery, 1, false);
+    } else {
+      await fetchDisputes(trimmedQuery, 1, false);
+    }
     setLoading(false);
   };
 
@@ -224,46 +287,104 @@ export default function PrecedentSearchPage() {
     setLoadingMore(true);
     const nextPage = page + 1;
     setPage(nextPage);
-    await fetchPrecedents(query, nextPage, true);
+    if (searchTab === 'court') {
+      await fetchPrecedents(query, nextPage, true);
+    } else {
+      await fetchDisputes(query, nextPage, true);
+    }
     setLoadingMore(false);
+  };
+
+  const handleTabChange = async (tab: 'court' | 'dispute') => {
+    if (searchTab === tab) return;
+    setSearchTab(tab);
+    setPage(1);
+    setError('');
+    setOpenDetailId(null);
+
+    const trimmedQuery = query.trim();
+    if (trimmedQuery) {
+      setLoading(true);
+      setResults([]);
+      const cacheKey = `${tab}_${trimmedQuery}`;
+      const cached = getCachedSearch(cacheKey);
+      if (cached) {
+        setResults(cached);
+        setTotalCount(cached.length);
+        setLoading(false);
+        return;
+      }
+
+      if (tab === 'court') {
+        await fetchPrecedents(trimmedQuery, 1, false);
+      } else {
+        await fetchDisputes(trimmedQuery, 1, false);
+      }
+      setLoading(false);
+    } else {
+      setResults([]);
+      setTotalCount(0);
+    }
   };
 
   // 온디맨드 상세 조회 로직 (지연 로딩)
   const handleToggleDetail = async (prec: Precedent) => {
-    // 닫기
     if (openDetailId === prec.id) {
       setOpenDetailId(null);
       return;
     }
     
-    // 열기 (아코디언 토글)
     setOpenDetailId(prec.id);
     
-    // 이미 캐시되어 있으면 통신 생략
+    // 이미 내용이 있으면 통신 생략 (분쟁조정은 전문이 이미 탑재됨)
     if (prec.caseContent || prec.judgmentSummary || prec.casePoints) {
       return;
     }
     
-    // 첫 클릭 시 1개의 판례만 법제처에 상세 API 호출
     setDetailLoadingId(prec.id);
     try {
-      const detailRes = await fetch(`/api/precedent-detail?ID=${prec.id}`);
-      if (!detailRes.ok) throw new Error('상세 API 에러');
-      
-      const detailXml = await detailRes.text();
-      const parser = new DOMParser();
-      const detailDoc = parser.parseFromString(detailXml, "text/xml");
-      
-      const getValue = (tagName: string) => {
-        const el = detailDoc.getElementsByTagName(tagName)[0];
-        return el?.textContent?.trim() || '';
-      };
+      let newSummary = prec.judgmentSummary || '';
+      let newContent = '';
+      let newPoints = prec.casePoints || '';
 
-      const newSummary = cleanLawText(getValue('판결요지'));
-      const newContent = cleanLawText(getValue('판례내용'));
-      const newPoints = cleanLawText(getValue('판시사항'));
+      if (searchTab === 'court') {
+        // 법원 판례: 법제처 상세 API 호출
+        const detailRes = await fetch(`/api/precedent-detail?ID=${prec.id}`);
+        if (!detailRes.ok) throw new Error('법제처 상세 API 에러');
+        
+        const detailXml = await detailRes.text();
+        const parser = new DOMParser();
+        const detailDoc = parser.parseFromString(detailXml, "text/xml");
+        
+        const getValue = (tagName: string) => {
+          const el = detailDoc.getElementsByTagName(tagName)[0];
+          return el?.textContent?.trim() || '';
+        };
 
-      // 상태 업데이트 (원본 배열 중 이 ID만 업데이트)
+        newSummary = cleanLawText(getValue('판결요지')) || newSummary;
+        newContent = cleanLawText(getValue('판례내용'));
+        newPoints = cleanLawText(getValue('판시사항')) || newPoints;
+      } else {
+        // 금융감독원 분쟁조정: 전문 온디맨드 API 호출
+        let detailRes = await fetch(`/api/disputes?id=${prec.id}`);
+        if (!detailRes.ok) {
+          // 폴백: 정적 데이터에서 해당 ID 탐색
+          const staticRes = await fetch('/data/fss-disputes-full.json');
+          if (staticRes.ok) {
+            const all: any[] = await staticRes.json();
+            const found = all.find((d: any) => d.id === prec.id);
+            if (found) {
+              newSummary = cleanLawText(found.summary) || newSummary;
+              newContent = cleanLawText(found.fullText);
+            }
+          }
+        } else {
+          const detailData = await detailRes.json();
+          newSummary = cleanLawText(detailData.summary) || newSummary;
+          newContent = cleanLawText(detailData.fullText);
+        }
+      }
+
       const updatedResults = results.map(p => {
         if (p.id === prec.id) {
           return { ...p, judgmentSummary: newSummary, caseContent: newContent, casePoints: newPoints };
@@ -271,7 +392,7 @@ export default function PrecedentSearchPage() {
         return p;
       });
       setResults(updatedResults);
-      setCachedSearch(query, updatedResults); // 캐시도 업데이트
+      setCachedSearch(`${searchTab}_${query}`, updatedResults);
     } catch (err) {
       console.error("상세 정보를 불러오는 중 에러:", err);
     } finally {
@@ -301,44 +422,78 @@ export default function PrecedentSearchPage() {
   };
 
   return (
-    <div className="w-full space-y-6 sm:space-y-8">
-      {/* 상단 브레드크럼 */}
-      <nav className="flex text-xs text-[#5f6368] dark:text-[#9aa0a6]" aria-label="Breadcrumb">
-        <ol className="inline-flex items-center space-x-1.5">
-          <li><Link href="/" className="hover:text-[var(--google-blue)] transition-colors">홈</Link></li>
-          <li><span className="mx-1">/</span></li>
-          <li className="text-[#202124] dark:text-[#e8eaed] font-medium" aria-current="page">판례검색센터</li>
-        </ol>
-      </nav>
-
-      {/* 1. 상단 메인 헤더 배너 */}
+    <div className="space-y-6 max-w-5xl mx-auto px-4 sm:px-6 py-6 font-sans">
+      {/* 1. 상단 타이틀 배너 */}
       <PremiumHeaderBanner
-        theme="blue"
         icon="scale"
         title="손해사정 법률분석센터"
-        badges={['법제처 국가법령정보 실시간 연동', { text: '대법원·하급심 주요 손해배상 판례', color: 'gray' }]}
-        description="보험사의 억울한 거절과 삭감 주장도 명확한 판례가 있다면 방어할 수 있습니다. 겪으신 상황이나 키워드를 검색하시면 실시간 부합하는 법원 판결 전문을 찾아드립니다."
+        badges={[
+          '법제처 국가법령정보 실시간 연동',
+          { text: '금융감독원 분쟁조정 559편 전문 완비', color: 'green' },
+          { text: '대법원·하급심 주요 손해배상 판례', color: 'gray' }
+        ]}
+        description="보험사의 억울한 거절과 삭감 주장도 명확한 판례와 분쟁조정 결정례가 있다면 방어할 수 있습니다. 겪으신 상황이나 키워드를 검색하시면 실시간 부합하는 법원 판결 및 금감원 결정문 전문을 찾아드립니다."
       />
 
-      {/* 2. 판례 검색 인풋 박스 */}
+      {/* 2. 판례 & 분쟁조정 검색 인풋 박스 */}
       <PremiumCard hoverEffect={false} borderColor="blue" className="!p-5 sm:!p-6">
         <div id="search-box-area" className="space-y-4">
-          <div className="flex gap-2 flex-col sm:flex-row">
+          
+          {/* 2대 탭 전환 네비게이션 */}
+          <div className="flex border-b border-gray-200 dark:border-zinc-800 gap-1">
+            <button
+              type="button"
+              onClick={() => handleTabChange('court')}
+              className={`flex items-center gap-2 px-4 sm:px-6 py-3 font-bold text-xs sm:text-sm border-b-2 transition-all cursor-pointer ${
+                searchTab === 'court'
+                  ? 'border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/20'
+                  : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+              }`}
+            >
+              <AppIcon name="scale" size={16} />
+              <span>대한민국 법원 판례</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
+                법제처 실시간
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange('dispute')}
+              className={`flex items-center gap-2 px-4 sm:px-6 py-3 font-bold text-xs sm:text-sm border-b-2 transition-all cursor-pointer ${
+                searchTab === 'dispute'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20'
+                  : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+              }`}
+            >
+              <AppIcon name="shield-check" size={16} />
+              <span>금융감독원 분쟁조정</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">
+                559편 전문 완비
+              </span>
+            </button>
+          </div>
+
+          <div className="flex gap-2 flex-col sm:flex-row pt-1">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch(query)}
-              placeholder="상황이나 키워드를 적어보세요 (예: 교통사고 합의금, 뇌출혈 진단비, 척추 장해)"
+              placeholder={
+                searchTab === 'court'
+                  ? "사건명 또는 판례 키워드를 적어보세요 (예: 교통사고 합의금, 뇌출혈 진단비, 척추 장해)"
+                  : "금감원 분쟁조정 키워드를 적어보세요 (예: 암보험 고지의무, 표적항암, 도수치료, 실손)"
+              }
               className="flex-1 px-4 py-3 sm:py-3.5 rounded-none border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800/40 focus:outline-none focus:border-blue-600 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-600 dark:text-white text-xs sm:text-sm font-medium shadow-inner"
             />
             <PremiumButton
               onClick={() => handleSearch(query)}
               disabled={loading}
-              color="blue"
-              className="py-3 sm:py-3.5 min-w-[120px] flex items-center justify-center h-full !rounded-none font-bold text-xs sm:text-sm"
+              
+              className="py-3 sm:py-3.5 min-w-[130px] flex items-center justify-center h-full !rounded-none font-bold text-xs sm:text-sm"
             >
-              {loading ? '검색 중...' : '판례 검색'}
+              {loading ? '검색 중...' : searchTab === 'court' ? '판례 검색' : '분쟁조정 검색'}
             </PremiumButton>
           </div>
 
@@ -360,10 +515,14 @@ export default function PrecedentSearchPage() {
 
       {loading && (
         <div className="bg-white dark:bg-[#202124] rounded-none py-16 px-4 text-center border border-gray-100 dark:border-white/5 shadow-sm space-y-4">
-          <div className="inline-block w-9 h-9 border-4 border-[var(--google-blue)] border-t-transparent rounded-full animate-spin" />
-          <div className="text-sm font-bold text-[#202124] dark:text-[#e8eaed]">법제처 실시간 데이터 연동 분석 중...</div>
+          <div className="inline-block w-9 h-9 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <div className="text-sm font-bold text-[#202124] dark:text-[#e8eaed]">
+            {searchTab === 'court' ? '법제처 실시간 데이터 연동 분석 중...' : '금융감독원 분쟁조정 전문 아카이브 검색 중...'}
+          </div>
           <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6] max-w-xs mx-auto leading-relaxed">
-            국가법령 공동활용 API 시스템에서 판례 목록 전체를 확보하고 있습니다.
+            {searchTab === 'court'
+              ? '국가법령 공동활용 API 시스템에서 판례 목록 전체를 확보하고 있습니다.'
+              : '금감원 금융분쟁조정위원회 공문서 전문 데이터베이스에서 최적 판례를 탐색합니다.'}
           </p>
         </div>
       )}
@@ -376,9 +535,18 @@ export default function PrecedentSearchPage() {
 
       {!loading && results.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-black text-[#202124] dark:text-[#e8eaed] mb-1 tracking-tight flex items-center gap-2">
-            검색 결과 <span className="text-[var(--google-blue)]">{totalCount > 0 ? totalCount.toLocaleString() : results.length}</span>건
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-black text-[#202124] dark:text-[#e8eaed] tracking-tight flex items-center gap-2">
+              <span>{searchTab === 'court' ? '판례 검색 결과' : '분쟁조정 결정례'}</span>
+              <span className={searchTab === 'court' ? 'text-blue-600' : 'text-emerald-600'}>
+                {totalCount > 0 ? totalCount.toLocaleString() : results.length}
+              </span>
+              <span>건</span>
+            </h2>
+            <span className="text-xs text-gray-500 font-medium">
+              {searchTab === 'court' ? '법제처 국가법령정보' : '금융감독원 분쟁조정 전문'}
+            </span>
+          </div>
 
           <div className="flex flex-col border border-gray-200 dark:border-white/10 rounded-none bg-white dark:bg-[#202124] shadow-sm divide-y divide-gray-100 dark:divide-white/5">
             {results.map((prec) => {
@@ -386,10 +554,9 @@ export default function PrecedentSearchPage() {
               const isLoadingDetail = detailLoadingId === prec.id;
               const relatedPosts = getRelatedBlogPosts(prec);
               
-              // 초압축 리스트 뷰 UI
               return (
                 <div key={prec.id} className="flex flex-col group transition-colors">
-                  {/* 리스트 헤더 (클릭 가능 영역) */}
+                  {/* 리스트 헤더 */}
                   <div 
                     onClick={() => handleToggleDetail(prec)}
                     className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/2 transition-colors ${isDetailOpen ? 'bg-gray-50 dark:bg-white/2' : ''}`}
@@ -397,23 +564,26 @@ export default function PrecedentSearchPage() {
                     <div className="flex-1 min-w-0 space-y-1.5 pr-4">
                       <div className="flex flex-wrap items-center gap-2">
                         {prec.caseType && (
-                          <span className="px-2 py-0.5 rounded-none bg-blue-50 dark:bg-blue-900/20 text-[#1a73e8] dark:text-[#8ab4f8] text-[10px] font-bold border border-blue-100/30">
+                          <span className={`px-2 py-0.5 rounded-none text-[10px] font-bold border ${
+                            searchTab === 'court'
+                              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100/30'
+                              : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100/30'
+                          }`}>
                             {prec.caseType}
                           </span>
                         )}
                         <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400">
-                          {prec.courtName || '법원'} {formatJudgmentDate(prec.judgmentDate)}
+                          {prec.courtName || (searchTab === 'court' ? '법원' : '금융감독원')} {formatJudgmentDate(prec.judgmentDate)}
                         </span>
                       </div>
-                      <h3 className="text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] leading-snug group-hover:text-[var(--google-blue)] transition-colors truncate">
+                      <h3 className="text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] leading-snug group-hover:text-blue-600 transition-colors truncate">
                         {prec.title}
                       </h3>
                       <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">사건번호: {prec.caseNo}</p>
                     </div>
                     
-                    {/* 우측 꺽쇠 화살표 */}
-                    <div className="shrink-0 flex items-center justify-end sm:justify-center w-6 h-6 text-gray-300 group-hover:text-[var(--google-blue)] transition-colors">
-                      <AppIcon name="chevron-down" size={20} className={`transition-transform duration-300 ${isDetailOpen ? 'rotate-180 text-[var(--google-blue)]' : ''}`} strokeWidth={2} />
+                    <div className="shrink-0 flex items-center justify-end sm:justify-center w-6 h-6 text-gray-300 group-hover:text-blue-600 transition-colors">
+                      <AppIcon name="chevron-down" size={20} className={`transition-transform duration-300 ${isDetailOpen ? 'rotate-180 text-blue-600' : ''}`} strokeWidth={2} />
                     </div>
                   </div>
 
@@ -422,29 +592,33 @@ export default function PrecedentSearchPage() {
                     <div className="border-t border-gray-100 dark:border-white/5 bg-white dark:bg-[#202124] animate-in slide-in-from-top-2 duration-300">
                       {isLoadingDetail ? (
                         <div className="p-10 flex flex-col items-center justify-center space-y-3">
-                          <div className="w-6 h-6 border-2 border-[var(--google-blue)] border-t-transparent rounded-full animate-spin" />
-                          <span className="text-xs text-gray-500 font-bold">법제처에서 판결 전문을 즉시 불러오는 중입니다...</span>
+                          <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                          <span className="text-xs text-gray-500 font-bold">판결 전문을 즉시 불러오는 중입니다...</span>
                         </div>
                       ) : (
                         <div className="p-5 sm:p-7 space-y-5">
-                          {/* 판결 핵심 요지 */}
-                          <div className="bg-blue-50/30 dark:bg-blue-950/20 p-4 rounded-none border border-blue-100/50 dark:border-blue-900/30 space-y-2">
-                            <div className="flex items-center gap-1.5 text-xs font-bold text-[#1a73e8] dark:text-[#8ab4f8]">
-                              <AppIcon name="scale" size={16} />
-                              <span>판결 핵심 요지 및 미리보기</span>
+                          {/* 핵심 요지 */}
+                          <div className={`p-4 rounded-none border space-y-2 ${
+                            searchTab === 'court'
+                              ? 'bg-blue-50/30 dark:bg-blue-950/20 border-blue-100/50 dark:border-blue-900/30'
+                              : 'bg-emerald-50/30 dark:bg-emerald-950/20 border-emerald-100/50 dark:border-emerald-900/30'
+                          }`}>
+                            <div className={`flex items-center gap-1.5 text-xs font-bold ${searchTab === 'court' ? 'text-blue-600 dark:text-blue-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                              <AppIcon name={searchTab === 'court' ? 'scale' : 'shield-check'} size={16} />
+                              <span>{searchTab === 'court' ? '판결 핵심 요지 및 미리보기' : '분쟁조정 핵심 요지 및 판단 결과'}</span>
                             </div>
                             <div className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium whitespace-pre-wrap">
-                              {prec.casePoints || prec.judgmentSummary || getSmartSummary('', prec.caseContent)}
+                              {prec.judgmentSummary || prec.casePoints || getSmartSummary('', prec.caseContent)}
                             </div>
                           </div>
 
                           {/* 실무 코멘트 (통합 AI 컴포넌트) */}
                           <AiCommentBox 
                             sourceText={[prec.title, prec.casePoints, prec.judgmentSummary, prec.caseContent].join('\n\n').slice(0, 4000)}
-                            type="precedent"
+                            type={searchTab === 'court' ? 'precedent' : 'fss'}
                           />
 
-                          {/* 원문 새창 버튼 */}
+                          {/* 원문 새창 링크 */}
                           <div className="flex pt-1">
                             <a
                               href={prec.officialUrl}
@@ -453,18 +627,18 @@ export default function PrecedentSearchPage() {
                               className="px-4 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 border border-gray-250 dark:border-white/10 rounded-none text-[11px] font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 w-full sm:w-auto"
                             >
                               <AppIcon name="external-link" size={14} />
-                              <span>법제처 공식 원문 새창으로 열람하기</span>
+                              <span>{searchTab === 'court' ? '법제처 공식 원문 새창으로 열람하기' : '분쟁조정 결정문 원문 페이지 열람하기'}</span>
                             </a>
                           </div>
 
-                          {/* 판결문 본문 (옵션) */}
+                          {/* 결정문/판결문 전문 본문 */}
                           {prec.caseContent && (
                             <div className="bg-gray-50/50 dark:bg-[#303134]/30 p-4 rounded-none border border-gray-200 dark:border-white/5 shadow-inner mt-4">
                               <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-white/5 pb-2 mb-2 flex items-center gap-1.5">
                                 <AppIcon name="file-text" size={14} />
-                                <span>대법원 공식 판결문 전문</span>
+                                <span>{searchTab === 'court' ? '대법원·하급심 공식 판결문 전문' : '금융감독원 분쟁조정위원회 결정문 전문 (공문서)'}</span>
                               </div>
-                              <pre className="text-[11px] text-gray-600 dark:text-gray-400 font-medium leading-relaxed max-h-[300px] overflow-y-auto whitespace-pre-wrap font-sans pr-2">
+                              <pre className="text-[11px] text-gray-600 dark:text-gray-400 font-medium leading-relaxed max-h-[350px] overflow-y-auto whitespace-pre-wrap font-sans pr-2">
                                 {prec.caseContent}
                               </pre>
                             </div>
@@ -483,7 +657,7 @@ export default function PrecedentSearchPage() {
                                 <span>보상스쿨 전체 칼럼 읽기</span>
                               </Link>
                             )}
-                            <button onClick={() => openChatWithContext()} className="w-full text-center py-3 bg-[var(--google-blue)] hover:bg-[#174ea6] text-white text-xs font-bold shadow-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer" id="precedent-chat-btn">
+                            <button onClick={() => openChatWithContext()} className="w-full text-center py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer" id="precedent-chat-btn">
                               <AppIcon name="chat" size={14} />
                               <span>무료 보상 검토 신청</span>
                             </button>
@@ -503,9 +677,9 @@ export default function PrecedentSearchPage() {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="px-8 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-sm font-bold shadow-sm transition-colors flex items-center justify-center gap-2 rounded-full min-w-[200px]"
+                className="px-8 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-[#202124] dark:text-[#e8eaed] text-sm font-bold shadow-sm transition-colors flex items-center justify-center gap-2 rounded-full min-w-[200px] cursor-pointer"
               >
-                {loadingMore ? '데이터 불러오는 중...' : `나머지 판례 더보기 (${results.length} / ${totalCount})`}
+                {loadingMore ? '데이터 불러오는 중...' : `나머지 ${searchTab === 'court' ? '판례' : '분쟁조정례'} 더보기 (${results.length} / ${totalCount})`}
               </button>
             </div>
           )}
@@ -517,7 +691,7 @@ export default function PrecedentSearchPage() {
         <span className="shrink-0 mt-0.5 flex items-center">
           <AppIcon name="warning" size={16} />
         </span>
-        <span>본 검색 시스템은 공공 API를 바탕으로 한 참고 정보이며, 어떠한 법률 자문도 대행하지 않습니다. 실제 지급 거절 등의 사안은 전문 손해사정사와 직접 상담하십시오.</span>
+        <span>본 검색 시스템은 공공 데이터 및 금융감독원 분쟁조정 결정례를 바탕으로 한 참고 정보이며, 어떠한 법률 자문도 대행하지 않습니다. 실제 지급 거절 등의 사안은 전문 손해사정사와 직접 상담하십시오.</span>
       </div>
     </div>
   );

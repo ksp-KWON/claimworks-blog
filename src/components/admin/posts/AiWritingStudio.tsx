@@ -99,16 +99,21 @@ export default function AiWritingStudio({
     else if (cat.includes('질병') || cat.includes('판례')) target = 'medical';
     else if (cat.includes('산재') || cat.includes('배상') || cat.includes('사망')) target = 'accident';
 
-    const success = await copyToNaverClipboard(postMeta.content, {
-      title: postMeta.title,
-      targetBlog: target
-    });
+    try {
+      const success = await copyToNaverClipboard(postMeta.content, {
+        title: postMeta.title,
+        targetBlog: target
+      });
 
-    if (success) {
-      setIsCopiedNaver(true);
-      setTimeout(() => setIsCopiedNaver(false), 3500);
-    } else {
-      alert('클립보드 복사에 실패했습니다.');
+      if (success) {
+        setIsCopiedNaver(true);
+        setTimeout(() => setIsCopiedNaver(false), 3500);
+      } else {
+        alert('클립보드 복사에 실패했습니다. 브라우저의 클립보드 권한을 확인해 주세요.');
+      }
+    } catch (err) {
+      console.error('Copy error:', err);
+      alert('복사 처리 중 오류가 발생했습니다.');
     }
   };
 

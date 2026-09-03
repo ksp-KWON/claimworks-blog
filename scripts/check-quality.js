@@ -1,377 +1,19 @@
 /**
  * scripts/check-quality.js
- * 글로벌 마크다운(GFM) & W3C 시맨틱 웹 표준 CQF 품질 검증 및 자동 교정 엔진
- * - [Option A] 순수 텍스트 미니멀리즘 (No Emoji in Markdown)
- * - gray-matter 기반 견고한 Frontmatter 파싱 및 마크다운 표준화
+ * 글로벌 마크다운(GFM) & W3C 시맨틱 웹 표준 CQF 품질 검증 엔진
+ * 
+ * [헌법 원칙: 표준 · 콤팩트 · 통합 · 공유]
+ * - 자체 중복 정규식을 전면 폐지하고, 전사 단일 표준 엔진(markdown-standard.js)을 공유
+ * - 빌드 파이프라인에서 전수 무결성 검증 및 초고속 동기화 수행
  */
+
+'use strict';
 
 const fs = require('fs');
 const path = require('path');
-const matter = require('gray-matter');
+const { normalizePost } = require('../src/lib/markdown-standard.js');
 
 const POSTS_DIR = path.join(process.cwd(), 'src/content/posts');
-
-function processPost(filePath) {
-  const fileRaw = fs.readFileSync(filePath, 'utf8');
-  let parsed;
-  try {
-    parsed = matter(fileRaw);
-  } catch (e) {
-    // gray-matter 실패 시 fallback 수동 교정
-    const rawFixed = fileRaw.replace(/summary:\s*([\s\S]*?)(?=\r?\n[a-zA-Z0-9_-]+:|$)/m, (m, val) => {
-      let clean = val.replace(/[\r\n]+/g, ' ').replace(/"/g, "'").replace(/^'+|'+$/g, '').trim();
-      return `summary: "${clean}"`;
-    });
-    parsed = matter(rawFixed);
-  }
-
-  let data = parsed.data;
-  let body = parsed.content;
-
-  // ── [1. Frontmatter summary 정규화] ──────────────────────────────────
-  if (data.summary) {
-    let s = String(data.summary).replace(/[\r\n]+/g, ' ').replace(/"/g, "'").replace(/^'+|'+$/g, '').trim();
-    data.summary = s;
-  }
-
-  // ── [1-1. Frontmatter category 단일 표준화 (string[] Monomorphic SSOT)] ──
-  let categories = [];
-  if (Array.isArray(data.category)) {
-    categories = data.category.map(c => String(c).trim()).filter(Boolean);
-  } else if (typeof data.category === 'string' && data.category.trim()) {
-    categories = [data.category.trim()];
-  }
-
-  if (data.specialtyCategory && typeof data.specialtyCategory === 'string' && data.specialtyCategory.trim()) {
-    const spec = data.specialtyCategory.trim();
-    if (!categories.includes(spec)) {
-      categories.push(spec);
-    }
-  }
-
-  if (categories.length === 0) {
-    categories = ['보상가이드'];
-  }
-
-  data.category = categories;
-  delete data.specialtyCategory; // 단일 표준 배열로 완전 통합 후 레거시 키 영구 삭제
-
-  // ── [1-2. Frontmatter tags 정규화 (string[] 표준)] ────────────────────
-  if (typeof data.tags === 'string') {
-    data.tags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
-  } else if (!Array.isArray(data.tags)) {
-    data.tags = [];
-  }
-
-  // ── [2. 상투적 더미 멘트 박스 및 AI 메모 청소] ──────────────────────────
-  body = body.replace(
-    />\s*###\s*(?:💡|👨‍⚖️|⚖️)?\s*보상스쿨\s*실무쟁점[\s\S]*?(?=\r?\n\r?\n(?:##|#|[^\n>])|$)/gi,
-    ''
-  );
-  body = body.replace(/\[\s*(?:이미지\s*제안|관련\s*글\s*추천|이미지제안|관련글추천)\s*:[^\]]*\]/gi, '');
-
-  // ── [2-1. 비표준 GitHub alert 및 비표준 전문가 조언 박스 정규화] ──────────
-  body = body.replace(/>\s*\[!(?:TIP|NOTE|IMPORTANT|WARNING|CAUTION)\]\s*\r?\n/gi, '> ### 보상스쿨 피드백 & 실무 인사이트\n');
-  body = body.replace(/>\s*(?:전문가\s*조언|손해사정사\s*실무\s*조언|실무\s*TIP)\s*:\s*/gi, '> ### 보상스쿨 피드백 & 실무 인사이트\n> ');
-
-  // ── [3. 오프닝 & 핵심 요약 순서 교정 및 배치 보장] ───────────────────
-  // 오프닝 문단이 ## 핵심 요약보다 위에 있는 경우 순서를 표준(## 핵심 요약 -> 오프닝)으로 자동 교정
-  const keyPointOrderMatch = body.match(/(?:^|\r?\n)(##\s*(?:💡|🎯)?\s*(?:핵심\s*요약|핵심요약|핵심\s*포인트)[^\n]*\r?\n+(?:[ \t]*>.*(?:\r?\n|$))+)/i);
-  if (keyPointOrderMatch && keyPointOrderMatch.index > 0) {
-    const beforeKeyPoints = body.slice(0, keyPointOrderMatch.index).trim();
-    const keyPointsBlock = keyPointOrderMatch[1].trim();
-    const afterKeyPoints = body.slice(keyPointOrderMatch.index + keyPointOrderMatch[0].length).trim();
-    if (beforeKeyPoints && !beforeKeyPoints.startsWith('#') && !beforeKeyPoints.startsWith('>')) {
-      body = `${keyPointsBlock}\n\n${beforeKeyPoints}\n\n${afterKeyPoints}`;
-    }
-  }
-
-  let hasOpeningText = false;
-  const trimmedBody = body.trim();
-
-  if (!trimmedBody.startsWith('#') && !trimmedBody.startsWith('>')) {
-    hasOpeningText = true;
-  } else if (/^##\s*(?:💡|🎯)?\s*핵심\s*요약/i.test(trimmedBody)) {
-    // 핵심 요약 블록 제거 후 첫 번째 ## H2 이전 영역에 일반 문단이 있는지 확인
-    const afterSummary = trimmedBody.replace(/^##\s*(?:💡|🎯)?\s*핵심\s*요약[^\n]*\r?\n+(?:[ \t]*>.*(?:\r?\n|$))+/i, '').trim();
-    const firstH2Match = afterSummary.match(/^##\s+/m);
-    const introPart = firstH2Match && firstH2Match.index !== undefined ? afterSummary.slice(0, firstH2Match.index).trim() : afterSummary;
-    const hasParagraph = introPart.split(/\r?\n/).some(l => {
-      const t = l.trim();
-      return t && !t.startsWith('#') && !t.startsWith('>') && !t.startsWith('|') && !t.startsWith('[') && !t.startsWith('!');
-    });
-    if (hasParagraph) {
-      hasOpeningText = true;
-    }
-  }
-
-  if (!hasOpeningText) {
-    const fallbackOpening = data.summary || '보험금 청구와 손해사정 실무에서 피보험자의 정당한 권익을 보호하기 위한 핵심 법리와 대응 전략을 상세히 안내해 드립니다.';
-    if (/^##\s*(?:💡|🎯)?\s*핵심\s*요약/i.test(trimmedBody)) {
-      body = body.replace(/(##\s*(?:💡|🎯)?\s*핵심\s*요약[^\n]*\r?\n+(?:[ \t]*>.*(?:\r?\n|$))+)/i, `$1\n${fallbackOpening}\n\n`);
-    } else {
-      body = `${fallbackOpening}\n\n${body.trim()}`;
-    }
-  }
-
-  // ── [4. 다단계 솔루션(①~⑳) 콜론 분리 및 H6 헤딩 승격] ───────────────────
-  body = body.replace(
-    /(?:^|\r?\n)(?<!#\s*)([①-⑳])\s*(?:\*\*)?(?:[1-9]단계\s*:\s*)?([^\n:]+?)(?:\*\*)?\s*:\s*([^\n]+)/g,
-    (m, num, title, desc) => {
-      if (m.trim().startsWith('#')) return m;
-      if (/\d+$/.test(title.trim()) && /^\d+/.test(desc.trim())) return m;
-      const cleanTitle = title.replace(/[*_#]/g, '').trim();
-      const cleanDesc = desc.trim();
-      return `\n\n###### ${num} ${cleanTitle}\n\n${cleanDesc}`;
-    }
-  );
-
-  // ── [5. 핵심 요약 박스 순수 텍스트 정규화 (💡 제거 및 불릿 래핑)] ─────────
-  body = body.replace(
-    /(##\s*(?:💡\s*|🎯\s*)?(?:핵심\s*요약|핵심요약|핵심\s*포인트)\s*\r?\n+)((?:[ \t]*>.*(?:\r?\n|$))+)/gi,
-    (m, head, bullets) => {
-      const cleanBullets = bullets
-        .split(/\r?\n/)
-        .map((l) => l.trim())
-        .filter(Boolean)
-        .map((l) => {
-          let text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').replace(/^>\s*/, '').trim();
-          text = text.replace(/^(?:\*\*)?\[?\s*핵심\s*쟁점\s*\d*\s*\]?(?:\*\*)?\s*\*+\s*:\s*/gi, '');
-          text = text.replace(/^\[?\s*핵심\s*쟁점\s*\d*\s*\]?\s*:\s*/gi, '');
-          text = text.replace(/^\[[^\n\]]+\]\s*\*+\s*:\s*/, '');
-          text = text.replace(/^[💡🎯📌⭐🛡️✅☑️✔]+\s*/, '');
-          // '핵심 키워드 1 : ', '핵심 키워드 : ' 등 무의미한 더미 키워드 접두사 제거
-          text = text.replace(/^(?:\*\*)?핵심\s*키워드\s*\d*(?:\*\*)?\s*[:：]\s*/i, '');
-          if (!text) return '';
-          return `> - ${text.trim()}`;
-        })
-        .filter(Boolean)
-        .join('\n');
-      return `## 핵심 요약\n${cleanBullets}\n\n`;
-    }
-  );
-
-  // ── [6. 1분 자가진단 헤딩 및 체크리스트 완전 표준화 (이모지 제거)] ─────────
-  body = body.replace(/##[^\n]*1분\s*(?:자가진단|체크리스트|체크)[^\n]*/gi, (m) => {
-    let subject = '';
-    const colonMatch = m.match(/:\s*([^\n\r]+)/);
-    if (colonMatch && !colonMatch[1].includes('지금 전문가')) {
-      subject = ` : ${colonMatch[1].replace(/체크리스트/g, '').replace(/[💡🎯📌⭐🛡️✅☑️✔]/g, '').trim()} 체크리스트`;
-    } else {
-      subject = ' : 체크리스트';
-    }
-    return `## 1분 자가진단${subject}`;
-  });
-
-  body = body.replace(/(##\s*1분\s*자가진단[^\n]*\r?\n+)((?:[ \t]*>?[ \t]*[-*+☑️✅✔\[].*\r?\n*)+)/gi, (m, head, bullets) => {
-    const cleanBullets = bullets
-      .split(/\r?\n/)
-      .map((l) => l.trim())
-      .filter((l) => l && !l.startsWith('---') && !l.startsWith('***') && !l.includes('위 항목 중 하나라도'))
-      .map((l) => {
-        let text = l.replace(/^(?:>\s*)?[-*+]\s*/, '').trim();
-        text = text.replace(/^[☑️✅✔]+\s*/, '');
-        if (!text.startsWith('[ ]') && !text.startsWith('[-]') && !text.startsWith('[x]')) {
-          text = `[ ] ${text}`;
-        }
-        return `> - ${text}`;
-      })
-      .join('\n');
-    return `${head.trim()}\n${cleanBullets}\n\n`;
-  });
-
-  // ── [7. FAQ 및 결론 헤딩 표준화 (이모지 제거 및 순수 시맨틱 헤더화)] ───────
-  body = body.replace(/##\s*(?:[1-9]\.\s*)?(?:💡\s*|❓\s*)?(?:자주\s*묻는\s*질문|자주묻는질문|FAQ)[^\n]*/gi, '## 자주 묻는 질문 (FAQ)');
-  body = body.replace(/##\s*(?:[1-9]\.\s*)?(?:결론\s*및\s*보상스쿨의\s*맞춤형\s*솔루션|결론\s*및\s*보상스쿨\s*맞춤형\s*솔루션|결론\s*및\s*맞춤형\s*솔루션)[^\n]*/gi, '## 결론 및 보상스쿨의 맞춤형 솔루션');
-
-  // ── [8. 표(Table) 끝에 붙은 인라인 용어사전, 팁, 링크 분리 및 삭제] ────
-  body = body.replace(
-    /(\|.*\|)[ \t]*(?:💡|📖|📌|>?[ \t]*💡)\s*(?:\*\*)?(?:함께\s*읽[^\n:]+?|관련\s*글[^\n:]+?)(?:\*\*)?\s*(?::|\r?\n)[\s\S]*?(?=\r?\n\r?\n#|$)/gi,
-    '$1\n\n'
-  );
-  body = body.replace(
-    /(\|.*\|)[ \t]*(?:💡|📖|📌|>?[ \t]*(?:💡|📖|📌))\s*(?:\*\*)?([^:\n*]+?)(?:\*\*)?\s*:\s*([^\n]+)/g,
-    (m, tableRow, term, desc) => {
-      const cleanTerm = term.replace(/[*_\[\]]/g, '').trim();
-      return `${tableRow}\n\n> **${cleanTerm}** : ${desc.trim()}`;
-    }
-  );
-
-  // ── [9. 인라인 용어사전 표준화 (💡 제거, 볼드 통일)] ────────────────────
-  body = body.replace(/>\s*(?:💡|📖|📌)\s*(?:\*\*)?\[([^\n\]]+)\](?:\*\*)?\s*:\s*/g, '> **$1** : ');
-  body = body.replace(/>\s*(?:💡|📖|📌)\s*(?:\*\*)?([^:\n*]+?)(?:\*\*)?\s*:\s*/g, (m, term) => {
-    const cleanTerm = term.replace(/[*_\[\]]/g, '').trim();
-    if (cleanTerm.includes('피드백') || cleanTerm.includes('실무')) return m;
-    return `> **${cleanTerm}** : `;
-  });
-
-  // ── [10. 중복 관련 글 추천 헤더 및 본문 단독 링크 목록 삭제] ─
-  body = body.replace(/##\s*🔗?\s*함께\s*읽으면\s*(?:도움이\s*되는|도움되는|좋은)\s*보상\s*(?:칼럼|글)[\s\S]*?(?=\r?\n\r?\n#|$)/gi, '');
-  body = body.replace(/(?:^|\r?\n)\[[^\]\n]+\]\(\/blog\/[^\)\n]+\)[ \t]*(?=\r?\n|$)/g, '');
-
-  // ── [11. H3 소제목 공문서식 번호 제거 및 이스케이프된 H2 헤딩 자동 승격] ─
-  body = body.replace(/###\s*(?:[가-하]\.|\([가-하]\)|[1-9]\.|\([1-9]\)|[1-9]\))\s*/g, '### ');
-  body = body.replace(/(?:^|\r?\n)([1-9])\\\.\s+([^\n]+)/g, '\n\n## $1. $2');
-
-  // ── [11-1. 파손된 핵심 요약 볼드 기호 교정] ────────────────────────────
-  body = body.replace(/(>\s*-\s*)([^\n*:]+?)\*\*\s*:/g, '$1**$2** :');
-
-  // ── [11-2. 시그니처 박스 표준화 (💡 제거: 보상스쿨 피드백 & 실무 인사이트)] ─
-  body = body.replace(
-    />\s*###\s*(?:💡\s*|👨‍⚖️\s*|⚖️\s*)?(?:보상스쿨\s*피드백\s*&\s*실무\s*인사이트|보상스쿨\s*실무\s*TIP|보상스쿨\s*실무TIP|손해사정사\s*실무\s*조언|실무\s*TIP|보상스쿨\s*실무쟁점)[^\n]*/gi,
-    '> ### 보상스쿨 피드백 & 실무 인사이트'
-  );
-  body = body.replace(
-    />\s*(?:💡\s*)?\*\*(?:보상스쿨\s*피드백\s*&\s*실무\s*인사이트|보상스쿨\s*실무\s*TIP|보상스쿨\s*실무TIP|손해사정사\s*실무\s*조언|실무\s*TIP)\*\*\s*:\s*/gi,
-    '> ### 보상스쿨 피드백 & 실무 인사이트\n> '
-  );
-
-  // ── [11-3. 본문 및 헤딩 내 잔존 유니코드 이모지 및 대괄호([]) 일괄 정규화] ─
-  body = body.replace(/##\s*[💡🎯📌⭐🛡️🔴⚡💎🔮🌿🧑‍⚖️⚖️]\s*/g, '## ');
-  body = body.replace(/###\s*[💡🎯📌⭐🛡️🔴⚡💎🔮🌿🧑‍⚖️⚖️]\s*/g, '### ');
-  body = body.replace(/##\s*([1-9])\.\s*\[([^\]\n]+)\]/g, '## $1. $2');
-  body = body.replace(/##\s*1분\s*자가진단\s*:\s*\[([^\]\n]+)\]/g, '## 1분 자가진단 : $1');
-
-  // ── [11-4. H2/H3/H4 헤딩 뒤에 본문 볼드(**)가 줄바꿈 없이 붙은 결함 분리] ─
-  body = body.replace(/^(#{2,4}[^\n\r*]+)(\*\*[가-힣A-Za-z0-9])/gm, '$1\n\n$2');
-
-  // ── [12. 마크다운 표(Table) 구분선 및 행 오타 자동 교정] ────────────────
-  body = body.replace(/(\|(?:\s*:?-+:?\s*\|)+)\s*>[ \t]*/g, '$1\n');
-  body = body.replace(/(\|.*\|)\r?\n[ \t]*\r?\n+(\s*\|)/g, '$1\n$2');
-
-  // ── [13. 표와 인용구 사이 빈 줄 강제 확보] ────────────────────────────
-  body = body.replace(/(\|.*\|)\r?\n(>[^\n]+)/g, '$1\n\n$2');
-
-  // ── [13-1. 리스트 및 마크다운 목록 문법 정밀 표준화 (공백 누락 방지)] ────────
-  body = body.replace(/(\d+)\.\s*\*\*/g, '$1. **');
-  body = body.replace(/>\s*-\s*\*\*/g, '> - **');
-  body = body.replace(/^>\s*\*\*/gm, '> **');
-  body = body.replace(/\*\*\s*:\s*/g, '** : ');
-  body = body.replace(/(\d+\.\s*\*\*[^*]+\*\*\s*:[^\n]+)(\n)(\d+\.)/g, '$1\n\n$3');
-
-  // ── [13-2. 마크다운 별표(Bold) 문법 정밀 표준화] ──────────────────────
-  body = body.replace(/\*{3,}([^\n*]+?)\*{2,}/g, '**$1**');
-  body = body.replace(/\*{2,}([^\n*]+?)\*{3,}/g, '**$1**');
-  body = body.replace(/^>\s*\*\*([^*:\n]+)\*\s*:/gm, '> **$1** :');
-
-  // ── [13-3. LaTeX 수식 ($$) 완전 자동 교정 (순수 마크다운화)] ─────────────
-  if (body.includes('$$')) {
-    body = body.replace(/\$\$([\s\S]*?)\$\$/g, (m, p1) => {
-      let clean = p1.replace(/\\text\{([^}]+)\}/g, '$1')
-                    .replace(/\\times/g, '×')
-                    .replace(/\\sim/g, '~')
-                    .replace(/\\%/g, '%')
-                    .trim();
-      return `> **산출 공식** : **${clean}**`;
-    });
-  }
-
-  // ── [13-4. 계산식 인라인 백틱(\`) 코딩 폰트 이질감 방지 자동 정규화] ─────────
-  body = body.replace(/`([^`\n]*[=×x][^`\n]*)`/g, (match, formula) => {
-    const pretty = formula.replace(/\s+x\s+/g, ' × ').trim();
-    return `**${pretty}**`;
-  });
-
-  // ── [13-5. 피드백 박스 헤딩 뒤 빈 줄 누락 자동 보충] ───────────────────
-  body = body.replace(/(>\s*###\s*보상스쿨 피드백 & 실무 인사이트\s*\n)(>\s*[^\n\s>])/g, '$1>\n$2');
-
-  // ── [13-6. 짝이 맞지 않는 고아 볼드(**) 태그 자동 감지 및 제거] ──────────
-  const bMatches = body.match(/\*\*/g);
-  if (bMatches && bMatches.length % 2 !== 0) {
-    const lastIdx = body.lastIndexOf('**');
-    if (lastIdx !== -1) {
-      body = body.slice(0, lastIdx) + body.slice(lastIdx + 2);
-    }
-  }
-
-  // ── [14. 스마트 문단 호흡 정규화 (GFM Paragraph Breathing Rule)] ─────────
-  // 4문장 이상의 긴 텍스트 단락을 2~3문장 단위로 쾌적하게 \n\n 분리
-  const blocks = body.split(/\r?\n\r?\n/);
-  const normalizedBlocks = blocks.map(block => {
-    const trimmed = block.trim();
-    if (
-      !trimmed ||
-      trimmed.startsWith('#') ||
-      trimmed.startsWith('>') ||
-      trimmed.startsWith('|') ||
-      trimmed.startsWith('-') ||
-      trimmed.startsWith('*') ||
-      /^[1-9]\./.test(trimmed) ||
-      trimmed.startsWith('```')
-    ) {
-      return block;
-    }
-
-    // 문장 분리
-    const sentences = [];
-    let current = '';
-    let inParen = 0;
-    let inQuote = false;
-
-    for (let i = 0; i < block.length; i++) {
-      const char = block[i];
-      current += char;
-
-      if (char === '(' || char === '[' || char === '{') inParen++;
-      else if (char === ')' || char === ']' || char === '}') inParen = Math.max(0, inParen - 1);
-      else if (char === '"' || char === '“' || char === '”') inQuote = !inQuote;
-
-      if (inParen === 0 && (char === '.' || char === '?' || char === '!')) {
-        const nextChar = block[i + 1];
-        const isEnd = (nextChar === undefined || /\s/.test(nextChar) || nextChar === '"' || nextChar === '”');
-        const prevTrimmed = current.slice(0, -1).trim();
-        const prevChar = prevTrimmed.slice(-1);
-        const isSentenceEnd = /[가-힣0-9"'\)\]]/.test(prevChar);
-        const isNumberDot = /\d+\.$/.test(current.trim());
-
-        if (isEnd && isSentenceEnd && !isNumberDot) {
-          while (i + 1 < block.length && /\s/.test(block[i + 1])) {
-            i++;
-          }
-          sentences.push(current.trim());
-          current = '';
-        }
-      }
-    }
-
-    if (current.trim()) {
-      sentences.push(current.trim());
-    }
-
-    if (sentences.length < 4) return block;
-
-    const chunks = [];
-    let currentChunk = [];
-
-    for (let i = 0; i < sentences.length; i++) {
-      currentChunk.push(sentences[i]);
-      const remaining = sentences.length - (i + 1);
-      if (currentChunk.length >= 2 && remaining >= 2) {
-        chunks.push(currentChunk.join(' '));
-        currentChunk = [];
-      }
-    }
-
-    if (currentChunk.length > 0) {
-      chunks.push(currentChunk.join(' '));
-    }
-
-    return chunks.join('\n\n');
-  });
-
-  body = normalizedBlocks.join('\n\n');
-
-  // ── [15. 다중 빈 줄 정리] ──────────────────────────────────────────────
-  body = body.replace(/(?:\r?\n){3,}/g, '\n\n').trim();
-
-  // gray-matter stringify로 안전하게 재결합
-  const newContent = matter.stringify(body, data);
-  if (newContent !== fileRaw) {
-    fs.writeFileSync(filePath, newContent, 'utf8');
-    return true;
-  }
-  return false;
-}
 
 function normalizeFilename(filename) {
   const baseName = filename.replace(/\.md$/, '');
@@ -396,6 +38,8 @@ function main() {
 
   files.forEach((f) => {
     let fullPath = path.join(POSTS_DIR, f);
+    
+    // 1. 파일명 구글 SEO 표준 검사
     const standardName = normalizeFilename(f);
     if (standardName !== f) {
       const newPath = path.join(POSTS_DIR, standardName);
@@ -405,7 +49,12 @@ function main() {
       console.log(`  [SEO 파일명 교정] ${f} -> ${standardName}`);
     }
 
-    if (processPost(fullPath)) {
+    // 2. 단일 표준 엔진(SSOT) 기반 본문 및 메타데이터 무결성 검증/교정
+    const rawContent = fs.readFileSync(fullPath, 'utf8');
+    const result = normalizePost(rawContent);
+
+    if (result.isChanged) {
+      fs.writeFileSync(fullPath, result.fullContent, 'utf8');
       modifiedCount++;
     }
   });
@@ -417,4 +66,3 @@ function main() {
 }
 
 main();
-

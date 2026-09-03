@@ -160,6 +160,8 @@ export const sharedComponents: Components & Record<string, any> = {
       const tagName = (node.props as any)?.node?.tagName;
       if (typeof tagName === 'string' && /^h[1-6]$/i.test(tagName)) return true;
       if (typeof node.type === 'string' && /^h[1-6]$/i.test(node.type)) return true;
+      const text = extractTextFromNode(node).trim();
+      if (/^(?:###|##)?\s*보상스쿨\s*피드백/i.test(text)) return true;
       return false;
     };
 
@@ -263,7 +265,7 @@ export const sharedComponents: Components & Record<string, any> = {
     const isInline = !className;
     if (isInline) {
       return (
-        <code className="px-1.5 py-0.5 mx-0.5 rounded-none bg-gray-100 dark:bg-[#303134] text-[#d93025] dark:text-[#f28b82] text-[0.9em] font-sans font-bold">
+        <code className="px-1.5 py-0.5 mx-0.5 rounded-none bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-slate-200/80 dark:border-zinc-700/80 text-[0.92em] font-sans font-medium">
           {children}
         </code>
       );

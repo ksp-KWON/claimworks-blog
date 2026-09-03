@@ -229,25 +229,8 @@ function getKSTDateTimeString(date = new Date()) {
   return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}+09:00`;
 }
 
-/**
- * 저장 직전 마크다운 W3C 시맨틱 무결성 게이트키퍼 (Ingestion Gatekeeper)
- * - AI가 작성한 본문이 디스크에 저장되기 직전, 헤딩 유착 및 표준 빈 줄을 사전 정제
- */
-function sanitizeMarkdownBeforeSave(rawContent) {
-  if (!rawContent) return '';
-  let body = String(rawContent).trim();
-
-  // 1. 헤딩 뒤에 엔터 없이 본문/볼드가 붙어버린 결함 사전 분리 (예: ### 소제목**본문**)
-  body = body.replace(/^(#{2,4}[^\n\r*]+)(\*\*[가-힣A-Za-z0-9])/gm, '$1\n\n$2');
-
-  // 2. 헤딩(##, ###) 뒤에 바로 다음 줄에 본문이 붙은 경우 표준 빈 줄 1개(\n\n) 보장
-  body = body.replace(/^(#{2,4}[^\n\r]+)\r?\n([^\r\n#>-|])/gm, '$1\n\n$2');
-
-  // 3. 3개 이상 과도한 빈 줄을 2개(표준 빈 줄 1개)로 정돈
-  body = body.replace(/(?:\r?\n){3,}/g, '\n\n');
-
-  return body.trim();
-}
+// ── 단일 표준 마크다운 정규화 엔진 연동 (SSOT 사전 예방 체계) ─────────────
+const { normalizeFrontmatter, normalizeMarkdownBody } = require('./markdown-standard.js');
 
 function saveMarkdownPost(topic, summary, content, additionalFrontmatter = {}) {
   const uniqueSlug = resolveUniqueSlug(topic.slug);
@@ -255,7 +238,7 @@ function saveMarkdownPost(topic, summary, content, additionalFrontmatter = {}) {
 
   const dateStr = getKSTDateTimeString();
 
-  const fmData = {
+  const rawFmData = {
     title: topic.title,
     date: dateStr,
     summary: summary || topic.summary || '',
@@ -265,13 +248,16 @@ function saveMarkdownPost(topic, summary, content, additionalFrontmatter = {}) {
   };
   
   if (topic.specialtyCategory) {
-    fmData.category.push(topic.specialtyCategory);
+    rawFmData.category.push(topic.specialtyCategory);
   }
 
-  // 저장 직전 사전 예방 무결성 정제 적용
-  const sanitizedContent = sanitizeMarkdownBeforeSave(content);
+  // 1. 저장 직전 프론트매터 단일 표준 정규화
+  const fmData = normalizeFrontmatter(rawFmData);
 
-  // gray-matter를 이용한 직렬화
+  // 2. 저장 직전 마크다운 본문 W3C/GFM 단일 표준 사전예방 정규화 (원천 차단)
+  const sanitizedContent = normalizeMarkdownBody(content, fmData.summary);
+
+  // 3. gray-matter를 이용한 안전한 직렬화
   const fullContent = matter.stringify(sanitizedContent, fmData);
 
   const filePath = path.join(POSTS_DIR, `${uniqueSlug}.md`);

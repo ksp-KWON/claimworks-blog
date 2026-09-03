@@ -168,20 +168,38 @@ export async function runAutoGenerationWorkflow(
         const pool = await poolRes.json();
         const valid = pool.filter((p: any) => !p.used && p.caseNumber && p.courtName);
         if (valid.length > 0) {
-          const matched = valid.find((p: any) => {
-            const kw = (topic.title + ' ' + dynamicKeyword).replace(/\s+/g, '');
-            return (p.caseName + (p.summary || '')).replace(/\s+/g, '').includes(kw);
-          }) || valid[0];
+          const rawTokens = (topic.title + ' ' + dynamicKeyword)
+            .replace(/[\(\)\[\]·,]/g, ' ')
+            .split(/\s+/)
+            .map((t: string) => t.trim())
+            .filter((t: string) => t.length >= 2);
+
+          let bestMatch = valid[0];
+          let maxScore = 0;
+
+          for (const item of valid) {
+            let score = 0;
+            const cName = item.caseName || '';
+            const sText = item.summary || '';
+            for (const tk of rawTokens) {
+              if (cName.includes(tk)) score += 3;
+              if (sText.includes(tk)) score += 1;
+            }
+            if (score > maxScore) {
+              maxScore = score;
+              bestMatch = item;
+            }
+          }
 
           precedentData = {
-            id: matched.id,
-            caseNo: matched.caseNumber,
-            caseName: matched.caseName,
-            judgmentSummary: matched.summary,
-            courtName: matched.courtName
+            id: bestMatch.id,
+            caseNo: bestMatch.caseNumber,
+            caseName: bestMatch.caseName,
+            judgmentSummary: bestMatch.summary,
+            courtName: bestMatch.courtName
           };
-          topic.caseNumber = matched.caseNumber;
-          onProgress(`⚖️ [판례 풀 확보] 실존 판례 주입: [${matched.courtName}] ${matched.caseNumber}`);
+          topic.caseNumber = bestMatch.caseNumber;
+          onProgress(`⚖️ [판례 풀 확보] 실존 분조위 결정문 주입: [${bestMatch.courtName}] ${bestMatch.caseNumber} - ${bestMatch.caseName.substring(0, 35)}`);
         }
       }
     } catch (e) {

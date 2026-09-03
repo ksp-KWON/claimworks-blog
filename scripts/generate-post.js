@@ -150,30 +150,30 @@ async function generateSinglePost() {
   let precedentData = null;
   let markPrecedentUsed = null;
 
-  if (dailyTopic.category === '판례·분쟁조정') {
-    const { getVerifiedPrecedent } = require('../src/lib/precedent-pool.js');
-    console.log(`  ⚖️ [판례 게이트] 주제("${dailyTopic.keyword}")로 검증된 판례 풀(Pool) 탐색 중...`);
-    
-    const poolResult = getVerifiedPrecedent(dailyTopic.keyword);
-    if (poolResult && poolResult.item) {
-      const p = poolResult.item;
-      precedentData = {
-        id: p.id,
-        caseNo: p.caseNumber,
-        caseName: p.caseName,
-        judgmentSummary: p.summary,
-        courtName: p.courtName
-      };
-      markPrecedentUsed = poolResult.markAsUsed;
-      console.log(`    ✅ [판례 확보] 검증된 실존 판례/분조위 주입: [${p.courtName}] ${p.caseNumber} - ${p.caseName}`);
+  const { getVerifiedPrecedent } = require('../src/lib/precedent-pool.js');
+  const isPrecedentCategory = dailyTopic.category === '판례·분쟁조정' || dailyTopic.category.includes('판례');
+
+  console.log(`  ⚖️ [지능형 분조위·판례 게이트] 주제("${dailyTopic.keyword}") 연관 선례 탐색 중...`);
+  const poolResult = getVerifiedPrecedent(dailyTopic.keyword);
+
+  if (poolResult && poolResult.item) {
+    const p = poolResult.item;
+    precedentData = {
+      id: p.id,
+      caseNo: p.caseNumber,
+      caseName: p.caseName,
+      judgmentSummary: p.summary,
+      courtName: p.courtName
+    };
+    markPrecedentUsed = poolResult.markAsUsed;
+    console.log(`    ✅ [실존 선례 주입] [${p.courtName}] ${p.caseNumber} - ${p.caseName.substring(0, 40)}`);
+  } else if (isPrecedentCategory) {
+    console.log(`  ℹ️ 풀 내 매칭 부재 → 법제처 실시간 1회 안전 탐색으로 폴백...`);
+    precedentData = await fetchPrecedentQuick(dailyTopic.keyword);
+    if (precedentData) {
+      console.log(`    ✅ [실시간 확보] 법제처 판례 주입: ${precedentData.caseNo} (${precedentData.caseName})`);
     } else {
-      console.log(`  ℹ️ 풀 내 미사용 매칭 부재 → 법제처 실시간 1회 안전 탐색으로 폴백...`);
-      precedentData = await fetchPrecedentQuick(dailyTopic.keyword);
-      if (precedentData) {
-        console.log(`    ✅ [실시간 확보] 법제처 판례 주입: ${precedentData.caseNo} (${precedentData.caseName})`);
-      } else {
-        console.log(`    ℹ️ [안전 강등] 일치 판례 부재 → 파이프라인 무중단 유지 및 사건번호 없는 원칙명 모드로 자동 강등`);
-      }
+      console.log(`    ℹ️ [안전 강등] 일치 판례 부재 → 파이프라인 무중단 유지 및 사건번호 없는 원칙명 모드로 자동 강등`);
     }
   }
 

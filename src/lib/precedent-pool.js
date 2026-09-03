@@ -47,17 +47,38 @@ function getVerifiedPrecedent(keyword = '') {
 
   if (validItems.length === 0) return null;
 
-  // 키워드 매칭 우선 탐색
+  // 2단계: 지능형 토큰 스코어링 검색 (Token Scoring Search)
   let selected = null;
+  let highestScore = 0;
+
   if (keyword) {
-    const cleanKw = keyword.replace(/\s+/g, '');
-    selected = validItems.find(item => {
-      const target = (item.caseName + (item.summary || '') + (item.targetKeyword || '')).replace(/\s+/g, '');
-      return target.includes(cleanKw);
-    });
+    // 2글자 이상의 핵심 키워드 토큰 추출
+    const tokens = keyword
+      .replace(/[\(\)\[\]·,]/g, ' ')
+      .split(/\s+/)
+      .map(t => t.trim())
+      .filter(t => t.length >= 2);
+
+    for (const item of validItems) {
+      let score = 0;
+      const caseName = item.caseName || '';
+      const summary = item.summary || '';
+      const targetKw = item.targetKeyword || '';
+
+      for (const token of tokens) {
+        if (caseName.includes(token)) score += 3; // 안건명 일치 시 높은 가중치
+        if (summary.includes(token)) score += 1;  // 요약문 일치
+        if (targetKw.includes(token)) score += 2; // 타겟 키워드 일치
+      }
+
+      if (score > highestScore) {
+        highestScore = score;
+        selected = item;
+      }
+    }
   }
 
-  // 매칭 항목이 없으면 미사용 첫 번째 항목 선택
+  // 매칭 점수가 없으면 (또는 키워드가 없으면) 미사용 첫 번째 항목 선택
   if (!selected) {
     selected = validItems[0];
   }

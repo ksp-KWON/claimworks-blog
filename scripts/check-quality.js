@@ -254,6 +254,36 @@ function processPost(filePath) {
   body = body.replace(/\*{2,}([^\n*]+?)\*{3,}/g, '**$1**');
   body = body.replace(/^>\s*\*\*([^*:\n]+)\*\s*:/gm, '> **$1** :');
 
+  // ── [13-3. LaTeX 수식 ($$) 완전 자동 교정 (순수 마크다운화)] ─────────────
+  if (body.includes('$$')) {
+    body = body.replace(/\$\$([\s\S]*?)\$\$/g, (m, p1) => {
+      let clean = p1.replace(/\\text\{([^}]+)\}/g, '$1')
+                    .replace(/\\times/g, '×')
+                    .replace(/\\sim/g, '~')
+                    .replace(/\\%/g, '%')
+                    .trim();
+      return `> **산출 공식** : **${clean}**`;
+    });
+  }
+
+  // ── [13-4. 계산식 인라인 백틱(\`) 코딩 폰트 이질감 방지 자동 정규화] ─────────
+  body = body.replace(/`([^`\n]*[=×x][^`\n]*)`/g, (match, formula) => {
+    const pretty = formula.replace(/\s+x\s+/g, ' × ').trim();
+    return `**${pretty}**`;
+  });
+
+  // ── [13-5. 피드백 박스 헤딩 뒤 빈 줄 누락 자동 보충] ───────────────────
+  body = body.replace(/(>\s*###\s*보상스쿨 피드백 & 실무 인사이트\s*\n)(>\s*[^\n\s>])/g, '$1>\n$2');
+
+  // ── [13-6. 짝이 맞지 않는 고아 볼드(**) 태그 자동 감지 및 제거] ──────────
+  const bMatches = body.match(/\*\*/g);
+  if (bMatches && bMatches.length % 2 !== 0) {
+    const lastIdx = body.lastIndexOf('**');
+    if (lastIdx !== -1) {
+      body = body.slice(0, lastIdx) + body.slice(lastIdx + 2);
+    }
+  }
+
   // ── [14. 스마트 문단 호흡 정규화 (GFM Paragraph Breathing Rule)] ─────────
   // 4문장 이상의 긴 텍스트 단락을 2~3문장 단위로 쾌적하게 \n\n 분리
   const blocks = body.split(/\r?\n\r?\n/);

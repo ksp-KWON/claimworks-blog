@@ -97,12 +97,14 @@ jobs:
           echo "✍️ 확정 카테고리: $POST_TYPE"
           npm run generate:post
 
-      - name: 금감원 소비자보호센터 보도자료 동기화
+      - name: 금감원 소비자보호센터 보도자료 및 분쟁조정 풀 동기화
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           echo "📢 금감원 보도자료 및 소비자경보 업데이트 수집 중..."
           node scripts/generate-fss-news.js || true
+          echo "⚖️ 금감원 분쟁조정위원회 최신 결정례 증분 동기화 중..."
+          node scripts/ingest-fss-tistory.js 1 || true
 
       - name: 원격 브랜치 최신화 (충돌 방지)
         run: git pull origin main --autostash --rebase
@@ -110,7 +112,7 @@ jobs:
       - name: 변경사항 커밋 & 푸시
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "auto: [${{ steps.set_category.outputs.category }}] 자동글쓰기 및 금감원 뉴스 업데이트"
-          file_pattern: 'src/content/posts/*.md public/data/*.json'
+          commit_message: "auto: [${{ steps.set_category.outputs.category }}] 자동글쓰기 및 판례풀/금감원 뉴스 업데이트"
+          file_pattern: 'src/content/posts/*.md public/data/*.json src/data/*.json'
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"

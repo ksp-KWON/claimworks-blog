@@ -159,8 +159,38 @@ export async function runAutoGenerationWorkflow(
   
   const topic = safeJsonParse(topicPlanStr);
 
+  // ⚖️ 판례 카테고리 또는 precedent 모드 시 판례 풀 연동
+  let precedentData: any = null;
+  if (type === 'precedent' || targetCategory.includes('판례')) {
+    try {
+      const poolRes = await fetch('/data/precedent-pool.json');
+      if (poolRes.ok) {
+        const pool = await poolRes.json();
+        const valid = pool.filter((p: any) => !p.used && p.caseNumber && p.courtName);
+        if (valid.length > 0) {
+          const matched = valid.find((p: any) => {
+            const kw = (topic.title + ' ' + dynamicKeyword).replace(/\s+/g, '');
+            return (p.caseName + (p.summary || '')).replace(/\s+/g, '').includes(kw);
+          }) || valid[0];
+
+          precedentData = {
+            id: matched.id,
+            caseNo: matched.caseNumber,
+            caseName: matched.caseName,
+            judgmentSummary: matched.summary,
+            courtName: matched.courtName
+          };
+          topic.caseNumber = matched.caseNumber;
+          onProgress(`⚖️ [판례 풀 확보] 실존 판례 주입: [${matched.courtName}] ${matched.caseNumber}`);
+        }
+      }
+    } catch (e) {
+      console.warn('Precedent pool fetch fallback:', e);
+    }
+  }
+
   onProgress('4/5: AI가 단일 헌법 뼈대에 맞추어 전문 칼럼 및 제목을 집필 중입니다 (약 20초 소요)...');
-  const prompt = buildArticlePrompt(topic, angle, existingPostsArr);
+  const prompt = buildArticlePrompt(topic, angle, existingPostsArr, precedentData);
   
   const generated = await callGeminiAPI(geminiKey, prompt, 'auto-generate', CONTENT_SCHEMA, ['flash', 'pro']);
   const { content, thoughtProcess, title: generatedTitle } = parseGeneratedContent(generated);

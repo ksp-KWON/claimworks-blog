@@ -63,6 +63,17 @@ function getVerifiedPrecedent(keyword = '') {
     selected = validItems[0];
   }
 
+  return {
+    item: selected,
+    markAsUsed: () => {
+      selected.used = true;
+      selected.usedAt = new Date().toISOString();
+      savePool(pool);
+      console.log(`    💾 [판례 풀 갱신] 사건 [${selected.caseNumber}] 사용 완료 마킹 (남은 미사용: ${validItems.length - 1}건)`);
+    }
+  };
+}
+
 const PUBLIC_POOL_PATH = path.resolve(__dirname, '../../public/data/precedent-pool.json');
 
 function savePool(pool) {
@@ -73,17 +84,6 @@ function savePool(pool) {
     if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
     fs.writeFileSync(PUBLIC_POOL_PATH, jsonStr, 'utf8');
   } catch {}
-}
-
-  return {
-    item: selected,
-    markAsUsed: () => {
-      selected.used = true;
-      selected.usedAt = new Date().toISOString();
-      savePool(pool);
-      console.log(`    💾 [판례 풀 갱신] 사건 [${selected.caseNumber}] 사용 완료 마킹 (남은 미사용: ${validItems.length - 1}건)`);
-    }
-  };
 }
 
 module.exports = { getVerifiedPrecedent, POOL_PATH, PUBLIC_POOL_PATH, savePool };

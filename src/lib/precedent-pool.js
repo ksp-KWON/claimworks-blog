@@ -1,12 +1,15 @@
 /**
  * precedent-pool.js
- * 판례 및 분쟁조정 결정례 풀(Pool) 관리 및 자가 검증 모듈
+ * 판례 및 금융분쟁조정 결정례 풀(Pool) 전사 단일 관리 및 2중 자가 검증 모듈
  * 
- * [헌법 원칙]
- * 1. 약속이 아닌 코드로 강제하는 2중 자가 검증 (Self-Validation Gate)
- *    - source, caseNumber, courtName 필수 필드가 없는 항목은 소비 단계에서 자동 스킵
- * 2. 500건 초과 시 자동 모니터링 알림
- * 3. 콤팩트 스키마 및 사용 여부(used) 마킹
+ * [헌법 6대 슬로건: 표준 · 범용 · 콤팩트 · 통합 · 공유 · 공통]
+ * 1. 단일 진실의 원천 (SSOT):
+ *    - 백엔드(Node.js)와 프론트엔드(Browser)가 오직 'public/data/precedent-pool.json' 하나만 공유.
+ *    - 중복 복사본 및 동기화 지연 원천 박멸.
+ * 2. 2중 자가 검증 게이트 (Self-Validation Guardrail):
+ *    - source 도장('law.go.kr' 또는 'fss-dispute'), 사건번호, 법원명 결측치 기계적 배제.
+ * 3. 사전 예방적 스키마 유효성 검증:
+ *    - 비정상 데이터 주입 시 저장을 거부하는 선제적 방어.
  */
 
 'use strict';
@@ -14,7 +17,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const POOL_PATH = path.resolve(__dirname, '../data/precedent-pool.json');
+// 전사 단일 풀 경로 (Next.js public 디렉토리)
+const POOL_PATH = path.resolve(process.cwd(), 'public/data/precedent-pool.json');
 
 /**
  * 풀에서 검증된 미사용 판례/분조위 1건 조회
@@ -31,16 +35,11 @@ function getVerifiedPrecedent(keyword = '') {
     return null;
   }
 
-  // 500건 모니터링 알림
-  if (pool.length >= 500) {
-    console.warn(`\n🔔 [판례 풀 모니터링] 총 ${pool.length}건 적재됨 — 향후 DB(D1/Supabase) 이관 검토를 권장합니다.`);
-  }
-
   // 1차 검증: 공식 source 및 필수 필드를 온전히 갖춘 미사용 항목 필터링
   const validItems = pool.filter(item => {
     if (item.used === true) return false;
     if (!item.caseNumber || !item.courtName) return false;
-    if (!item.source || (!item.source.includes('law.go.kr') && !item.source.includes('fss-dispute'))) {
+    if (!item.source || (!item.source.includes('law.go.kr') && !item.source.includes('fss-dispute') && !item.source.includes('fss-official'))) {
       return false; // 공식 출처 도장이 없는 임의 데이터는 기계적으로 거부
     }
     return true;
@@ -74,16 +73,25 @@ function getVerifiedPrecedent(keyword = '') {
   };
 }
 
-const PUBLIC_POOL_PATH = path.resolve(__dirname, '../../public/data/precedent-pool.json');
-
+/**
+ * 풀 안전 저장 (선제적 스키마 검증)
+ * @param {Array} pool - 판례 배열
+ */
 function savePool(pool) {
-  const jsonStr = JSON.stringify(pool, null, 2);
+  if (!Array.isArray(pool)) {
+    throw new Error('판례 풀은 반드시 배열이어야 합니다.');
+  }
+
+  // 사전 예방: 유효 항목만 보존
+  const sanitized = pool.filter(item => item && item.caseNumber && item.courtName);
+  const jsonStr = JSON.stringify(sanitized, null, 2);
+
+  const dir = path.dirname(POOL_PATH);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
   fs.writeFileSync(POOL_PATH, jsonStr, 'utf8');
-  try {
-    const publicDir = path.dirname(PUBLIC_POOL_PATH);
-    if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
-    fs.writeFileSync(PUBLIC_POOL_PATH, jsonStr, 'utf8');
-  } catch {}
 }
 
-module.exports = { getVerifiedPrecedent, POOL_PATH, PUBLIC_POOL_PATH, savePool };
+module.exports = { getVerifiedPrecedent, POOL_PATH, savePool };

@@ -191,7 +191,8 @@ async function generateSinglePost() {
   }
   console.log(`[4] 파싱 완료 (${content.length}자) | 기획: ${topic.title}`);
 
-  const confirmedCaseNo = precedentData?.caseNo || topic.caseNumber;
+  // 🚨 사건번호는 실제 검증된 실존 선례 데이터가 존재할 때만 엄격히 주입
+  const confirmedCaseNo = (precedentData?.caseNo && /\d/.test(precedentData.caseNo)) ? precedentData.caseNo : '';
   const additionalFm = confirmedCaseNo ? { caseNumber: confirmedCaseNo } : {};
   const saved = saveMarkdownPost(topic, topic.summary, content, additionalFm);
   

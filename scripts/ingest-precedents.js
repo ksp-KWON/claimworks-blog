@@ -36,13 +36,24 @@ function fetchText(url) {
 function cleanText(str) {
   if (!str) return '';
   return str
-    .replace(/<[^>]+>/g, ' ')
+    .replace(/<[^>]*>?/g, ' ')
     .replace(/&middot;/g, '·')
     .replace(/&quot;/g, '"')
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&nbsp;/g, ' ')
+    .replace(/&ldquo;|&rdquo;|&ldqu;|&rdqu;/g, '"')
+    .replace(/&lsquo;|&rsquo;/g, "'")
+    .replace(/&times;/g, '×')
+    .replace(/&divide;/g, '÷')
+    .replace(/&rarr;/g, '→')
+    .replace(/&ndash;/g, '-')
+    .replace(/&hellip;/g, '…')
+    .replace(/&[a-zA-Z0-9#]+;?/g, ' ')
+    .replace(/tt_article_useless_p_margin/g, '')
+    .replace(/contents_style/g, '')
+    .replace(/^["'>\s\\]+/, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -65,31 +76,45 @@ function parseFssTitle(rawTitle, itemUrl = '') {
   const urlMatch = itemUrl.match(/\/(\d+)$/);
   const articleId = urlMatch ? urlMatch[1] : '';
 
-  const match1 = clean.match(/(제?\d{4}-\d+호\]?|제?\d{4}-\d+|제?\d{2}-\d+호)/);
+  const match1 = clean.match(/(제?\d{4}-\d+호?|제?\d{2}-\d+호)/);
   if (match1) {
-    const caseNumber = match1[1].replace(/[\[\]]/g, '');
-    const caseName = clean.replace(match1[0], '').replace(/^\]\s*/, '').trim();
-    return { caseNumber: `금융분쟁조정위원회 ${caseNumber}`, caseName };
+    let ho = match1[1].replace(/[\[\]]/g, '');
+    if (!ho.startsWith('제')) ho = '제' + ho;
+    if (!ho.endsWith('호')) ho = ho + '호';
+    const caseName = clean
+      .replace(match1[0], '')
+      .replace(/^[\[\(][^\]\)]+[\]\)]\s*/, '')
+      .replace(/^\]\s*/, '')
+      .trim();
+    return { caseNumber: `금융분쟁조정위원회 ${ho}`, caseName };
   }
 
-  const match2 = clean.match(/(\d{6}(?:분조위무번호|조위무번호)?\]?|\d{6}\])/);
+  const match2 = clean.match(/(\d{6})/);
   if (match2) {
-    const numStr = match2[1].replace(/[\[\]]/g, '').trim();
-    const caseNumber = articleId ? `금융분쟁조정사례 (${numStr}-${articleId})` : `금융분쟁조정사례 (${numStr})`;
-    const caseName = clean.replace(match2[0], '').replace(/^\]\s*/, '').trim();
+    const numStr = match2[1].trim();
+    const caseNumber = `금융감독원 분쟁조정 (${numStr})`;
+    const caseName = clean
+      .replace(match2[0], '')
+      .replace(/^[\[\(][^\]\)]+[\]\)]\s*/, '')
+      .replace(/^\]\s*/, '')
+      .trim();
     return { caseNumber, caseName };
   }
 
-  const match3 = clean.match(/(소보원\d+\]?)/);
+  const match3 = clean.match(/(소보원\s*\d+)/);
   if (match3) {
-    const numStr = match3[1].replace(/[\[\]]/g, '').trim();
-    const caseNumber = articleId ? `소비자원 조정사례 (${numStr}-${articleId})` : `소비자원 조정사례 (${numStr})`;
-    const caseName = clean.replace(match3[0], '').replace(/^\]\s*/, '').trim();
+    const numStr = match3[1].trim();
+    const caseNumber = `한국소비자원 분쟁조정 (${numStr})`;
+    const caseName = clean
+      .replace(match3[0], '')
+      .replace(/^[\[\(][^\]\)]+[\]\)]\s*/, '')
+      .replace(/^\]\s*/, '')
+      .trim();
     return { caseNumber, caseName };
   }
 
-  const uniqueId = articleId ? `no.${articleId}` : clean.substring(0, 15);
-  return { caseNumber: `금융분쟁조정사례 [${uniqueId}]`, caseName: clean };
+  const uniqueId = articleId ? `제${articleId}호` : clean.substring(0, 15);
+  return { caseNumber: `금융분쟁조정사례 (${uniqueId})`, caseName: clean.replace(/^[\[\(][^\]\)]+[\]\)]\s*/, '').trim() };
 }
 
 function parseFssBody(html) {
@@ -99,7 +124,27 @@ function parseFssBody(html) {
   if (containerIdx === -1) return '';
 
   const snippet = html.substring(containerIdx, containerIdx + 6000);
-  const text = cleanText(snippet);
+  let text = cleanText(snippet);
+
+  // 블로그 사이드바/광고/링크 찌꺼기 절단
+  const cutMarkers = [
+    '<보험약관',
+    '<가계부관련',
+    '<순자산',
+    '<육아비용',
+    '<통신비',
+    '글을 올린 규칙과 비슷한 조정결정문',
+    '출처 월간생명보험',
+    '보험편: 총정리',
+    '보험약관 이해하는법 시리즈',
+    '봄이네가 가입한 보험'
+  ];
+  for (const marker of cutMarkers) {
+    const cutIdx = text.indexOf(marker);
+    if (cutIdx !== -1) {
+      text = text.substring(0, cutIdx).trim();
+    }
+  }
 
   let summary = '';
   const keywords = ['사례 요약', '위원회 판단', '위원회의 판단', '처리 결과', '처리결과', '결론', '쟁점'];
@@ -113,6 +158,11 @@ function parseFssBody(html) {
 
   if (!summary) {
     summary = text.substring(0, 800);
+  }
+
+  summary = cleanText(summary);
+  if (summary.includes('육아비용') || summary.includes('포장이사') || summary.includes('순자산 10억')) {
+    return '';
   }
 
   return summary.trim();

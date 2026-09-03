@@ -183,7 +183,7 @@ export async function runAutoGenerationWorkflow(
             .map((t: string) => t.trim())
             .filter((t: string) => t.length >= 2);
 
-          let bestMatch = valid[0];
+          let bestMatch: any = null;
           let maxScore = 0;
 
           for (const item of valid) {
@@ -191,7 +191,7 @@ export async function runAutoGenerationWorkflow(
             const cName = item.caseName || '';
             const sText = item.summary || '';
             for (const tk of rawTokens) {
-              if (cName.includes(tk)) score += 3;
+              if (cName.includes(tk)) score += 5;
               if (sText.includes(tk)) score += 1;
             }
             if (score > maxScore) {
@@ -200,15 +200,19 @@ export async function runAutoGenerationWorkflow(
             }
           }
 
-          precedentData = {
-            id: bestMatch.id,
-            caseNo: bestMatch.caseNumber,
-            caseName: bestMatch.caseName,
-            judgmentSummary: bestMatch.summary,
-            courtName: bestMatch.courtName
-          };
-          topic.caseNumber = bestMatch.caseNumber;
-          onProgress(`⚖️ [판례 풀 확보] 실존 분조위 결정문 주입: [${bestMatch.courtName}] ${bestMatch.caseNumber} - ${bestMatch.caseName.substring(0, 35)}`);
+          if (maxScore >= 4 && bestMatch) {
+            precedentData = {
+              id: bestMatch.id,
+              caseNo: bestMatch.caseNumber,
+              caseName: bestMatch.caseName,
+              judgmentSummary: bestMatch.summary,
+              courtName: bestMatch.courtName
+            };
+            topic.caseNumber = bestMatch.caseNumber;
+            onProgress(`⚖️ [판례 풀 확보] 실존 분조위 결정문 주입: [${bestMatch.courtName}] ${bestMatch.caseNumber} - ${bestMatch.caseName.substring(0, 35)}`);
+          } else {
+            topic.caseNumber = '';
+          }
         }
       }
     } catch (e) {

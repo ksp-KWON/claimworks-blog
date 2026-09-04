@@ -250,6 +250,8 @@ export function parseBlogPost(content: string): ParsedBlogPost {
     // 3개 이상 과도한 별표 오타만 마크다운 표준 볼드(**)로 정돈
     normalized = normalized.replace(/\*{3,}([^\n*]+?)\*{2,}/g, '**$1**');
     normalized = normalized.replace(/\*{2,}([^\n*]+?)\*{3,}/g, '**$1**');
+    // 괄호 뒤 볼드 + 한글 조사 결합 시 볼드 파싱 파손 방지 (CommonMark 6.2 사양 대응)
+    normalized = normalized.replace(/\*\*([^*\n()]+)\(([^)\n]+)\)\*\*([가-힣])/g, '**$1**($2)$3');
     return normalized;
   };
   

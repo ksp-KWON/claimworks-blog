@@ -67,126 +67,62 @@ function loadPool() {
   }
 }
 
-// ── 1. 금융감독원 분쟁조정사례 수집 엔진 (wpwsyn.tistory.com 564편) ───────────
-const FSS_BASE_URL = 'https://wpwsyn.tistory.com';
-const FSS_CAT_PATH = '/category/%3C%3C%EB%B3%B4%ED%97%98%EA%B4%80%EB%A0%A8%3E%3E/%EB%B3%B4%ED%97%98%EB%B6%84%EC%9F%81%EC%A1%B0%EC%A0%95%EC%82%AC%EB%A1%80';
+// ── 1. 금융감독원 공식 분쟁조정사례 수집 엔진 (fss.or.kr 1차 원문 직결) ────────
+const FSS_BASE_URL = 'https://www.fss.or.kr';
+const FSS_CASE_LIST_PATH = '/fss/job/fncCnflCase/list.do?menuNo=201195';
 
-function parseFssTitle(rawTitle, itemUrl = '') {
-  const clean = cleanText(rawTitle);
-  const urlMatch = itemUrl.match(/\/(\d+)$/);
-  const articleId = urlMatch ? urlMatch[1] : '';
-
-  const match1 = clean.match(/(제?\d{4}-\d+호?|제?\d{2}-\d+호)/);
-  if (match1) {
-    let ho = match1[1].replace(/[\[\]]/g, '');
+function parseCaseNumber(title, caseSlno) {
+  const clean = cleanText(title);
+  // 공식 결정호수(제XXXX-XX호) 패턴이 제목에 직접 있는 경우
+  const hoMatch = clean.match(/(제?\d{4}-\d+호?|제?\d{2}-\d+호)/);
+  if (hoMatch) {
+    let ho = hoMatch[1].replace(/[\[\]]/g, '');
     if (!ho.startsWith('제')) ho = '제' + ho;
     if (!ho.endsWith('호')) ho = ho + '호';
-    const caseName = clean
-      .replace(match1[0], '')
-      .replace(/^[\[\(][^\]\)]+[\]\)]\s*/, '')
-      .replace(/^\]\s*/, '')
-      .trim();
-    return { caseNumber: `금융분쟁조정위원회 ${ho}`, caseName };
+    return `금융분쟁조정위원회 ${ho}`;
   }
-
-  const match2 = clean.match(/(\d{6})/);
-  if (match2) {
-    const numStr = match2[1].trim();
-    const caseNumber = `금융감독원 분쟁조정 (${numStr})`;
-    const caseName = clean
-      .replace(match2[0], '')
-      .replace(/^[\[\(][^\]\)]+[\]\)]\s*/, '')
-      .replace(/^\]\s*/, '')
-      .trim();
-    return { caseNumber, caseName };
-  }
-
-  const match3 = clean.match(/(소보원\s*\d+)/);
-  if (match3) {
-    const numStr = match3[1].trim();
-    const caseNumber = `한국소비자원 분쟁조정 (${numStr})`;
-    const caseName = clean
-      .replace(match3[0], '')
-      .replace(/^[\[\(][^\]\)]+[\]\)]\s*/, '')
-      .replace(/^\]\s*/, '')
-      .trim();
-    return { caseNumber, caseName };
-  }
-
-  const uniqueId = articleId ? `제${articleId}호` : clean.substring(0, 15);
-  return { caseNumber: `금융분쟁조정사례 (${uniqueId})`, caseName: clean.replace(/^[\[\(][^\]\)]+[\]\)]\s*/, '').trim() };
+  // 공식 일련번호 기반 고유 사건번호 부여 (날짜 오인식 0% 방어)
+  return `금융감독원 분쟁조정사례 (제${caseSlno}호)`;
 }
 
-function parseFssBody(html) {
-  let containerIdx = html.indexOf('tt_article_useless_p_margin');
-  if (containerIdx === -1) containerIdx = html.indexOf('contents_style');
-  if (containerIdx === -1) containerIdx = html.indexOf('entry-content');
-  if (containerIdx === -1) return '';
-
-  const snippet = html.substring(containerIdx, containerIdx + 6000);
-  let text = cleanText(snippet);
-
-  // 블로그 사이드바/광고/링크 찌꺼기 절단
-  const cutMarkers = [
-    '<보험약관',
-    '<가계부관련',
-    '<순자산',
-    '<육아비용',
-    '<통신비',
-    '글을 올린 규칙과 비슷한 조정결정문',
-    '출처 월간생명보험',
-    '보험편: 총정리',
-    '보험약관 이해하는법 시리즈',
-    '봄이네가 가입한 보험'
-  ];
-  for (const marker of cutMarkers) {
-    const cutIdx = text.indexOf(marker);
-    if (cutIdx !== -1) {
-      text = text.substring(0, cutIdx).trim();
-    }
-  }
-
-  let summary = '';
-  const keywords = ['사례 요약', '위원회 판단', '위원회의 판단', '처리 결과', '처리결과', '결론', '쟁점'];
-  for (const kw of keywords) {
-    const idx = text.indexOf(kw);
-    if (idx !== -1) {
-      summary = text.substring(idx, idx + 1000);
-      break;
-    }
-  }
-
-  if (!summary) {
-    summary = text.substring(0, 800);
-  }
-
-  summary = cleanText(summary);
-  if (summary.includes('육아비용') || summary.includes('포장이사') || summary.includes('순자산 10억')) {
-    return '';
-  }
-
-  return summary.trim();
-}
-
-async function ingestFssDisputes(startPage = 1, endPage = 60) {
-  console.log(`\n🏛️ [금융감독원 분조위 수집 시작] (페이지 ${startPage} ~ ${endPage})`);
+async function ingestFssOfficialCases(startPage = 1, endPage = 21) {
+  console.log(`\n🏛️ [금융감독원 공식 분조위 수집 시작] (페이지 ${startPage} ~ ${endPage})`);
   const pool = loadPool();
   const existingUrls = new Set(pool.filter(p => p.url).map(p => p.url));
+  const existingCaseNos = new Set(pool.filter(p => p.caseNumber).map(p => p.caseNumber));
   let addedCount = 0;
 
   for (let page = startPage; page <= endPage; page++) {
-    const pageUrl = `${FSS_BASE_URL}${FSS_CAT_PATH}?page=${page}`;
+    const pageUrl = `${FSS_BASE_URL}${FSS_CASE_LIST_PATH}&pageIndex=${page}`;
     const listHtml = await fetchText(pageUrl);
     if (!listHtml || listHtml.length < 500) break;
 
-    const regex = /<a href="(\/\d+)"[^>]*class="link-article"[^>]*>[\s\S]*?<strong class="title">([\s\S]*?)<\/strong>/g;
-    let match;
-    const pageItems = [];
+    const tbodyMatch = listHtml.match(/<tbody>([\s\S]*?)<\/tbody>/);
+    if (!tbodyMatch) break;
 
-    while ((match = regex.exec(listHtml)) !== null) {
+    const trMatches = tbodyMatch[1].match(/<tr>([\s\S]*?)<\/tr>/g) || [];
+    if (trMatches.length === 0) break;
+
+    const pageItems = [];
+    for (const tr of trMatches) {
+      const tds = (tr.match(/<td[^>]*>([\s\S]*?)<\/td>/g) || []).map(cleanText);
+      const linkMatch = tr.match(/caseSlno=(\d+)/);
+      const caseSlno = linkMatch ? linkMatch[1] : '';
+      if (!caseSlno) continue;
+
+      const detailUrl = `${FSS_BASE_URL}/fss/job/fncCnflCase/view.do?caseSlno=${caseSlno}&menuNo=201195`;
+      const title = tds[3] || '';
+      const category = tds[1] || '보험';
+      const subCategory = tds[2] || '';
+      const regDate = (tds[4] || '').replace(/-/g, '');
+
       pageItems.push({
-        url: `${FSS_BASE_URL}${match[1]}`,
-        rawTitle: match[2]
+        caseSlno,
+        title,
+        category,
+        subCategory,
+        regDate,
+        url: detailUrl
       });
     }
 
@@ -195,22 +131,42 @@ async function ingestFssDisputes(startPage = 1, endPage = 60) {
     const promises = pageItems.map(async (item) => {
       if (existingUrls.has(item.url)) return null;
 
-      const { caseNumber, caseName } = parseFssTitle(item.rawTitle, item.url);
+      const caseNumber = parseCaseNumber(item.title, item.caseSlno);
+      if (existingCaseNos.has(caseNumber)) return null;
+
       const detailHtml = await fetchText(item.url);
-      const summary = parseFssBody(detailHtml);
+      if (!detailHtml) return null;
+
+      const text = cleanText(detailHtml);
+      let summary = '';
+      const startIdx = text.indexOf('▣ 민원내용');
+      if (startIdx !== -1) {
+        const endIdx = text.indexOf('정보관리 담당부서', startIdx);
+        summary = endIdx !== -1 ? text.substring(startIdx, endIdx) : text.substring(startIdx, startIdx + 1200);
+      } else {
+        const contentStart = text.indexOf('분쟁조정사례');
+        if (contentStart !== -1) {
+          summary = text.substring(contentStart, contentStart + 1000);
+        }
+      }
+
+      summary = cleanText(summary);
       if (!summary || summary.length < 40) return null;
 
+      let targetKeyword = item.subCategory ? item.subCategory.split('(')[0] : '분쟁조정';
+      if (targetKeyword.length < 2) targetKeyword = '보험금분쟁';
+
       return {
-        id: `FSS-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
-        source: 'fss-dispute',
-        rawResponseId: item.url,
+        id: `FSS-OFFICIAL-${item.caseSlno}`,
+        source: 'fss-official',
+        rawResponseId: item.caseSlno,
         caseNumber,
-        caseName: caseName || cleanText(item.rawTitle),
+        caseName: cleanText(item.title),
         courtName: '금융감독원 금융분쟁조정위원회',
-        judgmentDate: '',
-        summary: summary.substring(0, 1000),
+        judgmentDate: item.regDate || '',
+        summary: summary.substring(0, 1200),
         url: item.url,
-        targetKeyword: '분쟁조정',
+        targetKeyword,
         used: false,
         ingestedAt: new Date().toISOString()
       };
@@ -221,18 +177,19 @@ async function ingestFssDisputes(startPage = 1, endPage = 60) {
       if (res) {
         pool.push(res);
         existingUrls.add(res.url);
+        existingCaseNos.add(res.caseNumber);
         addedCount++;
       }
     }
 
-    if (page % 5 === 0) {
+    if (page % 5 === 0 || page === endPage) {
       savePool(pool);
-      console.log(`  💾 중간 동기화 완료 (누적 풀: ${pool.length}건, 신규: ${addedCount}건)`);
+      console.log(`  💾 중간 동기화 완료 (누적 풀: ${pool.length}건, 신규: ${addedCount}건, 페이지: ${page})`);
     }
   }
 
   savePool(pool);
-  console.log(`  ✅ [분조위 완료] 신규 추가: ${addedCount}건 / 전체 풀: ${pool.length}건`);
+  console.log(`  ✅ [금감원 공식 분조위 완료] 신규 추가: ${addedCount}건 / 전체 풀: ${pool.length}건`);
   return addedCount;
 }
 
@@ -310,12 +267,15 @@ async function main() {
 
   if (isIncremental) {
     // GitHub Actions 정기 워크플로우: 1초 만에 최신 1페이지 증분 동기화
-    await ingestFssDisputes(1, 1);
+    await ingestFssOfficialCases(1, 1);
   } else if (sourceArg === 'law') {
     await ingestLawPrecedents();
+  } else if (sourceArg === 'fss') {
+    await ingestFssOfficialCases(1, 21);
   } else {
-    // 기본 디폴트: 금융감독원 분조위 공식 결정문 전건 수집
-    await ingestFssDisputes(1, 60);
+    // 기본 디폴트: 금감원 공식 분조위 전수 + 법제처
+    await ingestFssOfficialCases(1, 21);
+    await ingestLawPrecedents();
   }
 
   const finalPool = loadPool();
@@ -326,4 +286,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { ingestFssDisputes, ingestLawPrecedents };
+module.exports = { ingestFssOfficialCases, ingestLawPrecedents };

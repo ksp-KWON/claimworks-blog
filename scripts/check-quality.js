@@ -12,6 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 const { normalizePost } = require('../src/lib/markdown-standard.js');
+const { BANNED_PHRASES, getUniversalSkeleton } = require('../src/lib/prompt-rules.js');
 
 const POSTS_DIR = path.join(process.cwd(), 'src/content/posts');
 
@@ -31,7 +32,22 @@ function normalizeFilename(filename) {
   return `${clean || 'post'}.md`;
 }
 
+function checkTemplateSelfConsistency() {
+  const skeleton = getUniversalSkeleton();
+  const violations = BANNED_PHRASES.filter((phrase) => skeleton.includes(phrase));
+
+  if (violations.length > 0) {
+    console.error('❌ [CQF 비상] 템플릿 자기모순 발견: 금지 목록에 있는 표현이 뼈대 템플릿(getUniversalSkeleton)에 포함되어 있습니다.');
+    violations.forEach((v) => console.error(`   - 위반 표현: "${v}"`));
+    process.exit(1); // 빌드/배포 즉각 중단!
+  }
+  console.log('✅ [CQF 게이트] 템플릿-금지목록 자기모순 검사 통과 (무결 확인)');
+}
+
 function main() {
+  // 0. 프롬프트 헌법 템플릿과 금지 목록 간 자기모순 기계적 검증 (CI 게이트키퍼)
+  checkTemplateSelfConsistency();
+
   if (!fs.existsSync(POSTS_DIR)) return;
   const files = fs.readdirSync(POSTS_DIR).filter((f) => f.endsWith('.md'));
   let modifiedCount = 0;

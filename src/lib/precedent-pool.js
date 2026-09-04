@@ -25,6 +25,9 @@ const STOP_WORDS = new Set([
   '보험', '사고', '청구', '지급', '기준', '분쟁', '손해', '면책', '인정', '대상', '여부', '관련', '사례'
 ]);
 
+// 🚨 공식 1차 출처 SSOT 허용 목록: 법제처 공식 API 및 금감원 공식 사이트 직접 수집 데이터만 허용
+const ALLOWED_SOURCES = new Set(['law.go.kr-api', 'fss-official']);
+
 /**
  * 풀에서 검증된 미사용 판례/분조위 1건 조회
  * @param {string} [keyword] - 검색 키워드 (선택)
@@ -44,8 +47,8 @@ function getVerifiedPrecedent(keyword = '') {
   const validItems = pool.filter(item => {
     if (item.used === true) return false;
     if (!item.caseNumber || !/\d/.test(item.caseNumber) || !item.courtName) return false;
-    if (!item.source || (!item.source.includes('law.go.kr') && !item.source.includes('fss-dispute') && !item.source.includes('fss-official'))) {
-      return false; // 공식 출처 도장이 없는 임의 데이터는 기계적으로 거부
+    if (!item.source || !ALLOWED_SOURCES.has(item.source)) {
+      return false; // 허용 목록에 없는 출처(예: 티스토리 fss-dispute) 영구 차단
     }
     return true;
   });

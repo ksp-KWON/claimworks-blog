@@ -260,7 +260,7 @@ ${precedentInfo}${rawSection}
   const modeInstruction = `[구글 E-E-A-T 최고 권위 전문 칼럼 창작 특명 (8대 옴니-인지 프로토콜)]
 1. [1단계: 거시적 본질 및 입체 탐색 (Step-Back & ToT/GoT)]: 사안의 세부 사실 이전에 상법/표준약관의 대원칙(Step-Back)을 먼저 규정하고, 보험사 면책 주장 vs 손해사정사 반박 논리를 2갈래 이상 분기 탐색(ToT/GoT)하여 thoughtProcess에 1~2문장으로 콤팩트하게 기술하십시오.
 2. [2단계: 정밀 실행 및 연쇄 추론 (CoT & ReAct & PoT)]: 원인 ➔ 진단 ➔ 면책 ➔ 반박 ➔ 장해 ➔ 보상의 필연적 인과관계 사슬(CoT)과 정확한 손해액 산출(PoT)을 4대 본문 챕터(1·2·3·4번)와 6대 무기에 담아 정밀 집필하십시오.
-3. [3단계: 자가 비판 및 일관성 검증 (Reflexion & Self-Consistency)]: 헌법 제10조(GFM 시맨틱 위계), 제1조(이모지 전면 배제), 대법원 판례 팩트 무결성을 스스로 교차 검증(Reflexion)하십시오.`;
+3. [3단계: 자가 비판 및 일관성 검증 (Reflexion & Self-Consistency)]: 헌법 제2조(W3C 시맨틱 위계), 제1조 1.3(이모지 전면 배제), 제9조 9.1(대법원 판례 팩트 무결성)을 스스로 교차 검증(Reflexion)하십시오.`;
 
   return `${getExpertRole()}
 

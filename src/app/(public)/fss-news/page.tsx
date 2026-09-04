@@ -490,12 +490,12 @@ export default function FssNewsPage() {
                       </ul>
                     </div>
 
-                    {/* 보상스쿨 수석 손해사정사 실무 코멘트 */}
+                    {/* 보상스쿨 공인 손해사정 실무 코멘트 */}
                     {item.comment && (
                       <div className="bg-[#fcf8e3]/40 dark:bg-[#fcf8e3]/5 p-4 rounded-none border border-[#faebcc] dark:border-[#faebcc]/10 space-y-2">
                         <div className="flex items-center gap-1.5 text-xs font-black text-[#8a6d3b] dark:text-[#c4a86f]">
                           <AppIcon name="shield-check" size={14} />
-                          <span>보상스쿨 수석 손해사정사 실무 코멘트</span>
+                          <span>보상스쿨 공인 손해사정 실무 코멘트</span>
                         </div>
                         <p className="text-xs text-gray-800 dark:text-gray-200 leading-relaxed font-medium pl-0.5">
                           {item.comment}

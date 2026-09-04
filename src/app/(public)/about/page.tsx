@@ -122,7 +122,7 @@ export default function AboutPage() {
                 국가공인 신체손해사정 실무
               </h3>
               <p className="text-[12px] sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed break-keep font-medium">
-                금융감독원 등록 신체손해사정사로서 수천 건의 교통사고, 배상책임, 후유장해 및 질병 보상 분쟁을 직접 수행하며 현장 중심의 승소 데이터를 축적했습니다.
+                금융감독원 등록 신체손해사정사로서 다수의 교통사고, 배상책임, 후유장해 및 질병 보상 분쟁을 직접 수행하며 현장 중심의 실무 데이터를 축적했습니다.
               </p>
             </div>
           </PremiumCard>
@@ -138,7 +138,7 @@ export default function AboutPage() {
                 언더라이팅 & 사기조사 최고 전문역
               </h3>
               <p className="text-[12px] sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed break-keep font-medium">
-                CKLU(생보심사)·APIU(개인보험심사)·CIFI(보험조사분석) 트리플 크라운을 달성하여 보험사의 의학적 삭감 명분을 사전에 완벽히 무력화합니다.
+                CKLU(생보심사)·APIU(개인보험심사)·CIFI(보험조사분석) 자격을 모두 취득하여 보험사의 의학적 삭감 근거를 사전에 면밀히 검토·대응합니다.
               </p>
             </div>
           </PremiumCard>
@@ -163,7 +163,7 @@ export default function AboutPage() {
                 </h3>
               </div>
               <p className="text-xs sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed break-keep font-medium">
-                수천 건의 자동차사고, 배상책임, 개인보험 장해 평가 실무를 직접 수행하며 피땀으로 얻어낸 <strong className="text-[var(--google-blue)] dark:text-[#8ab4f8]">현장 중심의 실무 노하우</strong>를 전달합니다.
+                다수의 자동차사고, 배상책임, 개인보험 장해 평가 실무를 직접 수행하며 축적한 <strong className="text-[var(--google-blue)] dark:text-[#8ab4f8]">현장 중심의 실무 노하우</strong>를 전달합니다.
               </p>
             </div>
           </PremiumCard>

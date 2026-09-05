@@ -12,7 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 const { normalizePost } = require('../src/lib/markdown-standard.js');
-const { BANNED_PHRASES, CORE_BANNED_KEYWORDS, getUniversalSkeleton } = require('../src/lib/prompt-rules.js');
+const { BANNED_PHRASES, CORE_BANNED_KEYWORDS, BANNED_REGEX_PATTERNS, getUniversalSkeleton } = require('../src/lib/prompt-rules.js');
 
 const POSTS_DIR = path.join(process.cwd(), 'src/content/posts');
 
@@ -35,10 +35,12 @@ function normalizeFilename(filename) {
 function checkTemplateSelfConsistency() {
   const skeleton = getUniversalSkeleton();
   const violations = BANNED_PHRASES.filter((phrase) => skeleton.includes(phrase));
+  const regexViolations = BANNED_REGEX_PATTERNS.filter(({ pattern }) => pattern.test(skeleton));
 
-  if (violations.length > 0) {
+  if (violations.length > 0 || regexViolations.length > 0) {
     console.error('❌ [CQF 비상] 템플릿 자기모순 발견: 금지 목록에 있는 표현이 뼈대 템플릿(getUniversalSkeleton)에 포함되어 있습니다.');
     violations.forEach((v) => console.error(`   - 위반 표현: "${v}"`));
+    regexViolations.forEach((v) => console.error(`   - 위반 패턴: [${v.label}] ${v.pattern}`));
     process.exit(1); // 빌드/배포 즉각 중단!
   }
   console.log('✅ [CQF 게이트] 템플릿-금지목록 자기모순 검사 통과 (무결 확인)');
@@ -70,6 +72,7 @@ function checkUIAndStaticQuality() {
   const pageFiles = getTargetFiles(APP_DIR, false);
   const componentFiles = getTargetFiles(COMPONENTS_DIR, true);
   const allFiles = [...pageFiles, ...componentFiles];
+
   let violationCount = 0;
 
   for (const filePath of allFiles) {
@@ -128,6 +131,16 @@ function checkUIAndStaticQuality() {
           recordedWords.add(word);
         }
       }
+
+      // 3) BANNED_REGEX_PATTERNS 어간 및 활용형 정규식 매칭
+      for (const { pattern, label } of BANNED_REGEX_PATTERNS) {
+        if (pattern.test(testLine) && !recordedWords.has(label)) {
+          console.error(`❌ [CQF 게이트] 어간/활용형 금지 패턴 적발: ${relativePath}:${i + 1} -> [${label}]`);
+          console.error(`   내용: ${trimmed}`);
+          violationCount++;
+          recordedWords.add(label);
+        }
+      }
     }
   }
 
@@ -135,7 +148,7 @@ function checkUIAndStaticQuality() {
     console.error(`❌ [CQF 비상] 총 ${violationCount}건의 금지 표현이 UI 컴포넌트 및 정적 페이지에서 적발되었습니다. 배포를 즉각 중단합니다.`);
     process.exit(1);
   }
-  console.log(`✅ [CQF 게이트] 정적 페이지 및 UI 컴포넌트(총 ${allFiles.length}개) 금지어 전수 검사 통과 (무결 확인)`);
+  console.log(`✅ [CQF 게이트] 정적 페이지, 라이브러리 및 UI 컴포넌트(총 ${allFiles.length}개) 금지어·패턴 전수 검사 통과 (무결 확인)`);
 }
 
 function main() {

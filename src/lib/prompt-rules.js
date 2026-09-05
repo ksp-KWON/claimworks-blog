@@ -42,6 +42,20 @@ const CORE_BANNED_KEYWORDS = [
   '무조건'
 ];
 
+// 활용형·어순 변형·맥락 결합형 정규식 금지 패턴 SSOT
+const BANNED_REGEX_PATTERNS = [
+  { pattern: /전액.*(지급|배상|보전|청구|쟁취|수령|보장|인용|명령)/, label: '전액 결과 단정형' },
+  { pattern: /일관되게.*(판시|판결|인정|적용|판단)/, label: '판례 일관성 과장형' },
+  { pattern: /(판례|법원).*(일관되게|항상|무조건|전부\s*인정|일괄\s*인정)/, label: '판례 일방성 과장형' },
+  { pattern: /쟁취/, label: '전투적 단어(쟁취)' },
+  { pattern: /원천\s*(무효|차단)/, label: '법률 효과 단정형(원천 무효/차단)' },
+  { pattern: /100%\s*(보장|인정|배상|승소|무과실|면책)/, label: '100% 단정형' },
+  { pattern: /승소율/, label: '승소율 과장' },
+  { pattern: /(지급을|배상을)\s*명령합니다/, label: '법원 명령 단정형' },
+  { pattern: /(판례|법원|재판부)[는이가]?.*(선고합니다|인정합니다|판단합니다|결정합니다|고수합니다|명령합니다|인용합니다)[\'\"`]?\s*\,?$/, label: '법원/판례 단정 서술 종결형' },
+  { pattern: /(판례|법원|재판부)[는이가]?\s+.*(선고합니다|판단합니다|명령합니다|고수합니다)/, label: '법원/판례 현재 단정형' }
+];
+
 // ── 1. 절대 헌법 규칙 (STRICT WRITING RULES) ───────────────────────────
 const STRICT_RULES = `
 ## 1. 글로벌 표준 마크다운(GFM) & W3C 시맨틱 위계 규칙 (절대 헌법)
@@ -597,6 +611,7 @@ accept인 경우, 일반 소비자가 읽기 쉬운 3줄 요약(summary), 손해
 module.exports = {
   BANNED_PHRASES,
   CORE_BANNED_KEYWORDS,
+  BANNED_REGEX_PATTERNS,
   STRICT_RULES,
   TOPIC_SCHEMA,
   CONTENT_SCHEMA,

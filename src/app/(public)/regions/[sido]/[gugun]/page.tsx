@@ -1,7 +1,7 @@
 import { REGIONS_DATA } from '@/lib/constants';
 import { Suspense } from 'react';
 import HospitalDataClient from './HospitalDataClient';
-import { getRegionContent } from '@/lib/region-content';
+import { getJurisdiction, JurisdictionInfo } from '@/lib/jurisdiction-data';
 import AppIcon from '@/components/ui/AppIcon';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 
@@ -24,11 +24,12 @@ export async function generateMetadata({ params }: { params: Promise<{ sido: str
   const { sido, gugun } = await params;
   const decodedSido = decodeURIComponent(sido);
   const decodedGugun = decodeURIComponent(gugun);
-  const content = getRegionContent(decodedSido, decodedGugun);
+  const jurisdiction = getJurisdiction(decodedSido, decodedGugun);
+  const courtName = jurisdiction ? jurisdiction.court : `${decodedSido} 관할 법원`;
   
   return {
-    title: `${decodedSido} ${decodedGugun} 손해사정 실무 및 의료기관 네트워크 | 보상스쿨`,
-    description: `${decodedSido} ${decodedGugun} (${content.archetypeName}) 관할 법원·검찰청 및 ${content.hospitalStat.totalCount}개 의료기관 연계 손해사정 실무 가이드입니다.`,
+    title: `${decodedSido} ${decodedGugun} 의료기관 및 관할 법원·검찰청 안내 | 보상스쿨`,
+    description: `${decodedSido} ${decodedGugun} 관내 의료기관 현황 및 ${courtName} 사법 관할 구역 안내 정보입니다.`,
     alternates: {
       canonical: `https://claim-works.com/regions/${encodeURIComponent(decodedSido)}/${encodeURIComponent(decodedGugun)}`,
     },
@@ -40,73 +41,34 @@ export default async function GugunPage({ params }: { params: Promise<{ sido: st
   const decodedSido = decodeURIComponent(sido);
   const decodedGugun = decodeURIComponent(gugun);
 
-  const content = getRegionContent(decodedSido, decodedGugun);
-  const { jurisdiction, hospitalStat } = content;
+  const jurisdiction: JurisdictionInfo = getJurisdiction(decodedSido, decodedGugun) || {
+    court: `${decodedSido} 관할 지방법원`,
+    prosecution: `${decodedSido} 관할 지방검찰청`,
+    highCourt: '관할 고등법원',
+    courtType: '본원',
+  };
 
   return (
     <div className="w-full space-y-8 pb-12">
-      {/* 1. 상단 타이틀 & 뱃지 헤더 (W3C H1) */}
+      {/* 1. 상단 타이틀 & 뱃지 헤더 */}
       <header className="space-y-3 pt-2">
         <div className="flex flex-wrap items-center gap-2">
           <PremiumBadge color="gray">
             {decodedSido} · {decodedGugun}
           </PremiumBadge>
           <PremiumBadge color="teal">
-            {content.archetypeName}
+            사법 및 의료기관 네트워크
           </PremiumBadge>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 dark:text-zinc-50">
-          {decodedSido} {decodedGugun} 손해사정 실무 가이드 & 의료기관 네트워크
+          {decodedSido} {decodedGugun} 의료기관 및 관할 사법기관 안내
         </h1>
         <p className="text-sm sm:text-base text-gray-600 dark:text-zinc-400">
-          관내 {hospitalStat.totalCount}개 의료기관 인프라 분석과 {jurisdiction.court} 관할 사법 절차를 결합한 전문 손해사정 핵심 가이드입니다.
+          {decodedSido} {decodedGugun} 관내 의료기관 인프라 현황과 {jurisdiction.court} 관할 사법 구역 안내 정보입니다.
         </p>
       </header>
 
-      {/* 2. 핵심 요약 박스 (W3C 라인 SVG + 샤프 모던 룩) */}
-      <section className="border border-blue-200/80 dark:border-blue-900/60 bg-blue-50/50 dark:bg-blue-950/20 p-5 rounded-none space-y-3">
-        <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-bold text-base">
-          <AppIcon name="lightbulb" size={20} className="text-blue-600 dark:text-blue-400" />
-          <h2>핵심 실무 요약</h2>
-        </div>
-        <ul className="space-y-2 text-sm leading-relaxed text-gray-800 dark:text-zinc-200">
-          {content.summaryBox.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2">
-              <span className="text-blue-600 dark:text-blue-400 font-bold mt-0.5">•</span>
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* 3. 지역 특화 심층 가이드 (H2 + 3대 표준 문단) */}
-      <article className="border border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 rounded-none space-y-4">
-        <div className="border-b border-gray-200/80 dark:border-zinc-800 pb-3">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-zinc-50">
-            {content.mainGuideTitle}
-          </h2>
-        </div>
-        <div className="space-y-4 text-sm sm:text-base leading-relaxed text-gray-700 dark:text-zinc-300">
-          {content.guideParagraphs.map((paragraph, idx) => (
-            <p key={idx} className="mb-4">
-              {paragraph}
-            </p>
-          ))}
-        </div>
-
-        {/* 전문가 팁 콜아웃 */}
-        <div className="mt-4 border-l-4 border-teal-500 bg-teal-50/50 dark:bg-teal-950/20 p-4 rounded-none space-y-1">
-          <div className="flex items-center gap-2 text-teal-900 dark:text-teal-200 font-bold text-sm">
-            <AppIcon name="shield-check" size={18} className="text-teal-600 dark:text-teal-400" />
-            <h3>{content.specialtyAdviceTitle}</h3>
-          </div>
-          <p className="text-sm text-gray-700 dark:text-zinc-300 leading-relaxed">
-            {content.specialtyAdviceContent}
-          </p>
-        </div>
-      </article>
-
-      {/* 4. 관할 사법기관 & 소송/조정 절차 카드 */}
+      {/* 2. 관할 사법기관 & 소송/조정 관할 안내 카드 */}
       <section className="border border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 rounded-none space-y-4">
         <div className="flex items-center gap-2 border-b border-gray-200/80 dark:border-zinc-800 pb-3">
           <AppIcon name="scale" size={20} className="text-gray-700 dark:text-zinc-300" />
@@ -134,11 +96,11 @@ export default async function GugunPage({ params }: { params: Promise<{ sido: st
         </div>
 
         <p className="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed pt-1">
-          {content.courtActionGuide}
+          {decodedGugun} 관내의 민사 분쟁 및 손해배상 소송은 {jurisdiction.court}에서 관할하며, 형사 수사 및 검찰 사무는 {jurisdiction.prosecution}에서 담당합니다. 1심 판결에 대한 상소 사건은 {jurisdiction.highCourt}에서 총괄 심리합니다.
         </p>
       </section>
 
-      {/* 5. 인터랙티브 의료기관 상세 검색 (클라이언트 하위 컴포넌트) */}
+      {/* 3. 인터랙티브 의료기관 상세 검색 (클라이언트 컴포넌트) */}
       <section className="space-y-4">
         <Suspense fallback={
           <div className="py-12 text-center border border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900">

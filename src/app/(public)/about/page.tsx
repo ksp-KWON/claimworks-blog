@@ -94,18 +94,23 @@ export default function AboutPage() {
         themeColor="purple"
         description="보험사의 상품 설계부터 언더라이팅 심사, 보상 조사 기법까지 전체 과정을 꿰뚫어 완벽한 반박 논리를 구축합니다."
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+        {/* 18년 실무이력 가로 1열 와이드 타임라인 카드 */}
+        <div className="space-y-3 sm:space-y-3.5">
           {/* STAGE 01 */}
           <PremiumCard borderColor="blue" hoverEffect watermarkIcon="book" className="!p-4 sm:!p-5">
             <div className="relative z-10 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 tracking-wider">STAGE 01</span>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[11px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 border border-blue-200 dark:border-blue-900 tracking-wider">
+                    STAGE 01
+                  </span>
+                  <h3 className="text-sm sm:text-[15.5px] font-bold text-[#202124] dark:text-[#e8eaed]">
+                    보험 상품 구조 & 약관 설계 정복
+                  </h3>
+                </div>
                 <PremiumBadge color="blue">2007 ~ 2015</PremiumBadge>
               </div>
-              <h3 className="text-[14.5px] sm:text-base font-bold text-[#202124] dark:text-[#e8eaed]">
-                보험 상품 구조 & 약관 설계 정복
-              </h3>
-              <p className="text-[12px] sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed break-keep font-medium">
+              <p className="text-xs sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed break-keep font-medium pt-2 border-t border-gray-100 dark:border-zinc-800/60">
                 생명보험·손해보험·제3보험·변액보험 공인 자격을 바탕으로, 보험사가 상품을 설계하는 메커니즘과 약관 조항의 뼈대를 완벽히 체득했습니다.
               </p>
             </div>
@@ -114,14 +119,18 @@ export default function AboutPage() {
           {/* STAGE 02 */}
           <PremiumCard borderColor="indigo" hoverEffect watermarkIcon="scale" className="!p-4 sm:!p-5">
             <div className="relative z-10 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 tracking-wider">STAGE 02</span>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[11px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 border border-indigo-200 dark:border-indigo-900 tracking-wider">
+                    STAGE 02
+                  </span>
+                  <h3 className="text-sm sm:text-[15.5px] font-bold text-indigo-600 dark:text-indigo-400">
+                    국가공인 신체손해사정 실무
+                  </h3>
+                </div>
                 <PremiumBadge color="indigo">2020 ~ 현재</PremiumBadge>
               </div>
-              <h3 className="text-[14.5px] sm:text-base font-bold text-indigo-600 dark:text-indigo-400">
-                국가공인 신체손해사정 실무
-              </h3>
-              <p className="text-[12px] sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed break-keep font-medium">
+              <p className="text-xs sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed break-keep font-medium pt-2 border-t border-gray-100 dark:border-zinc-800/60">
                 금융감독원 등록 신체손해사정사로서 다수의 교통사고, 배상책임, 후유장해 및 질병 보상 분쟁을 직접 수행하며 현장 중심의 실무 데이터를 축적했습니다.
               </p>
             </div>
@@ -130,14 +139,18 @@ export default function AboutPage() {
           {/* STAGE 03 */}
           <PremiumCard borderColor="green" hoverEffect watermarkIcon="award" className="!p-4 sm:!p-5">
             <div className="relative z-10 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">STAGE 03</span>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 border border-emerald-200 dark:border-emerald-900 tracking-wider">
+                    STAGE 03
+                  </span>
+                  <h3 className="text-sm sm:text-[15.5px] font-bold text-emerald-600 dark:text-emerald-400">
+                    언더라이팅 & 사기조사 최고 전문역
+                  </h3>
+                </div>
                 <PremiumBadge color="green">2023 ~ 2024</PremiumBadge>
               </div>
-              <h3 className="text-[14.5px] sm:text-base font-bold text-emerald-600 dark:text-emerald-400">
-                언더라이팅 & 사기조사 최고 전문역
-              </h3>
-              <p className="text-[12px] sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed break-keep font-medium">
+              <p className="text-xs sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed break-keep font-medium pt-2 border-t border-gray-100 dark:border-zinc-800/60">
                 CKLU(생보심사)·APIU(개인보험심사)·CIFI(보험조사분석) 자격을 모두 취득하여 보험사의 의학적 삭감 근거를 사전에 면밀히 검토·대응합니다.
               </p>
             </div>

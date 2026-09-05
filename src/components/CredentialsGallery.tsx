@@ -69,51 +69,59 @@ export default function CredentialsGallery() {
 
   return (
     <div className="space-y-4">
-      {/* 4대 공인 전문 라이선스 그리드 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+      {/* 4대 공인 전문 라이선스 가로 1열 와이드 카드 리스트 */}
+      <div className="space-y-3.5">
         {CREDENTIALS.map((item) => (
           <div
             key={item.id}
             onClick={() => setSelectedCredential(item)}
-            className="group relative bg-white dark:bg-[#202124] border border-gray-200/90 dark:border-zinc-800 rounded-none overflow-hidden shadow-sm hover:shadow-md hover:border-indigo-500/50 dark:hover:border-indigo-500/50 transition-all duration-300 cursor-pointer flex flex-col"
+            className="group relative bg-white dark:bg-[#202124] border border-gray-200/90 dark:border-zinc-800 rounded-none overflow-hidden shadow-sm hover:shadow-md hover:border-indigo-500/50 dark:hover:border-indigo-500/50 transition-all duration-300 cursor-pointer flex flex-col sm:flex-row items-center sm:items-stretch"
           >
-            {/* 상단 썸네일 프리뷰 */}
-            <div className="relative w-full aspect-[3/4] bg-gray-50 dark:bg-zinc-950 overflow-hidden border-b border-gray-100 dark:border-zinc-800/80 flex items-center justify-center p-2">
+            {/* 좌측 썸네일 프리뷰 */}
+            <div className="relative w-full sm:w-44 md:w-52 aspect-[4/3] sm:aspect-auto min-h-[140px] sm:min-h-0 bg-gray-50 dark:bg-zinc-950 overflow-hidden border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-zinc-800/80 shrink-0 flex items-center justify-center p-3">
               <Image
                 src={item.imageSrc}
                 alt={item.title}
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-contain p-1 group-hover:scale-105 transition-transform duration-300"
+                sizes="(max-width: 640px) 100vw, 220px"
+                className="object-contain p-1.5 group-hover:scale-105 transition-transform duration-300"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
-                <span className="text-[11px] font-bold text-white bg-black/70 px-2.5 py-1 rounded-none backdrop-blur-xs flex items-center gap-1.5 border border-white/20">
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span className="text-[11px] font-bold text-white bg-black/75 px-3 py-1.5 rounded-none backdrop-blur-xs flex items-center gap-1.5 border border-white/20 shadow-sm">
                   <AppIcon name="search" size={12} />
-                  증서 원본 보기
+                  증서 원본 확대
                 </span>
               </div>
             </div>
 
-            {/* 카드 정보 본문 */}
-            <div className="p-3.5 flex-1 flex flex-col justify-between space-y-2">
-              <div>
-                <div className="flex items-center justify-between gap-1 mb-1.5">
-                  <PremiumBadge color={item.badgeColor === 'amber' ? 'yellow' : item.badgeColor}>
-                    {item.date}
-                  </PremiumBadge>
-                  <span className="text-[10px] text-gray-400 dark:text-zinc-500 font-mono truncate">
-                    {item.regNo.split(' ')[0]}
+            {/* 우측 카드 정보 본문 */}
+            <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-2.5 w-full">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <PremiumBadge color={item.badgeColor === 'amber' ? 'yellow' : item.badgeColor}>
+                      {item.date}
+                    </PremiumBadge>
+                    <span className="text-xs text-gray-500 dark:text-zinc-400 font-medium">
+                      {item.issuer}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-gray-600 dark:text-zinc-400 font-mono font-semibold bg-gray-100 dark:bg-zinc-800/90 px-2 py-0.5 border border-gray-200/80 dark:border-zinc-700/80">
+                    등록번호 : {item.regNo}
                   </span>
                 </div>
-                <h4 className="text-sm font-extrabold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                  {item.title}
-                </h4>
-                <p className="text-[11px] text-gray-500 dark:text-zinc-400 font-medium mt-0.5">
-                  {item.issuer}
-                </p>
+
+                <div>
+                  <h4 className="text-base sm:text-[17px] font-extrabold text-[#202124] dark:text-[#e8eaed] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex flex-wrap items-baseline gap-2">
+                    <span>{item.title}</span>
+                    <span className="text-xs font-normal text-gray-400 dark:text-zinc-500 font-sans">
+                      ({item.subtitle})
+                    </span>
+                  </h4>
+                </div>
               </div>
 
-              <p className="text-[11px] text-gray-600 dark:text-zinc-400 leading-snug line-clamp-2 pt-2 border-t border-gray-100 dark:border-zinc-800/60">
+              <p className="text-xs sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed break-keep font-medium pt-2.5 border-t border-gray-100 dark:border-zinc-800/60">
                 {item.description}
               </p>
             </div>

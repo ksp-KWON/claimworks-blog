@@ -8,6 +8,7 @@ import { AdminHeaderBar } from './AdminHeader';
 import PremiumCard from '@/components/ui/PremiumCard';
 import PremiumButton from '@/components/ui/PremiumButton';
 import AppIcon from '@/components/ui/AppIcon';
+import { getAdminAuthHeader } from '@/lib/admin-auth';
 
 export interface ClaimsProgressEntry {
   id: string;
@@ -132,7 +133,9 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
   const fetchEvents = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/admin-manage?table=admin_calendar_events');
+      const res = await fetch('/api/admin-manage?table=admin_calendar_events', {
+        headers: getAdminAuthHeader(),
+      });
       const json = await res.json();
       
       if (json.success && Array.isArray(json.data)) {
@@ -342,7 +345,10 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
       if (editingEventId) {
         const res = await fetch(`/api/admin-manage?table=admin_calendar_events&id=${encodeURIComponent(editingEventId)}`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            ...getAdminAuthHeader(),
+          },
           body: JSON.stringify({
             date: modalForm.date,
             title: modalForm.title,
@@ -354,7 +360,10 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
       } else {
         const res = await fetch('/api/admin-manage?table=admin_calendar_events', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            ...getAdminAuthHeader(),
+          },
           body: JSON.stringify({
             date: modalForm.date,
             title: modalForm.title,
@@ -433,7 +442,10 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     try {
       await fetch(`/api/admin-manage?table=admin_calendar_events&id=${encodeURIComponent(eventItem.id)}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...getAdminAuthHeader(),
+        },
         body: JSON.stringify({
           content: JSON.stringify(fullPayload)
         })
@@ -472,7 +484,10 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     try {
       await fetch(`/api/admin-manage?table=admin_calendar_events&id=${encodeURIComponent(eventItem.id)}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...getAdminAuthHeader(),
+        },
         body: JSON.stringify({
           content: JSON.stringify(fullPayload)
         })
@@ -519,7 +534,10 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     try {
       await fetch(`/api/admin-manage?table=admin_calendar_events&id=${encodeURIComponent(eventItem.id)}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...getAdminAuthHeader(),
+        },
         body: JSON.stringify({
           content: JSON.stringify(fullPayload)
         })
@@ -543,7 +561,8 @@ export default function CalendarAdminPanel({ searchQuery = '', refreshCounter = 
     // 2) 서버 API를 통해 DB에서 영구 삭제
     try {
       const res = await fetch(`/api/admin-manage?table=admin_calendar_events&id=${encodeURIComponent(id)}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAdminAuthHeader(),
       });
       const json = await res.json();
       if (!json.success) {

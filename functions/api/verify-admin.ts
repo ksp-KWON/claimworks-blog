@@ -5,10 +5,17 @@ export async function onRequestPost(context: any) {
     const { password } = body;
     
     const userPw = String(password || '').trim();
-    const adminPw = env.ADMIN_PASSWORD ? String(env.ADMIN_PASSWORD).trim() : '9913006';
+    const adminPw = (env.ADMIN_PASSWORD || '').trim();
 
-    // 관리자 비밀번호 검증 (환경변수 및 기본값 9913006)
-    if (userPw === adminPw || userPw === '9913006') {
+    if (!adminPw) {
+      return new Response(JSON.stringify({ success: false, message: 'Server configuration error: ADMIN_PASSWORD is not configured' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // 관리자 비밀번호 검증 (오직 환경변수 기반)
+    if (userPw === adminPw) {
       return new Response(JSON.stringify({ success: true }), {
         headers: { 'Content-Type': 'application/json' },
       });

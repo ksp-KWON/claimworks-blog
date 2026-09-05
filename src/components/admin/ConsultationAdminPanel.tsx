@@ -10,6 +10,7 @@ import { AdminStatusSelect } from './AdminStatusSelect';
 import AdminPanelLayout from './AdminPanelLayout';
 import { AdminTableHeader } from './AdminHeader';
 import { formatAdminDateTime, formatAdminDate } from '@/lib/admin-utils';
+import { getAdminAuthHeader } from '@/lib/admin-auth';
 
 interface ConsultationAdminPanelProps {
   isSplitView: boolean;
@@ -45,6 +46,25 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
   const fetchConsultations = useCallback(async () => {
     setIsLoading(true);
     try {
+      // 1. 보안된 관리자 엔드포인트(/api/admin-manage) 우선 조회
+      const authHeader = getAdminAuthHeader();
+      if (Object.keys(authHeader).length > 0) {
+        try {
+          const res = await fetch('/api/admin-manage?table=consultations', {
+            headers: authHeader,
+          });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success && Array.isArray(json.data)) {
+              setConsultations(json.data.filter((c: any) => c.status !== '삭제'));
+              return;
+            }
+          }
+        } catch {
+          // 백엔드 실패 시 Supabase 직접 조회로 fallback
+        }
+      }
+
       const { data, error } = await supabase
         .from('consultations')
         .select('*')
@@ -117,7 +137,10 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
     try {
       const res = await fetch(`/api/admin-manage?table=consultations&id=${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...getAdminAuthHeader(),
+        },
         body: JSON.stringify({ status: newStatus })
       });
       const data = await res.json();
@@ -137,6 +160,7 @@ export default function ConsultationAdminPanel({ onNavigateToManage, searchQuery
     try {
       const res = await fetch(`/api/admin-manage?table=consultations&id=${id}`, {
         method: 'DELETE',
+        headers: getAdminAuthHeader(),
       });
       const data = await res.json();
       if (!data.success) {

@@ -9,13 +9,6 @@
  * - 8시간 유효 보안 세션 타임스탬프 자동 만료 메커니즘
  */
 
-// 마스터 비밀번호('9913006')의 정확한 SHA-256 정식 암호학적 해시값
-// sha256('9913006') = '4ee2255cce537d30721abb1847303f886fe2be3d033c31134640a50786c44abd'
-const MASTER_PASSWORD_HASH = '4ee2255cce537d30721abb1847303f886fe2be3d033c31134640a50786c44abd';
-
-// 개발/관리자 마스터 비밀번호 목록
-const ALLOWED_PASSWORDS = ['9913006', '0000', 'claimworks'];
-
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 5 * 60 * 1000; // 5분
 const SESSION_EXPIRY_MS = 8 * 60 * 60 * 1000; // 8시간
@@ -24,7 +17,21 @@ const STORAGE_KEYS = {
   FAILED_ATTEMPTS: 'cw_auth_fails',
   LOCKOUT_UNTIL: 'cw_auth_locked_until',
   SESSION: 'cw_auth_session',
+  ADMIN_KEY: 'cw_admin_key',
 };
+
+/**
+ * 관리자 API 호출용 인증 헤더 획득
+ */
+export function getAdminToken(): string {
+  if (typeof window === 'undefined') return '';
+  return sessionStorage.getItem(STORAGE_KEYS.ADMIN_KEY) || '';
+}
+
+export function getAdminAuthHeader(): Record<string, string> {
+  const token = getAdminToken();
+  return token ? { 'Authorization': `Bearer ${token}`, 'X-Admin-Key': token } : {};
+}
 
 /**
  * 문자열을 W3C 표준 SHA-256 다이제스트로 변환 (Hex String)
@@ -72,42 +79,10 @@ export function getLockoutState(): LockoutState {
 }
 
 /**
- * 로그인 시도 및 암호 검증
+ * 로그인 시도 및 암호 검증 (서버 API 검증 방식)
  */
 export async function authenticateAdmin(password: string): Promise<{ success: boolean; error?: string; lockoutState: LockoutState }> {
   const cleanPassword = password.trim();
-  const inputHash = await hashTextSHA256(cleanPassword);
-  
-  // 환경변수로 지정된 별도 관리자 비밀번호가 있을 경우 해당 해시도 허용
-  let customEnvHash = '';
-  if (process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
-    customEnvHash = await hashTextSHA256(process.env.NEXT_PUBLIC_ADMIN_PASSWORD);
-  }
-
-  // 올바른 비밀번호 검증 (SHA-256 해시 매칭 및 허용 목록)
-  const isMatch = 
-    inputHash === MASTER_PASSWORD_HASH || 
-    ALLOWED_PASSWORDS.includes(cleanPassword) ||
-    (customEnvHash && inputHash === customEnvHash);
-
-  if (isMatch) {
-    // 로그인 성공: 실패 횟수 및 잠금 즉시 초기화
-    localStorage.removeItem(STORAGE_KEYS.FAILED_ATTEMPTS);
-    localStorage.removeItem(STORAGE_KEYS.LOCKOUT_UNTIL);
-    
-    // 8시간 유효 보안 세션 발급
-    const sessionData = {
-      authenticated: true,
-      expiresAt: Date.now() + SESSION_EXPIRY_MS,
-    };
-    sessionStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(sessionData));
-    sessionStorage.setItem('admin_auth', 'true'); // 레거시 호환
-
-    return {
-      success: true,
-      lockoutState: { isLocked: false, remainingSeconds: 0, failedCount: 0 },
-    };
-  }
 
   // 잠금 상태 확인
   const currentLockout = getLockoutState();
@@ -116,6 +91,53 @@ export async function authenticateAdmin(password: string): Promise<{ success: bo
       success: false,
       error: `연속 비밀번호 오류로 시스템이 잠겼습니다. ${currentLockout.remainingSeconds}초 후에 다시 시도해주세요.`,
       lockoutState: currentLockout,
+    };
+  }
+
+  let isMatch = false;
+
+  // 1. 서버 사이드 인증 API 호출
+  try {
+    const res = await fetch('/api/verify-admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: cleanPassword }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        isMatch = true;
+      }
+    }
+  } catch {
+    // 오프라인 또는 서버 통신 불가 시 환경변수 Fallback
+  }
+
+  // 2. 환경변수 기반 로컬 개발 Fallback
+  if (!isMatch && process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
+    if (cleanPassword === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
+      isMatch = true;
+    }
+  }
+
+  if (isMatch) {
+    // 로그인 성공: 실패 횟수 및 잠금 즉시 초기화
+    localStorage.removeItem(STORAGE_KEYS.FAILED_ATTEMPTS);
+    localStorage.removeItem(STORAGE_KEYS.LOCKOUT_UNTIL);
+    
+    // 8시간 유효 보안 세션 발급 및 관리자 토큰 세션스토리지 저장
+    const sessionData = {
+      authenticated: true,
+      expiresAt: Date.now() + SESSION_EXPIRY_MS,
+    };
+    sessionStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(sessionData));
+    sessionStorage.setItem(STORAGE_KEYS.ADMIN_KEY, cleanPassword);
+    sessionStorage.setItem('admin_auth', 'true'); // 레거시 호환
+
+    return {
+      success: true,
+      lockoutState: { isLocked: false, remainingSeconds: 0, failedCount: 0 },
     };
   }
 
@@ -181,5 +203,6 @@ export function checkAdminSession(): boolean {
 export function clearAdminSession(): void {
   if (typeof window === 'undefined') return;
   sessionStorage.removeItem(STORAGE_KEYS.SESSION);
+  sessionStorage.removeItem(STORAGE_KEYS.ADMIN_KEY);
   sessionStorage.removeItem('admin_auth');
 }

@@ -1,6 +1,27 @@
+function isAuthorized(request: Request, env: any): boolean {
+  const authHeader = request.headers.get('Authorization') || '';
+  const customKey = request.headers.get('X-Admin-Key') || '';
+  const token = (authHeader.replace(/^Bearer\s+/i, '') || customKey).trim();
+  const adminPw = (env.ADMIN_PASSWORD || '').trim();
+
+  // 환경변수가 없거나 토큰이 불일치하면 즉시 거부
+  if (!adminPw || !token || token !== adminPw) {
+    return false;
+  }
+  return true;
+}
+
 export async function onRequestGet(context: any) {
   try {
     const { request, env } = context;
+
+    if (!isAuthorized(request, env)) {
+      return new Response(JSON.stringify({ success: false, message: 'Unauthorized: Admin authentication required' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const url = new URL(request.url);
     const table = url.searchParams.get('table');
 
@@ -58,6 +79,14 @@ export async function onRequestGet(context: any) {
 export async function onRequestPost(context: any) {
   try {
     const { request, env } = context;
+
+    if (!isAuthorized(request, env)) {
+      return new Response(JSON.stringify({ success: false, message: 'Unauthorized: Admin authentication required' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const url = new URL(request.url);
     const table = url.searchParams.get('table');
 
@@ -121,6 +150,14 @@ export async function onRequestPost(context: any) {
 export async function onRequestPatch(context: any) {
   try {
     const { request, env } = context;
+
+    if (!isAuthorized(request, env)) {
+      return new Response(JSON.stringify({ success: false, message: 'Unauthorized: Admin authentication required' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const url = new URL(request.url);
     const id = url.searchParams.get('id');
     const table = url.searchParams.get('table');
@@ -185,6 +222,13 @@ export async function onRequestPatch(context: any) {
 export async function onRequestDelete(context: any) {
   try {
     const { request, env } = context;
+
+    if (!isAuthorized(request, env)) {
+      return new Response(JSON.stringify({ success: false, message: 'Unauthorized: Admin authentication required' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
     const url = new URL(request.url);
     const id = url.searchParams.get('id');
     const table = url.searchParams.get('table');

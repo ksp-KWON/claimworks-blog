@@ -10,6 +10,7 @@ import PremiumBadge from '@/components/ui/PremiumBadge';
 import { AdminStatusSelect } from './AdminStatusSelect';
 import AppIcon from '@/components/ui/AppIcon';
 import { formatAdminDateTime } from '@/lib/admin-utils';
+import { getAdminAuthHeader } from '@/lib/admin-auth';
 
 interface SessionWithMeta extends ChatSession {
   last_content?: string;
@@ -251,7 +252,10 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
     try {
       const res = await fetch(`/api/admin-manage?table=chat_sessions&id=${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...getAdminAuthHeader(),
+        },
         body: JSON.stringify({ status: newStatus })
       });
       const data = await res.json();
@@ -278,6 +282,7 @@ export default function ChatAdminPanel({ searchQuery = '', sortType = 'date', re
     try {
       const res = await fetch(`/api/admin-manage?table=chat_sessions&id=${id}`, {
         method: 'DELETE',
+        headers: getAdminAuthHeader(),
       });
       const data = await res.json();
       

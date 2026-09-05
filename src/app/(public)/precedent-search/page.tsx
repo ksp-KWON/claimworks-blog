@@ -579,7 +579,10 @@ export default function PrecedentSearchPage() {
                       <h3 className="text-[15px] font-bold text-[#202124] dark:text-[#e8eaed] leading-snug group-hover:text-blue-600 transition-colors truncate">
                         {prec.title}
                       </h3>
-                      <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">사건번호: {prec.caseNo}</p>
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">
+                        {searchTab === 'court' ? '판례번호: ' : '금감원 분쟁조정 결정번호: '}
+                        {prec.caseNo.replace(/^금융분쟁조정위원회\s*/, '')}
+                      </p>
                     </div>
                     
                     <div className="shrink-0 flex items-center justify-end sm:justify-center w-6 h-6 text-gray-300 group-hover:text-blue-600 transition-colors">

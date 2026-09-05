@@ -11,6 +11,7 @@ import PremiumHeading from '@/components/ui/PremiumHeading';
 import PremiumBadge from '@/components/ui/PremiumBadge';
 import PremiumButton from '@/components/ui/PremiumButton';
 import AppIcon from '@/components/ui/AppIcon';
+import { parsePrecedentBadge } from '@/lib/precedent-badge';
 
 export const dynamicParams = false;
 
@@ -194,12 +195,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <PremiumBadge color={getCategoryMeta(post.category || '').themeColor as any}>
             {post.category || '보상가이드'}
           </PremiumBadge>
-          {post.caseNumber && (
-            <span className="px-2.5 py-1 font-bold rounded-none bg-[#fce8e6] dark:bg-[#c5221f]/10 text-[#c5221f] dark:text-[#f28b82] border border-[#f28b82]/30 flex items-center gap-1.5">
-              <AppIcon name="scale" size={13} />
-              <span>사건번호: {post.caseNumber}</span>
-            </span>
-          )}
+          {post.caseNumber && (() => {
+            const badge = parsePrecedentBadge(post.caseNumber);
+            if (!badge) return null;
+            return (
+              <span className={`px-2.5 py-1 font-bold rounded-none flex items-center gap-1.5 ${badge.badgeClass}`}>
+                <AppIcon name={badge.icon} size={13} />
+                <span>{badge.label}</span>
+              </span>
+            );
+          })()}
           {/* 발행일 */}
           <time dateTime={post.date} className="text-[#5f6368] dark:text-[#9aa0a6] font-medium tracking-wide flex items-center gap-1">
             <AppIcon name="calendar" size={13} />

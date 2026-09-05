@@ -7,7 +7,7 @@ category:
   - 판례·분쟁조정
   - 소화기내과
 date: '2026-08-27'
-caseNumber: 금융분쟁조정위원회 제2012-30호
+caseNumber: 제2012-30호
 published: true
 tags:
   - 대장내시경천공

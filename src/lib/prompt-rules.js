@@ -344,7 +344,7 @@ const TOPIC_SCHEMA = {
     },
     caseNumber: {
       type: "STRING",
-      description: "판례·분쟁조정 카테고리인 경우 대법원/하급심 사건번호(예: 2019다214248) 또는 금융분쟁조정위원회 결정번호(예: 금융분쟁조정위원회 제2023-15호). 일반 주제인 경우 빈 문자열."
+      description: "판례·분쟁조정 카테고리인 경우 법원 판례번호(예: 2019다214248) 또는 금감원 분쟁조정 결정번호(예: 제2023-15호). 일반 주제인 경우 빈 문자열."
     },
     specialtyCategory: {
       type: "STRING",
@@ -388,7 +388,7 @@ function getTopicPlanningPrompt(keyword, trendTitle, existingPosts, targetCatego
   const feedbackSection = planFeedback ? `\n[🚨 기획안 재시도 피드백 (반드시 준수)]\n${planFeedback}\n` : '';
   const isLegal = targetCategory === '판례·분쟁조정' || targetCategory === '판례·법률 해석';
   const legalInstruction = isLegal
-    ? `\n[판례·분쟁조정 카테고리 특화 지침]\n- 대한민국 대법원 주요 판례(예: 2019다214248) 또는 금융감독원 금융분쟁조정위원회 결정례(예: 금융분쟁조정위원회 제2023-15호) 중 오늘의 이슈에 가장 부합하는 실존 선례를 바탕으로 기획하십시오.\n- 가공의 사건번호나 결정번호는 절대 창작하지 마시고, 실존하는 번호를 caseNumber 필드에 명시하십시오.\n`
+    ? `\n[판례·분쟁조정 카테고리 특화 지침]\n- 대한민국 법원 주요 판례(예: 2019다214248) 또는 금융감독원 금융분쟁조정위원회 결정례(예: 제2023-15호) 중 오늘의 이슈에 가장 부합하는 실존 선례를 바탕으로 기획하십시오.\n- 가공의 판례번호나 결정번호는 절대 창작하지 마시고, 실존하는 번호를 caseNumber 필드에 명시하십시오.\n`
     : '';
 
   return `당신은 '보상스쿨'의 최정상 콘텐츠 기획자이자 마케터입니다.
@@ -406,7 +406,7 @@ ${feedbackSection}
    - title: SEO 최적화 제목 (딱딱한 법률 용어를 버리고, 일상 언어와 실무적 혜택을 결합한 강력한 훅킹)
    - summary: 구글 검색 결과에 노출될 150자 이내의 클릭 유도용 매력적인 한글 요약문
    - category: 판례·분쟁조정|사망·자살 보험금|질병진단·실손|교통사고 보상|배상책임·의료|근재·산재 사고|장해평가·면책|보상가이드 중 1개
-   - caseNumber: 실존하는 사건번호/결정번호(판례·분쟁조정 카테고리인 경우) 또는 빈 문자열
+   - caseNumber: 실존하는 판례번호 또는 금감원 분쟁조정 결정번호(판례·분쟁조정 카테고리인 경우) 또는 빈 문자열
    - specialtyCategory: 사안과 직결된 전문 진료과목
    - tags: 관련 태그 5개
    - keywords: 타겟 키워드 목록

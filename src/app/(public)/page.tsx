@@ -5,13 +5,13 @@ import type { Metadata } from "next";
 import PremiumHeaderBanner from "@/components/ui/PremiumHeaderBanner";
 
 export const metadata: Metadata = {
-  title: "보상스쿨 | 정도와 승소율의 전문 손해사정 그룹",
+  title: "보상스쿨 | 정도와 신뢰의 손해사정 실무 전문 그룹",
   description: "단순 보험금부터 까다로운 면책 분쟁까지, 유능한 손해사정 전문가 그룹 보상스쿨이 정당한 권리를 되찾아 드립니다. 수년간 축적된 방대한 실무 경험과 수많은 성공 사례로 검증된 압도적인 보상 노하우를 지금 무료 1:1 상담으로 확인해 보세요.",
   alternates: {
     canonical: "https://claim-works.com",
   },
   openGraph: {
-    title: "보상스쿨 | 정도와 승소율의 전문 손해사정 그룹",
+    title: "보상스쿨 | 정도와 신뢰의 손해사정 실무 전문 그룹",
     description: "단순 보험금부터 까다로운 면책 분쟁까지, 유능한 손해사정 전문가 그룹 보상스쿨이 정당한 권리를 되찾아 드립니다. 수년간 축적된 방대한 실무 경험과 수많은 성공 사례로 검증된 압도적인 보상 노하우를 지금 무료 1:1 상담으로 확인해 보세요.",
     url: "https://claim-works.com",
     siteName: "보상스쿨 전문 손해사정 그룹",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "보상스쿨 | 정도와 승소율의 전문 손해사정 그룹",
+    title: "보상스쿨 | 정도와 신뢰의 손해사정 실무 전문 그룹",
     description: "수년간 축적된 방대한 실무 경험과 수많은 성공 사례로 검증된 압도적인 보상 노하우를 지금 무료 1:1 상담으로 확인해 보세요.",
     images: ["https://claim-works.com/og-image.png"],
   },
@@ -98,7 +98,7 @@ export default function Home() {
           theme="blue"
           icon="book"
           title="보상스쿨 매거진"
-          badges={['대한민국 최고 손해사정 실무 칼럼', { text: '8대 전문 분야 300+ 심층 분석', color: 'gray' }]}
+          badges={['손해사정 실무 전문 칼럼', { text: '8대 전문 분야 300+ 심층 분석', color: 'gray' }]}
           description="사망·후유장해부터 실손·질병 진단까지, 보상스쿨 전문가 그룹의 분야별 보상 가이드와 최신 판례 분석을 전달합니다."
           rightLink={{ href: '/blog', text: '전체보기' }}
         />

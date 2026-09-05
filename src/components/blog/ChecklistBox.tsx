@@ -82,7 +82,7 @@ export default function ChecklistBox({ items }: ChecklistBoxProps) {
       {count >= 3 && (
         <div className="mt-4 bg-[#fce8e6] dark:bg-[#c5221f]/10 px-4 py-3 flex items-start gap-2 rounded-none">
           <p className="text-[#c5221f] dark:text-[#f28b82] text-[13.5px] font-semibold leading-relaxed">
-            <strong className="font-extrabold">{count}개 이상 해당</strong>됩니다. 숨은 보상금이 있을 가능성이 높으니 전문가 정밀 진단을 권장합니다.
+            <strong className="font-extrabold">{count}개 이상 해당</strong>됩니다. 정당한 보상 항목이 누락되었을 가능성이 있으니 전문가 정밀 진단을 권장합니다.
           </p>
         </div>
       )}

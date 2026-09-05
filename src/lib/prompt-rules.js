@@ -14,6 +14,7 @@
 const { naverBlogPrompt } = require('./naver-blog-prompt.js');
 
 // ── 0. 표현 제한 및 금지 목록 SSOT (Single Source of Truth) ─────────
+// 문장형 금지 표현 (글로벌 헌법 CQF 기준)
 const BANNED_PHRASES = [
   // 은유·비유
   '마의 구간', '숨은 보상금', '함정', '두 마리 토끼', '싸움', '전쟁터', '평행선',
@@ -24,6 +25,21 @@ const BANNED_PHRASES = [
   // 자기 과장·서열적·확정형
   '대한민국 1호', '수석', '최고 권위', '타협 없는', '100% 무조건 보장', '전액 수령 보장', '전액 수령',
   '수천 건', '트리플 크라운', '피땀'
+];
+
+// UI 컴포넌트 및 정적 페이지 핵심 단어 단위 차단 목록 (부분 문자열 매칭 SSOT)
+// ※ '1호'나 '최고'처럼 법조문(제1호 서식, 최고(催告))과 충돌할 수 있는 단어는 과장 맥락 결합형으로 정밀화
+const CORE_BANNED_KEYWORDS = [
+  '100%',
+  '수천',
+  '수석',
+  '대한민국 1호', '국내 1호', '업계 1호',
+  '최고 권위', '최고 전문가', '최고 전문역', '대한민국 최고', '업계 최고', '최고의 ', '최고 손해사정',
+  '트리플',
+  '무력화',
+  '피땀',
+  '승소',
+  '무조건'
 ];
 
 // ── 1. 절대 헌법 규칙 (STRICT WRITING RULES) ───────────────────────────
@@ -580,6 +596,7 @@ accept인 경우, 일반 소비자가 읽기 쉬운 3줄 요약(summary), 손해
 
 module.exports = {
   BANNED_PHRASES,
+  CORE_BANNED_KEYWORDS,
   STRICT_RULES,
   TOPIC_SCHEMA,
   CONTENT_SCHEMA,

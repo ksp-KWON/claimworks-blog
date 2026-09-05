@@ -165,7 +165,7 @@ export default function ConsultationPage() {
         theme="blue"
         icon="chat"
         title="보상스쿨 1:1 무료 상담 신청"
-        badges={['국가공인 손해사정사 직접 검토', { text: '100% 비밀 보장', color: 'green' }]}
+        badges={['국가공인 손해사정사 직접 검토', { text: '상담 내용 철저한 비밀 유지', color: 'green' }]}
         description="보험사의 일방적인 삭감·면책 주장, 혼자 고민하지 마세요. 손해사정사가 사고 경위와 의학적 판례를 사전에 정밀 분석하여 명쾌한 권익 수호 솔루션을 제시해 드립니다."
       />
 
@@ -425,7 +425,7 @@ export default function ConsultationPage() {
               <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-zinc-800 px-2 py-0.5 border border-emerald-200/80 dark:border-emerald-800/80">STEP 03</span>
               <h2 className="text-sm sm:text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
                 <AppIcon name="shield-check" size={16} className="text-emerald-600 dark:text-emerald-400" />
-                보상스쿨 3대 고객 안심 보장
+                보상스쿨 3대 고객 안심 원칙
               </h2>
             </div>
             <span className="text-xs text-gray-400 font-medium hidden sm:inline-block">안심 보안 원칙</span>
@@ -437,14 +437,14 @@ export default function ConsultationPage() {
               <div className="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1.5">
                 <div className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
                   <AppIcon name="shield-check" size={16} className="text-emerald-600" />
-                  스팸·영업 전화 0%
+                  스팸·영업 전화 차단
                 </div>
                 <div className="text-xs text-gray-500 font-medium">상담 완료 후 무단 마케팅 절대 금지</div>
               </div>
               <div className="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 space-y-1.5">
                 <div className="text-xs sm:text-[13.5px] font-extrabold text-gray-900 dark:text-white flex items-center justify-center gap-1.5">
                   <AppIcon name="lock" size={16} className="text-emerald-600" />
-                  100% 비밀 보장
+                  철저한 비밀 유지
                 </div>
                 <div className="text-xs text-gray-500 font-medium">담당 손해사정사 1인만 비공개 열람</div>
               </div>

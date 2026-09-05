@@ -41,7 +41,11 @@ const initialData: LiabilityData = {
   futureTreatmentCost: 2000000,
 };
 
-// ── 판례 기준 호프만 계수 계산기 (월 단리 5/12% 할인) ──
+// ── [법적 산출 근거] ──
+// 1. 호프만 계수: 대법원 판례 기준 중간이자 공제 공식 (월 단리 5/12% 할인 및 수치 한도 240 제한)
+// 2. 일반 육체노동 가동연한: 대법원 2019.2.21. 선고 2018다248909 전원합의체 판결 (만 65세 기준)
+// 3. 위자료 및 과실상계: 서울중앙지방법원 손해배상 실무제요 기준 (사망·장해 기준액 1억원 및 과실 60% 반영식)
+// 4. 개호비 산정: 대법원 판례상 도시일용근로자 노임단가 및 통계청 간병인 노임 기준
 function getHoffmanCoeff(months: number): number {
   let coeff = 0;
   for (let m = 1; m <= months; m++) {
@@ -307,7 +311,7 @@ export default function LiabilityCalculator({ hideHeader = false }: { hideHeader
                 <div>
                   <div className={labelHeaderClass}>
                     <label className={labelTextClass}>입원 일수 (휴업손해)</label>
-                    <span className={labelSubClass}>100% 실질 손해액</span>
+                    <span className={labelSubClass}>과실상계 전 실손해액</span>
                   </div>
                   <input
                     type="number"
@@ -519,10 +523,12 @@ export default function LiabilityCalculator({ hideHeader = false }: { hideHeader
         </div>
       </div>
 
-      {/* 5. 전문가 조언 및 액션 버튼 바 */}
+      {/* 5. 법적 면책 안내 및 전문가 상담 안내 */}
       <div className="bg-amber-50 dark:bg-amber-950/30 p-4 border border-amber-200/80 dark:border-amber-900/40 text-xs sm:text-[13px] leading-relaxed text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
         <AppIcon name="shield-alert" size={16} className="text-amber-600 shrink-0 mt-0.5" />
-        <p>위 결과는 <strong>법원 손해배상 소송 판례(호프만 단리 수식)</strong> 기준 산출액입니다. 상대방 보험사의 자체 지급기준(라이프니츠 계수 등)보다 판례 기준이 통상 20~40% 높게 산정될 수 있습니다.</p>
+        <p>
+          이 계산 결과는 약관 지급기준과 법원 판례를 참고하여 산출한 예상 추정치로, 실제 지급되는 보험금과 다를 수 있습니다. 과실 비율, 개별 특약, 의무기록 등 세부 사항에 따라 정확한 손해사정 결과는 달라지므로, 정밀한 산정이 필요하시다면 보상스쿨 손해사정사에게 편하게 문의해 주세요.
+        </p>
       </div>
 
       <div className="space-y-3 pt-1">

@@ -92,7 +92,7 @@ export default function AboutPage() {
         title="2007년부터 이어진 18년 보험 전주기(全週期) 실무 이력"
         icon={<AppIcon name="trending-up" size={20} />}
         themeColor="purple"
-        description="보험사의 상품 설계부터 언더라이팅 심사, 보상 조사 기법까지 전체 과정을 꿰뚫어 완벽한 반박 논리를 구축합니다."
+        description="보험사의 상품 설계부터 언더라이팅 심사, 보상 조사 기법까지 전체 과정을 꿰뚫어 체계적인 반박 논리를 구축합니다."
       >
         {/* 18년 실무이력 가로 1열 와이드 타임라인 카드 */}
         <div className="space-y-3 sm:space-y-3.5">
@@ -111,7 +111,7 @@ export default function AboutPage() {
                 <PremiumBadge color="blue">2007 ~ 2015</PremiumBadge>
               </div>
               <p className="text-xs sm:text-[13px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed break-keep font-medium pt-2 border-t border-gray-100 dark:border-zinc-800/60">
-                생명보험·손해보험·제3보험·변액보험 공인 자격을 바탕으로, 보험사가 상품을 설계하는 메커니즘과 약관 조항의 뼈대를 완벽히 체득했습니다.
+                생명보험·손해보험·제3보험·변액보험 공인 자격을 바탕으로, 보험사가 상품을 설계하는 메커니즘과 약관 조항의 뼈대를 깊이 있게 체득했습니다.
               </p>
             </div>
           </PremiumCard>
@@ -145,7 +145,7 @@ export default function AboutPage() {
                     STAGE 03
                   </span>
                   <h3 className="text-sm sm:text-[15.5px] font-bold text-emerald-600 dark:text-emerald-400">
-                    언더라이팅 & 사기조사 최고 전문역
+                    언더라이팅 & 사기조사 공인 심사역
                   </h3>
                 </div>
                 <PremiumBadge color="green">2023 ~ 2024</PremiumBadge>

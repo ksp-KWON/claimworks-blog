@@ -12,7 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 const { normalizePost } = require('../src/lib/markdown-standard.js');
-const { BANNED_PHRASES, getUniversalSkeleton } = require('../src/lib/prompt-rules.js');
+const { BANNED_PHRASES, CORE_BANNED_KEYWORDS, getUniversalSkeleton } = require('../src/lib/prompt-rules.js');
 
 const POSTS_DIR = path.join(process.cwd(), 'src/content/posts');
 
@@ -45,8 +45,9 @@ function checkTemplateSelfConsistency() {
 }
 
 const APP_DIR = path.join(process.cwd(), 'src/app');
+const COMPONENTS_DIR = path.join(process.cwd(), 'src/components');
 
-function getPageFiles(dir) {
+function getTargetFiles(dir, isComponents = false) {
   let results = [];
   if (!fs.existsSync(dir)) return results;
   const list = fs.readdirSync(dir);
@@ -55,43 +56,94 @@ function getPageFiles(dir) {
     const stat = fs.statSync(filePath);
     if (stat && stat.isDirectory()) {
       if (file === 'api' || file === 'admin' || file === 'node_modules') continue;
-      results = results.concat(getPageFiles(filePath));
-    } else if (file === 'page.tsx') {
-      results.push(filePath);
+      results = results.concat(getTargetFiles(filePath, isComponents));
+    } else if (file.endsWith('.tsx')) {
+      if (isComponents || file === 'page.tsx') {
+        results.push(filePath);
+      }
     }
   }
   return results;
 }
 
-function checkStaticPagesQuality() {
-  const pageFiles = getPageFiles(APP_DIR);
+function checkUIAndStaticQuality() {
+  const pageFiles = getTargetFiles(APP_DIR, false);
+  const componentFiles = getTargetFiles(COMPONENTS_DIR, true);
+  const allFiles = [...pageFiles, ...componentFiles];
   let violationCount = 0;
 
-  for (const filePath of pageFiles) {
+  for (const filePath of allFiles) {
     const content = fs.readFileSync(filePath, 'utf8');
+    const lines = content.split('\n');
     const relativePath = path.relative(process.cwd(), filePath);
+    let inBlockComment = false;
 
-    for (const phrase of BANNED_PHRASES) {
-      if (content.includes(phrase)) {
-        console.error(`❌ [CQF 게이트] 정적 페이지 금지 표현 적발: ${relativePath} -> "${phrase}"`);
-        violationCount++;
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i];
+      const trimmed = line.trim();
+
+      // 다중 라인 블록 주석 스킵
+      if (inBlockComment) {
+        if (trimmed.includes('*/')) inBlockComment = false;
+        continue;
+      }
+      if (trimmed.startsWith('/*')) {
+        if (!trimmed.includes('*/')) inBlockComment = true;
+        continue;
+      }
+
+      // 한 줄 주석 스킵
+      if (trimmed.startsWith('//') || trimmed.startsWith('{/*')) continue;
+
+      // CSS 레이아웃 스타일의 100% 속성은 정상 레이아웃이므로 필터링
+      let testLine = line;
+      testLine = testLine.replace(/width\s*[:=]\s*['"]?100%['"]?/g, '');
+      testLine = testLine.replace(/height\s*[:=]\s*['"]?100%['"]?/g, '');
+      testLine = testLine.replace(/max-width\s*[:=]\s*['"]?100%['"]?/g, '');
+
+      // 인라인 주석(//) 뒤 내용 제거
+      const commentIdx = testLine.indexOf('//');
+      if (commentIdx >= 0) {
+        testLine = testLine.slice(0, commentIdx);
+      }
+
+      const recordedWords = new Set();
+
+      // 1) 헌법 BANNED_PHRASES 매칭
+      for (const phrase of BANNED_PHRASES) {
+        if (testLine.includes(phrase) && !recordedWords.has(phrase)) {
+          console.error(`❌ [CQF 게이트] UI 컴포넌트/정적 페이지 금지 표현 적발: ${relativePath}:${i + 1} -> "${phrase}"`);
+          console.error(`   내용: ${trimmed}`);
+          violationCount++;
+          recordedWords.add(phrase);
+        }
+      }
+
+      // 2) UI 핵심 단어 단위 매칭 (CORE_BANNED_KEYWORDS - SSOT)
+      for (const word of CORE_BANNED_KEYWORDS) {
+        if (testLine.includes(word) && !recordedWords.has(word)) {
+          console.error(`❌ [CQF 게이트] UI 컴포넌트/정적 페이지 금지 단어 적발: ${relativePath}:${i + 1} -> "${word}"`);
+          console.error(`   내용: ${trimmed}`);
+          violationCount++;
+          recordedWords.add(word);
+        }
       }
     }
   }
 
   if (violationCount > 0) {
-    console.error(`❌ [CQF 비상] 총 ${violationCount}건의 금지 표현이 정적 페이지 컴포넌트에서 적발되었습니다. 배포를 즉각 중단합니다.`);
+    console.error(`❌ [CQF 비상] 총 ${violationCount}건의 금지 표현이 UI 컴포넌트 및 정적 페이지에서 적발되었습니다. 배포를 즉각 중단합니다.`);
     process.exit(1);
   }
-  console.log(`✅ [CQF 게이트] 정적 페이지(${pageFiles.length}개) 금지 목록 전수 검사 통과 (무결 확인)`);
+  console.log(`✅ [CQF 게이트] 정적 페이지 및 UI 컴포넌트(총 ${allFiles.length}개) 금지어 전수 검사 통과 (무결 확인)`);
 }
 
 function main() {
   // 0. 프롬프트 헌법 템플릿과 금지 목록 간 자기모순 기계적 검증 (CI 게이트키퍼)
   checkTemplateSelfConsistency();
 
-  // 1. 전사 정적 페이지 컴포넌트(src/app/**/page.tsx) 금지 목록 기계적 전수 검사
-  checkStaticPagesQuality();
+  // 1. 전사 정적 페이지 및 UI 컴포넌트 금지 목록 기계적 전수 검사
+  checkUIAndStaticQuality();
 
   if (!fs.existsSync(POSTS_DIR)) return;
   const files = fs.readdirSync(POSTS_DIR).filter((f) => f.endsWith('.md'));

@@ -44,7 +44,7 @@ export default function AiCommentBox({ sourceText, type, className = '' }: AiCom
     <div className={`bg-amber-50/40 dark:bg-amber-950/20 p-4 rounded-none border border-amber-200/80 dark:border-amber-900/40 space-y-2 ${className}`}>
       <div className="flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-amber-300">
         <AppIcon name="book" size={16} />
-        <span>보상스쿨 수석 손해사정사 실무 코멘트</span>
+        <span>보상스쿨 대표 손해사정사 실무 코멘트</span>
       </div>
       
       <div className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium pl-1 min-h-[2.5rem]">

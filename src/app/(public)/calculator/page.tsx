@@ -88,7 +88,7 @@ const CALCULATORS: CalculatorItem[] = [
     step: 'CALCULATOR 02',
     title: '실손의료비 보상 계산기',
     subtitle: '1세대 구실손부터 5세대 실손까지 전 세대 지원',
-    description: '가입 시기별 세대 약관(1~5세대)을 자동 반영하여 입원 100% 보장부터 외래 통원 공제, 3대 비급여 특약(도수치료·비급여주사·MRI) 예상 지급액을 산출합니다.',
+    description: '가입 시기별 세대 약관(1~5세대)을 자동 반영하여 입원 본인부담금 0원 혜택부터 외래 통원 공제, 3대 비급여 특약(도수치료·비급여주사·MRI) 예상 지급액을 산출합니다.',
     features: ['1~5세대 세대별 공제율', '병원 규모별 차등 공제', '3대 비급여 특약 정밀 분리'],
     icon: 'hospital',
     href: '/calculator/medical',
@@ -126,7 +126,7 @@ export default function CalculatorIndex() {
         theme="purple"
         icon="calculator"
         title="스마트 보상금·합의금 계산기 센터"
-        badges={['국가공인 손해사정 실무 연산', { text: '대법원 판례·약관 100% 반영', color: 'gray' }]}
+        badges={['국가공인 손해사정 실무 연산', { text: '대법원 판례 및 표준약관 기준 산출', color: 'gray' }]}
         description="복잡한 보험 약관과 판례 산정식을 손해사정 실무 알고리즘으로 체계화했습니다. 해당하는 사고 유형의 계산기를 선택하시면 예상 보상금과 세부 산출 명세서를 1분 만에 실시간으로 확인하실 수 있습니다."
       />
 
@@ -209,7 +209,7 @@ export default function CalculatorIndex() {
         <AppIcon name="shield-check" size={18} className="text-amber-600 shrink-0 mt-0.5" />
         <div>
           <p className="font-bold mb-0.5">보상스쿨 계산기 이용 안내</p>
-          <p className="opacity-90">모든 계산기는 <strong>별도의 회원가입이나 개인정보 입력 없이 100% 무료</strong>로 이용하실 수 있습니다. 산출된 결과는 PDF로 다운로드하거나 링크로 공유할 수 있으며, 정밀 검토가 필요한 경우 손해사정사 1:1 상담을 연결해 드립니다.</p>
+          <p className="opacity-90">모든 계산기는 <strong>별도의 회원가입이나 비용 없이 무료</strong>로 이용하실 수 있습니다. 산출된 결과는 PDF로 다운로드하거나 링크로 공유할 수 있으며, 정밀 검토가 필요한 경우 손해사정사 1:1 상담을 연결해 드립니다.</p>
         </div>
       </div>
     </div>

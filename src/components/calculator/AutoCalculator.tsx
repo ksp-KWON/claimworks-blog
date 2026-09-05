@@ -65,7 +65,11 @@ export default function AutoCalculator({ hideHeader = false }: { hideHeader?: bo
   };
   const parse = (val: string) => Math.max(0, Number(val.replace(/[^0-9]/g, '')) || 0);
 
-  // ── 대법원 호프만 계수 연산 (PoT Engine) ──
+  // ── [법적 산출 근거] ──
+  // 1. 호프만 계수: 대법원 판례 기준 월 단리 5/12% 할인 및 수치 한도 240 제한
+  // 2. 일반 육체노동 가동연한: 대법원 2019.2.21. 선고 2018다248909 전원합의체 판결 (만 65세 기준)
+  // 3. 상해급수별 위자료: 자동차손해배상보장법 시행령 [별표 1] 및 자동차보험 표준약관 대인배상 지급기준
+  // 4. 휴업손해 인정률(85%): 금융감독원 자동차보험 표준약관 대인배상 휴업손해 인정 기준
   const getHoffmanCoefficient = (months: number) => {
     let sum = 0;
     for (let i = 1; i <= months; i++) {
@@ -551,10 +555,12 @@ export default function AutoCalculator({ hideHeader = false }: { hideHeader?: bo
         </div>
       </div>
 
-      {/* 5. 전문가 조언 및 액션 버튼 바 */}
+      {/* 5. 법적 면책 안내 및 전문가 상담 안내 */}
       <div className="bg-amber-50 dark:bg-amber-950/30 p-4 border border-amber-200/80 dark:border-amber-900/40 text-xs sm:text-[13px] leading-relaxed text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
         <AppIcon name="shield-alert" size={16} className="text-amber-600 shrink-0 mt-0.5" />
-        <p>위 결과는 <strong>보험회사 대인배상 약관 지급기준</strong> 참고용입니다. 실제 소송 판례 기준(특인) 적용 시 수천만 원 이상 증액될 수 있으므로 조기 합의 전 손해사정 전문가와의 상담을 적극 권장합니다.</p>
+        <p>
+          이 계산 결과는 약관 지급기준과 법원 판례를 참고하여 산출한 예상 추정치로, 실제 지급되는 보험금과 다를 수 있습니다. 과실 비율, 개별 특약, 의무기록 등 세부 사항에 따라 정확한 손해사정 결과는 달라지므로, 합의 전 정밀한 산정이 필요하시다면 보상스쿨 손해사정사에게 편하게 문의해 주세요.
+        </p>
       </div>
 
       <div className="space-y-3 pt-1">

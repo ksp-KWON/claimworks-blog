@@ -32,7 +32,7 @@ const initialMedicalData: MedicalInsuranceData = {
 };
 
 const GENERATIONS = [
-  { id: 1, label: '1세대', period: '~09.09', note: '자기부담금 0% (입원 100% 보장)' },
+  { id: 1, label: '1세대', period: '~09.09', note: '자기부담금 0% (입원 본인부담금 없음)' },
   { id: 2, label: '2세대', period: '09.10~17.03', note: '자기부담금 10% 또는 20% 표준화' },
   { id: 3, label: '3세대', period: '17.04~21.06', note: '기본형(10~20%) + 3대비급여특약(30%)' },
   { id: 4, label: '4세대', period: '21.07~현재', note: '급여 20%, 비급여 30% 공제 (비급여 차등제)' },
@@ -59,7 +59,12 @@ export default function MedicalCalculator({ hideHeader = false }: { hideHeader?:
   };
   const parse = (val: string) => Math.max(0, Number(val.replace(/[^0-9]/g, '')) || 0);
 
-  // ── 약관 세대별 본인부담금 산출 엔진 (PoT Engine) ──
+  // ── [법적 산출 근거] ──
+  // 1. 1세대 (구실손, ~2009.09): 금융감독원 표준화 이전 실손의료비 약관 (입원 전액 보상, 외래 5,000원 공제)
+  // 2. 2세대 (표준화 실손, 2009.10~2017.03): 실손의료보험 표준약관 (자기부담금 10%/20%, 의원 1만/병원 1.5만/상급종합 2만)
+  // 3. 3세대 (착한실손, 2017.04~2021.06): 실손의료보험 표준약관 기본형 및 3대 비급여 특약(도수·주사·MRI 30% 공제)
+  // 4. 4세대 (2021.07~현재): 금융감독원 4세대 실손의료보험 표준약관 (급여 20%, 비급여 30% 차등 공제)
+  // 5. 5세대 (개편안): 금융위원회 실손보험 개편 방향안 반영
   const calculateResult = () => {
     const formulas: string[] = [];
     const totalCovered = data.coveredCost;
@@ -77,7 +82,7 @@ export default function MedicalCalculator({ hideHeader = false }: { hideHeader?:
         coveredPayout = totalCovered;
         nonCoveredPayout = totalNormalNonCovered + totalSpecialNonCovered;
         totalDeduction = 0;
-        formulas.push(`1세대 입원: 본인부담금 0원 (100% 전액 지급)`);
+        formulas.push(`1세대 입원: 본인부담금 0원 (자기부담금 없는 지급 기준)`);
       } else {
         const deduct = 5000 * days;
         const total = totalCovered + totalNormalNonCovered + totalSpecialNonCovered;
@@ -529,10 +534,12 @@ export default function MedicalCalculator({ hideHeader = false }: { hideHeader?:
         </div>
       </div>
 
-      {/* 5. 전문가 조언 및 액션 버튼 바 */}
+      {/* 5. 법적 면책 안내 및 전문가 상담 안내 */}
       <div className="bg-amber-50 dark:bg-amber-950/30 p-4 border border-amber-200/80 dark:border-amber-900/40 text-xs sm:text-[13px] leading-relaxed text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
         <AppIcon name="shield-alert" size={16} className="text-amber-600 shrink-0 mt-0.5" />
-        <p>위 결과는 <strong>표준 실손의료비 약관</strong> 기준 단순 산출액입니다. 가입 시기 및 특약(비급여 3대 특약 등), 연간 자기부담금 한도(200만 원) 초과 여부에 따라 실제 지급액이 달라질 수 있습니다.</p>
+        <p>
+          이 계산 결과는 약관 지급기준과 법원 판례를 참고하여 산출한 예상 추정치로, 실제 지급되는 보험금과 다를 수 있습니다. 과실 비율, 개별 특약, 의무기록 등 세부 사항에 따라 정확한 손해사정 결과는 달라지므로, 청구 전 정밀한 산정이 필요하시다면 보상스쿨 손해사정사에게 편하게 문의해 주세요.
+        </p>
       </div>
 
       <div className="space-y-3 pt-1">

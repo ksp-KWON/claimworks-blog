@@ -115,7 +115,7 @@ export default function SharedOGImage({
               lineHeight: 1.2,
             }}
           >
-            정도와 승소율의 전문 손해사정 그룹
+            정도와 신뢰의 손해사정 실무 전문 그룹
           </div>
           <div
             style={{
@@ -191,7 +191,7 @@ export default function SharedOGImage({
             color: '#64748b',
           }}
         >
-          손해사정 최고 전문가 1:1 권익 수호
+          손해사정 실무 전문가 1:1 권익 수호
         </div>
       </div>
     </div>

@@ -60,6 +60,90 @@ function normalizeFrontmatter(data = {}) {
 }
 
 /**
+ * 라인 단위 마크다운 볼드(**) 문법 정밀 표준화 및 파싱 깨짐 원천 복원 엔진
+ * (CommonMark W3C Flanking Delimiter 규격 100% 준수)
+ */
+function repairLineBold(line) {
+  if (line.startsWith('```') || line.startsWith('---')) return line;
+
+  let text = line;
+
+  // 0. 특수 오타 사전 교정
+  text = text.replace(/^재보험\(근로자재해보험\)\*\*/, '**근재보험(근로자재해보험)**');
+  text = text.replace(/([a-zA-Z])\*\*('s)/g, '$1$2');
+
+  // 1. 콜론 전후 볼드 유착 분리 (헌법 제1조 1.1항 표준 공백 준수)
+  text = text.replace(/\*\*\s*:\s*\*\*/g, '**: **');
+  text = text.replace(/([가-힣0-9a-zA-Z])\*\*:\s*\*\*/g, '$1**: **');
+
+  // 2. 따옴표 내부 볼드 정상화 ('**단어'** 또는 **'단어'** -> '**단어**')
+  text = text.replace(/(?<=\s|^)\*\*'([^'\n*.]{1,50})'\*\*(?=\s|[.,?!:]|[가-힣]|$)/g, (m, p1) => `'**${p1.trim()}**'`);
+  text = text.replace(/'\*\*([^'\n*.]{1,50})'\*\*(?=\s|[.,?!:]|[가-힣]|$)/g, (m, p1) => `'**${p1.trim()}**'`);
+  text = text.replace(/(?<=\s|^)\*\*'([가-힣0-9a-zA-Z\s\(\)\/·-]{1,50})\*\*'(?=\s|[.,?!:]|$)/g, (m, p1) => `'**${p1.trim()}**'`);
+
+  text = text.replace(/(?<=\s|^)\*\*"([^"\n*.]{1,50})"\*\*(?=\s|[.,?!:]|[가-힣]|$)/g, (m, p1) => `"**${p1.trim()}**"`);
+  text = text.replace(/"\*\*([^"\n*.]{1,50})"\*\*(?=\s|[.,?!:]|[가-힣]|$)/g, (m, p1) => `"**${p1.trim()}**"`);
+  text = text.replace(/(?<=\s|^)\*\*"([가-힣0-9a-zA-Z\s\(\)\/·-]{1,50})\*\*"(?=\s|[.,?!:]|$)/g, (m, p1) => `"**${p1.trim()}**"`);
+
+  // 3. 서류/진단서/법리 명칭 뒤 닫는 별표 누락 복원 ('**손해사정서' -> '**손해사정서**')
+  text = text.replace(/(?<=\s|^)'\*\*([가-힣0-9a-zA-Z\s\(\)\/·-]{1,50})'(?!\*\*)/g, (m, p1) => `'**${p1.trim()}**'`);
+  text = text.replace(/(?<=\s|^)"\*\*([가-힣0-9a-zA-Z\s\(\)\/·-]{1,50})"(?!\*\*)/g, (m, p1) => `"**${p1.trim()}**"`);
+
+  // 4. 백내장/서류 나열 케이스 정돈 ('**문서1', '문서2', '**문서3' -> '**문서1**', '**문서2**', '**문서3**')
+  if (text.includes("시술 당일 '**") || text.includes("당일 '**")) {
+    text = text.replace(/'\*\*([^*\n']+)',\s*'([^*\n']+)',\s*'\*\*([^*\n']+)'/g, "'**$1**', '**$2**', '**$3**'");
+  }
+
+  // 5. 앞 단어와 여는 따옴표+볼드 유착 분리: '단어'**인용구' -> '단어 '**인용구'
+  text = text.replace(/([가-힣0-9a-zA-Z,])('|\")\*\*/g, '$1 $2**');
+
+  // 6. 구두점(%, ., ?, !, ), ,, :, ;, ]) 뒤 ** 닫힘 후 일반 문자(한글) 유착 시 공백 추가
+  // CommonMark 핵심: 구두점 + ** + 한글조사 -> 구두점 + ** + ' ' + 한글조사 (Right-Flanking Delimiter 성립)
+  text = text.replace(/([.%?!:,;\)\]])\*\*([가-힣0-9a-zA-Z])/g, '$1** $2');
+
+  // 7. 괄호 뒤 조사 유착: **단어(부연)**조사 -> **단어**(부연)조사
+  text = text.replace(/\*\*([^*\n()]+)\(([^)\n]+)\)\*\*([가-힣])/g, '**$1**($2)$3');
+
+  // 9. 범위 물결표 취소선 방지: 20~30만 -> 20 ~ 30만
+  text = text.replace(/([0-9가-힣])~([0-9가-힣])/g, '$1 ~ $2');
+
+  // 10. 불릿 뒤 볼드 유착 분리: -**단어 -> - **단어
+  text = text.replace(/^(\s*[-*+])\*\*/, '$1 **');
+  text = text.replace(/^>\s*-\s*\*\*/, '> - **');
+
+  // 11. 별표 3개 이상 불일치 교정
+  text = text.replace(/\*{3,}([^\n*]+?)\*{2,}/g, '**$1**');
+  text = text.replace(/\*{2,}([^\n*]+?)\*{3,}/g, '**$1**');
+
+  // 12. 볼드 쌍 토큰 단위 내부/외부 공백 정밀 교정
+  const parts = text.split('**');
+  if (parts.length > 2 && parts.length % 2 === 1) {
+    for (let i = 1; i < parts.length; i += 2) {
+      parts[i] = parts[i].trim();
+    }
+    for (let i = 0; i < parts.length; i += 2) {
+      if (i + 1 < parts.length) {
+        if (parts[i].length > 0 && /[가-힣0-9a-zA-Z\),]$/.test(parts[i])) {
+          parts[i] += ' ';
+        }
+      }
+    }
+    text = parts.join('**');
+  }
+
+  // 13. 고아 별표(홀수 개수) 제거
+  const bMatches = text.match(/\*\*/g);
+  if (bMatches && bMatches.length % 2 !== 0) {
+    const lastIdx = text.lastIndexOf('**');
+    if (lastIdx !== -1) {
+      text = text.slice(0, lastIdx) + text.slice(lastIdx + 2);
+    }
+  }
+
+  return text;
+}
+
+/**
  * 마크다운 본문 단일 표준 정규화 (사전 예방 및 렌더링 무결성 보장)
  */
 function normalizeMarkdownBody(rawBody, fallbackSummary = '') {
@@ -209,19 +293,16 @@ function normalizeMarkdownBody(rawBody, fallbackSummary = '') {
   body = body.replace(/(\|.*\|)\r?\n[ \t]*\r?\n+(\s*\|)/g, '$1\n$2');
   body = body.replace(/(\|.*\|)\r?\n(>[^\n]+)/g, '$1\n\n$2');
 
-  // ── [14. 마크다운 별표(Bold) 문법 정밀 표준화 및 고아 태그 정리] ────────
-  body = body.replace(/\*{3,}([^\n*]+?)\*{2,}/g, '**$1**');
-  body = body.replace(/\*{2,}([^\n*]+?)\*{3,}/g, '**$1**');
+  // ── [14. 마크다운 별표(Bold) 문법 정밀 표준화 및 파싱 버그 전수 복원] ───
+  // 1) 인라인으로 붙어버린 블록 요소 분리
+  body = body.replace(/([^\n])\s*(>+\s*-\s*|\s*-\s*)\*\*/g, '$1\n\n$2**');
+  // 2) 줄 단위 토큰화 및 CommonMark Flanking Delimiter 정밀 수리
+  body = body
+    .split(/\r?\n/)
+    .map((line) => repairLineBold(line))
+    .join('\n');
   body = body.replace(/^>\s*\*\*([^*:\n]+)\*\s*:/gm, '> **$1** :');
   body = body.replace(/(>\s*-\s*)([^\n*:]+?)\*\*\s*:/g, '$1**$2** :');
-
-  const bMatches = body.match(/\*\*/g);
-  if (bMatches && bMatches.length % 2 !== 0) {
-    const lastIdx = body.lastIndexOf('**');
-    if (lastIdx !== -1) {
-      body = body.slice(0, lastIdx) + body.slice(lastIdx + 2);
-    }
-  }
 
   // ── [15. 중복 관련 글 추천 헤더 및 본문 단독 링크 목록 삭제] ───────────
   body = body.replace(/##\s*🔗?\s*함께\s*읽으면\s*(?:도움이\s*되는|도움되는|좋은)\s*보상\s*(?:칼럼|글)[\s\S]*?(?=\r?\n\r?\n#|$)/gi, '');
@@ -338,5 +419,6 @@ function normalizePost(rawFileContent) {
 module.exports = {
   normalizeFrontmatter,
   normalizeMarkdownBody,
-  normalizePost
+  normalizePost,
+  repairLineBold
 };

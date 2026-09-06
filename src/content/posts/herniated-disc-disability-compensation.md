@@ -48,7 +48,7 @@ published: true
 
 ## 3. 허리디스크 후유장해보험금 100% 수령 3단계 실무 절차
 
-1. **사고 직후 요추 정밀 MRI 영상 CD 및 판독지 확보**: **Rupture**, **Extrusion**, **Sequestration** 영문 진단명을 확인합니다.
+1. **사고 직후 요추 정밀 MRI 영상 CD 및 판독지 확보** : Rupture, Extrusion, Sequestration 영문 진단명을 확인합니다.
 
 2. **사고 6개월 경과 시점 근전도 검사(EMG) 및 대학병원 장해진단** : 하지 방사통과 신경근 압박 잔존 상태를 입증합니다.
 

@@ -231,8 +231,8 @@ export const sharedComponents: Components & Record<string, any> = {
   ),
   th: ({ children, style, ...props }: any) => (
     <th
-      style={style}
-      className="bg-slate-100/90 dark:bg-zinc-800/90 p-3.5 font-extrabold text-[#111827] dark:text-[#f3f4f6] border-b-2 border-slate-300 dark:border-zinc-700 tracking-tight whitespace-nowrap text-center"
+      style={{ ...style, textAlign: 'center' }}
+      className="bg-slate-100/90 dark:bg-zinc-800/90 p-3.5 font-bold font-extrabold text-[#111827] dark:text-[#f3f4f6] border-b-2 border-slate-300 dark:border-zinc-700 tracking-tight whitespace-nowrap text-center !text-center"
       {...props}
     >
       {children}

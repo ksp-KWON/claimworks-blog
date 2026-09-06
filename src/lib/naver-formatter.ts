@@ -157,8 +157,7 @@ function createNaverRenderer() {
   renderer.table = function({ header, rows }) {
     let out = '<table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; margin: 24px 0; font-size: 13.5px; line-height: 1.5;">\n<thead><tr style="background-color: #f1f5f9;">';
     header.forEach(cell => {
-      const align = cell.align || 'center';
-      out += `<th style="padding: 10px 12px; font-weight: bold; color: #1e293b; border: 1px solid #cbd5e1; text-align: ${align}; vertical-align: middle; background-color: #f1f5f9;">${this.parser.parseInline(cell.tokens)}</th>`;
+      out += `<th style="padding: 10px 12px; font-weight: bold; color: #1e293b; border: 1px solid #cbd5e1; text-align: center; vertical-align: middle; background-color: #f1f5f9;">${this.parser.parseInline(cell.tokens)}</th>`;
     });
     out += '</tr></thead>\n<tbody>';
 

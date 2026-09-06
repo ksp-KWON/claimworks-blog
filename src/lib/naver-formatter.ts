@@ -11,7 +11,7 @@
  */
 
 import { marked } from 'marked';
-import { BLOG_TONE_TOKENS, getToneColor, getKeywordTone, BlogTone } from './blog-tokens';
+import { BLOG_TONE_TOKENS, getToneColor, getKeywordTone, parseBoldTone, BlogTone } from './blog-tokens';
 
 export interface NaverFormatOptions {
   title?: string;
@@ -214,6 +214,14 @@ function createNaverRenderer() {
 
   renderer.link = function({ href, text }) {
     return `<a href="${href}" style="color: #1a73e8; text-decoration: underline; font-weight: bold;" target="_blank" rel="noopener noreferrer">${text}</a>`;
+  };
+
+  // 8. 볼드 강조 (네이버 스마트에디터 전용 파스텔톤 하이라이트 & 접두사 자동 분리)
+  renderer.strong = function({ tokens }) {
+    const text = this.parser.parseInline(tokens);
+    const { tone, cleanText } = parseBoldTone(text);
+    const token = BLOG_TONE_TOKENS[tone].hex;
+    return `<strong style="font-weight: bold; background-color: ${token.highlightBg}; color: ${token.highlightText}; padding: 2px 6px; margin: 0 2px; border-radius: 4px;">${cleanText}</strong>`;
   };
 
   return renderer;

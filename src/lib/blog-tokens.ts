@@ -262,3 +262,46 @@ export function getKeywordTone(text: string): BlogTone {
 
   return 'blue';
 }
+
+/**
+ * 5대 톤 접두사 매핑 테이블 (생성 시점 AI 명시적 지정)
+ * - R: 위험·경고 (red)
+ * - E: 지급·승소 (green / emerald)
+ * - A: 핵심·체크 (yellow / amber)
+ * - P: 전문법리·의학 (purple / indigo)
+ * - B: 일반 기본 (blue)
+ */
+export const TONE_PREFIX_MAP: Record<string, BlogTone> = {
+  R: 'red',
+  E: 'green',
+  A: 'yellow',
+  P: 'purple',
+  B: 'blue',
+  r: 'red',
+  e: 'green',
+  a: 'yellow',
+  p: 'purple',
+  b: 'blue',
+};
+
+export const TONE_PREFIX_REGEX = /^([REAPB]):\s*/i;
+
+/**
+ * 볼드 텍스트 톤 판별 및 접두사 분리 엔진 (웹 렌더러 & 네이버 변환기 공통 SSOT)
+ * 1. AI 생성 접두사(^([REAPB]):)가 있는 경우: AI의 명시적 문맥 판단 100% 채택 및 접두사 제거
+ * 2. 접두사가 없는 경우: 기존 368개 칼럼 호환성을 위해 getKeywordTone() 키워드 매칭으로 안전하게 폴백
+ */
+export function parseBoldTone(rawText: string): { tone: BlogTone; cleanText: string; hasPrefix: boolean } {
+  const text = (rawText || '').trim();
+  const match = text.match(TONE_PREFIX_REGEX);
+
+  if (match) {
+    const prefix = match[1].toUpperCase();
+    const tone = TONE_PREFIX_MAP[prefix] || 'blue';
+    const cleanText = text.replace(TONE_PREFIX_REGEX, '').trim();
+    return { tone, cleanText, hasPrefix: true };
+  }
+
+  return { tone: getKeywordTone(text), cleanText: text, hasPrefix: false };
+}
+

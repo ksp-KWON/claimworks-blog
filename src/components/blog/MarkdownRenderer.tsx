@@ -13,7 +13,7 @@ import PremiumHeading from '../ui/PremiumHeading';
 import PremiumCard from '../ui/PremiumCard';
 import AppIcon from '../ui/AppIcon';
 
-import { BLOG_TONE_TOKENS, getToneColor as getTokenTone, getKeywordTone, BlogTone } from '@/lib/blog-tokens';
+import { BLOG_TONE_TOKENS, getToneColor as getTokenTone, getKeywordTone, parseBoldTone, TONE_PREFIX_REGEX, BlogTone } from '@/lib/blog-tokens';
 
 const SCROLL_OFFSET = 140;
 
@@ -22,6 +22,19 @@ const extractTextFromNode = (n: any): string => {
   if (Array.isArray(n)) return n.map(extractTextFromNode).join('');
   if (n?.props?.children) return extractTextFromNode(n.props.children);
   return '';
+};
+
+const cleanBoldChildren = (node: React.ReactNode): React.ReactNode => {
+  if (typeof node === 'string') {
+    return node.replace(TONE_PREFIX_REGEX, '');
+  }
+  if (Array.isArray(node) && node.length > 0) {
+    if (typeof node[0] === 'string') {
+      const first = node[0].replace(TONE_PREFIX_REGEX, '');
+      return [first, ...node.slice(1)];
+    }
+  }
+  return node;
 };
 
 // 헤딩 톤온톤 컬러 매핑 (헌법 제10조 시맨틱 위계)
@@ -107,15 +120,16 @@ export const sharedComponents: Components & Record<string, any> = {
   ol: ({ children }) => <ol className="list-decimal ml-5 sm:ml-6 my-5 space-y-2.5 text-[15.5px] sm:text-[16px] text-gray-800 dark:text-[#e8eaed] marker:font-bold marker:text-[#1A73E8] dark:marker:text-[#8ab4f8]">{children}</ol>,
   li: ({ children }) => <li className="pl-1 leading-[1.8] break-keep">{children}</li>,
 
-  // 헌법 제1조 톤온톤 파스텔 키워드 강조 자동 매핑
+  // 헌법 제1조 톤온톤 파스텔 키워드 강조 자동 매핑 (생성 시점 AI 명시적 접두사 우선 + 키워드 폴백)
   strong: ({ children }) => {
     const text = extractTextFromNode(children).trim();
-    const tone = getKeywordTone(text);
+    const { tone, hasPrefix } = parseBoldTone(text);
     const toneClass = BLOG_TONE_TOKENS[tone].tailwind.highlightClass;
+    const displayContent = hasPrefix ? cleanBoldChildren(children) : children;
 
     return (
       <strong className={`font-bold px-1.5 py-0.5 mx-0.5 rounded-md ${toneClass}`}>
-        {children}
+        {displayContent}
       </strong>
     );
   },
